@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -245,11 +245,7 @@ function eamHistoryTab(mode){const box=document.getElementById('eamHistoryView')
 function eamPick(cat,code){const defaults={court:'COURT-01',leak:'A-001',env:'ENV-01',safety:'SAFE-02',fire:'EQ-01',equipment:'EQ-04',temp:'EQ-08',light:'LR-01'};window.__eamCat=cat||'court';window.__eamSelCode=code||defaults[window.__eamCat];render()}
 function eamToggleForm(){const e=document.getElementById('eamRegisterForm');if(e)e.classList.toggle('show')}
 function eamShowHistory(){const e=document.querySelector('.eam-history');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})}
-{const box=document.getElementById('eamHistoryView');if(!box)return;const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];const code=window.__eamSelCode||'';const a=A.find(x=>x.asset_code===code);const hs=a?H.filter(v=>v.asset_id===a.id||v.asset_code===code):[];const ins=a?I.filter(v=>v.asset_id===a.id||v.asset_code===code):[];if(mode==='inspection')box.innerHTML=`<div class="history-single"><h3>🔎 점검 이력 <span>${ins.length}건</span></h3>${ins.map(v=>`<div class="hist-row"><b>${xEsc(v.result||'-')}</b><span>${xEsc(v.inspector_name||'-')}</span><time>${time(v.inspection_date)}</time></div>`).join('')||'<div class="empty">등록된 점검 이력이 없습니다.</div>'}</div>`;else if(mode==='all')box.innerHTML=renderEamHistory(hs,ins);else box.innerHTML=`<div class="history-single"><h3>🛠 고장·수리 이력 <span>${hs.length}건</span></h3>${hs.map(v=>`<div class="hist-row"><b>${xEsc(v.event_type||'조치')}</b><span>${xEsc(v.description||'-')}</span><time>${time(v.event_date)}</time></div>`).join('')||'<div class="empty">등록된 고장·수리 이력이 없습니다.</div>'}</div>`}
 
-function eamToggleForm(){const e=document.getElementById('eamRegisterForm');if(e)e.classList.toggle('show')}
-function eamShowHistory(){const e=document.querySelector('.eam-history');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})}
-function eamShowInspection(){const e=document.querySelector('.eam-history .card:nth-child(2)');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})}
 
 function leakagePage(){
  const A=window.__eamA||[],H=window.__eamH||[], codes=['A-001','B-001','C-001','D-001','E-001'];
@@ -271,7 +267,7 @@ function leakagePage(){
  <div class="grid3" style="margin-top:12px"><div class="panel" style="grid-column:span 2"><h2>누수 이력 전체</h2>${allH.length?allH.map(v=>{const a=leaks.find(z=>z.id===v.asset_id);return `<div class="issue"><div><b>${a?xEsc(a.asset_code+' · '+a.name):'-'}</b><div>${xEsc(v.event_type)} · ${xEsc(v.description||'-')}</div><div class="small">${time(v.event_date)} · ${xEsc(v.worker_name||v.vendor_name||'')}</div></div><span class="badge">${v.action_type?xEsc(v.action_type):'내부/외부 미기록'}</span></div>`}).join(''):'<div class="small">등록된 누수 이력이 없습니다.</div>'}</div>
  <div class="panel"><h2>누수 관리 원칙</h2><div class="notice">A 1번 코트 인접 벽체<br>B 5번 코트 인접 벽체(좌측)<br>C 2·3번 코트 외부 천장<br>D 5번 코트 인접 벽체(우측)<br>E 여자 탈의실 천장</div><div class="small" style="margin-top:10px">직원 조치와 외부 수리·교체는 별도로 기록합니다.</div></div></div>`
 }
-async function addAssetHistory(assetId){const description=document.getElementById("histDesc").value.trim();if(!description){alert("내용을 입력하세요.");return}const r=await SUPA.from("asset_history").insert({asset_id:assetId,event_type:document.getElementById("histType").value,description,worker_name:document.getElementById("histWorker").value.trim(),action_type:document.getElementById("histAction")?.value||'직원 조치',cost:Number(document.getElementById("histCost").value||0)});if(r.error){alert("이력 저장에 실패했습니다.");return}await eamLoad();render()}
+async function addAssetHistory(assetId){const description=document.getElementById("histDesc").value.trim();if(!description){alert("내용을 입력하세요.");return}const r=await SUPA.from("asset_history").insert({asset_id:assetId,event_type:document.getElementById("histType").value,description,worker_name:document.getElementById("histWorker").value.trim(),action_type:document.getElementById("histAction")?.value||'직원 조치',cost:Number(document.getElementById("histCost")?.value||0)});if(r.error){alert("이력 저장에 실패했습니다.");return}await eamLoad();render()}
 async function addInspection(assetId){const r=await SUPA.from("inspections").insert({asset_id:assetId,result:document.getElementById("inspResult").value,inspector_name:document.getElementById("inspWorker").value,memo:document.getElementById("inspMemo").value.trim()});if(r.error){alert("점검 저장에 실패했습니다.");return}await eamLoad();render()}
 
 function xEsc(s){return String(s??'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
