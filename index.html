@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -186,7 +186,7 @@ function startRealtime(){if(!SUPA)return;try{SUPA.channel("jgb-facility-live").o
 function render(){
  const app=document.getElementById("app");
  app.innerHTML=`<div class="app"><aside class="side"><div class="brand">🛡 장군봉체육관<br>종합관리</div>
- ${nav("dashboard","🏠 종합 대시보드")}${nav("process","🛠 접수사항 조치")}${nav("basic","🧹 기본업무 관리")}${nav("eam","🏢 시설물 EAM")}${nav("schedule","📅 근무편성표")}${nav("stats","📊 통합 실적 현황")}${nav("workers","👥 근무자별 현황")}${nav("pending","🔔 미조치 현황")}${nav("settings","⚙ 시스템 설정")}</aside>
+ ${nav("dashboard","🏠 종합 대시보드")}${nav("register","📥 시설·환경·안전 등록")}${nav("process","🛠 접수사항 조치")}${nav("basic","🧹 기본업무 관리")}${nav("eam","🏢 시설물 EAM")}${nav("schedule","📅 근무편성표")}${nav("stats","📊 통합 실적 현황")}${nav("workers","👥 근무자별 현황")}${nav("pending","🔔 미조치 현황")}${nav("settings","⚙ 시스템 설정")}</aside>
  <main class="main"><header class="head"><div><div class="title">장군봉체육관 종합 대시보드</div><div class="sub">시설 · 환경 · 안전 통합 관리 시스템</div></div><div class="period"><b>${monthKey().replace("-","년 ")}월 실적</b><small>기준일 : ${selectedDate}</small></div><div class="now"><span id="clock"></span><div class="live">● 실시간 자동 업데이트 중</div></div></header><section class="content">${body()}</section></main></div>`;
  tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
 }
@@ -196,6 +196,7 @@ function go(p){page=p;render()}
 function body(){
  const s=stats();
 
+ if(page==="register")return registerPage();
  if(page==="process")return processPage();
  if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="schedule")return schedulePage(); if(page==="external")return eamPage();
  if(page==="stats")return statsPage();
