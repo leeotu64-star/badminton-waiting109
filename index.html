@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -219,6 +219,43 @@ function body(){
  if(page==="settings")return settingsPage();
  return dashboard(s);
 }
+function eamDashboardSummary(){
+ const A=Array.isArray(window.__eamA)?window.__eamA:[];
+ const H=Array.isArray(window.__eamH)?window.__eamH:[];
+ const now=new Date(), y=now.getFullYear(), m=now.getMonth()+1;
+ const pad=n=>String(n).padStart(2,"0");
+ const months=[];
+ for(let i=1;i<=m;i++){
+   const key=`${y}-${pad(i)}`;
+   const assets=A.filter(a=>String(a.created_at||a.createdAt||"").slice(0,7)===key).length;
+   const hist=H.filter(h=>String(h.event_date||h.created_at||"").slice(0,7)===key);
+   const consum=hist.filter(h=>String(h.event_type||"")==="소모품교체");
+   const retire=hist.filter(h=>["폐기","자산교체"].includes(String(h.event_type||"")));
+   const cost=hist.reduce((n,h)=>n+(Number(h.cost)||0),0);
+   months.push({key,assets,hist:hist.length,consum:consum.length,retire:retire.length,cost});
+ }
+ const totalA=months.reduce((n,x)=>n+x.assets,0);
+ const totalH=months.reduce((n,x)=>n+x.hist,0);
+ const totalC=months.reduce((n,x)=>n+x.cost,0);
+ return `<div class="panel eam-dash-panel">
+   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <h2 style="margin:0">🏢 EAM 월별 누적 현황 · ${y}년</h2>
+    <button class="btn gray" onclick="go('eam')">EAM 상세</button>
+   </div>
+   <div class="kpis" style="margin-top:10px">
+    <div class="card"><h3 class="blue">등록 자산</h3><div class="num">${totalA}건</div><div class="small">올해 신규 등록 누계</div></div>
+    <div class="card"><h3 class="green">작업 이력</h3><div class="num">${totalH}건</div><div class="small">올해 EAM 작업 이력 누계</div></div>
+    <div class="card"><h3 style="color:#7048c9">소모품 교체</h3><div class="num">${months.reduce((n,x)=>n+x.consum,0)}건</div><div class="small">본체 자산에 연결된 교체 이력</div></div>
+    <div class="card"><h3 class="orange">유지보수 비용</h3><div class="num">${totalC.toLocaleString()}원</div><div class="small">올해 EAM 이력 비용 누계</div></div>
+   </div>
+   <div style="overflow:auto;margin-top:10px">
+    <table><thead><tr><th>월</th><th>신규 자산</th><th>작업 이력</th><th>소모품 교체</th><th>폐기·교체</th><th>비용</th></tr></thead>
+    <tbody>${months.map(x=>`<tr><td><b>${x.key.slice(5)}월</b></td><td>${x.assets}건</td><td>${x.hist}건</td><td>${x.consum}건</td><td>${x.retire}건</td><td>${x.cost.toLocaleString()}원</td></tr>`).join("")}</tbody>
+    </table>
+   </div>
+   <div class="small" style="margin-top:8px">※ EAM에 저장된 자산·작업 이력을 기준으로 월별 자동 집계합니다. 직원 작업실적은 EAM과 별도로 집계합니다.</div>
+  </div>`;
+}
 function dashboard(s){
  const pct=s.is.length?Math.round(s.done.length/s.is.length*100):0, tw=todayWorkers();
  return `<div class="pagebar"><h1>종합 현황</h1><div class="actions"><input type="date" value="${selectedDate}" onchange="setDate(this.value)"><button class="btn blue" onclick="eamRegisterNewAsset()">🏢 EAM 신규 등록</button><button class="btn gray" onclick="seedDemo()">테스트 예시 1회 생성</button></div></div>
@@ -226,15 +263,14 @@ function dashboard(s){
  <div class="card"><h3 class="blue">📋 시설·환경·안전 접수</h3><div class="num">${s.is.length}건</div><div class="small">전월 대비는 월별 실제 데이터로 자동 계산</div></div>
  <div class="card"><h3 class="green">✓ 조치완료</h3><div class="num">${s.done.length}건</div><div class="small">완료 시 이행시간 자동 기록</div></div>
  <div class="card"><h3 class="red">⚠ 미조치 현황</h3><div class="num red">${s.pending.length}건</div><div class="small">담당 근무자별 즉시 확인</div></div>
- <div class="card"><h3 style="color:#7048c9">🧹 기본업무 완료일</h3><div class="num">${s.completedDays}/${s.targetDays}일</div><div class="small">근무자별 근무일 합산 기준 · 1인 1근무일</div></div>
- <div class="card"><h3 class="orange">⊗ 기본업무 미완료일</h3><div class="num orange">${s.missDays}일</div><div class="small">근무자별 미실시 근무일 합계</div></div>
  <div class="card"><h3 class="green">📈 조치완료율</h3><div class="num">${pct}%</div><div class="small">조치완료 건수 ÷ 접수 건수 · 접수 1건마다 1건 집계</div></div></div>
  <div class="grid3"><div class="panel"><h2>전월 대비 비교 · 2026년 8월 → ${monthKey()}</h2>${compareRows(s)}</div><div class="panel"><h2>전년도 대비 · 2025년 → 2026년</h2><div class="notice">2025년 기준은 0건으로 시작합니다. 이후 실제 누적 데이터만 표시합니다.</div>${yearRows(s)}</div><div class="panel"><h2>업무 분야별 현황</h2><div class="donutbox"><div class="donut"></div><div class="donuttext">${pct}%<small>전체 접수사항 조치율</small></div></div><div class="legend">시설 · 환경 · 안전 · 기타<br>※ 실제 접수 자료가 쌓이면 분야별 비율이 자동 계산됩니다.</div></div></div>
  <div class="workgrid"><div class="panel"><h2>오늘 근무자별 실적 현황 · ${selectedDate}</h2><table><thead><tr><th>근무자</th><th>근무조 / 시간</th><th>상태</th><th>기본업무</th><th>조치완료</th><th>미조치</th><th>접수 합계</th></tr></thead><tbody>${tw.map(w=>workerRow(w)).join("")}</tbody></table><div class="small">※ 기본업무는 10개 체크항목을 모두 완료해야 1일 완료로 집계합니다.</div></div>
  <div class="panel missed"><h2 class="red">미조치 상세 현황 (${s.pending.length}건)</h2>${s.pending.slice(0,6).map(x=>`<div class="miss"><b>${x.handlerName||"담당 미지정"}</b>${x.category} · ${x.place} · ${x.content}<br>접수 ${time(x.createdAt)} · <span class="red">미조치</span></div>`).join("")||"<div class='small'>현재 미조치 사항이 없습니다.</div>"}</div></div>
+ ${eamDashboardSummary()}
  <div class="bottom"><div class="panel mini"><h2>${monthKey()} 요약</h2><div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b class="green">${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div></div><div class="panel mini"><h2>근무자 현황</h2><div class="compareline">근무중 <b>${tw.filter(x=>x.working).length}명</b></div><div class="compareline">휴무/기타 <b>${tw.filter(x=>!x.working).length}명</b></div></div><div class="panel mini"><h2>실시간 연결</h2><div class="compareline">저장 <b>자동</b></div><div class="compareline">다른 탭 반영 <b class="green">ON</b></div></div></div>`;
 }
-function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div><div class="compareline">기본업무 완료일일 <b>${s.completedDays}/${s.targetDays}일</b></div><div class="compareline">기본업무 미완료일일 <b>${s.missDays}일</b></div>`}
+function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
 function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
 function workerRow(w){const d=tasksFor(w.id), mine=db.issues.filter(x=>x.handlerId===w.id&&x.createdAt.slice(0,7)===monthKey()), md=mine.filter(x=>x.status!=="완료").length, bs=basicWorkerStats(w.id,monthKey());return `<tr><td><b>${w.name}</b></td><td>${w.shift}<br>${w.start?`${w.start}~${w.end}`:"-"}</td><td><span class="badge ${w.working?"":"off"}">${w.working?"근무":"휴무"}</span></td><td>${w.working?`${bs.complete}/${bs.target}일`:"-"}</td><td>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</td><td class="${md?"red":"green"}"><b>${w.working?md:"-"}</b></td><td><b>${mine.length}건</b></td></tr>`}
 function registerPage(){const defaultCat="시설";const places=PLACE_GROUPS[defaultCat]||PLACE_OPTIONS;const presets=ISSUE_PRESETS[defaultCat]||[];return `<div class="pagebar"><h1>시설·환경·안전 접수</h1><button class="btn gray" onclick="go('dashboard')">종합 대시보드</button></div><div class="notice">구분과 장소를 선택하면 해당 시설에 맞는 장소·접수사항이 자동으로 표시됩니다. 등록자 이름은 저장하지 않습니다.</div><div class="panel"><div class="formgrid"><div class="field"><label>구분</label><select id="cat" onchange="updateRegisterOptions()"><option>시설</option><option>환경</option><option>안전</option><option>기타</option></select></div><div class="field"><label>접수 장소</label><select id="place"><option value="">장소를 선택하세요</option>${places.map(p=>`<option value="${p}">${p}</option>`).join("")}</select></div><div class="field full"><label>시설·접수사항 선택</label><select id="issuePreset" onchange="applyIssuePreset()"><option value="">내용을 선택하세요</option>${presets.map(v=>`<option value="${v}">${v}</option>`).join("")}<option value="직접입력">직접입력</option></select></div><div class="field full"><label>상세 내용</label><textarea id="content" rows="3" placeholder="위 목록에서 선택하거나 필요한 경우 상세 내용을 입력하세요"></textarea></div><div class="field full"><label>사진(선택)</label><input id="photo" type="file" accept="image/*"></div></div><button class="btn" style="margin-top:10px" onclick="addIssue()">접수 등록</button></div><div class="panel" style="margin-top:10px"><h2>최근 접수</h2>${db.issues.slice(-8).reverse().map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수 ${time(x.createdAt)}</div></div><div class="status ${x.status==="완료"?"green":"red"}">${x.status}</div></div>`).join("")||"<div class='small'>접수된 사항이 없습니다.</div>"}</div>`}
