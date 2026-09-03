@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -145,7 +145,8 @@ function workersForDate(date){
 function monthWorkingDays(wid, month){
   let n=0; const y=Number(month.slice(0,4)), m=Number(month.slice(5,7));
   const days=new Date(y,m,0).getDate();
-  for(let d=1;d<=days;d++){
+  const limit=month===monthKey()?Number(selectedDate.slice(8,10)):days;
+  for(let d=1;d<=Math.min(days,limit);d++){
     const date=month+"-"+String(d).padStart(2,"0"), w=workersForDate(date).find(x=>x.id===wid);
     if(w&&w.working)n++;
   }
@@ -154,7 +155,8 @@ function monthWorkingDays(wid, month){
 function completedBasicDays(wid, month){
   let n=0; const y=Number(month.slice(0,4)), m=Number(month.slice(5,7));
   const days=new Date(y,m,0).getDate();
-  for(let d=1;d<=days;d++){
+  const limit=month===monthKey()?Number(selectedDate.slice(8,10)):days;
+  for(let d=1;d<=Math.min(days,limit);d++){
     const date=month+"-"+String(d).padStart(2,"0"), w=workersForDate(date).find(x=>x.id===wid);
     if(w&&w.working){const k=date+"_"+wid, t=db.tasks[k]; if(t&&t.done&&t.done.length===10)n++;}
   }
@@ -207,7 +209,7 @@ function body(){
 }
 function dashboard(s){
  const pct=s.is.length?Math.round(s.done.length/s.is.length*100):0, tw=todayWorkers();
- return `<div class="pagebar"><h1>종합 현황</h1><div class="actions"><input type="date" value="${selectedDate}" onchange="setDate(this.value)"><button class="btn gray" onclick="seedDemo()">테스트 예시 1회 생성</button></div></div>
+ return `<div class="pagebar"><h1>종합 현황</h1><div class="actions"><input type="date" value="${selectedDate}" onchange="setDate(this.value)"><button class="btn blue" onclick="eamRegisterNewAsset()">🏢 EAM 신규 등록</button><button class="btn gray" onclick="seedDemo()">테스트 예시 1회 생성</button></div></div>
  <div class="kpis">
  <div class="card"><h3 class="blue">📋 시설·환경·안전 접수</h3><div class="num">${s.is.length}건</div><div class="small">전월 대비는 월별 실제 데이터로 자동 계산</div></div>
  <div class="card"><h3 class="green">✓ 조치완료</h3><div class="num">${s.done.length}건</div><div class="small">완료 시 이행시간 자동 기록</div></div>
@@ -218,7 +220,7 @@ function dashboard(s){
  <div class="grid3"><div class="panel"><h2>전월 대비 비교 · 2026년 8월 → ${monthKey()}</h2>${compareRows(s)}</div><div class="panel"><h2>전년도 대비 · 2025년 → 2026년</h2><div class="notice">2025년 기준은 0건으로 시작합니다. 이후 실제 누적 데이터만 표시합니다.</div>${yearRows(s)}</div><div class="panel"><h2>업무 분야별 현황</h2><div class="donutbox"><div class="donut"></div><div class="donuttext">${pct}%<small>전체 접수사항 조치율</small></div></div><div class="legend">시설 · 환경 · 안전 · 기타<br>※ 실제 접수 자료가 쌓이면 분야별 비율이 자동 계산됩니다.</div></div></div>
  <div class="workgrid"><div class="panel"><h2>오늘 근무자별 실적 현황 · ${selectedDate}</h2><table><thead><tr><th>근무자</th><th>근무조 / 시간</th><th>상태</th><th>기본업무</th><th>조치완료</th><th>미조치</th><th>접수 합계</th></tr></thead><tbody>${tw.map(w=>workerRow(w)).join("")}</tbody></table><div class="small">※ 기본업무는 10개 체크항목을 모두 완료해야 1일 완료로 집계합니다.</div></div>
  <div class="panel missed"><h2 class="red">미조치 상세 현황 (${s.pending.length}건)</h2>${s.pending.slice(0,6).map(x=>`<div class="miss"><b>${x.handlerName||"담당 미지정"}</b>${x.category} · ${x.place} · ${x.content}<br>접수 ${time(x.createdAt)} · <span class="red">미조치</span></div>`).join("")||"<div class='small'>현재 미조치 사항이 없습니다.</div>"}</div></div>
- <div class="bottom"><div class="panel mini"><h2>${monthKey()} 요약</h2><div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b class="green">${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div></div><div class="panel mini"><h2>조치 소요시간</h2><div class="compareline">접수 합계 <b>${avgTime(s.done)}</b></div><div class="compareline">완료 즉시 기록 <b>실시간</b></div></div><div class="panel mini"><h2>근무자 현황</h2><div class="compareline">근무중 <b>${tw.filter(x=>x.working).length}명</b></div><div class="compareline">휴무/기타 <b>${tw.filter(x=>!x.working).length}명</b></div></div><div class="panel mini"><h2>실시간 연결</h2><div class="compareline">저장 <b>자동</b></div><div class="compareline">다른 탭 반영 <b class="green">ON</b></div></div></div>`;
+ <div class="bottom"><div class="panel mini"><h2>${monthKey()} 요약</h2><div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b class="green">${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div></div><div class="panel mini"><h2>근무자 현황</h2><div class="compareline">근무중 <b>${tw.filter(x=>x.working).length}명</b></div><div class="compareline">휴무/기타 <b>${tw.filter(x=>!x.working).length}명</b></div></div><div class="panel mini"><h2>실시간 연결</h2><div class="compareline">저장 <b>자동</b></div><div class="compareline">다른 탭 반영 <b class="green">ON</b></div></div></div>`;
 }
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div><div class="compareline">기본업무 완료일일 <b>${s.completedDays}/${s.targetDays}일</b></div><div class="compareline">기본업무 미완료일일 <b>${s.missDays}일</b></div>`}
 function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
@@ -243,6 +245,24 @@ function eamPick(cat,code){
   if(code!==undefined && code!==null) window.__eamSelCode=String(code);
   else window.__eamSelCode="";
   render();
+}
+async function eamRegisterNewAsset(){
+  if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+  const name=prompt('시설·설비명을 입력하세요.',''); if(name===null)return;
+  const categories=['냉난방','소방설비','보일러·온수','전기설비','코트조명','방수','기타설비','누수관리'];
+  const category=prompt('분류를 입력하세요.\n냉난방 / 소방설비 / 보일러·온수 / 전기설비 / 코트조명 / 방수 / 기타설비 / 누수관리','기타설비'); if(category===null)return;
+  const place=prompt('설치 위치를 입력하세요.',''); if(place===null)return;
+  const code=prompt('자산번호를 입력하세요.',`AST-${Date.now()}`); if(code===null)return;
+  const installDate=prompt('설치일 (YYYY-MM-DD)',new Date().toISOString().slice(0,10)); if(installDate===null)return;
+  const cat=categories.includes(String(category).trim())?String(category).trim():'기타설비';
+  if(!String(name).trim()||!String(place).trim()||!String(code).trim()){alert('시설·설비명, 위치, 자산번호는 필수입니다.');return}
+  const r=await SUPA.from('assets').insert({asset_code:String(code).trim(),name:String(name).trim(),category:cat,place:String(place).trim(),status:'정상',product_name:cat}).select('id,asset_code').single();
+  if(r.error){console.error(r.error);alert('EAM 신규 등록에 실패했습니다. 자산번호가 중복인지 확인하세요.');return}
+  window.__eamCat=({
+    '냉난방':'cooling','소방설비':'fire','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other','누수관리':'leak'
+  })[cat]||'other';
+  window.__eamSelCode=String(code).trim();
+  await eamLoad(); go('eam');
 }
 function eamPage(){
  const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];
@@ -283,7 +303,7 @@ function eamPage(){
  const photo=e?.photo||null;
  const details=e?`<div class="eamx-source"><span>📋 원본 시설대장</span><b>${xEsc(e.type)}</b></div><div class="eamx-facts"><div class="eamx-fact"><span>시설물명</span><b>${xEsc(e.name)}</b></div><div class="eamx-fact"><span>설치 위치</span><b>${xEsc(e.place||'-')}</b></div><div class="eamx-fact"><span>입고·설치일</span><b>${xEsc(e.installDate||e.date||'-')}</b></div><div class="eamx-fact"><span>모델·규격</span><b>${xEsc(e.model||e.capacity||'-')}</b></div><div class="eamx-fact"><span>수량</span><b>${xEsc(e.quantity??'-')}</b></div><div class="eamx-fact"><span>구매·제작</span><b>${xEsc(e.vendor||e.maker||'-')}</b></div><div class="eamx-fact"><span>A/S 업체</span><b>${xEsc(e.vendor||e.maker||'-')}</b></div><div class="eamx-fact"><span>A/S 연락처</span><b>${xEsc(e.asContact||e.contact||'-')}</b></div><div class="eamx-fact"><span>보증기간</span><b>${xEsc(e.warranty||'-')}</b></div><div class="eamx-fact"><span>A/S 기록</span><b>${xEsc(e.asHistory||'-')}</b></div></div><div class="eamx-source-note">※ 사진은 현재 HTML에 저장하지 않습니다. 필요 시 Supabase Storage에 연결합니다.</div>`:`<div class="eamx-source"><span>📍 실제 배치도</span><b>${xEsc(item?.[1]||'-')}</b></div><div class="eamx-facts"><div class="eamx-fact"><span>누수 위치</span><b>${xEsc(item?.[1]||'-')}</b></div></div>`;
  const total=all.length,photoCount=all.filter(x=>x.photo).length,expired=all.filter(x=>x.warranty==='만료').length;
- return `<div class="eamx-wrap"><div class="eamx-top"><div><h1>🏢 시설물 EAM <span>자산관제</span></h1><p>아이콘 분류 → 설비 선택 → 자산정보 → 소모품·작업 이력 → 폐기·교체 이력</p></div><div style="display:flex;align-items:center;gap:8px"><button class="btn gray" onclick="eamShowLocation()">📍 위치 보기</button><div class="eamx-live">● 자산 수명주기 관리</div></div></div>
+ return `<div class="eamx-wrap"><div class="eamx-top"><div><h1>🏢 시설물 EAM <span>자산관제</span></h1><p>아이콘 분류 → 설비 선택 → 자산정보 → 소모품·작업 이력 → 폐기·교체 이력</p></div><div style="display:flex;align-items:center;gap:8px"><button class="btn blue" onclick="eamRegisterNewAsset()">＋ EAM 신규 등록</button><button class="btn gray" onclick="eamShowLocation()">📍 위치 보기</button><div class="eamx-live">● 자산 수명주기 관리</div></div></div>
  <div class="eamx-tree"><aside class="eamx-side"><div class="eamx-side-title">시설 · 설비 한눈에 보기</div>${order.map(k=>{const v=cats[k];return `<button class="eamx-cat ${k===cat?'on':''}" data-cat="${k}" onclick="eamPick('${k}')"><span class="ico">${v.ico}</span><span><b>${v.label}</b><small>${v.desc}</small></span><em>${v.items.length}</em></button>`}).join('')}<div class="eamx-side-title" style="margin-top:6px">등록 자산 ${total}건 · 사진 ${photoCount}건</div></aside>
  <main class="eamx-main">${cat!=='leak'?`<div class="eamx-subbar"><div class="eamx-subtitle"><b>${C.ico} ${C.label}</b><span>${list.length}개</span></div><div class="eamx-subgrid">${list.map(v=>{const code=v.code||v[0],name=v.name||v[1],ph=v.photo||null;return `<button type="button" class="eamx-sub ${code===sel?'on':''}" data-cat="${cat}" data-code="${code}" onclick="eamPick('${cat}','${code}')"><div class="eamx-sub-photo">${ph?`<img src="${ph}" alt="${xEsc(name)}">`:`<span>${C.ico}</span>`}</div><div class="eamx-sub-text"><b>${xEsc(name)}</b><small>${xEsc(v.place||v[2]||code)}</small></div></button>`}).join('')}</div></div>`:''}
  ${cat==='leak'?`<div class="eamx-leakmap"><img src="${JGB_LAYOUT_PHOTO}" alt="장군봉체육관 실제 누수 배치도"><div class="eamx-leakkeys">${leaks.map((x,i)=>`<button type="button" class="eamx-leakkey ${x[0]===sel?'on':''}" data-code="${x[0]}" onclick="eamPick('leak','${x[0]}')"><b>${String.fromCharCode(65+i)}</b><small>${xEsc(x[1].replace(/^\w-\d+ · /,''))}</small></button>`).join('')}</div></div>`:''}
