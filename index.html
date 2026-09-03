@@ -237,6 +237,12 @@ function eamShowLocation(){
  m.innerHTML=`<div style="width:min(1200px,96vw);max-height:92vh;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)"><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #ddd"><b style="font-size:18px">📍 장군봉체육관 위치 보기</b><button class="btn gray" onclick="document.getElementById('eamLocationModal').remove()">닫기</button></div><div style="padding:12px;overflow:auto;max-height:calc(92vh - 64px);text-align:center"><img src="${JGB_LAYOUT_PHOTO}" alt="장군봉체육관 원본 배치도" style="max-width:100%;height:auto;display:block;margin:auto"></div></div>`;
  document.body.appendChild(m); m.addEventListener("click",e=>{if(e.target===m)m.remove();});
 }
+function eamPick(cat,code){
+  window.__eamCat=cat||"cooling";
+  if(code!==undefined && code!==null) window.__eamSelCode=String(code);
+  else window.__eamSelCode="";
+  render();
+}
 function eamPage(){
  const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];
  const excel=(Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[]).filter((e,i,a)=>a.findIndex(z=>z.code===e.code)===i);
