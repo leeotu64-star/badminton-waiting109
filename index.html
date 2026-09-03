@@ -1,4 +1,4 @@
-﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -325,7 +325,7 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
     }
     return out;
   }
-  function render(mode){
+  function renderMonthYearCompare(mode){
     const box=document.getElementById("monthYearCompareBody"); if(!box)return;
     const d=annualData(), now=new Date(), cy=now.getFullYear(), cm=now.getMonth()+1;
     if(mode==="month"){
@@ -363,7 +363,7 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
     if(!sec)return;
     sec.style.display="block";
     document.querySelectorAll("#monthYearCompare .myc-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.mode===mode));
-    render(mode);
+    renderMonthYearCompare(mode);
     sec.scrollIntoView({behavior:"smooth",block:"start"});
   };
 })();
