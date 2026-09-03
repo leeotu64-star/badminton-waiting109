@@ -519,24 +519,9 @@ async function completeIssue(id){
    const r=await SUPA.from("requests").update({status:"완료",handler_name:x.handlerName,started_at:x.startedAt||now,completed_at:now,elapsed_minutes:elapsed}).eq("id",x.remoteId);
    if(r.error){alert("조치완료 저장에 실패했습니다.");return}
  }
- /* 완료 순간에만 EAM에 자동 누적: 별도 유지보수 이력 메뉴를 만들지 않는다. */
- try{
-   if(SUPA){
-     const assetCategory="기타설비";
-     let asset=null;
-     const aq=await SUPA.from("assets").select("id,name,category,place").eq("place",x.place).limit(20);
-     if(!aq.error && aq.data?.length) asset=aq.data.find(a=>String(a.name||"").trim()===String(x.content||"").trim())||aq.data[0];
-     if(!asset){
-       const ar=await SUPA.from("assets").insert({asset_code:"REQ-"+Date.now(),name:x.content||"시설관리 작업",category:assetCategory,place:x.place||"-",status:"정상",product_name:assetCategory}).select("id,name,category,place").single();
-       if(ar.error) throw ar.error;
-       asset=ar.data;
-     }
-     const hr=await SUPA.from("asset_history").insert({asset_id:asset.id,event_type:"작업완료",description:x.content||"시설관리 작업 완료",worker_name:x.handlerName||"",action_type:"직원작업",cost:0,event_date:now.slice(0,10)});
-     if(hr.error) throw hr.error;
-   }
- }catch(e){console.error("EAM 자동등록 실패",e);alert("조치완료는 저장됐지만 EAM 자동등록에 실패했습니다. 관리자에게 확인해 주세요.");return}
+ /* 스마트폰 시설·환경·안전 접수의 조치완료는 직원 작업실적만 기록한다.
+    EAM 자산/유지보수 이력에는 자동 등록하지 않는다. EAM은 별도 화면에서 관리한다. */
  await syncFromSupabase();
- if(typeof eamLoad==="function") await eamLoad();
  render();
 }
 function toggleTask(wid,t){const d=tasksFor(wid);d.done=d.done.includes(t)?d.done.filter(x=>x!==t):[...d.done,t];d.updatedAt=new Date().toISOString();save();render()}
