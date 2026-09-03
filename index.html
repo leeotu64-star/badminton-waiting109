@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -34,6 +34,26 @@
 @media(max-width:900px){.myc-grid{grid-template-columns:repeat(2,1fr)}}
 .formgrid .field input,.formgrid .field select,.formgrid .field textarea{width:100%}
 @media(max-width:900px){.grid3{grid-template-columns:1fr}.workergrid{grid-template-columns:1fr}}
+</style>
+
+<style id="JGB_MAJOR_EQUIP_STYLE">
+.jgb-eq{padding:18px;background:#f5f7fa}
+.jgb-eq .hero{background:linear-gradient(135deg,#0b2545,#183f67);color:#fff;border-radius:18px;padding:22px;margin-bottom:16px}
+.jgb-eq .hero h2{margin:0 0 7px;font-size:26px}
+.jgb-eq .hero p{margin:0;opacity:.86}
+.jgb-eq .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.jgb-eq .card{background:#fff;border:1px solid #dfe5ec;border-radius:15px;padding:16px;box-shadow:0 5px 16px rgba(20,40,60,.05)}
+.jgb-eq .card h3{margin:0 0 12px;font-size:18px}
+.jgb-eq .tag{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef3f8;font-size:12px;margin-bottom:10px}
+.jgb-eq .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px}
+.jgb-eq .meta div{background:#f8fafc;padding:9px;border-radius:9px}
+.jgb-eq .meta b{display:block;margin-top:3px}
+.jgb-eq .section{background:#fff;border:1px solid #dfe5ec;border-radius:15px;padding:16px;margin-top:14px}
+.jgb-eq table{width:100%;border-collapse:collapse}
+.jgb-eq th,.jgb-eq td{padding:10px;border-bottom:1px solid #e8edf2;text-align:left}
+.jgb-eq th{background:#f2f5f8}
+@media(max-width:1000px){.jgb-eq .cards{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.jgb-eq .cards{grid-template-columns:1fr}}
 </style>
 </head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -109,7 +129,7 @@ function startRealtime(){try{SUPA.channel("jgb-facility-live").on("postgres_chan
 function render(){
  const app=document.getElementById("app");
  app.innerHTML=`<div class="app"><aside class="side"><div class="brand">🛡 장군봉체육관<br>종합관리</div>
- ${nav("dashboard","🏠 종합 대시보드")}${nav("process","🛠 접수사항 조치")}${nav("basic","🧹 기본업무 관리")}${nav("eam","🏢 시설물 EAM")}${nav("leak","💧 누수 관리")}${nav("schedule","📅 근무편성표")}${nav("external","🔧 외부 작업") }${nav("stats","📊 통합 실적 현황")}${nav("workers","👥 근무자별 현황")}${nav("pending","🔔 미조치 현황")}${nav("settings","⚙ 시스템 설정")}</aside>
+ ${nav("dashboard","🏠 종합 대시보드")}${nav("map","📍 배치도 통합관리")}${nav("process","🛠 접수사항 조치")}${nav("basic","🧹 기본업무 관리")}${nav("eam","🏢 시설물 EAM")}${nav("leak","💧 누수 관리")}${nav("schedule","📅 근무편성표")}${nav("external","🔧 외부 작업") }${nav("stats","📊 통합 실적 현황")}${nav("workers","👥 근무자별 현황")}${nav("pending","🔔 미조치 현황")}${nav("settings","⚙ 시스템 설정")}</aside>
  <main class="main"><header class="head"><div><div class="title">장군봉체육관 종합 대시보드</div><div class="sub">시설 · 환경 · 안전 통합 관리 시스템</div></div><div class="period"><b>${monthKey().replace("-","년 ")}월 실적</b><small>기준일 : ${selectedDate}</small></div><div class="now"><span id="clock"></span><div class="live">● 실시간 자동 업데이트 중</div></div></header><section class="content">${body()}</section></main></div>`;
  tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
 }
@@ -119,6 +139,7 @@ function go(p){page=p;render()}
 function body(){
  const s=stats();
 
+ if(page==="map")return mapPage();
  if(page==="process")return processPage();
  if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="leak")return leakagePage(); if(page==="schedule")return schedulePage(); if(page==="external")return externalPage();
  if(page==="stats")return statsPage();
@@ -126,6 +147,22 @@ function body(){
  if(page==="pending")return pendingPage();
  if(page==="settings")return settingsPage();
  return dashboard(s);
+}
+function mapPage(){
+ const A=window.__eamA||[], H=window.__eamH||[], I=window.__eamI||[];
+ const groups=[
+  {key:'leak',title:'💧 A~E 누수 구간',items:[
+   ['A','A구간 · 1번 코트 인접 벽체 누수','A-001'],['B','B구간 · 5번 코트 인접 벽체 누수(좌측)','B-001'],['C','C구간 · 2·3번 코트 외부 천장 누수','C-001'],['D','D구간 · 5번 코트 인접 벽체 누수(우측)','D-001'],['E','E구간 · 여자 탈의실 천장 누수','E-001']]},
+  {key:'court',title:'🏸 1~5번 코트',items:[['1','1번 코트','COURT-01'],['2','2번 코트','COURT-02'],['3','3번 코트','COURT-03'],['4','4번 코트','COURT-04'],['5','5번 코트','COURT-05']]},
+  {key:'env',title:'🧹 환경·위생',items:[['남탈','남자 탈의실','ENV-03'],['여탈','여자 탈의실','ENV-04'],['남화','남자 화장실','ENV-01'],['여화','여자 화장실','ENV-02'],['복도','복도',''],['휴게','휴게실','']]},
+  {key:'safe',title:'🛡 안전·공용시설',items:[['소화기','소화기','SAFE-01'],['AED','AED','SAFE-02'],['비상','비상조명','SAFE-03'],['관리','관리실',''],['방문','방문객실',''],['기타','기타 공용구역','']]}
+ ];
+ const allPlaces=groups.flatMap(g=>g.items);
+ const card=(label,name,code)=>{const a=A.find(x=>x.asset_code===code); const qs=db.issues.filter(x=>x.place===name||x.place===label||x.place?.includes(name)); const pending=qs.filter(x=>x.status!=="완료").length; const hs=a?H.filter(x=>x.asset_id===a.id).length:0; const ins=a?I.filter(x=>x.asset_id===a.id).length:0; const bad=pending>0||a?.status&&a.status!=="정상"; return `<div class="issue" style="cursor:pointer;border-left:5px solid ${bad?'#ef4444':'#22c55e'};padding:14px" onclick="${a?`window.__eamSel='${a.id}';go('eam')`:`go('process')`}"><div style="display:flex;justify-content:space-between;gap:8px"><b>${xEsc(name)}</b><span class="badge ${bad?'off':''}">${bad?'확인필요':'정상'}</span></div><div class="small">${code||'시설물 자산 미등록'}${label&&label!==name?' · '+xEsc(label):''}</div><div class="compareline">접수 <b>${qs.length}건</b> · 미조치 <b>${pending}건</b></div><div class="compareline">시설물 이력 <b>${hs}건</b> · 점검 <b>${ins}건</b></div></div>`};
+ return `<div class="pagebar"><div><h1>📍 배치도 통합관리</h1><div class="small">장군봉체육관 실제 배치도 기준으로 같은 장소의 접수·조치·시설물·점검·누수 이력을 한곳에서 관리</div></div><button class="btn gray" onclick="eamLoad().then(render)">실시간 새로고침</button></div>
+ <div class="panel" style="margin-bottom:12px"><h2>장군봉체육관 시설 배치 구조</h2><div class="small" style="margin-bottom:10px">누수 A~E 구간을 포함해 코트·탈의실·화장실·복도·휴게실·관리실·방문객실·안전설비를 같은 기준으로 묶었습니다.</div><div style="display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:8px;align-items:center"><div class="notice"><b>A구간</b><br>1번 코트 인접 벽체</div><div class="notice" style="text-align:center"><b>1  ·  2  ·  3  ·  4  ·  5번 코트</b><br><span class="small">중앙 코트 구역</span></div><div class="notice"><b>B구간</b><br>5번 코트 인접 벽체(좌측)</div><div class="notice"><b>E구간</b><br>여자 탈의실 천장</div><div class="notice" style="text-align:center"><b>C구간</b><br>2·3번 코트 외부 천장</div><div class="notice"><b>D구간</b><br>5번 코트 인접 벽체(우측)</div></div></div>
+ <div class="grid3">${groups.map(g=>`<div class="panel"><h2>${g.title}</h2>${g.items.map(it=>card(it[0],it[1],it[2])).join('')}</div>`).join('')}</div>
+ <div class="grid3" style="margin-top:12px"><div class="panel"><h2>📋 전체 장소 접수 현황</h2>${allPlaces.map(it=>{const q=db.issues.filter(x=>x.place===it[1]||x.place?.includes(it[1]));return `<div class="compareline"><span>${xEsc(it[1])}</span><b>${q.length}건</b></div>`}).join('')}</div><div class="panel"><h2>💧 누수 구간 현황</h2>${groups[0].items.map(it=>{const a=A.find(x=>x.asset_code===it[2]);const q=a?H.filter(x=>x.asset_id===a.id):[];return `<div class="compareline"><span>${xEsc(it[0])} · ${xEsc(it[1])}</span><b>${q.length}건</b></div>`}).join('')}</div><div class="panel"><h2>🔄 장소별 관리 원칙</h2><div class="notice">한 장소 = 한 관리 기준<br><br>접수 → 조치 → 완료 → 시설물 이력 → 점검 → 외부작업<br><br>같은 장소의 기록은 분야가 달라도 장소 기준으로 연결합니다.</div></div></div>`;
 }
 function dashboard(s){
  const pct=s.is.length?Math.round(s.done.length/s.is.length*100):0, tw=todayWorkers();
@@ -287,4 +324,47 @@ setInterval(syncFromSupabase,5000);
   </div>
   <div id="monthYearCompareBody"></div>
 </section>
+
+<script id="JGB_MAJOR_EQUIP_SCRIPT">
+const JGB_MAJOR_EQUIPMENT=[
+ {no:1,name:"주펌프(소방장비)",capacity:"37.5 kW × 1대",life:"9년",maker:"하이젠모터스",place:"기계실",date:"2017.09.",cost:"-",grade:"B등급",plan:"2023~2025년 특이사항 없음"},
+ {no:2,name:"보조펌프(소방장비)",capacity:"37.5 kW × 1대",life:"9년",maker:"하이젠모터스",place:"기계실",date:"2017. 4. 17.",cost:"-",grade:"B등급",plan:"2023~2025년 특이사항 없음"},
+ {no:3,name:"예비펌프(소방장비)",capacity:"37.5 kW × 1대",life:"9년",maker:"동원주식회사",place:"기계실",date:"2017.09.",cost:"-",grade:"B등급",plan:"2023~2025년 특이사항 없음"},
+ {no:4,name:"스마트온수기(온수기)",capacity:"2000L",life:"7년",maker:"썬코리아",place:"2층",date:"2017.09.",cost:"-",grade:"B등급",plan:"2023~2025년 특이사항 없음"},
+ {no:5,name:"전기소방제어장비(MCC판넬)",capacity:"1대",life:"5년",maker:"㈜보성엔지니어링",place:"기계실",date:"2017. 9. 4.",cost:"",grade:"B등급",plan:"2023~2025년 특이사항 없음"},
+ {no:6,name:"축열식 전기온수기",capacity:"600L × 1대",life:"7년",maker:"㈜영창테크",place:"기계실",date:"2017. 5. 29.",cost:"-",grade:"B등급",plan:"2023~2025년 특이사항 없음"},
+ {no:7,name:"저수조",capacity:"32톤 × 1대",life:"5년",maker:"",place:"기계실",date:"2017. 9. 4.",cost:"-",grade:"B등급",plan:"2023~2025년 특이사항 없음"}
+];
+function jgbMajorEquipmentPage(){
+ const root=document.getElementById("app")||document.body;
+ root.innerHTML=`<div class="jgb-eq">
+  <div class="hero"><h2>⚙️ 주요설비 기기 이력카드</h2><p>기존 EAM의 시설물 이력과 연결되는 주요설비 관리 화면입니다. 원본 이력카드의 설비명·용량·내용연수·제작회사·설치장소·제조년월일·평가등급을 기준으로 정리했습니다.</p></div>
+  <div class="cards" id="jgbEqCards"></div>
+  <div class="section"><h3>시설개선계획 현황</h3>
+   <table><thead><tr><th>설비</th><th>2023</th><th>2024</th><th>2025</th></tr></thead>
+   <tbody id="jgbEqPlan"></tbody></table>
+  </div>
+  <div class="section"><h3>집행내역</h3><p style="color:#6b7280">원본 이력카드의 집행내역 표는 비어 있어 기존 자료에서 임의로 금액·예산과목·조치내역을 추가하지 않았습니다. 향후 실제 집행이 발생하면 EAM 이력으로 등록할 수 있습니다.</p></div>
+ </div>`;
+ const cards=document.getElementById("jgbEqCards");
+ JGB_MAJOR_EQUIPMENT.forEach(e=>cards.insertAdjacentHTML("beforeend",`<div class="card">
+  <span class="tag">주요설비 ${e.no} · ${e.grade}</span><h3>${e.name}</h3>
+  <div class="meta">
+   <div>용량<b>${e.capacity}</b></div><div>내용연수<b>${e.life}</b></div>
+   <div>제작회사<b>${e.maker||"기재 없음"}</b></div><div>설치장소<b>${e.place}</b></div>
+   <div>제조년월일<b>${e.date}</b></div><div>설치비용<b>${e.cost||"기재 없음"}</b></div>
+  </div>
+ </div>`));
+ const plan=document.getElementById("jgbEqPlan");
+ JGB_MAJOR_EQUIPMENT.forEach(e=>plan.insertAdjacentHTML("beforeend",`<tr><td>${e.name}</td><td>특이사항 없음</td><td>특이사항 없음</td><td>특이사항 없음</td></tr>`));
+}
+</script>
 </body></html>
+<script>
+(function(){
+ try{
+  const p=new URLSearchParams(location.search).get("page");
+  if(p==="major-equipment") setTimeout(jgbMajorEquipmentPage,50);
+ }catch(e){}
+})();
+</script>
