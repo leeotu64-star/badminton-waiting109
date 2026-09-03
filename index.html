@@ -1,0 +1,270 @@
+﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
+.app{min-height:100vh;display:flex}.side{width:185px;background:#061b36;color:#dce8f7;padding:15px 10px;flex:none}.brand{font-size:18px;font-weight:900;padding:8px 10px 22px;color:#fff}.nav{padding:11px 10px;margin:3px 0;border-radius:8px;cursor:pointer;font-weight:700}.nav.active,.nav:hover{background:#1265bb;color:#fff}
+.main{flex:1;min-width:0}.head{height:94px;background:#071d3a;color:#fff;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:0 25px}.title{font-size:25px;font-weight:900}.sub{font-size:12px;opacity:.8;margin-top:5px}.period{text-align:center}.period b{font-size:24px}.period small{display:block;margin-top:5px;opacity:.8}.now{text-align:right;font-size:12px}.live{color:#4be28b;font-weight:800;margin-top:6px}.content{padding:13px;max-width:1600px;margin:auto}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}.card,.panel{background:#fff;border:1px solid #dce4ee;border-radius:10px;padding:13px;box-shadow:0 2px 8px #15233a0b}.card h3{font-size:13px;margin:0 0 8px}.num{font-size:25px;font-weight:900}.small{font-size:11px;color:#667386;margin-top:6px}.red{color:#e23434}.green{color:#159447}.orange{color:#ed7900}.blue{color:#1769c1}
+.grid3{display:grid;grid-template-columns:1.1fr 1.1fr .9fr;gap:9px;margin-top:10px}.panel h2{font-size:14px;margin:0 0 10px}.bars{height:170px;display:flex;align-items:end;justify-content:space-around;border-bottom:1px solid #ccd6e2;padding:10px 8px 0}.group{height:100%;display:flex;align-items:end;gap:5px}.bar{width:18px;background:#2877cf;border-radius:3px 3px 0 0;position:relative}.bar.gray{background:#b9c1cb}.bar.green{background:#29a45a}.bar.red{background:#e33d3d}.bar span{position:absolute;top:-16px;font-size:10px;font-weight:800}.labels{display:flex;justify-content:space-around;font-size:9px;text-align:center;margin-top:5px}.donutbox{position:relative}.donut{width:145px;height:145px;border-radius:50%;margin:10px auto;background:conic-gradient(#2877cf 0 28%,#2aa45a 28% 51%,#f28b19 51% 74%,#7350c8 74% 100%);display:grid;place-items:center}.donut:after{content:"";width:90px;height:90px;border-radius:50%;background:#fff}.donuttext{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-size:22px;font-weight:900}.donuttext small{display:block;font-size:10px;font-weight:500}.legend{font-size:11px;line-height:1.8}
+.workgrid{display:grid;grid-template-columns:2fr .9fr;gap:9px;margin-top:10px}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border-bottom:1px solid #e5eaf0;padding:8px 5px;text-align:center}th{background:#f7f9fc}.badge{padding:3px 7px;border-radius:12px;background:#eaf8ef;color:#138a42;font-weight:800}.badge.off{background:#f0f2f5;color:#8993a1}.badge.bad{background:#fff0f0;color:#df3030}.missed{border-top:4px solid #e03131}.miss{padding:9px 2px;border-bottom:1px solid #eee;font-size:11px}.miss b{display:block;margin-bottom:4px}
+.bottom{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:10px}.mini{min-height:125px}.compareline{display:flex;justify-content:space-between;border-bottom:1px solid #edf0f4;padding:6px 0;font-size:11px}.compareline b{font-size:13px}
+.pagebar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.pagebar h1{font-size:21px;margin:0}.actions{display:flex;gap:7px;flex-wrap:wrap}.btn{border:0;border-radius:7px;padding:9px 12px;background:#1769c1;color:#fff;font-weight:800;cursor:pointer}.btn.gray{background:#e8edf3;color:#26364b}.btn.green{background:#159447}.btn.red{background:#d93636}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:800}.field input,.field select,.field textarea{border:1px solid #ccd6e2;border-radius:7px;padding:9px;background:#fff}.field.full{grid-column:1/-1}
+.issue{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px;border-bottom:1px solid #e5eaf0}.issue:last-child{border:0}.status{font-weight:800}.taskgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.task{border:1px solid #dce4ee;border-radius:9px;padding:11px;display:flex;align-items:center;justify-content:space-between}.task.done{background:#effaf3;border-color:#8bd0a4}.workergrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.workerbox{border:1px solid #dce4ee;border-radius:9px;padding:11px}.workerbox h3{margin:0 0 6px}.notice{background:#f5f9ff;border-left:4px solid #1769c1;padding:10px;margin-bottom:10px;font-size:11px}
+@media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.grid3,.workgrid{grid-template-columns:1fr}.bottom{grid-template-columns:repeat(2,1fr)}.head{grid-template-columns:1fr}.head{height:auto;padding:15px;gap:8px}.period,.now{text-align:left}}
+</style>
+<style id="EMPLOYEE_OVERVIEW_STYLE">
+.eov-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+.eov-card{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:14px;box-shadow:0 2px 8px #00000008}
+.eov-card b{display:block;font-size:25px;margin-top:5px}
+.eov-table{width:100%;border-collapse:separate;border-spacing:0;background:white;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
+.eov-table th,.eov-table td{padding:12px 10px;border-bottom:1px solid #eef2f7;text-align:center}
+.eov-table th{background:#f8fafc;font-size:13px;color:#475569}
+.eov-table td:first-child,.eov-table th:first-child{text-align:left;padding-left:16px}
+.eov-ok{color:#15803d;font-weight:800}.eov-bad{color:#dc2626;font-weight:800}.eov-muted{color:#94a3b8}
+.eov-sub{font-size:12px;color:#64748b;margin-top:3px}
+@media(max-width:900px){.eov-grid{grid-template-columns:repeat(2,1fr)}.eov-table{font-size:12px}.eov-table th,.eov-table td{padding:8px 5px}}
+</style>
+<style id="REVAMP_EMPLOYEE_CSS">.empdash{background:#f4f7fb;padding:18px;border-radius:16px}.empdash-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:16px}.empdash-title{font-size:24px;font-weight:900}.empdash-sub{font-size:12px;color:#64748b;margin-top:5px}.emp-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}.emp-kpi{background:#fff;border:1px solid #dfe7f1;border-radius:14px;padding:14px 16px}.emp-kpi span{font-size:12px;color:#64748b}.emp-kpi b{display:block;font-size:25px;margin-top:5px}.emp-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.emp-row{background:#fff;border:1px solid #dfe7f1;border-radius:15px;padding:15px;box-shadow:0 4px 12px rgba(20,45,80,.05)}.emp-top{display:flex;justify-content:space-between;align-items:center}.emp-name{font-size:18px;font-weight:900}.emp-shift{font-size:11px;color:#64748b;margin-top:3px}.emp-state{padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800;background:#e8f7ee;color:#15803d}.emp-state.off{background:#f1f5f9;color:#64748b}.emp-line{display:grid;grid-template-columns:125px 1fr 72px;gap:10px;align-items:center;margin-top:14px}.emp-label{font-size:12px;color:#475569;font-weight:700}.emp-track{height:9px;background:#edf2f7;border-radius:99px;overflow:hidden}.emp-fill{height:100%;border-radius:99px;background:#1769aa}.emp-fill.bad{background:#dc2626}.emp-num{text-align:right;font-weight:900;font-size:13px}.emp-request{display:flex;gap:7px;margin-top:13px}.emp-chip{flex:1;background:#f8fafc;border-radius:10px;padding:9px;text-align:center}.emp-chip small{display:block;color:#64748b;font-size:11px}.emp-chip b{font-size:18px}.emp-chip.red b{color:#dc2626}.emp-note{margin-top:13px;font-size:11px;color:#64748b}.emp-foot{margin-top:12px;padding:10px 12px;background:#eef5ff;border-radius:10px;font-size:11px;color:#48627d}.emp-alert{border-color:#fecaca}.emp-alert .emp-name{color:#b91c1c}@media(max-width:950px){.emp-kpis{grid-template-columns:repeat(2,1fr)}.emp-list{grid-template-columns:1fr}}</style>
+<style id="MONTH_YEAR_COMPARE_STYLE">
+.myc-wrap{margin-top:18px}.myc-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.myc-tabs{display:flex;gap:6px}.myc-tabs button{border:1px solid #dbe3ee;background:#fff;border-radius:9px;padding:8px 13px;cursor:pointer}.myc-tabs button.on{background:#111827;color:#fff}
+.myc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.myc-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px}.myc-card .v{font-size:24px;font-weight:800;margin-top:5px}.myc-card .s{font-size:12px;color:#64748b;margin-top:3px}
+.myc-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}.myc-table th,.myc-table td{padding:11px 9px;border-bottom:1px solid #eef2f7;text-align:center}.myc-table th{background:#f8fafc;color:#475569;font-size:12px}.myc-table tr:last-child td{border-bottom:0}.myc-up{color:#15803d;font-weight:800}.myc-down{color:#dc2626;font-weight:800}.myc-zero{color:#64748b}
+.myc-bar{height:8px;background:#e5e7eb;border-radius:99px;overflow:hidden}.myc-bar i{display:block;height:100%;background:#111827;border-radius:99px}
+@media(max-width:900px){.myc-grid{grid-template-columns:repeat(2,1fr)}}
+.formgrid .field input,.formgrid .field select,.formgrid .field textarea{width:100%}
+@media(max-width:900px){.grid3{grid-template-columns:1fr}.workergrid{grid-template-columns:1fr}}
+</style>
+</head><body><div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
+const SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const PLACE_OPTIONS=["남자 탈의실","여자 탈의실","남자 화장실","여자 화장실","코트 1","코트 2","코트 3","코트 4","코트 5","복도","휴게실","기타"];
+const KEY="JGB_LIVE_TEST_V3";
+const workers=[
+ {id:"w1",name:"김민수",shift:"새벽조",start:"06:00",end:"15:00"},
+ {id:"w2",name:"이현우",shift:"오전조",start:"09:00",end:"18:00"},
+ {id:"w3",name:"박성훈",shift:"오후조",start:"13:30",end:"22:30"},
+ {id:"w4",name:"최지훈",shift:"-",start:"",end:""}
+];
+const tasks=["남자화장실","여자화장실","남자탈의실","여자탈의실","코트","복도","휴게실","재활용","종량제","기타"];
+const offWords=["휴무","주휴일","연가","공가","대체휴무"];
+const defaultSchedule={};
+// 2026년 9월 근무편성표 기준. 빈 날짜는 아직 편성되지 않은 날로 봅니다.
+const SEPT_2026=[
+["새벽조","오전조","휴무","오후조"],["새벽조","오전조","주휴일","오후조"],["새벽조","오전조","오전조","오전조"],["휴무","새벽조","오전조","오후조"],["주휴일","공가/건강검진","새벽조","오후조"],["새벽조","주휴일","오후조","휴무"],["새벽조","오후조","휴무","주휴일"],["새벽조","오전조","주휴일","오후조"],["새벽조","휴무","연가","오후조"],["새벽조","주휴일","연가","오후조"],["휴무","새벽조","연가","오후조"],["주휴일","새벽조","오전조","오후조"],["새벽조","오전조","오후조","휴무"],["새벽조","오후조","휴무","주휴일"],["새벽조","오후조","주휴일","공가/건강검진"],["새벽조","휴무","오전조","오후조"],["새벽조","주휴일","오전조","오후조"],["휴무","새벽조","오전조","오후조"],["주휴일","새벽조","오전조","오후조"],["새벽조","오전조","오후조","휴무"],["새벽조","오후조","휴무","주휴일"],["새벽조","연가","주휴일","오후조"],["새벽조","휴무","8/17대체휴무","오후조"],["","","",""],["","","",""],["","","",""],["8/15대체휴무","9/24대체휴무","오후조","휴무"],["8/17대체휴무","오후조","휴무","주휴일"],["9/25대체휴무","오전조","주휴일","오후조"],["새벽조","휴무","오전조","오후조"]
+];
+function scheduleValues(date){
+  const m=date.slice(0,7), day=Number(date.slice(8,10));
+  if(m==="2026-09" && day>=1 && day<=30) return SEPT_2026[day-1];
+  return db.schedule[date]||null;
+}
+function workersForDate(date){
+  const vals=scheduleValues(date)||[];
+  return workers.map((w,i)=>{const st=vals[i]||"";return {...w,status:st||"편성없음",working:!!st&&!offWords.some(x=>st.includes(x))&&st!=="-"}});
+}
+function monthWorkingDays(wid, month){
+  let n=0; const y=Number(month.slice(0,4)), m=Number(month.slice(5,7));
+  const days=new Date(y,m,0).getDate();
+  for(let d=1;d<=days;d++){
+    const date=month+"-"+String(d).padStart(2,"0"), w=workersForDate(date).find(x=>x.id===wid);
+    if(w&&w.working)n++;
+  }
+  return n;
+}
+function completedBasicDays(wid, month){
+  let n=0; const y=Number(month.slice(0,4)), m=Number(month.slice(5,7));
+  const days=new Date(y,m,0).getDate();
+  for(let d=1;d<=days;d++){
+    const date=month+"-"+String(d).padStart(2,"0"), w=workersForDate(date).find(x=>x.id===wid);
+    if(w&&w.working){const k=date+"_"+wid, t=db.tasks[k]; if(t&&t.done&&t.done.length===10)n++;}
+  }
+  return n;
+}
+function basicWorkerStats(wid,month){const target=monthWorkingDays(wid,month),complete=completedBasicDays(wid,month);return {target,complete,miss:Math.max(0,target-complete)}}
+
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{issues:[],tasks:{},schedule:{}}}catch(e){return{issues:[],tasks:{},schedule:{}}}}
+let db=load(); let page="dashboard"; let selectedDate="2026-09-02";
+function save(){localStorage.setItem(KEY,JSON.stringify(db));if(window.BroadcastChannel){new BroadcastChannel("JGB_LIVE").postMessage("update")}}
+window.addEventListener("storage",()=>{db=load();render()});
+let bc;try{bc=new BroadcastChannel("JGB_LIVE");bc.onmessage=()=>{db=load();render()}}catch(e){}
+function dateKey(){return selectedDate}
+function monthKey(d=selectedDate){return d.slice(0,7)}
+function todayWorkers(){return workersForDate(dateKey()).map(w=>{const shift=w.working?w.status:"-";const times=shift.includes("새벽")?["06:00","15:00"]:shift.includes("오전")?["09:00","18:00"]:shift.includes("오후")?["13:30","22:30"]:["",""];return {...w,shift:shift||w.shift,start:times[0],end:times[1]}})}
+function tasksFor(wid){const k=dateKey()+"_"+wid;if(!db.tasks[k])db.tasks[k]={done:[],updatedAt:null};return db.tasks[k]}
+async function syncBasicTasks(){try{const {data,error}=await SUPA.from("basic_tasks").select("*");if(error)throw error;const t={};(data||[]).forEach(r=>{const k=r.work_date+"_"+r.worker_id;(t[k]??={done:[],updatedAt:null}).done.push(r.task_name);t[k].updatedAt=r.completed_at||null});db.tasks=t;localStorage.setItem(KEY,JSON.stringify(db))}catch(e){console.warn("기본업무 동기화 실패",e)}}
+function issuesForMonth(){return db.issues.filter(x=>x.createdAt.slice(0,7)===monthKey())}
+function stats(){
+  const is=issuesForMonth(), done=is.filter(x=>x.status==="완료"), pending=is.filter(x=>x.status!=="완료");
+  let completedDays=0, targetDays=0;
+  workers.forEach(w=>{const q=basicWorkerStats(w.id,monthKey());targetDays+=q.target;completedDays+=q.complete;});
+  return {is,done,pending,completedDays,targetDays,missDays:Math.max(0,targetDays-completedDays)};
+}
+function fmt(ms){let m=Math.max(0,Math.round(ms/60000));return m+"분"}
+function avgTime(list){const a=list.filter(x=>x.completedAt).map(x=>new Date(x.completedAt)-new Date(x.createdAt));return a.length?fmt(a.reduce((p,c)=>p+c,0)/a.length):"-"}
+async function syncFromSupabase(){try{const {data,error}=await SUPA.from("requests").select("*").order("received_at",{ascending:true});if(error)throw error;const remote=(data||[]).map(r=>({remoteId:r.id,id:"R"+r.id,category:r.category||"기타",place:r.place,content:r.content,status:r.status==="완료"?"완료":(r.status==="조치중"?"조치중":"미조치"),createdAt:r.received_at,handlerId:(workers.find(w=>w.name===r.handler_name)||{}).id||"",handlerName:r.handler_name||"",completedAt:r.completed_at||"",photo_url:r.photo_url||""}));const localTasks=db.tasks||{}, localSchedule=db.schedule||{};db.issues=remote;db.tasks=localTasks;db.schedule=localSchedule;localStorage.setItem(KEY,JSON.stringify(db));render()}catch(e){console.warn("Supabase 동기화 실패",e)}}
+function startRealtime(){try{SUPA.channel("jgb-facility-live").on("postgres_changes",{event:"*",schema:"public",table:"requests"},()=>syncFromSupabase()).on("postgres_changes",{event:"*",schema:"public",table:"basic_tasks"},()=>syncBasicTasks().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"assets"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"asset_history"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"inspections"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"external_work"},()=>externalLoad().then(render)).subscribe()}catch(e){console.warn(e)}}
+function render(){
+ const app=document.getElementById("app");
+ app.innerHTML=`<div class="app"><aside class="side"><div class="brand">🛡 장군봉체육관<br>종합관리</div>
+ ${nav("dashboard","🏠 종합 대시보드")}${nav("process","🛠 접수사항 조치")}${nav("basic","🧹 기본업무 관리")}${nav("eam","🏢 시설물 EAM")}${nav("schedule","📅 근무편성표")}${nav("external","🔧 외부 작업") }${nav("stats","📊 통합 실적 현황")}${nav("workers","👥 근무자별 현황")}${nav("pending","🔔 미조치 현황")}${nav("settings","⚙ 시스템 설정")}</aside>
+ <main class="main"><header class="head"><div><div class="title">장군봉체육관 종합 대시보드</div><div class="sub">시설 · 환경 · 안전 통합 관리 시스템</div></div><div class="period"><b>${monthKey().replace("-","년 ")}월 실적</b><small>기준일 : ${selectedDate}</small></div><div class="now"><span id="clock"></span><div class="live">● 실시간 자동 업데이트 중</div></div></header><section class="content">${body()}</section></main></div>`;
+ tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+}
+function nav(p,t){return `<div class="nav ${page===p?"active":""}" onclick="go('${p}')">${t}</div>`}
+function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
+function go(p){page=p;render()}
+function body(){
+ const s=stats();
+
+ if(page==="process")return processPage();
+ if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="schedule")return schedulePage(); if(page==="external")return externalPage();
+ if(page==="stats")return statsPage();
+ if(page==="workers")return workerPage();
+ if(page==="pending")return pendingPage();
+ if(page==="settings")return settingsPage();
+ return dashboard(s);
+}
+function dashboard(s){
+ const pct=s.is.length?Math.round(s.done.length/s.is.length*100):0, tw=todayWorkers();
+ return `<div class="pagebar"><h1>종합 현황</h1><div class="actions"><input type="date" value="${selectedDate}" onchange="setDate(this.value)"><button class="btn gray" onclick="seedDemo()">테스트 예시 1회 생성</button></div></div>
+ <div class="kpis">
+ <div class="card"><h3 class="blue">📋 시설·환경·안전 접수</h3><div class="num">${s.is.length}건</div><div class="small">전월 대비는 월별 실제 데이터로 자동 계산</div></div>
+ <div class="card"><h3 class="green">✓ 조치완료</h3><div class="num">${s.done.length}건</div><div class="small">완료 시 이행시간 자동 기록</div></div>
+ <div class="card"><h3 class="red">⚠ 미조치 현황</h3><div class="num red">${s.pending.length}건</div><div class="small">담당 근무자별 즉시 확인</div></div>
+ <div class="card"><h3 style="color:#7048c9">🧹 기본업무 완료일</h3><div class="num">${s.completedDays}/${s.targetDays}일</div><div class="small">근무자별 근무일 합산 기준 · 1인 1근무일</div></div>
+ <div class="card"><h3 class="orange">⊗ 기본업무 미완료일</h3><div class="num orange">${s.missDays}일</div><div class="small">근무자별 미실시 근무일 합계</div></div>
+ <div class="card"><h3 class="green">📈 조치완료율</h3><div class="num">${pct}%</div><div class="small">조치완료 건수 ÷ 접수 건수 · 접수 1건마다 1건 집계</div></div></div>
+ <div class="grid3"><div class="panel"><h2>전월 대비 비교 · 2026년 8월 → ${monthKey()}</h2>${compareRows(s)}</div><div class="panel"><h2>전년도 대비 · 2025년 → 2026년</h2><div class="notice">2025년 기준은 0건으로 시작합니다. 이후 실제 누적 데이터만 표시합니다.</div>${yearRows(s)}</div><div class="panel"><h2>업무 분야별 현황</h2><div class="donutbox"><div class="donut"></div><div class="donuttext">${pct}%<small>전체 접수사항 조치율</small></div></div><div class="legend">시설 · 환경 · 안전 · 기타<br>※ 실제 접수 자료가 쌓이면 분야별 비율이 자동 계산됩니다.</div></div></div>
+ <div class="workgrid"><div class="panel"><h2>오늘 근무자별 실적 현황 · ${selectedDate}</h2><table><thead><tr><th>근무자</th><th>근무조 / 시간</th><th>상태</th><th>기본업무</th><th>조치완료</th><th>미조치</th><th>접수 합계</th></tr></thead><tbody>${tw.map(w=>workerRow(w)).join("")}</tbody></table><div class="small">※ 기본업무는 10개 체크항목을 모두 완료해야 1일 완료로 집계합니다.</div></div>
+ <div class="panel missed"><h2 class="red">미조치 상세 현황 (${s.pending.length}건)</h2>${s.pending.slice(0,6).map(x=>`<div class="miss"><b>${x.handlerName||"담당 미지정"}</b>${x.category} · ${x.place} · ${x.content}<br>접수 ${time(x.createdAt)} · <span class="red">미조치</span></div>`).join("")||"<div class='small'>현재 미조치 사항이 없습니다.</div>"}</div></div>
+ <div class="bottom"><div class="panel mini"><h2>${monthKey()} 요약</h2><div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b class="green">${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div></div><div class="panel mini"><h2>조치 소요시간</h2><div class="compareline">접수 합계 <b>${avgTime(s.done)}</b></div><div class="compareline">완료 즉시 기록 <b>실시간</b></div></div><div class="panel mini"><h2>근무자 현황</h2><div class="compareline">근무중 <b>${tw.filter(x=>x.working).length}명</b></div><div class="compareline">휴무/기타 <b>${tw.filter(x=>!x.working).length}명</b></div></div><div class="panel mini"><h2>실시간 연결</h2><div class="compareline">저장 <b>자동</b></div><div class="compareline">다른 탭 반영 <b class="green">ON</b></div></div></div>`;
+}
+function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div><div class="compareline">기본업무 완료일일 <b>${s.completedDays}/${s.targetDays}일</b></div><div class="compareline">기본업무 미완료일일 <b>${s.missDays}일</b></div>`}
+function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
+function workerRow(w){const d=tasksFor(w.id), mine=db.issues.filter(x=>x.handlerId===w.id&&x.createdAt.slice(0,7)===monthKey()), md=mine.filter(x=>x.status!=="완료").length, bs=basicWorkerStats(w.id,monthKey());return `<tr><td><b>${w.name}</b></td><td>${w.shift}<br>${w.start?`${w.start}~${w.end}`:"-"}</td><td><span class="badge ${w.working?"":"off"}">${w.working?"근무":"휴무"}</span></td><td>${w.working?`${bs.complete}/${bs.target}일`:"-"}</td><td>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</td><td class="${md?"red":"green"}"><b>${w.working?md:"-"}</b></td><td><b>${mine.length}건</b></td></tr>`}
+function registerPage(){return `<div class="pagebar"><h1>시설·환경·안전 접수</h1><button class="btn gray" onclick="go('dashboard')">종합 대시보드</button></div><div class="notice">등록자 이름은 저장하지 않습니다. 접수시간은 자동 기록됩니다.</div><div class="panel"><div class="formgrid"><div class="field"><label>구분</label><select id="cat"><option>시설</option><option>환경</option><option>안전</option><option>기타</option></select></div><div class="field"><label>접수 장소</label><select id="place"><option value="">장소를 선택하세요</option>${PLACE_OPTIONS.map(p=>`<option value="${p}">${p}</option>`).join("")}</select></div><div class="field full"><label>접수사항</label><textarea id="content" rows="3" placeholder="문제 내용을 입력하세요"></textarea></div><div class="field full"><label>사진(선택)</label><input id="photo" type="file" accept="image/*"></div></div><button class="btn" style="margin-top:10px" onclick="addIssue()">접수 등록</button></div><div class="panel" style="margin-top:10px"><h2>최근 접수</h2>${db.issues.slice(-8).reverse().map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수 ${time(x.createdAt)}</div></div><div class="status ${x.status==="완료"?"green":"red"}">${x.status}</div></div>`).join("")||"<div class='small'>접수된 사항이 없습니다.</div>"}</div>`}
+function processPage(){const pending=db.issues.filter(x=>x.status!=="완료");return `<div class="pagebar"><div><h1>접수사항 실시간 조치</h1><div class="small">접수 → 실제 근무자 선택 → 조치완료 · 실시간 동기화</div></div><button class="btn gray" onclick="syncFromSupabase()">새로고침</button></div><div class="panel">${pending.map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수시간 ${time(x.createdAt)} ${x.startedAt?`· 조치 시작 ${time(x.startedAt)}`:""} ${x.handlerName?`· 담당 ${x.handlerName}`:"· 담당 미지정"}</div>${x.photo_url?`<div style="margin-top:7px"><a href="${x.photo_url}" target="_blank">사진 보기</a></div>`:""}${x.handlerId?`<div style="margin-top:8px"><button class="btn green" onclick="completeIssue('${x.id}')">✓ 조치완료</button></div>`:""}</div><div><select onchange="assign('${x.id}',this.value)"><option value="">실제 근무자 선택</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?"selected":""}>${w.name}</option>`).join("")}</select></div></div>`).join("")||"<div class='small'>현재 미조치 사항이 없습니다.</div>"}</div>`}
+function basicPage(){const tw=todayWorkers();return `<div class="pagebar"><h1>기본업무 관리 · ${selectedDate}</h1><input type="date" value="${selectedDate}" onchange="setDate(this.value)"></div><div class="notice">근무편성표에서 실제 근무한 직원에게만 10개 항목이 부여됩니다. 10개 전부 완료한 근무일은 <b>기본업무 1일 완료</b>입니다. 근무했는데 하나라도 빠지면 그 날은 <b>기본업무 미완료일 1일</b>로 집계됩니다. 휴무·연가·공가·대체휴무는 대상에서 제외합니다.</div><div class="workergrid">${tw.map(w=>{if(!w.working)return `<div class="workerbox"><h3>${w.name}</h3><span class="badge off">${w.status||"휴무"}</span></div>`;const d=tasksFor(w.id);return `<div class="workerbox" style="grid-column:span 2"><h3>${w.name} · ${w.shift} ${w.start}~${w.end}</h3><div class="taskgrid">${tasks.map(t=>`<div class="task ${d.done.includes(t)?"done":""}"><span>${t}</span><button class="btn ${d.done.includes(t)?"gray":"green"}" onclick="toggleTask('${w.id}','${t}')">${d.done.includes(t)?"✓ 실시":"실시"}</button></div>`).join("")}</div><div class="small">현재 ${d.done.length}/10 · ${d.done.length===10?"오늘 기본업무 완료일":"미완료"}</div></div>`}).join("")}</div>`}
+function statsPage(){const s=stats();const ym=monthKey();const today=todayWorkers();return `<div class="pagebar"><div><h1>직원별 근무 실적 한눈에</h1><div class="small">${ym} · 근무편성표 기준으로 자동 집계</div></div><input type="date" value="${selectedDate}" onchange="setDate(this.value)"></div><div class="empdash"><div class="empdash-head"><div><div class="empdash-title">이번 달 직원별 이행 현황</div><div class="empdash-sub">근무일 · 기본업무 · 접수사항을 한 화면에서 확인</div></div><div class="empdash-sub">실시간 반영 ON</div></div><div class="emp-kpis"><div class="emp-kpi"><span>전체 근무일</span><b>${s.targetDays}일</b></div><div class="emp-kpi"><span>기본업무 완료일</span><b>${s.completedDays}일</b></div><div class="emp-kpi"><span>기본업무 미완료일</span><b>${s.missDays}일</b></div><div class="emp-kpi"><span>조치완료</span><b>${s.done.length}건</b></div><div class="emp-kpi"><span>미조치</span><b>${s.pending.length}건</b></div></div><div class="emp-list">${workers.map(w=>{const bs=basicWorkerStats(w.id,ym);const mine=s.is.filter(x=>x.handlerId===w.id);const done=mine.filter(x=>x.status==="완료").length;const pending=mine.length-done;const pct=bs.target?Math.round(bs.complete/bs.target*100):0;const tw=today.find(x=>x.id===w.id);const alert=(bs.miss>0||pending>0);return `<div class="emp-row ${alert?'emp-alert':''}"><div class="emp-top"><div><div class="emp-name">${w.name}</div><div class="emp-shift">${w.shift}${w.start?` · ${w.start}~${w.end}`:''}</div></div><span class="emp-state ${tw&&!tw.working?'off':''}">${tw&&tw.working?'오늘 근무':'오늘 '+(tw?.status||'편성없음')}</span></div><div class="emp-line"><div class="emp-label">기본업무</div><div class="emp-track"><div class="emp-fill ${bs.miss?'bad':''}" style="width:${pct}%"></div></div><div class="emp-num">${bs.complete}/${bs.target}일</div></div><div class="emp-request"><div class="emp-chip"><small>접수사항 합계</small><b>${mine.length}건</b></div><div class="emp-chip"><small>완료</small><b>${done}건</b></div><div class="emp-chip red"><small>미완료</small><b>${pending}건</b></div></div><div class="emp-note">${bs.target?`기본업무 미완료 ${bs.miss}일`:'이번 달 근무일 없음'}${pending?` · 미조치 ${pending}건`:''}</div></div>`}).join('')}</div><div class="actions" style="margin-top:12px"><button class="btn gray" onclick="showMonthYearCompare('month')">📈 월별 비교</button><button class="btn gray" onclick="showMonthYearCompare('year')">📊 연도별 비교</button></div><div class="emp-foot">※ 기본업무는 근무편성표의 실제 근무일만 대상이며, 하루 10개 항목을 모두 완료해야 완료일 1일로 집계합니다. 접수사항은 접수 1건마다 1건으로 집계합니다.</div></div>`}
+function workerPage(){return `<div class="pagebar"><h1>근무자별 현황 · ${selectedDate}</h1></div><div class="workergrid">${todayWorkers().map(w=>{const d=tasksFor(w.id), bs=basicWorkerStats(w.id,monthKey()), mine=db.issues.filter(x=>x.handlerId===w.id&&x.createdAt.slice(0,7)===monthKey()),p=mine.filter(x=>x.status!=="완료");return `<div class="workerbox"><h3>${w.name}</h3><span class="badge ${w.working?"":"off"}">${w.working?w.shift+" "+w.start+"~"+w.end:w.status}</span><div class="compareline">기본업무 <b>${w.working?`${bs.complete}/${bs.target}일`:"-"}</b></div><div class="compareline">조치완료 <b>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</b></div><div class="compareline">미조치 <b class="${p.length?"red":"green"}">${w.working?p.length:"-"}</b></div><div class="compareline">접수 합계 <b>${mine.length}건</b></div></div>`}).join("")}</div>`}
+function pendingPage(){const p=db.issues.filter(x=>x.status!=="완료");return `<div class="pagebar"><h1>미조치 현황</h1></div><div class="panel">${p.map(x=>`<div class="issue"><div><b class="red">${x.handlerName||"담당 미지정"}</b><br>${x.category} · ${x.place} · ${x.content}<div class="small">접수시간 ${time(x.createdAt)}</div></div><button class="btn" onclick="go('process')">조치</button></div>`).join("")||"<div class='small'>미조치 사항이 없습니다.</div>"}</div>`}
+function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:30 · 9시간</b></div><hr><button class="btn red" onclick="resetAll()">테스트 데이터 전체 초기화</button></div>`}
+async function eamLoad(){try{const a=await SUPA.from("assets").select("*").order("name");const h=await SUPA.from("asset_history").select("*").order("event_date",{ascending:false});const i=await SUPA.from("inspections").select("*").order("inspection_date",{ascending:false});window.__eamA=a.data||[];window.__eamH=h.data||[];window.__eamI=i.data||[]}catch(e){console.warn(e)}}
+function eamPage(){const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[],sel=window.__eamSel||"",a=A.find(v=>v.id===sel);return `<div class="pagebar"><div><h1>시설물 EAM · 고장·수리·점검 이력</h1><div class="small">시설물별 이력과 외부 작업을 직원 실적과 분리 관리</div></div><button class="btn gray" onclick="eamLoad().then(render)">새로고침</button></div><div class="grid3"><div class="panel"><h2>시설물 목록</h2>${A.map(v=>`<div class="issue" onclick="window.__eamSel='${v.id}';render()" style="cursor:pointer"><b>${xEsc(v.name)}</b><div class="small">${xEsc(v.place)} · ${xEsc(v.asset_code)}</div><span class="badge">${xEsc(v.status)}</span></div>`).join("")||'<div class="small">시설물이 없습니다.</div>'}</div><div class="panel"><h2>${a?xEsc(a.name):'시설물을 선택하세요'}</h2>${a?`<div class="compareline">위치 <b>${xEsc(a.place)}</b></div><div class="compareline">시설물 코드 <b>${xEsc(a.asset_code)}</b></div><div class="compareline">상태 <b>${xEsc(a.status)}</b></div><div class="compareline">제품 <b>${xEsc(a.product_name||'-')}</b></div><hr><h3>고장·수리 이력</h3>${H.filter(v=>v.asset_id===a.id).map(v=>`<div class="miss"><b>${xEsc(v.event_type)}</b> · ${time(v.event_date)}<br>${xEsc(v.description)}<br>${xEsc(v.worker_name||v.external_company||'')}${v.cost?` · ${Number(v.cost).toLocaleString()}원`:''}</div>`).join("")||'<div class="small">등록된 이력이 없습니다.</div>'}`:'<div class="small">왼쪽 시설물을 선택하세요.</div>'}</div><div class="panel"><h2>점검 이력</h2>${a?I.filter(v=>v.asset_id===a.id).map(v=>`<div class="miss"><b>${xEsc(v.result)}</b> · ${xEsc(v.inspection_date)}<br>점검자 ${xEsc(v.inspector_name||'-')}<br>${xEsc(v.memo||'')}</div>`).join("")||'<div class="small">점검 이력이 없습니다.</div>':'<div class="small">시설물을 선택하세요.</div>'}</div></div>${a?`<div class="grid3" style="margin-top:10px"><div class="panel"><h2>고장·수리 이력 등록</h2><div class="field"><label>구분</label><select id="histType"><option>고장</option><option>수리</option><option>교체</option><option>점검조치</option></select></div><div class="field" style="margin-top:8px"><label>내용</label><textarea id="histDesc" rows="3"></textarea></div><div class="field" style="margin-top:8px"><label>담당자/업체</label><input id="histWorker" placeholder="직원명 또는 업체명"></div><div class="field" style="margin-top:8px"><label>비용</label><input id="histCost" type="number" value="0"></div><button class="btn" style="margin-top:8px" onclick="addAssetHistory('${a.id}')">이력 저장</button></div><div class="panel"><h2>점검 이력 등록</h2><div class="field"><label>결과</label><select id="inspResult"><option>정상</option><option>주의</option><option>조치필요</option></select></div><div class="field" style="margin-top:8px"><label>점검자</label><select id="inspWorker">${workers.map(w=>`<option>${w.name}</option>`).join("")}</select></div><div class="field" style="margin-top:8px"><label>메모</label><textarea id="inspMemo" rows="3"></textarea></div><button class="btn green" style="margin-top:8px" onclick="addInspection('${a.id}')">점검 기록</button></div><div class="panel"><h2>시설물 요약</h2><div class="compareline">고장·수리 이력 <b>${H.filter(v=>v.asset_id===a.id).length}건</b></div><div class="compareline">점검 이력 <b>${I.filter(v=>v.asset_id===a.id).length}건</b></div><div class="compareline">최근 이력 <b>${H.filter(v=>v.asset_id===a.id)[0]?time(H.filter(v=>v.asset_id===a.id)[0].event_date):'-'}</b></div></div></div>`:''}`}
+async function addAssetHistory(assetId){const description=document.getElementById("histDesc").value.trim();if(!description){alert("내용을 입력하세요.");return}const r=await SUPA.from("asset_history").insert({asset_id:assetId,event_type:document.getElementById("histType").value,description,worker_name:document.getElementById("histWorker").value.trim(),cost:Number(document.getElementById("histCost").value||0)});if(r.error){alert("이력 저장에 실패했습니다.");return}await eamLoad();render()}
+async function addInspection(assetId){const r=await SUPA.from("inspections").insert({asset_id:assetId,result:document.getElementById("inspResult").value,inspector_name:document.getElementById("inspWorker").value,memo:document.getElementById("inspMemo").value.trim()});if(r.error){alert("점검 저장에 실패했습니다.");return}await eamLoad();render()}
+
+function xEsc(s){return String(s??'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
+async function addIssue(){const c=document.getElementById("content").value.trim(),p=document.getElementById("place").value,cat=document.getElementById("cat").value;if(!c||!p){alert("접수 장소와 접수사항을 입력하세요.");return}const btn=document.getElementById("intakeBtn");if(btn)btn.disabled=true;let photo_url="";try{const f=document.getElementById("photo")?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,"_")}`;const up=await SUPA.storage.from("request-photos").upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+"/storage/v1/object/public/request-photos/"+path;}const now=new Date().toISOString();const ins=await SUPA.from("requests").insert({category:cat,place:p,content:c,photo_url,status:"접수",received_at:now});if(ins.error)throw ins.error;alert("접수가 완료되었습니다.");document.getElementById("content").value="";if(document.getElementById("photo"))document.getElementById("photo").value="";await syncFromSupabase();go("process")}catch(e){console.error(e);alert("접수에 실패했습니다. Supabase 연결을 확인하세요.")}finally{if(btn)btn.disabled=false}}
+async function assign(id,wid){const x=db.issues.find(i=>i.id===id);if(!x||!wid)return;const w=workers.find(v=>v.id===wid);if(!w)return;const started=x.startedAt||new Date().toISOString();if(x.remoteId){const r=await SUPA.from("requests").update({handler_name:w.name,status:"조치중",started_at:started}).eq("id",x.remoteId);if(r.error){alert("담당 직원 저장에 실패했습니다.");return}}await syncFromSupabase()}
+async function completeIssue(id){const x=db.issues.find(i=>i.id===id);if(!x||!x.handlerId){alert("먼저 실제 조치 직원을 선택하세요.");return}const now=new Date().toISOString();const elapsed=Math.max(0,Math.round((new Date(now)-new Date(x.createdAt))/60000));if(x.remoteId){const r=await SUPA.from("requests").update({status:"조치완료",handler_name:x.handlerName,started_at:x.startedAt||now,completed_at:now,elapsed_minutes:elapsed}).eq("id",x.remoteId);if(r.error){alert("조치완료 저장에 실패했습니다.");return}}await syncFromSupabase()}function toggleTask(wid,t){const d=tasksFor(wid);d.done=d.done.includes(t)?d.done.filter(x=>x!==t):[...d.done,t];d.updatedAt=new Date().toISOString();save();render()}
+function setDate(v){if(v){selectedDate=v;render()}}
+function time(v){return new Date(v).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hourCycle:"h23"})}
+function seedDemo(){if(db.issues.length)return alert("이미 테스트 데이터가 있습니다.");let now=Date.now();db.issues=[{id:"I"+now,category:"시설",place:"2층 남자화장실",content:"조명 점검 필요",status:"미조치",createdAt:new Date(now-35*60000).toISOString(),handlerId:"w1",handlerName:"김민수",completedAt:""},{id:"I"+(now+1),category:"환경",place:"복도",content:"바닥 청소 요청",status:"완료",createdAt:new Date(now-70*60000).toISOString(),handlerId:"w2",handlerName:"이현우",completedAt:new Date(now-25*60000).toISOString()}];save();render()}
+function resetAll(){if(confirm("테스트 데이터를 모두 삭제할까요?")){db={issues:[],tasks:{},schedule:{}};save();render()}}
+eamLoad().then(function(){externalLoad().then(render)});
+syncFromSupabase();
+startRealtime();
+setInterval(syncFromSupabase,5000);
+</script>
+
+<script id="REQUEST_RATE_RULE">
+(function(){
+  window.calcRequestRate = function(receivedCount, completedCount){
+    receivedCount = Number(receivedCount)||0;
+    completedCount = Number(completedCount)||0;
+    if(receivedCount===0) return 0;
+    return Math.round((completedCount/receivedCount)*100);
+  };
+})();
+</script>
+
+<script id="MONTH_YEAR_COMPARE_JS">
+(function(){
+  const baseMonths={2026:{8:0}};
+  const baseYears={2025:0};
+  function state(){
+    try{
+      const keys=["JGB_LIVE_TEST_V2","JGB_FACILITY_LIVE","JGB_LIVE_TEST"];
+      for(const k of keys){const v=localStorage.getItem(k);if(v){const s=JSON.parse(v);if(s&&typeof s==="object")return s;}}
+    }catch(e){}
+    return {};
+  }
+  function issues(s){
+    return s.issues||s.requests||s.items||s.receipts||[];
+  }
+  function monthKey(x){
+    const t=x.receivedAt||x.createdAt||x.time||x.date||"";
+    const m=String(t).match(/(20\d\d)[-/.](\d\d?)/);
+    return m?m[1]+"-"+String(m[2]).padStart(2,"0"):"";
+  }
+  function annualData(){
+    const s=state(), arr=issues(s), out={};
+    for(const x of arr){
+      const k=monthKey(x); if(!k) continue;
+      const [y,m]=k.split("-").map(Number);
+      out[y]??={}; out[y][m]??={received:0,done:0,miss:0};
+      out[y][m].received++;
+      if(x.completed||x.status==="completed"||x.status==="done"||x.handledAt) out[y][m].done++;
+      else out[y][m].miss++;
+    }
+    return out;
+  }
+  function render(mode){
+    const box=document.getElementById("monthYearCompareBody"); if(!box)return;
+    const d=annualData(), now=new Date(), cy=now.getFullYear(), cm=now.getMonth()+1;
+    if(mode==="month"){
+      const months=[];
+      for(let m=1;m<=12;m++){
+        const z=(d[cy]&&d[cy][m])||{received:0,done:0,miss:0};
+        if(cy===2026 && m===8 && !d[cy]?.[m]) z.received=z.done=z.miss=0;
+        const prev=(m===1?{received:0,done:0,miss:0}:((d[cy]&&d[cy][m-1])||{received:0,done:0,miss:0}));
+        const delta=z.received-prev.received;
+        months.push({m,z,delta});
+      }
+      const cur=(d[cy]&&d[cy][cm])||{received:0,done:0,miss:0};
+      const rate=cur.received?Math.round(cur.done/cur.received*100):0;
+      box.innerHTML=`
+        <div class="myc-grid">
+          <div class="myc-card">현재 월 접수<b class="v">${cur.received}건</b><div class="s">${cy}년 ${cm}월</div></div>
+          <div class="myc-card">현재 월 완료<b class="v myc-up">${cur.done}건</b><div class="s">조치완료</div></div>
+          <div class="myc-card">현재 월 미완료<b class="v myc-down">${cur.miss}건</b><div class="s">아직 완료되지 않은 건</div></div>
+          <div class="myc-card">완료율<b class="v">${rate}%</b><div class="s">완료 건수 ÷ 접수 건수</div></div>
+        </div>
+        <table class="myc-table"><thead><tr><th>월</th><th>접수</th><th>완료</th><th>미완료</th><th>완료율</th><th>전월 대비 접수</th></tr></thead>
+        <tbody>${months.map(x=>{const r=x.z.received?Math.round(x.z.done/x.z.received*100):0; return `<tr><td><b>${x.m}월</b></td><td>${x.z.received}건</td><td class="myc-up">${x.z.done}건</td><td class="${x.z.miss?'myc-down':'myc-zero'}">${x.z.miss}건</td><td>${r}%</td><td class="${x.delta>0?'myc-up':x.delta<0?'myc-down':'myc-zero'}">${x.delta>0?"+":""}${x.delta}건</td></tr>`}).join("")}</tbody></table>`;
+    }else{
+      const years=[2025,2026];
+      box.innerHTML=`
+        <div class="myc-grid">
+          ${years.map(y=>{const months=d[y]||{};let rec=0,done=0,miss=0;for(const m in months){rec+=months[m].received;done+=months[m].done;miss+=months[m].miss}if(y===2025&&!rec)rec=0;const rate=rec?Math.round(done/rec*100):0;return `<div class="myc-card"><b>${y}년</b><div class="v">${rec}건</div><div class="s">접수 · 완료 ${done}건 · 미완료 ${miss}건 · 완료율 ${rate}%</div></div>`}).join("")}
+        </div>
+        <table class="myc-table"><thead><tr><th>연도</th><th>접수</th><th>완료</th><th>미완료</th><th>완료율</th><th>전년도 대비 접수</th></tr></thead>
+        <tbody>${years.map((y,i)=>{const months=d[y]||{};let rec=0,done=0,miss=0;for(const m in months){rec+=months[m].received;done+=months[m].done;miss+=months[m].miss}const prev=i?((()=>{const q=d[years[i-1]]||{};let n=0;for(const m in q)n+=q[m].received;return n})()):0;const rate=rec?Math.round(done/rec*100):0;const delta=rec-prev;return `<tr><td><b>${y}년</b></td><td>${rec}건</td><td class="myc-up">${done}건</td><td class="${miss?'myc-down':'myc-zero'}">${miss}건</td><td>${rate}%</td><td class="${delta>0?'myc-up':delta<0?'myc-down':'myc-zero'}">${delta>0?"+":""}${delta}건</td></tr>`}).join("")}</tbody></table>`;
+    }
+  }
+  window.showMonthYearCompare=function(mode){
+    const sec=document.getElementById("monthYearCompare");
+    if(!sec)return;
+    sec.style.display="block";
+    document.querySelectorAll("#monthYearCompare .myc-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.mode===mode));
+    render(mode);
+    sec.scrollIntoView({behavior:"smooth",block:"start"});
+  };
+})();
+</script>
+
+<section id="monthYearCompare" style="display:none" class="myc-wrap">
+  <div class="myc-head">
+    <div><h2 style="margin:0">📈 월별 · 연도별 개선 현황</h2><div style="font-size:12px;color:#64748b;margin-top:4px">접수 건수를 기준으로 이전 기간과 비교</div></div>
+    <div class="myc-tabs">
+      <button data-mode="month" onclick="showMonthYearCompare('month')">월별 비교</button>
+      <button data-mode="year" onclick="showMonthYearCompare('year')">연도별 비교</button>
+    </div>
+  </div>
+  <div id="monthYearCompareBody"></div>
+</section>
+</body></html>
