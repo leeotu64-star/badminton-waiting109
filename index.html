@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -54,6 +54,41 @@
 .jgb-modal{position:fixed;inset:0;background:rgba(4,18,35,.55);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}.jgb-modal.show{display:flex}.jgb-modalbox{width:min(900px,95vw);max-height:88vh;overflow:auto;background:#fff;border-radius:20px;padding:20px;box-shadow:0 25px 70px rgba(0,0,0,.25)}.jgb-modalhead{display:flex;justify-content:space-between;align-items:center}.jgb-close{border:0;background:#eef3f8;border-radius:10px;padding:8px 12px;cursor:pointer}
 @media(max-width:1100px){.jgb-actions{grid-template-columns:repeat(4,1fr)}.jgb-kpi{grid-template-columns:repeat(3,1fr)}.jgb-main,.jgb-bottom{grid-template-columns:1fr}.jgb-eqgrid{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:700px){.jgb-actions{grid-template-columns:repeat(2,1fr)}.jgb-kpi{grid-template-columns:repeat(2,1fr)}.jgb-selector{grid-template-columns:repeat(2,1fr)}.jgb-eqgrid{grid-template-columns:repeat(2,1fr)}.jgb-eqdetail{grid-template-columns:1fr}.jgb-eqdetail img{width:100%}}
+</style>
+
+<style id="JGB_INNOVATION_V3_STYLE">
+.jgb-exec{max-width:1500px;margin:auto}
+.jgb-category-panel{margin-top:14px}
+.jgb-category-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.jgb-category-btn{border:1px solid #dbe5f1;background:#fff;border-radius:14px;padding:14px 12px;display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;transition:.18s;min-height:74px}
+.jgb-category-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(16,48,80,.10);border-color:#2f76d2}
+.cat-ico{font-size:29px;width:38px;text-align:center}
+.jgb-category-btn b{display:block;font-size:15px}
+.jgb-category-btn small{display:block;color:#74849a;margin-top:3px;font-size:11px}
+.cat-arrow{margin-left:auto;font-size:25px;color:#a5b2c2}
+.jgb-dashboard-grid{grid-template-columns:1.08fr .92fr!important;gap:14px;margin-top:14px}
+.jgb-leak-map{position:relative;display:grid;grid-template-columns:1.2fr 1fr 1fr 1.2fr;grid-template-rows:58px 150px 55px 70px;gap:5px;background:#f7f9fc;border:1px solid #dce5ef;border-radius:14px;padding:10px;overflow:hidden}
+.jgb-leak-map>div,.jgb-leak-map>button{border:1px solid #d8e0ea;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px}
+.lr-a{grid-column:1}.lr-rest-m{grid-column:2}.lr-rest-f{grid-column:3}.lr-b{grid-column:4}
+.lr-courts{grid-column:1/5;display:grid!important;grid-template-columns:repeat(5,1fr);gap:5px;background:#eef5fd!important;padding:7px}
+.lr-courts button{border:1px solid #9fc3eb;background:#5d98d7;color:#fff;border-radius:7px;font-weight:800;cursor:pointer}
+.lr-courts button small{display:block}
+.lr-zone{cursor:pointer!important}
+.lr-c{grid-column:1/4;background:#fff3c9!important;border-color:#e9c64d!important}
+.lr-d{grid-column:4;background:#ffe6e6!important;border-color:#f19a9a!important}
+.lr-office{grid-column:1}.lr-visit{grid-column:2}.lr-mchange{grid-column:3}.lr-fchange{grid-column:4}
+.lr-lounge{grid-column:1}.lr-e{grid-column:4;background:#eee4ff!important;border-color:#b99be8!important;cursor:pointer!important}
+.lr-a,.lr-b{background:#ffe7e7!important;border-color:#ee9b9b!important;cursor:pointer!important}
+.lr-a small,.lr-b small,.lr-c small,.lr-d small,.lr-e small{display:block;font-size:9px;margin-top:2px;color:#5d6570}
+.lr-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:9px;color:#5d6d80;font-size:12px}
+.jgb-eqgrid.compact{grid-template-columns:repeat(4,1fr)!important;gap:8px}
+.jgb-eqgrid.compact .jgb-eqbtn{min-height:150px}
+.jgb-eqgrid.compact .jgb-eqbtn img{height:78px;object-fit:cover}
+.jgb-status-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.jgb-status-row button{border:1px solid #dbe5f1;background:#fff;border-radius:12px;padding:13px;cursor:pointer;text-align:left}
+.jgb-status-row span{font-size:22px}.jgb-status-row b{display:block;margin:5px 0}.jgb-status-row strong{font-size:20px}
+@media(max-width:1200px){.jgb-category-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:850px){.jgb-category-grid{grid-template-columns:repeat(2,1fr)}.jgb-dashboard-grid{grid-template-columns:1fr!important}.jgb-status-row{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -140,7 +175,7 @@ function startRealtime(){try{SUPA.channel("jgb-facility-live").on("postgres_chan
 function render(){
  const app=document.getElementById("app");
  app.innerHTML=`<div class="app"><aside class="side"><div class="brand">🛡 장군봉체육관<br>종합관리</div>
- ${nav("dashboard","🏠 종합 대시보드")}${nav("map","📍 배치도 통합관리")}${nav("process","🛠 접수사항 조치")}${nav("basic","🧹 기본업무 관리")}${nav("eam","🏢 시설물 EAM")}${nav("leak","💧 누수 관리")}${nav("schedule","📅 근무편성표")}${nav("external","🔧 외부 작업") }${nav("stats","📊 통합 실적 현황")}${nav("workers","👥 근무자별 현황")}${nav("pending","🔔 미조치 현황")}${nav("settings","⚙ 시스템 설정")}</aside>
+ ${nav("dashboard","🏠 종합 대시보드")}${nav("map","📍 배치도 통합관리")}${nav("process","🛠 접수사항 조치")}${nav("basic","🧹 기본업무 관리")}${nav("eam","🏢 시설물 EAM")}${nav("schedule","📅 근무편성표")}${nav("external","🔧 외부 작업") }${nav("stats","📊 통합 실적 현황")}${nav("workers","👥 근무자별 현황")}${nav("pending","🔔 미조치 현황")}${nav("settings","⚙ 시스템 설정")}</aside>
  <main class="main"><header class="head"><div><div class="title">장군봉체육관 종합 대시보드</div><div class="sub">시설 · 환경 · 안전 통합 관리 시스템</div></div><div class="period"><b>${monthKey().replace("-","년 ")}월 실적</b><small>기준일 : ${selectedDate}</small></div><div class="now"><span id="clock"></span><div class="live">● 실시간 자동 업데이트 중</div></div></header><section class="content">${body()}</section></main></div>`;
  tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
 }
@@ -152,7 +187,7 @@ function body(){
 
  if(page==="map")return mapPage();
  if(page==="process")return processPage();
- if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="leak")return leakagePage(); if(page==="schedule")return schedulePage(); if(page==="external")return externalPage();
+ if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="leak")return mapPage(); if(page==="schedule")return schedulePage(); if(page==="external")return externalPage();
  if(page==="stats")return statsPage();
  if(page==="workers")return workerPage();
  if(page==="pending")return pendingPage();
@@ -173,34 +208,89 @@ function mapPage(){
  <div class="jgb-map"><div class="jgb-floor"><div class="jgb-zone a" onclick="mapSelect('leak','A')">A구간</div><div class="jgb-zone b" onclick="mapSelect('leak','B')">B구간</div><div class="jgb-zone c" onclick="mapSelect('leak','C')">C구간</div><div class="jgb-zone d" onclick="mapSelect('leak','D')">D구간</div><div class="jgb-zone e" onclick="mapSelect('leak','E')">E구간</div><div class="jgb-courts">${[1,2,3,4,5].map(n=>`<div class="jgb-court" onclick="mapSelect('court','${n}')">${n}<br>코트</div>`).join('')}</div></div></div>
  <div class="jgb-actions" style="grid-template-columns:repeat(5,1fr)">${[['leak','💧','누수'],['court','🏸','코트'],['env','🚻','탈의·화장실'],['elec','💡','조명·전동릴'],['safe','🛡️','안전·공용']].map(x=>`<button class="jgb-action" onclick="mapSelect('${x[0]}')"><span class="ico">${x[1]}</span><b>${x[2]}</b></button>`).join('')}</div>
  <div class="panel"><h2>${list.title}</h2><div class="jgb-selector">${list.items.map(x=>`<button class="${x[0]===sel?'sel':''}" onclick="mapSelect('${g}','${x[0]}')">${x[1].replace('·','<br>')}</button>`).join('')}</div></div>
- <div class="jgb-detail"><h2 style="margin-top:0">${xEsc(item[1])}</h2><div class="jgb-detailgrid"><div class="jgb-info"><span>상태</span><b>${xEsc(a?.status||'정상')}</b></div><div class="jgb-info"><span>접수</span><b>${qs.length}건</b></div><div class="jgb-info"><span>시설물 이력</span><b>${hs.length}건</b></div><div class="jgb-info"><span>점검 이력</span><b>${ins.length}건</b></div></div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="go('process')">📥 접수사항 조치</button>${a?`<button class="btn gray" onclick="window.__eamSel='${a.id}';go('eam')">🏢 시설물 이력</button>`:''}${g==='leak'?`<button class="btn gray" onclick="go('leak')">💧 누수 이력</button>`:''}${g==='elec'?`<button class="btn gray" onclick="jgbOpenModal('equipment')">💡 조명·전동릴 이력</button>`:''}</div></div></div>`;
+ <div class="jgb-detail"><h2 style="margin-top:0">${xEsc(item[1])}</h2><div class="jgb-detailgrid"><div class="jgb-info"><span>상태</span><b>${xEsc(a?.status||'정상')}</b></div><div class="jgb-info"><span>접수</span><b>${qs.length}건</b></div><div class="jgb-info"><span>시설물 이력</span><b>${hs.length}건</b></div><div class="jgb-info"><span>점검 이력</span><b>${ins.length}건</b></div></div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="go('process')">📥 접수사항 조치</button>${a?`<button class="btn gray" onclick="window.__eamSel='${a.id}';go('eam')">🏢 시설물 이력</button>`:''}${g==='leak'?`<button class="btn gray" onclick="mapSelect('leak')">💧 누수 이력</button>`:''}${g==='elec'?`<button class="btn gray" onclick="jgbOpenModal('equipment')">💡 조명·전동릴 이력</button>`:''}</div></div></div>`;
 }
 function mapSelect(group,key){window.__mapGroup=group||'leak';const g=window.__mapGroup;const defaults={leak:'A',court:'1',env:'남탈',safe:'소화기',elec:'1'};window.__mapSel=key||defaults[g];render()}
 
 function dashboard(s){
- const A=window.__eamA||[], H=window.__eamH||[], I=window.__eamI||[];
- const pct=s.is.length?Math.round(s.done.length/s.is.length*100):0;
+ const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];
  const leaks=['A-001','B-001','C-001','D-001','E-001'].map(c=>A.find(x=>x.asset_code===c)).filter(Boolean);
- const leakOpen=leaks.filter(a=>a.status!=='정상').length;
+ const pct=s.is.length?Math.round(s.done.length/s.is.length*100):0;
  const quick=[
-  ['💧','누수','A~E','leak'],['💡','조명·전동릴','1~36번','map'],['🏢','시설물 이력','시설 전체','eam'],['🧯','소방 설비','주·보조·예비','equip'],['♨️','온수·저수조','주요설비','equip'],['🛡️','안전시설','소화기·AED','map'],['🧹','기본업무','일상 체크','basic'],['🔧','외부작업','수리·점검','external'],['📥','접수사항','실시간 접수','process'],['📊','통합 실적','월·연 비교','stats'],['📅','근무편성표','근무일 기준','schedule'],['🔔','미조치','확인 필요','pending']
+  ['🏸','코트','1~5번','map','court'],
+  ['💧','누수','A~E 구간','map','leak'],
+  ['💡','조명·전동릴','1~36번','map','elec'],
+  ['🧯','소방','주·보조·예비','equip','equip'],
+  ['🛡️','안전시설','소화기·AED','map','safe'],
+  ['🚿','탈의실','남·여','map','env'],
+  ['🚻','화장실','남·여','map','env'],
+  ['🚶','복도·휴게실','공용구역','map','env'],
+  ['🏢','주요설비','7종 이력카드','equip','equip'],
+  ['📥','접수사항','접수 → 조치','process',''],
+  ['🧹','기본업무','일상업무','basic',''],
+  ['📊','실적관리','월·연 비교','stats','']
  ];
- return `<div class="jgb-smart">
- <div class="jgb-hero"><h1>장군봉체육관 운영 컨트롤센터</h1><p>배치도와 시설물을 기준으로 접수·조치·점검·이력을 한곳에서 관리합니다.</p><span class="livepill">● SUPABASE 실시간 연결 · ${selectedDate} 기준</span></div>
+ return `<div class="jgb-smart jgb-exec">
+ <div class="jgb-hero">
+   <div><h1>장군봉체육관 시설·환경·안전 관제센터</h1><p>배치도에서 필요한 시설을 선택하고, 선택한 정보만 확인합니다.</p></div>
+   <span class="livepill">● SUPABASE 실시간 연결 · ${selectedDate}</span>
+ </div>
  <div class="jgb-kpi">
-  <div class="k"><span>시설·환경·안전 접수</span><b>${s.is.length}건</b></div><div class="k"><span>조치완료</span><b>${s.done.length}건</b></div><div class="k"><span>미조치</span><b>${s.pending.length}건</b></div><div class="k"><span>기본업무 완료일</span><b>${s.completedDays}일</b></div><div class="k"><span>누수 구간</span><b>${leaks.length}구간</b></div><div class="k"><span>접수 조치율</span><b>${pct}%</b></div>
+  <div class="k"><span>시설·환경·안전 접수</span><b>${s.is.length}건</b></div>
+  <div class="k"><span>조치완료</span><b>${s.done.length}건</b></div>
+  <div class="k"><span>미조치</span><b>${s.pending.length}건</b></div>
+  <div class="k"><span>기본업무 완료일</span><b>${s.completedDays}일</b></div>
+  <div class="k"><span>접수 조치율</span><b>${pct}%</b></div>
  </div>
- <div class="jgb-main">
-  <div class="jgb-map"><div class="jgb-maphead"><div><h2 style="margin:0">📍 체육관 배치도</h2><div class="small">구역을 누르면 해당 관리 화면으로 바로 이동</div></div><button class="btn gray" onclick="go('map')">배치도 전체</button></div>
-   <div class="jgb-floor"><div class="jgb-zone a" onclick="go('leak')">A구간<br>1번 코트 벽체</div><div class="jgb-zone b" onclick="go('leak')">B구간<br>5번 코트 좌측</div><div class="jgb-zone c" onclick="go('leak')">C구간<br>2·3번 코트 천장</div><div class="jgb-zone d" onclick="go('leak')">D구간<br>5번 코트 우측</div><div class="jgb-zone e" onclick="go('leak')">E구간<br>여자 탈의실</div><div class="jgb-courts">${[1,2,3,4,5].map(n=>`<div class="jgb-court" onclick="mapSelect('court','${n}')">${n}<br>코트</div>`).join('')}</div></div>
-   <div class="small" style="margin-top:8px">A~E 누수 / 1~5 코트 / 탈의실·화장실 / 관리·방문객·휴게 공간을 장소 기준으로 관리</div>
+
+ <div class="jgb-panel jgb-category-panel">
+   <div class="jgb-maphead"><div><h2 style="margin:0">⚡ 빠른 선택</h2><div class="small">같은 종류의 기능을 하나의 버튼으로 묶었습니다.</div></div></div>
+   <div class="jgb-category-grid">
+     ${quick.map(q=>`<button class="jgb-category-btn" onclick="${q[3]==='map'?`mapSelect('${q[4]}')`:q[3]==='equip'?`jgbOpenModal('equip')`:`go('${q[3]}')`}">
+       <span class="cat-ico">${q[0]}</span><span><b>${q[1]}</b><small>${q[2]}</small></span><span class="cat-arrow">›</span>
+     </button>`).join('')}
+   </div>
+ </div>
+
+ <div class="jgb-main jgb-dashboard-grid">
+  <div class="jgb-panel">
+   <div class="jgb-maphead"><div><h2 style="margin:0">📍 누수 배치도</h2><div class="small">제공해주신 A~E 누수 배치 기준 · 누수 버튼을 누르면 해당 구간만 표시</div></div><button class="btn gray" onclick="mapSelect('leak')">누수 전체</button></div>
+   <div class="jgb-leak-map">
+     <div class="lr-room lr-a" onclick="mapSelect('leak','A')"><b>A구간</b><small>1번 코트 인접 벽체</small></div>
+     <div class="lr-room lr-rest-m">남자<br>화장실</div>
+     <div class="lr-room lr-rest-f">여자<br>화장실</div>
+     <div class="lr-room lr-b" onclick="mapSelect('leak','B')"><b>B구간</b><small>5번 코트 인접 벽체(좌측)</small></div>
+     <div class="lr-courts">${[1,2,3,4,5].map(n=>`<button onclick="mapSelect('court','${n}')">${n}<small>코트</small></button>`).join('')}</div>
+     <div class="lr-zone lr-c" onclick="mapSelect('leak','C')"><b>C구간</b><small>2·3번 코트 외부 천장</small></div>
+     <div class="lr-zone lr-d" onclick="mapSelect('leak','D')"><b>D구간</b><small>5번 코트 인접 벽체(우측)</small></div>
+     <div class="lr-room lr-office">관리실</div><div class="lr-room lr-visit">방문객실</div>
+     <div class="lr-room lr-mchange">남자 탈의실</div><div class="lr-room lr-fchange">여자 탈의실</div>
+     <div class="lr-room lr-lounge">휴게실</div>
+     <div class="lr-zone lr-e" onclick="mapSelect('leak','E')"><b>E구간</b><small>여자 탈의실 천장</small></div>
+   </div>
+   <div class="lr-legend"><span>🔴 누수 A~E</span><span>🔵 코트</span><span>🟢 탈의실</span><span>🟡 화장실</span></div>
   </div>
-  <div class="jgb-quick"><h2 style="margin:0 0 10px">⚡ 바로가기</h2><div class="jgb-quickgrid">${quick.map(q=>`<div class="jgb-tile" onclick="jgbQuick('${q[3]}')"><span class="ico">${q[0]}</span><b>${q[1]}</b><small>${q[2]}</small></div>`).join('')}</div></div>
+
+  <div class="jgb-panel">
+   <div class="jgb-maphead"><div><h2 style="margin:0">🏢 주요설비 7종</h2><div class="small">사진 + 이력카드 · 버튼을 누르면 상세정보만 표시</div></div><button class="btn gray" onclick="jgbOpenModal('equip')">전체 보기</button></div>
+   <div class="jgb-eqgrid compact">${JGB_MAIN_EQUIPMENT.map((e,i)=>`<button class="jgb-eqbtn" onclick="jgbSelectEquip(${i})"><img src="${e.photo}" alt="${xEsc(e.name)}"><b>${i+1}. ${xEsc(e.name)}</b><small>${xEsc(e.type)} · ${xEsc(e.place)}</small></button>`).join('')}</div>
+   <div id="jgbEqDetail"></div>
+  </div>
  </div>
- <div class="jgb-panel"><div class="jgb-maphead"><div><h2 style="margin:0">🏢 주요설비 7종</h2><div class="small">원본 이력카드 사진을 포함한 버튼식 선택</div></div><button class="btn gray" onclick="jgbOpenModal('equip')">전체 크게 보기</button></div><div class="jgb-eqgrid">${JGB_MAIN_EQUIPMENT.map((e,i)=>`<button class="jgb-eqbtn" onclick="jgbSelectEquip(${i})"><img src="${e.photo}" alt="${xEsc(e.name)}"><b>${i+1}. ${xEsc(e.name)}</b><small>${xEsc(e.place)} · ${xEsc(e.grade)}</small></button>`).join('')}</div><div id="jgbEqDetail"></div></div>
- <div class="jgb-bottom"><div class="jgb-panel"><h3>💧 누수 A~E</h3>${leaks.map(a=>`<div class="jgb-listbtn" onclick="go('leak')"><span>${xEsc(a.asset_code)} · ${xEsc(a.name)}</span><span class="jgb-status">${xEsc(a.status||'정상')}</span></div>`).join('')}</div><div class="jgb-panel"><h3>📥 최근 접수</h3>${s.is.slice(-5).reverse().map(x=>`<div class="jgb-listbtn" onclick="go('process')"><span>${xEsc(x.place)} · ${xEsc(x.content)}</span><span class="jgb-status">${x.status==='완료'?'조치완료':'미조치'}</span></div>`).join('')||'<div class="small">접수 내역이 없습니다.</div>'}</div></div>
- </div><div id="jgbModal" class="jgb-modal" onclick="if(event.target===this)jgbCloseModal()"><div class="jgb-modalbox"><div class="jgb-modalhead"><h2 id="jgbModalTitle">상세</h2><button class="jgb-close" onclick="jgbCloseModal()">닫기</button></div><div id="jgbModalBody"></div></div></div>`;
+
+ <div class="jgb-panel">
+  <div class="jgb-maphead"><div><h2 style="margin:0">🧭 오늘의 상태</h2><div class="small">상세 화면은 선택했을 때만 열립니다.</div></div></div>
+  <div class="jgb-status-row">
+   <button onclick="go('process')"><span>📥</span><b>접수</b><strong>${s.is.length}</strong></button>
+   <button onclick="go('process')"><span>✅</span><b>조치완료</b><strong>${s.done.length}</strong></button>
+   <button onclick="go('pending')"><span>⚠️</span><b>미조치</b><strong>${s.pending.length}</strong></button>
+   <button onclick="go('basic')"><span>🧹</span><b>기본업무</b><strong>${s.completedDays}일</strong></button>
+   <button onclick="go('stats')"><span>📊</span><b>실적</b><strong>보기</strong></button>
+  </div>
+ </div>
+ </div>`;
 }
+
 function jgbQuick(key){if(key==='equip'){jgbOpenModal('equip');return} if(key==='map'){go('map');return} go(key)}
 function jgbSelectEquip(i){const e=JGB_MAIN_EQUIPMENT[i], A=window.__eamA||[], a=A.find(x=>x.asset_code===e.code);const H=window.__eamH||[];const hs=a?H.filter(x=>x.asset_id===a.id):[];const el=document.getElementById('jgbEqDetail');if(!el)return;el.innerHTML=`<div class="jgb-eqdetail"><img src="${e.photo}" alt=""><div><h3 style="margin:0 0 7px">${i+1}. ${xEsc(e.name)}</h3><div class="jgb-detailgrid"><div class="jgb-info"><span>구분</span><b>${xEsc(e.type)}</b></div><div class="jgb-info"><span>용량</span><b>${xEsc(e.capacity)}</b></div><div class="jgb-info"><span>제작회사</span><b>${xEsc(e.maker)}</b></div><div class="jgb-info"><span>설치장소</span><b>${xEsc(e.place)}</b></div></div><div class="jgb-note" style="margin-top:9px">제조 ${xEsc(e.date)} · 내용연수 ${xEsc(e.life)} · 평가 ${xEsc(e.grade)} · 등록 이력 ${hs.length}건</div><button class="btn" style="margin-top:9px" onclick="jgbOpenEquipment('${e.code}')">이력카드 열기</button></div></div>`}
 function jgbOpenEquipment(code){const i=JGB_MAIN_EQUIPMENT.findIndex(x=>x.code===code);jgbOpenModal('equipment',i)}
