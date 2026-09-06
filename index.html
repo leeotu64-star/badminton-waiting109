@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿﻿﻿﻿﻿﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -210,6 +210,7 @@ function go(p){page=p;render()}
 function body(){
  const s=stats();
 
+ if(page==="qr")return qrRequestPage();
  if(page==="register")return registerPage();
  if(page==="process")return processPage();
  if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="schedule")return schedulePage(); if(page==="external")return eamPage();
@@ -273,6 +274,28 @@ function dashboard(s){
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
 function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
 function workerRow(w){const d=tasksFor(w.id), mine=db.issues.filter(x=>x.handlerId===w.id&&x.createdAt.slice(0,7)===monthKey()), md=mine.filter(x=>x.status!=="완료").length, bs=basicWorkerStats(w.id,monthKey());return `<tr><td><b>${w.name}</b></td><td>${w.shift}<br>${w.start?`${w.start}~${w.end}`:"-"}</td><td><span class="badge ${w.working?"":"off"}">${w.working?"근무":"휴무"}</span></td><td>${w.working?`${bs.complete}/${bs.target}일`:"-"}</td><td>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</td><td class="${md?"red":"green"}"><b>${w.working?md:"-"}</b></td><td><b>${mine.length}건</b></td></tr>`}
+function qrRequestPage(){
+ const q=new URLSearchParams(location.search);
+ const code=q.get('asset')||q.get('qr')||'';
+ const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
+ const cat=a?.category||'设施'; const place=a?.place||''; const name=a?.name||'';
+ return `<div class="pagebar"><div><h1>시설·설비 이상 접수</h1><div class="small">EAM 자산 QR 접수</div></div></div>
+ <div class="panel" style="max-width:760px;margin:auto">
+ <div class="notice"><b>${xEsc(name||'시설·설비')}</b>${code?` · 자산번호 ${xEsc(code)}`:''}<br>위치 · ${xEsc(place||'-')}</div>
+ <input type="hidden" id="qrAssetCode" value="${xEsc(code)}"><input type="hidden" id="cat" value="${xEsc(cat)}"><input type="hidden" id="place" value="${xEsc(place)}">
+ <div class="field full"><label>이상 내용</label><textarea id="content" rows="4" placeholder="이상 내용을 입력하세요"></textarea></div>
+ <div class="field full" style="margin-top:10px"><label>사진</label><input id="photo" type="file" accept="image/*" capture="environment"></div>
+ <button id="intakeBtn" class="btn" style="margin-top:14px;width:100%" onclick="addQrIssue()">📥 EAM 접수</button>
+ </div>`;
+}
+async function addQrIssue(){
+ const c=document.getElementById('content')?.value.trim(), p=document.getElementById('place')?.value, cat=document.getElementById('cat')?.value||'시설', code=document.getElementById('qrAssetCode')?.value||'';
+ if(!c||!p){alert('이상 내용과 위치를 입력하세요.');return}
+ const btn=document.getElementById('intakeBtn'); if(btn)btn.disabled=true; let photo_url='';
+ try{ const f=document.getElementById('photo')?.files?.[0]; if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,'_')}`; const up=await SUPA.storage.from('request-photos').upload(path,f,{upsert:false}); if(up.error)throw up.error; photo_url=SUPABASE_URL+'/storage/v1/object/public/request-photos/'+path;}
+ const now=new Date().toISOString(); const ins=await SUPA.from('requests').insert({category:cat,place:p,content:`[${code||'QR'}] ${c}`,photo_url,status:'접수',received_at:now}); if(ins.error)throw ins.error; alert('EAM 접수가 완료되었습니다.'); location.href=location.pathname+'?page=process';
+ }catch(e){console.error(e);alert('접수에 실패했습니다. Supabase 연결을 확인하세요.')}finally{if(btn)btn.disabled=false}
+}
 function registerPage(){const defaultCat="시설";const places=PLACE_GROUPS[defaultCat]||PLACE_OPTIONS;const presets=ISSUE_PRESETS[defaultCat]||[];return `<div class="pagebar"><h1>시설·환경·안전 접수</h1><button class="btn gray" onclick="go('dashboard')">종합 대시보드</button></div><div class="notice">구분과 장소를 선택하면 해당 시설에 맞는 장소·접수사항이 자동으로 표시됩니다. 등록자 이름은 저장하지 않습니다.</div><div class="panel"><div class="formgrid"><div class="field"><label>구분</label><select id="cat" onchange="updateRegisterOptions()"><option>시설</option><option>환경</option><option>안전</option><option>기타</option></select></div><div class="field"><label>접수 장소</label><select id="place"><option value="">장소를 선택하세요</option>${places.map(p=>`<option value="${p}">${p}</option>`).join("")}</select></div><div class="field full"><label>시설·접수사항 선택</label><select id="issuePreset" onchange="applyIssuePreset()"><option value="">내용을 선택하세요</option>${presets.map(v=>`<option value="${v}">${v}</option>`).join("")}<option value="직접입력">직접입력</option></select></div><div class="field full"><label>상세 내용</label><textarea id="content" rows="3" placeholder="위 목록에서 선택하거나 필요한 경우 상세 내용을 입력하세요"></textarea></div><div class="field full"><label>사진(선택)</label><input id="photo" type="file" accept="image/*"></div></div><button class="btn" style="margin-top:10px" onclick="addIssue()">접수 등록</button></div><div class="panel" style="margin-top:10px"><h2>최근 접수</h2>${db.issues.slice(-8).reverse().map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수 ${time(x.createdAt)}</div></div><div class="status ${x.status==="완료"?"green":"red"}">${x.status}</div></div>`).join("")||"<div class='small'>접수된 사항이 없습니다.</div>"}</div>`}
 function updateRegisterOptions(){const cat=document.getElementById("cat")?.value||"시설",place=document.getElementById("place"),preset=document.getElementById("issuePreset");if(place){const arr=PLACE_GROUPS[cat]||PLACE_OPTIONS;place.innerHTML='<option value="">장소를 선택하세요</option>'+arr.map(p=>`<option value="${p}">${p}</option>`).join("")}if(preset){const arr=ISSUE_PRESETS[cat]||[];preset.innerHTML='<option value="">내용을 선택하세요</option>'+arr.map(v=>`<option value="${v}">${v}</option>`).join("")+ '<option value="직접입력">직접입력</option>';preset.value=""}}
 function applyIssuePreset(){const v=document.getElementById("issuePreset")?.value||"",ta=document.getElementById("content");if(!ta)return;if(v&&v!=="직접입력")ta.value=v;else if(v==="직접입력"){ta.value="";ta.focus()}}
