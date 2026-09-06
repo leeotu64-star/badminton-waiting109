@@ -238,6 +238,48 @@ body{background:var(--bg)}
 <style id="DASH_REALISM_CSS">
 .dash-recent-list{display:flex;flex-direction:column;gap:0}.dash-recent-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e8edf3}.dash-recent-row:last-child{border-bottom:0}.dash-recent-row>div{min-width:0}.dash-recent-row b{display:block;font-size:12px}.dash-recent-row span{font-size:11px;color:#334155;margin-left:7px}.dash-recent-row small{display:block;color:#64748b;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:430px}.dash-recent-row strong{white-space:nowrap;font-size:12px}.goodtxt{color:#159447}.warntxt{color:#d83b3b}
 .dash-method-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 12px}.dash-method-grid .dash-kpi{min-height:92px}@media(max-width:900px){.dash-method-grid{grid-template-columns:repeat(2,1fr)}}</style>
+
+<style id="REALISM_TEXT_LAYOUT_V12">
+/* 대시보드 글씨/배열 정렬 개선 */
+.jgb-page-title h2{font-size:24px!important;line-height:1.25!important;letter-spacing:-.02em!important}
+.jgb-page-title p{font-size:13px!important;line-height:1.5!important}
+.jgb-actions{align-items:center!important}
+.jgb-actions input[type=date]{height:40px!important;padding:0 10px!important;border:1px solid #cbd5e1!important;border-radius:8px!important}
+.wow-title{font-size:16px!important;line-height:1.35!important}
+.wow-big{font-size:34px!important;line-height:1.1!important;white-space:nowrap!important}
+.wow-flow{grid-template-columns:1fr 32px 1fr 32px 1fr 32px 1fr!important;align-items:stretch!important;gap:8px!important}
+.wow-step{min-width:0!important;min-height:88px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;padding:12px 8px!important;text-align:center!important}
+.wow-step b{font-size:13px!important;line-height:1.25!important;white-space:nowrap!important}
+.wow-step strong{font-size:27px!important;line-height:1.1!important;margin-top:7px!important}
+.wow-arrow{display:flex!important;align-items:center!important;justify-content:center!important;font-size:24px!important;font-weight:900!important}
+.wow-health-text b{font-size:16px!important}
+.wow-health-text small{font-size:11px!important;line-height:1.55!important}
+.dash-section-title{font-size:16px!important;line-height:1.3!important;margin-top:18px!important}
+.dash-kpi span{font-size:13px!important;line-height:1.3!important}
+.dash-kpi b{font-size:28px!important;line-height:1.15!important}
+.dash-kpi small{font-size:11px!important;line-height:1.4!important}
+.dash-head h3{font-size:16px!important}
+.dash-head small{font-size:12px!important}
+.dash-year-row{font-size:12px!important;min-height:45px!important}
+.dash-table th,.dash-table td{font-size:12px!important;line-height:1.4!important}
+.dash-method-grid .dash-kpi{min-height:108px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+@media(max-width:1100px){.wow-flow{grid-template-columns:1fr!important}.wow-arrow{display:none!important}}
+
+/* EAM 내부수리 / 외부수리 */
+.eam-service-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-top:12px!important}
+.eam-service-btn{border:1px solid #d7e1eb!important;border-radius:12px!important;padding:13px 14px!important;background:#fff!important;cursor:pointer!important;text-align:left!important}
+.eam-service-btn:hover{border-color:#7aa7d9!important;box-shadow:0 7px 18px rgba(15,70,120,.08)!important}
+.eam-service-btn b{display:block!important;font-size:14px!important}
+.eam-service-btn small{display:block!important;margin-top:4px!important;color:#64748b!important;font-size:11px!important;line-height:1.35!important}
+.eam-service-btn.internal{border-left:5px solid #2563eb!important}
+.eam-service-btn.external{border-left:5px solid #f59e0b!important}
+.eam-service-stats{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:12px!important}
+.eam-service-stat{background:#f8fafc!important;border:1px solid #e2e8f0!important;border-radius:10px!important;padding:10px 12px!important}
+.eam-service-stat span{display:block!important;color:#64748b!important;font-size:11px!important}
+.eam-service-stat b{display:block!important;font-size:20px!important;margin-top:4px!important}
+@media(max-width:700px){.eam-service-actions{grid-template-columns:1fr!important}}
+</style>
+
 </head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -791,6 +833,8 @@ function eamPage(){
   const abnormal=A.filter(a=>String(a.status||"정상")!=="정상").length;
   const overdue=allSource.filter(x=>{const a=eamRegisteredForSource(x);return a && String(a.status||"")!=="정상"}).length;
   const maintenanceCount=H.length;
+  const internalCount=H.filter(h=>String(h.action_type||"").includes("내부")||String(h.worker_name||"").includes("직원")).length;
+  const externalCount=H.filter(h=>String(h.action_type||"").includes("외부")||!!h.vendor_name).length;
 
   return `<div class="eam-final cat-${cat}">
     <div class="eam-final-head">
@@ -804,6 +848,8 @@ function eamPage(){
       <div class="eam-kpi good"><small>정상</small><b>${normal}</b><span>현재 상태</span></div>
       <div class="eam-kpi alert"><small>상태확인 필요</small><b>${abnormal+overdue}</b><span>정상 외 / 이력 필요</span></div>
       <div class="eam-kpi"><small>유지보수 이력</small><b>${maintenanceCount}</b><span>asset_history</span></div>
+      <div class="eam-kpi"><small>내부수리</small><b>${internalCount}</b><span>직원 직접 작업</span></div>
+      <div class="eam-kpi"><small>외부수리</small><b>${externalCount}</b><span>업체 작업</span></div>
     </div>
 
     <div class="eam-tabs">
@@ -863,6 +909,11 @@ function eamPage(){
           ${reg?`<button onclick="eamShowHistory()">📋 작업 이력</button><button onclick="eamEditSelectedAsset()">✏️ 자산 수정</button><button onclick="eamRetireSelectedAsset()">♻️ 폐기·교체</button><button class="danger" onclick="eamDeleteSelectedAsset()">🗑 삭제</button>`:
           `<button class="primary" onclick="eamRegisterNewAsset()">＋ 신규 자산 등록</button>`}
         </div>
+        ${reg?`<div class="eam-service-actions">
+          <button class="eam-service-btn internal" onclick="eamRegisterMaintenance('내부수리','${reg.id}')"><b>🔵 내부수리 등록</b><small>직원이 직접 점검·수리한 작업을 자산 이력에 기록</small></button>
+          <button class="eam-service-btn external" onclick="eamRegisterMaintenance('외부수리','${reg.id}')"><b>🟠 외부수리 등록</b><small>업체 수리·교체·점검 및 비용을 자산 이력에 기록</small></button>
+        </div>
+        <div class="eam-service-stats"><div class="eam-service-stat"><span>이 자산 내부수리</span><b>${hs.filter(h=>String(h.action_type||'').includes('내부')||String(h.worker_name||'').includes('직원')).length}건</b></div><div class="eam-service-stat"><span>이 자산 외부수리</span><b>${hs.filter(h=>String(h.action_type||'').includes('외부')||!!h.vendor_name).length}건</b></div></div>`:''}
         <div class="eam-history-box"><div class="eam-history-head"><b>수명주기 이력</b><span>작업 ${hs.length} · 점검 ${ins.length}</span></div>${renderEamHistory(hs,ins)}</div>
         ${current.note&&current.note!=="-"?`<div class="eam-note">메모 · ${xEsc(current.note)}</div>`:""}
         `:`<div class="eam-empty-big">상단 분류에서 자산을 선택하세요.</div>`}
@@ -892,7 +943,7 @@ function leakagePage(){
     `<div class="leak-empty"><b>현재 등록된 누수 자산이 없습니다.</b><span>임의의 누수 위치를 자동으로 만들지 않습니다. 실제 누수 항목을 신규 등록하면 이곳에 표시됩니다.</span></div>`}
   </div>`;
 }
-async function addAssetHistory(assetId){alert('작업 이력은 자산에 연결된 작업·점검 과정에서 기록합니다.');}
+async function addAssetHistory(assetId){eamRegisterMaintenance('내부수리',assetId);}
 function renderEamHistory(hs,ins){return `<div>${hs.length?hs.slice(0,10).map(v=>`<div class="eamx-hrow"><b>${xEsc(v.event_type||'조치')}</b><span>${xEsc(v.description||'-')} · ${xEsc(v.worker_name||v.vendor_name||'-')}</span><time>${time(v.event_date)}</time></div>`).join(''):'<div class="eamx-empty">등록된 작업·교체 이력이 없습니다.</div>'}</div>`}
 function eamHistoryTab(mode){const box=document.getElementById('eamHistoryView');if(!box)return;const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];const code=window.__eamSelCode||'';const a=A.find(x=>x.asset_code===code);const hs=a?H.filter(v=>v.asset_id===a.id||v.asset_code===code):[];const ins=a?I.filter(v=>v.asset_id===a.id||v.asset_code===code):[];if(mode==='inspection')box.innerHTML=ins.length?ins.map(v=>`<div class="eamx-hrow"><b>${xEsc(v.result||'-')}</b><span>${xEsc(v.inspector_name||'-')}</span><time>${time(v.inspection_date)}</time></div>`).join(''):'<div class="eamx-empty">등록된 점검 이력이 없습니다.</div>';else box.innerHTML=renderEamHistory(hs,[])}
 function eamToggleForm(){return}
@@ -998,7 +1049,7 @@ function leakagePage(){
  <div class="grid3" style="margin-top:12px"><div class="panel" style="grid-column:span 2"><h2>누수 이력 전체</h2>${allH.length?allH.map(v=>{const a=leaks.find(z=>z.id===v.asset_id);return `<div class="issue"><div><b>${a?xEsc(a.asset_code+' · '+a.name):'-'}</b><div>${xEsc(v.event_type)} · ${xEsc(v.description||'-')}</div><div class="small">${time(v.event_date)} · ${xEsc(v.worker_name||v.vendor_name||'')}</div></div><span class="badge">${v.action_type?xEsc(v.action_type):'내부/외부 미기록'}</span></div>`}).join(''):'<div class="small">등록된 누수 이력이 없습니다.</div>'}</div>
  <div class="panel"><h2>누수 관리 원칙</h2><div class="notice">A 1번 코트 인접 벽체<br>B 5번 코트 인접 벽체(좌측)<br>C 2·3번 코트 외부 천장<br>D 5번 코트 인접 벽체(우측)<br>E 여자 탈의실 천장</div><div class="small" style="margin-top:10px">직원 작업실적과 설비 유지보수 이력은 별도로 기록합니다.</div></div></div>`
 }
-async function addAssetHistory(assetId){alert('작업 이력은 수동 등록하지 않습니다. 직원 신고 → 작업관리 → 조치완료 과정에서 EAM에 자동 기록됩니다.');}
+async function addAssetHistory(assetId){eamRegisterMaintenance('내부수리',assetId);}
 
 function xEsc(s){return String(s??'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
 async function addIssue(){const c=document.getElementById("content").value.trim(),p=document.getElementById("place").value,cat=document.getElementById("cat").value;if(!c||!p){alert("접수 장소와 접수사항을 입력하세요.");return}const btn=document.getElementById("intakeBtn");if(btn)btn.disabled=true;let photo_url="";try{const f=document.getElementById("photo")?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,"_")}`;const up=await SUPA.storage.from("request-photos").upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+"/storage/v1/object/public/request-photos/"+path}const now=new Date().toISOString();const ins=await SUPA.from("requests").insert({category:cat,place:p,content:c,photo_url,status:"접수",received_at:now});if(ins.error)throw ins.error;alert("접수가 완료되었습니다.");document.getElementById("content").value="";if(document.getElementById("photo"))document.getElementById("photo").value="";await syncFromSupabase();go("process")}catch(e){console.error(e);alert("접수에 실패했습니다. Supabase 연결을 확인하세요.")}finally{if(btn)btn.disabled=false}}
