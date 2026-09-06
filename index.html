@@ -59,7 +59,7 @@
 </style>
 
 <style id="JGB_EAM_PHOTO_LINK_FIX">
-.eamx-subgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.eamx-sub{display:grid;grid-template-columns:46px 1fr;align-items:center;gap:9px}.eamx-sub-photo{width:46px;height:46px;border-radius:8px;overflow:hidden;background:#eef3f8;display:grid;place-items:center}.eamx-sub-photo img{width:100%;height:100%;object-fit:contain}.eamx-sub-text b{display:block}.eamx-sub-text small{display:block;color:#7a8796;font-size:10px;margin-top:3px}.eamx-photo{background:#f4f7fa}.eamx-photo img{object-fit:contain!important;background:#f4f7fa}.eamx-source-note{margin-top:8px;padding:7px 9px;border-radius:8px;background:#f8fafc;color:#718096;font-size:10px}
+.eamx-subgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.eamx-sub{display:grid;grid-template-columns:46px 1fr;align-items:center;gap:9px}.eamx-sub-photo{width:46px;height:46px;border-radius:8px;overflow:hidden;background:#eef3f8;display:grid;place-items:center}.eamx-sub-photo img{width:100%;height:100%;object-fit:contain}.eamx-sub-text b{display:block}.eamx-sub-text small{display:block;color:#7a8796;font-size:10px;margin-top:3px}.eamx-photo{background:#f4f7fa}.eamx-photo img{object-fit:contain!important;background:#f4f7fa;display:block}.eamx-source-note{margin-top:8px;padding:7px 9px;border-radius:8px;background:#f8fafc;color:#718096;font-size:10px}
 @media(max-width:900px){.eamx-subgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 
@@ -230,11 +230,11 @@ function eamPage(){
  const excel=(Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[]).filter((e,i,a)=>a.findIndex(z=>z.code===e.code)===i);
  const main=(Array.isArray(JGB_MAIN_EQUIPMENT)?JGB_MAIN_EQUIPMENT:[]).filter(e=>e.code!=='EQ-06');
  const leaks=[['A-001','A구간 · 1번 코트 인접 벽체 누수'],['B-001','B구간 · 5번 코트 인접 벽체 누수(좌측)'],['C-001','C구간 · 2·3번 코트 외부 천장 누수'],['D-001','D구간 · 5번 코트 인접 벽체 누수(우측)'],['E-001','E구간 · 여자 탈의실 천장 누수']];
- // 사용자 지정 분류: 스마트온수기는 온수, EQ-06은 제외, 명확한 중복 분전반/예비펌프는 1건으로 표시
+ // 원본 자산자료 기준으로 분류하여 표시. 소방설비 FI-01~FI-08 전체 포함.
  const cooling=excel.filter(e=>e.type==='냉난방');
  const water=[main.find(e=>e.code==='EQ-04'),excel.find(e=>e.code==='BO-02'),excel.find(e=>e.code==='BO-03')].filter(Boolean).map(e=>({...e, type:'온수·난방'}));
  const fireMain=main.filter(e=>['EQ-01','EQ-02','EQ-03','EQ-05','EQ-07'].includes(e.code));
- const fireExcel=excel.filter(e=>e.type==='소방').filter(e=>!['FI-03','FI-08'].includes(e.code));
+ const fireExcel=excel.filter(e=>e.type==='소방');
  const fire=[...fireMain,...fireExcel];
  const heating=excel.filter(e=>e.code==='FI-05').map(e=>({...e,type:'온수·난방',name:'난방순환펌프'}));
  const other=excel.filter(e=>e.type==='기타');
