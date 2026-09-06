@@ -1,4 +1,4 @@
-﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -127,7 +127,44 @@ body{background:var(--bg)}
 </style>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#eef3f8;color:#172033;font-family:"Malgun Gothic",Arial,sans-serif}.wrap{max-width:560px;margin:auto;padding:18px 14px 30px}.brand{background:#08234a;color:#fff;border-radius:20px;padding:20px;margin-bottom:12px}.brand small{opacity:.7}.brand h1{margin:7px 0 3px;font-size:24px}.brand p{margin:0;font-size:12px;opacity:.8}.card{background:#fff;border:1px solid #dbe4ee;border-radius:18px;padding:18px;box-shadow:0 8px 28px rgba(16,42,75,.08)}.step{display:flex;gap:10px;align-items:center;margin:5px 0 12px}.step i{width:28px;height:28px;border-radius:50%;background:#1264a3;color:#fff;display:grid;place-items:center;font-style:normal;font-weight:900}.step b{display:block}.step small{color:#718096}.field{margin:0 0 15px}.field label{display:block;font-size:13px;font-weight:900;margin-bottom:6px}.field em{font-style:normal;color:#d92d20;font-size:10px;margin-left:4px}.field input,.field select,.field textarea{width:100%;border:1px solid #cbd6e2;border-radius:10px;padding:12px;background:#fff;font-size:15px}.field textarea{resize:vertical;min-height:120px}.photo{border:1px dashed #b9c7d6;padding:14px;border-radius:12px;background:#f8fafc}.submit{width:100%;border:0;border-radius:12px;background:#1264a3;color:#fff;padding:14px;font-size:16px;font-weight:900;cursor:pointer}.submit:disabled{opacity:.55}.foot{text-align:center;color:#718096;font-size:11px;margin-top:12px}.ok{display:none;background:#ecfdf3;border:1px solid #a7e3bd;color:#08783c;border-radius:12px;padding:13px;margin-bottom:12px;font-weight:800}
-</style><style id="modern-basic-style">.modern-basic{gap:18px}.modern-worker{border:1px solid #e7ebf0!important;border-radius:18px!important;box-shadow:0 8px 24px rgba(20,30,50,.06);padding:20px!important;background:#fff}.worker-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.worker-head h3{margin:0 0 4px}.basic-result{margin-top:15px;padding:12px 14px;border-radius:12px;background:#f5f7fa;font-size:14px}.basic-result.auto{background:#eef7f0;font-weight:700}.modern-worker .task{border-radius:12px;background:#f8fafc;border:1px solid #edf0f3}.modern-worker .task.done{background:#f0f7f2;border-color:#dcecdf}</style></head><body><div id="app"></div>
+</style><style id="modern-basic-style">.modern-basic{gap:18px}.modern-worker{border:1px solid #e7ebf0!important;border-radius:18px!important;box-shadow:0 8px 24px rgba(20,30,50,.06);padding:20px!important;background:#fff}.worker-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.worker-head h3{margin:0 0 4px}.basic-result{margin-top:15px;padding:12px 14px;border-radius:12px;background:#f5f7fa;font-size:14px}.basic-result.auto{background:#eef7f0;font-weight:700}.modern-worker .task{border-radius:12px;background:#f8fafc;border:1px solid #edf0f3}.modern-worker .task.done{background:#f0f7f2;border-color:#dcecdf}.staff-table{width:100%;border-collapse:separate;border-spacing:0}.staff-table th,.staff-table td{padding:11px;border-bottom:1px solid #edf1f5;text-align:center}.staff-table th{background:#f8fafc;font-size:12px;color:#64748b}.staff-table td{font-size:12px}
+</style>
+<style id="work-status-modern">
+.basic-modern{display:flex;flex-direction:column;gap:16px}
+.basic-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.basic-toolbar .title h2{margin:0;font-size:22px}
+.basic-toolbar .title p{margin:5px 0 0;color:#6b7280;font-size:13px}
+.basic-legend{display:flex;gap:8px;flex-wrap:wrap}
+.basic-chip{padding:7px 11px;border-radius:999px;background:#f4f6f8;font-size:12px;font-weight:800;color:#59636f}
+.basic-chip.work{background:#eef6ff;color:#1769aa}
+.basic-chip.off{background:#f3f4f6;color:#6b7280}
+.basic-chip.auto{background:#eef8f0;color:#28733c}
+.basic-worker{border:1px solid #e6e9ee!important;border-radius:18px!important;padding:20px!important;background:#fff;box-shadow:0 5px 20px rgba(30,40,55,.05)}
+.basic-worker.off-worker{background:#fafbfc}
+.basic-worker-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:16px}
+.basic-worker-name{font-size:17px;font-weight:900}
+.basic-worker-sub{margin-top:4px;font-size:12px;color:#7a8490}
+.work-status{padding:7px 11px;border-radius:999px;font-size:12px;font-weight:900;white-space:nowrap}
+.work-status.ready{background:#eef6ff;color:#1769aa}
+.work-status.off{background:#f1f3f5;color:#69727d}
+.work-status.auto{background:#edf8ef;color:#26723a}
+.taskgrid-modern{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.task-modern{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid #edf0f3;border-radius:12px;background:#f9fafb}
+.task-modern.done{background:#f0f8f2;border-color:#dcecdf}
+.task-modern .task-name{font-size:13px;font-weight:700}
+.task-modern button{min-width:62px}
+.basic-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:13px;border-top:1px solid #eef0f2;font-size:13px}
+.basic-progress{font-weight:900}
+.basic-progress.complete{color:#28733c}
+.basic-progress.pending{color:#7a5b00}
+.auto-note{font-size:12px;color:#28733c;font-weight:800}
+@media(max-width:760px){
+ .taskgrid-modern{grid-template-columns:1fr!important}
+ .basic-worker-head{align-items:flex-start}
+}
+</style>
+
+</head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style id="STAFF_MANAGEMENT_CSS">.staff-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:12px 0}.staff-kpi{background:#fff;border:1px solid #dbe5ef;border-radius:14px;padding:14px}.staff-kpi span{display:block;font-size:12px;color:#64748b}.staff-kpi b{display:block;font-size:24px;margin-top:5px}.staff-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid #dbe5ef;border-radius:14px;overflow:hidden}.staff-table th,.staff-table td{padding:11px 9px;border-bottom:1px solid #eef2f7;text-align:center;font-size:12px}.staff-table th{background:#f7f9fc;color:#475569}.staff-table td:first-child,.staff-table th:first-child{text-align:left;padding-left:15px}.staff-good{color:#15803d;font-weight:900}.staff-bad{color:#dc2626;font-weight:900}.staff-muted{color:#94a3b8}.staff-bar{height:7px;background:#edf2f7;border-radius:99px;overflow:hidden;min-width:100px}.staff-bar i{display:block;height:100%;background:#1265bb;border-radius:99px}.staff-detail{margin-top:12px;padding:14px;background:#f8fbff;border:1px solid #dbe8f7;border-radius:12px}.schedule-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.schedule-table{width:100%;border-collapse:collapse;background:#fff}.schedule-table th,.schedule-table td{border:1px solid #e2e8f0;padding:7px;text-align:center;font-size:12px}.schedule-table th{background:#f8fafc}.schedule-working{font-weight:800}.schedule-off{color:#94a3b8}.upload-note{font-size:12px;color:#64748b;margin-top:8px;line-height:1.5}@media(max-width:1050px){.staff-kpis{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.staff-kpis{grid-template-columns:repeat(2,1fr)}.staff-table{min-width:900px}.schedule-table{min-width:760px}}</style>
@@ -169,12 +206,14 @@ const JGB_MAIN_EQUIPMENT=[
 const JGB_EXCEL_EQUIPMENT=[{"code":"AC-01","name":"냉방기(난방겸용)","type":"냉난방","place":"사무실","photo":null,"vendor":"엘지","asContact":"1544-7777","installDate":"2017년","model":"SW071BSf1W","quantity":1,"warranty":"만료","asHistory":"25년5월수리","note":null},{"code":"AC-02","name":"냉방기(난방겸용)","type":"냉난방","place":"1번 코트(우측)","photo":null,"vendor":"케리어","asContact":"1588-8866","installDate":"2018/9.28","model":"CPV-Q1457DXO","quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"AC-03","name":"냉방기(난방겸용)","type":"냉난방","place":"3번 코트(우측)","photo":null,"vendor":"케리어","asContact":"1588-8866","installDate":"2018/9.28","model":"CPV-Q1457DXO","quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"AC-04","name":"냉방기(난방겸용)","type":"냉난방","place":"5번 코트(우측)","photo":null,"vendor":"케리어","asContact":"1588-8866","installDate":"2018/9.28","model":"CPV-Q1457DXO","quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"AC-05","name":"냉방기(난방겸용)","type":"냉난방","place":"1번 코트(좌측)","photo":null,"vendor":"엘지","asContact":"1544-7777","installDate":"2018/5.28","model":"PNW06QR2S","quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"AC-06","name":"냉방기(난방겸용)","type":"냉난방","place":"3번 코트(좌측)","photo":null,"vendor":"엘지","asContact":"1544-7777","installDate":"2018/5.28","model":"PNW06QR2S","quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"AC-07","name":"냉방기(난방겸용)","type":"냉난방","place":"5번 코트(좌측)","photo":null,"vendor":"엘지","asContact":"1544-7777","installDate":"2018/5.28","model":"PNW06QR2S","quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"AC-08","name":"냉방기(난방겸용)","type":"냉난방","place":"휴게실","photo":null,"vendor":"엘지","asContact":"1544-7777","installDate":"2018/5.28","model":"PNW06QR2S","quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"AC-09","name":"실외기/대형","type":"냉난방","place":"옥상","photo":null,"vendor":"엘지","asContact":"010-9730-9875","installDate":"2018/5.28","model":"PUW1451T9S","quantity":3,"warranty":"만료","asHistory":null,"note":"1544-7777"},{"code":"AC-10","name":"실외기/소형","type":"냉난방","place":"옥상","photo":null,"vendor":"엘지","asContact":"010-9730-9875","installDate":"2018/5.28","model":null,"quantity":2,"warranty":"만료","asHistory":null,"note":"1544-7777"},{"code":"BO-01","name":"온수기/보일러","type":"온수·난방","place":"옥상","photo":null,"vendor":"스마트코리아","asContact":"031-564-2371","installDate":"2017년","model":"스마트 전기온수기","quantity":1,"warranty":"만료","asHistory":null,"note":"1588-7887"},{"code":"BO-02","name":"온도조절기","type":"온수·난방","place":"사무실","photo":null,"vendor":"토브에너지","asContact":"02-923-5204","installDate":"2017년","model":"보일러조절기","quantity":2,"warranty":"만료","asHistory":null,"note":null},{"code":"BO-03","name":"온도조절기","type":"온수·난방","place":"사무실","photo":null,"vendor":"에너지코리아","asContact":"1600-9339","installDate":"2017년","model":"복사패널 온도조절기","quantity":4,"warranty":"만료","asHistory":null,"note":null},{"code":"FI-01","name":"소방설비","type":"소방","place":"유수장치실","photo":null,"vendor":"유신플렌테크","asContact":"010-3766-9348","installDate":"2017년","model":null,"quantity":null,"warranty":"만료","asHistory":null,"note":null},{"code":"FI-02","name":"소방설비","type":"소방","place":"유수장치실","photo":null,"vendor":"기광전기","asContact":"(02) 445-0755/0756","installDate":"2017년","model":"소방 분전반","quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"FI-03","name":"소방설비","type":"소방","place":"유수장치실","photo":null,"vendor":"유신플렌테크","asContact":"010-3766-9348","installDate":"2017년","model":"SP-예비펌프","quantity":null,"warranty":"만료","asHistory":null,"note":null},{"code":"FI-04","name":"소방설비","type":"소방","place":"유수장치실","photo":null,"vendor":"유신플렌테크","asContact":"010-3766-9348","installDate":"2017년","model":"프리액션 밸브","quantity":null,"warranty":"만료","asHistory":null,"note":null},{"code":"FI-05","name":"소방설비","type":"소방","place":"유수장치실","photo":null,"vendor":"유신플렌테크","asContact":"010-3766-9348","installDate":"2017년","model":"난방순환펌프","quantity":1,"warranty":"만료","asHistory":"교체","note":"25년11/26"},{"code":"FI-06","name":"소방설비","type":"소방","place":"유수장치실","photo":null,"vendor":"유신플렌테크","asContact":"010-3766-9348","installDate":"2017년","model":"충압펌프","quantity":null,"warranty":"만료","asHistory":null,"note":null},{"code":"FI-07","name":"소방설비","type":"소방","place":"유수장치실","photo":null,"vendor":"유신플렌테크","asContact":"010-3766-9348","installDate":"2017년","model":"건저지교테","quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"FI-08","name":"소방설비","type":"소방","place":"유수장치실","photo":null,"vendor":"유신플렌테크","asContact":"010-3766-9348","installDate":"2017년","model":"소방 분전반","quantity":null,"warranty":"만료","asHistory":null,"note":null},{"code":"EL-01","name":"분전반","type":"전기","place":"휴게실","photo":null,"vendor":"중앙이엔테크","asContact":"02-533-2220","installDate":"2017년","model":null,"quantity":1,"warranty":"만료","asHistory":null,"note":"교정형 교체예정"},{"code":"WP-01","name":"지붕","type":"방수","place":"옥상","photo":null,"vendor":"민석산업","asContact":"010-4618-4211","installDate":null,"model":null,"quantity":null,"warranty":"만료","asHistory":"25년11월","note":null},{"code":"LT-01","name":"원격조명릴","type":"코트조명","place":"코트","photo":null,"vendor":"릴테크","asContact":"061-723-1127","installDate":"2017","model":"CSI-7, 컴팩형","quantity":8,"warranty":"만료","asHistory":"3,9,10,11,17,26,27,30(교체)","note":"25/12/4"},{"code":"OT-01","name":"칼라복합기/D-300","type":"기타","place":"사무실","photo":null,"vendor":"신도리코","asContact":"02-875-8676","installDate":"2017년","model":"신도리코(D-300)","quantity":1,"warranty":"만료","asHistory":"토너교체","note":"2025.10.29."},{"code":"OT-02","name":"냉장고","type":"기타","place":"사무실","photo":null,"vendor":"엘지","asContact":"1544-7777","installDate":"2017년","model":null,"quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"OT-03","name":"전자레인지","type":"기타","place":"사무실","photo":null,"vendor":"엘지","asContact":"1544-7777","installDate":null,"model":null,"quantity":1,"warranty":"만료","asHistory":null,"note":null},{"code":"OT-04","name":"흰지","type":"기타","place":"샤워실/주출입문","photo":null,"vendor":"민석선업","asContact":"010-4618-4211","installDate":null,"model":null,"quantity":1,"warranty":"만료","asHistory":"주출입문교체","note":"2025.11.12."},{"code":"OT-05","name":"샤워실 하부판","type":"기타","place":"남녀 샤워실","photo":null,"vendor":"민석선업","asContact":"010-4618-4211","installDate":null,"model":null,"quantity":3,"warranty":"만료","asHistory":"2026년3월26일","note":null},{"code":"OT-06","name":"남자소변기 수리","type":"기타","place":"남녀 샤워실","photo":null,"vendor":"민석선업","asContact":"010-4618-4211","installDate":null,"model":null,"quantity":2,"warranty":"만료","asHistory":"2026년3월26일","note":null}];
 
 const KEY="JGB_LIVE_TEST_V3";
-const workers=[
+const DEFAULT_WORKERS=[
  {id:"w1",name:"김민수",shift:"새벽조",start:"06:00",end:"15:00"},
  {id:"w2",name:"이현우",shift:"오전조",start:"09:00",end:"18:00"},
  {id:"w3",name:"박성훈",shift:"오후조",start:"13:30",end:"22:30"},
  {id:"w4",name:"최지훈",shift:"-",start:"",end:""}
 ];
+let workers=(()=>{try{const saved=JSON.parse(localStorage.getItem("JGB_EAM_STAFF"));return Array.isArray(saved)&&saved.length?saved:DEFAULT_WORKERS.map(x=>({...x}))}catch(e){return DEFAULT_WORKERS.map(x=>({...x}))}})();
+function saveEamStaff(){localStorage.setItem("JGB_EAM_STAFF",JSON.stringify(workers));}
 const tasks=["남자화장실","여자화장실","남자탈의실","여자탈의실","코트","복도","휴게실","재활용","종량제","기타"];
 const offWords=["휴무","주휴일","연가","공가","대체휴무"];
 const defaultSchedule={};
@@ -239,7 +278,7 @@ async function syncFromSupabase(){if(!SUPA)return;try{const {data,error}=await S
 function startRealtime(){if(!SUPA)return;try{SUPA.channel("jgb-facility-live").on("postgres_changes",{event:"*",schema:"public",table:"requests"},()=>syncFromSupabase()).on("postgres_changes",{event:"*",schema:"public",table:"basic_tasks"},()=>syncBasicTasks().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"assets"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"asset_history"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"inspections"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"external_work"},()=>externalLoad().then(render)).subscribe()}catch(e){console.warn(e)}}
 function render(){
  const app=document.getElementById("app");
- app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📥 접수 · 조치")}${nav("pending","🔔 미조치")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 · EAM")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}${nav("stats","📈 직원실적")}${nav("workers","👥 근무자")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리</h1><small>직원 신고 → 관리자 작업관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);}
+ app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📥 접수 · 조치")}${nav("pending","🔔 미조치")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 · EAM")}${nav("dashboard2","📊 EAM 현황")}${nav("eamStaff","👤 직원관리")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}${nav("stats","📈 직원실적")}${nav("workers","👥 근무자")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리</h1><small>직원 신고 → 관리자 작업관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);}
 function nav(p,t){return `<div class="jgb-link ${page===p?"on":""}" onclick="go('${p}')">${t}</div>`}
 function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
 function go(p){page=p;render()}
@@ -249,7 +288,7 @@ function body(){
  if(page==="qr")return dashboard(s);
  if(page==="dashboard2")return dashboard2();
   if(page==="process")return processPage();
- if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="schedule")return schedulePage(); if(page==="external")return eamPage();
+ if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="eamStaff")return eamStaffPage(); if(page==="schedule")return schedulePage(); if(page==="external")return eamPage();
  if(page==="stats")return statsPage();
  if(page==="workers")return workerPage();
  if(page==="pending")return pendingPage();
@@ -333,7 +372,54 @@ function dashboard(s){
 }
 function dashboard2(){const A=window.__eamA||[],H=window.__eamH||[],s=stats(),normal=A.filter(a=>String(a.status||'')!=='폐기').length,cost=H.reduce((n,h)=>n+(Number(h.cost)||0),0);const u=new URL('index.html?page=employee', location.href).href;return `<div class="jgb-page-title"><div><h2>EAM 운영센터</h2><p>자산 수명주기 · 작업 이력 · 유지보수 현황</p></div><div class="jgb-actions"><button class="jgb-btn" onclick="eamRegisterNewAsset()">＋ 자산 등록</button><button class="jgb-btn gray" onclick="go('eam')">자산 관리</button></div></div><div class="jgb-section">EAM 핵심 현황</div><div class="jgb-kpis"><div class="jgb-kpi"><div class="label">운영 자산</div><div class="value">${normal}건</div></div><div class="jgb-kpi"><div class="label">작업 이력</div><div class="value">${H.length}건</div></div><div class="jgb-kpi"><div class="label">처리 작업요청</div><div class="value">${s.is.length}건</div></div><div class="jgb-kpi"><div class="label">누적 유지보수 비용</div><div class="value">${cost.toLocaleString()}원</div></div></div><div class="jgb-section">자산 수명주기</div><div class="jgb-card"><div class="jgb-flow"><div class="jgb-flow-step"><b>자산 등록</b><small>자산대장 생성</small></div><div class="jgb-flow-step"><b>운영</b><small>상태·기본정보 관리</small></div><div class="jgb-flow-step"><b>작업 발생</b><small>직원 신고 → 작업 생성</small></div><div class="jgb-flow-step"><b>조치 완료</b><small>담당자·내용 자동 기록</small></div><div class="jgb-flow-step"><b>EAM 이력</b><small>자산별 누적</small></div></div></div>`}
 function processPage(){const pending=db.issues.filter(x=>x.status!=="완료");return `<div class="jgb-page-title"><div><h2>작업관리 · 조치 처리</h2><p>직원 신고 → 담당자 지정 → 조치완료 · 직원 실적 자동 집계</p></div><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button></div><div class="jgb-section">처리 대기 ${pending.length}건</div><div class="jgb-card"><div class="jgb-queue">${pending.map(x=>`<div class="jgb-q"><div><b>${x.category} · ${x.place}</b>${x.assetCode?` <span class="jgb-status asset">${x.assetCode}</span>`:''}<br><small>${x.content}</small><br><small>접수 ${time(x.createdAt)} ${x.reporterName?'· 신고 '+x.reporterName:''} ${x.startedAt?'· 시작 '+time(x.startedAt):''} ${x.handlerName?'· 담당 '+x.handlerName:''}</small>${x.photo_url?`<br><a href="${x.photo_url}" target="_blank">사진 보기</a>`:''}</div><div>${x.handlerId?`<button class="jgb-btn green" onclick="completeIssue('${x.id}')">조치완료</button>`:`<select onchange="assign('${x.id}',this.value)"><option value="">담당자 선택</option>${workers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('')}</select>`}</div></div>`).join('')||'<div class="jgb-empty">처리할 작업이 없습니다.</div>'}</div></div>`}
-function basicPage(){const tw=todayWorkers();return `<div class="pagebar"><div><h1>기본업무 관리</h1><div class="small">${selectedDate} · 실제 근무자 기준 자동 집계</div></div><input type="date" value="${selectedDate}" onchange="setDate(this.value)"></div><div class="notice"><b>기본업무 실적 기준</b> · 일반 근무자는 10개 항목을 직접 실시합니다. 10개 완료 시 기본업무 <b>1건</b>으로 집계됩니다. 휴일근무자는 10개 항목이 자동 완료되어 <b>기본업무 1건</b>으로 집계됩니다.</div><div class="workergrid modern-basic">${tw.map(w=>{if(!w.working)return `<div class="workerbox"><div class="worker-head"><h3>${w.name}</h3><span class="badge off">${w.status||"휴무"}</span></div></div>`;const holiday=/휴일\s*근무/.test(String(w.status||""));const d=holiday?{done:tasks.slice()}:tasksFor(w.id);return `<div class="workerbox modern-worker"><div class="worker-head"><div><h3>${w.name}</h3><div class="small">${w.shift} ${w.start}~${w.end}</div></div><span class="badge ${holiday?'green':''}">${holiday?'휴일근무':'근무'}</span></div><div class="taskgrid">${tasks.map(t=>`<div class="task ${d.done.includes(t)?'done':''}"><span>${t}</span><button class="btn ${d.done.includes(t)?'gray':'green'}" ${holiday?'disabled':''} onclick="toggleTask('${w.id}','${t}')">${d.done.includes(t)?'✓ 실시':'실시'}</button></div>`).join('')}</div><div class="basic-result ${holiday?'auto':''}">${holiday?'⚡ 기본업무 1건 자동 반영':`현재 <b>${d.done.length}/10</b> · ${d.done.length===10?'기본업무 1건 완료':'미완료'}`}</div></div>`}).join('')}</div>`}
+function basicPage(){
+ const tw=todayWorkers();
+ return `<div class="basic-modern">
+  <div class="basic-toolbar">
+   <div class="title"><h2>기본업무 관리</h2><p>${selectedDate} · 근무자별 업무 실시 현황</p></div>
+   <div class="basic-legend">
+    <span class="basic-chip work">● 근무자 · 직접 실시</span>
+    <span class="basic-chip auto">● 휴일근무자 · 자동완료</span>
+    <span class="basic-chip off">● 휴무자 · 대상 제외</span>
+   </div>
+  </div>
+  <div class="workergrid">
+   ${tw.map(w=>{
+    const isOff=!w.working;
+    const holiday=/휴일\s*근무/.test(String(w.status||""));
+    if(isOff){
+      return `<div class="workerbox basic-worker off-worker">
+       <div class="basic-worker-head">
+        <div><div class="basic-worker-name">${w.name}</div><div class="basic-worker-sub">${w.shift||""} ${w.start||""}${w.end?"~"+w.end:""}</div></div>
+        <span class="work-status off">${w.status||"휴무"}</span>
+       </div>
+       <div class="basic-footer"><span>기본업무</span><b style="color:#7a8490">대상 제외</b></div>
+      </div>`;
+    }
+    const d=holiday?{done:tasks.slice()}:tasksFor(w.id);
+    return `<div class="workerbox basic-worker" style="grid-column:span 2">
+     <div class="basic-worker-head">
+      <div><div class="basic-worker-name">${w.name}</div><div class="basic-worker-sub">${w.shift||""} ${w.start||""}${w.end?"~"+w.end:""}</div></div>
+      <span class="work-status ${holiday?"auto":"ready"}">${holiday?"휴일근무 · 자동완료":"근무 · 직접 실시"}</span>
+     </div>
+     <div class="taskgrid taskgrid-modern">
+      ${tasks.map(t=>{
+       const done=d.done.includes(t);
+       return `<div class="task-modern ${done?"done":""}">
+        <span class="task-name">${t}</span>
+        <button class="btn ${done?"gray":"green"}" ${holiday?"disabled":""} onclick="toggleTask('${w.id}','${t}')">${done?"✓ 완료":"실시"}</button>
+       </div>`;
+      }).join("")}
+     </div>
+     <div class="basic-footer">
+      <span class="basic-progress ${holiday||d.done.length===10?"complete":"pending"}">${holiday?"기본업무 1건 자동완료":`실시 ${d.done.length}/10`}</span>
+      <span class="${holiday?"auto-note":""}">${holiday?"휴일근무자는 10개 항목이 자동완료 처리됩니다.":(d.done.length===10?"오늘 기본업무 완료":"미완료 항목 있음")}</span>
+     </div>
+    </div>`;
+   }).join("")}
+  </div>
+ </div>`;
+} · 실제 근무자 기준 자동 집계</div></div><input type="date" value="${selectedDate}" onchange="setDate(this.value)"></div><div class="notice"><b>기본업무 실적 기준</b> · 일반 근무자는 10개 항목을 직접 실시합니다. 10개 완료 시 기본업무 <b>1건</b>으로 집계됩니다. 휴일근무자는 10개 항목이 자동 완료되어 <b>기본업무 1건</b>으로 집계됩니다.</div><div class="workergrid modern-basic">${tw.map(w=>{if(!w.working)return `<div class="workerbox"><div class="worker-head"><h3>${w.name}</h3><span class="badge off">${w.status||"휴무"}</span></div></div>`;const holiday=/휴일\s*근무/.test(String(w.status||""));const d=holiday?{done:tasks.slice()}:tasksFor(w.id);return `<div class="workerbox modern-worker"><div class="worker-head"><div><h3>${w.name}</h3><div class="small">${w.shift} ${w.start}~${w.end}</div></div><span class="badge ${holiday?'green':''}">${holiday?'휴일근무':'근무'}</span></div><div class="taskgrid">${tasks.map(t=>`<div class="task ${d.done.includes(t)?'done':''}"><span>${t}</span><button class="btn ${d.done.includes(t)?'gray':'green'}" ${holiday?'disabled':''} onclick="toggleTask('${w.id}','${t}')">${d.done.includes(t)?'✓ 실시':'실시'}</button></div>`).join('')}</div><div class="basic-result ${holiday?'auto':''}">${holiday?'⚡ 기본업무 1건 자동 반영':`현재 <b>${d.done.length}/10</b> · ${d.done.length===10?'기본업무 1건 완료':'미완료'}`}</div></div>`}).join('')}</div>`}
 
 function schedulePage(){const ym=monthKey(),days=new Date(Number(ym.slice(0,4)),Number(ym.slice(5,7)),0).getDate();let rows='';for(let d=1;d<=days;d++){const date=ym+'-'+String(d).padStart(2,'0'),vals=scheduleValues(date)||[];let cells='',names=[];workers.forEach((w,i)=>{const v=vals[i]||'',work=!!v&&!offWords.some(x=>v.includes(x))&&v!=='-';if(work)names.push(w.name);cells+='<td class="'+(work?'schedule-working':'schedule-off')+'">'+(v||'미편성')+'</td>'});rows+='<tr><td><b>'+date+'</b></td>'+cells+'<td>'+(names.join(', ')||'-')+'</td></tr>'}return '<div class="pagebar"><div><h1>근무편성 · 실제 근무자 자동연동</h1><div class="small">근무편성부를 올리면 날짜별 근무자가 직원실적·기본업무에 자동 반영됩니다.</div></div><input type="month" value="'+ym+'" onchange="setMonth(this.value)"></div><div class="jgb-card"><div class="schedule-tools"><input id="scheduleFile" type="file" accept=".xlsx,.xls,.csv"><button class="jgb-btn" onclick="importScheduleFile()">근무편성부 올리기</button><button class="jgb-btn gray" onclick="clearUploadedSchedule()">업로드 편성 초기화</button></div><div class="upload-note">엑셀/CSV의 1열은 날짜, 2~5열은 '+workers.map(w=>w.name).join(' · ')+' 순서로 입력합니다. 근무조·휴무·연가·공가·대체휴무를 그대로 읽어 실제 근무자를 자동 판정합니다.</div></div><div class="jgb-card" style="margin-top:12px"><div style="overflow:auto"><table class="schedule-table"><thead><tr><th>날짜</th>'+workers.map(w=>'<th>'+w.name+'</th>').join('')+'<th>실제 근무자</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'}
 function setMonth(v){if(!v)return;selectedDate=v+'-01';render()}
@@ -361,6 +447,14 @@ function eamPick(cat,code){
 function eamRegisterNewAsset(){document.getElementById('eamRegisterModal')?.remove();document.body.insertAdjacentHTML('beforeend',`<div id="eamRegisterModal" class="eam-modal"><div class="eam-modal-card"><div class="eam-modal-head"><div><span>EAM ASSET MASTER</span><h3>새 자산 등록</h3><small>등록 후 작업·점검·교체·폐기 이력이 이 자산에 연결됩니다.</small></div><button type="button" onclick="closeEamRegisterModal()">×</button></div><div class="eam-modal-grid"><label>시설·설비명 *<input id="eamRegName" placeholder="예: 주펌프"></label><label>분류 *<select id="eamRegCat"><option>냉난방</option><option>소방설비</option><option>보일러·온수</option><option>전기설비</option><option>코트조명</option><option>방수</option><option>기타설비</option><option>누수관리</option></select></label><label>설치 위치 *<input id="eamRegPlace" placeholder="예: 기계실"></label><label>설치일<input id="eamRegDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label></div><div class="eam-modal-note">자산번호는 자동 발급합니다. 등록 후 직원 통합 QR 신고에서 이 설비를 선택할 수 있습니다.</div><div class="eam-modal-actions"><button class="btn gray" type="button" onclick="closeEamRegisterModal()">취소</button><button class="btn blue" id="eamRegSubmit" type="button" onclick="submitEamRegister()">EAM 자산 생성</button></div></div></div>`);}
 function closeEamRegisterModal(){document.getElementById('eamRegisterModal')?.remove()}
 async function submitEamRegister(){if(!SUPA){alert('Supabase 연결이 필요합니다.');return}const name=document.getElementById('eamRegName')?.value.trim(),category=document.getElementById('eamRegCat')?.value||'기타설비',place=document.getElementById('eamRegPlace')?.value.trim(),date=document.getElementById('eamRegDate')?.value||new Date().toISOString().slice(0,10);if(!name||!place){alert('시설·설비명과 설치 위치는 필수입니다.');return}const btn=document.getElementById('eamRegSubmit');if(btn)btn.disabled=true;const code='AST-'+new Date().toISOString().replace(/\D/g,'').slice(0,14)+'-'+Math.random().toString(36).slice(2,5).toUpperCase();try{const r=await SUPA.from('assets').insert({asset_code:code,name,category,place,status:'정상',product_name:category});if(r.error)throw r.error;await eamLoad();const created=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));if(created){const h=await SUPA.from('asset_history').insert({asset_id:created.id,event_type:'자산등록',description:`EAM 신규 자산 등록 · ${name}`,worker_name:'관리자',action_type:'자산수명주기',cost:0,event_date:date});if(h.error)console.warn('자산등록 이력 저장 실패',h.error)}window.__eamSelCode=code;window.__eamCat=({'냉난방':'cooling','소방설비':'fire','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other','누수관리':'leak'})[category]||'other';closeEamRegisterModal();await eamLoad();go('eam')}catch(e){console.error(e);alert('EAM 자산 등록에 실패했습니다.\n'+(e?.message||'assets 테이블의 등록 권한을 확인하세요.'))}finally{if(btn)btn.disabled=false}}
+
+function eamStaffPage(){
+ const rows=workers.map((w,i)=>`<tr><td><b>${xEsc(w.name)}</b></td><td>${xEsc(w.shift||"-")}</td><td>${xEsc(w.start||"-")} ~ ${xEsc(w.end||"-")}</td><td><button class="jgb-btn gray" onclick="editEamStaff(${i})">수정</button> <button class="jgb-btn red" onclick="deleteEamStaff(${i})">삭제</button></td></tr>`).join("");
+ return `<div class="jgb-page-title"><div><h2>EAM · 직원관리</h2><p>직원 등록·수정은 EAM에서만 관리합니다. 근무편성·기본업무·신고자 선택에 동일 목록을 사용합니다.</p></div><button class="jgb-btn" onclick="addEamStaff()">＋ 직원 등록</button></div><div class="jgb-card"><div style="overflow:auto"><table class="staff-table"><thead><tr><th>직원명</th><th>기본 근무조</th><th>기본 근무시간</th><th>관리</th></tr></thead><tbody>${rows||'<tr><td colspan="4">등록된 직원이 없습니다.</td></tr>'}</tbody></table></div></div>`;
+}
+function addEamStaff(){const name=prompt("직원명을 입력하세요.");if(!name?.trim())return;const shift=prompt("기본 근무조를 입력하세요.","오전조")||"-";const start=prompt("기본 시작시간",shift.includes("새벽")?"06:00":shift.includes("오후")?"13:30":"09:00")||"";const end=prompt("기본 종료시간",shift.includes("새벽")?"15:00":shift.includes("오후")?"22:30":"18:00")||"";workers.push({id:"w"+Date.now(),name:name.trim(),shift,start,end});saveEamStaff();render();}
+function editEamStaff(i){const w=workers[i];if(!w)return;const name=prompt("직원명",w.name);if(!name?.trim())return;w.name=name.trim();w.shift=prompt("기본 근무조",w.shift||"-")||w.shift;w.start=prompt("기본 시작시간",w.start||"")??w.start;w.end=prompt("기본 종료시간",w.end||"")??w.end;saveEamStaff();render();}
+function deleteEamStaff(i){const w=workers[i];if(!w)return;if(!confirm(w.name+" 직원을 EAM 직원목록에서 삭제할까요?"))return;workers.splice(i,1);saveEamStaff();render();}
 
 function eamPage(){
  const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];
@@ -522,7 +616,20 @@ async function addIssue(){const c=document.getElementById("content").value.trim(
 async function assign(id,wid){const x=db.issues.find(i=>i.id===id);if(!x||!wid)return;const w=workers.find(v=>v.id===wid);if(!w)return;const started=x.startedAt||new Date().toISOString();if(x.remoteId){const r=await SUPA.from("requests").update({handler_name:w.name,status:"조치중",started_at:started}).eq("id",x.remoteId);if(r.error){alert("담당 직원 저장에 실패했습니다.");return}}await syncFromSupabase()}
 async function completeIssue(id){const x=db.issues.find(i=>i.id===id);if(!x||!x.handlerId){alert("먼저 담당 직원을 선택하세요.");return}if(!SUPA){alert("Supabase 연결이 필요합니다.");return}const now=new Date().toISOString(),elapsed=Math.max(0,Math.round((new Date(now)-new Date(x.createdAt))/60000));if(x.remoteId){const r=await SUPA.from("requests").update({status:"완료",handler_name:x.handlerName,started_at:x.startedAt||now,completed_at:now,elapsed_minutes:elapsed}).eq("id",x.remoteId);if(r.error){alert("조치완료 저장에 실패했습니다.");return}}await syncFromSupabase();render();}
 
-function toggleTask(wid,t){const d=tasksFor(wid);d.done=d.done.includes(t)?d.done.filter(x=>x!==t):[...d.done,t];d.updatedAt=new Date().toISOString();save();render()}
+async function toggleTask(wid,t){
+  if(!SUPA){alert("Supabase 연결이 필요합니다.");return}
+  const date=dateKey(), d=tasksFor(wid), exists=d.done.includes(t);
+  try{
+    if(exists){
+      const r=await SUPA.from("basic_tasks").delete().eq("work_date",date).eq("worker_id",wid).eq("task_name",t);
+      if(r.error)throw r.error;
+    }else{
+      const r=await SUPA.from("basic_tasks").insert({work_date:date,worker_id:wid,task_name:t,completed_at:new Date().toISOString()});
+      if(r.error)throw r.error;
+    }
+    await syncBasicTasks(); render();
+  }catch(e){console.error(e);alert("기본업무 저장에 실패했습니다.\n"+(e?.message||"basic_tasks 권한/컬럼을 확인하세요."));}
+}
 function setDate(v){if(v){selectedDate=v;render()}}
 function time(v){return new Date(v).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hourCycle:"h23"})}
 function seedDemo(){if(db.issues.length)return alert("이미 테스트 데이터가 있습니다.");let now=Date.now();db.issues=[{id:"I"+now,category:"시설",place:"2층 남자화장실",content:"조명 점검 필요",status:"미조치",createdAt:new Date(now-35*60000).toISOString(),handlerId:"w1",handlerName:"김민수",completedAt:""},{id:"I"+(now+1),category:"환경",place:"복도",content:"바닥 청소 요청",status:"완료",createdAt:new Date(now-70*60000).toISOString(),handlerId:"w2",handlerName:"이현우",completedAt:new Date(now-25*60000).toISOString()}];save();render()}
@@ -547,7 +654,7 @@ function resetAll(){if(confirm("테스트 데이터를 모두 삭제할까요?")
 })();
 render();
 eamLoad().then(function(){if(typeof externalLoad==="function")externalLoad();render()});
-if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
+if(SUPA){syncFromSupabase();syncBasicTasks().then(render);startRealtime();setInterval(syncFromSupabase,5000);}
 </script>
 
 <script id="REQUEST_RATE_RULE">
