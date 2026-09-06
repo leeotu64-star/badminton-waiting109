@@ -351,7 +351,7 @@ function basicPage(){
   <div class="bm-grid">${tw.map(w=>{
    if(!w.working)return `<article class="bm-worker excluded"><div class="bm-worker-head"><div><strong>${w.name}</strong><small>${w.status||"휴무"}</small></div><em>대상 제외</em></div><div class="bm-excluded">오늘은 기본업무 실적 대상이 아닙니다.</div></article>`;
    const isHoliday=/휴일\s*근무/.test(String(w.status||"")), d=isHoliday?{done:tasks.slice()}:tasksFor(w.id), n=d.done.length;
-   return `<article class="bm-worker ${isHoliday?'holiday':''}"><div class="bm-worker-head"><div><strong>${w.name}</strong><small>${w.status||w.shift} ${w.start?`· ${w.start}~${w.end}`:''}</small></div><em class="${isHoliday?'auto':''}">${isHoliday?'휴일근무 · 자동완료':'실시 · '+n+'/10'}</em></div><div class="bm-progress"><i style="width:${isHoliday?100:n*10}%"></i></div><div class="bm-tasks">${tasks.map((t,i)=>{const done=d.done.includes(t);return `<button type="button" class="bm-task ${done?'is-done':''}" ${isHoliday?'disabled':''} data-toggle-task="1" data-wid="${w.id}" data-task="${xEsc(t)}"><span>${String(i+1).padStart(2,'0')}</span><b>${t}</b><em>${done?'✓ 완료':'실시'}</em></button>`}).join('')}</div><div class="bm-foot"><span>${isHoliday?'휴일근무 기본업무 1건 자동완료':n+'/10개 완료'}</span><strong>${isHoliday?100:n*10}%</strong></div></article>`;
+   return `<article class="bm-worker ${isHoliday?'holiday':''}"><div class="bm-worker-head"><div><strong>${w.name}</strong><small>${w.status||w.shift} ${w.start?`· ${w.start}~${w.end}`:''}</small></div><em class="${isHoliday?'auto':''}">${isHoliday?'휴일근무 · 자동완료':'실시 · '+n+'/10'}</em></div><div class="bm-progress"><i style="width:${isHoliday?100:n*10}%"></i></div><div class="bm-tasks">${tasks.map((t,i)=>{const done=d.done.includes(t);return `<button type="button" class="bm-task ${done?'is-done':''}" ${isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${t.replace(/'/g,"\\'")}')"><span>${String(i+1).padStart(2,'0')}</span><b>${t}</b><em>${done?'✓ 완료':'실시'}</em></button>`}).join('')}</div><div class="bm-foot"><span>${isHoliday?'휴일근무 기본업무 1건 자동완료':n+'/10개 완료'}</span><strong>${isHoliday?100:n*10}%</strong></div></article>`;
   }).join('')}</div>
   <div class="bm-bottom"><b>기본업무 집계 기준</b><span>일반 근무자는 10개 항목을 모두 완료하면 1일 완료로 집계됩니다. 휴일근무자는 1건으로 자동 집계됩니다.</span></div>
  </div>`}
@@ -536,34 +536,31 @@ async function assign(id,wid){const x=db.issues.find(i=>i.id===id);if(!x||!wid)r
 async function completeIssue(id){const x=db.issues.find(i=>i.id===id);if(!x||!x.handlerId){alert("먼저 담당 직원을 선택하세요.");return}if(!SUPA){alert("Supabase 연결이 필요합니다.");return}const now=new Date().toISOString(),elapsed=Math.max(0,Math.round((new Date(now)-new Date(x.createdAt))/60000));if(x.remoteId){const r=await SUPA.from("requests").update({status:"완료",handler_name:x.handlerName,started_at:x.startedAt||now,completed_at:now,elapsed_minutes:elapsed}).eq("id",x.remoteId);if(r.error){alert("조치완료 저장에 실패했습니다.");return}}const code=x.assetCode||((String(x.content||'').match(/^\[([^\]]+)\]/)||[])[1]||'');if(code&&code!=='QR'){await eamLoad();const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));if(a){const desc=String(x.content||'').replace(/^\[[^\]]+\]\s*/,'').trim();const hr=await SUPA.from('asset_history').insert({asset_id:a.id,event_type:'수리',description:desc,worker_name:x.handlerName||'',action_type:'접수조치',cost:0,event_date:now.slice(0,10)});if(hr.error)console.warn('EAM 자동 이력 등록 실패',hr.error)}}await syncFromSupabase();await eamLoad();render();}
 async function syncBasicTasks(){if(!SUPA)return;try{const {data,error}=await SUPA.from("basic_tasks").select("*");if(error)throw error;const t={};(data||[]).forEach(r=>{const name=taskDisplayName(r.task_name);if(!name)return;const k=r.work_date+"_"+r.worker_id;(t[k]??={done:[],updatedAt:null}).done.push(name);t[k].updatedAt=r.completed_at||null});db.tasks=t;save()}catch(e){console.warn("기본업무 동기화 실패",e)}}
 async function toggleTask(wid,t){
- const d=tasksFor(wid),idx=d.done.indexOf(t),wasDone=idx>=0;
- if(wasDone)d.done.splice(idx,1);else d.done.push(t);
- d.updatedAt=new Date().toISOString();
- render();
- if(!SUPA)return;
- try{
-  const q=SUPA.from("basic_tasks"),dbName=taskDbName(t);
-  if(wasDone){const {error}=await q.delete().eq("work_date",dateKey()).eq("worker_id",wid).eq("task_name",dbName);if(error)throw error}
-  else{const {error}=await q.insert({work_date:dateKey(),worker_id:wid,task_name:dbName,completed_at:new Date().toISOString()});if(error)throw error}
-  // 성공한 클릭을 다시 전체 동기화하지 않습니다. RLS 환경에서 방금 저장한 행이 조회되지 않아 화면이 되돌아가는 것을 방지합니다.
- }catch(e){
-  console.warn(e);
-  if(wasDone)d.done.push(t);else d.done=d.done.filter(x=>x!==t);
-  render();alert("기본업무 저장에 실패했습니다. Supabase 권한/컬럼을 확인하세요.");
- }
+  const d=tasksFor(wid),idx=d.done.indexOf(t);
+  if(idx>=0)d.done.splice(idx,1);else d.done.push(t);
+  d.updatedAt=new Date().toISOString();
+  save();
+  render();
+  if(!SUPA)return;
+  try{
+    const q=SUPA.from("basic_tasks");
+    const dbName=taskDbName(t);
+    if(idx>=0){
+      const {error}=await q.delete().eq("work_date",dateKey()).eq("worker_id",wid).eq("task_name",dbName);
+      if(error)throw error;
+    }else{
+      const {error}=await q.insert({work_date:dateKey(),worker_id:wid,task_name:dbName,completed_at:new Date().toISOString()});
+      if(error)throw error;
+    }
+    await syncBasicTasks();
+    render();
+  }catch(e){
+    console.warn("basic_tasks 저장 실패 — 화면 상태는 유지합니다.",e);
+    save();
+    render();
+  }
 }
 function setDate(v){if(v){selectedDate=v;render()}}
-(function bindBasicTaskClicks(){
- if(window.__basicTaskClicksBound)return;
- window.__basicTaskClicksBound=true;
- document.addEventListener("click",function(ev){
-  const btn=ev.target.closest("[data-toggle-task]");
-  if(!btn)return;
-  ev.preventDefault(); ev.stopPropagation();
-  const wid=btn.getAttribute("data-wid"), task=btn.getAttribute("data-task");
-  if(wid&&task) toggleTask(wid,task);
- });
-})();
 function time(v){return new Date(v).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hourCycle:"h23"})}
 function seedDemo(){if(db.issues.length)return alert("이미 테스트 데이터가 있습니다.");let now=Date.now();db.issues=[{id:"I"+now,category:"시설",place:"2층 남자화장실",content:"조명 점검 필요",status:"미조치",createdAt:new Date(now-35*60000).toISOString(),handlerId:"w1",handlerName:"김민수",completedAt:""},{id:"I"+(now+1),category:"환경",place:"복도",content:"바닥 청소 요청",status:"완료",createdAt:new Date(now-70*60000).toISOString(),handlerId:"w2",handlerName:"이현우",completedAt:new Date(now-25*60000).toISOString()}];save();render()}
 function resetAll(){if(confirm("테스트 데이터를 모두 삭제할까요?")){db={issues:[],tasks:{},schedule:{}};save();render()}}
