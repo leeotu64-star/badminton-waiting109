@@ -1,4 +1,4 @@
-﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -231,8 +231,7 @@ const DEFAULT_WORKERS=[
  {id:"w3",name:"박성훈",shift:"오후조",start:"13:30",end:"22:30"},
  {id:"w4",name:"최지훈",shift:"-",start:"",end:""}
 ];
-let workers=(()=>{try{const saved=JSON.parse(localStorage.getItem("JGB_EAM_STAFF"));return Array.isArray(saved)&&saved.length?saved:DEFAULT_WORKERS.map(x=>({...x}))}catch(e){return DEFAULT_WORKERS.map(x=>({...x}))}})();
-function saveEamStaff(){localStorage.setItem("JGB_EAM_STAFF",JSON.stringify(workers));}
+let workers=DEFAULT_WORKERS.map(x=>({...x}));
 const tasks=["남자화장실","여자화장실","남자탈의실","여자탈의실","코트","복도","휴게실","재활용","종량제","기타"];
 const offWords=["휴무","주휴일","연가","공가","대체휴무"];
 const defaultSchedule={};
@@ -297,7 +296,7 @@ async function syncFromSupabase(){if(!SUPA)return;try{const {data,error}=await S
 function startRealtime(){if(!SUPA)return;try{SUPA.channel("jgb-facility-live").on("postgres_changes",{event:"*",schema:"public",table:"requests"},()=>syncFromSupabase()).on("postgres_changes",{event:"*",schema:"public",table:"basic_tasks"},()=>syncBasicTasks().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"assets"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"asset_history"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"inspections"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"external_work"},()=>externalLoad().then(render)).subscribe()}catch(e){console.warn(e)}}
 function render(){
  const app=document.getElementById("app");
- app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📥 접수 · 조치")}${nav("pending","🔔 미조치")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 · EAM")}${nav("dashboard2","📊 EAM 현황")}${nav("eamStaff","👤 직원관리")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}${nav("stats","📈 직원실적")}${nav("workers","👥 근무자")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리</h1><small>직원 신고 → 관리자 작업관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);}
+ app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📥 접수 · 조치")}${nav("pending","🔔 미조치")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 · EAM")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}${nav("stats","📈 직원실적")}${nav("workers","👥 근무자")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리</h1><small>직원 신고 → 관리자 작업관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);}
 function nav(p,t){return `<div class="jgb-link ${page===p?"on":""}" onclick="go('${p}')">${t}</div>`}
 function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
 function go(p){page=p;render()}
@@ -307,7 +306,7 @@ function body(){
  if(page==="qr")return dashboard(s);
  if(page==="dashboard2")return dashboard2();
   if(page==="process")return processPage();
- if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="eamStaff")return eamStaffPage(); if(page==="schedule")return schedulePage(); if(page==="external")return eamPage();
+ if(page==="basic")return basicPage(); if(page==="eam")return eamPage(); if(page==="schedule")return schedulePage(); if(page==="external")return eamPage();
  if(page==="stats")return statsPage();
  if(page==="workers")return workerPage();
  if(page==="pending")return pendingPage();
@@ -404,7 +403,7 @@ function basicPage(){
    const doneCount=d.done.length;
    return `<section class="basic-worker ${holiday?'holiday':''}">
     <div class="bw-head"><div><strong>${w.name}</strong><small>${w.status||w.shift} · ${w.start}~${w.end}</small></div><em class="${holiday?'auto':''}">${holiday?'자동완료':'직접 실시'} · ${holiday?'1건':doneCount+'/10'}</em></div>
-    <div class="task-compact">${tasks.map((t,i)=>{const done=d.done.includes(t);return `<div class="task-mini ${done?'is-done':''}"><span class="task-no">${String(i+1).padStart(2,'0')}</span><span class="task-name">${t}</span><button ${holiday?'disabled':''} class="task-btn ${done?'done':''}" onclick="toggleTask('${w.id}','${t}')">${done?'✓ 완료':'실시'}</button></div>`}).join('')}</div>
+    <div class="task-compact">${tasks.map((t,i)=>{const done=d.done.includes(t);return `<div class="task-mini ${done?'is-done':''}"><span class="task-no">${String(i+1).padStart(2,'0')}</span><span class="task-name">${t}</span><button ${holiday?'disabled':''} class="task-btn ${done?'done':''}" onclick="toggleTask('${w.id}','${t}')">${done?'✓ 완료됨':'실시'}</button></div>`}).join('')}</div>
     <div class="bw-foot"><span>${holiday?'휴일근무자 기본업무 1건 자동완료':`완료 ${doneCount}/10 · ${doneCount===10?'오늘 기본업무 완료':'진행 중'}`}</span><b class="${doneCount===10?'ok':''}">${doneCount===10?'완료':'진행'}</b></div>
    </section>`;
   }).join('')}</div>
@@ -428,17 +427,9 @@ function eamPick(cat,code){
   else window.__eamSelCode="";
   render();
 }
-function eamRegisterNewAsset(){document.getElementById('eamRegisterModal')?.remove();document.body.insertAdjacentHTML('beforeend',`<div id="eamRegisterModal" class="eam-modal"><div class="eam-modal-card"><div class="eam-modal-head"><div><span>EAM ASSET MASTER</span><h3>새 자산 등록</h3><small>등록 후 작업·점검·교체·폐기 이력이 이 자산에 연결됩니다.</small></div><button type="button" onclick="closeEamRegisterModal()">×</button></div><div class="eam-modal-grid"><label>시설·설비명 *<input id="eamRegName" placeholder="예: 주펌프"></label><label>분류 *<select id="eamRegCat"><option>냉난방</option><option>소방설비</option><option>보일러·온수</option><option>전기설비</option><option>코트조명</option><option>방수</option><option>기타설비</option><option>누수관리</option></select></label><label>설치 위치 *<input id="eamRegPlace" placeholder="예: 기계실"></label><label>설치일<input id="eamRegDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label></div><div class="eam-modal-note">자산번호는 자동 발급합니다. 등록 후 직원 통합 QR 신고에서 이 설비를 선택할 수 있습니다.</div><div class="eam-modal-actions"><button class="btn gray" type="button" onclick="closeEamRegisterModal()">취소</button><button class="btn blue" id="eamRegSubmit" type="button" onclick="submitEamRegister()">EAM 자산 생성</button></div></div></div>`);}
+function eamRegisterNewAsset(){document.getElementById('eamRegisterModal')?.remove();document.body.insertAdjacentHTML('beforeend',`<div id="eamRegisterModal" class="eam-modal"><div class="eam-modal-card"><div class="eam-modal-head"><div><span>EAM ASSET MASTER</span><h3>새 자산 등록</h3><small>등록 후 자산별 작업·점검·교체·폐기 이력을 관리합니다.</small></div><button type="button" onclick="closeEamRegisterModal()">×</button></div><div class="eam-modal-grid"><label>시설·설비명 *<input id="eamRegName" placeholder="예: 주펌프"></label><label>분류 *<select id="eamRegCat"><option>냉난방</option><option>소방설비</option><option>보일러·온수</option><option>전기설비</option><option>코트조명</option><option>방수</option><option>기타설비</option><option>누수관리</option></select></label><label>설치 위치 *<input id="eamRegPlace" placeholder="예: 기계실"></label><label>설치일<input id="eamRegDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label></div><div class="eam-modal-note">자산번호는 자동 발급합니다. 직원 통합 QR 신고와 EAM 자산관리는 별도로 운영합니다.</div><div class="eam-modal-actions"><button class="btn gray" type="button" onclick="closeEamRegisterModal()">취소</button><button class="btn blue" id="eamRegSubmit" type="button" onclick="submitEamRegister()">EAM 자산 생성</button></div></div></div>`);}
 function closeEamRegisterModal(){document.getElementById('eamRegisterModal')?.remove()}
 async function submitEamRegister(){if(!SUPA){alert('Supabase 연결이 필요합니다.');return}const name=document.getElementById('eamRegName')?.value.trim(),category=document.getElementById('eamRegCat')?.value||'기타설비',place=document.getElementById('eamRegPlace')?.value.trim(),date=document.getElementById('eamRegDate')?.value||new Date().toISOString().slice(0,10);if(!name||!place){alert('시설·설비명과 설치 위치는 필수입니다.');return}const btn=document.getElementById('eamRegSubmit');if(btn)btn.disabled=true;const code='AST-'+new Date().toISOString().replace(/\D/g,'').slice(0,14)+'-'+Math.random().toString(36).slice(2,5).toUpperCase();try{const r=await SUPA.from('assets').insert({asset_code:code,name,category,place,status:'정상',product_name:category});if(r.error)throw r.error;await eamLoad();const created=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));if(created){const h=await SUPA.from('asset_history').insert({asset_id:created.id,event_type:'자산등록',description:`EAM 신규 자산 등록 · ${name}`,worker_name:'관리자',action_type:'자산수명주기',cost:0,event_date:date});if(h.error)console.warn('자산등록 이력 저장 실패',h.error)}window.__eamSelCode=code;window.__eamCat=({'냉난방':'cooling','소방설비':'fire','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other','누수관리':'leak'})[category]||'other';closeEamRegisterModal();await eamLoad();go('eam')}catch(e){console.error(e);alert('EAM 자산 등록에 실패했습니다.\n'+(e?.message||'assets 테이블의 등록 권한을 확인하세요.'))}finally{if(btn)btn.disabled=false}}
-
-function eamStaffPage(){
- const rows=workers.map((w,i)=>`<tr><td><b>${xEsc(w.name)}</b></td><td>${xEsc(w.shift||"-")}</td><td>${xEsc(w.start||"-")} ~ ${xEsc(w.end||"-")}</td><td><button class="jgb-btn gray" onclick="editEamStaff(${i})">수정</button> <button class="jgb-btn red" onclick="deleteEamStaff(${i})">삭제</button></td></tr>`).join("");
- return `<div class="jgb-page-title"><div><h2>EAM · 직원관리</h2><p>직원 등록·수정은 EAM에서만 관리합니다. 근무편성·기본업무·신고자 선택에 동일 목록을 사용합니다.</p></div><button class="jgb-btn" onclick="addEamStaff()">＋ 직원 등록</button></div><div class="jgb-card"><div style="overflow:auto"><table class="staff-table"><thead><tr><th>직원명</th><th>기본 근무조</th><th>기본 근무시간</th><th>관리</th></tr></thead><tbody>${rows||'<tr><td colspan="4">등록된 직원이 없습니다.</td></tr>'}</tbody></table></div></div>`;
-}
-function addEamStaff(){const name=prompt("직원명을 입력하세요.");if(!name?.trim())return;const shift=prompt("기본 근무조를 입력하세요.","오전조")||"-";const start=prompt("기본 시작시간",shift.includes("새벽")?"06:00":shift.includes("오후")?"13:30":"09:00")||"";const end=prompt("기본 종료시간",shift.includes("새벽")?"15:00":shift.includes("오후")?"22:30":"18:00")||"";workers.push({id:"w"+Date.now(),name:name.trim(),shift,start,end});saveEamStaff();render();}
-function editEamStaff(i){const w=workers[i];if(!w)return;const name=prompt("직원명",w.name);if(!name?.trim())return;w.name=name.trim();w.shift=prompt("기본 근무조",w.shift||"-")||w.shift;w.start=prompt("기본 시작시간",w.start||"")??w.start;w.end=prompt("기본 종료시간",w.end||"")??w.end;saveEamStaff();render();}
-function deleteEamStaff(i){const w=workers[i];if(!w)return;if(!confirm(w.name+" 직원을 EAM 직원목록에서 삭제할까요?"))return;workers.splice(i,1);saveEamStaff();render();}
 
 function eamPage(){
  const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];
@@ -593,7 +584,7 @@ function leakagePage(){
  <div class="grid3" style="margin-top:12px"><div class="panel" style="grid-column:span 2"><h2>누수 이력 전체</h2>${allH.length?allH.map(v=>{const a=leaks.find(z=>z.id===v.asset_id);return `<div class="issue"><div><b>${a?xEsc(a.asset_code+' · '+a.name):'-'}</b><div>${xEsc(v.event_type)} · ${xEsc(v.description||'-')}</div><div class="small">${time(v.event_date)} · ${xEsc(v.worker_name||v.vendor_name||'')}</div></div><span class="badge">${v.action_type?xEsc(v.action_type):'내부/외부 미기록'}</span></div>`}).join(''):'<div class="small">등록된 누수 이력이 없습니다.</div>'}</div>
  <div class="panel"><h2>누수 관리 원칙</h2><div class="notice">A 1번 코트 인접 벽체<br>B 5번 코트 인접 벽체(좌측)<br>C 2·3번 코트 외부 천장<br>D 5번 코트 인접 벽체(우측)<br>E 여자 탈의실 천장</div><div class="small" style="margin-top:10px">직원 작업실적과 설비 유지보수 이력은 별도로 기록합니다.</div></div></div>`
 }
-async function addAssetHistory(assetId){alert('작업 이력은 수동 등록하지 않습니다. 직원 신고 → 작업관리 → 조치완료 과정에서 EAM에 자동 기록됩니다.');}
+async function addAssetHistory(assetId){alert('EAM 작업 이력은 EAM 유지보수 기능에서 별도로 관리합니다.');}
 
 function xEsc(s){return String(s??'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
 async function addIssue(){const c=document.getElementById("content").value.trim(),p=document.getElementById("place").value,cat=document.getElementById("cat").value;if(!c||!p){alert("접수 장소와 접수사항을 입력하세요.");return}const btn=document.getElementById("intakeBtn");if(btn)btn.disabled=true;let photo_url="";try{const f=document.getElementById("photo")?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,"_")}`;const up=await SUPA.storage.from("request-photos").upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+"/storage/v1/object/public/request-photos/"+path}const now=new Date().toISOString();const ins=await SUPA.from("requests").insert({category:cat,place:p,content:c,photo_url,status:"접수",received_at:now});if(ins.error)throw ins.error;alert("접수가 완료되었습니다.");document.getElementById("content").value="";if(document.getElementById("photo"))document.getElementById("photo").value="";await syncFromSupabase();go("process")}catch(e){console.error(e);alert("접수에 실패했습니다. Supabase 연결을 확인하세요.")}finally{if(btn)btn.disabled=false}}
@@ -601,7 +592,9 @@ async function assign(id,wid){const x=db.issues.find(i=>i.id===id);if(!x||!wid)r
 async function completeIssue(id){const x=db.issues.find(i=>i.id===id);if(!x||!x.handlerId){alert("먼저 담당 직원을 선택하세요.");return}if(!SUPA){alert("Supabase 연결이 필요합니다.");return}const now=new Date().toISOString(),elapsed=Math.max(0,Math.round((new Date(now)-new Date(x.createdAt))/60000));if(x.remoteId){const r=await SUPA.from("requests").update({status:"완료",handler_name:x.handlerName,started_at:x.startedAt||now,completed_at:now,elapsed_minutes:elapsed}).eq("id",x.remoteId);if(r.error){alert("조치완료 저장에 실패했습니다.");return}}await syncFromSupabase();render();}
 
 async function toggleTask(wid,t){
+  if(window.__taskBusy)return;
   if(!SUPA){alert("Supabase 연결이 필요합니다.");return}
+  window.__taskBusy=true;
   const date=dateKey(), d=tasksFor(wid), exists=d.done.includes(t);
   try{
     if(exists){
@@ -613,6 +606,7 @@ async function toggleTask(wid,t){
     }
     await syncBasicTasks(); render();
   }catch(e){console.error(e);alert("기본업무 저장에 실패했습니다.\n"+(e?.message||"basic_tasks 권한/컬럼을 확인하세요."));}
+  finally{window.__taskBusy=false}
 }
 function setDate(v){if(v){selectedDate=v;render()}}
 function time(v){return new Date(v).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hourCycle:"h23"})}
@@ -636,7 +630,7 @@ function resetAll(){if(confirm("테스트 데이터를 모두 삭제할까요?")
     },true);
   }
 })();
-render();
+db.tasks={}; render();
 eamLoad().then(function(){if(typeof externalLoad==="function")externalLoad();render()});
 if(SUPA){syncFromSupabase();syncBasicTasks().then(render);startRealtime();setInterval(syncFromSupabase,5000);}
 </script>
