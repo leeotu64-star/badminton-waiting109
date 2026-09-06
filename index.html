@@ -126,7 +126,7 @@ const PLACE_GROUPS={
 };
 const PLACE_OPTIONS=[...new Set(Object.values(PLACE_GROUPS).flat())];
 const ISSUE_PRESETS={
-  시설:["냉난방기 점검","실내기 점검","실외기 점검","조명·전동릴 점검","온수·난방 설비 점검","누수·방수 점검","시설물 파손","기타 시설사항"],
+  시설:["냉난방기 점검","실내기 점검","실외기 점검","조명·전동릴 점검","온수·난방 설비 점검","방수 상태 점검","시설물 파손","기타 시설사항"],
   환경:["화장실 청소","탈의실 청소","샤워실 청소","복도 청소","휴게실 청소","코트 환경정비","재활용 정리","종량제 정리","기타 환경사항"],
   안전:["소방설비 점검","유수장치실 점검","기계실 점검","옥상 안전점검","안전시설 점검","위험요소 확인","기타 안전사항"],
   기타:["기타 시설사항","기타 환경사항","기타 안전사항","기타 요청사항"]
@@ -634,7 +634,7 @@ function resetAll(){if(confirm("테스트 데이터를 모두 삭제할까요?")
   if(!window.__eamClickBound){
     window.__eamClickBound=true;
     document.addEventListener('click',function(ev){
-      const cat=ev.target.closest('.eamx-cat'); if(cat){ev.preventDefault(); const v=cat.getAttribute('data-cat'); if(v && v!=='leak') eamPick(v); return;}
+      const cat=ev.target.closest('.eamx-cat'); if(cat){ev.preventDefault(); const v=cat.getAttribute('data-cat'); if(v) eamPick(v); return;}
       const sub=ev.target.closest('.eamx-sub'); if(sub){ev.preventDefault(); const v=sub.getAttribute('data-cat'), c=sub.getAttribute('data-code'); if(v&&c && v!=='leak') eamPick(v,c); return;}
       const leak=ev.target.closest('.eamx-leakkey'); if(leak){ev.preventDefault(); const c=leak.getAttribute('data-code'); if(c) eamPick('leak',c); return;}
       const tab=ev.target.closest('[data-eam-history-tab]'); if(tab){ev.preventDefault(); eamHistoryTab(tab.getAttribute('data-eam-history-tab')); document.querySelectorAll('.eamx-tab').forEach(x=>x.classList.toggle('on',x===tab)); return;}
