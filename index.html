@@ -240,6 +240,21 @@ body{background:var(--bg)}
 <style id="WOW_DASHBOARD_CSS">
 .wow-hero{display:grid;grid-template-columns:1.45fr .9fr;gap:12px;margin-bottom:14px}.wow-panel{background:#fff;border:1px solid #dbe5ef;border-radius:16px;padding:18px;box-shadow:0 6px 22px rgba(15,35,60,.06)}.wow-title{font-size:13px;color:#64748b;font-weight:800}.wow-big{font-size:34px;font-weight:950;margin-top:5px}.wow-sub{font-size:11px;color:#64748b;margin-top:5px}.wow-flow{display:grid;grid-template-columns:1fr 30px 1fr 30px 1fr;align-items:center;gap:7px;margin-top:16px}.wow-step{padding:12px;border-radius:12px;background:#f7f9fc;text-align:center;border:1px solid #e5eaf0}.wow-step b{display:block;font-size:12px}.wow-step strong{display:block;font-size:22px;margin-top:4px}.wow-arrow{text-align:center;font-size:20px;font-weight:900;color:#94a3b8}.wow-health{display:flex;align-items:center;gap:16px}.wow-ring{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#159447 var(--rate),#e9eef4 0)}.wow-ring:after{content:'';width:68px;height:68px;background:#fff;border-radius:50%;grid-area:1/1}.wow-ring b{grid-area:1/1;z-index:1;font-size:20px}.wow-health-text b{display:block;font-size:16px}.wow-health-text small{display:block;color:#64748b;margin-top:5px;font-size:11px}.dash-section-title{letter-spacing:-.2px}.dash-kpi{min-height:112px;position:relative;overflow:hidden}.dash-kpi:after{content:'';position:absolute;right:-22px;bottom:-28px;width:80px;height:80px;border-radius:50%;background:#f3f7fb}.dash-kpi b{position:relative;z-index:1}.dash-kpi small{position:relative;z-index:1}.dash-table tbody tr:hover{background:#f8fbff}.dash-panel{box-shadow:0 5px 18px rgba(15,35,60,.045)}
 @media(max-width:850px){.wow-hero{grid-template-columns:1fr}.wow-flow{grid-template-columns:1fr}.wow-arrow{transform:rotate(90deg);height:18px}.wow-health{justify-content:center}.dash-kpi-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* EAM READABILITY + FIRE EQUIPMENT v9 */
+.eam-final{font-size:14px}
+.eam-tab{min-height:86px;padding:13px 15px}
+.eam-tab span{font-size:28px!important}.eam-tab strong{font-size:15px!important}.eam-tab em{font-size:13px!important}.eam-tab small{font-size:11px!important}
+.eam-panel-head b{font-size:17px!important}.eam-panel-head span{font-size:13px!important}.eam-panel-head input{font-size:13px!important;padding:10px 12px}
+.eam-asset-card{min-height:78px!important;padding:12px!important;grid-template-columns:42px 1fr auto!important;gap:11px!important}
+.eam-asset-icon{width:42px!important;height:42px!important;font-size:21px!important}
+.eam-asset-copy b{font-size:14px!important;line-height:1.3!important;white-space:normal!important}.eam-asset-copy small{font-size:11px!important}.eam-asset-copy span{font-size:10px!important}.eam-asset-card i{font-size:10px!important;padding:5px 7px!important}
+.eam-detail-hero h2{font-size:29px!important}.eam-detail-hero p{font-size:13px!important}.asset-code{font-size:11px!important}.state-badge{font-size:10px!important}
+.eam-lifecycle{padding:11px!important}.life-step{font-size:12px!important}.life-step b{width:24px!important;height:24px!important;font-size:10px!important}.master-title b{font-size:12px!important}.master-title span{font-size:11px!important}.master-grid small{font-size:10px!important}.master-grid b{font-size:13px!important}.eam-actions button{font-size:12px!important;padding:9px 12px!important}.eam-history-head{font-size:12px!important}.eam-note{font-size:11px!important}
+.eam-final.cat-fire .eam-asset-card{border-left:5px solid #df4b4b}.eam-final.cat-fire .eam-asset-card.on{border-left-color:#b92f2f;background:linear-gradient(135deg,#fff8f8,#ffefef)}
+.eam-final.cat-fire .eam-asset-copy b{color:#8f2d2d;font-size:15px!important}
+@media(max-width:1100px){.eam-tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:700px){.eam-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}.eam-asset-card{min-height:70px!important}.eam-detail-hero h2{font-size:24px!important}}
 </style>
 <script>
 const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
@@ -626,7 +641,7 @@ function eamSourceAssets(){
   const excel=Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[];
   const rows=[...main,...excel]
     .filter(x=>x && x.code)
-    .filter(x=>!["EQ-06","FI-03","FI-08","OT-04","OT-05","OT-06"].includes(String(x.code)))
+    .filter(x=>!["EQ-06","OT-04","OT-05","OT-06"].includes(String(x.code)))
     .map(x=>({
       code:String(x.code),
       name:String(x.name||"-"),
@@ -645,6 +660,16 @@ function eamSourceAssets(){
   const map=new Map();
   rows.forEach(x=>{ if(!map.has(x.code)) map.set(x.code,x); });
   return [...map.values()];
+}
+function eamDisplayName(x){
+  const code=String(x?.code||"");
+  if(code.startsWith("FI-")){
+    const m=String(x?.model||"").trim();
+    if(m && m!=="-") return m;
+    if(code==="FI-01") return "소방설비 · FI-01";
+    return String(x?.name||"소방설비");
+  }
+  return String(x?.name||"-");
 }
 function eamSourceCategory(x){
   const t=String(x.type||"");
@@ -770,7 +795,7 @@ function eamPage(){
             const a=eamRegisteredForSource(v), status=a?.status||"원본";
             return `<button class="eam-asset-card cat-card-${cat} ${v.code===sel?'on':''}" data-code="${v.code}" onclick="eamPick('${cat}','${v.code}')">
               <div class="eam-asset-icon">${C.ico}</div>
-              <div class="eam-asset-copy"><b>${xEsc(v.name)}</b><small>${xEsc(v.place)}</small><span>${xEsc(v.code)}</span></div>
+              <div class="eam-asset-copy"><b>${xEsc(eamDisplayName(v))}</b><small>${xEsc(v.place)}</small><span>${xEsc(v.code)}</span></div>
               <i class="${status==='정상'?'ok':status==='원본'?'source':'bad'}">${xEsc(status)}</i>
             </button>`
           }).join("") || `<div class="eam-empty-big">등록된 기존 자산이 없습니다.<br><span>신규 자산 등록으로 구매한 제품을 추가하세요.</span></div>`}
@@ -781,7 +806,7 @@ function eamPage(){
         ${current?`
         <div class="eam-detail-hero">
           <div class="eam-icon-xl">${C.ico}</div>
-          <div><div class="asset-code">${xEsc(code)}</div><h2>${xEsc(current.name)}</h2><p>${xEsc(current.place||"-")}</p></div>
+          <div><div class="asset-code">${xEsc(code)}</div><h2>${xEsc(eamDisplayName(current))}</h2><p>${xEsc(current.place||"-")}</p></div>
           <div class="state-badge ${String(current.status||"원본")==='정상'?'good':String(current.status||'')==='원본'?'source':'bad'}">${xEsc(current.status||'원본')}</div>
         </div>
         <div class="eam-lifecycle">
