@@ -928,7 +928,18 @@ html,body{overflow-x:hidden!important}
 <script>
 const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
-const SUPA=(window.supabase&&typeof window.supabase.createClient==="function")?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
+let SUPA=(window.supabase&&typeof window.supabase.createClient==="function")?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
+function getSupa(){
+  if(!SUPA && window.supabase && typeof window.supabase.createClient==="function"){
+    try{SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);}catch(e){console.warn("Supabase 초기화 실패",e)}
+  }
+  return SUPA;
+}
+async function waitForSupa(ms=4000){
+  const end=Date.now()+ms;
+  while(Date.now()<end){const s=getSupa();if(s)return s;await new Promise(r=>setTimeout(r,100));}
+  return getSupa();
+}
 const PLACE_GROUPS={
   시설:["유수장치실","기계실","사무실","휴게실","코트 1","코트 2","코트 3","코트 4","코트 5","옥상","남자 탈의실","여자 탈의실","남자 샤워실","여자 샤워실","남자 화장실","여자 화장실","복도","기타"],
   환경:["남자 화장실","여자 화장실","남자 탈의실","여자 탈의실","남자 샤워실","여자 샤워실","코트 1","코트 2","코트 3","코트 4","코트 5","복도","휴게실","사무실","기타"],
@@ -1707,16 +1718,48 @@ function eamEditLocationChange(v,currentPlace){
   if(currentPlace && [...box.options].some(o=>o.value===currentPlace))box.value=currentPlace;
 }
 async function eamSaveFullEdit(code){
-  const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code)); if(!a){alert('자산을 찾을 수 없습니다.');return}
-  const cat=document.getElementById('editCategory').value, name=document.getElementById('editName').value.trim(), lc=document.getElementById('editLocCode').value, dp=document.getElementById('editDetailPlace').value;
+  const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
+  if(!a){alert('자산을 찾을 수 없습니다.');return}
+  const supa=await waitForSupa();
+  if(!supa){alert('Supabase 연결을 불러오지 못했습니다. 잠시 후 다시 시도하세요.');return}
+  const get=id=>document.getElementById(id)?.value?.trim()||'';
+  const cat=get('editCategory')||'기타설비';
+  const name=get('editName');
+  const lc=get('editLocCode');
+  const dp=get('editDetailPlace');
+  const status=get('editStatus')||'정상';
   if(!name){alert('소분류(자산명)를 입력하세요.');return}
-  const place=dp;
-  const meta={asset_code:code,name,category:cat,place,model:document.getElementById('editModel').value.trim(),qty:document.getElementById('editQty').value.trim(),vendor:document.getElementById('editVendor').value.trim(),asContact:document.getElementById('editAs').value.trim(),installDate:document.getElementById('editInstall').value.trim(),warranty:document.getElementById('editWarranty').value.trim(),asHistory:document.getElementById('editAsHistory').value.trim(),note:document.getElementById('editNote').value.trim()};
-  const payload={name,category:cat,place,status:document.getElementById('editStatus').value,product_name:meta.model||cat};
-  const r=await SUPA.from('assets').update(payload).eq('id',a.id); if(r.error){console.error(r.error);alert('자산 기본정보 저장에 실패했습니다.');return}
-  const h=await SUPA.from('asset_history').insert({asset_id:a.id,event_type:'자산정보수정',description:'META::'+JSON.stringify(meta),worker_name:'관리자',action_type:'자산마스터수정',cost:0,event_date:new Date().toISOString().slice(0,10)});
-  if(h.error){console.warn(h.error);alert('기본정보는 저장됐지만 상세 메모 저장에 실패했습니다.');}
-  document.getElementById('eamEditModal')?.remove(); await eamLoad(); window.__eamSelCode=code; const map={'냉난방':'cooling','소방·방재':'fire','온수·난방':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'}; window.__eamCat=map[cat]||'other'; render();
+  if(!lc||!dp){alert('위치코드와 세부 위치를 선택하세요.');return}
+  const meta={asset_code:String(code),name,category:cat,place:dp,locationCode:lc,model:get('editModel'),qty:get('editQty'),vendor:get('editVendor'),asContact:get('editAs'),installDate:get('editInstall'),warranty:get('editWarranty'),asHistory:get('editAsHistory'),status,note:get('editNote')};
+  const payload={name,category:cat,place:dp,status,product_name:meta.model||cat};
+  const btn=document.getElementById('eamEditSave'); if(btn){btn.disabled=true;btn.textContent='저장 중…'}
+  try{
+    const r=await supa.from('assets').update(payload).eq('id',a.id);
+    if(r.error) throw r.error;
+    const all=readMeta(); all[String(code)]=meta; writeMeta(all); window.__eamMetaByCode=all;
+    document.getElementById('eamEditModal')?.remove();
+    // Keep current EAM selection/category and restore the exact list scroll after reload/render.
+    const scrollMap=window.__eamScrollByCat||{};
+    const currentCat=window.__eamCat||'cooling';
+    const currentScroll=document.getElementById('eamproGrid')?.scrollTop;
+    if(typeof currentScroll==='number') scrollMap[currentCat]=currentScroll;
+    window.__eamScrollByCat=scrollMap;
+    await eamLoad();
+    window.__eamMetaByCode=Object.assign(readMeta(),window.__eamMetaByCode||{});
+    window.__eamSelCode=String(code);
+    const map={'냉난방':'cooling','소방·방재':'fire','소방설비':'fire','온수·난방':'water','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'};
+    window.__eamCat=map[cat]||currentCat;
+    render();
+    requestAnimationFrame(()=>{
+      const b=document.getElementById('eamproGrid'); if(!b)return;
+      const saved=window.__eamScrollByCat[window.__eamCat]; if(typeof saved==='number') b.scrollTop=saved;
+      const row=b.querySelector(`[data-code="${CSS.escape(String(code))}"]`);
+      if(row){const top=row.offsetTop,bottom=top+row.offsetHeight,v0=b.scrollTop,v1=v0+b.clientHeight;if(top<v0)b.scrollTop=top-8;else if(bottom>v1)b.scrollTop=bottom-b.clientHeight+8;}
+      window.__eamScrollByCat[window.__eamCat]=b.scrollTop;
+    });
+    alert('자산 정보가 저장되었습니다.');
+  }catch(e){console.error(e);alert('자산 저장에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'));}
+  finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
 }
 
 async function eamDeleteSelectedAsset(){
@@ -2083,10 +2126,26 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
       </div></div>`;
   };
   // Keep scroll position stable when selecting lower assets.
+  window.__eamScrollByCat=window.__eamScrollByCat||{};
   window.eamPick=function(cat,code){
-    const box=document.getElementById('eamproGrid'), old=box?box.scrollTop:0, oldCat=window.__eamCat||'';
-    window.__eamCat=cat||'cooling'; if(code!==undefined&&code!==null)window.__eamSelCode=String(code); else window.__eamSelCode='';
-    render(); requestAnimationFrame(()=>{const b=document.getElementById('eamproGrid');if(!b)return;if(oldCat===window.__eamCat)b.scrollTop=old;const s=b.querySelector('.eam-asset-row.on');if(s){const t=s.offsetTop,bt=t+s.offsetHeight,vT=b.scrollTop,vB=vT+b.clientHeight;if(t<vT)b.scrollTop=Math.max(0,t-8);else if(bt>vB)b.scrollTop=Math.max(0,bt-b.clientHeight+8);}});
+    const oldBox=document.getElementById('eamproGrid');
+    const oldCat=window.__eamCat||'';
+    if(oldBox) window.__eamScrollByCat[oldCat]=oldBox.scrollTop;
+    window.__eamCat=cat||'cooling';
+    if(code!==undefined&&code!==null) window.__eamSelCode=String(code); else window.__eamSelCode='';
+    render();
+    requestAnimationFrame(()=>{
+      const b=document.getElementById('eamproGrid'); if(!b)return;
+      const saved=window.__eamScrollByCat[window.__eamCat];
+      if(typeof saved==='number') b.scrollTop=saved;
+      const row=code!==undefined&&code!==null ? b.querySelector(`[data-code="${CSS.escape(String(code))}"]`) : null;
+      if(row){
+        const top=row.offsetTop, bottom=top+row.offsetHeight, viewTop=b.scrollTop, viewBottom=viewTop+b.clientHeight;
+        if(top<viewTop) b.scrollTop=Math.max(0,top-8);
+        else if(bottom>viewBottom) b.scrollTop=Math.max(0,bottom-b.clientHeight+8);
+      }
+      window.__eamScrollByCat[window.__eamCat]=b.scrollTop;
+    });
   };
 })();
 </script>
@@ -2161,153 +2220,4 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
 })();
 </script>
 
-
-<style id="JGB_V40_EAM_FIXES">
-/* V40: EAM 저장/위치/스크롤 안정화 */
-.eamproGrid,.eam-asset-list,#eamproGrid{overflow-y:auto !important;overscroll-behavior:contain !important;scroll-behavior:auto !important;}
-.eam-edit-overlay{overflow:auto !important;}
-.eam-edit-card{max-height:94vh !important;overflow:auto !important;}
-.eam-save-toast{position:fixed;right:24px;bottom:24px;z-index:10050;background:#0b3f73;color:#fff;padding:13px 18px;border-radius:12px;font-size:15px;font-weight:800;box-shadow:0 12px 30px rgba(0,0,0,.22);}
-.eam-edit-grid label{min-width:0;}
-.eam-edit-grid input,.eam-edit-grid select,.eam-edit-grid textarea{font-size:16px !important;line-height:1.4 !important;}
-</style>
-<script id="JGB_V40_EAM_FIXES">
-(function(){
-  const LOCS={A:'코트',B:'복도',C:'사무실',D:'옥상',E:'유수장치실'};
-  const CATMAP={'냉난방':'cooling','소방·방재':'fire','온수·난방':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'};
-  const META_KEY='JGB_EAM_ASSET_META_V40';
-  window.__eamScrollByCat=window.__eamScrollByCat||{};
-  function readMeta(){try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}catch(e){return {}}}
-  function writeMeta(m){try{localStorage.setItem(META_KEY,JSON.stringify(m||{}))}catch(e){}}
-  window.__eamMetaByCode=Object.assign(readMeta(),window.__eamMetaByCode||{});
-  function toast(msg){const old=document.getElementById('eamSaveToast');old?.remove();const d=document.createElement('div');d.id='eamSaveToast';d.className='eam-save-toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
-  function esc(v){return typeof xEsc==='function'?xEsc(v):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-  function placeCodeFrom(v){const p=String(v||'');if(p.includes('유수장치실'))return 'E';if(p.includes('옥상'))return 'D';if(p.includes('사무실'))return 'C';if(p.includes('복도'))return 'B';if(p.includes('코트'))return 'A';return ''}
-
-  // 화면 표시명: 원본/사진·현장확인으로 정리한 세부 명칭을 우선하되 실제 데이터가 있으면 사용자 수정값을 우선.
-  window.eamDisplayName=function(x){
-    const code=String(x?.code||x?.asset_code||'');
-    const meta=window.__eamMetaByCode?.[code]||{};
-    const map={
-      'EQ-01':'주펌프','EQ-02':'보조펌프','EQ-03':'예비펌프','EQ-05':'전기소방제어장비(MCC판넬)',
-      'FI-01':'P형 복합식수신기','FI-02':'소방 분전반','FI-03':'SP-예비펌프','FI-04':'프리액션 밸브',
-      'FI-05':'난방순환펌프','FI-06':'충압펌프','FI-07':'기동용수압개폐장치','FI-08':'소방 분전반',
-      'EQ-04':'스마트온수기','EQ-06':'축열식 전기온수기','EQ-07':'저수조'
-    };
-    return String(meta.name||map[code]||x?.name||x?.model||'-');
-  };
-
-  // 기존/신규 위치 선택값을 모두 코드 기준으로 처리
-  window.eamEditLocationChange=function(v,currentPlace){
-    const box=document.getElementById('editDetailPlace'); if(!box)return;
-    const opts={
-      A:['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트'],
-      B:['복도'],C:['사무실'],D:['옥상'],E:['유수장치실'],X:[String(currentPlace||'')||'기존 위치']
-    };
-    box.innerHTML=(opts[v]||opts.A).map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
-    if(currentPlace && [...box.options].some(o=>o.value===currentPlace)) box.value=currentPlace;
-  };
-
-  // 전체 자산정보 수정창: 기존 이력카드 원본 + DB + 사용자 수정값을 일치시켜 표시
-  window.eamEditSelectedAsset=async function(){
-    const code=String(window.__eamSelCode||''); if(!code){alert('수정할 자산을 선택하세요.');return}
-    if(!window.SUPA){alert('Supabase 연결이 필요합니다.');return}
-    let a=(window.__eamA||[]).find(v=>String(v.asset_code)===code);
-    if(!a && typeof eamEnsureEditableAsset==='function') a=await eamEnsureEditableAsset();
-    if(!a){alert('수정할 자산을 찾지 못했습니다.');return}
-    const src=typeof eamSelectedSource==='function'?(eamSelectedSource()||{}):{};
-    const meta=window.__eamMetaByCode?.[code]||{};
-    const merged={...src,...a,...meta};
-    const cat=merged.category||({'냉난방':'냉난방','소방':'소방·방재','온수·난방':'온수·난방','전기':'전기설비','코트조명':'코트조명','방수':'방수'})[merged.type]||'기타설비';
-    const pos=placeCodeFrom(merged.place)||'X';
-    const detail=String(merged.place||'');
-    document.getElementById('eamEditModal')?.remove();
-    document.body.insertAdjacentHTML('beforeend',`<div id="eamEditModal" class="eam-edit-overlay" onclick="if(event.target===this)this.remove()">
-      <div class="eam-edit-card">
-        <div class="eam-edit-head"><div><span>ASSET MASTER EDIT</span><h2>자산 전체정보 수정</h2><p>자산코드는 유지하고 나머지 자산정보를 한 번에 수정합니다.</p></div><button type="button" onclick="document.getElementById('eamEditModal').remove()">×</button></div>
-        <div class="eam-edit-grid">
-          <label>자산코드<input value="${esc(code)}" readonly></label>
-          <label>설비 종류<select id="editCategory">${['냉난방','소방·방재','온수·난방','전기설비','코트조명','방수','기타설비'].map(x=>`<option ${cat===x?'selected':''}>${x}</option>`).join('')}</select></label>
-          <label class="wide">소분류(자산명)<input id="editName" value="${esc(merged.name||merged.model||'')}"></label>
-          <label>위치코드<select id="editLocCode" onchange="eamEditLocationChange(this.value)">${[['A','코트'],['B','복도'],['C','사무실'],['D','옥상'],['E','유수장치실']].map(([k,n])=>`<option value="${k}" ${pos===k?'selected':''}>${k} · ${n}</option>`).join('')}</select></label>
-          <label>세부 위치<select id="editDetailPlace"></select></label>
-          <label>모델·규격<input id="editModel" value="${esc(merged.model||'')}"></label>
-          <label>수량<input id="editQty" value="${esc(merged.qty??merged.quantity??'')}"></label>
-          <label>제작·구매<input id="editVendor" value="${esc(merged.vendor||merged.maker||'')}"></label>
-          <label>A/S 연락처<input id="editAs" value="${esc(merged.asContact||'')}"></label>
-          <label>설치일<input id="editInstall" value="${esc(merged.installDate||merged.date||'')}"></label>
-          <label>보증<input id="editWarranty" value="${esc(merged.warranty||'')}"></label>
-          <label>기존 A/S 기록<input id="editAsHistory" value="${esc(merged.asHistory||'')}"></label>
-          <label>상태<select id="editStatus">${['정상','점검필요','조치필요','폐기'].map(x=>`<option ${String(merged.status||'정상')===x?'selected':''}>${x}</option>`).join('')}</select></label>
-          <label class="wide">비고<textarea id="editNote" rows="4">${esc(merged.note||'')}</textarea></label>
-        </div>
-        <div class="eam-edit-actions"><button class="btn gray" type="button" onclick="document.getElementById('eamEditModal').remove()">취소</button><button class="btn blue" id="eamEditSave" type="button" onclick="eamSaveFullEdit('${esc(code)}')">저장</button></div>
-      </div></div>`);
-    eamEditLocationChange(pos,detail);
-  };
-
-  // 핵심: Supabase assets 저장이 성공하면 상세 메모 저장 실패로 전체 작업이 실패하지 않도록 함.
-  // 확장 필드는 V40 메타에 저장하고 asset_history는 있으면 이력으로 남김.
-  window.eamSaveFullEdit=async function(code){
-    code=String(code||'');
-    const a=(window.__eamA||[]).find(v=>String(v.asset_code)===code);
-    if(!a){alert('자산을 찾을 수 없습니다.');return}
-    if(!window.SUPA){alert('Supabase 연결이 필요합니다.');return}
-    const val=id=>document.getElementById(id)?.value?.trim()||'';
-    const name=val('editName'), cat=val('editCategory')||'기타설비', loc=val('editLocCode'), detail=val('editDetailPlace');
-    if(!name){alert('소분류(자산명)를 입력하세요.');return}
-    const place=detail||LOCS[loc]||'';
-    const meta={asset_code:code,name,category:cat,place,locationCode:loc,model:val('editModel'),qty:val('editQty'),vendor:val('editVendor'),asContact:val('editAs'),installDate:val('editInstall'),warranty:val('editWarranty'),asHistory:val('editAsHistory'),status:val('editStatus')||'정상',note:val('editNote')};
-    const btn=document.getElementById('eamEditSave'); if(btn){btn.disabled=true;btn.textContent='저장 중…'}
-    try{
-      const r=await window.SUPA.from('assets').update({name,category:cat,place,status:meta.status,product_name:meta.model||cat}).eq('id',a.id);
-      if(r.error) throw r.error;
-      // 상세 항목은 같은 브라우저에서도 새로고침 후 유지
-      const all=readMeta(); all[code]=meta; writeMeta(all); window.__eamMetaByCode=all;
-      // 가능하면 EAM 이력에도 원본을 남김. 실패해도 자산 저장 자체는 성공 처리.
-      try{
-        const h=await window.SUPA.from('asset_history').insert({asset_id:a.id,event_type:'자산정보수정',description:'META::'+JSON.stringify(meta),worker_name:'관리자',action_type:'자산마스터수정',cost:0,event_date:new Date().toISOString().slice(0,10)});
-        if(h?.error) console.warn('자산정보수정 이력 기록 생략:',h.error);
-      }catch(e){console.warn('자산정보수정 이력 예외:',e)}
-      document.getElementById('eamEditModal')?.remove();
-      await eamLoad();
-      window.__eamMetaByCode=Object.assign(readMeta(),window.__eamMetaByCode||{});
-      window.__eamSelCode=code; window.__eamCat=CATMAP[cat]||'other';
-      render();
-      requestAnimationFrame(()=>{
-        const b=document.getElementById('eamproGrid'); if(!b)return;
-        const desired=window.__eamScrollByCat[window.__eamCat]||0; b.scrollTop=desired;
-      });
-      toast('자산 정보가 저장되었습니다.');
-    }catch(e){console.error(e);alert('자산 저장에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'))}
-    finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
-  };
-
-  // 자산 선택 시 현재 스크롤을 보존하고, 선택 후 자동으로 맨 위로 이동하지 않음.
-  window.eamPick=function(cat,code){
-    const oldBox=document.getElementById('eamproGrid');
-    const oldCat=window.__eamCat||'cooling';
-    const oldScroll=oldBox?oldBox.scrollTop:0;
-    window.__eamScrollByCat[oldCat]=oldScroll;
-    window.__eamCat=cat||oldCat;
-    if(code!==undefined&&code!==null) window.__eamSelCode=String(code);
-    else window.__eamSelCode='';
-    render();
-    requestAnimationFrame(()=>{
-      const b=document.getElementById('eamproGrid'); if(!b)return;
-      // 같은 분류면 방금 보던 위치, 다른 분류면 이전에 보던 위치를 복원
-      b.scrollTop=Number.isFinite(window.__eamScrollByCat[window.__eamCat])?window.__eamScrollByCat[window.__eamCat]:0;
-    });
-  };
-
-  // 필터/검색 렌더링 이후에도 스크롤 유지 보조
-  const oldFilter=window.eamProFilter;
-  window.eamProFilter=function(q,loc){
-    const box=document.getElementById('eamproGrid'), cat=window.__eamCat||'cooling';
-    if(box) window.__eamScrollByCat[cat]=box.scrollTop;
-    if(typeof oldFilter==='function') oldFilter(q,loc);
-    requestAnimationFrame(()=>{const b=document.getElementById('eamproGrid');if(b)b.scrollTop=window.__eamScrollByCat[cat]||0;});
-  };
-})();
-</script>
 </body></html>
