@@ -783,7 +783,27 @@ td{font-size:13px;line-height:1.4;vertical-align:middle}
 @media(max-width:1200px){.wow-kpis{grid-template-columns:repeat(3,1fr)}.wow-main-grid,.wow-main-grid.lower{grid-template-columns:1fr}.wow-year-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.wow-hero{grid-template-columns:1fr}.wow-hero-side{align-items:flex-start;text-align:left}.wow-kpis{grid-template-columns:1fr 1fr}.wow-flow{grid-template-columns:1fr}.wow-arrow{transform:rotate(90deg)}.wow-methods{grid-template-columns:1fr}.wow-year-grid{grid-template-columns:1fr}.wow-footer{align-items:flex-start;flex-direction:column}}
 </style>
-</head><body><div id="app"></div>
+<style id="WORK_PROCESS_DETAIL_CSS">
+.process-wrap{background:#eef4fa;border:1px solid #d8e3ef;border-radius:18px;padding:16px}
+.process-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.process-kpi{background:#fff;border:1px solid #d9e4ef;border-radius:13px;padding:12px 14px;border-top:5px solid #2463d4;min-height:82px}
+.process-kpi.warn{border-top-color:#f59e0b}.process-kpi.bad{border-top-color:#dc2626}.process-kpi.ok{border-top-color:#16a34a}
+.process-kpi .k-label{font-size:12px;color:#64748b;font-weight:800}.process-kpi .k-value{font-size:25px;font-weight:950;line-height:1.1;margin-top:6px;color:#10233f}
+.process-list{display:flex;flex-direction:column;gap:12px}
+.process-card{background:#fff;border:1px solid #cad8e7;border-radius:15px;overflow:hidden;box-shadow:0 4px 14px rgba(31,56,85,.06)}
+.process-card-head{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 14px;background:linear-gradient(90deg,#eaf3ff,#f8fbff);border-bottom:1px solid #d5e0ec}
+.process-id{font-size:11px;font-weight:900;color:#3569ad;letter-spacing:.03em}.process-title{font-size:16px;font-weight:950;color:#12243e;margin-top:3px}.process-sub{font-size:12px;color:#52657b;margin-top:3px}
+.process-status{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid #b9c9dc;background:#fff;color:#334155}.process-status.wait{color:#b45309;background:#fff7ed;border-color:#fed7aa}.process-status.run{color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe}.process-status.done{color:#15803d;background:#f0fdf4;border-color:#bbf7d0}
+.process-body{display:grid;grid-template-columns:1.25fr 1fr 1.05fr;min-height:150px}
+.process-col{padding:13px 14px;border-right:1px solid #d9e2ec}.process-col:last-child{border-right:0}.process-col h4{margin:0 0 9px;font-size:13px;font-weight:950;color:#183455}.process-info{display:grid;grid-template-columns:1fr 1fr;gap:7px}.process-info div{background:#f7faff;border:1px solid #e1e9f2;border-radius:9px;padding:8px 9px}.process-info span{display:block;font-size:10px;color:#7b8ba0;margin-bottom:3px;font-weight:800}.process-info b{font-size:12px;color:#19314f;word-break:break-word}.process-note{margin-top:8px;padding:9px;background:#f7f9fc;border-left:4px solid #6b8fbd;border-radius:7px;font-size:12px;color:#334155;line-height:1.45}
+.process-fields{display:grid;grid-template-columns:1fr;gap:8px}.process-fields label{font-size:11px;color:#52657b;font-weight:900}.process-fields select,.process-fields textarea,.process-fields input{width:100%;border:1px solid #cbd8e6;border-radius:8px;background:#fff;padding:9px 10px;font-size:12px}.process-fields textarea{min-height:62px;resize:vertical}
+.process-type-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}.process-type{border:1px solid #cbd8e6;background:#fff;border-radius:9px;padding:9px 8px;text-align:center;font-size:12px;font-weight:900;cursor:pointer}.process-type.on.self{background:#eff6ff;border-color:#3b82f6;color:#1d4ed8}.process-type.on.out{background:#fff7ed;border-color:#fb923c;color:#c2410c}
+.process-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.process-actions button{border:0;border-radius:8px;padding:9px 11px;font-size:12px;font-weight:900;cursor:pointer}.process-actions .save{background:#1769c1;color:#fff}.process-actions .done{background:#16a34a;color:#fff}.process-actions .gray{background:#e9eff6;color:#24364e}
+.process-history{display:flex;flex-direction:column;gap:6px}.process-history-row{display:grid;grid-template-columns:72px 1fr auto;gap:8px;align-items:center;font-size:11px;padding:7px 8px;border:1px solid #e0e7ef;border-radius:8px;background:#fbfdff}.process-history-row b{font-size:11px;color:#244b7a}.process-history-row span{color:#68798d}.process-history-row em{font-style:normal;font-weight:900;color:#1f7a4d}
+.completed-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.completed-card{border:1px solid #d7e2ed;border-radius:11px;background:#fff;padding:10px 12px}.completed-card .top{display:flex;justify-content:space-between;gap:8px;align-items:center}.completed-card strong{font-size:12px;color:#19314f}.completed-card .meta{font-size:11px;color:#64748b;margin-top:5px;display:flex;gap:10px;flex-wrap:wrap}.completed-card .content{margin-top:6px;font-size:12px;color:#334155;line-height:1.4}.completed-card .tag{padding:4px 7px;border-radius:999px;background:#eef6ff;color:#2563eb;font-size:10px;font-weight:900}.completed-card .tag.out{background:#fff4e8;color:#c2410c}
+@media(max-width:1050px){.process-summary{grid-template-columns:repeat(2,1fr)}.process-body{grid-template-columns:1fr}.process-col{border-right:0;border-bottom:1px solid #d9e2ec}.process-col:last-child{border-bottom:0}.completed-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.process-summary{grid-template-columns:1fr}.process-card-head{grid-template-columns:1fr}.process-info{grid-template-columns:1fr}}
+</style></head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style id="WOW_DASHBOARD_CSS">
@@ -1145,45 +1165,44 @@ function actionTypeFromIssue(x){if(x&&ACTION_TYPES.includes(x.actionType))return
 function cleanIssueContent(x){return String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').trim()}
 function withActionMarker(content,type){const base=String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').trim();return type?base+' [[처리구분:'+type+']]':base}
 async function setActionType(id,type){const x=(db.issues||[]).find(i=>i.id===id);if(!x||!type)return;x.actionType=type;x.content=withActionMarker(x.content,type);if(x.remoteId){const r=await SUPA.from('requests').update({content:x.content}).eq('id',x.remoteId);if(r.error){alert('처리구분 저장에 실패했습니다.');return}}await syncFromSupabase()}
+function cleanReporterContent(text){return String(text||'').replace(/\s*\[\[신고자:[^\]]+\]\]/g,'').trim()}
+function actionNoteFromIssue(x){const m=String(x?.content||'').match(/\[\[조치내용:([\s\S]*?)\]\]/);return m?m[1].trim():''}
+function cleanWorkContent(x){return cleanReporterContent(String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim())}
+function withWorkMarkers(content,type,note){let base=cleanReporterContent(String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim());if(type)base+=' [[처리구분:'+type+']]';if(note)base+=' [[조치내용:'+String(note).replace(/\]\]/g,'')+']]';return base}
 function processPage(){
  const all=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
- const pending=all.filter(x=>x.status!=='완료');
- const completed=all.filter(x=>x.status==='완료');
- return `<div class="jgb-page-title"><div><h2>작업관리</h2><p>직원 신고 접수 건을 이 화면에서 담당자 지정 → 처리구분 → 조치완료까지 관리합니다.</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="jgb-status">전체 ${all.length}건</span><span class="jgb-status danger">처리대기 ${pending.length}건</span><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button></div></div>
- <div class="jgb-section">처리 대기</div>
- <div class="jgb-card jgb-process-card">
- ${pending.map(x=>{const at=actionTypeFromIssue(x);return `<div class="jgb-q jgb-q-v21">
-   <div class="jgb-q-main"><b>${x.category||'기타'} · ${x.place||'-'} ${x.assetCode?`<span class="jgb-status asset">${xEsc(x.assetCode)}</span>`:''}</b>
-   <small>${xEsc(cleanIssueContent(x))}</small>
-   <div class="jgb-meta"><span>접수 ${time(x.createdAt)}</span>${x.handlerName?`<span>담당 ${xEsc(x.handlerName)}</span>`:`<span>담당 미지정</span>`}<span class="${x.status==='조치중'?'txt-warn':'txt-danger'}">${x.status||'미조치'}</span>${x.photo_url?`<a href="${x.photo_url}" target="_blank">사진 보기</a>`:''}</div></div>
-   <div class="jgb-process-col"><label>담당자</label><select onchange="assign('${x.id}',this.value)"><option value="">선택</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select></div>
-   <div class="jgb-process-col"><label>처리구분</label><select id="action_${x.id}"><option value="">선택</option>${ACTION_TYPES.map(v=>`<option value="${v}" ${at===v?'selected':''}>${v}</option>`).join('')}</select><button class="jgb-save-btn" onclick="saveWorkProcessing('${x.id}',this)">저장</button>${x.handlerId&&at?`<button class="jgb-btn green" onclick="completeIssue('${x.id}')">✓ 조치완료</button>`:''}</div>
- </div>`}).join('')||'<div class="jgb-empty">현재 처리할 작업이 없습니다.</div>'}
- </div>
- <div class="jgb-section" style="margin-top:14px">처리 완료 ${completed.length}건</div>
- <div class="jgb-card jgb-completed-list">${completed.slice(0,30).map(x=>{const at=actionTypeFromIssue(x);return `<div class="jgb-completed-row"><div><b>${x.category||'기타'} · ${x.place||'-'}</b><small>${xEsc(cleanIssueContent(x))}</small></div><div class="jgb-meta"><span>${at||'처리구분 미기록'}</span><span>${x.handlerName||'담당 미기록'}</span><span>완료 ${time(x.completedAt||x.createdAt)}</span></div><span class="jgb-status ok">완료</span></div>`}).join('')||'<div class="jgb-empty">완료된 작업이 없습니다.</div>'}</div>`;
+ const pending=all.filter(x=>x.status!=='완료'); const completed=all.filter(x=>x.status==='완료');
+ const waiting=pending.filter(x=>!x.handlerId).length, running=pending.filter(x=>x.handlerId).length;
+ return `<div class="jgb-page-title"><div><h2>작업관리</h2><p>QR 신고 접수부터 담당자 지정, 처리방식, 조치내용 입력, 완료까지 한 화면에서 관리합니다.</p></div><div class="process-actions"><span class="process-status">전체 ${all.length}건</span><span class="process-status wait">담당 미지정 ${waiting}건</span><span class="process-status run">조치중 ${running}건</span><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button></div></div>
+ <div class="process-wrap">
+  <div class="process-summary">
+   <div class="process-kpi"><div class="k-label">전체 접수</div><div class="k-value">${all.length}건</div></div>
+   <div class="process-kpi warn"><div class="k-label">담당 미지정</div><div class="k-value">${waiting}건</div></div>
+   <div class="process-kpi" style="border-top-color:#2563eb"><div class="k-label">조치 진행</div><div class="k-value">${running}건</div></div>
+   <div class="process-kpi ok"><div class="k-label">처리 완료</div><div class="k-value">${completed.length}건</div></div>
+  </div>
+  <div class="jgb-section">처리 대기 · 진행 ${pending.length}건</div>
+  <div class="process-list">
+  ${pending.map(x=>{const at=actionTypeFromIssue(x),note=actionNoteFromIssue(x),status=x.status||'미조치';const safeContent=cleanWorkContent(x);return `<div class="process-card">
+    <div class="process-card-head"><div><div class="process-id">접수번호 ${x.remoteId?`R-${x.remoteId}`:x.id}</div><div class="process-title">${xEsc(x.category||'기타')} · ${xEsc(x.place||'장소 미기록')}</div><div class="process-sub">접수 ${time(x.createdAt)} ${x.photo_url?' · 📷 현장사진 있음':''}</div></div><div class="process-status ${status==='조치중'?'run':'wait'}">● ${xEsc(status)}</div></div>
+    <div class="process-body">
+      <div class="process-col"><h4>① 접수 내용</h4><div class="process-info"><div><span>구분</span><b>${xEsc(x.category||'기타')}</b></div><div><span>장소</span><b>${xEsc(x.place||'-')}</b></div><div><span>신고 시각</span><b>${time(x.createdAt)}</b></div><div><span>담당자</span><b>${xEsc(x.handlerName||'미지정')}</b></div></div><div class="process-note">${xEsc(safeContent||'접수 내용 없음')}</div>${x.photo_url?`<div class="process-actions"><button class="gray" onclick="window.open('${x.photo_url}','_blank')">📷 사진 확인</button></div>`:''}</div>
+      <div class="process-col"><h4>② 처리 등록</h4><div class="process-fields"><label>담당 직원</label><select onchange="assign('${x.id}',this.value)"><option value="">담당자 선택</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select><label>처리구분</label><div class="process-type-row">${ACTION_TYPES.map(v=>`<button type="button" class="process-type ${at===v?'on '+(v==='자체조치'?'self':'out'):''}" onclick="selectProcessType('${x.id}','${v}')">${v}</button>`).join('')}</div><input type="hidden" id="action_${x.id}" value="${xEsc(at)}"><label>조치내용</label><textarea id="note_${x.id}" placeholder="실제로 조치한 내용을 구체적으로 입력하세요.">${xEsc(note)}</textarea></div><div class="process-actions"><button class="save" onclick="saveWorkProcessing('${x.id}',this)">저장</button>${x.handlerId&&at?`<button class="done" onclick="completeIssue('${x.id}')">✓ 조치완료</button>`:''}</div></div>
+      <div class="process-col"><h4>③ 처리 상태</h4><div class="process-history"><div class="process-history-row"><b>접수</b><span>${time(x.createdAt)}</span><em>완료</em></div><div class="process-history-row"><b>담당지정</b><span>${x.handlerName?xEsc(x.handlerName):'미지정'}</span><em>${x.handlerName?'완료':'대기'}</em></div><div class="process-history-row"><b>처리방식</b><span>${at||'미선택'}</span><em>${at?'완료':'대기'}</em></div><div class="process-history-row"><b>조치내용</b><span>${note?'등록됨':'미등록'}</span><em>${note?'완료':'대기'}</em></div><div class="process-history-row"><b>완료</b><span>${x.completedAt?time(x.completedAt):'-'}</span><em>${status==='완료'?'완료':'대기'}</em></div></div><div class="small" style="margin-top:8px">저장 후 처리내용과 구분이 유지됩니다.</div></div>
+    </div></div>`}).join('')||'<div class="jgb-empty">현재 처리할 작업이 없습니다.</div>'}
+  </div>
+  <div class="jgb-section" style="margin-top:16px">최근 처리완료 ${completed.length}건</div>
+  <div class="completed-grid">${completed.slice(0,20).map(x=>{const at=actionTypeFromIssue(x),note=actionNoteFromIssue(x)||cleanWorkContent(x);return `<div class="completed-card"><div class="top"><strong>${xEsc(x.category||'기타')} · ${xEsc(x.place||'-')}</strong><span class="jgb-status ok">완료</span></div><div class="content">${xEsc(note||'조치내용 미기록')}</div><div class="meta"><span>${xEsc(x.handlerName||'담당 미기록')}</span><span>${at||'처리구분 미기록'}</span><span>완료 ${time(x.completedAt||x.createdAt)}</span></div></div>`}).join('')||'<div class="jgb-empty">완료된 작업이 없습니다.</div>'}</div>
+ </div>`;
 }
+function selectProcessType(id,type){const el=document.getElementById('action_'+id);if(el)el.value=type;document.querySelectorAll('[onclick^="selectProcessType(\''+id+'\'"]').forEach(b=>{b.classList.remove('on','self','out');if((b.textContent||'').trim()===type)b.classList.add('on',type==='자체조치'?'self':'out')});}
+
 async function saveWorkProcessing(id,btn){
- const x=(db.issues||[]).find(i=>i.id===id);
- const sel=document.getElementById('action_'+id);
- const type=sel?.value||'';
- if(!x){alert('작업을 찾을 수 없습니다.');return}
- if(!type){alert('처리구분을 선택하세요.');return}
- if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+ const x=(db.issues||[]).find(i=>i.id===id); const sel=document.getElementById('action_'+id); const type=sel?.value||''; const note=(document.getElementById('note_'+id)?.value||'').trim();
+ if(!x){alert('작업을 찾을 수 없습니다.');return} if(!x.handlerId){alert('담당 직원을 먼저 선택하세요.');return} if(!type){alert('처리구분을 선택하세요.');return} if(!note){alert('조치내용을 입력하세요.');return} if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
  if(btn){btn.disabled=true;btn.textContent='저장 중...'}
- try{
-   const content=withActionMarker(cleanIssueContent(x),type);
-   if(x.remoteId){
-     const r=await SUPA.from('requests').update({content}).eq('id',x.remoteId);
-     if(r.error)throw r.error;
-   }else{
-     x.content=content;x.actionType=type;save();render();return;
-   }
-   await syncFromSupabase();
-   alert('처리구분이 저장되었습니다.');
- }catch(e){console.error(e);alert('처리구분 저장에 실패했습니다.\n'+(e?.message||''));}
- finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
-}
+ try{const content=withWorkMarkers(x.content,type,note); if(x.remoteId){const r=await SUPA.from('requests').update({content,status:'조치중'}).eq('id',x.remoteId);if(r.error)throw r.error}else{x.content=content;x.actionType=type;save();render();return} await syncFromSupabase(); alert('작업기록이 저장되었습니다.')}catch(e){console.error(e);alert('작업기록 저장에 실패했습니다.\n'+(e?.message||''))}finally{if(btn){btn.disabled=false;btn.textContent='저장'}}}
+
 
 function saveScheduleDay(date){
   const vals=workers.map(w=>document.getElementById(`sch_${w.id}`)?.value||"");
