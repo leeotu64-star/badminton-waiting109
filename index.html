@@ -2005,10 +2005,24 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
     const map=new Map();rows.forEach(x=>{if(!map.has(x.code))map.set(x.code,x)});
     return [...map.values()];
   };
-  window.eamDisplayName=function(x){return vstr(x?.name)||'-'};
+  const FIRE_DISPLAY_NAMES={
+    'FI-01':'P형 복합식수신기(HPS-320)',
+    'FI-02':'소방 분전반',
+    'FI-03':'SP-예비펌프',
+    'FI-04':'프리액션 밸브',
+    'FI-05':'난방순환펌프',
+    'FI-06':'충압펌프',
+    'FI-07':'기동용 수압개폐장치',
+    'FI-08':'소방 분전반'
+  };
+  window.eamDisplayName=function(x){
+    const code=vstr(x?.code);
+    if(FIRE_DISPLAY_NAMES[code]) return FIRE_DISPLAY_NAMES[code];
+    return vstr(x?.name)||'-';
+  };
   window.eamDisplaySubName=function(x){
     const code=vstr(x?.code);
-    if(code.startsWith('FI-')) return '원본 자산명: 소방설비';
+    if(code.startsWith('FI-')) return '소분류 · '+(FIRE_DISPLAY_NAMES[code]||'소방설비');
     return '자산명';
   };
   window.eamCategoryDefs=function(){
