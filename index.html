@@ -389,6 +389,23 @@ async function syncBasicTasks(){
  }catch(e){console.warn("기본업무 동기화 실패",e)}
 }
 function issuesForMonth(){return (db.issues||[]).filter(x=>String(x?.createdAt||"").slice(0,7)===monthKey())}
+function basicPage(){
+ const tw=Array.isArray(todayWorkers())?todayWorkers():workers.map(w=>({...w,status:w.shift||"편성없음",working:false,start:"",end:""}));
+ return `<div class="basic-v5">
+  <div class="basic-v5-head"><div><h2 class="basic-v5-title">오늘의 기본업무</h2><div class="basic-v5-sub">${selectedDate} · 근무자별 10개 업무를 실제 실시한 항목만 완료 처리</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div>
+  <div class="basic-v5-grid">${tw.map(w=>{
+    const d=tasksFor(w.id)||{done:[],updatedAt:null}; const isHoliday=/휴일\s*근무/.test(String(w.status||''));
+    const isOff=!w.working || offWords.some(x=>(w.status||'').includes(x));
+    const done=isHoliday?10:Array.isArray(d.done)?d.done.length:0;
+    const state=isOff?'대상 제외':isHoliday?'자동완료':'직접 실시';
+    return `<article class="basic-v5-card">
+      <div class="head"><div><div class="name">${w.name}</div><div class="shift">${w.shift||w.status||''}${w.start?` · ${w.start}~${w.end}`:''}</div></div><span class="state ${done===10&&!isOff?'done':''}">${state} · ${isOff?'-':done+'/10'}</span></div>
+      <div class="bar"><i style="width:${isOff?0:done*10}%"></i></div>
+      <div class="basic-v5-tasks">${tasks.map((t,i)=>{const checked=isHoliday||(Array.isArray(d.done)&&d.done.includes(t));return `<button type="button" class="basic-v5-task ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${t.replace(/'/g,"\\'")}')"><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`}).join('')}</div>
+      <div class="basic-v5-foot"><span>${isOff?'기본업무 대상 아님':isHoliday?'휴일근무 · 기본업무 1건 자동완료':done===10?'오늘 기본업무 완료':'실시한 항목만 실적 반영'}</span><b>${isOff?'':done+'/10'}</b></div>
+    </article>`}).join('')}</div>
+ </div>`;
+}
 function stats(){
   const is=issuesForMonth(), done=is.filter(x=>x.status==="완료"), pending=is.filter(x=>x.status!=="완료");
   let completedDays=0, targetDays=0;
