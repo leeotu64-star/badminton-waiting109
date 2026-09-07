@@ -929,6 +929,7 @@ html,body{overflow-x:hidden!important}
 const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
 const SUPA=(window.supabase&&typeof window.supabase.createClient==="function")?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
+window.SUPA=SUPA;
 const PLACE_GROUPS={
   시설:["유수장치실","기계실","사무실","휴게실","코트 1","코트 2","코트 3","코트 4","코트 5","옥상","남자 탈의실","여자 탈의실","남자 샤워실","여자 샤워실","남자 화장실","여자 화장실","복도","기타"],
   환경:["남자 화장실","여자 화장실","남자 탈의실","여자 탈의실","남자 샤워실","여자 샤워실","코트 1","코트 2","코트 3","코트 4","코트 5","복도","휴게실","사무실","기타"],
@@ -2104,13 +2105,15 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
   window.eamSaveFullEdit=async function(code){
     const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
     if(!a){alert('자산을 찾을 수 없습니다.');return}
-    if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+    const client=window.SUPA || (window.supabase&&typeof window.supabase.createClient==='function' ? window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY) : null);
+    if(!client){alert('Supabase 연결이 필요합니다.');return}
+    window.SUPA=client;
     const val=id=>document.getElementById(id)?.value?.trim()||'';
-    const cat=val('editCategory')||'기타설비';
+    const cat=val('editCategory')||String(a.category||'기타설비');
     const name=val('editName');
-    const locCode=val('editLocCode');
+    const locCode=val('editLocCode')||'';
     const detail=val('editDetailPlace');
-    const place=detail||({A:'코트',B:'복도',C:'사무실',D:'옥상',E:'유수장치실'}[locCode]||'');
+    const place=detail||({A:'코트',B:'복도',C:'사무실',D:'옥상',E:'유수장치실'}[locCode]||String(a.place||''));
     if(!name){alert('소분류(자산명)를 입력하세요.');return}
     const meta={
       asset_code:String(code), name, category:cat, place, locationCode:locCode,
@@ -2119,20 +2122,34 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
       asHistory:val('editAsHistory'), status:val('editStatus')||'정상', note:val('editNote')
     };
     const btn=document.getElementById('eamEditSave'); if(btn){btn.disabled=true;btn.textContent='저장 중…'}
+    // Keep the asset master in Supabase limited to columns that exist in the shared schema.
+    // Extended fields are kept in local metadata until the schema has matching columns.
     try{
-      const r=await window.SUPA.from('assets').update({name,category:cat,place,status:meta.status,product_name:meta.model||cat}).eq('id',a.id);
+      const r=await client.from('assets').update({name,category:cat,place,status:meta.status,product_name:meta.model||cat}).eq('id',a.id);
       if(r.error) throw r.error;
       const all=readMeta(); all[String(code)]=meta; writeMeta(all); window.__eamMetaByCode=all;
+      const oldBox=document.getElementById('eamproGrid');
+      const oldScroll=oldBox?oldBox.scrollTop:0;
       document.getElementById('eamEditModal')?.remove();
-      await (typeof eamLoad==='function'?eamLoad():Promise.resolve());
+      if(typeof eamLoad==='function') await eamLoad();
       window.__eamMetaByCode=Object.assign(readMeta(),window.__eamMetaByCode||{});
       window.__eamSelCode=String(code);
       const map={'냉난방':'cooling','소방·방재':'fire','온수·난방':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'};
       window.__eamCat=map[cat]||'other';
       render();
-      requestAnimationFrame(()=>{const b=document.getElementById('eamproGrid');if(!b)return;const row=b.querySelector(`[data-code=\"${CSS.escape(String(code))}\"]`);if(row){const top=row.offsetTop,bot=top+row.offsetHeight,v0=b.scrollTop,v1=v0+b.clientHeight;if(top<v0)b.scrollTop=Math.max(0,top-8);else if(bot>v1)b.scrollTop=Math.max(0,bot-b.clientHeight+8);}});
+      requestAnimationFrame(()=>{
+        const b=document.getElementById('eamproGrid');
+        if(!b)return;
+        b.scrollTop=oldScroll;
+        const row=b.querySelector(`.eam-asset-row[data-code="${CSS.escape(String(code))}"]`);
+        if(row){
+          const top=row.offsetTop,bot=top+row.offsetHeight,v0=b.scrollTop,v1=v0+b.clientHeight;
+          if(top<v0)b.scrollTop=Math.max(0,top-8);
+          else if(bot>v1)b.scrollTop=Math.max(0,bot-b.clientHeight+8);
+        }
+      });
       alert('자산 정보가 저장되었습니다.');
-    }catch(e){console.error(e);alert('자산 저장에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'));}
+    }catch(e){console.error(e);alert('자산 저장에 실패했습니다.\n'+(e?.message||'Supabase 저장 오류'))}
     finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
   };
 
