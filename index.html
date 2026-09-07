@@ -1985,7 +1985,7 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
 @media(max-width:1000px){.eam-innovation-layout{grid-template-columns:1fr!important}.eam-asset-list{max-height:580px!important}.master-grid{grid-template-columns:repeat(2,1fr)!important}.source-grid{grid-template-columns:repeat(2,1fr)!important}}
 @media(max-width:650px){.eam-innovation{padding:16px 10px 28px!important}.eam-type-row{grid-template-columns:repeat(2,1fr)!important}.master-grid,.source-grid{grid-template-columns:1fr!important}.source-plan{grid-template-columns:1fr!important}.eam-detail-hero h2{font-size:27px!important}}
 </style>
-<script id="EAM_CLEAN_V36_SCRIPT">
+<script id="EAM_NAMING_V38_SCRIPT">
 (function(){
   const FIRE_CODES=new Set(['EQ-01','EQ-02','EQ-03','EQ-05','FI-01','FI-02','FI-03','FI-04','FI-05','FI-06','FI-07','FI-08']);
   function vstr(v){return String(v??'').trim()}
@@ -2006,18 +2006,32 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
     return [...map.values()];
   };
   const FIRE_DISPLAY_NAMES={
-    'FI-01':'P형 복합식수신기(HPS-320)',
+    'EQ-01':'주펌프',
+    'EQ-02':'보조펌프',
+    'EQ-03':'예비펌프',
+    'EQ-05':'전기소방제어장비(MCC판넬)',
+    'FI-01':'P형 복합식수신기(HPS-320N)',
     'FI-02':'소방 분전반',
     'FI-03':'SP-예비펌프',
-    'FI-04':'프리액션 밸브',
+    'FI-04':'프리액션 밸브(준비작동식)',
     'FI-05':'난방순환펌프',
     'FI-06':'충압펌프',
-    'FI-07':'기동용 수압개폐장치',
+    'FI-07':'기동용수압개폐장치(압력챔버)',
     'FI-08':'소방 분전반'
+  };
+
+  const NAME_OVERRIDES={
+    'EQ-04':'스마트온수기',
+    'EQ-06':'축열식 전기온수기',
+    'EQ-07':'저수조',
+    'BO-01':'온수기/보일러',
+    'BO-02':'온도조절기',
+    'BO-03':'온도조절기'
   };
   window.eamDisplayName=function(x){
     const code=vstr(x?.code);
     if(FIRE_DISPLAY_NAMES[code]) return FIRE_DISPLAY_NAMES[code];
+    if(NAME_OVERRIDES[code]) return NAME_OVERRIDES[code];
     return vstr(x?.name)||'-';
   };
   window.eamDisplaySubName=function(x){
