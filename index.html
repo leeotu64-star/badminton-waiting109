@@ -1,4 +1,4 @@
-﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+﻿﻿﻿﻿<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
@@ -233,53 +233,8 @@ body{background:var(--bg)}
 .v6-lower{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}.v6-panel{background:#fff;border:1px solid #dce6f0;border-radius:18px;padding:16px;box-shadow:0 7px 20px rgba(15,42,72,.045)}.panel-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:12px}.panel-head h3{margin:3px 0 0;font-size:17px}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.quick-grid button{position:relative;text-align:left;min-height:84px;border:1px solid #e0e8ef;border-radius:13px;background:#fbfdff;padding:13px;cursor:pointer}.quick-grid button:hover{border-color:#94b9dc;background:#f6fbff}.quick-grid strong{display:block;font-size:13px;color:#17314d}.quick-grid small{display:block;margin-top:5px;color:#7c8b9c;font-size:10px}.quick-grid b{position:absolute;right:13px;top:13px;color:#317bc8}.rule-item{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #edf2f6;font-size:10px}.rule-item b{font-size:11px;color:#17324e}.rule-item span{color:#708196;text-align:right}.rule-foot{margin-top:12px;padding:10px 11px;background:#fff8e7;border:1px solid #f2dfab;border-radius:10px;color:#7e6429;font-size:9px;line-height:1.5}
 @media(max-width:1150px){.v6-kpis{grid-template-columns:repeat(3,1fr)}.v6-flow{grid-template-columns:1fr 20px 1fr 20px 1fr}.v6-flow .flow-card:nth-of-type(4){display:none}.v6-flow .flow-arrow:nth-of-type(4){display:none}.v6-lower{grid-template-columns:1fr}.eam-dash-hero{grid-template-columns:1.3fr .7fr}}
 @media(max-width:760px){.eam-dash-hero{grid-template-columns:1fr}.hero-right{align-items:flex-start}.hero-big{text-align:left}.hero-big b{font-size:36px}.v6-kpis{grid-template-columns:1fr 1fr}.v6-flow{grid-template-columns:1fr}.flow-arrow{display:none}.v6-flow .flow-card:nth-of-type(4){display:block}.v6-flow .flow-arrow:nth-of-type(4){display:none}.quick-grid{grid-template-columns:1fr}.eam-dash-v6{padding:0}.hero-left,.hero-right{padding:22px}.hero-left h1{font-size:28px}}
+.eam-history-card-source{margin-top:12px;background:#fff;border:1px solid #d9e3ef;border-radius:14px;padding:14px}.source-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}.source-head b{font-size:16px}.source-head span:not(.source-tag){display:block;font-size:11px;color:#718096;margin-top:3px}.source-tag{background:#eaf3ff;color:#1457a6;padding:5px 9px;border-radius:999px;font-weight:900;font-size:11px}.source-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.source-grid>div{background:#f7faff;border:1px solid #e7edf5;border-radius:9px;padding:9px}.source-grid small{display:block;color:#718096;font-size:10px;margin-bottom:3px}.source-grid b{font-size:13px}.source-history-title{font-size:12px;font-weight:900;margin:13px 0 7px;padding-bottom:6px;border-bottom:1px solid #e7edf5}.source-years{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.source-years span{background:#f8fafc;border:1px solid #e7edf5;border-radius:8px;padding:9px;font-size:11px}.source-years b{display:block;margin-top:3px;font-size:12px}.source-history-lines{display:grid;gap:6px}.source-history-lines>div{display:flex;justify-content:space-between;gap:12px;background:#f8fafc;border:1px solid #e7edf5;border-radius:8px;padding:9px;font-size:11px}.source-history-lines span{color:#667386}.source-history-lines b{font-size:12px}.source-empty{background:#fafafa;border:1px dashed #cdd6e2;border-radius:8px;padding:10px;color:#667386;font-size:11px}@media(max-width:900px){.source-grid{grid-template-columns:repeat(2,1fr)}.source-years{grid-template-columns:1fr}}
 </style>
-
-<style id="DASH_REALISM_CSS">
-.dash-recent-list{display:flex;flex-direction:column;gap:0}.dash-recent-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e8edf3}.dash-recent-row:last-child{border-bottom:0}.dash-recent-row>div{min-width:0}.dash-recent-row b{display:block;font-size:12px}.dash-recent-row span{font-size:11px;color:#334155;margin-left:7px}.dash-recent-row small{display:block;color:#64748b;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:430px}.dash-recent-row strong{white-space:nowrap;font-size:12px}.goodtxt{color:#159447}.warntxt{color:#d83b3b}
-.dash-method-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 12px}.dash-method-grid .dash-kpi{min-height:92px}@media(max-width:900px){.dash-method-grid{grid-template-columns:repeat(2,1fr)}}</style>
-
-<style id="REALISM_TEXT_LAYOUT_V12">
-/* 대시보드 글씨/배열 정렬 개선 */
-.jgb-page-title h2{font-size:24px!important;line-height:1.25!important;letter-spacing:-.02em!important}
-.jgb-page-title p{font-size:13px!important;line-height:1.5!important}
-.jgb-actions{align-items:center!important}
-.jgb-actions input[type=date]{height:40px!important;padding:0 10px!important;border:1px solid #cbd5e1!important;border-radius:8px!important}
-.wow-title{font-size:16px!important;line-height:1.35!important}
-.wow-big{font-size:34px!important;line-height:1.1!important;white-space:nowrap!important}
-.wow-flow{grid-template-columns:1fr 32px 1fr 32px 1fr 32px 1fr!important;align-items:stretch!important;gap:8px!important}
-.wow-step{min-width:0!important;min-height:88px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;padding:12px 8px!important;text-align:center!important}
-.wow-step b{font-size:13px!important;line-height:1.25!important;white-space:nowrap!important}
-.wow-step strong{font-size:27px!important;line-height:1.1!important;margin-top:7px!important}
-.wow-arrow{display:flex!important;align-items:center!important;justify-content:center!important;font-size:24px!important;font-weight:900!important}
-.wow-health-text b{font-size:16px!important}
-.wow-health-text small{font-size:11px!important;line-height:1.55!important}
-.dash-section-title{font-size:16px!important;line-height:1.3!important;margin-top:18px!important}
-.dash-kpi span{font-size:13px!important;line-height:1.3!important}
-.dash-kpi b{font-size:28px!important;line-height:1.15!important}
-.dash-kpi small{font-size:11px!important;line-height:1.4!important}
-.dash-head h3{font-size:16px!important}
-.dash-head small{font-size:12px!important}
-.dash-year-row{font-size:12px!important;min-height:45px!important}
-.dash-table th,.dash-table td{font-size:12px!important;line-height:1.4!important}
-.dash-method-grid .dash-kpi{min-height:108px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
-@media(max-width:1100px){.wow-flow{grid-template-columns:1fr!important}.wow-arrow{display:none!important}}
-
-/* EAM 내부수리 / 외부수리 */
-.eam-service-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-top:12px!important}
-.eam-service-btn{border:1px solid #d7e1eb!important;border-radius:12px!important;padding:13px 14px!important;background:#fff!important;cursor:pointer!important;text-align:left!important}
-.eam-service-btn:hover{border-color:#7aa7d9!important;box-shadow:0 7px 18px rgba(15,70,120,.08)!important}
-.eam-service-btn b{display:block!important;font-size:14px!important}
-.eam-service-btn small{display:block!important;margin-top:4px!important;color:#64748b!important;font-size:11px!important;line-height:1.35!important}
-.eam-service-btn.internal{border-left:5px solid #2563eb!important}
-.eam-service-btn.external{border-left:5px solid #f59e0b!important}
-.eam-service-stats{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:12px!important}
-.eam-service-stat{background:#f8fafc!important;border:1px solid #e2e8f0!important;border-radius:10px!important;padding:10px 12px!important}
-.eam-service-stat span{display:block!important;color:#64748b!important;font-size:11px!important}
-.eam-service-stat b{display:block!important;font-size:20px!important;margin-top:4px!important}
-@media(max-width:700px){.eam-service-actions{grid-template-columns:1fr!important}}
-</style>
-
 </head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -323,11 +278,11 @@ const ISSUE_PRESETS={
 const JGB_EQUIP_PHOTOS=[null,null,null,null,null,null,null];
 const JGB_LAYOUT_PHOTO=null;
 const JGB_MAIN_EQUIPMENT=[
- {code:'EQ-01',name:'주펌프',type:'소방장비',capacity:'37.5 kW × 1대',life:'9년',maker:'하이젠모터스',place:'기계실',date:'2017.09.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[0]},
- {code:'EQ-02',name:'보조펌프',type:'소방장비',capacity:'37.5 kW × 1대',life:'9년',maker:'하이젠모터스',place:'기계실',date:'2017.04.17.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[1]},
- {code:'EQ-03',name:'예비펌프',type:'소방장비',capacity:'37.5 kW × 1대',life:'9년',maker:'동원주식회사',place:'기계실',date:'2017.09.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[2]},
+ {code:'EQ-01',name:'주펌프',type:'소방장비',capacity:'37.5 kW × 1대',life:'9년',maker:'하이젠모터스',place:'유수장치실',date:'2017.09.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[0]},
+ {code:'EQ-02',name:'보조펌프',type:'소방장비',capacity:'37.5 kW × 1대',life:'9년',maker:'하이젠모터스',place:'유수장치실',date:'2017.04.17.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[1]},
+ {code:'EQ-03',name:'예비펌프',type:'소방장비',capacity:'37.5 kW × 1대',life:'9년',maker:'동원주식회사',place:'유수장치실',date:'2017.09.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[2]},
  {code:'EQ-04',name:'스마트온수기',type:'온수기',capacity:'2000L',life:'7년',maker:'썬코리아',place:'2층',date:'2017.09.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[3]},
- {code:'EQ-05',name:'전기소방제어장비(MCC판넬)',type:'소방제어',capacity:'1대',life:'5년',maker:'㈜보성엔지니어링',place:'기계실',date:'2017.09.04.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[4]},
+ {code:'EQ-05',name:'전기소방제어장비(MCC판넬)',type:'소방제어',capacity:'1대',life:'5년',maker:'㈜보성엔지니어링',place:'유수장치실',date:'2017.09.04.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[4]},
  {code:'EQ-06',name:'축열식 전기온수기',type:'온수기',capacity:'600L × 1대',life:'7년',maker:'㈜영창테크',place:'기계실',date:'2017.05.29.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[5]},
  {code:'EQ-07',name:'저수조',type:'저수조',capacity:'32톤 × 1대',life:'5년',maker:'-',place:'기계실',date:'2017.09.04.',grade:'B등급',photo:JGB_EQUIP_PHOTOS[6]}
 ];
@@ -497,60 +452,44 @@ function eamDashboardSummary(){
    <div class="small" style="margin-top:8px">※ EAM에 저장된 자산·작업 이력을 기준으로 월별 자동 집계합니다. 직원 작업실적은 EAM과 별도로 집계합니다.</div>
   </div>`;
 }
-function getProcessMethod(x){
- const m=String(x?.processingMethod||'').trim(); if(m) return m;
- const c=String(x?.content||''); const z=c.match(/\[\[처리방식:(직접수리|외부수리|점검·조치|기타)\]\]/); return z?z[1]:'';
-}
-function cleanIssueContent(x){return String(x?.content||'').replace(/\s*\[\[처리방식:(직접수리|외부수리|점검·조치|기타)\]\]/g,'').trim();}
 function dashboard(s){
- const all=Array.isArray(db.issues)?db.issues:[], ym=monthKey(), [cy,cm]=ym.split('-').map(Number);
- const current=all.filter(x=>String(x?.createdAt||'').slice(0,7)===ym);
- const received=current.length, done=current.filter(x=>x.status==='완료').length;
- const progress=current.filter(x=>x.status==='조치중').length;
- const unassigned=current.filter(x=>!x.handlerId&&!x.handlerName).length;
- const miss=current.filter(x=>x.status!=='완료').length;
+ const all=db.issues||[], ym=monthKey(), [cy,cm]=ym.split('-').map(Number);
+ const current=all.filter(x=>String(x.createdAt||'').slice(0,7)===ym);
+ const received=current.length, done=current.filter(x=>x.status==='완료').length, progress=current.filter(x=>x.status==='조치중').length, miss=received-done;
  const rate=received?Math.round(done/received*100):0;
- const today=all.filter(x=>String(x?.createdAt||'').slice(0,10)===String(selectedDate));
- const todayPending=today.filter(x=>x.status!=='완료').length;
- const avgDone=current.filter(x=>x.completedAt&&x.createdAt).map(x=>Math.max(0,(new Date(x.completedAt)-new Date(x.createdAt))/60000));
- const avgMinutes=avgDone.length?Math.round(avgDone.reduce((a,b)=>a+b,0)/avgDone.length):0;
  const months=[]; const base=new Date(cy,cm-1,1);
- for(let i=5;i>=0;i--){const d=new Date(base.getFullYear(),base.getMonth()-i,1);const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;const q=all.filter(x=>String(x?.createdAt||'').slice(0,7)===key);const r=q.length,z=q.filter(x=>x.status==='완료').length;months.push({key,label:`${d.getMonth()+1}월`,received:r,done:z,miss:r-z});}
- const years=[...new Set(all.map(x=>String(x?.createdAt||'').slice(0,4)).filter(Boolean).concat([String(cy)]))].map(Number).sort((a,b)=>a-b);
- const yearRows=years.map(y=>{const q=all.filter(x=>String(x?.createdAt||'').slice(0,4)===String(y));const r=q.length,z=q.filter(x=>x.status==='완료').length;return {y,received:r,done:z,miss:r-z,rate:r?Math.round(z/r*100):0};});
+ for(let i=5;i>=0;i--){const d=new Date(base.getFullYear(),base.getMonth()-i,1);const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;const q=all.filter(x=>String(x.createdAt||'').slice(0,7)===key);const r=q.length,z=q.filter(x=>x.status==='완료').length;months.push({key,label:`${d.getMonth()+1}월`,received:r,done:z,miss:r-z});}
+ const years=[...new Set(all.map(x=>String(x.createdAt||'').slice(0,4)).filter(Boolean).concat([String(cy)]))].map(Number).sort((a,b)=>a-b);
+ const yearRows=years.map(y=>{const q=all.filter(x=>String(x.createdAt||'').slice(0,4)===String(y));const r=q.length,z=q.filter(x=>x.status==='완료').length;return {y,received:r,done:z,miss:r-z,rate:r?Math.round(z/r*100):0};});
+ const A=window.__eamA||[]; const linked=current.filter(x=>x.assetCode||/^\[[^\]]+\]/.test(String(x.content||''))).length;
  const cats={}; current.forEach(x=>cats[x.category||'기타']=(cats[x.category||'기타']||0)+1); const catRows=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
  const maxMonth=Math.max(1,...months.map(x=>x.received));
  const recent=[...all].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,8);
  const prev=months[months.length-2]||{received:0}; const delta=received-prev.received;
- return `<div class="jgb-page-title"><div><h2>운영 대시보드</h2><p>${cy}년 ${cm}월 · 실제 접수·조치 현황과 근무 실적을 한눈에 확인</p></div><div class="jgb-actions"><input type="date" value="${selectedDate}" onchange="setDate(this.value)"><button class="jgb-btn" onclick="go('process')">접수 · 조치</button><button class="jgb-btn gray" onclick="go('eam')">EAM 자산관리</button></div></div>
- <div class="wow-hero"><div class="wow-panel"><div class="wow-title">시설관리 작업 흐름</div><div class="wow-big">${received}건 <span style="font-size:14px;color:#64748b;font-weight:700">이번 달 접수</span></div><div class="wow-sub">실제 접수된 건을 담당자 지정 후 처리하고 완료까지 관리</div><div class="wow-flow"><div class="wow-step"><b>접수</b><strong>${received}</strong></div><div class="wow-arrow">→</div><div class="wow-step"><b>담당 미지정</b><strong>${unassigned}</strong></div><div class="wow-arrow">→</div><div class="wow-step"><b>조치중</b><strong>${progress}</strong></div><div class="wow-arrow">→</div><div class="wow-step"><b>완료</b><strong>${done}</strong></div></div></div><div class="wow-panel"><div class="wow-title">오늘 처리상태 · ${selectedDate}</div><div class="wow-health" style="margin-top:12px"><div class="wow-ring" style="--rate:${rate}%"><b>${rate}%</b></div><div class="wow-health-text"><b>이번 달 완료율</b><small>오늘 접수 ${today.length}건</small><small>오늘 미완료 ${todayPending}건</small><small>평균 처리 ${avgDone.length?avgMinutes+'분':'-'}</small></div></div></div></div>
+ return `<div class="jgb-page-title"><div><h2>운영 대시보드</h2><p>${cy}년 ${cm}월 · 시설관리 운영상태와 EAM 연계를 한눈에</p></div><div class="jgb-actions"><input type="date" value="${selectedDate}" onchange="setDate(this.value)"><button class="jgb-btn" onclick="go('process')">접수 · 조치</button><button class="jgb-btn gray" onclick="go('dashboard2')">EAM 현황</button></div></div>
+ <div class="wow-hero"><div class="wow-panel"><div class="wow-title">시설관리 업무 흐름</div><div class="wow-big">${received}건 <span style="font-size:14px;color:#64748b;font-weight:700">이번 달 작업요청</span></div><div class="wow-sub">직원 접수부터 조치완료까지 실시간 상태</div><div class="wow-flow"><div class="wow-step"><b>접수</b><strong>${received}</strong></div><div class="wow-arrow">→</div><div class="wow-step"><b>조치중</b><strong>${progress}</strong></div><div class="wow-arrow">→</div><div class="wow-step"><b>완료</b><strong>${done}</strong></div></div></div><div class="wow-panel"><div class="wow-title">운영 건강도</div><div class="wow-health" style="margin-top:12px"><div class="wow-ring" style="--rate:${rate}%"><b>${rate}%</b></div><div class="wow-health-text"><b>월간 완료율</b><small>미완료 ${miss}건</small><small>QR 접수 ${linked}건</small><small>EAM 자산 ${A.filter(a=>String(a.status||'')!=='폐기').length}건</small></div></div></div></div>
  <div class="dash-kpi-grid">
   <div class="dash-kpi"><span>이번 달 접수</span><b>${received}건</b><small>${delta>0?'전월 대비 +'+delta:delta<0?'전월 대비 '+delta:'전월과 동일'}</small></div>
-  <div class="dash-kpi"><span>담당 미지정</span><b>${unassigned}건</b><small>담당자 지정 대기</small></div>
-  <div class="dash-kpi"><span>조치중</span><b>${progress}건</b><small>담당자 지정 후 처리중</small></div>
-  <div class="dash-kpi warn"><span>미완료</span><b>${miss}건</b><small>완료되지 않은 작업요청</small></div>
+  <div class="dash-kpi"><span>조치중</span><b>${progress}건</b><small>담당자 지정 후 작업중</small></div>
+  <div class="dash-kpi warn"><span>미완료</span><b>${miss}건</b><small>완료되지 않은 접수</small></div>
   <div class="dash-kpi good"><span>완료율</span><b>${rate}%</b><small>${done}건 완료 / ${received}건 접수</small></div>
-  <div class="dash-kpi"><span>오늘 접수</span><b>${today.length}건</b><small>기준일 ${selectedDate}</small></div>
+  <div class="dash-kpi"><span>QR 접수</span><b>${linked}건</b><small>설비 QR로 등록</small></div>
+  <div class="dash-kpi"><span>운영 자산</span><b>${A.filter(a=>String(a.status||'')!=='폐기').length}건</b><small>EAM 등록 자산</small></div>
  </div>
- <div class="dash-section-title">📊 기간별 처리현황</div>
+ <div class="dash-section-title">📊 기간별 비교</div>
  <div class="dash-compare-grid">
-  <div class="jgb-card dash-panel"><div class="dash-head"><div><h3>월별 접수 · 완료 비교</h3><small>최근 6개월 실제 접수 데이터</small></div><b>${received}건</b></div><div class="dash-bars">${months.map(m=>`<div class="dash-bar-col"><div class="dash-bar-values"><i style="height:${Math.max(4,Math.round(m.received/maxMonth*130))}px" title="접수 ${m.received}"></i><em style="height:${Math.max(4,Math.round(m.done/maxMonth*130))}px" title="완료 ${m.done}"></em></div><label>${m.label}</label><small>${m.received}/${m.done}</small></div>`).join('')}</div><div class="dash-legend"><span>■ 접수</span><span>■ 완료</span><span>표기: 접수/완료</span></div></div>
-  <div class="jgb-card dash-panel"><div class="dash-head"><div><h3>연도별 비교</h3><small>실제 접수 · 완료 · 미완료</small></div><button class="jgb-btn gray" onclick="go('dashboard2')">상세</button></div><div class="dash-year-list">${yearRows.slice(-5).map(r=>{const idx=yearRows.indexOf(r);const prevY=yearRows[idx-1];const d=r.received-(prevY?.received||0);return `<div class="dash-year-row"><b>${r.y}년</b><span>${r.received}건</span><span class="goodtxt">완료 ${r.done}</span><span class="warntxt">미완료 ${r.miss}</span><span>${d>0?'▲ '+d:d<0?'▼ '+Math.abs(d):'-'}</span></div>`}).join('')||'<div class="jgb-empty">데이터가 없습니다.</div>'}</div></div>
+  <div class="jgb-card dash-panel"><div class="dash-head"><div><h3>월별 접수 · 완료 비교</h3><small>최근 6개월 기준</small></div><b>${received}건</b></div><div class="dash-bars">${months.map(m=>`<div class="dash-bar-col"><div class="dash-bar-values"><i style="height:${Math.max(4,Math.round(m.received/maxMonth*130))}px" title="접수 ${m.received}"></i><em style="height:${Math.max(4,Math.round(m.done/maxMonth*130))}px" title="완료 ${m.done}"></em></div><label>${m.label}</label><small>${m.received}/${m.done}</small></div>`).join('')}</div><div class="dash-legend"><span>■ 접수</span><span>■ 완료</span><span>표기: 접수/완료</span></div></div>
+  <div class="jgb-card dash-panel"><div class="dash-head"><div><h3>연도별 비교</h3><small>연간 접수 · 완료 · 미완료</small></div><button class="jgb-btn gray" onclick="go('dashboard2')">상세</button></div><div class="dash-year-list">${yearRows.slice(-5).map((r,i)=>{const prevY=yearRows[yearRows.indexOf(r)-1];const d=r.received-(prevY?.received||0);return `<div class="dash-year-row"><b>${r.y}년</b><span>${r.received}건</span><span class="goodtxt">완료 ${r.done}</span><span class="warntxt">미완료 ${r.miss}</span><span>${d>0?'▲ '+d:d<0?'▼ '+Math.abs(d):'-'}</span></div>`}).join('')||'<div class="jgb-empty">데이터가 없습니다.</div>'}</div></div>
  </div>
  <div class="dash-section-title">📈 월별 상세 비교</div>
- <div class="jgb-card dash-panel"><table class="dash-table"><thead><tr><th>월</th><th>접수</th><th>완료</th><th>미완료</th><th>완료율</th><th>전월 대비</th></tr></thead><tbody>${months.map((m,i)=>{const r=m.received?Math.round(m.done/m.received*100):0;const d=m.received-(months[i-1]?.received||0);return `<tr><td><b>${m.key}</b></td><td>${m.received}건</td><td class="goodtxt">${m.done}건</td><td class="${m.miss?'warntxt':''}">${m.miss}건</td><td>${r}%</td><td>${i===0?'-':d>0?'▲ '+d+'건':d<0?'▼ '+Math.abs(d)+'건':'-'}</td></tr>`}).join('')}</tbody></table></div>
- <div class="dash-section-title">🛠 업무 현황</div>
- <div class="dash-section-title">🔧 처리방식별 실적</div>
- <div class="dash-method-grid">
-  ${['직접수리','외부수리','점검·조치','기타'].map((m,i)=>{const n=current.filter(x=>getProcessMethod(x)===m).length;return `<div class="dash-kpi"><span>${m}</span><b>${n}건</b><small>${done?Math.round(n/done*100):0}% · 완료건 기준</small></div>`}).join('')}
- </div>
+ <div class="jgb-card dash-panel"><table class="dash-table"><thead><tr><th>월</th><th>접수</th><th>완료</th><th>미완료</th><th>완료율</th><th>전월 대비</th></tr></thead><tbody>${months.map((m,i)=>{const r=m.received?Math.round(m.done/m.received*100):0;const d=m.received-(months[i-1]?.received||0);return `<tr><td><b>${m.key}</b></td><td>${m.received}건</td><td class="goodtxt">${m.done}건</td><td class="${m.miss?'warntxt':''}">${m.miss}건</td><td>${r}%</td><td>${i===0?'-':d>0?'▲ '+d+'건':d<0?'▼ '+Math.abs(d)+'건':'-'} </td></tr>`}).join('')}</tbody></table></div>
+ <div class="dash-section-title">🏢 업무 분야 · EAM 연계</div>
  <div class="dash-bottom-grid">
-  <div class="jgb-card dash-panel"><div class="dash-head"><div><h3>이번 달 분야별 접수</h3><small>실제 접수 데이터 기준</small></div></div>${catRows.length?catRows.map(([k,v])=>`<div class="dash-cat"><span>${k}</span><div><i style="width:${received?Math.max(4,Math.round(v/received*100)):0}%"></i></div><b>${v}건</b></div>`).join(''):'<div class="jgb-empty">접수 데이터가 없습니다.</div>'}</div>
-  <div class="jgb-card dash-panel"><div class="dash-head"><div><h3>최근 작업요청</h3><small>접수 → 담당자 지정 → 조치완료</small></div><button class="jgb-btn" onclick="go('process')">조치 화면</button></div><div class="dash-recent-list">${recent.map(x=>`<div class="dash-recent-row"><div><b>${x.handlerName||'담당 미지정'}</b><span>${x.category||'기타'} · ${x.place||'-'}</span><small>${String(x.content||'-').slice(0,55)} · ${time(x.createdAt)}</small></div><strong class="${x.status==='완료'?'goodtxt':x.status==='조치중'?'':'warntxt'}">${x.status||'미조치'}</strong></div>`).join('')||'<div class="jgb-empty">최근 접수사항이 없습니다.</div>'}</div></div>
+  <div class="jgb-card dash-panel"><div class="dash-head"><div><h3>이번 달 분야별 접수</h3><small>시설 · 환경 · 안전 · 기타</small></div></div>${catRows.length?catRows.map(([k,v])=>`<div class="dash-cat"><span>${k}</span><div><i style="width:${Math.max(4,Math.round(v/received*100))}%"></i></div><b>${v}건</b></div>`).join(''):'<div class="jgb-empty">접수 데이터가 없습니다.</div>'}</div>
+  <div class="jgb-card dash-panel"><div class="dash-head"><div><h3>EAM 자동 연계 현황</h3><small>직원 접수 → 작업 → 자산이력</small></div><button class="jgb-btn" onclick="go('eam')">EAM 자산</button></div><div class="dash-flow"><div><b>① 직원 접수</b><small>통합 QR 스마트폰 신고</small></div><div>→</div><div><b>② 작업 처리</b><small>담당자 지정</small></div><div>→</div><div><b>③ EAM 저장</b><small>자산별 이력</small></div></div><div class="dash-eam-note">현재 월 스마트폰 신고 <b>${linked}건</b> · 운영 자산 <b>${A.filter(a=>String(a.status||'')!=='폐기').length}건</b></div></div>
  </div>
- <div class="wow-panel" style="margin-top:14px"><div class="wow-title">운영 원칙</div><div style="font-size:13px;font-weight:900;margin-top:6px">직원 신고 → 담당자 지정 → 처리방식 등록(직접수리·외부수리·점검·조치·기타) → 완료로 실제 작업을 관리합니다.</div><div class="wow-sub">EAM은 작업요청과 별도로 자산등록·자산현황·점검·유지보수 이력을 관리합니다. 직원 신고·작업처리는 EAM에 자동 연결하지 않습니다.</div></div>`;
+ <div class="wow-panel" style="margin-top:14px"><div class="wow-title">운영 원칙</div><div style="font-size:13px;font-weight:900;margin-top:6px">직원 접수 1건이 작업요청으로 등록되고, 조치완료 시 설비 EAM 이력으로 연결됩니다.</div><div class="wow-sub">상세 접수내역은 <b>접수 · 조치</b> 화면에서 관리하고, 설비별 이력은 <b>EAM</b>에서 확인합니다.</div></div>`;
 }
-
 function dashboard2(){
  const A=Array.isArray(window.__eamA)?window.__eamA:[],H=Array.isArray(window.__eamH)?window.__eamH:[],s=stats();
  const active=A.filter(a=>String(a.status||'정상')!=='폐기').length;
@@ -622,18 +561,14 @@ function dashboard2(){
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
 function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
 function workerRow(w){const d=tasksFor(w.id), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()), md=mine.filter(x=>x.status!=="완료").length, bs=basicWorkerStats(w.id,monthKey());return `<tr><td><b>${w.name}</b></td><td>${w.shift}<br>${w.start?`${w.start}~${w.end}`:"-"}</td><td><span class="badge ${w.working?"":"off"}">${w.working?"근무":"휴무"}</span></td><td>${w.working?`${bs.complete}/${bs.target}일`:"-"}</td><td>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</td><td class="${md?"red":"green"}"><b>${w.working?md:"-"}</b></td><td><b>${mine.length}건</b></td></tr>`}
-function qrRequestPage(){return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="mobile-hero"><span>시설 이상 신고</span><b>직원용 통합 신고</b><small>직원 신고는 작업관리로 접수되며 EAM과 별도로 관리합니다.</small></div><div class="jgb-card qr-card"><div class="qr-step"><i>1</i><div><b>구분·위치</b><small>문제가 발생한 분야와 위치를 선택합니다.</small></div></div><div class="jgb-field"><label>구분 <em>필수</em></label><select id="qrCat" onchange="qrCatChanged(this.value)">${Object.keys(ISSUE_PRESETS).map(v=>`<option>${v}</option>`).join('')}</select></div><div class="jgb-field"><label>위치 <em>필수</em></label><select id="qrPlace"><option value="">위치를 선택하세요</option>${(PLACE_GROUPS['시설']||PLACE_OPTIONS).map(v=>`<option>${v}</option>`).join('')}</select></div><div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 문제를 적어주세요.</small></div></div><div class="jgb-field"><textarea id="content" rows="5" placeholder="예: 샤워실 조명이 켜지지 않습니다."></textarea></div><div class="qr-step"><i>3</i><div><b>현장 사진</b><small>필요하면 사진을 첨부합니다.</small></div></div><div class="jgb-field"><input id="photo" type="file" accept="image/*" capture="environment"></div><button id="intakeBtn" class="jgb-btn qr-submit" style="width:100%" onclick="addQrIssue()">신고 등록</button><div class="qr-foot">등록 → 관리자 작업관리 → 담당자 지정 → 처리방식 등록 → 완료</div></div></div>`;}
-function qrCatChanged(cat){const place=document.getElementById('qrPlace');if(place){const arr=PLACE_GROUPS[cat]||PLACE_OPTIONS;place.innerHTML='<option value="">위치를 선택하세요</option>'+arr.map(v=>`<option>${v}</option>`).join('')}}
-async function addQrIssue(){const c=document.getElementById('content')?.value.trim(),p=document.getElementById('qrPlace')?.value||'',cat=document.getElementById('qrCat')?.value||'시설';if(!p){alert('위치를 선택하세요.');return}if(!c){alert('이상 내용을 입력하세요.');return}if(!SUPA){alert('Supabase 연결이 필요합니다.');return}const btn=document.getElementById('intakeBtn');if(btn)btn.disabled=true;try{let photo_url='';const f=document.getElementById('photo')?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,'_')}`;const up=await SUPA.storage.from('request-photos').upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+'/storage/v1/object/public/request-photos/'+path}const now=new Date().toISOString();const r=await SUPA.from('requests').insert({category:cat,place:p,content:c,photo_url,status:'접수',received_at:now});if(r.error)throw r.error;alert('신고가 등록되었습니다. 관리자 작업관리로 전달됩니다.');location.href=location.pathname+'?page=process'}catch(e){console.error(e);alert('신고 등록에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'))}finally{if(btn)btn.disabled=false}}
+function qrRequestPage(){const A=(window.__eamA||[]).filter(a=>String(a.status||'')!=='폐기').sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko'));return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="mobile-hero"><span>시설 이상 신고</span><b>직원용 통합 신고</b><small>QR 하나로 신고하고, 관리자가 작업으로 처리합니다.</small></div><div class="jgb-card qr-card"><div class="qr-step"><i>1</i><div><b>시설·설비 선택</b><small>고장난 설비를 선택하면 EAM 자산과 자동 연결됩니다.</small></div></div><div class="jgb-field"><label>시설·설비 <em>필수</em></label><select id="qrAssetCode" onchange="qrAssetChanged(this.value)"><option value="">시설·설비를 선택하세요</option>${A.map(a=>`<option value="${xEsc(a.asset_code)}">${xEsc(a.name)} · ${xEsc(a.place||'-')} · ${xEsc(a.asset_code)}</option>`).join('')}</select></div><div id="qrAssetInfo" class="qr-asset-info">설비를 선택하면 위치와 자산번호가 표시됩니다.</div><div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 증상을 적어주세요.</small></div></div><div class="jgb-field"><label>고장·이상 내용 <em>필수</em></label><textarea id="content" rows="5" placeholder="예: 주펌프에서 평소보다 큰 소음이 발생합니다."></textarea></div><div class="qr-step"><i>3</i><div><b>현장 사진</b><small>카메라로 바로 촬영할 수 있습니다.</small></div></div><div class="jgb-field"><input id="photo" type="file" accept="image/*" capture="environment"></div><button id="intakeBtn" class="jgb-btn qr-submit" style="width:100%" onclick="addQrIssue()">신고 등록</button><div class="qr-foot">등록 즉시 관리자 작업관리로 전달됩니다.</div></div></div>`;}
+function qrAssetChanged(code){const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));const box=document.getElementById('qrAssetInfo');if(box)box.innerHTML=a?`<b>${xEsc(a.name||'시설·설비')}</b><span>${xEsc(a.place||'-')} · 자산번호 ${xEsc(a.asset_code||'-')}</span>`:'설비를 선택하면 위치와 자산번호가 표시됩니다.';}
+async function addQrIssue(){const c=document.getElementById('content')?.value.trim(),code=document.getElementById('qrAssetCode')?.value||'',a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));if(!a){alert('시설·설비를 먼저 선택하세요.');return}if(!c){alert('고장·이상 내용을 입력하세요.');return}if(!SUPA){alert('Supabase 연결이 필요합니다.');return}const btn=document.getElementById('intakeBtn');if(btn)btn.disabled=true;try{let photo_url='';const f=document.getElementById('photo')?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,'_')}`;const up=await SUPA.storage.from('request-photos').upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+'/storage/v1/object/public/request-photos/'+path}const now=new Date().toISOString();const r=await SUPA.from('requests').insert({category:a.category||'시설',place:a.place||'',content:`[${a.asset_code}] ${c}`,photo_url,status:'접수',received_at:now});if(r.error)throw r.error;const eh=await SUPA.from('asset_history').insert({asset_id:a.id,event_type:'작업요청',description:c,worker_name:'직원 신고',action_type:'직원신고',cost:0,event_date:now.slice(0,10)});if(eh.error)console.warn('EAM 작업요청 이력 자동등록 실패',eh.error);alert('신고가 등록되었습니다. 관리자 작업관리로 전달됩니다.');location.href=location.pathname+'?page=process'}catch(e){console.error(e);alert('신고 등록에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'))}finally{if(btn)btn.disabled=false}}
+
 function registerPage(){const defaultCat="시설";const places=PLACE_GROUPS[defaultCat]||PLACE_OPTIONS;const presets=ISSUE_PRESETS[defaultCat]||[];return `<div class="pagebar"><h1>시설·환경·안전 접수</h1><button class="btn gray" onclick="go('dashboard')">종합 대시보드</button></div><div class="notice">구분과 장소를 선택하면 해당 시설에 맞는 장소·접수사항이 자동으로 표시됩니다. 등록자 이름은 저장하지 않습니다.</div><div class="panel"><div class="formgrid"><div class="field"><label>구분</label><select id="cat" onchange="updateRegisterOptions()"><option>시설</option><option>환경</option><option>안전</option><option>기타</option></select></div><div class="field"><label>접수 장소</label><select id="place"><option value="">장소를 선택하세요</option>${places.map(p=>`<option value="${p}">${p}</option>`).join("")}</select></div><div class="field full"><label>시설·접수사항 선택</label><select id="issuePreset" onchange="applyIssuePreset()"><option value="">내용을 선택하세요</option>${presets.map(v=>`<option value="${v}">${v}</option>`).join("")}<option value="직접입력">직접입력</option></select></div><div class="field full"><label>상세 내용</label><textarea id="content" rows="3" placeholder="위 목록에서 선택하거나 필요한 경우 상세 내용을 입력하세요"></textarea></div><div class="field full"><label>사진(선택)</label><input id="photo" type="file" accept="image/*"></div></div><button class="btn" style="margin-top:10px" onclick="addIssue()">접수 등록</button></div><div class="panel" style="margin-top:10px"><h2>최근 접수</h2>${db.issues.slice(-8).reverse().map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수 ${time(x.createdAt)}</div></div><div class="status ${x.status==="완료"?"green":"red"}">${x.status}</div></div>`).join("")||"<div class='small'>접수된 사항이 없습니다.</div>"}</div>`}
 function updateRegisterOptions(){const cat=document.getElementById("cat")?.value||"시설",place=document.getElementById("place"),preset=document.getElementById("issuePreset");if(place){const arr=PLACE_GROUPS[cat]||PLACE_OPTIONS;place.innerHTML='<option value="">장소를 선택하세요</option>'+arr.map(p=>`<option value="${p}">${p}</option>`).join("")}if(preset){const arr=ISSUE_PRESETS[cat]||[];preset.innerHTML='<option value="">내용을 선택하세요</option>'+arr.map(v=>`<option value="${v}">${v}</option>`).join("")+ '<option value="직접입력">직접입력</option>';preset.value=""}}
 function applyIssuePreset(){const v=document.getElementById("issuePreset")?.value||"",ta=document.getElementById("content");if(!ta)return;if(v&&v!=="직접입력")ta.value=v;else if(v==="직접입력"){ta.value="";ta.focus()}}
-function processPage(){
- const pending=(db.issues||[]).filter(x=>x.status!=="완료");
- return `<div class="jgb-page-title"><div><h2>작업관리 · 조치 처리</h2><p>직원 신고 → 담당자 지정 → 처리방식 등록 → 조치완료</p></div><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button></div>
- <div class="jgb-section">처리 대기 ${pending.length}건</div>
- <div class="jgb-card"><div class="jgb-queue">${pending.map(x=>{const method=getProcessMethod(x);return `<div class="jgb-q"><div><b>${x.category} · ${x.place}</b>${x.assetCode?` <span class="jgb-status asset">${x.assetCode}</span>`:''}<br><small>${xEsc(cleanIssueContent(x))}</small><br><small>접수 ${time(x.createdAt)} ${x.startedAt?'· 시작 '+time(x.startedAt):''} ${x.handlerName?'· 담당 '+x.handlerName:''} ${method?`· ${method}`:''}</small>${x.photo_url?`<br><a href="${x.photo_url}" target="_blank">사진 보기</a>`:''}</div><div style="display:flex;flex-direction:column;gap:7px;align-items:stretch">${x.handlerId?`<select id="method_${x.id}" onchange="setProcessMethod('${x.id}',this.value)"><option value="">처리방식 선택</option><option ${method==='직접수리'?'selected':''}>직접수리</option><option ${method==='외부수리'?'selected':''}>외부수리</option><option ${method==='점검·조치'?'selected':''}>점검·조치</option><option ${method==='기타'?'selected':''}>기타</option></select><button class="jgb-btn green" onclick="completeIssue('${x.id}')">✓ 조치완료</button>`:`<select onchange="assign('${x.id}',this.value)"><option value="">담당자 선택</option>${workers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('')}</select>`}</div></div>`}).join('')||'<div class="jgb-empty">처리할 작업이 없습니다.</div>'}</div></div>`
-}
+function processPage(){const pending=(db.issues||[]).filter(x=>x.status!=="완료");return `<div class="jgb-page-title"><div><h2>작업관리 · 조치 처리</h2><p>직원 신고 → 담당자 지정 → 조치완료</p></div><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button></div><div class="jgb-section">처리 대기 ${pending.length}건</div><div class="jgb-card"><div class="jgb-queue">${pending.map(x=>`<div class="jgb-q"><div><b>${x.category} · ${x.place}</b>${x.assetCode?` <span class="jgb-status asset">${x.assetCode}</span>`:''}<br><small>${x.content}</small><br><small>접수 ${time(x.createdAt)} ${x.startedAt?'· 시작 '+time(x.startedAt):''} ${x.handlerName?'· 담당 '+x.handlerName:''}</small>${x.photo_url?`<br><a href="${x.photo_url}" target="_blank">사진 보기</a>`:''}</div><div>${x.handlerId?`<button class="jgb-btn green" onclick="completeIssue('${x.id}')">조치완료</button>`:`<select onchange="assign('${x.id}',this.value)"><option value="">담당자 선택</option>${workers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('')}</select>`}</div></div>`).join('')||'<div class="jgb-empty">처리할 작업이 없습니다.</div>'}</div></div>`}
 function basicPage(){
  const tw=Array.isArray(todayWorkers())?todayWorkers():workers.map(w=>({...w,status:w.shift||"편성없음",working:false,start:"",end:""}));
  return `<div class="basic-v5">
@@ -707,12 +642,12 @@ function eamSourceAssets(){
   const excel=Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[];
   const rows=[...main,...excel]
     .filter(x=>x && x.code)
-    .filter(x=>!["EQ-06","OT-04","OT-05","OT-06"].includes(String(x.code)))
+    .filter(x=>!["OT-04","OT-05","OT-06"].includes(String(x.code)))
     .map(x=>({
       code:String(x.code),
       name:String(x.name||"-"),
       type:String(x.type||"기타설비"),
-      place:String(x.place||"-"),
+      place:String(String(x.type||"").includes('소방')?'유수장치실':(x.place||"-")),
       model:String(x.model||x.capacity||"-"),
       qty:x.quantity??x.quantity??"-",
       vendor:String(x.vendor||x.maker||"-"),
@@ -833,8 +768,6 @@ function eamPage(){
   const abnormal=A.filter(a=>String(a.status||"정상")!=="정상").length;
   const overdue=allSource.filter(x=>{const a=eamRegisteredForSource(x);return a && String(a.status||"")!=="정상"}).length;
   const maintenanceCount=H.length;
-  const internalCount=H.filter(h=>String(h.action_type||"").includes("내부")||String(h.worker_name||"").includes("직원")).length;
-  const externalCount=H.filter(h=>String(h.action_type||"").includes("외부")||!!h.vendor_name).length;
 
   return `<div class="eam-final cat-${cat}">
     <div class="eam-final-head">
@@ -848,8 +781,6 @@ function eamPage(){
       <div class="eam-kpi good"><small>정상</small><b>${normal}</b><span>현재 상태</span></div>
       <div class="eam-kpi alert"><small>상태확인 필요</small><b>${abnormal+overdue}</b><span>정상 외 / 이력 필요</span></div>
       <div class="eam-kpi"><small>유지보수 이력</small><b>${maintenanceCount}</b><span>asset_history</span></div>
-      <div class="eam-kpi"><small>내부수리</small><b>${internalCount}</b><span>직원 직접 작업</span></div>
-      <div class="eam-kpi"><small>외부수리</small><b>${externalCount}</b><span>업체 작업</span></div>
     </div>
 
     <div class="eam-tabs">
@@ -900,6 +831,23 @@ function eamPage(){
             <div><small>기존 A/S 기록</small><b>${xEsc(current.asHistory||"-")}</b></div>
           </div>
         </div>
+        ${src?`<div class="eam-history-card-source">
+          <div class="source-head"><div><b>주요설비 기기 이력카드</b><span>원본 이력카드 기준</span></div><span class="source-tag">${xEsc(String(src.type||'').includes('소방')?'소방설비':'기존자산')}</span></div>
+          <div class="source-grid">
+            <div><small>설비명</small><b>${xEsc(eamDisplayName(src))}</b></div>
+            <div><small>용량</small><b>${xEsc(src.model||src.capacity||'-')}</b></div>
+            <div><small>내용연수</small><b>${xEsc(src.life||'-')}</b></div>
+            <div><small>제작회사</small><b>${xEsc(src.vendor||src.maker||'-')}</b></div>
+            <div><small>설치장소</small><b>${xEsc(String(src.type||'').includes('소방')?'유수장치실':(src.place||'-'))}</b></div>
+            <div><small>제조년월일</small><b>${xEsc(src.installDate||src.date||'-')}</b></div>
+            <div><small>설치비용</small><b>${xEsc(src.cost||'-')}</b></div>
+            <div><small>평가등급</small><b>${xEsc(src.grade||'-')}</b></div>
+          </div>
+          <div class="source-history-title">시설개선계획</div>
+          <div class="source-years"><span>2023년 <b>특이사항 없음</b></span><span>2024년 <b>특이사항 없음</b></span><span>2025년 <b>특이사항 없음</b></span></div>
+          <div class="source-history-title">기존 기록</div>
+          <div class="source-history-lines">${(src.asHistory&&src.asHistory!=="-")?`<div><span>A/S·교체 기록</span><b>${xEsc(src.asHistory)}${src.note&&src.note!=="-"?` · ${xEsc(src.note)}`:""}</b></div>`:`<div><span>집행내역</span><b>원본 이력카드에 기록 없음</b></div>`}</div>
+        </div>`:''}
         <div class="eam-health">
           <div class="health-ring"><div><b>${hs.length}</b><small>작업이력</small></div></div>
           <div><b>유지보수 상태</b><span>${ins.length}회 점검 기록 · ${hs.length}회 작업/수리 기록</span></div>
@@ -909,11 +857,6 @@ function eamPage(){
           ${reg?`<button onclick="eamShowHistory()">📋 작업 이력</button><button onclick="eamEditSelectedAsset()">✏️ 자산 수정</button><button onclick="eamRetireSelectedAsset()">♻️ 폐기·교체</button><button class="danger" onclick="eamDeleteSelectedAsset()">🗑 삭제</button>`:
           `<button class="primary" onclick="eamRegisterNewAsset()">＋ 신규 자산 등록</button>`}
         </div>
-        ${reg?`<div class="eam-service-actions">
-          <button class="eam-service-btn internal" onclick="eamRegisterMaintenance('내부수리','${reg.id}')"><b>🔵 내부수리 등록</b><small>직원이 직접 점검·수리한 작업을 자산 이력에 기록</small></button>
-          <button class="eam-service-btn external" onclick="eamRegisterMaintenance('외부수리','${reg.id}')"><b>🟠 외부수리 등록</b><small>업체 수리·교체·점검 및 비용을 자산 이력에 기록</small></button>
-        </div>
-        <div class="eam-service-stats"><div class="eam-service-stat"><span>이 자산 내부수리</span><b>${hs.filter(h=>String(h.action_type||'').includes('내부')||String(h.worker_name||'').includes('직원')).length}건</b></div><div class="eam-service-stat"><span>이 자산 외부수리</span><b>${hs.filter(h=>String(h.action_type||'').includes('외부')||!!h.vendor_name).length}건</b></div></div>`:''}
         <div class="eam-history-box"><div class="eam-history-head"><b>수명주기 이력</b><span>작업 ${hs.length} · 점검 ${ins.length}</span></div>${renderEamHistory(hs,ins)}</div>
         ${current.note&&current.note!=="-"?`<div class="eam-note">메모 · ${xEsc(current.note)}</div>`:""}
         `:`<div class="eam-empty-big">상단 분류에서 자산을 선택하세요.</div>`}
@@ -943,7 +886,7 @@ function leakagePage(){
     `<div class="leak-empty"><b>현재 등록된 누수 자산이 없습니다.</b><span>임의의 누수 위치를 자동으로 만들지 않습니다. 실제 누수 항목을 신규 등록하면 이곳에 표시됩니다.</span></div>`}
   </div>`;
 }
-async function addAssetHistory(assetId){eamRegisterMaintenance('내부수리',assetId);}
+async function addAssetHistory(assetId){alert('작업 이력은 자산에 연결된 작업·점검 과정에서 기록합니다.');}
 function renderEamHistory(hs,ins){return `<div>${hs.length?hs.slice(0,10).map(v=>`<div class="eamx-hrow"><b>${xEsc(v.event_type||'조치')}</b><span>${xEsc(v.description||'-')} · ${xEsc(v.worker_name||v.vendor_name||'-')}</span><time>${time(v.event_date)}</time></div>`).join(''):'<div class="eamx-empty">등록된 작업·교체 이력이 없습니다.</div>'}</div>`}
 function eamHistoryTab(mode){const box=document.getElementById('eamHistoryView');if(!box)return;const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];const code=window.__eamSelCode||'';const a=A.find(x=>x.asset_code===code);const hs=a?H.filter(v=>v.asset_id===a.id||v.asset_code===code):[];const ins=a?I.filter(v=>v.asset_id===a.id||v.asset_code===code):[];if(mode==='inspection')box.innerHTML=ins.length?ins.map(v=>`<div class="eamx-hrow"><b>${xEsc(v.result||'-')}</b><span>${xEsc(v.inspector_name||'-')}</span><time>${time(v.inspection_date)}</time></div>`).join(''):'<div class="eamx-empty">등록된 점검 이력이 없습니다.</div>';else box.innerHTML=renderEamHistory(hs,[])}
 function eamToggleForm(){return}
@@ -1049,13 +992,12 @@ function leakagePage(){
  <div class="grid3" style="margin-top:12px"><div class="panel" style="grid-column:span 2"><h2>누수 이력 전체</h2>${allH.length?allH.map(v=>{const a=leaks.find(z=>z.id===v.asset_id);return `<div class="issue"><div><b>${a?xEsc(a.asset_code+' · '+a.name):'-'}</b><div>${xEsc(v.event_type)} · ${xEsc(v.description||'-')}</div><div class="small">${time(v.event_date)} · ${xEsc(v.worker_name||v.vendor_name||'')}</div></div><span class="badge">${v.action_type?xEsc(v.action_type):'내부/외부 미기록'}</span></div>`}).join(''):'<div class="small">등록된 누수 이력이 없습니다.</div>'}</div>
  <div class="panel"><h2>누수 관리 원칙</h2><div class="notice">A 1번 코트 인접 벽체<br>B 5번 코트 인접 벽체(좌측)<br>C 2·3번 코트 외부 천장<br>D 5번 코트 인접 벽체(우측)<br>E 여자 탈의실 천장</div><div class="small" style="margin-top:10px">직원 작업실적과 설비 유지보수 이력은 별도로 기록합니다.</div></div></div>`
 }
-async function addAssetHistory(assetId){eamRegisterMaintenance('내부수리',assetId);}
+async function addAssetHistory(assetId){alert('작업 이력은 수동 등록하지 않습니다. 직원 신고 → 작업관리 → 조치완료 과정에서 EAM에 자동 기록됩니다.');}
 
 function xEsc(s){return String(s??'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
 async function addIssue(){const c=document.getElementById("content").value.trim(),p=document.getElementById("place").value,cat=document.getElementById("cat").value;if(!c||!p){alert("접수 장소와 접수사항을 입력하세요.");return}const btn=document.getElementById("intakeBtn");if(btn)btn.disabled=true;let photo_url="";try{const f=document.getElementById("photo")?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,"_")}`;const up=await SUPA.storage.from("request-photos").upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+"/storage/v1/object/public/request-photos/"+path}const now=new Date().toISOString();const ins=await SUPA.from("requests").insert({category:cat,place:p,content:c,photo_url,status:"접수",received_at:now});if(ins.error)throw ins.error;alert("접수가 완료되었습니다.");document.getElementById("content").value="";if(document.getElementById("photo"))document.getElementById("photo").value="";await syncFromSupabase();go("process")}catch(e){console.error(e);alert("접수에 실패했습니다. Supabase 연결을 확인하세요.")}finally{if(btn)btn.disabled=false}}
 async function assign(id,wid){const x=db.issues.find(i=>i.id===id);if(!x||!wid)return;const w=workers.find(v=>v.id===wid);if(!w)return;const started=x.startedAt||new Date().toISOString();if(x.remoteId){const r=await SUPA.from("requests").update({handler_name:w.name,status:"조치중",started_at:started}).eq("id",x.remoteId);if(r.error){alert("담당 직원 저장에 실패했습니다.");return}}await syncFromSupabase()}
-async function setProcessMethod(id,method){const x=(db.issues||[]).find(i=>i.id===id);if(!x||!method)return; x.processingMethod=method; x.content=cleanIssueContent(x); const base=x.content; const tagged=`${base} [[처리방식:${method}]]`; if(x.remoteId&&SUPA){const r=await SUPA.from('requests').update({content:tagged}).eq('id',x.remoteId);if(r.error){alert('처리방식 저장에 실패했습니다.');return}} x.content=base; save(); await syncFromSupabase()}
-async function completeIssue(id){const x=db.issues.find(i=>i.id===id);if(!x||!x.handlerId){alert("먼저 담당 직원을 선택하세요.");return}if(!SUPA){alert("Supabase 연결이 필요합니다.");return}const now=new Date().toISOString(),elapsed=Math.max(0,Math.round((new Date(now)-new Date(x.createdAt))/60000));if(x.remoteId){const r=await SUPA.from("requests").update({status:"완료",handler_name:x.handlerName,started_at:x.startedAt||now,completed_at:now,elapsed_minutes:elapsed}).eq("id",x.remoteId);if(r.error){alert("조치완료 저장에 실패했습니다.");return}}await syncFromSupabase();await eamLoad();render();}
+async function completeIssue(id){const x=db.issues.find(i=>i.id===id);if(!x||!x.handlerId){alert("먼저 담당 직원을 선택하세요.");return}if(!SUPA){alert("Supabase 연결이 필요합니다.");return}const now=new Date().toISOString(),elapsed=Math.max(0,Math.round((new Date(now)-new Date(x.createdAt))/60000));if(x.remoteId){const r=await SUPA.from("requests").update({status:"완료",handler_name:x.handlerName,started_at:x.startedAt||now,completed_at:now,elapsed_minutes:elapsed}).eq("id",x.remoteId);if(r.error){alert("조치완료 저장에 실패했습니다.");return}}const code=x.assetCode||((String(x.content||'').match(/^\[([^\]]+)\]/)||[])[1]||'');if(code&&code!=='QR'){await eamLoad();const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));if(a){const desc=String(x.content||'').replace(/^\[[^\]]+\]\s*/,'').trim();const hr=await SUPA.from('asset_history').insert({asset_id:a.id,event_type:'수리',description:desc,worker_name:x.handlerName||'',action_type:'접수조치',cost:0,event_date:now.slice(0,10)});if(hr.error)console.warn('EAM 자동 이력 등록 실패',hr.error)}}await syncFromSupabase();await eamLoad();render();}
 async function syncBasicTasks(){if(!SUPA)return;try{const {data,error}=await SUPA.from("basic_tasks").select("*");if(error)throw error;const t={};(data||[]).forEach(r=>{const name=taskDisplayName(r.task_name);if(!name)return;const k=r.work_date+"_"+r.worker_id;(t[k]??={done:[],updatedAt:null}).done.push(name);t[k].updatedAt=r.completed_at||null});db.tasks=t;save()}catch(e){console.warn("기본업무 동기화 실패",e)}}
 async function toggleTask(wid,t){const d=tasksFor(wid),idx=d.done.indexOf(t);if(idx>=0)d.done.splice(idx,1);else d.done.push(t);d.updatedAt=new Date().toISOString();render();if(!SUPA)return;try{const q=SUPA.from("basic_tasks");const dbName=taskDbName(t);if(idx>=0){const {error}=await q.delete().eq("work_date",dateKey()).eq("worker_id",wid).eq("task_name",dbName);if(error)throw error}else{const {error}=await q.insert({work_date:dateKey(),worker_id:wid,task_name:dbName,completed_at:new Date().toISOString()});if(error)throw error}await syncBasicTasks();render()}catch(e){console.warn(e);if(idx>=0)d.done.push(t);else d.done=d.done.filter(x=>x!==t);render();alert("기본업무 저장에 실패했습니다. Supabase 권한/컬럼을 확인하세요.")}}
 function setDate(v){if(v){selectedDate=v;render()}}
