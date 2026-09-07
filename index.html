@@ -1079,7 +1079,7 @@ function render(){
  const app=document.getElementById("app");
  if(!app)return;
  try{
- app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","🛠 작업관리")}${nav("pending","🔔 미조치 현황")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("leakage","💧 누수관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}${nav("stats","📈 직원실적")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v24</span></h1><small>신고 접수 → 작업관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+ app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","🛠 작업관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("leakage","💧 누수관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}${nav("stats","📈 직원실적")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v24</span></h1><small>신고 접수 → 작업관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
  }catch(err){
    console.error("화면 렌더링 오류",err);
    app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
@@ -2088,6 +2088,76 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
     window.__eamCat=cat||'cooling'; if(code!==undefined&&code!==null)window.__eamSelCode=String(code); else window.__eamSelCode='';
     render(); requestAnimationFrame(()=>{const b=document.getElementById('eamproGrid');if(!b)return;if(oldCat===window.__eamCat)b.scrollTop=old;const s=b.querySelector('.eam-asset-row.on');if(s){const t=s.offsetTop,bt=t+s.offsetHeight,vT=b.scrollTop,vB=vT+b.clientHeight;if(t<vT)b.scrollTop=Math.max(0,t-8);else if(bt>vB)b.scrollTop=Math.max(0,bt-b.clientHeight+8);}});
   };
+})();
+</script>
+
+
+<script id="JGB_V39_FIXES">
+(function(){
+  // 대화에서 확정한 EAM 기준: 기존 자산은 자산코드를 유지하고 전체 자산정보를 수정 가능하게 한다.
+  const META_KEY='JGB_EAM_ASSET_META_V39';
+  function readMeta(){try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}catch(e){return {}}}
+  function writeMeta(m){try{localStorage.setItem(META_KEY,JSON.stringify(m||{}))}catch(e){console.warn('EAM 메타 저장 실패',e)}}
+  window.__eamMetaByCode=Object.assign(readMeta(),window.__eamMetaByCode||{});
+
+  // Supabase assets 핵심필드는 확실히 저장하고, 추가 상세정보는 이 브라우저에서도 즉시 유지한다.
+  window.eamSaveFullEdit=async function(code){
+    const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
+    if(!a){alert('자산을 찾을 수 없습니다.');return}
+    if(!window.SUPA){alert('Supabase 연결이 필요합니다.');return}
+    const val=id=>document.getElementById(id)?.value?.trim()||'';
+    const cat=val('editCategory')||'기타설비';
+    const name=val('editName');
+    const locCode=val('editLocCode');
+    const detail=val('editDetailPlace');
+    const place=detail||({A:'코트',B:'복도',C:'사무실',D:'옥상',E:'유수장치실'}[locCode]||'');
+    if(!name){alert('소분류(자산명)를 입력하세요.');return}
+    const meta={
+      asset_code:String(code), name, category:cat, place, locationCode:locCode,
+      model:val('editModel'), qty:val('editQty'), vendor:val('editVendor'),
+      asContact:val('editAs'), installDate:val('editInstall'), warranty:val('editWarranty'),
+      asHistory:val('editAsHistory'), status:val('editStatus')||'정상', note:val('editNote')
+    };
+    const btn=document.getElementById('eamEditSave'); if(btn){btn.disabled=true;btn.textContent='저장 중…'}
+    try{
+      const r=await window.SUPA.from('assets').update({name,category:cat,place,status:meta.status,product_name:meta.model||cat}).eq('id',a.id);
+      if(r.error) throw r.error;
+      const all=readMeta(); all[String(code)]=meta; writeMeta(all); window.__eamMetaByCode=all;
+      document.getElementById('eamEditModal')?.remove();
+      await (typeof eamLoad==='function'?eamLoad():Promise.resolve());
+      window.__eamMetaByCode=Object.assign(readMeta(),window.__eamMetaByCode||{});
+      window.__eamSelCode=String(code);
+      const map={'냉난방':'cooling','소방·방재':'fire','온수·난방':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'};
+      window.__eamCat=map[cat]||'other';
+      render();
+      requestAnimationFrame(()=>{const b=document.getElementById('eamproGrid');const row=b?.querySelector(`[data-code="${CSS.escape(String(code))}"]`);if(b&&row){const top=row.offsetTop,bot=top+row.offsetHeight,v0=b.scrollTop,v1=v0+b.clientHeight;if(top<v0)b.scrollTop=top-8;else if(bot>v1)b.scrollTop=bot-b.clientHeight+8;}});
+      alert('자산 정보가 저장되었습니다.');
+    }catch(e){console.error(e);alert('자산 저장에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'));}
+    finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
+  };
+
+  // 기존 자산의 소방 표시명은 원본자료/현장확인 명칭을 우선한다.
+  window.eamDisplayName=function(x){
+    const code=String(x?.code||x?.asset_code||'');
+    const map={
+      'EQ-01':'주펌프(소방장비)','EQ-02':'보조펌프(소방장비)','EQ-03':'예비펌프(소방장비)',
+      'EQ-05':'전기소방제어장비(MCC판넬)',
+      'FI-01':'P형 복합식수신기(HPS-320N)','FI-02':'소방 분전반','FI-03':'SP-예비펌프',
+      'FI-04':'프리액션 밸브(준비작동식)','FI-05':'난방순환펌프','FI-06':'충압펌프',
+      'FI-07':'기동용수압개폐장치(압력챔버)','FI-08':'소방 분전반',
+      'EQ-04':'스마트온수기(온수기)','EQ-06':'축열식 전기온수기','EQ-07':'저수조'
+    };
+    return map[code]||String(x?.name||x?.model||'-');
+  };
+
+  // QR 신고와 EAM은 분리. 직원 신고 화면에는 자산 선택/EAM 자동연계 문구가 없어야 한다.
+  window.qrRequestPage=function(){return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="mobile-hero"><span>시설 이상 신고</span><b>직원용 통합 신고</b><small>QR 하나로 신고하고, 관리자가 작업관리에서 처리합니다.</small></div><div class="jgb-card qr-card"><div class="qr-step"><i>1</i><div><b>신고 위치</b><small>문제가 발생한 위치를 선택하세요.</small></div></div><div class="jgb-field"><label>위치 <em>필수</em></label><select id="qrPlace"><option value="">신고 위치를 선택하세요</option><option>A · 코트</option><option>B · 복도</option><option>C · 사무실</option><option>D · 옥상</option><option>E · 유수장치실</option></select></div><div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 증상을 적어주세요.</small></div></div><div class="jgb-field"><label>고장·이상 내용 <em>필수</em></label><textarea id="content" rows="5" placeholder="예: 조명 1개가 켜지지 않습니다."></textarea></div><div class="qr-step"><i>3</i><div><b>현장 사진</b><small>필요한 경우 사진을 첨부하세요.</small></div></div><div class="jgb-field"><input id="photo" type="file" accept="image/*" capture="environment"></div><button id="intakeBtn" class="jgb-btn qr-submit" style="width:100%" onclick="addQrIssue()">신고 등록</button><div class="qr-foot">등록된 신고는 관리자 작업관리에서 처리합니다.</div></div></div>`};
+  window.addQrIssue=async function(){
+    const c=document.getElementById('content')?.value.trim(),place=document.getElementById('qrPlace')?.value||'';
+    if(!place){alert('신고 위치를 선택하세요.');return} if(!c){alert('고장·이상 내용을 입력하세요.');return}
+    if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+    const btn=document.getElementById('intakeBtn');if(btn)btn.disabled=true;
+    try{let photo_url='';const f=document.getElementById('photo')?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\\w가-힣.\\-]/g,'_')}`;const up=await SUPA.storage.from('request-photos').upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+'/storage/v1/object/public/request-photos/'+path}const now=new Date().toISOString();const r=await SUPA.from('requests').insert({category:'시설',place,content:c,photo_url,status:'접수',received_at:now});if(r.error)throw r.error;alert('신고가 접수되었습니다.');location.href=location.pathname+'?page=qr_done'}catch(e){console.error(e);alert('신고 등록에 실패했습니다.\n'+(e?.message||''))}finally{if(btn)btn.disabled=false}}
 })();
 </script>
 
