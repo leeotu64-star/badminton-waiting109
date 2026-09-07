@@ -928,18 +928,7 @@ html,body{overflow-x:hidden!important}
 <script>
 const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
-let SUPA=(window.supabase&&typeof window.supabase.createClient==="function")?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
-function getSupa(){
-  if(!SUPA && window.supabase && typeof window.supabase.createClient==="function"){
-    try{SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);}catch(e){console.warn("Supabase 초기화 실패",e)}
-  }
-  return SUPA;
-}
-async function waitForSupa(ms=4000){
-  const end=Date.now()+ms;
-  while(Date.now()<end){const s=getSupa();if(s)return s;await new Promise(r=>setTimeout(r,100));}
-  return getSupa();
-}
+const SUPA=(window.supabase&&typeof window.supabase.createClient==="function")?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
 const PLACE_GROUPS={
   시설:["유수장치실","기계실","사무실","휴게실","코트 1","코트 2","코트 3","코트 4","코트 5","옥상","남자 탈의실","여자 탈의실","남자 샤워실","여자 샤워실","남자 화장실","여자 화장실","복도","기타"],
   환경:["남자 화장실","여자 화장실","남자 탈의실","여자 탈의실","남자 샤워실","여자 샤워실","코트 1","코트 2","코트 3","코트 4","코트 5","복도","휴게실","사무실","기타"],
@@ -1718,48 +1707,16 @@ function eamEditLocationChange(v,currentPlace){
   if(currentPlace && [...box.options].some(o=>o.value===currentPlace))box.value=currentPlace;
 }
 async function eamSaveFullEdit(code){
-  const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
-  if(!a){alert('자산을 찾을 수 없습니다.');return}
-  const supa=await waitForSupa();
-  if(!supa){alert('Supabase 연결을 불러오지 못했습니다. 잠시 후 다시 시도하세요.');return}
-  const get=id=>document.getElementById(id)?.value?.trim()||'';
-  const cat=get('editCategory')||'기타설비';
-  const name=get('editName');
-  const lc=get('editLocCode');
-  const dp=get('editDetailPlace');
-  const status=get('editStatus')||'정상';
+  const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code)); if(!a){alert('자산을 찾을 수 없습니다.');return}
+  const cat=document.getElementById('editCategory').value, name=document.getElementById('editName').value.trim(), lc=document.getElementById('editLocCode').value, dp=document.getElementById('editDetailPlace').value;
   if(!name){alert('소분류(자산명)를 입력하세요.');return}
-  if(!lc||!dp){alert('위치코드와 세부 위치를 선택하세요.');return}
-  const meta={asset_code:String(code),name,category:cat,place:dp,locationCode:lc,model:get('editModel'),qty:get('editQty'),vendor:get('editVendor'),asContact:get('editAs'),installDate:get('editInstall'),warranty:get('editWarranty'),asHistory:get('editAsHistory'),status,note:get('editNote')};
-  const payload={name,category:cat,place:dp,status,product_name:meta.model||cat};
-  const btn=document.getElementById('eamEditSave'); if(btn){btn.disabled=true;btn.textContent='저장 중…'}
-  try{
-    const r=await supa.from('assets').update(payload).eq('id',a.id);
-    if(r.error) throw r.error;
-    const all=readMeta(); all[String(code)]=meta; writeMeta(all); window.__eamMetaByCode=all;
-    document.getElementById('eamEditModal')?.remove();
-    // Keep current EAM selection/category and restore the exact list scroll after reload/render.
-    const scrollMap=window.__eamScrollByCat||{};
-    const currentCat=window.__eamCat||'cooling';
-    const currentScroll=document.getElementById('eamproGrid')?.scrollTop;
-    if(typeof currentScroll==='number') scrollMap[currentCat]=currentScroll;
-    window.__eamScrollByCat=scrollMap;
-    await eamLoad();
-    window.__eamMetaByCode=Object.assign(readMeta(),window.__eamMetaByCode||{});
-    window.__eamSelCode=String(code);
-    const map={'냉난방':'cooling','소방·방재':'fire','소방설비':'fire','온수·난방':'water','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'};
-    window.__eamCat=map[cat]||currentCat;
-    render();
-    requestAnimationFrame(()=>{
-      const b=document.getElementById('eamproGrid'); if(!b)return;
-      const saved=window.__eamScrollByCat[window.__eamCat]; if(typeof saved==='number') b.scrollTop=saved;
-      const row=b.querySelector(`[data-code="${CSS.escape(String(code))}"]`);
-      if(row){const top=row.offsetTop,bottom=top+row.offsetHeight,v0=b.scrollTop,v1=v0+b.clientHeight;if(top<v0)b.scrollTop=top-8;else if(bottom>v1)b.scrollTop=bottom-b.clientHeight+8;}
-      window.__eamScrollByCat[window.__eamCat]=b.scrollTop;
-    });
-    alert('자산 정보가 저장되었습니다.');
-  }catch(e){console.error(e);alert('자산 저장에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'));}
-  finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
+  const place=dp;
+  const meta={asset_code:code,name,category:cat,place,model:document.getElementById('editModel').value.trim(),qty:document.getElementById('editQty').value.trim(),vendor:document.getElementById('editVendor').value.trim(),asContact:document.getElementById('editAs').value.trim(),installDate:document.getElementById('editInstall').value.trim(),warranty:document.getElementById('editWarranty').value.trim(),asHistory:document.getElementById('editAsHistory').value.trim(),note:document.getElementById('editNote').value.trim()};
+  const payload={name,category:cat,place,status:document.getElementById('editStatus').value,product_name:meta.model||cat};
+  const r=await SUPA.from('assets').update(payload).eq('id',a.id); if(r.error){console.error(r.error);alert('자산 기본정보 저장에 실패했습니다.');return}
+  const h=await SUPA.from('asset_history').insert({asset_id:a.id,event_type:'자산정보수정',description:'META::'+JSON.stringify(meta),worker_name:'관리자',action_type:'자산마스터수정',cost:0,event_date:new Date().toISOString().slice(0,10)});
+  if(h.error){console.warn(h.error);alert('기본정보는 저장됐지만 상세 메모 저장에 실패했습니다.');}
+  document.getElementById('eamEditModal')?.remove(); await eamLoad(); window.__eamSelCode=code; const map={'냉난방':'cooling','소방·방재':'fire','온수·난방':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'}; window.__eamCat=map[cat]||'other'; render();
 }
 
 async function eamDeleteSelectedAsset(){
@@ -2126,26 +2083,10 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
       </div></div>`;
   };
   // Keep scroll position stable when selecting lower assets.
-  window.__eamScrollByCat=window.__eamScrollByCat||{};
   window.eamPick=function(cat,code){
-    const oldBox=document.getElementById('eamproGrid');
-    const oldCat=window.__eamCat||'';
-    if(oldBox) window.__eamScrollByCat[oldCat]=oldBox.scrollTop;
-    window.__eamCat=cat||'cooling';
-    if(code!==undefined&&code!==null) window.__eamSelCode=String(code); else window.__eamSelCode='';
-    render();
-    requestAnimationFrame(()=>{
-      const b=document.getElementById('eamproGrid'); if(!b)return;
-      const saved=window.__eamScrollByCat[window.__eamCat];
-      if(typeof saved==='number') b.scrollTop=saved;
-      const row=code!==undefined&&code!==null ? b.querySelector(`[data-code="${CSS.escape(String(code))}"]`) : null;
-      if(row){
-        const top=row.offsetTop, bottom=top+row.offsetHeight, viewTop=b.scrollTop, viewBottom=viewTop+b.clientHeight;
-        if(top<viewTop) b.scrollTop=Math.max(0,top-8);
-        else if(bottom>viewBottom) b.scrollTop=Math.max(0,bottom-b.clientHeight+8);
-      }
-      window.__eamScrollByCat[window.__eamCat]=b.scrollTop;
-    });
+    const box=document.getElementById('eamproGrid'), old=box?box.scrollTop:0, oldCat=window.__eamCat||'';
+    window.__eamCat=cat||'cooling'; if(code!==undefined&&code!==null)window.__eamSelCode=String(code); else window.__eamSelCode='';
+    render(); requestAnimationFrame(()=>{const b=document.getElementById('eamproGrid');if(!b)return;if(oldCat===window.__eamCat)b.scrollTop=old;const s=b.querySelector('.eam-asset-row.on');if(s){const t=s.offsetTop,bt=t+s.offsetHeight,vT=b.scrollTop,vB=vT+b.clientHeight;if(t<vT)b.scrollTop=Math.max(0,t-8);else if(bt>vB)b.scrollTop=Math.max(0,bt-b.clientHeight+8);}});
   };
 })();
 </script>
@@ -2163,7 +2104,7 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
   window.eamSaveFullEdit=async function(code){
     const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
     if(!a){alert('자산을 찾을 수 없습니다.');return}
-    if(!window.SUPA){alert('Supabase 연결이 필요합니다.');return}
+    if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
     const val=id=>document.getElementById(id)?.value?.trim()||'';
     const cat=val('editCategory')||'기타설비';
     const name=val('editName');
@@ -2189,7 +2130,7 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
       const map={'냉난방':'cooling','소방·방재':'fire','온수·난방':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'};
       window.__eamCat=map[cat]||'other';
       render();
-      requestAnimationFrame(()=>{const b=document.getElementById('eamproGrid');const row=b?.querySelector(`[data-code="${CSS.escape(String(code))}"]`);if(b&&row){const top=row.offsetTop,bot=top+row.offsetHeight,v0=b.scrollTop,v1=v0+b.clientHeight;if(top<v0)b.scrollTop=top-8;else if(bot>v1)b.scrollTop=bot-b.clientHeight+8;}});
+      requestAnimationFrame(()=>{const b=document.getElementById('eamproGrid');if(!b)return;const row=b.querySelector(`[data-code=\"${CSS.escape(String(code))}\"]`);if(row){const top=row.offsetTop,bot=top+row.offsetHeight,v0=b.scrollTop,v1=v0+b.clientHeight;if(top<v0)b.scrollTop=Math.max(0,top-8);else if(bot>v1)b.scrollTop=Math.max(0,bot-b.clientHeight+8);}});
       alert('자산 정보가 저장되었습니다.');
     }catch(e){console.error(e);alert('자산 저장에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'));}
     finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
