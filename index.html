@@ -959,10 +959,9 @@ const JGB_EXCEL_EQUIPMENT=[{"code":"AC-01","name":"냉방기(난방겸용)","typ
 
 const KEY="JGB_LIVE_TEST_V3";
 const workers=[
- {id:"w1",name:"김민수",shift:"새벽조",start:"06:00",end:"15:00"},
- {id:"w2",name:"이현우",shift:"오전조",start:"09:00",end:"18:00"},
- {id:"w3",name:"박성훈",shift:"오후조",start:"13:30",end:"22:30"},
- {id:"w4",name:"최지훈",shift:"-",start:"",end:""}
+ {id:"w1",name:"김",shift:"새벽조",start:"06:00",end:"15:00"},
+ {id:"w2",name:"안",shift:"오전조",start:"09:00",end:"18:00"},
+ {id:"w3",name:"한",shift:"오후조",start:"13:30",end:"22:30"}
 ];
 const tasks=["화장실 점검","샤워실 점검","코트 주변 점검","탈의실 점검","복도·계단 점검","출입구 점검","시설물 상태 확인","조명 상태 확인","청소 상태 확인","안전 위험요소 확인"];
 const BASIC_TASK_VERSION="v3";
@@ -972,8 +971,8 @@ const offWords=["휴무","주휴일","연가","공가","대체휴무"];
 const defaultSchedule={};
 // 2026년 9월 근무편성표 기준. 빈 날짜는 아직 편성되지 않은 날로 봅니다.
 const SEPT_2026=[
-["새벽조","오전조","휴무","오후조"],["새벽조","오전조","주휴일","오후조"],["새벽조","오전조","오전조","오전조"],["휴무","새벽조","오전조","오후조"],["주휴일","공가/건강검진","새벽조","오후조"],["새벽조","주휴일","오후조","휴무"],["새벽조","오후조","휴무","주휴일"],["새벽조","오전조","주휴일","오후조"],["새벽조","휴무","연가","오후조"],["새벽조","주휴일","연가","오후조"],["휴무","새벽조","연가","오후조"],["주휴일","새벽조","오전조","오후조"],["새벽조","오전조","오후조","휴무"],["새벽조","오후조","휴무","주휴일"],["새벽조","오후조","주휴일","공가/건강검진"],["새벽조","휴무","오전조","오후조"],["새벽조","주휴일","오전조","오후조"],["휴무","새벽조","오전조","오후조"],["주휴일","새벽조","오전조","오후조"],["새벽조","오전조","오후조","휴무"],["새벽조","오후조","휴무","주휴일"],["새벽조","연가","주휴일","오후조"],["새벽조","휴무","8/17대체휴무","오후조"],["","","",""],["","","",""],["","","",""],["8/15대체휴무","9/24대체휴무","오후조","휴무"],["8/17대체휴무","오후조","휴무","주휴일"],["9/25대체휴무","오전조","주휴일","오후조"],["새벽조","휴무","오전조","오후조"]
-];
+["새벽조","오전조","휴무"],["새벽조","오전조","주휴일"],["새벽조","오전조","오전조"],["휴무","새벽조","오전조"],["주휴일","공가/건강검진","새벽조"],["새벽조","주휴일","오후조"],["새벽조","오후조","휴무"],["새벽조","오전조","주휴일"],["새벽조","휴무","연가"],["새벽조","주휴일","연가"],["휴무","새벽조","연가"],["주휴일","새벽조","오전조"],["새벽조","오전조","오후조"],["새벽조","오후조","휴무"],["새벽조","오후조","주휴일"],["새벽조","휴무","오전조"],["새벽조","주휴일","오전조"],["휴무","새벽조","오전조"],["주휴일","새벽조","오전조"],["새벽조","오전조","오후조"],["새벽조","오후조","휴무"],["새벽조","연가","주휴일"],["새벽조","휴무","8/17대체휴무"],["","",""],["","",""],["","",""],["8/15대체휴무","9/24대체휴무","오후조"],["8/17대체휴무","오후조","휴무"],["9/25대체휴무","오전조","주휴일"],["새벽조","휴무","오전조"]
+]
 function scheduleValues(date){
   if(db.schedule && Array.isArray(db.schedule[date])) return db.schedule[date];
   const m=date.slice(0,7), day=Number(date.slice(8,10));
@@ -1310,15 +1309,56 @@ function saveScheduleDay(date){
   alert(`${date} 근무편성이 저장되었습니다.\n기본업무·직원실적에 즉시 반영됩니다.`);
   render();
 }
+function scheduleOptions(){return ["","새벽조","오전조","오후조","휴무","주휴일","연가","공가/건강검진","대체휴무","대휴","추석","8/15대체휴무","8/17대체휴무","9/24대체휴무","9/25대체휴무"]}
+function saveScheduleMonthFromText(){
+  const month=(document.getElementById("bulkScheduleMonth")?.value||monthKey()).slice(0,7);
+  const raw=document.getElementById("bulkScheduleText")?.value||"";
+  const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if(!lines.length){alert("근무편성 내용을 붙여넣어 주세요.");return}
+  if(!db.schedule||typeof db.schedule!=="object")db.schedule={};
+  let saved=0,skipped=[];
+  lines.forEach((line,idx)=>{
+    let cols=line.includes("\t")?line.split("\t"):line.split(/\s*,\s*/);
+    cols=cols.map(x=>String(x).trim());
+    if(!cols.length)return;
+    let day=parseInt(String(cols[0]).replace(/[^0-9]/g,""),10);
+    if(!Number.isInteger(day)||day<1||day>31){if(idx>0)skipped.push(idx+1);return}
+    const vals=workers.map((w,i)=>String(cols[i+1]||"").trim());
+    db.schedule[month+"-"+String(day).padStart(2,"0")]=vals; saved++;
+  });
+  save();
+  document.getElementById("bulkScheduleModal")?.remove();
+  alert(`${month} 근무편성 ${saved}일을 저장했습니다.${skipped.length?`\n건너뛴 행: ${skipped.join(", ")}행`:""}\n기본업무·직원실적에 자동 반영됩니다.`);
+  render();
+}
+function openScheduleBulkEditor(){
+  document.getElementById("bulkScheduleModal")?.remove();
+  const month=monthKey(), opts=scheduleOptions();
+  const days=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
+  const rows=Array.from({length:days},(_,i)=>{
+    const day=i+1,date=month+"-"+String(day).padStart(2,"0"),vals=scheduleValues(date)||[];
+    return `<tr><td><b>${day}일</b></td>${workers.map((w,j)=>{const st=vals[j]||"";return `<td><select class="bulk-sch" data-date="${date}" data-i="${j}">${opts.map(o=>`<option value="${xEsc(o)}" ${st===o?"selected":""}>${xEsc(o||"편성없음")}</option>`).join("")}</select></td>`}).join("")}</tr>`;
+  }).join("");
+  document.body.insertAdjacentHTML("beforeend",`<div id="bulkScheduleModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()"><div class="eam-manage-card" style="width:min(1100px,96vw);max-height:92vh;overflow:auto"><div class="eam-manage-head"><div><span>STAFF SCHEDULE</span><h3>📅 월간 근무편성 입력</h3><small>한 달 근무표를 한 번에 입력하고 저장합니다.</small></div><button onclick="document.getElementById('bulkScheduleModal').remove()">×</button></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0"><input id="bulkScheduleMonth" type="month" value="${month}"><button class="btn blue" onclick="saveBulkScheduleGrid()">월간 편성 저장</button></div><div style="overflow:auto"><table class="schedule-table"><thead><tr><th>일자</th>${workers.map(w=>`<th>${xEsc(w.name)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div><hr style="margin:16px 0"><h3 style="margin:0 0 6px">📋 엑셀 근무표 붙여넣기</h3><div class="small" style="margin-bottom:8px">엑셀에서 <b>일자 + 직원별 근무편성</b> 표를 복사해 아래에 붙여넣으세요. 첫 줄 제목은 있어도 됩니다. 예: 1일 / 새벽조 / 오전조 / 휴무 / 오후조</div><textarea id="bulkScheduleText" rows="8" placeholder="1\t새벽조\t오전조\t휴무\t오후조\n2\t새벽조\t오전조\t주휴일\t오후조"></textarea><div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn gray" onclick="saveScheduleMonthFromText()">붙여넣은 근무표 저장</button></div></div></div>`);
+}
+function saveBulkScheduleGrid(){
+  const month=(document.getElementById("bulkScheduleMonth")?.value||monthKey()).slice(0,7);
+  const cells=[...document.querySelectorAll("#bulkScheduleModal .bulk-sch")];
+  if(!db.schedule||typeof db.schedule!=="object")db.schedule={};
+  const by={};
+  cells.forEach(el=>{const d=el.dataset.date,i=Number(el.dataset.i);(by[d]||(by[d]=[]))[i]=el.value||""});
+  Object.keys(by).forEach(d=>{db.schedule[d]=workers.map((w,i)=>by[d]?.[i]||"")});
+  save(); document.getElementById("bulkScheduleModal")?.remove(); alert(`${month} 월간 근무편성을 저장했습니다.\n기본업무·직원실적에 자동 반영됩니다.`); render();
+}
 function schedulePage(){
   const vals=scheduleValues(selectedDate)||[];
-  return `<div class="jgb-page-title"><div><h2>근무편성</h2><p>${selectedDate} 근무편성표 · 저장된 편성은 기본업무와 직원실적에 자동 연동됩니다.</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input type="date" value="${selectedDate}" onchange="setDate(this.value)"><button class="btn blue" onclick="saveScheduleDay('${selectedDate}')">편성 저장</button></div></div>
-  <div class="notice"><b>근무편성 → 자동 연동</b><br>근무 상태가 ‘근무’인 직원만 기본업무 10개 항목의 대상이 되며, 휴무·주휴일·연가·공가·대체휴무는 자동 제외됩니다. 편성을 저장하면 기본업무·직원실적 화면이 같은 날짜 기준으로 즉시 반영됩니다.</div>
+  return `<div class="jgb-page-title"><div><h2>근무편성</h2><p>${selectedDate} 근무편성표 · 저장된 편성은 기본업무와 직원실적에 자동 연동됩니다.</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input type="date" value="${selectedDate}" onchange="setDate(this.value)"><button class="btn blue" onclick="saveScheduleDay('${selectedDate}')">오늘 날짜 저장</button><button class="btn" onclick="openScheduleBulkEditor()">📅 월간 근무편성 입력</button></div></div>
+  <div class="notice"><b>근무편성 → 자동 연동</b><br>이제 일자별 입력뿐 아니라 <b>월간 근무표를 한 번에 입력</b>할 수 있습니다. 직접 입력하거나 엑셀에서 복사해 붙여넣으면 저장된 편성이 기본업무·직원실적에 자동 반영됩니다.</div>
   <div class="jgb-card"><table class="schedule-table"><thead><tr><th>직원</th><th>근무편성</th><th>근무시간</th><th>기본업무 대상</th></tr></thead><tbody>${workers.map((w,i)=>{
     const st=vals[i]||"";
     const working=!!st&&!offWords.some(x=>st.includes(x))&&st!=="-";
     const tm=st.includes("새벽")?"06:00~15:00":st.includes("오전")?"09:00~18:00":st.includes("오후")?"13:30~22:30":"-";
-    const opts=["","새벽조","오전조","오후조","휴무","주휴일","연가","공가/건강검진","대체휴무","8/15대체휴무","8/17대체휴무","9/24대체휴무","9/25대체휴무"];
+    const opts=scheduleOptions();
     return `<tr><td><b>${xEsc(w.name)}</b></td><td><select id="sch_${w.id}" style="min-width:150px"><option value="">편성없음</option>${opts.filter(Boolean).map(o=>`<option value="${xEsc(o)}" ${st===o?"selected":""}>${xEsc(o)}</option>`).join("")}</select></td><td>${tm}</td><td class="${working?'schedule-working':'schedule-off'}">${working?'대상':'제외'}</td></tr>`;
   }).join('')}</tbody></table></div>`
 }
@@ -1824,7 +1864,7 @@ async function syncBasicTasks(){if(!SUPA)return;try{const {data,error}=await SUP
 async function toggleTask(wid,t){const d=tasksFor(wid),idx=d.done.indexOf(t);if(idx>=0)d.done.splice(idx,1);else d.done.push(t);d.updatedAt=new Date().toISOString();render();if(!SUPA)return;try{const q=SUPA.from("basic_tasks");const dbName=taskDbName(t);if(idx>=0){const {error}=await q.delete().eq("work_date",dateKey()).eq("worker_id",wid).eq("task_name",dbName);if(error)throw error}else{const {error}=await q.insert({work_date:dateKey(),worker_id:wid,task_name:dbName,completed_at:new Date().toISOString()});if(error)throw error}await syncBasicTasks();render()}catch(e){console.warn(e);if(idx>=0)d.done.push(t);else d.done=d.done.filter(x=>x!==t);render();alert("기본업무 저장에 실패했습니다. Supabase 권한/컬럼을 확인하세요.")}}
 function setDate(v){if(v){selectedDate=v;render()}}
 function time(v){return new Date(v).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hourCycle:"h23"})}
-function seedDemo(){if(db.issues.length)return alert("이미 테스트 데이터가 있습니다.");let now=Date.now();db.issues=[{id:"I"+now,category:"시설",place:"2층 남자화장실",content:"조명 점검 필요",status:"미조치",createdAt:new Date(now-35*60000).toISOString(),handlerId:"w1",handlerName:"김민수",completedAt:""},{id:"I"+(now+1),category:"환경",place:"복도",content:"바닥 청소 요청",status:"완료",createdAt:new Date(now-70*60000).toISOString(),handlerId:"w2",handlerName:"이현우",completedAt:new Date(now-25*60000).toISOString()}];save();render()}
+function seedDemo(){if(db.issues.length)return alert("이미 테스트 데이터가 있습니다.");let now=Date.now();db.issues=[{id:"I"+now,category:"시설",place:"2층 남자화장실",content:"조명 점검 필요",status:"미조치",createdAt:new Date(now-35*60000).toISOString(),handlerId:"w1",handlerName:"김",completedAt:""},{id:"I"+(now+1),category:"환경",place:"복도",content:"바닥 청소 요청",status:"완료",createdAt:new Date(now-70*60000).toISOString(),handlerId:"w2",handlerName:"안",completedAt:new Date(now-25*60000).toISOString()}];save();render()}
 function resetAll(){if(confirm("테스트 데이터를 모두 삭제할까요?")){db={issues:[],tasks:{},schedule:{}};save();render()}}
 (function(){
   window.eamPick=eamPick; window.eamHistoryTab=eamHistoryTab; window.eamShowLocation=eamShowLocation; window.eamShowHistory=eamShowHistory;
