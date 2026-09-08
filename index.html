@@ -1421,33 +1421,133 @@ function staffMonthlyAutoStats(wid,month){
   return {total,by};
 }
 
+let statsViewMode="month";
+let statsViewMonth=monthKey();
+let statsViewYear=Number(statsViewMonth.slice(0,4))||new Date().getFullYear();
+
+function setStatsViewMode(mode){
+  statsViewMode=mode==="year"?"year":"month";
+  render();
+}
+function setStatsViewMonth(v){
+  if(/^\d{4}-\d{2}$/.test(v)) statsViewMonth=v;
+  statsViewYear=Number(statsViewMonth.slice(0,4));
+  render();
+}
+function setStatsViewYear(v){
+  const y=Number(v)||new Date().getFullYear();
+  statsViewYear=y;
+  statsViewMonth=String(y)+"-"+statsViewMonth.slice(5,7);
+  if(Number(statsViewMonth.slice(5,7))<1||Number(statsViewMonth.slice(5,7))>12)statsViewMonth=String(y)+"-01";
+  render();
+}
+function statsMonthRows(year){
+  const out=[];
+  for(let m=1;m<=12;m++){
+    const ym=String(year)+"-"+String(m).padStart(2,"0");
+    let actual=0,auto=0,target=0;
+    workers.forEach(w=>{
+      const b=basicWorkerStats(w.id,ym),a=staffMonthlyAutoStats(w.id,ym);
+      target+=b.target;actual+=b.complete;auto+=a.total;
+    });
+    out.push({ym,m,target,actual,auto,total:actual+auto,rate:target?Math.round(actual/target*100):0});
+  }
+  return out;
+}
+function statsYearWorker(wid,year){
+  let target=0,actual=0,auto=0;
+  for(let m=1;m<=12;m++){
+    const ym=String(year)+"-"+String(m).padStart(2,"0");
+    const b=basicWorkerStats(wid,ym),a=staffMonthlyAutoStats(wid,ym);
+    target+=b.target;actual+=b.complete;auto+=a.total;
+  }
+  return {target,actual,auto,total:actual+auto,rate:target?Math.round(actual/target*100):0};
+}
 function statsPage(){
-  const s=stats(),ym=monthKey(),today=todayWorkers();
-  const rows=workers.map(w=>{
-    const bs=basicWorkerStats(w.id,ym),auto=staffMonthlyAutoStats(w.id,ym);
-    const mine=s.is.filter(x=>x.handlerId===w.id),done=mine.filter(x=>x.status==="완료").length,pending=mine.length-done;
-    const pct=bs.target?Math.round(bs.complete/bs.target*100):0,tw=today.find(x=>x.id===w.id),alert=(bs.miss>0||pending>0);
-    return `<div class="emp-row ${alert?'emp-alert':''}">
-      <div class="emp-top"><div><div class="emp-name">${w.name}</div><div class="emp-shift">${w.shift}${w.start?` · ${w.start}~${w.end}`:''}</div></div><span class="emp-state ${tw&&!tw.working?'off':''}">${tw&&tw.working?'오늘 근무':'오늘 '+(tw?.status||'편성없음')}</span></div>
-      <div class="emp-line"><div class="emp-label">실제 근무 실적</div><div class="emp-track"><div class="emp-fill ${bs.miss?'bad':''}" style="width:${pct}%"></div></div><div class="emp-num">${bs.complete}/${bs.target}회</div></div>
-      <div class="emp-request" style="margin-top:10px">
-        <div class="emp-chip"><small>실제 근무 실적</small><b>${bs.complete}회</b></div>
-        <div class="emp-chip"><small>휴무·연가 자동 실적</small><b>${auto.total}회</b></div>
-        <div class="emp-chip"><small>총 실적</small><b>${bs.complete+auto.total}회</b></div>
-        <div class="emp-chip"><small>접수사항 합계</small><b>${mine.length}건</b></div>
-        <div class="emp-chip"><small>완료</small><b>${done}건</b></div>
-        <div class="emp-chip red"><small>미완료</small><b>${pending}건</b></div>
+  const ym=statsViewMonth, year=statsViewYear;
+  const selected=statsMonthRows(year).find(x=>x.ym===ym)||statsMonthRows(year)[0];
+  const workersMonth=workers.map(w=>{
+    const b=basicWorkerStats(w.id,ym),a=staffMonthlyAutoStats(w.id,ym);
+    return {...w,b,a,total:b.complete+a.total,rate:b.target?Math.round(b.complete/b.target*100):0};
+  });
+  const monthTotal={target:workersMonth.reduce((n,x)=>n+x.b.target,0),actual:workersMonth.reduce((n,x)=>n+x.b.complete,0),auto:workersMonth.reduce((n,x)=>n+x.a.total,0)};
+  monthTotal.total=monthTotal.actual+monthTotal.auto;
+  monthTotal.rate=monthTotal.target?Math.round(monthTotal.actual/monthTotal.target*100):0;
+
+  const rows=workersMonth.map(w=>`
+    <div class="sx-person">
+      <div class="sx-person-head">
+        <div><strong>${w.name}</strong><span>${w.b.target}일 근무대상</span></div>
+        <b>${w.total}회</b>
       </div>
-      <div class="emp-note">자동 실적 ${auto.total}회${auto.total?` · 휴무 ${auto.by.휴무} · 주휴일 ${auto.by.주휴일} · 연가 ${auto.by.연가} · 공가 ${auto.by.공가} · 대체휴무 ${auto.by.대체휴무} · 추석 ${auto.by.추석}`:''}${bs.target?` · 기본업무 미완료 ${bs.miss}일`:' · 이번 달 실제 근무일 없음'}${pending?` · 미조치 ${pending}건`:''}</div>
-    </div>`;
-  }).join('');
-  const autoTotal=workers.reduce((n,w)=>n+staffMonthlyAutoStats(w.id,ym).total,0);
-  return `<div class="pagebar"><div><h1>직원별 근무 실적 한눈에</h1><div class="small">${ym} · 근무편성표 기준으로 자동 집계</div></div><input type="date" value="${selectedDate}" onchange="setDate(this.value)"></div>
-  <div class="empdash"><div class="empdash-head"><div><div class="empdash-title">이번 달 직원별 이행 현황</div><div class="empdash-sub">실제 근무 실적과 휴무·연가 자동 실적을 분리해서 확인</div></div><div class="empdash-sub">실시간 반영 ON</div></div>
-  <div class="emp-kpis"><div class="emp-kpi"><span>전체 근무일</span><b>${s.targetDays}일</b></div><div class="emp-kpi"><span>실제 근무 실적</span><b>${s.completedDays}회</b></div><div class="emp-kpi"><span>휴무·연가 자동 실적</span><b>${autoTotal}회</b></div><div class="emp-kpi"><span>총 실적</span><b>${s.completedDays+autoTotal}회</b></div><div class="emp-kpi"><span>조치완료</span><b>${s.done.length}건</b></div><div class="emp-kpi"><span>미조치</span><b>${s.pending.length}건</b></div></div>
-  <div class="emp-list">${rows}</div>
-  <div class="actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn gray" onclick="showMonthYearCompare('month')">📈 월별 비교</button><button class="btn gray" onclick="showMonthYearCompare('year')">📊 연도별 비교</button><button class="btn red" onclick="resetEmployeePerformance()">↻ 실적 전체 리셋</button></div>
-  <div class="emp-foot">※ 기존 기본업무 집계 방식은 그대로 유지합니다. 실제 근무일에는 기존처럼 기본업무 10개를 모두 완료해야 실적 1회입니다. 휴무·주휴일·연가·공가·대체휴무·추석은 근무편성에서 자동으로 별도 실적 1회로 집계합니다. 두 실적은 화면에서 구분하고 총 실적에는 합산합니다.</div></div>`;
+      <div class="sx-bars">
+        <div><i style="width:${Math.min(100,w.rate)}%"></i></div>
+        <span>실제 ${w.b.complete}회 · 자동 ${w.a.total}회</span>
+      </div>
+      <div class="sx-mini">
+        <span>실제 <b>${w.b.complete}</b></span>
+        <span>자동 <b>${w.a.total}</b></span>
+        <span>총 <b>${w.total}</b></span>
+        <span>미완료 <b>${w.b.miss}</b></span>
+      </div>
+    </div>`).join('');
+
+  const monthly=statsMonthRows(year);
+  const monthTable=monthly.map(x=>`
+    <tr class="${x.ym===ym?'sel':''}">
+      <td><button class="sx-month-link" onclick="setStatsViewMonth('${x.ym}')">${x.m}월</button></td>
+      <td>${x.target}일</td><td>${x.actual}회</td><td>${x.auto}회</td>
+      <td><strong>${x.total}회</strong></td><td>${x.rate}%</td>
+    </tr>`).join('');
+
+  const annualWorkers=workers.map(w=>({...w,y:statsYearWorker(w.id,year)}));
+  const annualTarget=annualWorkers.reduce((n,x)=>n+x.y.target,0);
+  const annualActual=annualWorkers.reduce((n,x)=>n+x.y.actual,0);
+  const annualAuto=annualWorkers.reduce((n,x)=>n+x.y.auto,0);
+  const annualTotal=annualActual+annualAuto;
+  const annualTable=annualWorkers.map(w=>`
+    <tr><td><strong>${w.name}</strong></td><td>${w.y.target}일</td><td>${w.y.actual}회</td><td>${w.y.auto}회</td><td><strong>${w.y.total}회</strong></td><td>${w.y.rate}%</td></tr>`).join('');
+
+  return `<div class="sx-wrap">
+    <div class="sx-head">
+      <div><div class="sx-kicker">STAFF PERFORMANCE</div><h1>직원실적</h1><p>근무편성 + 기본업무 실적을 월별·연도별로 한 화면에서 관리</p></div>
+      <div class="sx-actions">
+        <select onchange="setStatsViewYear(this.value)">${[2025,2026,2027].map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}년</option>`).join('')}</select>
+        <input type="month" value="${ym}" onchange="setStatsViewMonth(this.value)">
+        <button class="btn red" onclick="resetEmployeePerformance()">↻ 전체 리셋</button>
+      </div>
+    </div>
+
+    <div class="sx-tabs">
+      <button class="${statsViewMode==='month'?'on':''}" onclick="setStatsViewMode('month')">월별 실적</button>
+      <button class="${statsViewMode==='year'?'on':''}" onclick="setStatsViewMode('year')">연도별 실적</button>
+    </div>
+
+    ${statsViewMode==='month'?`
+    <div class="sx-hero">
+      <div><span>${ym.replace('-','년 ')}월 실적</span><strong>${monthTotal.total}<em>회</em></strong><small>실제 ${monthTotal.actual} + 자동 ${monthTotal.auto}</small></div>
+      <div class="sx-hero-stat"><b>${monthTotal.target}일</b><span>근무 대상</span></div>
+      <div class="sx-hero-stat"><b>${monthTotal.rate}%</b><span>기본업무 달성률</span></div>
+      <div class="sx-hero-stat"><b>${monthTotal.auto}회</b><span>휴무·연가 자동</span></div>
+    </div>
+    <div class="sx-section-title"><div><h2>직원별 실적</h2><p>${ym} · 실제 수행과 자동 실적을 분리 표시</p></div><span>총 실적 = 실제 + 자동</span></div>
+    <div class="sx-people">${rows}</div>
+    <div class="sx-section-title"><div><h2>${year}년 월별 흐름</h2><p>월을 누르면 해당 월 상세로 바로 이동</p></div></div>
+    <div class="sx-table-wrap"><table class="sx-table"><thead><tr><th>월</th><th>근무대상</th><th>실제</th><th>자동</th><th>총 실적</th><th>달성률</th></tr></thead><tbody>${monthTable}</tbody></table></div>
+    `:`
+    <div class="sx-hero sx-year">
+      <div><span>${year}년 연간 총 실적</span><strong>${annualTotal}<em>회</em></strong><small>실제 ${annualActual} + 자동 ${annualAuto}</small></div>
+      <div class="sx-hero-stat"><b>${annualTarget}일</b><span>연간 근무 대상</span></div>
+      <div class="sx-hero-stat"><b>${annualActual}회</b><span>실제 근무 실적</span></div>
+      <div class="sx-hero-stat"><b>${annualAuto}회</b><span>자동 실적</span></div>
+    </div>
+    <div class="sx-section-title"><div><h2>${year}년 직원별 누계</h2><p>실제 근무 실적과 자동 실적을 명확히 구분</p></div></div>
+    <div class="sx-table-wrap"><table class="sx-table sx-annual"><thead><tr><th>직원</th><th>근무대상</th><th>실제</th><th>자동</th><th>총 실적</th><th>달성률</th></tr></thead><tbody>${annualTable}</tbody></table></div>
+    <div class="sx-section-title"><div><h2>${year}년 월별 총 실적</h2><p>실제 + 자동 실적 추이</p></div></div>
+    <div class="sx-month-strip">${monthly.map(x=>`<button class="${x.ym===ym?'on':''}" onclick="setStatsViewMonth('${x.ym}')"><small>${x.m}월</small><b>${x.total}</b><span>실제 ${x.actual} · 자동 ${x.auto}</span></button>`).join('')}</div>
+    `}
+    <div class="sx-foot">※ 기본업무 산정 방식은 변경하지 않습니다. 실제 근무일은 기존처럼 10개 업무를 모두 완료해야 실적 1회이며, 휴무·주휴일·연가·공가·대체휴무·대휴·추석은 근무편성에서 자동 실적 1회로 별도 집계합니다.</div>
+  </div>`;
 }
 function workerPage(){return `<div class="pagebar"><h1>근무자별 현황 · ${selectedDate}</h1></div><div class="workergrid">${todayWorkers().map(w=>{const d=tasksFor(w.id), bs=basicWorkerStats(w.id,monthKey()), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()),p=mine.filter(x=>x.status!=="완료");return `<div class="workerbox"><h3>${w.name}</h3><span class="badge ${w.working?"":"off"}">${w.working?w.shift+" "+w.start+"~"+w.end:w.status}</span><div class="compareline">기본업무 <b>${w.working?`${bs.complete}/${bs.target}일`:"-"}</b></div><div class="compareline">조치완료 <b>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</b></div><div class="compareline">미조치 <b class="${p.length?"red":"green"}">${w.working?p.length:"-"}</b></div><div class="compareline">접수 합계 <b>${mine.length}건</b></div></div>`}).join("")}</div>`}
 function pendingPage(){const p=(db.issues||[]).filter(x=>x.status!=="완료");return `<div class="pagebar"><h1>미조치 현황</h1></div><div class="panel">${p.map(x=>`<div class="issue"><div><b class="red">${x.handlerName||"담당 미지정"}</b><br>${x.category} · ${x.place} · ${x.content}<div class="small">접수시간 ${time(x.createdAt)}</div></div><button class="btn" onclick="go('process')">조치</button></div>`).join("")||"<div class='small'>미조치 사항이 없습니다.</div>"}</div>`}
@@ -1955,6 +2055,61 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
 })();
 </script>
 
+
+<style id="STAFF_STATS_INNOVATION_V1">
+.sx-wrap{padding:4px 0 34px}
+.sx-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:18px}
+.sx-kicker{font-size:11px;letter-spacing:2px;color:#64748b;font-weight:800}
+.sx-head h1{margin:3px 0 4px;font-size:30px;color:#162b49}
+.sx-head p{margin:0;color:#718198;font-size:13px}
+.sx-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.sx-actions select,.sx-actions input{height:40px;border:1px solid #ccd9e7;border-radius:10px;padding:0 11px;background:#fff;color:#1e3655;font-weight:700}
+.sx-tabs{display:flex;gap:5px;background:#edf3f8;border-radius:12px;padding:4px;width:max-content;margin-bottom:14px}
+.sx-tabs button{border:0;background:transparent;padding:9px 20px;border-radius:9px;font-weight:800;color:#64748b;cursor:pointer}
+.sx-tabs button.on{background:#fff;color:#173a62;box-shadow:0 2px 7px rgba(28,54,82,.10)}
+.sx-hero{display:grid;grid-template-columns:minmax(260px,1.5fr) repeat(3,1fr);gap:1px;background:#d7e2ee;border:1px solid #d7e2ee;border-radius:16px;overflow:hidden;margin-bottom:20px}
+.sx-hero>div{background:#fff;padding:19px 20px}
+.sx-hero>div:first-child{background:linear-gradient(135deg,#173b63,#275a87);color:#fff}
+.sx-hero>div:first-child span{display:block;font-size:12px;opacity:.8}
+.sx-hero strong{display:block;font-size:38px;line-height:1.1;margin:8px 0 3px}
+.sx-hero strong em{font-size:16px;font-style:normal;margin-left:3px}
+.sx-hero small{font-size:12px;opacity:.85}
+.sx-hero-stat{display:flex;flex-direction:column;justify-content:center}
+.sx-hero-stat b{font-size:25px;color:#183655}
+.sx-hero-stat span{font-size:12px;color:#718198;margin-top:5px}
+.sx-section-title{display:flex;justify-content:space-between;align-items:end;margin:18px 2px 9px}
+.sx-section-title h2{font-size:18px;margin:0;color:#1d3553}
+.sx-section-title p,.sx-section-title>span{font-size:12px;color:#7a899d;margin:4px 0 0}
+.sx-people{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sx-person{background:#fff;border:1px solid #d5e1ed;border-radius:14px;padding:16px;box-shadow:0 5px 15px rgba(34,63,91,.05)}
+.sx-person-head{display:flex;justify-content:space-between;align-items:center}
+.sx-person-head strong{font-size:20px;color:#193754}
+.sx-person-head span{font-size:11px;color:#8795a8;margin-left:8px}
+.sx-person-head>b{font-size:22px;color:#173b63}
+.sx-bars{margin:13px 0 10px;display:flex;align-items:center;gap:9px}
+.sx-bars>div{height:8px;flex:1;background:#e8eff6;border-radius:99px;overflow:hidden}
+.sx-bars i{display:block;height:100%;background:#477ba8;border-radius:99px}
+.sx-bars span{font-size:10px;color:#718198;white-space:nowrap}
+.sx-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.sx-mini span{background:#f6f9fc;border-radius:8px;padding:7px 4px;text-align:center;font-size:9px;color:#8190a3}
+.sx-mini b{display:block;font-size:14px;color:#243d59;margin-top:2px}
+.sx-table-wrap{background:#fff;border:1px solid #d5e1ed;border-radius:14px;overflow:hidden}
+.sx-table{width:100%;border-collapse:collapse;font-size:12px}
+.sx-table th{background:#f3f7fb;color:#66778d;font-weight:800;padding:11px 12px;text-align:center}
+.sx-table td{padding:11px 12px;text-align:center;border-top:1px solid #edf2f6;color:#334a63}
+.sx-table tr.sel td{background:#eef6ff}
+.sx-table tr.sel td:first-child{box-shadow:inset 4px 0 #3975a8}
+.sx-month-link{border:0;background:none;font-weight:800;color:#245d8f;cursor:pointer}
+.sx-month-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.sx-month-strip button{border:1px solid #d5e1ed;background:#fff;border-radius:11px;padding:11px 8px;text-align:left;cursor:pointer}
+.sx-month-strip button.on{border-color:#4b7eaa;background:#eef6ff;box-shadow:0 3px 9px rgba(42,91,132,.09)}
+.sx-month-strip small{display:block;color:#8190a3;font-size:10px}
+.sx-month-strip b{display:block;font-size:20px;color:#1d3957;margin:2px 0}
+.sx-month-strip span{font-size:9px;color:#75869a}
+.sx-foot{margin-top:16px;background:#f0f6fb;border:1px solid #d9e7f2;border-radius:10px;padding:10px 13px;font-size:11px;color:#61758c;line-height:1.55}
+@media(max-width:900px){.sx-head{align-items:flex-start;flex-direction:column}.sx-hero{grid-template-columns:1fr 1fr}.sx-hero>div:first-child{grid-column:1/-1}.sx-people{grid-template-columns:1fr}.sx-month-strip{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.sx-actions{width:100%}.sx-actions select,.sx-actions input{flex:1}.sx-hero{grid-template-columns:1fr}.sx-hero>div:first-child{grid-column:auto}.sx-month-strip{grid-template-columns:repeat(2,1fr)}}
+</style>
 <script id="MONTH_YEAR_COMPARE_JS">
 (function(){
   const baseMonths={2026:{8:0}};
