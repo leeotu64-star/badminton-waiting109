@@ -961,13 +961,13 @@ const KEY="JGB_LIVE_TEST_V3";
 const workers=[
  {id:"w1",name:"김",shift:"새벽조",start:"06:00",end:"15:00"},
  {id:"w2",name:"안",shift:"오전조",start:"09:00",end:"18:00"},
- {id:"w3",name:"한",shift:"오후조",start:"13:30",end:"22:30"}
+ {id:"w3",name:"한",shift:"오후조",start:"13:30",end:"22:20"}
 ];
 const tasks=["화장실 점검","샤워실 점검","코트 주변 점검","탈의실 점검","복도·계단 점검","출입구 점검","시설물 상태 확인","조명 상태 확인","청소 상태 확인","안전 위험요소 확인"];
 const BASIC_TASK_VERSION="v3";
 function taskDbName(name){return BASIC_TASK_VERSION+"::"+name}
 function taskDisplayName(name){const v=String(name||"");return v.startsWith(BASIC_TASK_VERSION+"::")?v.slice((BASIC_TASK_VERSION+"::").length):null}
-const offWords=["휴무","주휴일","연가","공가","대체휴무"];
+const offWords=["휴무","주휴일","연가","공가","대체휴무","대휴"];
 const defaultSchedule={};
 // 2026년 9월 근무편성표 기준. 빈 날짜는 아직 편성되지 않은 날로 봅니다.
 const SEPT_2026=[
@@ -1021,7 +1021,7 @@ window.addEventListener("storage",()=>{db=load();render()});
 let bc;try{bc=new BroadcastChannel("JGB_LIVE");bc.onmessage=()=>{db=load();render()}}catch(e){}
 function dateKey(){return selectedDate}
 function monthKey(d=selectedDate){return d.slice(0,7)}
-function todayWorkers(){return workersForDate(dateKey()).map(w=>{const shift=w.working?w.status:"-";const times=shift.includes("새벽")?["06:00","15:00"]:shift.includes("오전")?["09:00","18:00"]:shift.includes("오후")?["13:30","22:30"]:["",""];return {...w,shift:shift||w.shift,start:times[0],end:times[1]}})}
+function todayWorkers(){return workersForDate(dateKey()).map(w=>{const shift=w.working?w.status:"-";const times=shift.includes("새벽")?["06:00","15:00"]:shift.includes("오전")?["09:00","18:00"]:shift.includes("오후")?["13:30","22:20"]:["",""];return {...w,shift:shift||w.shift,start:times[0],end:times[1]}})}
 function tasksFor(wid){
  const k=dateKey()+"_"+wid;
  if(!db.tasks||typeof db.tasks!=="object")db.tasks={};
@@ -1357,7 +1357,7 @@ function schedulePage(){
   <div class="jgb-card"><table class="schedule-table"><thead><tr><th>직원</th><th>근무편성</th><th>근무시간</th><th>기본업무 대상</th></tr></thead><tbody>${workers.map((w,i)=>{
     const st=vals[i]||"";
     const working=!!st&&!offWords.some(x=>st.includes(x))&&st!=="-";
-    const tm=st.includes("새벽")?"06:00~15:00":st.includes("오전")?"09:00~18:00":st.includes("오후")?"13:30~22:30":"-";
+    const tm=st.includes("새벽")?"06:00~15:00":st.includes("오전")?"09:00~18:00":st.includes("오후")?"13:30~22:20":"-";
     const opts=scheduleOptions();
     return `<tr><td><b>${xEsc(w.name)}</b></td><td><select id="sch_${w.id}" style="min-width:150px"><option value="">편성없음</option>${opts.filter(Boolean).map(o=>`<option value="${xEsc(o)}" ${st===o?"selected":""}>${xEsc(o)}</option>`).join("")}</select></td><td>${tm}</td><td class="${working?'schedule-working':'schedule-off'}">${working?'대상':'제외'}</td></tr>`;
   }).join('')}</tbody></table></div>`
@@ -1412,7 +1412,7 @@ function statsPage(){
 }
 function workerPage(){return `<div class="pagebar"><h1>근무자별 현황 · ${selectedDate}</h1></div><div class="workergrid">${todayWorkers().map(w=>{const d=tasksFor(w.id), bs=basicWorkerStats(w.id,monthKey()), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()),p=mine.filter(x=>x.status!=="완료");return `<div class="workerbox"><h3>${w.name}</h3><span class="badge ${w.working?"":"off"}">${w.working?w.shift+" "+w.start+"~"+w.end:w.status}</span><div class="compareline">기본업무 <b>${w.working?`${bs.complete}/${bs.target}일`:"-"}</b></div><div class="compareline">조치완료 <b>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</b></div><div class="compareline">미조치 <b class="${p.length?"red":"green"}">${w.working?p.length:"-"}</b></div><div class="compareline">접수 합계 <b>${mine.length}건</b></div></div>`}).join("")}</div>`}
 function pendingPage(){const p=(db.issues||[]).filter(x=>x.status!=="완료");return `<div class="pagebar"><h1>미조치 현황</h1></div><div class="panel">${p.map(x=>`<div class="issue"><div><b class="red">${x.handlerName||"담당 미지정"}</b><br>${x.category} · ${x.place} · ${x.content}<div class="small">접수시간 ${time(x.createdAt)}</div></div><button class="btn" onclick="go('process')">조치</button></div>`).join("")||"<div class='small'>미조치 사항이 없습니다.</div>"}</div>`}
-function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:30 · 9시간</b></div><hr><button class="btn red" onclick="resetAll()">테스트 데이터 전체 초기화</button></div>`}
+function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><button class="btn red" onclick="resetAll()">테스트 데이터 전체 초기화</button></div>`}
 async function ensureMainEquipmentAssets(){return;}
 async function eamLoad(){window.__eamA=window.__eamA||[];window.__eamH=window.__eamH||[];window.__eamI=window.__eamI||[];if(!SUPA)return;try{const a=await SUPA.from("assets").select("*").order("name");const h=await SUPA.from("asset_history").select("*").order("event_date",{ascending:false});const i=await SUPA.from("inspections").select("*").order("inspection_date",{ascending:false});window.__eamA=a.data||[];window.__eamH=h.data||[];window.__eamI=i.data||[]}catch(e){console.warn("EAM 동기화 실패",e)}}
 function eamShowLocation(){
