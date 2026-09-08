@@ -1137,47 +1137,382 @@ function eamDashboardSummary(){
    <div class="small" style="margin-top:8px">※ EAM에 저장된 자산·작업 이력을 기준으로 월별 자동 집계합니다. 직원 작업실적은 EAM과 별도로 집계합니다.</div>
   </div>`;
 }
+const OPX_STAFF_DASHBOARD_CSS = `
+.opx-dash{font-family:inherit;color:#13243a;max-width:1500px;margin:0 auto;padding:8px 2px 28px}
+.opx-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:1.55fr .8fr;gap:18px;padding:28px 30px;border-radius:24px;background:linear-gradient(135deg,#06254a 0%,#07599d 55%,#0786b9 100%);color:#fff;box-shadow:0 18px 45px rgba(11,59,105,.20)}
+.opx-hero:before,.opx-hero:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.13);border-radius:50%;pointer-events:none}
+.opx-hero:before{width:430px;height:430px;right:-190px;top:-260px}
+.opx-hero:after{width:330px;height:330px;right:-130px;bottom:-250px}
+.opx-eyebrow{font-size:11px;letter-spacing:2px;font-weight:900;color:#8fd8ff}
+.opx-title{font-size:34px;font-weight:1000;letter-spacing:-1.5px;margin:7px 0}
+.opx-sub{font-size:14px;color:#d5ebff;line-height:1.65}
+.opx-hero-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}
+.opx-btn{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.10);color:#fff;border-radius:11px;padding:10px 15px;font-weight:900;cursor:pointer;backdrop-filter:blur(5px)}
+.opx-btn.primary{background:#fff;color:#0866b4;border-color:#fff}
+.opx-hero-side{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:9px}
+.opx-live{font-size:12px;font-weight:900;color:#8ff2c1}
+.opx-date{font-size:13px;color:#d9efff}
+.opx-quote{font-size:20px;line-height:1.35;font-weight:1000;text-align:right;max-width:290px;margin-top:5px}
+.opx-quote small{display:block;font-size:11px;color:#bfe4ff;font-weight:700;margin-top:7px}
+
+.opx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.opx-kpi{position:relative;overflow:hidden;background:#fff;border:1px solid #dce7f2;border-radius:18px;padding:18px 20px;box-shadow:0 8px 22px rgba(20,55,90,.08)}
+.opx-kpi:after{content:"";position:absolute;right:-24px;top:-30px;width:90px;height:90px;border-radius:50%;background:rgba(30,120,230,.07)}
+.opx-kpi.blue{border-top:5px solid #1976e8}.opx-kpi.green{border-top:5px solid #11a865}.opx-kpi.orange{border-top:5px solid #ff7a00}.opx-kpi.violet{border-top:5px solid #7448e8}
+.opx-kpi span{display:block;font-size:13px;font-weight:900;color:#66778d}
+.opx-kpi strong{display:block;font-size:34px;line-height:1.05;margin:8px 0 10px;letter-spacing:-1px}
+.opx-kpi strong small{font-size:14px;margin-left:3px}
+.opx-kpi em{font-style:normal;font-size:11px;color:#8493a5;font-weight:800}
+.opx-track{height:7px;background:#e8eef5;border-radius:99px;overflow:hidden;margin-bottom:7px}
+.opx-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#1682e9,#2cb7e9)}
+
+.opx-grid{display:grid;grid-template-columns:1.45fr .78fr;gap:12px;margin-top:12px}
+.opx-panel{background:#fff;border:1px solid #dce7f2;border-radius:18px;box-shadow:0 8px 22px rgba(20,55,90,.06);padding:18px}
+.opx-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid #edf1f6;padding-bottom:12px;margin-bottom:15px}
+.opx-head h3{font-size:19px;margin:0;font-weight:1000;letter-spacing:-.5px}
+.opx-head p{font-size:11px;color:#8492a3;margin:5px 0 0}
+.opx-chip{font-size:11px;font-weight:900;padding:6px 9px;border-radius:9px;background:#eef6ff;color:#1770c9;white-space:nowrap}
+
+.opx-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.opx-person{border:1px solid #e1e8f0;border-radius:15px;padding:15px;background:linear-gradient(180deg,#fff,#f8fbfe)}
+.opx-person-head{display:flex;align-items:center;justify-content:space-between}
+.opx-name{display:flex;align-items:center;gap:9px;font-size:20px;font-weight:1000}
+.opx-avatar{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:#e9f4ff;color:#1474cf;font-weight:1000}
+.opx-total{font-size:25px;font-weight:1000;color:#163e78}.opx-total small{font-size:11px;margin-left:2px}
+.opx-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.opx-mini{border-radius:10px;padding:9px 6px;text-align:center}
+.opx-mini b{display:block;font-size:20px}.opx-mini span{display:block;font-size:9px;font-weight:900;margin-top:2px}
+.opx-mini.blue{background:#edf5ff;color:#1168c2}.opx-mini.green{background:#ecfaf3;color:#07834c}.opx-mini.orange{background:#fff4e8;color:#e96900}
+.opx-person-foot{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px dashed #dbe3ec;font-size:10px;color:#738398;font-weight:800}
+
+.opx-rule{display:grid;gap:8px}
+.opx-rule-box{border-radius:14px;padding:13px 14px;border-left:5px solid}
+.opx-rule-box b{display:block;font-size:13px}.opx-rule-box strong{display:block;font-size:15px;margin:3px 0}.opx-rule-box span{font-size:10px;color:#66788d;line-height:1.5}
+.opx-rule-box.blue{background:#eff6ff;border-color:#1976e8}.opx-rule-box.green{background:#edfaf4;border-color:#0ca45f}.opx-rule-box.orange{background:#fff5e9;border-color:#ff7800}.opx-rule-box.purple{background:#f3efff;border-color:#7448e8}
+.opx-rule-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.opx-rule-title b{font-size:18px}.opx-rule-title span{font-size:10px;color:#728196}
+
+.opx-chart-panel{margin-top:12px}
+.opx-bars{height:210px;display:grid;grid-template-columns:repeat(12,1fr);gap:7px;align-items:end;padding:8px 4px 0;border-bottom:1px solid #dce5ee}
+.opx-month-col{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0}
+.opx-bar-stack{width:100%;max-width:48px;height:165px;display:flex;align-items:flex-end;justify-content:center;gap:2px}
+.opx-bar{width:30%;min-height:3px;border-radius:6px 6px 0 0}
+.opx-bar.blue{background:#2580e8}.opx-bar.green{background:#10a767}.opx-bar.orange{background:#ff7b0a}
+.opx-month-col label{font-size:10px;font-weight:900;color:#718095;margin-top:7px}
+.opx-month-col small{font-size:8px;color:#98a4b3;margin-top:2px}
+.opx-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:10px;font-weight:900;color:#65758a}
+.opx-legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px}.opx-legend .b{background:#2580e8}.opx-legend .g{background:#10a767}.opx-legend .o{background:#ff7b0a}
+
+.opx-table-panel{margin-top:12px}
+.opx-table-tools{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.opx-select,.opx-search{border:1px solid #d7e1ec;background:#fff;border-radius:9px;padding:8px 10px;font:inherit;font-size:11px}
+.opx-table-wrap{overflow:auto;border:1px solid #e1e8f0;border-radius:13px}
+.opx-table{width:100%;border-collapse:collapse;min-width:760px}
+.opx-table th{background:#f5f8fb;color:#5c6d82;font-size:10px;padding:10px 8px;text-align:center;border-bottom:1px solid #dde6ef}
+.opx-table td{padding:10px 8px;text-align:center;border-bottom:1px solid #edf1f5;font-size:11px}
+.opx-table tr:last-child td{border-bottom:0}
+.opx-table .nm{text-align:left;font-weight:1000;font-size:13px}
+.opx-table .b{color:#146fc9;font-weight:1000}.opx-table .g{color:#07884f;font-weight:1000}.opx-table .o{color:#ed6900;font-weight:1000}.opx-table .t{color:#5938d0;font-weight:1000;font-size:14px}
+.opx-progress{min-width:100px}.opx-progress-track{height:7px;background:#e8eef5;border-radius:99px;overflow:hidden}.opx-progress-track i{display:block;height:100%;background:linear-gradient(90deg,#1679e6,#52b9ee);border-radius:99px}
+.opx-progress small{font-size:9px;font-weight:900;color:#65758a}
+
+.opx-guide{display:grid;grid-template-columns:1fr 1.7fr;gap:12px;margin-top:12px}
+.opx-guide-quote{border-radius:18px;padding:20px;background:linear-gradient(135deg,#eaf5ff,#f6fbff);border:1px solid #cfe3f5}
+.opx-guide-quote b{font-size:19px;color:#0a66b3}.opx-guide-quote p{font-size:12px;line-height:1.7;color:#64768b;margin:7px 0 0}
+.opx-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.opx-step{border:1px solid #dce6ef;border-radius:15px;background:#fff;padding:14px}
+.opx-step-no{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#e9f4ff;color:#1673ca;font-weight:1000;margin-bottom:8px}
+.opx-step b{display:block;font-size:12px}.opx-step span{display:block;font-size:9px;color:#748397;line-height:1.5;margin-top:4px}
+
+.opx-note{margin-top:12px;padding:12px 15px;border-radius:12px;background:#f7f9fc;border:1px solid #e4eaf1;color:#68788c;font-size:10px;line-height:1.6}
+.opx-note b{color:#27415f}
+
+@media(max-width:1100px){
+ .opx-hero,.opx-grid,.opx-guide{grid-template-columns:1fr}
+ .opx-hero-side{align-items:flex-start}.opx-quote{text-align:left}
+ .opx-kpis{grid-template-columns:repeat(2,1fr)}
+ .opx-cards{grid-template-columns:1fr}
+ .opx-steps{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:650px){
+ .opx-dash{padding:2px}
+ .opx-title{font-size:27px}.opx-hero{padding:21px 18px;border-radius:18px}
+ .opx-kpis{grid-template-columns:1fr}
+ .opx-bars{gap:2px}.opx-bar-stack{max-width:30px}
+ .opx-panel{padding:13px;border-radius:15px}
+}
+`;
+
+(function(){
+  if(!document.getElementById("opxStaffDashboardStyle")){
+    const st=document.createElement("style");
+    st.id="opxStaffDashboardStyle";
+    st.textContent=OPX_STAFF_DASHBOARD_CSS;
+    document.head.appendChild(st);
+  }
+})()
+
 function dashboard(s){
- const all=Array.isArray(db.issues)?db.issues:[], ym=monthKey(), [cy,cm]=ym.split('-').map(Number);
- const cur=all.filter(x=>String(x.createdAt||'').slice(0,7)===ym);
- const received=cur.length, done=cur.filter(x=>x.status==='완료').length, doing=cur.filter(x=>x.status==='조치중').length;
- const wait=Math.max(0,received-done-doing), rate=received?Math.round(done/received*100):0;
- const self=cur.filter(x=>x.status==='완료'&&actionTypeFromIssue(x)==='자체조치').length;
- const external=cur.filter(x=>x.status==='완료'&&actionTypeFromIssue(x)==='외부용역').length;
- const unassigned=cur.filter(x=>!x.handlerId&&x.status!=='완료').length;
- const activeAssets=(window.__eamA||[]).filter(a=>String(a.status||'정상')!=='폐기').length;
- const categories=['시설','환경','안전','기타'];
- const catRows=categories.map(c=>({name:c,count:cur.filter(x=>(x.category||'기타')===c).length}));
- const maxCat=Math.max(1,...catRows.map(x=>x.count));
- const months=[]; const base=new Date(cy,cm-1,1);
- for(let i=5;i>=0;i--){const d=new Date(base.getFullYear(),base.getMonth()-i,1);const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;const q=all.filter(x=>String(x.createdAt||'').slice(0,7)===key);months.push({label:`${d.getMonth()+1}월`,received:q.length,done:q.filter(x=>x.status==='완료').length,self:q.filter(x=>x.status==='완료'&&actionTypeFromIssue(x)==='자체조치').length,external:q.filter(x=>x.status==='완료'&&actionTypeFromIssue(x)==='외부용역').length});}
- const maxM=Math.max(1,...months.map(m=>Math.max(m.received,m.done)));
- const years=[...new Set(all.map(x=>String(x.createdAt||'').slice(0,4)).filter(Boolean).concat([String(cy)]))].map(Number).sort((a,b)=>a-b).slice(-4);
- const yearRows=years.map(y=>{const q=all.filter(x=>String(x.createdAt||'').slice(0,4)===String(y));return{y,received:q.length,done:q.filter(x=>x.status==='완료').length,self:q.filter(x=>x.status==='완료'&&actionTypeFromIssue(x)==='자체조치').length,external:q.filter(x=>x.status==='완료'&&actionTypeFromIssue(x)==='외부용역').length};});
- const focus=catRows.slice().sort((a,b)=>b.count-a.count)[0]||{name:'-',count:0};
- return `<div class="wow-dash">
-  <section class="wow-hero">
-   <div class="wow-hero-main"><div class="wow-eyebrow">JANGGUNBONG SPORTS CENTER · OPERATION CONTROL</div><div class="wow-title">시설관리 운영관제</div><div class="wow-sub">${cy}년 ${cm}월 실제 접수·조치 실적을 한 화면에서 확인합니다.</div><div class="wow-hero-actions"><button class="wow-btn primary" onclick="go('process')">🛠 작업관리</button><button class="wow-btn" onclick="go('eam')">🏢 EAM 자산관리</button><button class="wow-btn" onclick="go('stats')">📊 직원실적</button></div></div>
-   <div class="wow-hero-side"><div class="wow-live">● 실시간 동기화</div><div class="wow-date">기준일 ${selectedDate}</div><div class="wow-ring"><div class="wow-ring-inner"><b>${rate}<small>%</small></b><span>월 완료율</span></div></div></div>
-  </section>
-  <section class="wow-kpis">
-   <div class="wow-kpi blue"><span>이번 달 접수</span><strong>${received}<small>건</small></strong><em>전체 접수</em></div>
-   <div class="wow-kpi green"><span>처리 완료</span><strong>${done}<small>건</small></strong><em>완료율 ${rate}%</em></div>
-   <div class="wow-kpi orange"><span>조치 진행</span><strong>${doing}<small>건</small></strong><em>현재 작업중</em></div>
-   <div class="wow-kpi red"><span>처리 대기</span><strong>${wait}<small>건</small></strong><em>담당 미지정 ${unassigned}건</em></div>
-   <div class="wow-kpi violet"><span>EAM 운영 자산</span><strong>${activeAssets}<small>건</small></strong><em>EAM 별도 관리</em></div>
-  </section>
-  <section class="wow-main-grid">
-   <div class="wow-panel wow-flow-panel"><div class="wow-head"><div><h3>작업 처리 흐름</h3><p>접수된 작업의 현재 위치</p></div><button class="wow-link" onclick="go('process')">작업관리 →</button></div><div class="wow-flow"><div class="wow-flow-step received"><i>01</i><span>접수</span><b>${received}</b><small>이번 달</small></div><div class="wow-arrow">→</div><div class="wow-flow-step doing"><i>02</i><span>조치중</span><b>${doing}</b><small>진행 중</small></div><div class="wow-arrow">→</div><div class="wow-flow-step done"><i>03</i><span>완료</span><b>${done}</b><small>처리 완료</small></div></div><div class="wow-progress"><div><span>월 완료율</span><b>${rate}%</b></div><div class="wow-progress-track"><i style="width:${Math.min(100,rate)}%"></i></div></div></div>
-   <div class="wow-panel wow-method-panel"><div class="wow-head"><div><h3>처리구분 실적</h3><p>완료된 작업 기준</p></div></div><div class="wow-methods"><div class="wow-method self"><span>자체조치</span><b>${self}<small>건</small></b><em>내부 인력</em></div><div class="wow-method ext"><span>외부용역</span><b>${external}<small>건</small></b><em>외부 업체</em></div></div><div class="wow-method-total">완료 ${done}건 중 자체 ${self}건 · 외부 ${external}건</div></div>
-  </section>
-  <section class="wow-main-grid lower">
-   <div class="wow-panel"><div class="wow-head"><div><h3>최근 6개월 처리 추이</h3><p>접수와 완료 건수를 비교</p></div><span class="wow-chip">월별</span></div><div class="wow-chart">${months.map(m=>`<div class="wow-month"><div class="wow-bars"><i style="height:${Math.max(4,Math.round(m.received/maxM*150))}px" title="접수 ${m.received}"></i><em style="height:${Math.max(4,Math.round(m.done/maxM*150))}px" title="완료 ${m.done}"></em></div><label>${m.label}</label><small>${m.received}/${m.done}</small></div>`).join('')}</div><div class="wow-legend"><span><i></i> 접수</span><span><b></b> 완료</span><small>숫자: 접수 / 완료</small></div></div>
-   <div class="wow-panel"><div class="wow-head"><div><h3>업무 분야 현황</h3><p>이번 달 접수 기준</p></div><span class="wow-chip">${focus.name} ${focus.count}건</span></div><div class="wow-cat-list">${catRows.map(r=>`<div class="wow-cat"><div><span>${r.name}</span><b>${r.count}건</b></div><div class="wow-cat-track"><i style="width:${Math.round(r.count/maxCat*100)}%"></i></div></div>`).join('')}</div></div>
-  </section>
-  <section class="wow-panel wow-year-panel"><div class="wow-head"><div><h3>연도별 유지보수 처리현황</h3><p>실제 누적 작업 데이터 기준</p></div><span class="wow-chip">최근 ${yearRows.length}개년</span></div><div class="wow-year-grid">${yearRows.map(r=>`<div class="wow-year-card"><div><b>${r.y}년</b><span>총 ${r.received}건 접수</span></div><strong>${r.done}<small>건 완료</small></strong><div class="wow-year-sub"><span>자체조치 <b>${r.self}</b></span><span>외부용역 <b>${r.external}</b></span></div></div>`).join('')}</div></section>
-  <section class="wow-footer"><div><b>운영 원칙</b><span>직원 QR 신고 → 작업관리에서 처리</span><span>EAM은 자산별 이력을 별도로 관리</span></div><div class="wow-footer-status">● 정상 운영</div></section>
- </div>`;
+  const ym=monthKey();
+  const year=Number(ym.slice(0,4));
+  const month=Number(ym.slice(5,7));
+
+  const md=workers.map(w=>({
+    ...w,
+    p:staffPerformance(w.id,ym)
+  }));
+
+  const ys=workers.map(w=>({
+    ...w,
+    p:staffYearPerformance(w.id,year)
+  }));
+
+  const sum=md.reduce((a,x)=>{
+    a.basic+=x.p.basic.complete;
+    a.auto+=x.p.auto.performance;
+    a.issue+=x.p.issue.total;
+    a.total+=x.p.total;
+    return a;
+  },{basic:0,auto:0,issue:0,total:0});
+
+  const target=Math.max(1,md.reduce((n,x)=>n+(x.p.basic.target||0),0));
+  const totalTarget=Math.max(1,target+10+20);
+  const rate=Math.min(100,Math.round(sum.total/totalTarget*100));
+
+  const monthly=Array.from({length:12},(_,i)=>{
+    const mo=year+"-"+String(i+1).padStart(2,"0");
+    const vals=workers.map(w=>staffPerformance(w.id,mo));
+    return {
+      m:i+1,
+      basic:vals.reduce((n,p)=>n+p.basic.complete,0),
+      auto:vals.reduce((n,p)=>n+p.auto.performance,0),
+      issue:vals.reduce((n,p)=>n+p.issue.total,0),
+      total:vals.reduce((n,p)=>n+p.total,0)
+    };
+  });
+
+  const maxMonth=Math.max(1,...monthly.map(x=>Math.max(x.basic,x.auto,x.issue,x.total)));
+
+  const cards=md.map(x=>{
+    const p=x.p;
+    const basicRate=p.basic.target?Math.min(100,Math.round(p.basic.complete/p.basic.target*100)):0;
+    return `
+      <article class="opx-person">
+        <div class="opx-person-head">
+          <div class="opx-name"><span class="opx-avatar">${x.name}</span>${x.name}</div>
+          <div class="opx-total">${p.total}<small>회</small></div>
+        </div>
+        <div class="opx-mini-grid">
+          <div class="opx-mini blue"><b>${p.basic.complete}</b><span>정규업무</span></div>
+          <div class="opx-mini green"><b>${p.auto.performance}</b><span>근무편성 인정</span></div>
+          <div class="opx-mini orange"><b>${p.issue.total}</b><span>업무지시</span></div>
+        </div>
+        <div class="opx-person-foot">
+          <span>기본업무 달성 ${basicRate}%</span>
+          <span>편성 ${p.auto.units}회</span>
+        </div>
+      </article>`;
+  }).join("");
+
+  const tableRows=md.map((x,i)=>{
+    const p=x.p;
+    const targetP=p.basic.target?Math.min(100,Math.round(p.basic.complete/p.basic.target*100)):0;
+    return `
+      <tr>
+        <td>${i+1}</td>
+        <td class="nm">${x.name}</td>
+        <td class="b">${p.basic.complete}</td>
+        <td class="g">${p.auto.performance}<small> (${p.auto.units}회)</small></td>
+        <td class="o">${p.issue.total}</td>
+        <td class="t">${p.total}</td>
+        <td>
+          <div class="opx-progress">
+            <div class="opx-progress-track"><i style="width:${targetP}%"></i></div>
+            <small>${targetP}%</small>
+          </div>
+        </td>
+      </tr>`;
+  }).join("");
+
+  const bars=monthly.map(x=>`
+    <div class="opx-month-col">
+      <div class="opx-bar-stack">
+        <i class="opx-bar blue" style="height:${Math.max(3,Math.round(x.basic/maxMonth*150))}px" title="정규업무 ${x.basic}"></i>
+        <i class="opx-bar green" style="height:${Math.max(3,Math.round(x.auto/maxMonth*150))}px" title="근무편성 인정 ${x.auto}"></i>
+        <i class="opx-bar orange" style="height:${Math.max(3,Math.round(x.issue/maxMonth*150))}px" title="업무지시 ${x.issue}"></i>
+      </div>
+      <label>${x.m}월</label>
+      <small>${x.total}회</small>
+    </div>`).join("");
+
+  return `
+  <div class="opx-dash">
+
+    <section class="opx-hero">
+      <div>
+        <div class="opx-eyebrow">JANGGUNBONG SPORTS CENTER · STAFF OPERATION</div>
+        <div class="opx-title">직원 업무실적 운영 대시보드</div>
+        <div class="opx-sub">
+          실제 수행한 정규업무와 업무지시 실적, 근무편성에 따른 인정실적을
+          <b>서로 분리하여 확인하고 최종 종합 실적만 자동 합산</b>합니다.
+        </div>
+        <div class="opx-hero-actions">
+          <button class="opx-btn primary" onclick="go('stats')">📊 직원실적 상세</button>
+          <button class="opx-btn" onclick="go('schedule')">📅 근무편성 확인</button>
+          <button class="opx-btn" onclick="go('basic')">🧹 기본업무 확인</button>
+        </div>
+      </div>
+      <div class="opx-hero-side">
+        <div class="opx-live">● 실시간 직원실적 연동</div>
+        <div class="opx-date">기준월 ${year}년 ${month}월</div>
+        <div class="opx-quote">“공정하게 평가하고,<br>투명하게 관리합니다.”<small>장군봉체육관 직원 업무실적 관리 원칙</small></div>
+      </div>
+    </section>
+
+    <section class="opx-kpis">
+      <div class="opx-kpi blue">
+        <span>정규업무 실적</span>
+        <strong>${sum.basic}<small>건</small></strong>
+        <div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.basic/target*100))}%"></i></div>
+        <em>기본업무 10개 완료 = 1실적</em>
+      </div>
+      <div class="opx-kpi green">
+        <span>근무편성 인정실적</span>
+        <strong>${sum.auto}<small>건</small></strong>
+        <div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.auto/10*100))}%"></i></div>
+        <em>인정 ${md.reduce((n,x)=>n+x.p.auto.units,0)}회 · 10회 단위 환산</em>
+      </div>
+      <div class="opx-kpi orange">
+        <span>업무지시 수행실적</span>
+        <strong>${sum.issue}<small>건</small></strong>
+        <div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.issue/20*100))}%"></i></div>
+        <em>업무지시 수행 건별 즉시 반영</em>
+      </div>
+      <div class="opx-kpi violet">
+        <span>종합 업무실적</span>
+        <strong>${sum.total}<small>건</small></strong>
+        <div class="opx-track"><i style="width:${rate}%"></i></div>
+        <em>세 가지 실적 자동 합산</em>
+      </div>
+    </section>
+
+    <section class="opx-grid">
+      <div class="opx-panel">
+        <div class="opx-head">
+          <div>
+            <h3>직원별 실적 현황</h3>
+            <p>${year}년 ${month}월 · 직원별 세부 실적을 한눈에 비교합니다.</p>
+          </div>
+          <span class="opx-chip">${workers.length}명 운영</span>
+        </div>
+        <div class="opx-cards">${cards}</div>
+      </div>
+
+      <div class="opx-panel">
+        <div class="opx-rule-title">
+          <b>📘 실적 산정 기준</b>
+          <span>관리자 안내서</span>
+        </div>
+        <div class="opx-rule">
+          <div class="opx-rule-box blue">
+            <b>① 정규업무 실적</b>
+            <strong>기본업무 10개 완료 = 1실적</strong>
+            <span>실제 근무일에 수행하는 기본업무를 기준으로 합니다. 기존 기본업무 산정방식은 변경하지 않습니다.</span>
+          </div>
+          <div class="opx-rule-box green">
+            <b>② 근무편성 인정실적</b>
+            <strong>쉬는 날 10회 = 1실적</strong>
+            <span>휴무·주휴일·연가·공가·대휴 등 근무편성상 인정되는 일수를 자동 집계합니다.</span>
+          </div>
+          <div class="opx-rule-box orange">
+            <b>③ 업무지시 수행실적</b>
+            <strong>업무지시 건별 반영</strong>
+            <span>근무일·휴무일 여부와 관계없이 실제 지시사항을 수행한 직원에게 건별 반영합니다.</span>
+          </div>
+          <div class="opx-rule-box purple">
+            <b>④ 종합 업무실적</b>
+            <strong>정규업무 + 근무편성 인정 + 업무지시</strong>
+            <span>서로 다른 세 가지 실적을 분리 관리한 뒤 최종 합계에서만 합산합니다.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="opx-panel opx-chart-panel">
+      <div class="opx-head">
+        <div>
+          <h3>${year}년 월별 직원실적 추이</h3>
+          <p>월별 정규업무 · 근무편성 인정 · 업무지시 수행 실적</p>
+        </div>
+        <span class="opx-chip">1월 — 12월</span>
+      </div>
+      <div class="opx-bars">${bars}</div>
+      <div class="opx-legend">
+        <span><i class="b"></i>정규업무</span>
+        <span><i class="g"></i>근무편성 인정</span>
+        <span><i class="o"></i>업무지시</span>
+      </div>
+    </section>
+
+    <section class="opx-panel opx-table-panel">
+      <div class="opx-head">
+        <div>
+          <h3>직원별 상세 실적</h3>
+          <p>평가 기준을 분리하여 실제 업무수행과 자동 인정실적을 명확하게 구분합니다.</p>
+        </div>
+        <div class="opx-table-tools">
+          <select class="opx-select" onchange="setStaffPerfMonth(this.value)">
+            ${[...Array(12)].map((_,i)=>{
+              const v=year+"-"+String(i+1).padStart(2,"0");
+              return `<option value="${v}" ${v===ym?"selected":""}>${i+1}월</option>`;
+            }).join("")}
+          </select>
+          <button class="btn red" onclick="resetEmployeePerformance()">↻ 실적 리셋</button>
+        </div>
+      </div>
+      <div class="opx-table-wrap">
+        <table class="opx-table">
+          <thead>
+            <tr>
+              <th>순번</th>
+              <th>직원명</th>
+              <th>정규업무<br>실적</th>
+              <th>근무편성 인정<br>실적</th>
+              <th>업무지시<br>수행</th>
+              <th>종합<br>실적</th>
+              <th>기본업무<br>달성률</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="opx-guide">
+      <div class="opx-guide-quote">
+        <b>🎯 직원 업무실적 운영 원칙</b>
+        <p>
+          “누가 더 많이 쉬었는가”가 아니라<br>
+          <b>실제 근무한 업무는 실제 실적으로, 쉬는 날은 근무편성 기준으로,
+          지시받은 업무는 수행 건수대로</b> 투명하게 반영합니다.
+        </p>
+      </div>
+      <div class="opx-steps">
+        <div class="opx-step"><div class="opx-step-no">1</div><b>기본업무 수행</b><span>근무일 10개 업무를 모두 완료하면 정규업무 1실적</span></div>
+        <div class="opx-step"><div class="opx-step-no">2</div><b>근무편성 자동인정</b><span>휴무·주휴일·연가·공가·대휴 등을 자동 집계</span></div>
+        <div class="opx-step"><div class="opx-step-no">3</div><b>업무지시 수행</b><span>QR·지시사항을 실제 처리한 직원에게 건별 반영</span></div>
+        <div class="opx-step"><div class="opx-step-no">4</div><b>종합 실적 산출</b><span>세 가지 실적을 마지막 단계에서 자동 합산</span></div>
+      </div>
+    </section>
+
+    <div class="opx-note">
+      <b>관리자 확인사항</b> · 기존 기본업무 방식은 변경하지 않습니다.
+      · 근무편성 인정실적은 10회 단위로 1실적입니다.
+      · 업무지시 수행실적은 근무일 여부와 관계없이 수행 건별 반영됩니다.
+      
+    </div>
+
+  </div>`;
 }
 function dashboard2(){
  const A=Array.isArray(window.__eamA)?window.__eamA:[], H=Array.isArray(window.__eamH)?window.__eamH:[],
