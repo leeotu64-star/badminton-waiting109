@@ -1391,8 +1391,10 @@ function staffIssueStats(wid,month){
 function staffAutoUnits(wid,month){
   let units=0,by={휴무:0,주휴일:0,연가:0,공가:0,대체휴무:0,추석:0};
   const y=Number(month.slice(0,4)),m=Number(month.slice(5,7)),days=new Date(y,m,0).getDate();
-  const limit=month===monthKey()?Number(selectedDate.slice(8,10)):days;
-  for(let d=1;d<=Math.min(days,limit);d++){
+  // 근무편성 인정실적은 당월 전체 근무편성을 기준으로 자동 산정한다.
+  // 오늘 날짜 이후의 예정된 휴무·주휴일·연가·공가·대휴도 즉시 반영한다.
+  const limit=days;
+  for(let d=1;d<=limit;d++){
     const date=month+'-'+String(d).padStart(2,'0');
     const row=workersForDate(date).find(x=>x.id===wid), st=String(row?.status||'');
     if(!staffAutoStatus(st))continue;
