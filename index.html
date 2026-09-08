@@ -1186,216 +1186,166 @@ function dashboard2(){
        rawAssets=(typeof window.eamSourceAssets==='function'?window.eamSourceAssets():A),
        assets=rawAssets.filter(a=>String(a.status||'정상')!=='폐기'),
        V=s=>String(s??'').trim(),
-       esc=s=>typeof xEsc==='function'?xEsc(s):String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+       E=s=>typeof xEsc==='function'?xEsc(s):String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
  const hist=H.filter(h=>!['자산등록','자산정보수정','폐기'].includes(V(h.event_type)));
  const parseMaint=h=>{const d=V(h.description);if(!d.startsWith('MAINT::'))return {};try{return JSON.parse(d.slice(7))||{}}catch(e){return {}}};
  const info=h=>Object.assign({},parseMaint(h),h);
+ const method=h=>{const p=info(h),t=[p.maintenanceMethod,p.method,p.정비방식,h.action_type,h.event_type,h.description].map(V).join(' ');if(/외주정비|외부정비|외부수리|외부용역|정비업체|업체/.test(t))return'외주정비';if(/자체정비|자체조치|내부정비|내부수리/.test(t))return'자체정비';return'미분류'};
+ const maintType=h=>{const p=info(h),t=[p.maintenanceType,p.type,h.action_type,h.event_type,h.description,p.issue,p.cause].map(V).join(' ');if(/예방정비/.test(t))return'예방정비';if(/계획정비/.test(t))return'계획정비';if(/고장정비|고장|이상|불량|작동불량/.test(t))return'고장정비';return'기타'};
+ const maintCat=h=>{const p=info(h),t=[p.maintenanceCategory,p.category,p.type,h.action_type,h.event_type,h.description,p.action,p.part].map(V).join(' ');if(/설비교체|자산교체/.test(t))return'설비교체';if(/부품교체|소모품교체/.test(t))return'부품교체';if(/점검/.test(t))return'점검';if(/보수|수리/.test(t))return'보수';return'기타'};
 
- const method=h=>{
-   const p=info(h),t=[p.maintenanceMethod,p.method,p.정비방식,h.action_type,h.event_type,h.description].map(V).join(' ');
-   if(/외주정비|외부정비|외부수리|외부용역|정비업체|업체/.test(t))return'외주정비';
-   if(/자체정비|자체조치|내부정비|내부수리/.test(t))return'자체정비';
-   return'미분류';
- };
- const maintType=h=>{
-   const p=info(h),t=[p.maintenanceType,p.type,h.action_type,h.event_type,h.description,p.issue,p.cause].map(V).join(' ');
-   if(/예방정비/.test(t))return'예방정비';
-   if(/계획정비/.test(t))return'계획정비';
-   if(/고장정비|고장|이상|불량|작동불량/.test(t))return'고장정비';
-   return'기타';
- };
- const maintCat=h=>{
-   const p=info(h),t=[p.maintenanceCategory,p.category,p.type,h.action_type,h.event_type,h.description,p.action,p.part].map(V).join(' ');
-   if(/설비교체|자산교체/.test(t))return'설비교체';
-   if(/부품교체|소모품교체/.test(t))return'부품교체';
-   if(/점검/.test(t))return'점검';
-   if(/보수|수리/.test(t))return'보수';
-   return'기타';
- };
-
- const totalCost=hist.reduce((n,h)=>n+(Number(h.cost)||0),0);
- const normal=assets.filter(a=>V(a.status||'정상')==='정상').length;
- const replace=assets.filter(a=>V(a.status)==='교체 예정').length;
- const discarded=rawAssets.filter(a=>V(a.status)==='폐기').length;
- const attention=replace;
- const acquisition={};
- assets.forEach(a=>{const k=V(a.acquisitionType||'기존 자산')||'기존 자산';acquisition[k]=(acquisition[k]||0)+1});
- const categories={};
- assets.forEach(a=>{const k=V(a.category||a.type||'기타설비')||'기타설비';categories[k]=(categories[k]||0)+1});
- const statusMap={'정상':normal,'교체 예정':replace,'폐기':discarded};
+ const today=new Date();today.setHours(0,0,0,0);
+ const isoToday=today.toISOString().slice(0,10);
+ const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+ const daysBetween=(a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
+ const assetById=new Map();assets.forEach(a=>{assetById.set(V(a.id),a);if(a.asset_code)assetById.set('code:'+V(a.asset_code),a)});
+ const getAsset=h=>assetById.get(V(h.asset_id))||assetById.get('code:'+V(h.asset_code))||null;
+ const assetLabel=a=>V(a?.name||a?.asset_name||a?.model||a?.asset_code||'자산');
 
  const years=[...new Set(hist.map(h=>V(h.event_date).slice(0,4)).filter(Boolean))].map(Number).filter(Boolean).sort((a,b)=>a-b);
- const now=new Date(),currentYear=now.getFullYear();
+ const currentYear=today.getFullYear();
  const selectedYear=Number(localStorage.getItem('JGB_EAM_DASH_YEAR'))||currentYear;
  const year=years.includes(selectedYear)?selectedYear:(years.length?years[years.length-1]:currentYear);
  const qYear=hist.filter(h=>V(h.event_date).slice(0,4)===String(year));
  const yearCost=qYear.reduce((n,h)=>n+(Number(h.cost)||0),0);
- const yearSelf=qYear.filter(h=>method(h)==='자체정비').length;
- const yearOut=qYear.filter(h=>method(h)==='외주정비').length;
- const yearUnclassified=qYear.filter(h=>method(h)==='미분류').length;
- const failureCount=qYear.filter(h=>maintType(h)==='고장정비').length;
- const preventiveCount=qYear.filter(h=>maintType(h)==='예방정비').length;
- const avgCost=qYear.length?Math.round(yearCost/qYear.length):0;
- const failureRate=qYear.length?Math.round(failureCount/qYear.length*100):0;
- const outsourceRate=qYear.length?Math.round(yearOut/qYear.length*100):0;
+ const totalCost=hist.reduce((n,h)=>n+(Number(h.cost)||0),0);
+ const self=qYear.filter(h=>method(h)==='자체정비').length;
+ const out=qYear.filter(h=>method(h)==='외주정비').length;
+ const unknown=qYear.filter(h=>method(h)==='미분류').length;
+ const failure=qYear.filter(h=>maintType(h)==='고장정비').length;
+ const preventive=qYear.filter(h=>maintType(h)==='예방정비').length;
+ const planned=qYear.filter(h=>maintType(h)==='계획정비').length;
+ const repair=qYear.filter(h=>maintCat(h)==='보수').length;
+ const parts=qYear.filter(h=>maintCat(h)==='부품교체').length;
+ const equip=qYear.filter(h=>maintCat(h)==='설비교체').length;
+ const inspection=qYear.filter(h=>maintCat(h)==='점검').length;
 
- const months=Array.from({length:12},(_,i)=>{
-   const key=String(year)+'-'+String(i+1).padStart(2,'0');
-   const q=qYear.filter(h=>V(h.event_date).slice(0,7)===key);
-   return {m:i+1,total:q.length,self:q.filter(h=>method(h)==='자체정비').length,out:q.filter(h=>method(h)==='외주정비').length,cost:q.reduce((n,h)=>n+(Number(h.cost)||0),0)};
- });
+ const normal=assets.filter(a=>V(a.status||'정상')==='정상').length;
+ const replace=assets.filter(a=>V(a.status)==='교체 예정').length;
+ const discarded=rawAssets.filter(a=>V(a.status)==='폐기').length;
+
+ const nextDates=hist.map(h=>{const p=info(h);return V(p.nextDate||p.nextInspectionDate||p.next_inspection_date||h.next_inspection_date||'')}).filter(Boolean);
+ const overdue=nextDates.filter(d=>d<isoToday).length;
+ const due30=nextDates.filter(d=>d>=isoToday&&d<=addDays(today,30).toISOString().slice(0,10)).length;
+ const lifeRows=assets.map(a=>{const install=V(a.installDate||a.date),life=Number.parseFloat(String(a.life||'').replace(/[^0-9.]/g,''));if(!install||!life)return null;const age=(today-new Date(install))/31557600000;return {a,ratio:age/life,age,life}}).filter(Boolean);
+ const lifeOver=lifeRows.filter(x=>x.ratio>=1).length;
+ const lifeNear=lifeRows.filter(x=>x.ratio>=.8&&x.ratio<1).length;
+
+ const maintenanceDuration=qYear.map(h=>{const p=info(h),s=V(p.startDate),e=V(p.endDate);if(!s||!e)return null;const d=daysBetween(s,e);return d>=0?d:null}).filter(x=>x!==null);
+ const avgDuration=maintenanceDuration.length?(maintenanceDuration.reduce((a,b)=>a+b,0)/maintenanceDuration.length).toFixed(1):'0.0';
+
+ const months=Array.from({length:12},(_,i)=>{const key=String(year)+'-'+String(i+1).padStart(2,'0'),q=qYear.filter(h=>V(h.event_date).slice(0,7)===key);return {m:i+1,total:q.length,self:q.filter(h=>method(h)==='자체정비').length,out:q.filter(h=>method(h)==='외주정비').length,cost:q.reduce((n,h)=>n+(Number(h.cost)||0),0)}});
  const maxMonth=Math.max(1,...months.map(m=>m.total));
+ const maxCost=Math.max(1,...months.map(m=>m.cost));
 
- const typeNames=['예방정비','고장정비','계획정비','기타'];
- const typeRows=typeNames.map(n=>({name:n,count:qYear.filter(h=>maintType(h)===n).length,cost:qYear.filter(h=>maintType(h)===n).reduce((s,h)=>s+(Number(h.cost)||0),0)}));
- const catNames=['점검','보수','부품교체','설비교체','기타'];
- const catRows=catNames.map(n=>({name:n,count:qYear.filter(h=>maintCat(h)===n).length,cost:qYear.filter(h=>maintCat(h)===n).reduce((s,h)=>s+(Number(h.cost)||0),0)}));
-
- const assetById=new Map();
- assets.forEach(a=>{assetById.set(V(a.id),a);if(a.asset_code)assetById.set('code:'+V(a.asset_code),a)});
- const getAsset=h=>assetById.get(V(h.asset_id))||assetById.get('code:'+V(h.asset_code))||null;
- const assetLabel=a=>V(a?.name||a?.asset_name||a?.model||a?.asset_code||'자산');
-
- const aggregate=(rows)=>{
-   const map={};
-   rows.forEach(h=>{
-     const a=getAsset(h); if(!a)return;
-     const k=V(a.id||a.asset_code),o=map[k]||{asset:a,count:0,cost:0};
-     o.count++;o.cost+=Number(h.cost)||0;map[k]=o;
-   });
-   return Object.values(map);
- };
+ const aggregate=rows=>{const map={};rows.forEach(h=>{const a=getAsset(h);if(!a)return;const k=V(a.id||a.asset_code),o=map[k]||{asset:a,count:0,cost:0};o.count++;o.cost+=Number(h.cost)||0;map[k]=o});return Object.values(map)};
  const failureTop=aggregate(qYear.filter(h=>maintType(h)==='고장정비')).sort((a,b)=>b.count-a.count||b.cost-a.cost).slice(0,5);
  const burdenTop=aggregate(qYear).sort((a,b)=>b.count-a.count||b.cost-a.cost).slice(0,5);
  const costTop=aggregate(qYear).sort((a,b)=>b.cost-a.cost||b.count-a.count).slice(0,5);
+ const costTopShare=yearCost&&costTop.length?Math.round(costTop.reduce((s,x)=>s+x.cost,0)/yearCost*100):0;
 
- const lifecycle=assets.map(a=>{
-   const date=V(a.installDate||a.date),life=Number.parseFloat(String(a.life||'').replace(/[^0-9.]/g,''));
-   if(!date||!life)return null;
-   const age=(Date.now()-new Date(date).getTime())/31557600000;
-   return {a,ratio:age/life};
- }).filter(Boolean);
- const lifeCounts={normal:0,near:0,over:0};
- lifecycle.forEach(x=>{if(x.ratio>=1)lifeCounts.over++;else if(x.ratio>=.8)lifeCounts.near++;else lifeCounts.normal++});
-
- const yearRows=years.slice(-5).map(y=>{
-   const q=hist.filter(h=>V(h.event_date).slice(0,4)===String(y));
-   return {y,total:q.length,cost:q.reduce((n,h)=>n+(Number(h.cost)||0),0),self:q.filter(h=>method(h)==='자체정비').length,out:q.filter(h=>method(h)==='외주정비').length};
- });
-
- const list=(obj,limit=5)=>Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,limit);
- const renderRank=(arr,cost=false)=>arr.length?arr.map((x,i)=>`<div class="eam-dx-rank"><b>${String(i+1).padStart(2,'0')}</b><span>${esc(assetLabel(x.asset))}<small>${esc(x.asset.asset_code||'')}</small></span><strong>${cost?x.cost.toLocaleString():x.count}<small>${cost?'원':'건'}</small></strong></div>`).join(''):'<div class="eam-xempty">해당 연도 유지관리 이력이 없습니다.</div>';
-
- const attentionAssets=assets.filter(a=>V(a.status)==='교체 예정');
- const attentionList=attentionAssets.slice(0,6);
- const statusRows=[
-   {name:'정상',count:normal,cls:'ok'},
-   {name:'교체 예정',count:replace,cls:'warn'},
-   {name:'폐기',count:discarded,cls:'off'}
+ const statusTotal=Math.max(1,assets.length+discarded);
+ const health=Math.max(0,Math.min(100,Math.round(100-(replace/statusTotal)*30-(overdue/Math.max(1,nextDates.length))*25-(failure/Math.max(1,qYear.length))*20-(lifeOver/Math.max(1,lifeRows.length))*25)));
+ const healthLabel=health>=90?'안정':health>=75?'양호':health>=60?'주의':'집중관리';
+ const healthDeg=Math.round(health*3.6);
+ const typeRows=[['예방정비',preventive],['고장정비',failure],['계획정비',planned],['기타',Math.max(0,qYear.length-preventive-failure-planned)]];
+ const catRows=[['점검',inspection],['보수',repair],['부품교체',parts],['설비교체',equip],['기타',Math.max(0,qYear.length-inspection-repair-parts-equip)]];
+ const pct=(n,d)=>d?Math.round(n/d*100):0;
+ const rankHtml=(arr,mode)=>arr.length?arr.map((x,i)=>{const value=mode==='cost'?x.cost.toLocaleString()+'원':x.count+'건';const share=mode==='cost'&&yearCost?Math.round(x.cost/yearCost*100):pct(x.count,Math.max(1,qYear.length));return `<div class="eam-v3-rank"><b>${String(i+1).padStart(2,'0')}</b><div class="eam-v3-rank-name"><strong>${E(assetLabel(x.asset))}</strong><small>${E(x.asset.asset_code||'')} · ${share}%</small><i><em style="width:${Math.max(5,Math.min(100,share))}%"></em></i></div><span>${value}</span></div>`}).join(''):'<div class="eam-v3-empty">해당 연도 데이터가 없습니다.</div>';
+ const actionItems=[
+   {label:'교체 예정',n:replace,sub:'자산상태 기준',cls:'danger',icon:'↻'},
+   {label:'점검 기한 경과',n:overdue,sub:'차기 점검일 기준',cls:'danger',icon:'!' },
+   {label:'30일 내 점검',n:due30,sub:'선제 점검 대상',cls:'warn',icon:'◷'},
+   {label:'반복 고장',n:failure,sub:`${year}년 고장정비`,cls:'warn',icon:'⚠'}
  ];
- const actionSummary=[
-   {title:'교체 검토',value:replace,sub:'자산상태 기준',cls:'warn'},
-   {title:'내용연수 초과',value:lifeCounts.over,sub:'설치일·내용연수 기준',cls:'danger'},
-   {title:'고장정비',value:failureCount,sub:`${year}년`,cls:'danger'},
-   {title:'미분류 정비',value:yearUnclassified,sub:'정비방식 확인 필요',cls:'info'}
- ];
- const bar=(value,max,cls='')=>`<div class="eam-dx-bar"><i class="${cls}" style="width:${Math.max(0,Math.min(100,(value/max)*100))}%"></i></div>`;
 
- return `<div class="eam-xdash eam-controltower">
-  <section class="eam-xhero eam-controlhero">
-   <div>
-    <div class="eam-xeyebrow">EAM · FACILITY ASSET CONTROL TOWER</div>
-    <h1>EAM 시설·자산 통합 현황</h1>
-    <p>자산 상태와 유지관리 실적을 한 화면에서 판단하고, 교체·고장·비용이 집중되는 자산을 바로 확인합니다.</p>
+ return `<div class="eam-v3">
+  <section class="eam-v3-hero">
+   <div class="eam-v3-hero-copy">
+    <div class="eam-v3-eyebrow">JANGGUNBONG SPORTS CENTER · EAM CONTROL CENTER</div>
+    <h1>자산 운영을 <strong>한눈에 판단</strong>하는 EAM 현황</h1>
+    <p>자산 건강 · 정비실적 · 고장위험 · 점검기한 · 비용집중도를 하나의 관제 화면으로 통합했습니다.</p>
+    <div class="eam-v3-hero-tags"><span>● LIVE DATA</span><span>${assets.length}개 운영자산</span><span>${hist.length}건 누적이력</span></div>
    </div>
-   <div class="eam-xhero-right"><span>● 실시간 DB</span><button onclick="go('eam')">자산 EAM 관리 →</button></div>
+   <div class="eam-v3-health">
+    <div class="eam-v3-ring" style="--health:${healthDeg}deg"><div><b>${health}</b><small>/100</small><em>${healthLabel}</em></div></div>
+    <span>자산 관리지수</span><small>상태·점검·고장·내용연수 종합</small>
+   </div>
   </section>
 
-  <section class="eam-dx-yearbar">
-   <div><b>조회연도</b><small>선택한 연도의 1~12월 유지관리 실적을 조회합니다.</small></div>
+  <section class="eam-v3-toolbar">
+   <div><b>조회연도</b><span>선택 연도 1~12월 유지관리 실적</span></div>
    <select onchange="localStorage.setItem('JGB_EAM_DASH_YEAR',this.value);render()">${[...new Set([...years,currentYear])].sort((a,b)=>b-a).map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}년</option>`).join('')}</select>
   </section>
 
-  <section class="eam-xkpis eam-control-kpis">
-   <div class="eam-xkpi blue"><small>운영 자산</small><b>${assets.length}</b><span>폐기 제외</span></div>
-   <div class="eam-xkpi green"><small>정상 자산</small><b>${normal}</b><span>현재 정상</span></div>
-   <div class="eam-xkpi red"><small>조치 필요</small><b>${attention}</b><span>교체 예정</span></div>
-   <div class="eam-xkpi purple"><small>${year}년 정비건수</small><b>${qYear.length}</b><span>자체 ${yearSelf} · 외주 ${yearOut}</span></div>
-   <div class="eam-xkpi orange"><small>${year}년 정비비용</small><b>${yearCost.toLocaleString()}</b><span>원 · 건당 ${avgCost.toLocaleString()}원</span></div>
-   <div class="eam-xkpi dark"><small>누적 정비비용</small><b>${totalCost.toLocaleString()}</b><span>원</span></div>
+  <section class="eam-v3-kpis">
+   <div class="eam-v3-kpi blue"><small>운영 자산</small><b>${assets.length}<i>건</i></b><span>폐기 ${discarded}건 제외</span></div>
+   <div class="eam-v3-kpi green"><small>정상 자산</small><b>${normal}<i>건</i></b><span>정상 운영 ${pct(normal,assets.length)}%</span></div>
+   <div class="eam-v3-kpi red"><small>조치 필요</small><b>${replace+overdue}<i>건</i></b><span>교체 ${replace} · 기한경과 ${overdue}</span></div>
+   <div class="eam-v3-kpi violet"><small>${year}년 정비</small><b>${qYear.length}<i>건</i></b><span>자체 ${self} · 외주 ${out}</span></div>
+   <div class="eam-v3-kpi orange"><small>${year}년 정비비용</small><b>${yearCost.toLocaleString()}<i>원</i></b><span>건당 ${qYear.length?Math.round(yearCost/qYear.length).toLocaleString():0}원</span></div>
+   <div class="eam-v3-kpi dark"><small>평균 정비기간</small><b>${avgDuration}<i>일</i></b><span>시작일 → 완료일</span></div>
   </section>
 
-  <section class="eam-control-alerts">
-   <div class="eam-xpanel eam-alert-panel">
-    <div class="eam-xhead"><div><strong>⚠ EAM 조치 우선순위</strong><small>지금 확인해야 할 관리 신호</small></div><em>ACTION CENTER</em></div>
-    <div class="eam-alert-grid">${actionSummary.map(x=>`<div class="eam-alert-card ${x.cls}"><span>${x.title}</span><b>${x.value}</b><small>${x.sub}</small></div>`).join('')}</div>
+  <section class="eam-v3-grid main">
+   <div class="eam-v3-panel action">
+    <div class="eam-v3-head"><div><b>관리자 ACTION CENTER</b><small>지금 확인해야 할 자산 관리 신호</small></div><em>PRIORITY</em></div>
+    <div class="eam-v3-actions">${actionItems.map(x=>`<div class="eam-v3-action ${x.cls}"><i>${x.icon}</i><div><span>${x.label}</span><b>${x.n}<small>건</small></b><em>${x.sub}</em></div></div>`).join('')}</div>
+    <div class="eam-v3-action-foot"><b>관리 포인트</b><span>${replace?'교체 예정 자산을 우선 검토하세요.':'현재 교체 예정 자산 없음'}</span><span>${overdue?'점검 기한 경과 자산을 즉시 확인하세요.':'점검 기한 경과 없음'}</span></div>
    </div>
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>자산 상태</strong><small>등록 자산의 현재 운영 상태</small></div><em>ASSET STATUS</em></div>
-    <div class="eam-status-track">${statusRows.map(r=>`<div><span><i class="${r.cls}"></i>${r.name}</span><b>${r.count}건</b>${bar(r.count,Math.max(1,assets.length+discarded),r.cls)}</div>`).join('')}</div>
-   </div>
-  </section>
-
-  <section class="eam-xgrid2">
-   <div class="eam-xpanel eam-month-panel">
-    <div class="eam-xhead"><div><strong>${year}년 월별 유지관리 실적</strong><small>1월부터 12월까지 전체 월을 표시합니다.</small></div><em>JAN–DEC</em></div>
-    <div class="eam-dx-month-table"><div class="eam-dx-month-head"><span>월</span><span>전체</span><span>자체정비</span><span>외주정비</span><span>정비비용</span></div>${months.map(m=>`<div class="eam-dx-month-row"><b>${m.m}월</b><span>${m.total}건</span><span>${m.self}건</span><span>${m.out}건</span><strong>${m.cost.toLocaleString()}원</strong></div>`).join('')}</div>
-   </div>
-   <div class="eam-xpanel eam-method-panel">
-    <div class="eam-xhead"><div><strong>정비방식 · 정비유형</strong><small>${year}년 유지관리 처리 구조</small></div><em>MAINTENANCE MIX</em></div>
-    <div class="eam-mix-main">
-      <div class="eam-mix-box"><span>자체정비</span><b>${yearSelf}</b><small>건 · ${qYear.length?Math.round(yearSelf/qYear.length*100):0}%</small></div>
-      <div class="eam-mix-box"><span>외주정비</span><b>${yearOut}</b><small>건 · ${outsourceRate}%</small></div>
-      <div class="eam-mix-box"><span>고장정비</span><b>${failureCount}</b><small>건 · ${failureRate}%</small></div>
-      <div class="eam-mix-box"><span>예방정비</span><b>${preventiveCount}</b><small>건 · ${qYear.length?Math.round(preventiveCount/qYear.length*100):0}%</small></div>
+   <div class="eam-v3-panel status">
+    <div class="eam-v3-head"><div><b>ASSET HEALTH</b><small>현재 등록 자산 상태</small></div><em>STATUS</em></div>
+    <div class="eam-v3-status-big"><strong>${health}</strong><span>관리지수</span><b>${healthLabel}</b></div>
+    <div class="eam-v3-status-bars">
+      <div><span>정상</span><b>${normal}</b><i><em style="width:${pct(normal,statusTotal)}%"></em></i></div>
+      <div><span>교체 예정</span><b>${replace}</b><i><em class="warn" style="width:${pct(replace,statusTotal)}%"></em></i></div>
+      <div><span>폐기</span><b>${discarded}</b><i><em class="off" style="width:${pct(discarded,statusTotal)}%"></em></i></div>
     </div>
-    <div class="eam-mix-note">${yearUnclassified?`미분류 ${yearUnclassified}건은 정비방식 확인이 필요합니다.`:'정비방식 분류가 모두 완료되었습니다.'}</div>
    </div>
   </section>
 
-  <section class="eam-xgrid2">
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>고장 발생 TOP 5</strong><small>${year}년 반복 고장·이상 이력이 많은 자산</small></div><em>FAILURE TOP 5</em></div>
-    <div class="eam-dx-ranks">${renderRank(failureTop)}</div>
+  <section class="eam-v3-panel trend">
+   <div class="eam-v3-head"><div><b>${year}년 월별 유지관리 TREND</b><small>12개월 전체 · 막대 높이는 정비건수 · 하단은 월 정비비용</small></div><em>JAN — DEC</em></div>
+   <div class="eam-v3-chart">${months.map(m=>`<div class="eam-v3-month"><div class="eam-v3-barbox"><i style="height:${Math.max(8,Math.round(m.total/maxMonth*145))}px" title="${m.total}건"></i></div><b>${m.total}</b><span>${m.m}월</span><small>${m.cost.toLocaleString()}원</small><div class="eam-v3-cost"><i style="height:${Math.max(3,Math.round(m.cost/maxCost*42))}px"></i></div></div>`).join('')}</div>
+   <div class="eam-v3-trend-summary"><span>연간 <b>${qYear.length}건</b></span><span>예방정비 <b>${preventive}건</b></span><span>고장정비 <b>${failure}건</b></span><span>자체정비 <b>${self}건</b></span><span>외주정비 <b>${out}건</b></span><span>정비비용 <b>${yearCost.toLocaleString()}원</b></span></div>
+  </section>
+
+  <section class="eam-v3-grid split">
+   <div class="eam-v3-panel">
+    <div class="eam-v3-head"><div><b>정비 전략 MIX</b><small>예방 중심인지 고장 대응 중심인지 한눈에 확인</small></div><em>STRATEGY</em></div>
+    <div class="eam-v3-donut-row"><div class="eam-v3-donut" style="--p:${pct(preventive,qYear.length)*3.6}deg"><div><b>${pct(preventive,qYear.length)}%</b><span>예방정비</span></div></div><div class="eam-v3-strategy"><div><span>예방정비</span><b>${preventive}건</b><i><em style="width:${pct(preventive,qYear.length)}%"></em></i></div><div><span>고장정비</span><b>${failure}건</b><i><em class="danger" style="width:${pct(failure,qYear.length)}%"></em></i></div><div><span>계획정비</span><b>${planned}건</b><i><em class="plan" style="width:${pct(planned,qYear.length)}%"></em></i></div></div></div>
+    <div class="eam-v3-chips">${catRows.map(r=>`<span>${r[0]} <b>${r[1]}</b></span>`).join('')}</div>
    </div>
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>정비 집중 자산 TOP 5</strong><small>${year}년 유지관리 건수가 많은 자산</small></div><em>MAINT TOP 5</em></div>
-    <div class="eam-dx-ranks">${renderRank(burdenTop)}</div>
+   <div class="eam-v3-panel">
+    <div class="eam-v3-head"><div><b>점검 캘린더 SIGNAL</b><small>차기 점검일이 입력된 유지관리 이력 기준</small></div><em>INSPECTION</em></div>
+    <div class="eam-v3-inspect"><div class="danger"><b>${overdue}</b><span>기한 경과</span><small>즉시 확인</small></div><div class="warn"><b>${due30}</b><span>30일 이내</span><small>선제 점검</small></div><div><b>${nextDates.length}</b><span>점검 일정</span><small>등록 건수</small></div></div>
+    <div class="eam-v3-note">※ 점검일 데이터가 등록된 이력만 산출합니다.</div>
    </div>
   </section>
 
-  <section class="eam-xgrid2">
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>정비비용 TOP 5</strong><small>${year}년 정비비용이 높은 자산</small></div><em>COST TOP 5</em></div>
-    <div class="eam-dx-ranks">${renderRank(costTop,true)}</div>
+  <section class="eam-v3-top3">
+   <div class="eam-v3-panel rank danger-panel"><div class="eam-v3-head"><div><b>고장 발생 TOP 5</b><small>${year}년 반복 고장·이상이 많은 자산</small></div><em>BAD ACTOR</em></div><div class="eam-v3-ranks">${rankHtml(failureTop,'count')}</div></div>
+   <div class="eam-v3-panel rank"><div class="eam-v3-head"><div><b>정비 집중 자산 TOP 5</b><small>유지관리 건수가 많은 자산</small></div><em>MAINT LOAD</em></div><div class="eam-v3-ranks">${rankHtml(burdenTop,'count')}</div></div>
+   <div class="eam-v3-panel rank"><div class="eam-v3-head"><div><b>정비비용 TOP 5</b><small>비용이 집중된 자산 · 상위 비중 ${costTopShare}%</small></div><em>COST</em></div><div class="eam-v3-ranks">${rankHtml(costTop,'cost')}</div></div>
+  </section>
+
+  <section class="eam-v3-grid bottom">
+   <div class="eam-v3-panel lifecycle">
+    <div class="eam-v3-head"><div><b>ASSET LIFE & RISK</b><small>설치일·내용연수 기준 교체 판단 보조지표</small></div><em>LIFECYCLE</em></div>
+    <div class="eam-v3-life-kpis"><div><b>${lifeRows.length}</b><span>분석 가능</span></div><div class="warn"><b>${lifeNear}</b><span>교체 검토</span></div><div class="danger"><b>${lifeOver}</b><span>내용연수 초과</span></div></div>
+    <div class="eam-v3-life-meter"><div><span>내용연수 여유</span><b>${lifeRows.length?Math.max(0,100-Math.round((lifeNear+lifeOver)/lifeRows.length*100)):0}%</b></div><i><em style="width:${lifeRows.length?Math.max(0,100-Math.round((lifeNear+lifeOver)/lifeRows.length*100)):0}%"></em></i></div>
    </div>
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>내용연수·교체 판단</strong><small>설치일과 내용연수를 기준으로 산출</small></div><em>LIFECYCLE</em></div>
-    <div class="eam-lifecycle-hero"><b>${lifecycle.length}</b><span>분석 가능 자산</span></div>
-    <div class="eam-life-grid"><div><i class="ok"></i><span>정상 사용</span><b>${lifeCounts.normal}</b></div><div><i class="warn"></i><span>교체 검토</span><b>${lifeCounts.near}</b></div><div><i class="danger"></i><span>내용연수 초과</span><b>${lifeCounts.over}</b></div></div>
+   <div class="eam-v3-panel yearly">
+    <div class="eam-v3-head"><div><b>연도별 유지관리 PERFORMANCE</b><small>최근 등록 연도 기준 · 실적과 비용 비교</small></div><em>YEAR ON YEAR</em></div>
+    <div class="eam-v3-year-table"><div class="head"><span>연도</span><span>정비</span><span>자체</span><span>외주</span><span>비용</span></div>${years.slice(-5).reverse().map(y=>{const q=hist.filter(h=>V(h.event_date).slice(0,4)===String(y)),c=q.reduce((n,h)=>n+(Number(h.cost)||0),0);return `<div><b>${y}</b><span>${q.length}건</span><span>${q.filter(h=>method(h)==='자체정비').length}</span><span>${q.filter(h=>method(h)==='외주정비').length}</span><strong>${c.toLocaleString()}원</strong></div>`}).join('')||'<div class="eam-v3-empty">연도별 데이터가 없습니다.</div>'}</div>
    </div>
   </section>
 
-  <section class="eam-xgrid2">
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>자산 등록 구조</strong><small>등록된 EAM 자산을 설비분야와 취득구분으로 분석</small></div><em>ASSET REGISTER</em></div>
-    <div class="eam-dx-list">${list(categories,7).map(([k,n])=>`<div><span>설비분야 · ${esc(k)}</span><b>${n}건</b><em>등록</em></div>`).join('')}</div>
-    <div class="eam-dx-list eam-acq-list">${list(acquisition,5).map(([k,n])=>`<div><span>취득구분 · ${esc(k)}</span><b>${n}건</b><em>등록</em></div>`).join('')}</div>
-   </div>
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>조치 필요 자산</strong><small>현재 자산상태가 ‘교체 예정’인 자산</small></div><em>ACTION ASSETS</em></div>
-    <div class="eam-dx-ranks">${attentionList.length?attentionList.map((a,i)=>`<div class="eam-dx-rank"><b>${String(i+1).padStart(2,'0')}</b><span>${esc(assetLabel(a))}<small>${esc(a.asset_code||'')}</small></span><strong class="warn-text">교체 예정</strong></div>`).join(''):'<div class="eam-xempty">현재 조치 필요 자산이 없습니다.</div>'}</div>
-   </div>
-  </section>
-
-  <section class="eam-xpanel eam-xyear">
-   <div class="eam-xhead"><div><strong>연도별 EAM 유지관리 비교</strong><small>최근 등록 연도의 정비건수·정비방식·비용 비교</small></div><em>YEAR OVER YEAR</em></div>
-   <div class="eam-xtable"><div class="eam-xthead"><span>연도</span><span>자체정비</span><span>외주정비</span><span>전체</span><span>정비비용</span></div>
-   ${yearRows.map(r=>`<div class="eam-xtrow"><strong>${r.y}</strong><b>${r.self}<small>건</small></b><b>${r.out}<small>건</small></b><b class="total">${r.total}<small>건</small></b><b>${r.cost.toLocaleString()}<small>원</small></b></div>`).join('')||'<div class="eam-xempty">연도별 유지관리 이력이 없습니다.</div>'}</div>
-  </section>
+  <div class="eam-v3-foot"><span>※ 관리지수는 현황 판단을 위한 화면용 보조지표이며 법정·공인 KPI가 아닙니다.</span><button onclick="go('eam')">자산 EAM 관리 →</button></div>
  </div>`;
 }
+
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
 function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
 function workerRow(w){const d=tasksFor(w.id), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()), md=mine.filter(x=>x.status!=="완료").length, bs=basicWorkerStats(w.id,monthKey());return `<tr><td><b>${w.name}</b></td><td>${w.shift}<br>${w.start?`${w.start}~${w.end}`:"-"}</td><td><span class="badge ${w.working?"":"off"}">${w.working?"근무":"휴무"}</span></td><td>${w.working?`${bs.complete}/${bs.target}일`:"-"}</td><td>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</td><td class="${md?"red":"green"}"><b>${w.working?md:"-"}</b></td><td><b>${mine.length}건</b></td></tr>`}
@@ -3958,21 +3908,6 @@ if(typeof window.eamPage==='function'){
 </body></html>
 
 
-<style id="JGB_EAM_DASHBOARD_FINAL_V2">
-.eam-dx-yearbar{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:13px 16px;margin-bottom:14px;border:1px solid #cbd9e6;border-radius:12px;background:#fff}
-.eam-dx-yearbar b{display:block;font-size:14px}.eam-dx-yearbar small{display:block;color:#71879a;font-size:11px;margin-top:3px}
-.eam-dx-yearbar select{min-width:125px;border:1px solid #cbd9e6;border-radius:8px;padding:9px 11px;background:#fff;font-weight:900;color:#173d5b}
-.eam-dx-month-table{padding:8px 18px 16px}.eam-dx-month-head,.eam-dx-month-row{display:grid;grid-template-columns:55px 1fr 1fr 1fr 1.25fr;align-items:center;gap:8px}
-.eam-dx-month-head{min-height:34px;background:#eef5fa;color:#60788d;font-size:10px;font-weight:900}.eam-dx-month-head span,.eam-dx-month-row>*{padding:0 8px;text-align:center}
-.eam-dx-month-row{min-height:38px;border-bottom:1px solid #e5edf2;font-size:11px}.eam-dx-month-row b{text-align:left;color:#173d5b}.eam-dx-month-row strong{text-align:right;color:#1c69b0}
-.eam-dx-method{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:18px}.eam-dx-method>div{border:1px solid #dce6ef;border-radius:12px;padding:16px;text-align:center;background:#f8fbfe}.eam-dx-method span{font-size:11px;color:#647b8e;font-weight:900}.eam-dx-method b{display:block;font-size:29px;margin:7px 0}.eam-dx-method b small{font-size:11px}.eam-dx-method strong{font-size:12px;color:#1769c1}
-.eam-dx-list{padding:7px 18px 12px}.eam-dx-list>div{display:grid;grid-template-columns:1fr 70px 100px;gap:8px;align-items:center;min-height:39px;border-bottom:1px solid #e5edf2;font-size:11px}.eam-dx-list>div:last-child{border-bottom:0}.eam-dx-list span{font-weight:800}.eam-dx-list b{text-align:right}.eam-dx-list em{font-style:normal;text-align:right;color:#6e8394;font-size:10px}
-.eam-dx-ranks{padding:7px 18px 14px}.eam-dx-rank{display:grid;grid-template-columns:32px 1fr 75px;gap:8px;align-items:center;min-height:48px;border-bottom:1px solid #e5edf2}.eam-dx-rank>b{font-size:11px;color:#6e8ba4}.eam-dx-rank span{font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.eam-dx-rank strong{text-align:right;font-size:16px}.eam-dx-rank strong small{font-size:9px;margin-left:2px;color:#6e8394}
-.eam-dx-life{padding:14px 20px}.eam-dx-life>b{font-size:34px;display:block;text-align:center}.eam-dx-life>span{display:block;text-align:center;font-size:10px;color:#7b8d9e;margin-bottom:10px}.eam-dx-life>div{display:grid;grid-template-columns:1fr 45px;gap:8px;padding:8px 0;border-bottom:1px solid #edf1f4;font-size:11px}.eam-dx-life>div strong{text-align:right}
-@media(max-width:700px){.eam-dx-yearbar{align-items:stretch;flex-direction:column}.eam-dx-month-table{padding-left:8px;padding-right:8px}.eam-dx-month-head,.eam-dx-month-row{grid-template-columns:38px 1fr 1fr 1fr 1.3fr;font-size:9px}.eam-dx-month-head span,.eam-dx-month-row>*{padding:0 2px}.eam-dx-method{grid-template-columns:1fr}.eam-dx-list>div{grid-template-columns:1fr 55px 70px}.eam-dx-rank{grid-template-columns:28px 1fr 65px}}
-</style>
-
-
 <style id="JGB_MAINT_PHOTO_8X8_ALL3_FINAL">
 /* 유지관리 이력 상세: 왼쪽 빈 영역 제거 + 작업사진 8×8cm 3개를 한 줄에 */
 .jgb-history-detail{
@@ -4015,42 +3950,6 @@ if(typeof window.eamPage==='function'){
 .jgb-maint-table th.part,.jgb-maint-table td.part,
 .jgb-maint-table th.enddate,.jgb-maint-table td.enddate{white-space:normal;text-align:center;}
 </style>
-<style id="JGB_EAM_CONTROL_TOWER_FINAL">
-.eam-controltower{background:linear-gradient(180deg,#f2f7fb 0%,#eaf1f7 100%)!important}
-.eam-controlhero{border-radius:20px!important;padding:30px 34px!important;background:linear-gradient(135deg,#ffffff 0%,#e8f3fb 55%,#dcecf8 100%)!important}
-.eam-control-kpis{margin-bottom:16px!important}
-.eam-control-alerts{display:grid;grid-template-columns:1.45fr 1fr;gap:14px;margin-bottom:14px}
-.eam-alert-panel{overflow:hidden}
-.eam-alert-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:14px}
-.eam-alert-card{border:1px solid #dbe6ee;border-radius:12px;padding:13px;background:#f9fbfd}
-.eam-alert-card span{display:block;font-size:10px;font-weight:900;color:#60788d}
-.eam-alert-card b{display:block;font-size:25px;line-height:1.1;margin:7px 0 3px;color:#173d5b}
-.eam-alert-card small{font-size:9px;color:#7a8d9d;font-weight:700}
-.eam-alert-card.warn{border-color:#ead7ad;background:#fffaf0}
-.eam-alert-card.warn b{color:#b47700}
-.eam-alert-card.danger{border-color:#efc7c7;background:#fff6f6}
-.eam-alert-card.danger b{color:#c03939}
-.eam-alert-card.info{border-color:#cbdff0;background:#f4f9fd}
-.eam-alert-card.info b{color:#2874b8}
-.eam-status-track{padding:13px 18px 17px}
-.eam-status-track>div{display:grid;grid-template-columns:110px 48px 1fr;gap:10px;align-items:center;min-height:45px;border-bottom:1px solid #e7eef3}
-.eam-status-track>div:last-child{border-bottom:0}
-.eam-status-track span{font-size:11px;font-weight:900}.eam-status-track span i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;background:#55a875}
-.eam-status-track span i.warn{background:#d39a32}.eam-status-track span i.off{background:#8b9aa6}
-.eam-status-track b{text-align:right;font-size:12px}.eam-dx-bar{height:7px;background:#edf2f6;border-radius:99px;overflow:hidden}.eam-dx-bar i{display:block;height:100%;border-radius:99px;background:#55a875}.eam-dx-bar i.warn{background:#d39a32}.eam-dx-bar i.off{background:#8b9aa6}
-.eam-mix-main{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:14px}
-.eam-mix-box{border:1px solid #dce7ef;border-radius:12px;background:#f8fbfe;text-align:center;padding:15px 8px}
-.eam-mix-box span{display:block;font-size:10px;font-weight:900;color:#647b8e}.eam-mix-box b{display:block;font-size:26px;margin:6px 0 2px;color:#173d5b}.eam-mix-box small{font-size:9px;color:#71879a;font-weight:800}
-.eam-mix-note{margin:0 14px 14px;padding:9px 11px;border-radius:8px;background:#eef6fc;color:#4d718e;font-size:10px;font-weight:800}
-.eam-dx-rank span small{display:block;font-size:8px;color:#8a9aa7;font-weight:700;margin-top:2px}
-.eam-dx-rank strong.warn-text{font-size:10px;color:#c27b00}
-.eam-lifecycle-hero{text-align:center;padding:13px 10px 7px}.eam-lifecycle-hero b{display:block;font-size:34px;color:#173d5b}.eam-lifecycle-hero span{font-size:10px;color:#7b8d9e;font-weight:800}
-.eam-life-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 14px 15px}.eam-life-grid>div{border:1px solid #e2eaf0;border-radius:10px;padding:10px 7px;text-align:center}.eam-life-grid i{display:block;width:8px;height:8px;border-radius:50%;margin:0 auto 6px;background:#55a875}.eam-life-grid i.warn{background:#d39a32}.eam-life-grid i.danger{background:#cf5555}.eam-life-grid span{display:block;font-size:9px;color:#71879a}.eam-life-grid b{display:block;font-size:15px;margin-top:4px}
-.eam-acq-list{border-top:1px solid #edf2f6;margin-top:3px;padding-top:3px}
-@media(max-width:1100px){.eam-control-alerts{grid-template-columns:1fr}.eam-alert-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.eam-alert-grid{grid-template-columns:1fr 1fr}.eam-mix-main{grid-template-columns:1fr 1fr}.eam-life-grid{grid-template-columns:1fr}.eam-status-track>div{grid-template-columns:90px 45px 1fr}}
-</style>
-
 <style id="JGB_MAINT_TABLE_LEFT_ALIGN_FINAL">
 .jgb-maint-final{width:100%!important;max-width:100%!important;overflow:hidden!important}
 .jgb-maint-final .jgb-maint-table-wrap{width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;margin:0!important}
@@ -4082,3 +3981,24 @@ if(typeof window.eamPage==='function'){
 .jgb-maint-final .jgb-maint-table th:nth-child(12),
 .jgb-maint-final .jgb-maint-table td:nth-child(12){width:5%!important}
 </style>
+
+
+<style id="JGB_EAM_DASHBOARD_V3_FINAL">
+.eam-v3{width:100%;max-width:1480px;margin:0 auto;padding:6px 0 34px;color:#18364f;background:linear-gradient(180deg,#edf5fb 0%,#f7fafc 42%,#eef4f8 100%);font-family:inherit}
+.eam-v3 *{box-sizing:border-box}.eam-v3-hero{min-height:225px;border-radius:22px;padding:30px 34px;display:flex;justify-content:space-between;align-items:center;gap:30px;background:radial-gradient(circle at 82% 25%,rgba(40,139,211,.28),transparent 27%),linear-gradient(135deg,#092c4b 0%,#0b426b 54%,#0b6fae 100%);box-shadow:0 18px 40px rgba(17,58,86,.2);overflow:hidden;position:relative;color:#fff}.eam-v3-hero:after{content:"";position:absolute;width:260px;height:260px;border:1px solid rgba(255,255,255,.12);border-radius:50%;right:110px;top:-120px}.eam-v3-hero-copy{position:relative;z-index:2}.eam-v3-eyebrow{font-size:10px;letter-spacing:2px;font-weight:900;color:#b8ddf4;margin-bottom:10px}.eam-v3-hero h1{font-size:31px;line-height:1.18;margin:0 0 10px;letter-spacing:-1.5px}.eam-v3-hero h1 strong{color:#7fd3ff}.eam-v3-hero p{margin:0;color:#d6e8f5;font-size:13px;font-weight:600}.eam-v3-hero-tags{display:flex;gap:8px;margin-top:19px;flex-wrap:wrap}.eam-v3-hero-tags span{padding:7px 10px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.08);font-size:10px;font-weight:900}.eam-v3-health{width:190px;flex:none;display:flex;flex-direction:column;align-items:center;position:relative;z-index:2}.eam-v3-ring{width:132px;height:132px;border-radius:50%;background:conic-gradient(#69d2ff 0 var(--health),rgba(255,255,255,.14) var(--health) 360deg);display:grid;place-items:center;box-shadow:0 0 0 8px rgba(255,255,255,.05)}.eam-v3-ring>div{width:103px;height:103px;border-radius:50%;background:#0b385b;display:flex;align-items:center;justify-content:center;flex-direction:column}.eam-v3-ring b{font-size:32px;line-height:1}.eam-v3-ring small{font-size:9px;color:#b9d4e6;margin-top:2px}.eam-v3-ring em{font-style:normal;font-size:9px;color:#76d6ff;font-weight:900;margin-top:5px}.eam-v3-health>span{margin-top:11px;font-size:11px;font-weight:900}.eam-v3-health>small{font-size:8px;color:#b8d2e4;margin-top:3px}
+.eam-v3-toolbar{margin:14px 0;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border:1px solid #cbdce8;border-radius:14px;background:#fff;box-shadow:0 4px 14px rgba(26,67,91,.05)}.eam-v3-toolbar b{display:block;font-size:13px}.eam-v3-toolbar span{display:block;color:#7890a3;font-size:10px;margin-top:3px}.eam-v3-toolbar select{min-width:130px;border:1px solid #a9c4d8;border-radius:9px;padding:9px 12px;background:#fff;color:#173d5b;font-weight:900}
+.eam-v3-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}.eam-v3-kpi{min-height:112px;padding:15px 16px;border-radius:15px;background:#fff;border:1px solid #d6e3ec;box-shadow:0 5px 16px rgba(25,65,90,.06);position:relative;overflow:hidden}.eam-v3-kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#2679bd}.eam-v3-kpi.green:before{background:#19a36b}.eam-v3-kpi.red:before{background:#e25454}.eam-v3-kpi.violet:before{background:#7756db}.eam-v3-kpi.orange:before{background:#ed9428}.eam-v3-kpi.dark:before{background:#304b5d}.eam-v3-kpi small{display:block;color:#71879a;font-size:10px;font-weight:900}.eam-v3-kpi b{display:block;margin-top:10px;font-size:27px;line-height:1;color:#173d5b;letter-spacing:-1px}.eam-v3-kpi b i{font-style:normal;font-size:10px;margin-left:3px;color:#71879a}.eam-v3-kpi span{display:block;margin-top:9px;font-size:9px;color:#8496a5;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eam-v3-grid{display:grid;gap:14px}.eam-v3-grid.main{grid-template-columns:1.6fr 1fr}.eam-v3-grid.split{grid-template-columns:1.25fr 1fr}.eam-v3-grid.bottom{grid-template-columns:1fr 1.3fr}.eam-v3-panel{background:#fff;border:1px solid #d2e0e9;border-radius:17px;box-shadow:0 7px 20px rgba(26,65,90,.055);overflow:hidden}.eam-v3-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid #e4edf3;background:linear-gradient(180deg,#fff,#f9fbfd)}.eam-v3-head b{display:block;font-size:13px;letter-spacing:-.2px}.eam-v3-head small{display:block;color:#7b8e9e;font-size:9px;margin-top:3px}.eam-v3-head em{font-style:normal;font-size:8px;letter-spacing:1px;color:#6c91ac;border:1px solid #cfe2ee;border-radius:999px;padding:5px 8px;font-weight:900;white-space:nowrap}
+.eam-v3-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:14px}.eam-v3-action{min-height:120px;border-radius:13px;padding:13px;display:flex;gap:9px;border:1px solid #dce7ee;background:#f8fbfd}.eam-v3-action>i{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;background:#e9f4fb;color:#2077ad;font-style:normal;font-weight:900;font-size:14px}.eam-v3-action.danger{background:#fff8f8;border-color:#f0d1d1}.eam-v3-action.danger>i{background:#ffe8e8;color:#c84747}.eam-v3-action.warn{background:#fffbf3;border-color:#efdfbd}.eam-v3-action.warn>i{background:#fff0cf;color:#bd7b09}.eam-v3-action span{display:block;font-size:9px;color:#687f91;font-weight:900}.eam-v3-action b{display:block;font-size:24px;line-height:1;margin:8px 0 4px}.eam-v3-action b small{font-size:9px;color:#7c8f9e;margin-left:2px}.eam-v3-action em{font-style:normal;font-size:8px;color:#8495a2}.eam-v3-action-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-top:1px solid #edf2f5;background:#fbfdfe;font-size:9px}.eam-v3-action-foot b{color:#1d608e}.eam-v3-action-foot span{padding:5px 8px;border-radius:999px;background:#eef6fb;color:#607f94;font-weight:800}
+.eam-v3-status-big{text-align:center;padding:15px 10px 8px}.eam-v3-status-big strong{display:inline-block;font-size:37px;line-height:1;color:#176ba3}.eam-v3-status-big span{font-size:9px;color:#8295a4;margin-left:4px}.eam-v3-status-big b{display:block;font-size:10px;color:#23815d;margin-top:5px}.eam-v3-status-bars{padding:4px 18px 15px}.eam-v3-status-bars>div{display:grid;grid-template-columns:72px 34px 1fr;gap:8px;align-items:center;min-height:32px;border-bottom:1px solid #eef2f5}.eam-v3-status-bars>div:last-child{border-bottom:0}.eam-v3-status-bars span{font-size:9px;font-weight:900}.eam-v3-status-bars b{text-align:right;font-size:10px}.eam-v3-status-bars i{height:6px;background:#edf2f5;border-radius:99px;overflow:hidden}.eam-v3-status-bars i em{display:block;height:100%;border-radius:99px;background:#25a873}.eam-v3-status-bars i em.warn{background:#d9a238}.eam-v3-status-bars i em.off{background:#8b9aa6}
+.eam-v3-panel.trend{margin-top:14px}.eam-v3-chart{height:230px;display:grid;grid-template-columns:repeat(12,1fr);gap:7px;padding:20px 18px 7px;align-items:end;background:linear-gradient(180deg,#fbfdff,#fff)}.eam-v3-month{height:195px;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;min-width:0;position:relative}.eam-v3-barbox{height:145px;display:flex;align-items:flex-end;justify-content:center;width:100%}.eam-v3-barbox i{display:block;width:min(30px,70%);min-height:8px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,#37a9e7,#1768a6);box-shadow:0 4px 8px rgba(24,105,166,.18)}.eam-v3-month>b{font-size:9px;color:#275d7e;margin:3px 0}.eam-v3-month>span{font-size:9px;font-weight:900;color:#526f83}.eam-v3-month>small{font-size:7px;color:#8b9ba8;white-space:nowrap;margin-top:2px}.eam-v3-cost{position:absolute;right:8%;bottom:34px;height:42px;width:4px;display:flex;align-items:flex-end}.eam-v3-cost i{width:4px;background:#f2a03b;border-radius:5px;opacity:.7}.eam-v3-trend-summary{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid #e8eff3}.eam-v3-trend-summary span{padding:10px 6px;text-align:center;border-right:1px solid #edf2f5;font-size:8px;color:#7b8d9c}.eam-v3-trend-summary span:last-child{border-right:0}.eam-v3-trend-summary b{display:block;font-size:12px;color:#214f70;margin-top:3px}
+.eam-v3-donut-row{display:grid;grid-template-columns:180px 1fr;gap:20px;align-items:center;padding:20px}.eam-v3-donut{width:145px;height:145px;border-radius:50%;margin:auto;display:grid;place-items:center;background:conic-gradient(#27a774 0 var(--p),#eaf1f4 var(--p) 360deg);position:relative}.eam-v3-donut:after{content:"";position:absolute;width:103px;height:103px;border-radius:50%;background:#fff}.eam-v3-donut>div{position:relative;z-index:2;text-align:center}.eam-v3-donut b{display:block;font-size:25px;color:#1b597d}.eam-v3-donut span{font-size:8px;color:#7e919f;font-weight:900}.eam-v3-strategy>div{margin-bottom:12px}.eam-v3-strategy>div:last-child{margin-bottom:0}.eam-v3-strategy span{font-size:9px;font-weight:900}.eam-v3-strategy b{float:right;font-size:10px}.eam-v3-strategy i{display:block;clear:both;height:6px;background:#edf2f5;border-radius:99px;margin-top:6px;overflow:hidden}.eam-v3-strategy i em{display:block;height:100%;background:#27a774;border-radius:99px}.eam-v3-strategy i em.danger{background:#dd5b5b}.eam-v3-strategy i em.plan{background:#7a67d8}.eam-v3-chips{display:flex;gap:7px;flex-wrap:wrap;padding:0 20px 17px}.eam-v3-chips span{padding:7px 9px;border-radius:8px;background:#f3f7fa;border:1px solid #e2ebf0;font-size:8px;color:#708697;font-weight:800}.eam-v3-chips b{color:#1b5e85;margin-left:3px}
+.eam-v3-inspect{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:18px}.eam-v3-inspect>div{border-radius:12px;padding:17px 7px;text-align:center;background:#f7fafc;border:1px solid #dfe9ef}.eam-v3-inspect b{display:block;font-size:28px;color:#1b5578}.eam-v3-inspect span{display:block;font-size:9px;font-weight:900;margin-top:4px}.eam-v3-inspect small{display:block;font-size:8px;color:#81929f;margin-top:5px}.eam-v3-inspect .danger{background:#fff7f7;border-color:#efd2d2}.eam-v3-inspect .danger b{color:#c84d4d}.eam-v3-inspect .warn{background:#fffaf1;border-color:#eddcb9}.eam-v3-inspect .warn b{color:#b97b12}.eam-v3-note{margin:0 18px 17px;padding:8px 10px;border-radius:8px;background:#f3f8fb;color:#748b9c;font-size:8px}
+.eam-v3-top3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}.eam-v3-ranks{padding:6px 18px 13px}.eam-v3-rank{display:grid;grid-template-columns:27px 1fr 72px;gap:8px;align-items:center;min-height:58px;border-bottom:1px solid #edf2f5}.eam-v3-rank:last-child{border-bottom:0}.eam-v3-rank>b{font-size:10px;color:#91a3b0}.eam-v3-rank-name{min-width:0}.eam-v3-rank-name strong{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.eam-v3-rank-name small{display:block;font-size:7px;color:#8a9aa6;margin:3px 0}.eam-v3-rank-name i{display:block;height:4px;background:#edf2f5;border-radius:99px;overflow:hidden}.eam-v3-rank-name i em{display:block;height:100%;background:#2784bd;border-radius:99px}.eam-v3-rank>span{text-align:right;font-size:11px;font-weight:900;color:#1a5579}.danger-panel .eam-v3-rank-name i em{background:#d85a5a}.eam-v3-empty{text-align:center;padding:30px 10px;color:#8b9ba7;font-size:9px}
+.eam-v3-life-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:18px}.eam-v3-life-kpis>div{padding:15px 6px;text-align:center;background:#f7fafc;border:1px solid #dfe9ef;border-radius:11px}.eam-v3-life-kpis b{display:block;font-size:25px}.eam-v3-life-kpis span{font-size:8px;color:#7b8d9b;font-weight:900}.eam-v3-life-kpis .warn{background:#fffaf2;border-color:#eddfc1}.eam-v3-life-kpis .warn b{color:#b98018}.eam-v3-life-kpis .danger{background:#fff7f7;border-color:#efd2d2}.eam-v3-life-kpis .danger b{color:#c54f4f}.eam-v3-life-meter{padding:0 18px 18px}.eam-v3-life-meter>div{display:flex;justify-content:space-between;font-size:9px;font-weight:900;margin-bottom:7px}.eam-v3-life-meter>div b{color:#2372a5}.eam-v3-life-meter>i{display:block;height:9px;background:#edf2f5;border-radius:99px;overflow:hidden}.eam-v3-life-meter>i em{display:block;height:100%;background:linear-gradient(90deg,#26a877,#53c88d);border-radius:99px}
+.eam-v3-year-table{padding:7px 18px 15px}.eam-v3-year-table .head,.eam-v3-year-table>div:not(.head){display:grid;grid-template-columns:60px 1fr 1fr 1fr 1.3fr;align-items:center;gap:6px}.eam-v3-year-table .head{min-height:30px;background:#eef5fa;color:#6d8495;font-size:8px;font-weight:900}.eam-v3-year-table .head span,.eam-v3-year-table>div:not(.head)>*{padding:0 6px;text-align:right}.eam-v3-year-table .head span:first-child,.eam-v3-year-table>div:not(.head)>b{text-align:left}.eam-v3-year-table>div:not(.head){min-height:38px;border-bottom:1px solid #edf2f5;font-size:9px}.eam-v3-year-table strong{color:#1f6b9b}.eam-v3-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;padding:11px 15px;color:#80919d;font-size:8px}.eam-v3-foot button{border:1px solid #bfd4e2;border-radius:8px;background:#fff;color:#21678e;padding:7px 10px;font-weight:900;cursor:pointer}
+@media(max-width:1200px){.eam-v3-kpis{grid-template-columns:repeat(3,1fr)}.eam-v3-top3{grid-template-columns:1fr}.eam-v3-grid.bottom{grid-template-columns:1fr}.eam-v3-actions{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:850px){.eam-v3-hero{padding:24px;align-items:flex-start}.eam-v3-health{width:150px}.eam-v3-grid.main,.eam-v3-grid.split{grid-template-columns:1fr}.eam-v3-chart{overflow-x:auto;grid-template-columns:repeat(12,minmax(45px,1fr))}.eam-v3-trend-summary{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.eam-v3{padding:0}.eam-v3-hero{flex-direction:column}.eam-v3-health{align-self:center}.eam-v3-kpis{grid-template-columns:repeat(2,1fr)}.eam-v3-actions{grid-template-columns:1fr}.eam-v3-donut-row{grid-template-columns:1fr}.eam-v3-inspect{grid-template-columns:1fr}.eam-v3-trend-summary{grid-template-columns:repeat(2,1fr)}.eam-v3-head{padding:12px}.eam-v3-hero h1{font-size:23px}.eam-v3-hero p{font-size:11px}}
+</style>
+
