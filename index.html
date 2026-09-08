@@ -2282,7 +2282,7 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
     try{
       const r=await SUPA.from('assets').insert({asset_code:code,name,category,place:finalPlace,status:'정상',product_name:category}).select('id,asset_code,name,category,place,status').single();
       if(r.error)throw r.error;
-      const meta={asset_code:code,name,category,locationCode:placeCode(finalPlace),place:finalPlace,model:'',qty:'1',vendor:'',maker:'',asContact:'',manufactureDate:'',date:'',installDate:date,life:'',capacity:'',grade:'',warranty:'',asHistory:'',status:'정상',improvementPlan:'',note:''};
+      const meta={asset_code:code,name,category,locationCode:placeCode(finalPlace),place:finalPlace,model:'',qty:'1',quantity:'1',vendor:'',maker:'',asContact:'',manufactureDate:'',date:'',installDate:date,life:'',capacity:'',grade:'',warranty:'',asHistory:'',status:'정상',acquisitionType:'신규 취득',improvementPlan:'',note:''};
       const all=Object.assign({},readMeta(),{[code]:meta});writeMeta(all);window.__eamMetaByCode=all;
       await SUPA.from('asset_history').insert({asset_id:r.data.id,event_type:'자산등록',description:'신규 자산 등록 · '+name,worker_name:'관리자',cost:0,event_date:date});
       window.__eamSelCode=code;window.__eamCat=CATMAP[category]||'other';closeEamRegisterModal();await window.eamLoad();render();
@@ -2430,8 +2430,20 @@ if(typeof window.eamPage==='function'){
 (function(){
   const esc2=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const val2=s=>String(s??'').trim();
-  const getMeta2=()=>{try{return JSON.parse(localStorage.getItem('JGB_EAM_ASSET_META_V39')||'{}')||{}}catch(e){return {}}};
-  const putMeta2=o=>{try{localStorage.setItem('JGB_EAM_ASSET_META_V39',JSON.stringify(o||{}))}catch(e){console.warn(e)}};
+  // 이력카드 수정 저장은 최종 EAM 메타 저장소(V40)만 사용한다.
+  // 이전 V39 데이터가 남아 있는 경우 한 번만 V40으로 옮겨 기존 자료를 보존한다.
+  const META_KEY='JGB_EAM_ASSET_META_V40';
+  const OLD_META_KEY='JGB_EAM_ASSET_META_V39';
+  const getMeta2=()=>{
+    try{
+      const cur=JSON.parse(localStorage.getItem(META_KEY)||'{}')||{};
+      const old=JSON.parse(localStorage.getItem(OLD_META_KEY)||'{}')||{};
+      const merged=Object.assign({},old,cur);
+      if(JSON.stringify(merged)!==JSON.stringify(cur))localStorage.setItem(META_KEY,JSON.stringify(merged));
+      return merged;
+    }catch(e){return {}}
+  };
+  const putMeta2=o=>{try{localStorage.setItem(META_KEY,JSON.stringify(o||{}))}catch(e){console.warn(e)}};
 
   window.eamHistoryCardEdit=function(){
     const card=document.querySelector('.jgb-history-card');
@@ -2520,7 +2532,7 @@ if(typeof window.eamPage==='function'){
       document.querySelector('.jgb-history-card')?.setAttribute('data-editing','0');
       await window.eamLoad();window.__eamSelCode=String(code);window.__eamCat=CATMAP[category]||'other';render();
       requestAnimationFrame(()=>{const c=document.querySelector('.jgb-history-card');if(c)c.open=true});
-    }catch(e){console.error(e);alert('이력카드 저장에 실패했습니다.\n'+(e?.message||''))}
+    }catch(e){console.error(e);alert('이력카드 저장에 실패했습니다.\n'+(e?.message||'저장 처리 중 오류가 발생했습니다.'))}
     finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
   };
   // 자산 관리 메뉴의 "주요설비 이력카드 수정"도 별도 화면이 아니라 카드 자체를 열도록 한다.
