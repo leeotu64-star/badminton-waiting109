@@ -3861,10 +3861,14 @@ if(typeof window.eamPage==='function'){
     const next=prompt('차기 점검일 (YYYY-MM-DD)',V(d.nextDate));if(next===null)return;
     const result=prompt('결과',V(d.result)||'조치완료');if(result===null)return;
     const note=prompt('비고',V(d.note));if(note===null)return;
-    const data={maintenanceType:V(sub)||'예방정비',type:V(type)||'기타',issue:V(issue)||'-',cause:V(cause)||'-',action:V(action),part:V(part)||'-',startDate:V(start),endDate:V(end),nextDate:V(next),result:V(result)||'조치완료',note:V(note)||'-'};
-    const r=await SUPA.from('asset_history').update({event_type:'외부정비',description:'MAINT::'+JSON.stringify(data),worker_name:V(vendor)||'-',cost:Number(String(cost).replace(/[^0-9.-]/g,''))||0,event_date:date}).eq('id',id);
+    const normalizedDate=V(date).slice(0,10);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(normalizedDate)){alert('작업일자는 YYYY-MM-DD 형식으로 입력하세요.');return}
+    const data={eventDate:normalizedDate,maintenanceType:V(sub)||'예방정비',type:V(type)||'기타',issue:V(issue)||'-',cause:V(cause)||'-',action:V(action),part:V(part)||'-',startDate:V(start).slice(0,10),endDate:V(end).slice(0,10),nextDate:V(next).slice(0,10),result:V(result)||'조치완료',note:V(note)||'-'};
+    const r=await SUPA.from('asset_history').update({event_type:'외부정비',description:'MAINT::'+JSON.stringify(data),worker_name:V(vendor)||'-',cost:Number(String(cost).replace(/[^0-9.-]/g,''))||0,event_date:normalizedDate}).eq('id',id);
     if(r.error){console.error(r.error);alert('유지관리 이력 수정에 실패했습니다.\n'+(r.error.message||''));return}
-    await reload();
+    await window.eamLoad();
+    window.__jgbEamHistoryIndex=Math.max(0,(window.__eamH||[]).findIndex(x=>V(x.id)===V(id)));
+    render();
   };
   window.eamDeleteMaintenanceHistory=async function(id){
     if(typeof SUPA==='undefined'||!SUPA){alert('Supabase 연결이 필요합니다.');return}
