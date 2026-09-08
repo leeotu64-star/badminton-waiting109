@@ -2886,7 +2886,7 @@ if(typeof window.eamPage==='function'){
       <label>결과<select id="jf_result"><option>정상</option><option selected>조치완료</option><option>교체완료</option><option>추적관찰</option></select></label>
       <label class="full">비고<textarea id="jf_note" placeholder="기타 사항"></textarea></label>
       <div class="full"><b style="display:block;color:#4f6679;font-size:11px;margin-bottom:6px">작업사진 · 사진은 나중에 등록할 수 있도록 공간만 제공합니다.</b><div class="jgb-work-photos">${photoBox('작업 전')}${photoBox('작업 중')}${photoBox('작업 후')}${photoBox('완료 확인')}</div></div>
-    </div><div class="jgb-modal-final-actions"><button type="button" class="delete" onclick="eamDeleteMaintenanceFromForm('${E(s.reg.id)}')">삭제</button><button type="button" class="edit" onclick="eamEditMaintenanceFromForm('${E(s.reg.id)}')">수정</button><button type="button" class="save" onclick="eamSaveMaintenanceFinal('${E(s.reg.id)}')">등록</button></div></div></div>`);
+    </div></div></div>`);
   };
   window.eamSaveMaintenanceFinal=async function(assetId){
     if(typeof SUPA==='undefined'||!SUPA){alert('Supabase 연결이 필요합니다.');return}
@@ -3970,126 +3970,14 @@ if(typeof window.eamPage==='function'){
 @media(max-width:700px){.eam-xdash{padding:12px}.eam-xhero{padding:20px;display:block}.eam-xhero h1{font-size:24px}.eam-xhero-right{margin-top:15px;align-items:flex-start}.eam-xkpis{grid-template-columns:repeat(2,1fr)}.eam-xkpi b{font-size:30px}.eam-xsplit{grid-template-columns:1fr;gap:10px}.eam-xvs{display:none}.eam-xchart{height:280px}.eam-xbars{height:210px}.eam-xthead,.eam-xtrow{grid-template-columns:1fr 1fr 1fr 1fr}.eam-xthead span:last-child,.eam-xtrow>*:last-child{display:none}.eam-xrecent>div{grid-template-columns:70px 60px 1fr}.eam-xrecent em{display:none}}
 </style>
 
-<script id="JGB_ASSET_CARD_EMPTY_TEXT_SAVE_FINAL">
-(function(){
-  const S=x=>String(x??'');
-  const T=x=>S(x).trim();
-  const META_KEY='JGB_EAM_ASSET_META_V39';
-  const readMeta=()=>{
-    try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}
-    catch(e){return {}}
-  };
-  const writeMeta=o=>{
-    try{localStorage.setItem(META_KEY,JSON.stringify(o||{}))}
-    catch(e){console.warn('이력카드 메타 저장 실패',e)}
-  };
-
-  // 핵심: 빈칸을 '-'로 바꾸지 않고 그대로 저장한다.
-  async function saveCard(code, ids){
-    if(typeof SUPA==='undefined'||!SUPA){
-      alert('Supabase 연결이 필요합니다.'); return;
-    }
-    const a=(window.__eamA||[]).find(x=>T(x.asset_code)===T(code));
-    if(!a){alert('등록된 EAM 자산을 찾을 수 없습니다.');return}
-
-    const g=id=>document.getElementById(id)?.value ?? '';
-    const name=T(g(ids.name));
-    const category=T(g(ids.category))||'기타설비';
-    let locationCode=T(g(ids.loc))||'A';
-    let place=T(g(ids.place));
-    if(category==='소방·방재'){locationCode='E';place='유수장치실'}
-    if(!name){alert('자산명을 입력하세요.');return}
-
-    // trim은 하되 빈 문자열을 '-'로 대체하지 않는다.
-    const meta={
-      asset_code:T(code),
-      name:name,
-      category:category,
-      locationCode:locationCode,
-      place:place,
-      model:T(g(ids.model)),
-      capacity:T(g(ids.capacity)),
-      qty:T(g(ids.qty)),
-      quantity:T(g(ids.qty)),
-      maker:T(g(ids.maker)),
-      vendor:T(g(ids.maker)),
-      asContact:T(g(ids.as)),
-      date:T(g(ids.date)),
-      manufactureDate:T(g(ids.date)),
-      installDate:T(g(ids.install)),
-      life:T(g(ids.life)),
-      grade:T(g(ids.grade)),
-      warranty:T(g(ids.warranty)),
-      asHistory:T(g(ids.asHistory)),
-      status:T(g(ids.status))||'정상',
-      improvementPlan:S(g(ids.plan)).trim(),
-      note:S(g(ids.note)).trim()
-    };
-
-    const btn=document.getElementById(ids.save);
-    if(btn){btn.disabled=true;btn.textContent='저장 중…'}
-
-    try{
-      const r=await SUPA.from('assets').update({
-        name,category,place,status:meta.status,product_name:meta.model||category
-      }).eq('id',a.id);
-      if(r.error)throw r.error;
-
-      const all=Object.assign({},readMeta(),{[T(code)]:meta});
-      writeMeta(all);
-      window.__eamMetaByCode=all;
-
-      const h=await SUPA.from('asset_history').insert({
-        asset_id:a.id,
-        event_type:'자산정보수정',
-        description:'META::'+JSON.stringify(meta),
-        worker_name:'관리자',
-        cost:0,
-        event_date:new Date().toISOString().slice(0,10)
-      });
-      if(h.error)throw h.error;
-
-      // eamLoad가 같은 날짜의 오래된 META를 선택하더라도
-      // 방금 저장한 값(빈칸 포함)을 다시 우선 적용한다.
-      if(typeof window.eamLoad==='function')await window.eamLoad();
-      const after=Object.assign({},readMeta(),{[T(code)]:meta});
-      writeMeta(after);
-      window.__eamMetaByCode=after;
-      window.__eamSelCode=T(code);
-
-      document.getElementById(ids.modal)?.remove();
-      if(typeof render==='function')render();
-      else if(typeof window.render==='function')window.render();
-
-    }catch(e){
-      console.error(e);
-      alert('자산정보 저장에 실패했습니다.\n'+(e?.message||''));
-    }finally{
-      if(btn){btn.disabled=false;btn.textContent='저장'}
-    }
-  }
-
-  // 현재 화면에서 실제 사용되는 두 이력카드 수정 저장 함수를 모두 보강.
-  window.jgbAefSave=function(code){
-    return saveCard(code,{
-      name:'jaf_name',category:'jaf_category',loc:'jaf_loc',place:'jaf_place',
-      model:'jaf_model',capacity:'jaf_capacity',qty:'jaf_qty',maker:'jaf_maker',
-      as:'jaf_as',date:'jaf_date',install:'jaf_install',life:'jaf_life',
-      grade:'jaf_grade',warranty:'jaf_warranty',asHistory:'jaf_asHistory',
-      status:'jaf_status',plan:'jaf_plan',note:'jaf_note',save:'jaf_save',
-      modal:'jgbAssetEditFinal'
-    });
-  };
-
-  window.eamHistoryCardSave=function(code){
-    return saveCard(code,{
-      name:'jgbHC_name',category:'jgbHC_category',loc:'jgbHC_locCode',place:'jgbHC_place',
-      model:'jgbHC_model',capacity:'jgbHC_capacity',qty:'jgbHC_qty',maker:'jgbHC_maker',
-      as:'jgbHC_as',date:'jgbHC_date',install:'jgbHC_install',life:'jgbHC_life',
-      grade:'jgbHC_grade',warranty:'jgbHC_warranty',asHistory:'jgbHC_asHistory',
-      status:'jgbHC_status',plan:'jgbHC_plan',note:'jgbHC_note',save:'jgbHC_save',
-      modal:null
-    });
-  };
-})();
-</script>
+<style id="JGB_MAINT_DETAIL_NO_DUPLICATE_ACTIONS_FINAL">
+/* 유지관리 이력의 수정/삭제는 목록의 관리 열 한 곳에서만 제공 */
+.jgb-history-detail .jgb-modal-final-actions,
+.jgb-history-detail .jgb-maint-detail-actions,
+.jgb-history-detail .jgb-history-detail-actions,
+.jgb-maint-detail .jgb-modal-final-actions,
+.jgb-maint-detail .jgb-maint-detail-actions,
+.jgb-maint-detail .jgb-history-detail-actions{
+  display:none!important;
+}
+</style>
