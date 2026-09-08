@@ -2900,6 +2900,7 @@ if(typeof window.eamPage==='function'){
   function histories(reg,H){return reg?(H||[]).filter(h=>V(h.asset_id)===V(reg.id)&&!['자산정보수정','자산등록'].includes(V(h.event_type))).sort((a,b)=>String(b.event_date).localeCompare(String(a.event_date))):[]}
   function inferType(h){const t=V(h.event_type)+' '+V(h.action_type)+' '+V(h.description);if(/설비교체|폐기|교체완료/.test(t))return'설비교체';if(/부품교체/.test(t))return'부품교체';if(/수리|외부수리/.test(t))return'수리';if(/점검/.test(t))return'점검';return'기타'}
   function detailFor(h){return parseHist(h)}
+  const info=h=>parseHist(h);
   function photoBox(label){return `<div class="jgb-work-photo"><span>📷</span><b>${E(label)}</b><small>사진 등록 공간</small></div>`}
   window.eamOpenMaintenanceRegister=function(){
     const s=selected();if(!s.reg?.id){alert('먼저 등록할 자산을 선택하세요.');return}
