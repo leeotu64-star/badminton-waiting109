@@ -1189,12 +1189,9 @@ function dashboard2(){
        esc=s=>typeof xEsc==='function'?xEsc(s):String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
  const hist=H.filter(h=>!['자산등록','자산정보수정','폐기'].includes(V(h.event_type)));
- const parseMaint=h=>{
-   const d=V(h.description);
-   if(!d.startsWith('MAINT::'))return {};
-   try{return JSON.parse(d.slice(7))||{}}catch(e){return {}}
- };
+ const parseMaint=h=>{const d=V(h.description);if(!d.startsWith('MAINT::'))return {};try{return JSON.parse(d.slice(7))||{}}catch(e){return {}}};
  const info=h=>Object.assign({},parseMaint(h),h);
+
  const method=h=>{
    const p=info(h),t=[p.maintenanceMethod,p.method,p.정비방식,h.action_type,h.event_type,h.description].map(V).join(' ');
    if(/외주정비|외부정비|외부수리|외부용역|정비업체|업체/.test(t))return'외주정비';
@@ -1202,14 +1199,14 @@ function dashboard2(){
    return'미분류';
  };
  const maintType=h=>{
-   const p=info(h),t=[p.maintenanceType,p.type,h.action_type,h.event_type,h.description].map(V).join(' ');
+   const p=info(h),t=[p.maintenanceType,p.type,h.action_type,h.event_type,h.description,p.issue,p.cause].map(V).join(' ');
    if(/예방정비/.test(t))return'예방정비';
    if(/계획정비/.test(t))return'계획정비';
    if(/고장정비|고장|이상|불량|작동불량/.test(t))return'고장정비';
    return'기타';
  };
  const maintCat=h=>{
-   const p=info(h),t=[p.maintenanceCategory,p.category,p.type,h.action_type,h.event_type,h.description].map(V).join(' ');
+   const p=info(h),t=[p.maintenanceCategory,p.category,p.type,h.action_type,h.event_type,h.description,p.action,p.part].map(V).join(' ');
    if(/설비교체|자산교체/.test(t))return'설비교체';
    if(/부품교체|소모품교체/.test(t))return'부품교체';
    if(/점검/.test(t))return'점검';
@@ -1219,17 +1216,14 @@ function dashboard2(){
 
  const totalCost=hist.reduce((n,h)=>n+(Number(h.cost)||0),0);
  const normal=assets.filter(a=>V(a.status||'정상')==='정상').length;
- const attention=assets.length-normal;
+ const replace=assets.filter(a=>V(a.status)==='교체 예정').length;
+ const discarded=rawAssets.filter(a=>V(a.status)==='폐기').length;
+ const attention=replace;
  const acquisition={};
  assets.forEach(a=>{const k=V(a.acquisitionType||'기존 자산')||'기존 자산';acquisition[k]=(acquisition[k]||0)+1});
  const categories={};
  assets.forEach(a=>{const k=V(a.category||a.type||'기타설비')||'기타설비';categories[k]=(categories[k]||0)+1});
- const locations={};
- assets.forEach(a=>{const k=V(a.place||'미등록')||'미등록';locations[k]=(locations[k]||0)+1});
- const makers={};
- assets.forEach(a=>{const k=V(a.maker||a.vendor||'미등록')||'미등록';makers[k]=(makers[k]||0)+1});
- const statusMap={};
- assets.forEach(a=>{const k=V(a.status||'정상')||'정상';statusMap[k]=(statusMap[k]||0)+1});
+ const statusMap={'정상':normal,'교체 예정':replace,'폐기':discarded};
 
  const years=[...new Set(hist.map(h=>V(h.event_date).slice(0,4)).filter(Boolean))].map(Number).filter(Boolean).sort((a,b)=>a-b);
  const now=new Date(),currentYear=now.getFullYear();
@@ -1239,6 +1233,12 @@ function dashboard2(){
  const yearCost=qYear.reduce((n,h)=>n+(Number(h.cost)||0),0);
  const yearSelf=qYear.filter(h=>method(h)==='자체정비').length;
  const yearOut=qYear.filter(h=>method(h)==='외주정비').length;
+ const yearUnclassified=qYear.filter(h=>method(h)==='미분류').length;
+ const failureCount=qYear.filter(h=>maintType(h)==='고장정비').length;
+ const preventiveCount=qYear.filter(h=>maintType(h)==='예방정비').length;
+ const avgCost=qYear.length?Math.round(yearCost/qYear.length):0;
+ const failureRate=qYear.length?Math.round(failureCount/qYear.length*100):0;
+ const outsourceRate=qYear.length?Math.round(yearOut/qYear.length*100):0;
 
  const months=Array.from({length:12},(_,i)=>{
    const key=String(year)+'-'+String(i+1).padStart(2,'0');
@@ -1255,23 +1255,20 @@ function dashboard2(){
  const assetById=new Map();
  assets.forEach(a=>{assetById.set(V(a.id),a);if(a.asset_code)assetById.set('code:'+V(a.asset_code),a)});
  const getAsset=h=>assetById.get(V(h.asset_id))||assetById.get('code:'+V(h.asset_code))||null;
+ const assetLabel=a=>V(a?.name||a?.asset_name||a?.model||a?.asset_code||'자산');
 
- const failure={};
- qYear.filter(h=>maintType(h)==='고장정비').forEach(h=>{
-   const a=getAsset(h); if(!a)return;
-   const k=V(a.id||a.asset_code),o=failure[k]||{asset:a,count:0,cost:0};
-   o.count++;o.cost+=Number(h.cost)||0;failure[k]=o;
- });
- const failureTop=Object.values(failure).sort((a,b)=>b.count-a.count||b.cost-a.cost).slice(0,5);
-
- const burden={};
- qYear.forEach(h=>{
-   const a=getAsset(h); if(!a)return;
-   const k=V(a.id||a.asset_code),o=burden[k]||{asset:a,count:0,cost:0};
-   o.count++;o.cost+=Number(h.cost)||0;burden[k]=o;
- });
- const burdenTop=Object.values(burden).sort((a,b)=>b.count-a.count||b.cost-a.cost).slice(0,5);
- const costTop=Object.values(burden).sort((a,b)=>b.cost-a.cost||b.count-a.count).slice(0,5);
+ const aggregate=(rows)=>{
+   const map={};
+   rows.forEach(h=>{
+     const a=getAsset(h); if(!a)return;
+     const k=V(a.id||a.asset_code),o=map[k]||{asset:a,count:0,cost:0};
+     o.count++;o.cost+=Number(h.cost)||0;map[k]=o;
+   });
+   return Object.values(map);
+ };
+ const failureTop=aggregate(qYear.filter(h=>maintType(h)==='고장정비')).sort((a,b)=>b.count-a.count||b.cost-a.cost).slice(0,5);
+ const burdenTop=aggregate(qYear).sort((a,b)=>b.count-a.count||b.cost-a.cost).slice(0,5);
+ const costTop=aggregate(qYear).sort((a,b)=>b.cost-a.cost||b.count-a.count).slice(0,5);
 
  const lifecycle=assets.map(a=>{
    const date=V(a.installDate||a.date),life=Number.parseFloat(String(a.life||'').replace(/[^0-9.]/g,''));
@@ -1288,12 +1285,31 @@ function dashboard2(){
  });
 
  const list=(obj,limit=5)=>Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,limit);
- const renderRank=(arr,cost=false)=>arr.length?arr.map((x,i)=>`<div class="eam-dx-rank"><b>${String(i+1).padStart(2,'0')}</b><span>${esc(x.asset.name||x.asset.model||x.asset.asset_code||'자산')}</span><strong>${cost?x.cost.toLocaleString():x.count}<small>${cost?'원':'건'}</small></strong></div>`).join(''):'<div class="eam-xempty">해당 연도 유지관리 이력이 없습니다.</div>';
+ const renderRank=(arr,cost=false)=>arr.length?arr.map((x,i)=>`<div class="eam-dx-rank"><b>${String(i+1).padStart(2,'0')}</b><span>${esc(assetLabel(x.asset))}<small>${esc(x.asset.asset_code||'')}</small></span><strong>${cost?x.cost.toLocaleString():x.count}<small>${cost?'원':'건'}</small></strong></div>`).join(''):'<div class="eam-xempty">해당 연도 유지관리 이력이 없습니다.</div>';
 
- return `<div class="eam-xdash">
-  <section class="eam-xhero">
-   <div><div class="eam-xeyebrow">EAM · ASSET CONTROL CENTER</div><h1>EAM 시설·자산 통합 현황</h1><p>자산 등록 → 유지관리 → 고장·이상 → 정비비용 → 내용연수를 연도별로 통합 관리합니다.</p></div>
-   <div class="eam-xhero-right"><span>● 실시간 DB</span><button onclick="go('eam')">🏢 자산 EAM 관리</button></div>
+ const attentionAssets=assets.filter(a=>V(a.status)==='교체 예정');
+ const attentionList=attentionAssets.slice(0,6);
+ const statusRows=[
+   {name:'정상',count:normal,cls:'ok'},
+   {name:'교체 예정',count:replace,cls:'warn'},
+   {name:'폐기',count:discarded,cls:'off'}
+ ];
+ const actionSummary=[
+   {title:'교체 검토',value:replace,sub:'자산상태 기준',cls:'warn'},
+   {title:'내용연수 초과',value:lifeCounts.over,sub:'설치일·내용연수 기준',cls:'danger'},
+   {title:'고장정비',value:failureCount,sub:`${year}년`,cls:'danger'},
+   {title:'미분류 정비',value:yearUnclassified,sub:'정비방식 확인 필요',cls:'info'}
+ ];
+ const bar=(value,max,cls='')=>`<div class="eam-dx-bar"><i class="${cls}" style="width:${Math.max(0,Math.min(100,(value/max)*100))}%"></i></div>`;
+
+ return `<div class="eam-xdash eam-controltower">
+  <section class="eam-xhero eam-controlhero">
+   <div>
+    <div class="eam-xeyebrow">EAM · FACILITY ASSET CONTROL TOWER</div>
+    <h1>EAM 시설·자산 통합 현황</h1>
+    <p>자산 상태와 유지관리 실적을 한 화면에서 판단하고, 교체·고장·비용이 집중되는 자산을 바로 확인합니다.</p>
+   </div>
+   <div class="eam-xhero-right"><span>● 실시간 DB</span><button onclick="go('eam')">자산 EAM 관리 →</button></div>
   </section>
 
   <section class="eam-dx-yearbar">
@@ -1301,40 +1317,46 @@ function dashboard2(){
    <select onchange="localStorage.setItem('JGB_EAM_DASH_YEAR',this.value);render()">${[...new Set([...years,currentYear])].sort((a,b)=>b-a).map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}년</option>`).join('')}</select>
   </section>
 
-  <section class="eam-xkpis">
+  <section class="eam-xkpis eam-control-kpis">
    <div class="eam-xkpi blue"><small>운영 자산</small><b>${assets.length}</b><span>폐기 제외</span></div>
    <div class="eam-xkpi green"><small>정상 자산</small><b>${normal}</b><span>현재 정상</span></div>
-   <div class="eam-xkpi red"><small>확인 필요</small><b>${attention}</b><span>정상 외 상태</span></div>
+   <div class="eam-xkpi red"><small>조치 필요</small><b>${attention}</b><span>교체 예정</span></div>
    <div class="eam-xkpi purple"><small>${year}년 정비건수</small><b>${qYear.length}</b><span>자체 ${yearSelf} · 외주 ${yearOut}</span></div>
-   <div class="eam-xkpi orange"><small>${year}년 정비비용</small><b>${yearCost.toLocaleString()}</b><span>원</span></div>
+   <div class="eam-xkpi orange"><small>${year}년 정비비용</small><b>${yearCost.toLocaleString()}</b><span>원 · 건당 ${avgCost.toLocaleString()}원</span></div>
    <div class="eam-xkpi dark"><small>누적 정비비용</small><b>${totalCost.toLocaleString()}</b><span>원</span></div>
   </section>
 
-  <section class="eam-xgrid2">
+  <section class="eam-control-alerts">
+   <div class="eam-xpanel eam-alert-panel">
+    <div class="eam-xhead"><div><strong>⚠ EAM 조치 우선순위</strong><small>지금 확인해야 할 관리 신호</small></div><em>ACTION CENTER</em></div>
+    <div class="eam-alert-grid">${actionSummary.map(x=>`<div class="eam-alert-card ${x.cls}"><span>${x.title}</span><b>${x.value}</b><small>${x.sub}</small></div>`).join('')}</div>
+   </div>
    <div class="eam-xpanel">
+    <div class="eam-xhead"><div><strong>자산 상태</strong><small>등록 자산의 현재 운영 상태</small></div><em>ASSET STATUS</em></div>
+    <div class="eam-status-track">${statusRows.map(r=>`<div><span><i class="${r.cls}"></i>${r.name}</span><b>${r.count}건</b>${bar(r.count,Math.max(1,assets.length+discarded),r.cls)}</div>`).join('')}</div>
+   </div>
+  </section>
+
+  <section class="eam-xgrid2">
+   <div class="eam-xpanel eam-month-panel">
     <div class="eam-xhead"><div><strong>${year}년 월별 유지관리 실적</strong><small>1월부터 12월까지 전체 월을 표시합니다.</small></div><em>JAN–DEC</em></div>
     <div class="eam-dx-month-table"><div class="eam-dx-month-head"><span>월</span><span>전체</span><span>자체정비</span><span>외주정비</span><span>정비비용</span></div>${months.map(m=>`<div class="eam-dx-month-row"><b>${m.m}월</b><span>${m.total}건</span><span>${m.self}건</span><span>${m.out}건</span><strong>${m.cost.toLocaleString()}원</strong></div>`).join('')}</div>
    </div>
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>정비방식</strong><small>${year}년 처리 주체별 실적</small></div><em>METHOD</em></div>
-    <div class="eam-dx-method"><div><span>자체정비</span><b>${yearSelf}<small>건</small></b><strong>${qYear.length?Math.round(yearSelf/qYear.length*100):0}%</strong></div><div><span>외주정비</span><b>${yearOut}<small>건</small></b><strong>${qYear.length?Math.round(yearOut/qYear.length*100):0}%</strong></div></div>
+   <div class="eam-xpanel eam-method-panel">
+    <div class="eam-xhead"><div><strong>정비방식 · 정비유형</strong><small>${year}년 유지관리 처리 구조</small></div><em>MAINTENANCE MIX</em></div>
+    <div class="eam-mix-main">
+      <div class="eam-mix-box"><span>자체정비</span><b>${yearSelf}</b><small>건 · ${qYear.length?Math.round(yearSelf/qYear.length*100):0}%</small></div>
+      <div class="eam-mix-box"><span>외주정비</span><b>${yearOut}</b><small>건 · ${outsourceRate}%</small></div>
+      <div class="eam-mix-box"><span>고장정비</span><b>${failureCount}</b><small>건 · ${failureRate}%</small></div>
+      <div class="eam-mix-box"><span>예방정비</span><b>${preventiveCount}</b><small>건 · ${qYear.length?Math.round(preventiveCount/qYear.length*100):0}%</small></div>
+    </div>
+    <div class="eam-mix-note">${yearUnclassified?`미분류 ${yearUnclassified}건은 정비방식 확인이 필요합니다.`:'정비방식 분류가 모두 완료되었습니다.'}</div>
    </div>
   </section>
 
   <section class="eam-xgrid2">
    <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>정비유형</strong><small>예방정비 · 고장정비 · 계획정비</small></div><em>MAINTENANCE TYPE</em></div>
-    <div class="eam-dx-list">${typeRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b><em>${r.cost.toLocaleString()}원</em></div>`).join('')}</div>
-   </div>
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>정비구분</strong><small>점검 · 보수 · 부품교체 · 설비교체</small></div><em>CATEGORY</em></div>
-    <div class="eam-dx-list">${catRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b><em>${r.cost.toLocaleString()}원</em></div>`).join('')}</div>
-   </div>
-  </section>
-
-  <section class="eam-xgrid2">
-   <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>고장 발생 TOP 5</strong><small>${year}년 고장정비 이력이 반복된 자산</small></div><em>FAILURE TOP 5</em></div>
+    <div class="eam-xhead"><div><strong>고장 발생 TOP 5</strong><small>${year}년 반복 고장·이상 이력이 많은 자산</small></div><em>FAILURE TOP 5</em></div>
     <div class="eam-dx-ranks">${renderRank(failureTop)}</div>
    </div>
    <div class="eam-xpanel">
@@ -1349,32 +1371,31 @@ function dashboard2(){
     <div class="eam-dx-ranks">${renderRank(costTop,true)}</div>
    </div>
    <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>내용연수 현황</strong><small>설치일·내용연수가 입력된 자산 기준</small></div><em>LIFECYCLE</em></div>
-    <div class="eam-dx-life"><b>${lifecycle.length}</b><span>분석 가능 자산</span><div><i>정상 사용</i><strong>${lifeCounts.normal}</strong></div><div><i>교체 검토</i><strong>${lifeCounts.near}</strong></div><div><i>내용연수 초과</i><strong>${lifeCounts.over}</strong></div></div>
+    <div class="eam-xhead"><div><strong>내용연수·교체 판단</strong><small>설치일과 내용연수를 기준으로 산출</small></div><em>LIFECYCLE</em></div>
+    <div class="eam-lifecycle-hero"><b>${lifecycle.length}</b><span>분석 가능 자산</span></div>
+    <div class="eam-life-grid"><div><i class="ok"></i><span>정상 사용</span><b>${lifeCounts.normal}</b></div><div><i class="warn"></i><span>교체 검토</span><b>${lifeCounts.near}</b></div><div><i class="danger"></i><span>내용연수 초과</span><b>${lifeCounts.over}</b></div></div>
    </div>
   </section>
 
   <section class="eam-xgrid2">
    <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>자산 등록 현황</strong><small>등록된 EAM 자산의 주요 관리 통계</small></div><em>ASSET REGISTER</em></div>
+    <div class="eam-xhead"><div><strong>자산 등록 구조</strong><small>등록된 EAM 자산을 설비분야와 취득구분으로 분석</small></div><em>ASSET REGISTER</em></div>
     <div class="eam-dx-list">${list(categories,7).map(([k,n])=>`<div><span>설비분야 · ${esc(k)}</span><b>${n}건</b><em>등록</em></div>`).join('')}</div>
-    <div class="eam-dx-list">${list(acquisition,5).map(([k,n])=>`<div><span>취득구분 · ${esc(k)}</span><b>${n}건</b><em>등록</em></div>`).join('')}</div>
+    <div class="eam-dx-list eam-acq-list">${list(acquisition,5).map(([k,n])=>`<div><span>취득구분 · ${esc(k)}</span><b>${n}건</b><em>등록</em></div>`).join('')}</div>
    </div>
    <div class="eam-xpanel">
-    <div class="eam-xhead"><div><strong>위치·제조사 현황</strong><small>자산 등록정보 기준 상위 분포</small></div><em>MASTER DATA</em></div>
-    <div class="eam-dx-list">${list(locations,5).map(([k,n])=>`<div><span>위치 · ${esc(k)}</span><b>${n}건</b><em>자산</em></div>`).join('')}</div>
-    <div class="eam-dx-list">${list(makers,5).map(([k,n])=>`<div><span>제조사 · ${esc(k)}</span><b>${n}건</b><em>자산</em></div>`).join('')}</div>
+    <div class="eam-xhead"><div><strong>조치 필요 자산</strong><small>현재 자산상태가 ‘교체 예정’인 자산</small></div><em>ACTION ASSETS</em></div>
+    <div class="eam-dx-ranks">${attentionList.length?attentionList.map((a,i)=>`<div class="eam-dx-rank"><b>${String(i+1).padStart(2,'0')}</b><span>${esc(assetLabel(a))}<small>${esc(a.asset_code||'')}</small></span><strong class="warn-text">교체 예정</strong></div>`).join(''):'<div class="eam-xempty">현재 조치 필요 자산이 없습니다.</div>'}</div>
    </div>
   </section>
 
   <section class="eam-xpanel eam-xyear">
-   <div class="eam-xhead"><div><strong>연도별 EAM 유지관리 비교</strong><small>최근 5개 등록 연도의 건수·정비방식·비용 비교</small></div><em>YEAR OVER YEAR</em></div>
+   <div class="eam-xhead"><div><strong>연도별 EAM 유지관리 비교</strong><small>최근 등록 연도의 정비건수·정비방식·비용 비교</small></div><em>YEAR OVER YEAR</em></div>
    <div class="eam-xtable"><div class="eam-xthead"><span>연도</span><span>자체정비</span><span>외주정비</span><span>전체</span><span>정비비용</span></div>
    ${yearRows.map(r=>`<div class="eam-xtrow"><strong>${r.y}</strong><b>${r.self}<small>건</small></b><b>${r.out}<small>건</small></b><b class="total">${r.total}<small>건</small></b><b>${r.cost.toLocaleString()}<small>원</small></b></div>`).join('')||'<div class="eam-xempty">연도별 유지관리 이력이 없습니다.</div>'}</div>
   </section>
  </div>`;
 }
-
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
 function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
 function workerRow(w){const d=tasksFor(w.id), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()), md=mine.filter(x=>x.status!=="완료").length, bs=basicWorkerStats(w.id,monthKey());return `<tr><td><b>${w.name}</b></td><td>${w.shift}<br>${w.start?`${w.start}~${w.end}`:"-"}</td><td><span class="badge ${w.working?"":"off"}">${w.working?"근무":"휴무"}</span></td><td>${w.working?`${bs.complete}/${bs.target}일`:"-"}</td><td>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</td><td class="${md?"red":"green"}"><b>${w.working?md:"-"}</b></td><td><b>${mine.length}건</b></td></tr>`}
@@ -2941,13 +2962,13 @@ if(typeof window.eamPage==='function'){
     const infoHtml=infoRows.map(z=>`<div class="jgb-eam-info-cell"><small>${E(z[0])}</small><b>${E(z[1])}</b></div>`).join('');
     const lastInspection=ins[0]?.inspection_date||'-';const next=ins[0]?.next_inspection_date||ins[0]?.next_date||'-';const replacement=cur.replacementStatus||'미정';
     const detail=parsed?`<div class="jgb-history-detail"><div><div class="jgb-work-photos">${photoBox('작업 전')}${photoBox('작업 중')}${photoBox('작업 후')}</div><div style="font-weight:800;color:#49647a;margin:10px 0 6px">📎 첨부파일</div><div style="border:1px solid #d8e3ec;background:#fff;padding:10px;color:#7890a4;font-size:11px">첨부파일 등록 공간 · 작업확인서 / 정비보고서 등</div></div></div>`:'';
-    const rows=hs.map((h,n)=>{const p=detailFor(h),typ=p.type||inferType(h);return `<tr onclick="eamSelectHistory(${n})" style="cursor:pointer" class="${h===selectedH?'selected':''}"><td class="num">${n+1}</td><td class="date">${formatDate(h.event_date)}</td><td class="type">${E(typ)}</td><td class="subtype">${E(p.maintenanceType||'예방정비')}</td><td class="issue" title="${E(p.issue||'-')}">${E(p.issue||'-')}</td><td class="action" title="${E(p.action||h.description||'-')}">${E(p.action||h.description||'-')}</td><td class="part">${E(p.part||h.replacement_parts||'-')}</td><td class="vendor">${E(h.worker_name||'-')}</td><td class="cost">${Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-'}</td><td class="enddate">${formatDate(p.endDate||h.work_end_date||h.completed_at||h.event_date)}</td><td class="result">${E(p.result||'완료')}</td><td class="manage"><button type="button" class="jgb-hbtn del" onclick="event.stopPropagation();eamDeleteMaintenanceHistory('${E(h.id)}')">삭제</button></td></tr>`}).join('');
+    const rows=hs.map((h,n)=>{const p=detailFor(h),typ=p.type||inferType(h);return `<tr onclick="eamSelectHistory(${n})" style="cursor:pointer" class="${h===selectedH?'selected':''}"><td class="num">${n+1}</td><td class="date">${formatDate(h.event_date)}</td><td class="part">${E(info(h).replacementParts || info(h).parts || h.replacement_parts || "-")}</td><td class="enddate">${formatDate(info(h).workEndDate || info(h).completedDate || h.work_end_date || h.completed_at || h.event_date)}</td><td class="type">${E(typ)}</td><td class="subtype">${E(p.maintenanceType||'예방정비')}</td><td class="issue" title="${E(p.issue||'-')}">${E(p.issue||'-')}</td><td class="action" title="${E(p.action||h.description||'-')}">${E(p.action||h.description||'-')}</td><td class="vendor">${E(h.worker_name||'-')}</td><td class="cost">${Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-'}</td><td class="result">${E(p.result||'완료')}</td><td class="manage"><button type="button" class="jgb-hbtn del" onclick="event.stopPropagation();eamDeleteMaintenanceHistory('${E(h.id)}')">삭제</button></td></tr>`}).join('');
     return `<div class="eam-innovation"><div class="eam-innovation-head"><div><div class="eyebrow">ENTERPRISE ASSET MANAGEMENT</div><h1>시설물 EAM 관리</h1><p>설비 종류 → 자산 선택 → 주요설비 이력카드 → 유지관리 이력</p></div><button class="eam-manage-main eam-manage-top" onclick="eamOpenManageMenu()">⚙ 자산 관리</button></div>
       <div class="eam-type-row">${order.map(k=>{const z=cats[k];return `<button type="button" class="eam-type ${k===cat?'on':''}" onclick="eamPick('${k}')"><span>${z.ico}</span><strong>${E(z.label)}</strong><em>${z.items.length}</em><small>${E(z.desc)}</small></button>`}).join('')}</div>
       <div class="eam-innovation-layout"><aside class="eam-assets-panel"><div class="eam-assets-head"><div><b>${C.ico} ${E(C.label)}</b><span>${list.length}개 자산</span></div><div class="eam-filter-row"><input id="eamProSearch" placeholder="🔎 자산코드 또는 자산명" oninput="eamProFilter(this.value,document.getElementById('eamProLocationFilter')?.value||'')"><select id="eamProLocationFilter" onchange="eamProFilter(document.getElementById('eamProSearch')?.value||'',this.value)"><option value="">전체 위치</option><option value="A">A · 코트</option><option value="B">B · 복도</option><option value="C">C · 사무실</option><option value="D">D · 옥상</option><option value="E">E · 유수장치실</option></select></div></div><div id="eamproGrid" class="eam-asset-list">${list.map(x=>{const m=meta[x.code]||{},a=A.find(z=>V(z.asset_code)===V(x.code))||null,merged=Object.assign({},x,a||{},m);if(cat==='fire')merged.place='유수장치실';const st=a?.status||m.status||'원본';return `<button type="button" class="eam-asset-row ${V(x.code)===V(sel)?'on':''}" data-code="${E(x.code)}" data-loc="${E(typeof placeCode==='function'?placeCode(merged.place):'')}" onclick="eamPick('${cat}','${E(x.code)}')"><span class="row-code">${E(window.eamUnifiedCode?window.eamUnifiedCode(merged):x.code)}</span><span class="row-copy"><b>${E(window.eamDisplayName?window.eamDisplayName(merged):merged.name||'-')}</b><small>${E(window.placeLabel?window.placeLabel(merged.place):merged.place||'-')}</small></span><i class="${st==='정상'?'ok':st==='원본'?'source':'bad'}">${E(st)}</i></button>`}).join('')||'<div class="eam-empty">등록된 자산이 없습니다.</div>'}</div></aside>
       <main class="eam-detail-panel">${src?`<div class="eam-detail-hero"><div><div class="hero-code">${E(window.eamUnifiedCode?window.eamUnifiedCode(cur):sel)}</div><h2>${E(window.eamDisplayName?window.eamDisplayName(cur):cur.name||'-')}</h2><div class="hero-meta"><span>${E(C.label)}</span><b>${E(window.placeLabel?window.placeLabel(cur.place):cur.place||'-')}</b><span>위치코드 ${E(typeof placeCode==='function'?placeCode(cur.place):'-')}</span></div></div><span class="hero-status ${String(cur.status||'원본')==='정상'?'good':'source'}">${E(cur.status||'원본')}</span></div>
         <section class="jgb-eam-card-final"><div class="jgb-card-top"><span>📋 주요설비 이력카드</span><button onclick="event.preventDefault();event.stopPropagation();jgbOpenAssetHistoryEditor()">✏️ 수정</button></div><div class="jgb-eam-card-body"><div class="jgb-eam-info"><div class="jgb-eam-info-title">📄 기본정보</div><div class="jgb-eam-info-grid">${infoHtml}</div><div class="jgb-eam-note"><small>시설개선계획</small><b>${E(cur.improvementPlan||'-')}</b></div><div class="jgb-eam-note"><small>특이사항</small><b>${E(cur.note||'-')}</b></div></div>${photo}</div><div class="jgb-eam-auto"><div><small>최근 점검일</small><b>${E(lastInspection)}</b></div><div><small>최근 외부정비일</small><b>${E(recentExt?.event_date||'-')}</b></div><div><small>누적 외부정비 건수</small><b>${ext.length}건</b></div><div><small>최근 조치내용</small><b>${E(recentExt?((detailFor(recentExt).action)||recentExt.description||'-'):'-')}</b></div><div><small>차기 점검일</small><b>${E(next)}</b></div><div><small>교체·폐기 예정 여부</small><b>${E(replacement)}</b></div></div></section>
-        <section class="jgb-maint-final"><div class="jgb-maint-head"><h3>🔧 유지관리 이력</h3><span class="counts">외부정비 ${ext.length}건 · 전체 ${hs.length}건 · 점검 ${hs.filter(h=>inferType(h)==='점검').length}건</span><button type="button" id="jgbMaintRegisterBtn" class="jgb-maint-register-btn">＋ 등록</button></div><div class="jgb-maint-table-wrap"><table class="jgb-maint-table"><thead><tr><th class="num">No</th><th class="date">작업일자</th><th class="type">정비구분</th><th class="subtype">정비유형</th><th class="issue">고장·이상내용</th><th class="action">조치내용</th><th>교체부품</th><th class="vendor">정비업체</th><th class="cost">비용</th><th class="enddate">작업완료일</th><th class="result">결과</th><th class="manage">관리</th></tr></thead><tbody>${rows||`<tr><td colspan="12"><div class="jgb-maint-empty">등록된 유지관리 이력이 없습니다.</div></td></tr>`}</tbody></table></div>${detail}</section>
+        <section class="jgb-maint-final"><div class="jgb-maint-head"><h3>🔧 유지관리 이력</h3><span class="counts">외부정비 ${ext.length}건 · 전체 ${hs.length}건 · 점검 ${hs.filter(h=>inferType(h)==='점검').length}건</span><button type="button" id="jgbMaintRegisterBtn" class="jgb-maint-register-btn">＋ 등록</button></div><div class="jgb-maint-table-wrap"><table class="jgb-maint-table"><thead><tr><th class="num">No</th><th class="date">작업일자</th><th>교체부품</th><th>작업완료일</th><th class="type">정비구분</th><th class="subtype">정비유형</th><th class="issue">고장·이상내용</th><th class="action">조치내용</th><th class="vendor">정비업체</th><th class="cost">비용</th><th class="result">결과</th><th class="manage">관리</th></tr></thead><tbody>${rows||`<tr><td colspan="10"><div class="jgb-maint-empty">등록된 유지관리 이력이 없습니다.</div></td></tr>`}</tbody></table></div>${detail}</section>
       </main></div></div>`:'<div class="eam-empty">설비 종류에서 자산을 선택하세요.</div>'}</main></div></div>`;
   };
   if(typeof eamPage==='function'){try{eamPage=window.eamPage}catch(e){}}
@@ -3993,4 +4014,39 @@ if(typeof window.eamPage==='function'){
 .jgb-maint-table th,.jgb-maint-table td{box-sizing:border-box;}
 .jgb-maint-table th.part,.jgb-maint-table td.part,
 .jgb-maint-table th.enddate,.jgb-maint-table td.enddate{white-space:normal;text-align:center;}
+</style>
+<style id="JGB_EAM_CONTROL_TOWER_FINAL">
+.eam-controltower{background:linear-gradient(180deg,#f2f7fb 0%,#eaf1f7 100%)!important}
+.eam-controlhero{border-radius:20px!important;padding:30px 34px!important;background:linear-gradient(135deg,#ffffff 0%,#e8f3fb 55%,#dcecf8 100%)!important}
+.eam-control-kpis{margin-bottom:16px!important}
+.eam-control-alerts{display:grid;grid-template-columns:1.45fr 1fr;gap:14px;margin-bottom:14px}
+.eam-alert-panel{overflow:hidden}
+.eam-alert-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:14px}
+.eam-alert-card{border:1px solid #dbe6ee;border-radius:12px;padding:13px;background:#f9fbfd}
+.eam-alert-card span{display:block;font-size:10px;font-weight:900;color:#60788d}
+.eam-alert-card b{display:block;font-size:25px;line-height:1.1;margin:7px 0 3px;color:#173d5b}
+.eam-alert-card small{font-size:9px;color:#7a8d9d;font-weight:700}
+.eam-alert-card.warn{border-color:#ead7ad;background:#fffaf0}
+.eam-alert-card.warn b{color:#b47700}
+.eam-alert-card.danger{border-color:#efc7c7;background:#fff6f6}
+.eam-alert-card.danger b{color:#c03939}
+.eam-alert-card.info{border-color:#cbdff0;background:#f4f9fd}
+.eam-alert-card.info b{color:#2874b8}
+.eam-status-track{padding:13px 18px 17px}
+.eam-status-track>div{display:grid;grid-template-columns:110px 48px 1fr;gap:10px;align-items:center;min-height:45px;border-bottom:1px solid #e7eef3}
+.eam-status-track>div:last-child{border-bottom:0}
+.eam-status-track span{font-size:11px;font-weight:900}.eam-status-track span i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;background:#55a875}
+.eam-status-track span i.warn{background:#d39a32}.eam-status-track span i.off{background:#8b9aa6}
+.eam-status-track b{text-align:right;font-size:12px}.eam-dx-bar{height:7px;background:#edf2f6;border-radius:99px;overflow:hidden}.eam-dx-bar i{display:block;height:100%;border-radius:99px;background:#55a875}.eam-dx-bar i.warn{background:#d39a32}.eam-dx-bar i.off{background:#8b9aa6}
+.eam-mix-main{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:14px}
+.eam-mix-box{border:1px solid #dce7ef;border-radius:12px;background:#f8fbfe;text-align:center;padding:15px 8px}
+.eam-mix-box span{display:block;font-size:10px;font-weight:900;color:#647b8e}.eam-mix-box b{display:block;font-size:26px;margin:6px 0 2px;color:#173d5b}.eam-mix-box small{font-size:9px;color:#71879a;font-weight:800}
+.eam-mix-note{margin:0 14px 14px;padding:9px 11px;border-radius:8px;background:#eef6fc;color:#4d718e;font-size:10px;font-weight:800}
+.eam-dx-rank span small{display:block;font-size:8px;color:#8a9aa7;font-weight:700;margin-top:2px}
+.eam-dx-rank strong.warn-text{font-size:10px;color:#c27b00}
+.eam-lifecycle-hero{text-align:center;padding:13px 10px 7px}.eam-lifecycle-hero b{display:block;font-size:34px;color:#173d5b}.eam-lifecycle-hero span{font-size:10px;color:#7b8d9e;font-weight:800}
+.eam-life-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 14px 15px}.eam-life-grid>div{border:1px solid #e2eaf0;border-radius:10px;padding:10px 7px;text-align:center}.eam-life-grid i{display:block;width:8px;height:8px;border-radius:50%;margin:0 auto 6px;background:#55a875}.eam-life-grid i.warn{background:#d39a32}.eam-life-grid i.danger{background:#cf5555}.eam-life-grid span{display:block;font-size:9px;color:#71879a}.eam-life-grid b{display:block;font-size:15px;margin-top:4px}
+.eam-acq-list{border-top:1px solid #edf2f6;margin-top:3px;padding-top:3px}
+@media(max-width:1100px){.eam-control-alerts{grid-template-columns:1fr}.eam-alert-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.eam-alert-grid{grid-template-columns:1fr 1fr}.eam-mix-main{grid-template-columns:1fr 1fr}.eam-life-grid{grid-template-columns:1fr}.eam-status-track>div{grid-template-columns:90px 45px 1fr}}
 </style>
