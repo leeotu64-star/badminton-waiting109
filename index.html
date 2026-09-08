@@ -959,9 +959,9 @@ const JGB_EXCEL_EQUIPMENT=[{"code":"AC-01","name":"냉방기(난방겸용)","typ
 
 const KEY="JGB_LIVE_TEST_V3";
 const workers=[
- {id:"w1",name:"김",shift:"새벽조",start:"06:00",end:"15:00"},
- {id:"w2",name:"안",shift:"오전조",start:"09:00",end:"18:00"},
- {id:"w3",name:"한",shift:"오후조",start:"13:30",end:"22:20"}
+ {id:"w1",name:"김",shift:"",start:"",end:""},
+ {id:"w2",name:"안",shift:"",start:"",end:""},
+ {id:"w3",name:"한",shift:"",start:"",end:""}
 ];
 const tasks=["화장실 점검","샤워실 점검","코트 주변 점검","탈의실 점검","복도·계단 점검","출입구 점검","시설물 상태 확인","조명 상태 확인","청소 상태 확인","안전 위험요소 확인"];
 const BASIC_TASK_VERSION="v3";
@@ -1040,12 +1040,22 @@ function load(){
   return {
    issues:Array.isArray(raw?.issues)?raw.issues:[],
    tasks:(raw&&raw.tasks&&typeof raw.tasks==="object")?raw.tasks:{},
-   schedule:(raw&&raw.schedule&&typeof raw.schedule==="object")?raw.schedule:{}
+   schedule:(raw&&raw.schedule&&typeof raw.schedule==="object")?raw.schedule:{},
+   scheduleSeedVersion:String(raw?.scheduleSeedVersion||"")
   };
- }catch(e){return{issues:[],tasks:{},schedule:{}}}
+ }catch(e){return{issues:[],tasks:{},schedule:{},scheduleSeedVersion:""}}
 }
 let db=load(); let page=new URLSearchParams(location.search).get("page")||"dashboard"; let selectedDate=new Date().toISOString().slice(0,10);
 function save(){localStorage.setItem(KEY,JSON.stringify(db));if(window.BroadcastChannel){new BroadcastChannel("JGB_LIVE").postMessage("update")}}
+// 2026년 9월 근무편성은 기존 브라우저 저장값보다 이 표를 우선 적용하여 한 번 정확히 덮어씁니다. 이후 사용자가 수정한 편성은 그대로 저장됩니다.
+(function seedExactSeptember(){
+ const VERSION="2026-09-exact-v3";
+ if(db.scheduleSeedVersion===VERSION)return;
+ if(!db.schedule||typeof db.schedule!=="object")db.schedule={};
+ SEPT_2026.forEach((vals,i)=>{db.schedule["2026-09-"+String(i+1).padStart(2,"0")]=vals.slice();});
+ db.scheduleSeedVersion=VERSION;
+ save();
+})();
 window.addEventListener("storage",()=>{db=load();render()});
 let bc;try{bc=new BroadcastChannel("JGB_LIVE");bc.onmessage=()=>{db=load();render()}}catch(e){}
 function dateKey(){return selectedDate}
@@ -1436,7 +1446,7 @@ function statsPage(){
   <div class="empdash"><div class="empdash-head"><div><div class="empdash-title">이번 달 직원별 이행 현황</div><div class="empdash-sub">실제 근무 실적과 휴무·연가 자동 실적을 분리해서 확인</div></div><div class="empdash-sub">실시간 반영 ON</div></div>
   <div class="emp-kpis"><div class="emp-kpi"><span>전체 근무일</span><b>${s.targetDays}일</b></div><div class="emp-kpi"><span>실제 근무 실적</span><b>${s.completedDays}회</b></div><div class="emp-kpi"><span>휴무·연가 자동 실적</span><b>${autoTotal}회</b></div><div class="emp-kpi"><span>총 실적</span><b>${s.completedDays+autoTotal}회</b></div><div class="emp-kpi"><span>조치완료</span><b>${s.done.length}건</b></div><div class="emp-kpi"><span>미조치</span><b>${s.pending.length}건</b></div></div>
   <div class="emp-list">${rows}</div>
-  <div class="actions" style="margin-top:12px"><button class="btn gray" onclick="showMonthYearCompare('month')">📈 월별 비교</button><button class="btn gray" onclick="showMonthYearCompare('year')">📊 연도별 비교</button></div>
+  <div class="actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn gray" onclick="showMonthYearCompare('month')">📈 월별 비교</button><button class="btn gray" onclick="showMonthYearCompare('year')">📊 연도별 비교</button><button class="btn red" onclick="resetEmployeePerformance()">↻ 실적 전체 리셋</button></div>
   <div class="emp-foot">※ 기존 기본업무 집계 방식은 그대로 유지합니다. 실제 근무일에는 기존처럼 기본업무 10개를 모두 완료해야 실적 1회입니다. 휴무·주휴일·연가·공가·대체휴무·추석은 근무편성에서 자동으로 별도 실적 1회로 집계합니다. 두 실적은 화면에서 구분하고 총 실적에는 합산합니다.</div></div>`;
 }
 function workerPage(){return `<div class="pagebar"><h1>근무자별 현황 · ${selectedDate}</h1></div><div class="workergrid">${todayWorkers().map(w=>{const d=tasksFor(w.id), bs=basicWorkerStats(w.id,monthKey()), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()),p=mine.filter(x=>x.status!=="완료");return `<div class="workerbox"><h3>${w.name}</h3><span class="badge ${w.working?"":"off"}">${w.working?w.shift+" "+w.start+"~"+w.end:w.status}</span><div class="compareline">기본업무 <b>${w.working?`${bs.complete}/${bs.target}일`:"-"}</b></div><div class="compareline">조치완료 <b>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</b></div><div class="compareline">미조치 <b class="${p.length?"red":"green"}">${w.working?p.length:"-"}</b></div><div class="compareline">접수 합계 <b>${mine.length}건</b></div></div>`}).join("")}</div>`}
@@ -1894,6 +1904,22 @@ async function toggleTask(wid,t){const d=tasksFor(wid),idx=d.done.indexOf(t);if(
 function setDate(v){if(v){selectedDate=v;render()}}
 function time(v){return new Date(v).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hourCycle:"h23"})}
 function seedDemo(){if(db.issues.length)return alert("이미 테스트 데이터가 있습니다.");let now=Date.now();db.issues=[{id:"I"+now,category:"시설",place:"2층 남자화장실",content:"조명 점검 필요",status:"미조치",createdAt:new Date(now-35*60000).toISOString(),handlerId:"w1",handlerName:"김",completedAt:""},{id:"I"+(now+1),category:"환경",place:"복도",content:"바닥 청소 요청",status:"완료",createdAt:new Date(now-70*60000).toISOString(),handlerId:"w2",handlerName:"안",completedAt:new Date(now-25*60000).toISOString()}];save();render()}
+async function resetEmployeePerformance(){
+  if(!confirm("직원 실적을 전체 리셋할까요?\n\n기본업무 완료 실적은 0으로 초기화됩니다.\n근무편성(휴무·연가·대휴 등)은 삭제하지 않습니다."))return;
+  try{
+    if(SUPA){
+      const r=await SUPA.from("basic_tasks").delete().not("worker_id","is",null);
+      if(r.error)throw r.error;
+    }
+    db.tasks={};
+    save();
+    alert("직원 실적을 전체 리셋했습니다.\n근무편성은 그대로 유지됩니다.");
+    render();
+  }catch(e){
+    console.error(e);
+    alert("실적 리셋에 실패했습니다. Supabase basic_tasks 삭제 권한을 확인하세요.");
+  }
+}
 function resetAll(){if(confirm("테스트 데이터를 모두 삭제할까요?")){db={issues:[],tasks:{},schedule:{}};save();render()}}
 (function(){
   window.eamPick=eamPick; window.eamHistoryTab=eamHistoryTab; window.eamShowLocation=eamShowLocation; window.eamShowHistory=eamShowHistory;
