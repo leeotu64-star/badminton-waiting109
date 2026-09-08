@@ -1363,7 +1363,7 @@ function schedulePage(){
   }).join('')}</tbody></table></div>`
 }
 const STAFF_AUTO_OFF_WORDS=["휴무","주휴일","연가","공가","대체휴무","대휴","추석"];
-function staffAutoStatus(st){const v=String(st||"").trim();return v && STAFF_AUTO_OFF_WORDS.some(x=>v.includes(x));}
+function staffAutoStatus(st){const v=String(st||"").trim();if(!v||v==="편성없음"||v==="-")return false;return STAFF_AUTO_OFF_WORDS.some(x=>v.includes(x));}
 function staffMonthlyAutoStats(wid,month){
   let total=0,by={휴무:0,주휴일:0,연가:0,공가:0,대체휴무:0,추석:0};
   const y=Number(month.slice(0,4)),m=Number(month.slice(5,7)),days=new Date(y,m,0).getDate();
