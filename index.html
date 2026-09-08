@@ -3970,178 +3970,126 @@ if(typeof window.eamPage==='function'){
 @media(max-width:700px){.eam-xdash{padding:12px}.eam-xhero{padding:20px;display:block}.eam-xhero h1{font-size:24px}.eam-xhero-right{margin-top:15px;align-items:flex-start}.eam-xkpis{grid-template-columns:repeat(2,1fr)}.eam-xkpi b{font-size:30px}.eam-xsplit{grid-template-columns:1fr;gap:10px}.eam-xvs{display:none}.eam-xchart{height:280px}.eam-xbars{height:210px}.eam-xthead,.eam-xtrow{grid-template-columns:1fr 1fr 1fr 1fr}.eam-xthead span:last-child,.eam-xtrow>*:last-child{display:none}.eam-xrecent>div{grid-template-columns:70px 60px 1fr}.eam-xrecent em{display:none}}
 </style>
 
-<style id="JGB_EAM_CARD_MAINT_BOUNDARY_PHOTO_ALIGNMENT_FINAL">
-/* =========================================================
-   EAM 화면 일체감 보정
-   1) 주요설비 이력카드와 유지관리 이력의 경계를 명확하게
-   2) 이력카드 우측 설비사진 영역을 좌측 기본정보와 높이/선 정렬
-   3) 유지관리 작업사진은 8.8cm × 8.8cm 유지
-   ========================================================= */
+<script id="JGB_ASSET_CARD_EMPTY_TEXT_SAVE_FINAL">
+(function(){
+  const S=x=>String(x??'');
+  const T=x=>S(x).trim();
+  const META_KEY='JGB_EAM_ASSET_META_V39';
+  const readMeta=()=>{
+    try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}
+    catch(e){return {}}
+  };
+  const writeMeta=o=>{
+    try{localStorage.setItem(META_KEY,JSON.stringify(o||{}))}
+    catch(e){console.warn('이력카드 메타 저장 실패',e)}
+  };
 
-/* 주요설비 이력카드: 하나의 독립된 박스로 명확하게 */
-.jgb-eam-card-final{
-  border:2px solid #9bb7ce!important;
-  border-radius:9px!important;
-  overflow:hidden!important;
-  background:#fff!important;
-  box-shadow:none!important;
-  margin:12px 0 0!important;
-}
+  // 핵심: 빈칸을 '-'로 바꾸지 않고 그대로 저장한다.
+  async function saveCard(code, ids){
+    if(typeof SUPA==='undefined'||!SUPA){
+      alert('Supabase 연결이 필요합니다.'); return;
+    }
+    const a=(window.__eamA||[]).find(x=>T(x.asset_code)===T(code));
+    if(!a){alert('등록된 EAM 자산을 찾을 수 없습니다.');return}
 
-/* 카드 제목선 */
-.jgb-eam-card-final .jgb-card-top{
-  min-height:44px!important;
-  box-sizing:border-box!important;
-  background:#e7f2fb!important;
-  border-bottom:2px solid #9bb7ce!important;
-  padding:8px 14px!important;
-}
+    const g=id=>document.getElementById(id)?.value ?? '';
+    const name=T(g(ids.name));
+    const category=T(g(ids.category))||'기타설비';
+    let locationCode=T(g(ids.loc))||'A';
+    let place=T(g(ids.place));
+    if(category==='소방·방재'){locationCode='E';place='유수장치실'}
+    if(!name){alert('자산명을 입력하세요.');return}
 
-/* 기본정보 / 설비사진: 같은 높이로 맞춤 */
-.jgb-eam-card-final .jgb-card-body{
-  display:grid!important;
-  grid-template-columns:minmax(0,1.65fr) minmax(260px,.85fr)!important;
-  gap:10px!important;
-  padding:10px!important;
-  align-items:stretch!important;
-  background:#fff!important;
-}
+    // trim은 하되 빈 문자열을 '-'로 대체하지 않는다.
+    const meta={
+      asset_code:T(code),
+      name:name,
+      category:category,
+      locationCode:locationCode,
+      place:place,
+      model:T(g(ids.model)),
+      capacity:T(g(ids.capacity)),
+      qty:T(g(ids.qty)),
+      quantity:T(g(ids.qty)),
+      maker:T(g(ids.maker)),
+      vendor:T(g(ids.maker)),
+      asContact:T(g(ids.as)),
+      date:T(g(ids.date)),
+      manufactureDate:T(g(ids.date)),
+      installDate:T(g(ids.install)),
+      life:T(g(ids.life)),
+      grade:T(g(ids.grade)),
+      warranty:T(g(ids.warranty)),
+      asHistory:T(g(ids.asHistory)),
+      status:T(g(ids.status))||'정상',
+      improvementPlan:S(g(ids.plan)).trim(),
+      note:S(g(ids.note)).trim()
+    };
 
-/* 왼쪽 기본정보 외곽선 */
-.jgb-eam-card-final .jgb-eam-info{
-  border:1.5px solid #a9bfd2!important;
-  border-radius:6px!important;
-  overflow:hidden!important;
-  height:100%!important;
-  box-sizing:border-box!important;
-}
+    const btn=document.getElementById(ids.save);
+    if(btn){btn.disabled=true;btn.textContent='저장 중…'}
 
-/* 오른쪽 설비사진 외곽선 */
-.jgb-eam-card-final .jgb-eam-photo{
-  display:flex!important;
-  flex-direction:column!important;
-  height:100%!important;
-  min-height:0!important;
-  box-sizing:border-box!important;
-  border:1.5px solid #a9bfd2!important;
-  border-radius:6px!important;
-  overflow:hidden!important;
-  background:#fff!important;
-}
+    try{
+      const r=await SUPA.from('assets').update({
+        name,category,place,status:meta.status,product_name:meta.model||category
+      }).eq('id',a.id);
+      if(r.error)throw r.error;
 
-/* 사진 제목선도 기본정보 제목선과 동일하게 */
-.jgb-eam-card-final .jgb-eam-photo-title,
-.jgb-eam-card-final .jgb-eam-info-title{
-  background:#f0f6fb!important;
-  border-bottom:1.5px solid #a9bfd2!important;
-  min-height:38px!important;
-  box-sizing:border-box!important;
-  display:flex!important;
-  align-items:center!important;
-  padding:8px 10px!important;
-}
+      const all=Object.assign({},readMeta(),{[T(code)]:meta});
+      writeMeta(all);
+      window.__eamMetaByCode=all;
 
-/* 설비 사진 내부 공간: 바깥 카드에 맞춰 자연스럽게 확장 */
-.jgb-eam-card-final .jgb-photo-box{
-  flex:1 1 auto!important;
-  height:auto!important;
-  min-height:245px!important;
-  margin:10px!important;
-  box-sizing:border-box!important;
-  border:1.5px dashed #9bb7ce!important;
-  border-radius:5px!important;
-  background:#fbfdff!important;
-}
+      const h=await SUPA.from('asset_history').insert({
+        asset_id:a.id,
+        event_type:'자산정보수정',
+        description:'META::'+JSON.stringify(meta),
+        worker_name:'관리자',
+        cost:0,
+        event_date:new Date().toISOString().slice(0,10)
+      });
+      if(h.error)throw h.error;
 
-/* 사진 하단 캡션선 */
-.jgb-eam-card-final .jgb-photo-caption{
-  min-height:30px!important;
-  box-sizing:border-box!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  border-top:1px solid #d2e0eb!important;
-  padding:5px 8px!important;
-}
+      // eamLoad가 같은 날짜의 오래된 META를 선택하더라도
+      // 방금 저장한 값(빈칸 포함)을 다시 우선 적용한다.
+      if(typeof window.eamLoad==='function')await window.eamLoad();
+      const after=Object.assign({},readMeta(),{[T(code)]:meta});
+      writeMeta(after);
+      window.__eamMetaByCode=after;
+      window.__eamSelCode=T(code);
 
-/* 기본정보 셀 선도 외곽선과 어울리게 */
-.jgb-eam-card-final .jgb-eam-info-cell{
-  border-bottom:1px solid #d2e0eb!important;
-}
-.jgb-eam-card-final .jgb-eam-info-cell:nth-child(odd){
-  border-right:1px solid #d2e0eb!important;
-}
-.jgb-eam-card-final .jgb-eam-note{
-  border-top:1px solid #d2e0eb!important;
-}
+      document.getElementById(ids.modal)?.remove();
+      if(typeof render==='function')render();
+      else if(typeof window.render==='function')window.render();
 
-/* 자동 산출 정보: 이력카드의 하단 영역임을 확실히 구분 */
-.jgb-eam-card-final .jgb-eam-auto{
-  border-top:2px solid #9bb7ce!important;
-  background:#fff!important;
-}
-.jgb-eam-card-final .jgb-eam-auto>div{
-  border-right:1px solid #b8cbd9!important;
-  border-bottom:1px solid #b8cbd9!important;
-}
-.jgb-eam-card-final .jgb-eam-auto>div:nth-child(4n){
-  border-right:0!important;
-}
+    }catch(e){
+      console.error(e);
+      alert('자산정보 저장에 실패했습니다.\n'+(e?.message||''));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent='저장'}
+    }
+  }
 
-/* 주요설비 이력카드와 유지관리 이력 사이: 확실한 공백 + 굵은 경계 */
-.jgb-maint-final{
-  margin-top:18px!important;
-  border:2px solid #9bb7ce!important;
-  border-radius:9px!important;
-  overflow:hidden!important;
-  background:#fff!important;
-  box-shadow:none!important;
-}
-.jgb-maint-head{
-  background:#e7f2fb!important;
-  border-bottom:2px solid #9bb7ce!important;
-  min-height:50px!important;
-  box-sizing:border-box!important;
-}
-.jgb-maint-table th{
-  border-right:1px solid #9bb7ce!important;
-  border-bottom:1.5px solid #9bb7ce!important;
-  background:#dcecf8!important;
-}
-.jgb-maint-table td{
-  border-right:1px solid #c0d1de!important;
-  border-bottom:1px solid #c0d1de!important;
-}
+  // 현재 화면에서 실제 사용되는 두 이력카드 수정 저장 함수를 모두 보강.
+  window.jgbAefSave=function(code){
+    return saveCard(code,{
+      name:'jaf_name',category:'jaf_category',loc:'jaf_loc',place:'jaf_place',
+      model:'jaf_model',capacity:'jaf_capacity',qty:'jaf_qty',maker:'jaf_maker',
+      as:'jaf_as',date:'jaf_date',install:'jaf_install',life:'jaf_life',
+      grade:'jaf_grade',warranty:'jaf_warranty',asHistory:'jaf_asHistory',
+      status:'jaf_status',plan:'jaf_plan',note:'jaf_note',save:'jaf_save',
+      modal:'jgbAssetEditFinal'
+    });
+  };
 
-/* 유지관리 작업사진: 정확히 8.8cm × 8.8cm */
-.jgb-work-photos{
-  display:flex!important;
-  align-items:center!important;
-  gap:10px!important;
-  width:max-content!important;
-  max-width:none!important;
-  flex-wrap:nowrap!important;
-}
-.jgb-work-photos .jgb-work-photo{
-  width:8.8cm!important;
-  height:8.8cm!important;
-  min-width:8.8cm!important;
-  min-height:8.8cm!important;
-  max-width:8.8cm!important;
-  max-height:8.8cm!important;
-  flex:0 0 8.8cm!important;
-  box-sizing:border-box!important;
-  border:1.5px dashed #9bb7ce!important;
-  border-radius:6px!important;
-}
-.jgb-work-photos .jgb-photo-arrow{
-  flex:0 0 auto!important;
-  width:30px!important;
-  min-width:30px!important;
-  text-align:center!important;
-  color:#d71920!important;
-  font-size:32px!important;
-  font-weight:900!important;
-  line-height:1!important;
-}
-</style>
+  window.eamHistoryCardSave=function(code){
+    return saveCard(code,{
+      name:'jgbHC_name',category:'jgbHC_category',loc:'jgbHC_locCode',place:'jgbHC_place',
+      model:'jgbHC_model',capacity:'jgbHC_capacity',qty:'jgbHC_qty',maker:'jgbHC_maker',
+      as:'jgbHC_as',date:'jgbHC_date',install:'jgbHC_install',life:'jgbHC_life',
+      grade:'jgbHC_grade',warranty:'jgbHC_warranty',asHistory:'jgbHC_asHistory',
+      status:'jgbHC_status',plan:'jgbHC_plan',note:'jgbHC_note',save:'jgbHC_save',
+      modal:null
+    });
+  };
+})();
+</script>
