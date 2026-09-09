@@ -1078,6 +1078,7 @@ function render(){
  const app=document.getElementById("app");
  if(!app)return;
  try{
+  Array.from(document.body.childNodes).forEach(n=>{if(n.nodeType===3&&n.textContent.trim())n.remove()});
   // 스마트폰 QR 접수는 관리자 쉘/사이드바와 완전히 분리된 전용 화면
   if(page==="mobileqr" || page==="mobileqr_done"){
    app.innerHTML=body();
@@ -4349,7 +4350,7 @@ function mobileQrRequestPage(){
     <div class="jgb-card qr-card">
       <div class="qr-step"><i>1</i><div><b>신고 위치</b><small>문제가 발생한 위치를 선택하세요.</small></div></div>
       <div class="jgb-field"><label>위치 <em>필수</em></label>
-        <select id="mobileQrPlace"><option value="">신고 위치를 선택하세요</option><option>코트</option><option>복도</option><option>옥상</option><option>유수장치실</option><option>기타</option></select>
+        <select id="mobileQrPlace"><option value="">신고 위치를 선택하세요</option><option value="코트">코트</option><option value="복도">복도</option><option value="옥상">옥상</option><option value="유수장치실">유수장치실</option><option value="기타">기타</option></select>
       </div>
       <div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 증상을 적어주세요.</small></div></div>
       <div class="jgb-field"><label>고장·이상 내용 <em>필수</em></label>
@@ -4362,7 +4363,8 @@ function mobileQrRequestPage(){
 }
 
 async function addMobileQrIssue(){
-  const place=document.getElementById('mobileQrPlace')?.value||'';
+  const rawPlace=document.getElementById('mobileQrPlace')?.value||'';
+  const place=rawPlace.includes('코트')?'코트':rawPlace;
   const c=document.getElementById('mobileQrContent')?.value.trim()||'';
   if(!place){alert('신고 위치를 선택하세요.');return}
   if(!c){alert('고장·이상 내용을 입력하세요.');return}
