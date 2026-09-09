@@ -1089,7 +1089,7 @@ function tick(){const e=document.getElementById("clock");if(e)e.textContent=new 
 function go(p){if(!p)return;page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
 window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";render()})
 function body(){
- if(page==="qr")return qrRequestPage(); if(page==="qr_done")return qrDonePage();
+ if(page==="mobileqr")return mobileQrRequestPage(); if(page==="mobileqr_done")return mobileQrDonePage(); if(page==="qr")return qrRequestPage(); if(page==="qr_done")return qrDonePage();
  if(page==="dashboard2")return dashboard2();
   if(page==="process")return processPage();
  if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
@@ -4336,6 +4336,57 @@ if(typeof window.eamPage==='function'){
   window.eamHistoryCardEdit=window.jgbOpenAssetHistoryEditor;
   window.eamEditSelectedAsset=window.jgbOpenAssetHistoryEditor;
 })();
+
+function mobileQrRequestPage(){
+  return `<div class="jgb-mobile qr-mobile">
+    <div class="mobile-brand">🛡 장군봉체육관</div>
+    <div class="mobile-hero"><span>스마트폰 간편 접수</span><b>시설 이상 신고</b><small>현장에서 바로 접수하면 관리자 작업관리로 전달됩니다.</small></div>
+    <div class="jgb-card qr-card">
+      <div class="qr-step"><i>1</i><div><b>신고 위치</b><small>문제가 발생한 위치를 선택하세요.</small></div></div>
+      <div class="jgb-field"><label>위치 <em>필수</em></label>
+        <select id="mobileQrPlace"><option value="">신고 위치를 선택하세요</option><option>A · 코트</option><option>B · 복도</option><option>C · 사무실</option><option>D · 옥상</option><option>E · 유수장치실</option></select>
+      </div>
+      <div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 증상을 적어주세요.</small></div></div>
+      <div class="jgb-field"><label>고장·이상 내용 <em>필수</em></label>
+        <textarea id="mobileQrContent" rows="5" placeholder="예: 조명 1개가 켜지지 않습니다."></textarea>
+      </div>
+      <div class="qr-step"><i>3</i><div><b>현장 사진</b><small>필요한 경우 사진을 바로 촬영할 수 있습니다.</small></div></div>
+      <div class="jgb-field"><input id="mobileQrPhoto" type="file" accept="image/*" capture="environment"></div>
+      <button id="mobileQrSubmit" class="jgb-btn qr-submit" style="width:100%" onclick="addMobileQrIssue()">신고 등록</button>
+      <div class="qr-foot">접수 후 관리자 작업관리에서 담당자를 지정하고 조치합니다.</div>
+    </div>
+  </div>`;
+}
+
+async function addMobileQrIssue(){
+  const place=document.getElementById('mobileQrPlace')?.value||'';
+  const c=document.getElementById('mobileQrContent')?.value.trim()||'';
+  if(!place){alert('신고 위치를 선택하세요.');return}
+  if(!c){alert('고장·이상 내용을 입력하세요.');return}
+  if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+  const btn=document.getElementById('mobileQrSubmit'); if(btn)btn.disabled=true;
+  try{
+    let photo_url='';
+    const f=document.getElementById('mobileQrPhoto')?.files?.[0];
+    if(f){
+      const path=`mobile_${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,'_')}`;
+      const up=await SUPA.storage.from('request-photos').upload(path,f,{upsert:false});
+      if(up.error)throw up.error;
+      photo_url=SUPABASE_URL+'/storage/v1/object/public/request-photos/'+path;
+    }
+    const now=new Date().toISOString();
+    const r=await SUPA.from('requests').insert({category:'시설',place,content:c,photo_url,status:'접수',received_at:now});
+    if(r.error)throw r.error;
+    location.href=location.pathname+'?page=mobileqr_done';
+  }catch(e){
+    console.error(e);
+    alert('신고 등록에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'));
+  }finally{if(btn)btn.disabled=false}
+}
+
+function mobileQrDonePage(){
+  return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="jgb-card qr-card" style="text-align:center;padding:36px 22px"><div style="font-size:52px;margin-bottom:14px">✅</div><b style="font-size:22px">신고가 접수되었습니다.</b><small style="display:block;margin-top:10px;color:#64748b;line-height:1.6">관리자 작업관리로 전달되었습니다.<br>담당자 지정 후 조치가 진행됩니다.</small><button class="jgb-btn" style="width:100%;margin-top:24px" onclick="location.href=location.pathname+'?page=mobileqr'">새 신고 등록</button></div></div>`;
+}
 </script>
 
 <style id="STAFF_PERFORMANCE_INNOVATION_V2">
