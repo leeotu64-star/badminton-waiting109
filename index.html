@@ -1104,7 +1104,8 @@ function tick(){const e=document.getElementById("clock");if(e)e.textContent=new 
 function go(p){if(!p)return;page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
 window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";render()})
 function body(){
- if(page==="mobileqr" || page==="qr")return mobileQrRequestPage(); if(page==="mobileqr_done" || page==="qr_done")return mobileQrDonePage();
+ if(page==="qr")page="mobileqr"; if(page==="qr_done")page="mobileqr_done";
+ if(page==="mobileqr")return mobileQrRequestPage(); if(page==="mobileqr_done")return mobileQrDonePage();
  if(page==="dashboard2")return dashboard2();
   if(page==="process")return processPage();
  if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
