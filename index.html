@@ -1259,18 +1259,18 @@ function dashboard(s){
 
   const md=workers.map(w=>({
     ...w,
-    p:staffPerformance(w.id,ym)
+    p:dashboardStaffMonth(w.id,ym)
   }));
 
   const ys=workers.map(w=>({
     ...w,
-    p:staffYearPerformance(w.id,year)
+    p:dashboardStaffYear(w.id,year)
   }));
 
   const sum=md.reduce((a,x)=>{
     a.basic+=x.p.basic.complete;
     a.auto+=x.p.auto.performance;
-    a.issue+=x.p.issue.total;
+    a.issue+=x.p.qr.done;
     a.total+=x.p.total;
     return a;
   },{basic:0,auto:0,issue:0,total:0});
@@ -1281,12 +1281,12 @@ function dashboard(s){
 
   const monthly=Array.from({length:12},(_,i)=>{
     const mo=year+"-"+String(i+1).padStart(2,"0");
-    const vals=workers.map(w=>staffPerformance(w.id,mo));
+    const vals=workers.map(w=>dashboardStaffMonth(w.id,mo));
     return {
       m:i+1,
       basic:vals.reduce((n,p)=>n+p.basic.complete,0),
       auto:vals.reduce((n,p)=>n+p.auto.performance,0),
-      issue:vals.reduce((n,p)=>n+p.issue.total,0),
+      issue:vals.reduce((n,p)=>n+p.qr.done,0),
       total:vals.reduce((n,p)=>n+p.total,0)
     };
   });
@@ -1305,7 +1305,7 @@ function dashboard(s){
         <div class="opx-mini-grid">
           <div class="opx-mini blue"><b>${p.basic.complete}</b><span>정규업무</span></div>
           <div class="opx-mini green"><b>${p.auto.performance}</b><span>근무편성 인정</span></div>
-          <div class="opx-mini orange"><b>${p.issue.total}</b><span>업무지시</span></div>
+          <div class="opx-mini orange"><b>${p.qr.done}</b><span>업무지시</span></div>
         </div>
         <div class="opx-person-foot">
           <span>기본업무 달성 ${basicRate}%</span>
@@ -1323,7 +1323,7 @@ function dashboard(s){
         <td class="nm">${x.name}</td>
         <td class="b">${p.basic.complete}</td>
         <td class="g">${p.auto.performance}<small> (${p.auto.units}회)</small></td>
-        <td class="o">${p.issue.total}</td>
+        <td class="o">${p.qr.done}</td>
         <td class="t">${p.total}</td>
         <td>
           <div class="opx-progress">
@@ -1357,7 +1357,6 @@ function dashboard(s){
           <b>서로 분리하여 확인하고 최종 종합 실적만 자동 합산</b>합니다.
         </div>
         <div class="opx-hero-actions">
-          <button class="opx-btn primary" onclick="go('stats')">📊 직원실적 상세</button>
           <button class="opx-btn" onclick="go('schedule')">📅 근무편성 확인</button>
           <button class="opx-btn" onclick="go('basic')">🧹 기본업무 확인</button>
         </div>
@@ -1383,10 +1382,10 @@ function dashboard(s){
         <em>인정 ${md.reduce((n,x)=>n+x.p.auto.units,0)}회 · 10회 단위 환산</em>
       </div>
       <div class="opx-kpi orange">
-        <span>업무지시 수행실적</span>
+        <span>QR 조치완료 수행실적</span>
         <strong>${sum.issue}<small>건</small></strong>
         <div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.issue/20*100))}%"></i></div>
-        <em>업무지시 수행 건별 즉시 반영</em>
+        <em>QR 조치완료 건별 자동 반영</em>
       </div>
       <div class="opx-kpi violet">
         <span>종합 업무실적</span>
@@ -1457,6 +1456,22 @@ function dashboard(s){
     <section class="opx-panel opx-table-panel">
       <div class="opx-head">
         <div>
+          <h3>${year}년 직원별 연간 실적 비교</h3>
+          <p>월별 실적과 동일한 산정기준으로 연간 누계를 자동 집계합니다.</p>
+        </div>
+        <span class="opx-chip">연간 누계</span>
+      </div>
+      <div class="opx-table-wrap">
+        <table class="opx-table">
+          <thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성 인정</th><th>QR 조치완료</th><th>종합 실적</th><th>기본업무 달성률</th></tr></thead>
+          <tbody>${ys.map((x,i)=>{const p=x.p, r=p.target?Math.min(100,Math.round(p.basic/p.target*100)):0;return `<tr><td>${i+1}</td><td class="nm">${x.name}</td><td class="b">${p.basic}</td><td class="g">${p.auto}<small> (${p.autoUnits}회)</small></td><td class="o">${p.issueDone}</td><td class="t">${p.total}</td><td><div class="opx-progress"><div class="opx-progress-track"><i style="width:${r}%"></i></div><small>${r}%</small></div></td></tr>`}).join('')}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="opx-panel opx-table-panel">
+      <div class="opx-head">
+        <div>
           <h3>직원별 상세 실적</h3>
           <p>평가 기준을 분리하여 실제 업무수행과 자동 인정실적을 명확하게 구분합니다.</p>
         </div>
@@ -1478,7 +1493,7 @@ function dashboard(s){
               <th>직원명</th>
               <th>정규업무<br>실적</th>
               <th>근무편성 인정<br>실적</th>
-              <th>업무지시<br>수행</th>
+              <th>QR 조치완료<br>수행</th>
               <th>종합<br>실적</th>
               <th>기본업무<br>달성률</th>
             </tr>
@@ -1511,90 +1526,9 @@ function dashboard(s){
       · 업무지시 수행실적은 근무일 여부와 관계없이 수행 건별 반영됩니다.
       
 
-    ${staffPerformanceDashboardSection()}
     </div>
 
   </div>`;
-}
-
-function staffPerformanceDashboardSection(){
-  const ym=monthKey(), year=Number(ym.slice(0,4));
-  const monthData=workers.map(w=>({...w,p:staffPerformance(w.id,ym)}));
-  const yearData=workers.map(w=>({...w,p:staffYearPerformance(w.id,year)}));
-  const monthly=Array.from({length:12},(_,i)=>{
-    const m=String(i+1).padStart(2,"0"),mo=year+"-"+m;
-    const vals=workers.map(w=>staffPerformance(w.id,mo));
-    return {m:i+1,vals,total:vals.reduce((n,p)=>n+p.total,0)};
-  });
-  const yearSum=yearData.reduce((a,x)=>{
-    a.basic+=x.p.basic;a.auto+=x.p.auto;a.issue+=x.p.issue;a.total+=x.p.total;return a
-  },{basic:0,auto:0,issue:0,total:0});
-  const monthSum=monthData.reduce((a,x)=>{
-    a.basic+=x.p.basic.complete;a.auto+=x.p.auto.performance;a.issue+=x.p.issue.total;a.total+=x.p.total;return a
-  },{basic:0,auto:0,issue:0,total:0});
-  const monthRows=monthly.map(r=>`<tr class="${r.m===Number(ym.slice(5,7))?'current':''}">
-    <td>${r.m}월</td>
-    ${r.vals.map((p,i)=>`<td><b>${p.total}</b><small>정규 ${p.basic.complete} · 편성 ${p.auto.performance} · 지시 ${p.issue.total}</small></td>`).join("")}
-    <td class="sum">${r.total}</td>
-  </tr>`).join("");
-  const cards=monthData.map(x=>`<article class="sp-card">
-    <div class="sp-card-head"><div><span class="sp-person">${x.name}</span><span class="sp-status">${x.p.basic.target?`근무대상 ${x.p.basic.target}일`:''}</span></div><strong>${x.p.total}<small>회</small></strong></div>
-    <div class="sp-break">
-      <div class="sp-box basic"><span>정규업무 실적</span><b>${x.p.basic.complete}</b><small>기본업무 10/10</small></div>
-      <div class="sp-box auto"><span>근무편성 인정실적</span><b>${x.p.auto.performance}</b><small>인정 ${x.p.auto.units}회 · 잔여 ${x.p.auto.remainder}</small></div>
-      <div class="sp-box issue"><span>업무지시 수행실적</span><b>${x.p.issue.total}</b><small>완료 ${x.p.issue.done} · 미완료 ${x.p.issue.pending}</small></div>
-    </div>
-    <div class="sp-total"><span>종합 업무실적</span><b>${x.p.total}회</b></div>
-  </article>`).join("");
-  const yearCards=yearData.map(x=>`<article class="sp-year-card">
-    <div class="sp-year-name">${x.name}</div>
-    <div class="sp-year-total"><span>${year}년 종합 업무실적</span><b>${x.p.total}<em>회</em></b></div>
-    <div class="sp-year-grid">
-      <div><span>정규업무</span><b>${x.p.basic}</b></div>
-      <div><span>근무편성 인정</span><b>${x.p.auto}</b><small>인정 ${x.p.autoUnits}회</small></div>
-      <div><span>업무지시 수행</span><b>${x.p.issue}</b><small>완료 ${x.p.issueDone}건</small></div>
-    </div>
-    <div class="sp-foot">기본업무 달성률 ${x.p.target?Math.round(x.p.basic/x.p.target*100):0}% · 편성 인정 잔여 ${x.p.remainder}회</div>
-  </article>`).join("");
-
-  return `<section class="sp-dashboard-section">
-    <div class="sp-head">
-      <div><div class="sp-kicker">STAFF PERFORMANCE</div><h2>직원 업무수행 실적</h2>
-      <p>작업관리·기본업무·근무편성 데이터를 자동 연계하여 월별·연도별 실적을 이곳에서 통합 관리합니다.</p></div>
-      <div class="sp-controls">
-        <select onchange="setStaffPerfYear(this.value)">${[2025,2026,2027].map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}년</option>`).join("")}</select>
-        <input type="month" value="${ym}" onchange="setStaffPerfMonth(this.value)">
-      </div>
-    </div>
-    <div class="sp-tabs">
-      <button class="${staffPerfView==='month'?'on':''}" onclick="setStaffPerfView('month')">📅 월별</button>
-      <button class="${staffPerfView==='year'?'on':''}" onclick="setStaffPerfView('year')">📊 연도별</button>
-    </div>
-    ${staffPerfView==='month'?`
-      <div class="sp-summary">
-        <div><span>이번 달 종합 업무실적</span><b>${monthSum.total}<em>회</em></b></div>
-        <div><span>정규업무 실적</span><b>${monthSum.basic}</b></div>
-        <div><span>근무편성 인정실적</span><b>${monthSum.auto}</b></div>
-        <div><span>업무지시 수행실적</span><b>${monthSum.issue}</b></div>
-      </div>
-      <div class="sp-rule"><b>실적 산정 기준</b><span>정규업무 10회 완료 = 1실적</span><span>근무편성 인정 10회 = 1실적</span><span>업무지시는 수행자에게 건별 즉시 반영</span></div>
-      <h3 class="sp-title">${year}년 ${Number(ym.slice(5,7))}월 직원별 실적</h3>
-      <div class="sp-cards">${cards}</div>
-      <h3 class="sp-title">${year}년 월별 직원 실적 비교</h3>
-      <div class="sp-table-wrap"><table class="sp-table"><thead><tr><th>월</th>${workers.map(w=>`<th>${w.name}</th>`).join("")}<th>월 합계</th></tr></thead><tbody>${monthRows}</tbody></table></div>
-    `:`
-      <div class="sp-summary">
-        <div><span>${year}년 종합 업무실적</span><b>${yearSum.total}<em>회</em></b></div>
-        <div><span>정규업무 실적</span><b>${yearSum.basic}</b></div>
-        <div><span>근무편성 인정실적</span><b>${yearSum.auto}</b></div>
-        <div><span>업무지시 수행실적</span><b>${yearSum.issue}</b></div>
-      </div>
-      <div class="sp-rule"><b>연간 집계</b><span>월별 실적을 연간 기준으로 합산</span><span>근무편성 인정은 10회 단위로 실적 환산</span><span>업무지시는 근무일 여부와 관계없이 수행자에게 건별 반영</span></div>
-      <h3 class="sp-title">${year}년 직원별 연간 실적</h3>
-      <div class="sp-year-cards">${yearCards}</div>
-    `}
-    <div class="sp-note">※ 기존 기본업무 방식은 변경하지 않습니다. 정규업무·근무편성 인정·업무지시 수행은 분리하여 보여주고, 최종 종합 업무실적만 자동 합산합니다.</div>
-  </section>`;
 }
 
 function dashboard2(){
@@ -1800,24 +1734,26 @@ function staffMonthlyAutoStats(wid,month){
   return {total,by};
 }
 
-function staffIssueStats(wid,month){
+function dashboardQrStats(wid,month){
   const all=Array.isArray(db.issues)?db.issues:[];
-  const list=all.filter(x=>String(x?.handlerId||'')===String(wid)&&String(x?.createdAt||'').slice(0,7)===month);
-  const done=list.filter(x=>x.status==='완료').length;
-  return {total:list.length,done,pending:list.length-done};
+  const list=all.filter(x=>{
+    if(String(x?.handlerId||'')!==String(wid)) return false;
+    if(x?.status!=='완료') return false;
+    const basis=String(x?.completedAt||x?.startedAt||x?.createdAt||'');
+    return basis.slice(0,7)===month;
+  });
+  const done=list.length;
+  return {done,assigned:done,doing:0,pending:0};
 }
 function staffAutoUnits(wid,month){
   let units=0,by={휴무:0,주휴일:0,연가:0,공가:0,대체휴무:0,추석:0};
   const y=Number(month.slice(0,4)),m=Number(month.slice(5,7)),days=new Date(y,m,0).getDate();
-  // 근무편성 인정실적은 당월 전체 근무편성을 기준으로 자동 산정한다.
-  // 오늘 날짜 이후의 예정된 휴무·주휴일·연가·공가·대휴도 즉시 반영한다.
-  const limit=days;
-  for(let d=1;d<=limit;d++){
+  for(let d=1;d<=days;d++){
     const date=month+'-'+String(d).padStart(2,'0');
-    const row=workersForDate(date).find(x=>x.id===wid), st=String(row?.status||'');
+    const row=workersForDate(date).find(x=>x.id===wid),st=String(row?.status||'');
     if(!staffAutoStatus(st))continue;
     units++;
-    if(st.includes('휴무'))by.휴무++;
+    if(st.includes('휴무')&&!st.includes('대체휴무')&&!st.includes('대휴'))by.휴무++;
     else if(st.includes('주휴일'))by.주휴일++;
     else if(st.includes('연가'))by.연가++;
     else if(st.includes('공가'))by.공가++;
@@ -1826,38 +1762,22 @@ function staffAutoUnits(wid,month){
   }
   return {units,performance:Math.floor(units/10),remainder:units%10,by};
 }
-function staffPerformance(wid,month){
+function dashboardStaffMonth(wid,month){
   const basic=basicWorkerStats(wid,month);
   const auto=staffAutoUnits(wid,month);
-  const issue=staffIssueStats(wid,month);
-  return {basic,auto,issue,total:basic.complete+auto.performance+issue.total};
+  const qr=dashboardQrStats(wid,month);
+  return {basic,auto,qr,total:basic.complete+auto.performance+qr.done};
 }
-function staffYearPerformance(wid,year){
-  let basic=0,autoUnits=0,issue=0,issueDone=0,target=0;
+function dashboardStaffYear(wid,year){
+  let basic=0,autoUnits=0,qrDone=0,target=0;
   for(let m=1;m<=12;m++){
     const ym=year+'-'+String(m).padStart(2,'0');
-    const p=staffPerformance(wid,ym);
-    basic+=p.basic.complete; autoUnits+=p.auto.units; issue+=p.issue.total; issueDone+=p.issue.done; target+=p.basic.target;
+    const p=dashboardStaffMonth(wid,ym);
+    basic+=p.basic.complete; autoUnits+=p.auto.units; qrDone+=p.qr.done; target+=p.basic.target;
   }
-  return {basic,autoUnits,auto:Math.floor(autoUnits/10),remainder:autoUnits%10,issue,issueDone,target,total:basic+Math.floor(autoUnits/10)+issue};
+  return {basic,autoUnits,auto:Math.floor(autoUnits/10),remainder:autoUnits%10,issue:qrDone,issueDone:qrDone,target,total:basic+Math.floor(autoUnits/10)+qrDone};
 }
-let staffPerfView='month';
-function setStaffPerfView(v){staffPerfView=v;render();}
-function setStaffPerfMonth(v){selectedDate=String(v)+'-01';staffPerfView='month';render();}
-function setStaffPerfYear(v){selectedDate=String(v)+'-01-01';staffPerfView='year';render();}
-function statsPage(){
-  const ym=monthKey(), year=Number(ym.slice(0,4));
-  const monthData=workers.map(w=>({...w,p:staffPerformance(w.id,ym)}));
-  const yearData=workers.map(w=>({...w,p:staffYearPerformance(w.id,year)}));
-  const monthSum=monthData.reduce((a,x)=>{a.basic+=x.p.basic.complete;a.auto+=x.p.auto.performance;a.issue+=x.p.issue.total;a.total+=x.p.total;return a},{basic:0,auto:0,issue:0,total:0});
-  const yearSum=yearData.reduce((a,x)=>{a.basic+=x.p.basic;a.auto+=x.p.auto;a.issue+=x.p.issue;a.total+=x.p.total;return a},{basic:0,auto:0,issue:0,total:0});
-  const monthly=Array.from({length:12},(_,i)=>{const m=String(i+1).padStart(2,'0'),mo=year+'-'+m;const vals=workers.map(w=>staffPerformance(w.id,mo));return {m:i+1,vals,total:vals.reduce((n,p)=>n+p.total,0)}});
-  const selectedMonthLabel=Number(ym.slice(5,7))+'월';
-  const monthCards=monthData.map(x=>`<article class="sp-card"><div class="sp-card-head"><div><span class="sp-person">${x.name}</span><span class="sp-status">${x.p.basic.target?`근무대상 ${x.p.basic.target}일`:''}</span></div><strong>${x.p.total}<small>회</small></strong></div><div class="sp-break"><div class="sp-box basic"><span>정규업무 실적</span><b>${x.p.basic.complete}</b><small>기본업무 10/10</small></div><div class="sp-box auto"><span>근무편성 인정실적</span><b>${x.p.auto.performance}</b><small>인정 ${x.p.auto.units}회 · 잔여 ${x.p.auto.remainder}</small></div><div class="sp-box issue"><span>업무지시 수행실적</span><b>${x.p.issue.total}</b><small>완료 ${x.p.issue.done} · 미완료 ${x.p.issue.pending}</small></div></div><div class="sp-total"><span>종합 업무실적</span><b>${x.p.total}회</b></div></article>`).join('');
-  const monthTable=monthly.map(r=>`<tr class="${r.m===Number(ym.slice(5,7))?'current':''}"><td>${r.m}월</td>${r.vals.map(p=>`<td><b>${p.total}</b><small>정규 ${p.basic.complete} · 편성 ${p.auto.performance} · 지시 ${p.issue.total}</small></td>`).join('')}<td class="sum">${r.total}</td></tr>`).join('');
-  const yearCards=yearData.map(x=>`<article class="sp-year-card"><div class="sp-year-name">${x.name}</div><div class="sp-year-total"><span>종합 업무실적</span><b>${x.p.total}<em>회</em></b></div><div class="sp-year-grid"><div><span>정규업무</span><b>${x.p.basic}</b></div><div><span>근무편성 인정</span><b>${x.p.auto}</b><small>인정 ${x.p.autoUnits}회</small></div><div><span>업무지시 수행</span><b>${x.p.issue}</b><small>완료 ${x.p.issueDone}건</small></div></div><div class="sp-progress"><i style="width:${x.p.target?Math.min(100,Math.round((x.p.basic/x.p.target)*100)):0}%"></i></div><div class="sp-foot">기본업무 달성률 ${x.p.target?Math.round(x.p.basic/x.p.target*100):0}% · 편성 인정 잔여 ${x.p.remainder}회</div></article>`).join('');
-  return `<div class="sp-wrap"><div class="sp-head"><div><div class="sp-kicker">STAFF PERFORMANCE</div><h1>직원 업무실적</h1><p>월별 · 연도별 직원 실적을 동일 기준으로 분리 집계하고 종합 실적은 자동 합산합니다.</p></div><div class="sp-controls"><select onchange="setStaffPerfYear(this.value)">${[2025,2026,2027].map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}년</option>`).join('')}</select><input type="month" value="${ym}" onchange="setStaffPerfMonth(this.value)"><button class="btn red" onclick="resetEmployeePerformance()">↻ 직원 업무실적 리셋</button></div></div><div class="sp-tabs"><button class="${staffPerfView==='month'?'on':''}" onclick="setStaffPerfView('month')">📅 월별 직원 실적</button><button class="${staffPerfView==='year'?'on':''}" onclick="setStaffPerfView('year')">📊 연도별 직원 실적</button></div>${staffPerfView==='month'?`<section><div class="sp-summary"><div><span>이번 달 종합 업무실적</span><b>${monthSum.total}<em>회</em></b></div><div><span>정규업무 실적</span><b>${monthSum.basic}</b></div><div><span>근무편성 인정실적</span><b>${monthSum.auto}</b></div><div><span>업무지시 수행실적</span><b>${monthSum.issue}</b></div></div><div class="sp-rule"><b>실적 산정 기준</b><span>정규업무 10회 완료 = 1실적</span><span>근무편성 인정 10회 = 1실적</span><span>업무지시는 수행자에게 건별 즉시 반영</span></div><h2 class="sp-title">${year}년 ${selectedMonthLabel} 직원별 실적</h2><div class="sp-cards">${monthCards}</div><h2 class="sp-title">${year}년 월별 직원 실적</h2><div class="sp-table-wrap"><table class="sp-table"><thead><tr><th>월</th>${workers.map(w=>`<th>${w.name}</th>`).join('')}<th>월 합계</th></tr></thead><tbody>${monthTable}</tbody></table></div></section>`:`<section><div class="sp-summary"><div><span>${year}년 종합 업무실적</span><b>${yearSum.total}<em>회</em></b></div><div><span>정규업무 실적</span><b>${yearSum.basic}</b></div><div><span>근무편성 인정실적</span><b>${yearSum.auto}</b></div><div><span>업무지시 수행실적</span><b>${yearSum.issue}</b></div></div><div class="sp-rule"><b>연간 집계</b><span>월별 실적을 연간 기준으로 합산</span><span>근무편성 인정은 10회 단위로 실적 환산</span><span>업무지시는 근무일 여부와 관계없이 수행자에게 건별 반영</span></div><h2 class="sp-title">${year}년 직원별 연간 실적</h2><div class="sp-year-cards">${yearCards}</div></section>`}<div class="sp-note">※ 기존 기본업무 방식은 변경하지 않습니다. 정규업무·근무편성 인정·업무지시 수행은 화면에서 완전히 분리하여 보여주고, 마지막에만 종합 업무실적으로 합산합니다.</div></div>`;
-}
+function setStaffPerfMonth(v){selectedDate=String(v)+'-01';render();}
 function workerPage(){return `<div class="pagebar"><h1>근무자별 현황 · ${selectedDate}</h1></div><div class="workergrid">${todayWorkers().map(w=>{const d=tasksFor(w.id), bs=basicWorkerStats(w.id,monthKey()), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()),p=mine.filter(x=>x.status!=="완료");return `<div class="workerbox"><h3>${w.name}</h3><span class="badge ${w.working?"":"off"}">${w.working?w.shift+" "+w.start+"~"+w.end:w.status}</span><div class="compareline">기본업무 <b>${w.working?`${bs.complete}/${bs.target}일`:"-"}</b></div><div class="compareline">조치완료 <b>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</b></div><div class="compareline">미조치 <b class="${p.length?"red":"green"}">${w.working?p.length:"-"}</b></div><div class="compareline">접수 합계 <b>${mine.length}건</b></div></div>`}).join("")}</div>`}
 function pendingPage(){const p=(db.issues||[]).filter(x=>x.status!=="완료");return `<div class="pagebar"><h1>미조치 현황</h1></div><div class="panel">${p.map(x=>`<div class="issue"><div><b class="red">${x.handlerName||"담당 미지정"}</b><br>${x.category} · ${x.place} · ${x.content}<div class="small">접수시간 ${time(x.createdAt)}</div></div><button class="btn" onclick="go('process')">조치</button></div>`).join("")||"<div class='small'>미조치 사항이 없습니다.</div>"}</div>`}
 function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><button class="btn red" onclick="resetAll()">테스트 데이터 전체 초기화</button></div>`}
