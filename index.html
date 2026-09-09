@@ -1599,18 +1599,18 @@ function dashboard2(){
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
 function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
 function workerRow(w){const d=tasksFor(w.id), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()), md=mine.filter(x=>x.status!=="완료").length, bs=basicWorkerStats(w.id,monthKey());return `<tr><td><b>${w.name}</b></td><td>${w.shift}<br>${w.start?`${w.start}~${w.end}`:"-"}</td><td><span class="badge ${w.working?"":"off"}">${w.working?"근무":"휴무"}</span></td><td>${w.working?`${bs.complete}/${bs.target}일`:"-"}</td><td>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</td><td class="${md?"red":"green"}"><b>${w.working?md:"-"}</b></td><td><b>${mine.length}건</b></td></tr>`}
-const ACTION_TYPES=['자체조치','자동 자체조치','외부용역'];
+const ACTION_TYPES=['자체조치','외부용역'];
 function actionNoteFromIssue(x){const m=String(x?.content||'').match(/\[\[조치내용:([\s\S]*?)\]\]/);return m?m[1].trim():''}
 function applyIssuePreset(){const v=document.getElementById("issuePreset")?.value||"",ta=document.getElementById("content");if(!ta)return;if(v&&v!=="직접입력")ta.value=v;else if(v==="직접입력"){ta.value="";ta.focus()}}
-function cleanIssueContent(x){return String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|자동 자체조치|외부용역)\]\]/g,'').trim()}
+function cleanIssueContent(x){return String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').trim()}
 function cleanReporterContent(text){return String(text||'').replace(/\s*\[\[신고자:[^\]]+\]\]/g,'').trim()}
-function cleanWorkContent(x){return cleanReporterContent(String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|자동 자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim())}
+function cleanWorkContent(x){return cleanReporterContent(String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim())}
 function registerPage(){const defaultCat="시설";const places=PLACE_GROUPS[defaultCat]||PLACE_OPTIONS;const presets=ISSUE_PRESETS[defaultCat]||[];return `<div class="pagebar"><h1>시설·환경·안전 접수</h1><button class="btn gray" onclick="go('dashboard')">종합 대시보드</button></div><div class="notice">구분과 장소를 선택하면 해당 시설에 맞는 장소·접수사항이 자동으로 표시됩니다. 등록자 이름은 저장하지 않습니다.</div><div class="panel"><div class="formgrid"><div class="field"><label>구분</label><select id="cat" onchange="updateRegisterOptions()"><option>시설</option><option>환경</option><option>안전</option><option>기타</option></select></div><div class="field"><label>접수 장소</label><select id="place"><option value="">장소를 선택하세요</option>${places.map(p=>`<option value="${p}">${p}</option>`).join("")}</select></div><div class="field full"><label>시설·접수사항 선택</label><select id="issuePreset" onchange="applyIssuePreset()"><option value="">내용을 선택하세요</option>${presets.map(v=>`<option value="${v}">${v}</option>`).join("")}<option value="직접입력">직접입력</option></select></div><div class="field full"><label>상세 내용</label><textarea id="content" rows="3" placeholder="위 목록에서 선택하거나 필요한 경우 상세 내용을 입력하세요"></textarea></div><div class="field full"><label>사진(선택)</label><input id="photo" type="file" accept="image/*"></div></div><button class="btn" style="margin-top:10px" onclick="addIssue()">접수 등록</button></div><div class="panel" style="margin-top:10px"><h2>최근 접수</h2>${db.issues.slice(-8).reverse().map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수 ${time(x.createdAt)}</div></div><div class="status ${x.status==="완료"?"green":"red"}">${x.status}</div></div>`).join("")||"<div class='small'>접수된 사항이 없습니다.</div>"}</div>`}
 async function setActionType(id,type){const x=(db.issues||[]).find(i=>i.id===id);if(!x||!type)return;x.actionType=type;x.content=withActionMarker(x.content,type);if(x.remoteId){const r=await SUPA.from('requests').update({content:x.content}).eq('id',x.remoteId);if(r.error){alert('처리구분 저장에 실패했습니다.');return}}await syncFromSupabase()}
 function updateRegisterOptions(){const cat=document.getElementById("cat")?.value||"시설",place=document.getElementById("place"),preset=document.getElementById("issuePreset");if(place){const arr=PLACE_GROUPS[cat]||PLACE_OPTIONS;place.innerHTML='<option value="">장소를 선택하세요</option>'+arr.map(p=>`<option value="${p}">${p}</option>`).join("")}if(preset){const arr=ISSUE_PRESETS[cat]||[];preset.innerHTML='<option value="">내용을 선택하세요</option>'+arr.map(v=>`<option value="${v}">${v}</option>`).join("")+ '<option value="직접입력">직접입력</option>';preset.value=""}}
-function withActionMarker(content,type){const base=String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|자동 자체조치|외부용역)\]\]/g,'').trim();return type?base+' [[처리구분:'+type+']]':base}
-function withWorkMarkers(content,type,note){let base=cleanReporterContent(String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|자동 자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim());if(type)base+=' [[처리구분:'+type+']]';if(note)base+=' [[조치내용:'+String(note).replace(/\]\]/g,'')+']]';return base}
-function actionTypeFromIssue(x){if(x&&ACTION_TYPES.includes(x.actionType))return x.actionType;const m=String(x?.content||'').match(/\[\[처리구분:(자체조치|자동 자체조치|외부용역)\]\]/);return m?m[1]:''}
+function withActionMarker(content,type){const base=String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').trim();return type?base+' [[처리구분:'+type+']]':base}
+function withWorkMarkers(content,type,note){let base=cleanReporterContent(String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim());if(type)base+=' [[처리구분:'+type+']]';if(note)base+=' [[조치내용:'+String(note).replace(/\]\]/g,'')+']]';return base}
+function actionTypeFromIssue(x){if(x&&ACTION_TYPES.includes(x.actionType))return x.actionType;const m=String(x?.content||'').match(/\[\[처리구분:(자체조치|외부용역)\]\]/);return m?m[1]:''}
 function processPage(){
  const all=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
  const pending=all.filter(x=>x.status!=='완료');
@@ -1618,94 +1618,72 @@ function processPage(){
  const waiting=pending.filter(x=>!x.handlerId).length;
  const running=pending.filter(x=>x.handlerId).length;
  const done=completed.length;
- const todayKey=new Date().toISOString().slice(0,10);
- const today=all.filter(x=>String(x.createdAt||'').slice(0,10)===todayKey).length;
- const todayDone=completed.filter(x=>String(x.completedAt||x.createdAt||'').slice(0,10)===todayKey).length;
+ const today=all.filter(x=>{const d=new Date(x.createdAt||0),n=new Date();return d.toDateString()===n.toDateString()}).length;
  const places=['남자 샤워실','여자 샤워실','여자 화장실','남자 화장실','복도','기타'];
  const placeRows=places.map(place=>({place,count:all.filter(x=>(x.place||'기타')===place).length}));
  const maxPlace=Math.max(1,...placeRows.map(x=>x.count));
- const esc=window.xEsc||((v)=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])));
- const statusClass=v=>v==='완료'?'ok':v==='조치중'?'run':'';
- const timeLabel=x=>{
-   const d=new Date(x.createdAt||0);
-   if(Number.isNaN(d.getTime())) return '-';
-   return d.toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).replace(/\. /g,'.').replace(/\.$/,'');
- };
- const workerOptions=(x)=>workers.map(w=>`<option value="${esc(w.id)}" ${x.handlerId===w.id?'selected':''}>${esc(w.name)}</option>`).join('');
- return `<style id="process-v4-style">
- .proc-v3{--ink:#10233f;--muted:#65758b;--line:#d6e1ed;--blue:#1769d2;--soft:#f5f8fc;max-width:100%;padding:8px 0 40px;color:var(--ink)}
- .proc-v3 *{box-sizing:border-box}.proc-v3 button,.proc-v3 select,.proc-v3 textarea{font-family:inherit}
- .proc-v3 .pv-hero{padding:34px 34px;border-radius:24px;margin-bottom:18px}
- .proc-v3 .pv-kicker{font-size:18px!important;font-weight:900!important;letter-spacing:.06em}
- .proc-v3 .pv-title{font-size:38px!important;line-height:1.15!important;font-weight:950!important}
- .proc-v3 .pv-sub{font-size:20px!important;line-height:1.55!important;font-weight:650!important}
- .proc-v3 .pv-live-pill{font-size:17px!important;padding:11px 16px!important;font-weight:850!important}
- .proc-v3 .pv-refresh{font-size:17px!important;padding:12px 18px!important;font-weight:900!important}
- .proc-v3 .pv-kpis{gap:16px!important;margin-bottom:22px!important}
- .proc-v3 .pv-kpi{min-height:158px!important;padding:24px!important;border-radius:20px!important}
- .proc-v3 .pv-kpi .ico{font-size:30px!important}.proc-v3 .pv-cap{font-size:18px!important;font-weight:900!important}.proc-v3 .pv-num{font-size:46px!important;font-weight:950!important;line-height:1.05!important}.proc-v3 .pv-num small{font-size:20px!important}.proc-v3 .pv-desc{font-size:16px!important;font-weight:650!important}
- .proc-v3 .pv-section-title{margin:26px 0 12px!important}.proc-v3 .pv-section-title h3{font-size:26px!important;font-weight:950!important}.proc-v3 .pv-section-title span{font-size:16px!important;font-weight:750!important}
- .proc-v3 .pv-workflow{gap:14px!important;margin-bottom:20px!important}.proc-v3 .pv-flow{padding:22px 18px!important;min-height:112px!important}.proc-v3 .pv-flow-num{font-size:20px!important;width:38px!important;height:38px!important}.proc-v3 .pv-flow strong{font-size:20px!important}.proc-v3 .pv-flow small{font-size:16px!important;font-weight:700!important}
- .proc-v3 .pv-tools{gap:10px!important;padding:14px!important;margin-bottom:14px!important}.proc-v3 .pv-chip{font-size:17px!important;padding:10px 15px!important;font-weight:900!important}.proc-v3 .pv-danger{font-size:17px!important;padding:11px 16px!important;font-weight:900!important}
- .proc-v3 .pv-board{border-radius:20px!important}
- .proc-v3 .pv-head,.proc-v3 .pv-row{grid-template-columns:150px 165px minmax(260px,1.5fr) 110px 180px 280px 90px!important}
- .proc-v3 .pv-head{font-size:17px!important;font-weight:950!important;padding:18px 16px!important}
- .proc-v3 .pv-row{min-height:185px!important}
- .proc-v3 .pv-cell{padding:20px 16px!important;font-size:18px!important}
- .proc-v3 .pv-date{font-size:19px!important;font-weight:950!important}.proc-v3 .pv-clock{font-size:19px!important;font-weight:850!important;margin-top:5px!important}
- .proc-v3 .pv-place{font-size:22px!important;font-weight:950!important;line-height:1.3!important}.proc-v3 .pv-cat{font-size:16px!important;font-weight:800!important;padding:5px 9px!important}
- .proc-v3 .pv-content{font-size:20px!important;font-weight:750!important;line-height:1.55!important;white-space:normal!important;word-break:keep-all!important}
- .proc-v3 .pv-photo{font-size:16px!important;padding:8px 12px!important;font-weight:900!important;margin-top:10px!important}
- .proc-v3 .pv-status{font-size:19px!important;font-weight:950!important}.proc-v3 .pv-select{font-size:18px!important;min-height:52px!important;padding:10px 12px!important;font-weight:800!important}
- .proc-v3 .pv-step{display:flex!important;gap:6px!important;flex-wrap:wrap!important}.proc-v3 .pv-step span{font-size:15px!important;padding:7px 9px!important;font-weight:900!important}
- .proc-v3 .pv-history{font-size:16px!important;line-height:1.55!important;font-weight:750!important;margin:10px 0!important}.proc-v3 .pv-note{font-size:18px!important;min-height:86px!important;line-height:1.5!important;padding:12px!important;font-weight:650!important}
- .proc-v3 .pv-save,.proc-v3 .pv-done,.proc-v3 .pv-delete{font-size:17px!important;padding:11px 13px!important;font-weight:950!important;margin-top:8px!important}
- .proc-v3 .pv-lower{gap:16px!important;margin-top:20px!important}.proc-v3 .pv-panel{border-radius:20px!important}.proc-v3 .pv-panel-head{font-size:21px!important;font-weight:950!important;padding:18px!important}.proc-v3 .pv-panel-body{font-size:17px!important;padding:18px!important}
- .proc-v3 .pv-place-line{font-size:18px!important;min-height:44px!important}.proc-v3 .pv-place-line b{font-size:19px!important}.proc-v3 .pv-footer-note{font-size:16px!important;line-height:1.6!important}.proc-v3 .pv-recent strong{font-size:18px!important}.proc-v3 .pv-recent small{font-size:16px!important}.proc-v3 .pv-recent-state{font-size:16px!important;font-weight:900!important}.proc-v3 .pv-mini span{font-size:16px!important}.proc-v3 .pv-mini b{font-size:26px!important}
- .proc-v3 .pv-completed{gap:16px!important}.proc-v3 .pv-card{padding:20px!important;border-radius:18px!important}.proc-v3 .pv-card-title{font-size:21px!important;font-weight:950!important}.proc-v3 .pv-card-body{font-size:18px!important;line-height:1.6!important}.proc-v3 .pv-tag{font-size:15px!important;padding:7px 10px!important;font-weight:850!important}
- @media(max-width:950px){.proc-v3 .pv-title{font-size:32px!important}.proc-v3 .pv-sub{font-size:18px!important}.proc-v3 .pv-kpis{grid-template-columns:1fr 1fr}.proc-v3 .pv-head,.proc-v3 .pv-row{min-width:1180px!important}.proc-v3 .pv-cell{font-size:18px!important}}
+ const statusTotal=Math.max(1,all.length);
+ const statusRows=[
+   ['접수',waiting,'#f59e0b'],
+   ['담당 지정',Math.max(0,pending.filter(x=>x.handlerId&&x.status!=='조치중').length),'#2563eb'],
+   ['조치 진행',pending.filter(x=>x.status==='조치중').length,'#6366f1'],
+   ['처리 완료',done,'#16a34a']
+ ];
+ const state=(x)=>x.status==='완료'?'완료':x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
+ const stateClass=(x)=>state(x)==='완료'?'done':state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
+ const noteFor=(x)=>actionNoteFromIssue(x)||'';
+ return `<style id="process-v3-style">
+ .work-v3{--ink:#10243f;--blue:#1769d3;--blue2:#0d4fa9;--line:#dce6f1;--muted:#6f8095;--bg:#eef4f9;--card:#fff;max-width:1500px;margin:0 auto;padding:8px 4px 42px;font-family:inherit;color:var(--ink)}
+ .work-v3 *{box-sizing:border-box}.wv-hero{position:relative;overflow:hidden;display:flex;justify-content:space-between;gap:24px;align-items:flex-end;padding:28px 30px;margin-bottom:18px;border:1px solid #d5e2ef;border-radius:22px;background:linear-gradient(135deg,#ffffff 0%,#f2f7fd 70%,#e8f2ff 100%);box-shadow:0 12px 34px rgba(24,65,105,.08)}
+ .wv-hero:after{content:"";position:absolute;right:-90px;top:-120px;width:280px;height:280px;border-radius:50%;background:rgba(37,111,220,.08)}
+ .wv-eyebrow{font-size:12px;letter-spacing:2px;font-weight:950;color:var(--blue);margin-bottom:5px}.wv-title{font-size:36px;line-height:1.12;font-weight:950;letter-spacing:-1.6px;margin:0}.wv-sub{font-size:16px;font-weight:700;color:#63758b;margin:9px 0 0}.wv-live{position:relative;z-index:1;display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}.wv-pill{display:inline-flex;align-items:center;gap:8px;padding:11px 15px;border:1px solid #d5e2ef;border-radius:999px;background:#fff;font-size:13px;font-weight:900;white-space:nowrap}.wv-dot{width:9px;height:9px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px #dcfce7}.wv-refresh{padding:11px 15px;border:1px solid #c6d9ee;border-radius:11px;background:#edf6ff;color:#1459a8;font-size:13px;font-weight:950;cursor:pointer}
+ .wv-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.wv-kpi{position:relative;min-height:142px;padding:21px 22px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(24,65,105,.07);overflow:hidden}.wv-kpi:after{content:"";position:absolute;right:-38px;top:-38px;width:115px;height:115px;border-radius:50%;background:#eef6ff}.wv-kpi.warn:after{background:#fff7df}.wv-kpi.run:after{background:#f0efff}.wv-kpi.done:after{background:#eaf9ef}.wv-kpi .ico{position:absolute;right:22px;top:19px;font-size:28px;z-index:1}.wv-kpi .label{font-size:15px;font-weight:900;color:#63758b}.wv-kpi .num{font-size:42px;line-height:1;font-weight:950;letter-spacing:-1.8px;margin-top:10px}.wv-kpi .num small{font-size:18px;letter-spacing:0;margin-left:4px}.wv-kpi .desc{font-size:13px;font-weight:700;color:#8795a7;margin-top:8px}
+ .wv-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:18px;border:1px solid var(--line);border-radius:18px;background:#fff;overflow:hidden;box-shadow:0 7px 22px rgba(24,65,105,.05)}.wv-flow-step{position:relative;padding:18px 22px;border-right:1px solid #e7edf4}.wv-flow-step:last-child{border-right:0}.wv-flow-step:after{content:"›";position:absolute;right:-7px;top:24px;width:14px;height:14px;line-height:12px;text-align:center;border-radius:50%;background:#fff;border:1px solid #d8e4ef;color:#8a9aab;font-weight:900;z-index:2}.wv-flow-step:last-child:after{display:none}.wv-flow-step .n{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:950}.wv-flow-step .circle{width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:#edf5ff;color:var(--blue);font-size:12px}.wv-flow-step b{display:block;font-size:26px;margin-top:7px}.wv-flow-step small{display:block;color:#8997a8;font-size:12px;font-weight:700;margin-top:3px}
+ .wv-section{margin-top:18px}.wv-section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:10px}.wv-section-head h3{margin:0;font-size:21px;font-weight:950;letter-spacing:-.7px}.wv-section-head p{margin:4px 0 0;color:#8190a1;font-size:13px;font-weight:700}.wv-count{padding:8px 12px;border-radius:999px;background:#eaf3ff;color:#165eae;font-size:12px;font-weight:950}
+ .wv-queue{display:grid;gap:13px}.wv-card{display:grid;grid-template-columns:145px minmax(260px,1.3fr) minmax(230px,.85fr) minmax(300px,1.05fr) 92px;gap:0;align-items:stretch;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 7px 22px rgba(24,65,105,.06);overflow:hidden}.wv-card>div{min-width:0;padding:20px;border-right:1px solid #e9eef4}.wv-card>div:last-child{border-right:0}.wv-status-col{display:flex;flex-direction:column;justify-content:space-between;gap:12px;background:#fbfdff}.wv-state{display:inline-flex;align-items:center;width:max-content;padding:8px 11px;border-radius:999px;font-size:12px;font-weight:950}.wv-state.new{background:#fff6df;color:#ae6500}.wv-state.assigned{background:#eaf3ff;color:#145ea9}.wv-state.run{background:#f0efff;color:#5b4bc2}.wv-state.done{background:#e9f9ef;color:#16803b}.wv-time{font-size:14px;font-weight:850;color:#62758b;line-height:1.5}.wv-location{font-size:22px;font-weight:950;letter-spacing:-.7px;line-height:1.25}.wv-category{display:inline-block;margin-top:9px;padding:6px 10px;border-radius:999px;background:#f0f5fa;color:#53667b;font-size:11px;font-weight:900}.wv-content-label,.wv-work-label{font-size:11px;color:#8a98a8;font-weight:950;letter-spacing:.6px;margin-bottom:7px}.wv-content{font-size:17px;line-height:1.55;font-weight:800;color:#263c57;word-break:keep-all}.wv-photo{margin-top:10px;padding:7px 10px;border:1px solid #cfe0f2;border-radius:9px;background:#f4f9ff;color:#175fae;font-weight:900;cursor:pointer}.wv-assign select{width:100%;padding:12px 13px;border:1px solid #cbd9e8;border-radius:10px;background:#fff;color:#1c334e;font-size:15px;font-weight:800}.wv-handler{margin-top:11px;font-size:13px;color:#73849a;font-weight:800}.wv-handler b{color:#18334f}.wv-note{width:100%;height:92px;resize:vertical;padding:12px 13px;border:1px solid #cbd9e8;border-radius:11px;background:#fcfdff;color:#243b56;font-size:14px;font-weight:700;line-height:1.5}.wv-actions{display:flex;flex-direction:column;justify-content:center;gap:8px;padding:14px!important}.wv-btn{width:100%;padding:11px 8px;border-radius:10px;font-size:13px;font-weight:950;cursor:pointer}.wv-btn.save{border:0;background:var(--blue);color:#fff}.wv-btn.complete{border:1px solid #bce9cb;background:#edfcf2;color:#16803b}.wv-btn.delete{border:1px solid #fecaca;background:#fff;color:#dc2626}.wv-mini{font-size:12px;color:#8795a5;font-weight:750;line-height:1.5;margin-top:8px}.wv-empty{padding:62px 20px;text-align:center;border:1px dashed #cdd9e5;border-radius:18px;background:#fff;color:#7f8ea0;font-size:16px;font-weight:800}.wv-empty strong{display:block;font-size:22px;color:#24415f;margin-bottom:7px}
+ .wv-bottom{display:grid;grid-template-columns:1.1fr 1fr .9fr;gap:14px;margin-top:18px}.wv-panel{border:1px solid var(--line);border-radius:17px;background:#fff;overflow:hidden;box-shadow:0 7px 22px rgba(24,65,105,.05)}.wv-panel-head{padding:17px 19px;border-bottom:1px solid #e8eef4;font-size:16px;font-weight:950}.wv-panel-body{padding:17px 19px}.wv-place{display:grid;grid-template-columns:100px 1fr 42px;align-items:center;gap:10px;margin:12px 0;font-size:13px;font-weight:850}.wv-bar{height:9px;background:#edf2f7;border-radius:99px;overflow:hidden}.wv-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#5aa0f6,#1769d3)}.wv-recent{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #edf2f6}.wv-recent:last-child{border-bottom:0}.wv-recent strong{display:block;font-size:14px}.wv-recent small{display:block;margin-top:4px;color:#8492a3;font-size:12px;line-height:1.4}.wv-recent span{height:max-content;padding:6px 8px;border-radius:999px;background:#eef5ff;color:#2364a9;font-size:10px;font-weight:950}.wv-ratio{display:grid;gap:13px}.wv-rline{display:grid;grid-template-columns:70px 1fr 32px;align-items:center;gap:8px;font-size:12px;font-weight:900}.wv-rline i{height:9px;border-radius:99px;background:#edf2f7;overflow:hidden}.wv-rline i b{display:block;height:100%;border-radius:99px}.wv-total{margin-top:15px;padding:13px;border-radius:11px;background:#f5f8fc;color:#758599;font-size:12px;font-weight:800}.wv-completed{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.wv-done-card{padding:17px;border:1px solid var(--line);border-radius:15px;background:#fff}.wv-done-top{display:flex;justify-content:space-between;gap:10px}.wv-done-top strong{font-size:14px}.wv-done-text{margin:11px 0;font-size:13px;line-height:1.5;color:#51647a;font-weight:750}.wv-done-meta{display:flex;gap:8px;flex-wrap:wrap;color:#8a98a8;font-size:11px;font-weight:800}
+ @media(max-width:1250px){.wv-card{grid-template-columns:125px minmax(230px,1.2fr) minmax(200px,.8fr) minmax(270px,1fr) 82px}.wv-card>div{padding:16px}.wv-title{font-size:32px}.wv-bottom{grid-template-columns:1fr 1fr}.wv-completed{grid-template-columns:1fr 1fr}}
+ @media(max-width:980px){.work-v3{padding-left:0;padding-right:0}.wv-hero{align-items:flex-start;flex-direction:column}.wv-live{justify-content:flex-start}.wv-kpis{grid-template-columns:1fr 1fr}.wv-flow{grid-template-columns:1fr 1fr}.wv-flow-step{border-bottom:1px solid #e7edf4}.wv-card{grid-template-columns:1fr 1fr}.wv-card>div{border-right:0;border-bottom:1px solid #e9eef4}.wv-status-col{grid-column:1/-1;flex-direction:row;align-items:center}.wv-content-col{grid-column:1/-1}.wv-work-col{grid-column:1/-1}.wv-actions{grid-column:1/-1;flex-direction:row}.wv-btn{width:auto;flex:1}.wv-bottom{grid-template-columns:1fr}.wv-completed{grid-template-columns:1fr}}
+ @media(max-width:620px){.wv-title{font-size:28px}.wv-sub{font-size:14px}.wv-kpis{grid-template-columns:1fr}.wv-flow{grid-template-columns:1fr}.wv-flow-step{border-right:0}.wv-flow-step:after{display:none}.wv-card{grid-template-columns:1fr}.wv-status-col,.wv-content-col,.wv-work-col{grid-column:auto}.wv-actions{grid-column:auto;flex-direction:column}.wv-btn{width:100%}}
  </style>
- <div class="proc-v3">
-  <div class="pv-hero">
-   <div><div class="pv-kicker">STAFF PERFORMANCE · WORK CONTROL</div><div class="pv-title">직원 작업관리</div><p class="pv-sub">QR 접수 업무를 직원 실적으로 연결하고, 접수부터 조치완료까지 한눈에 관리합니다.</p></div>
-   <div class="pv-live"><span class="pv-live-pill"><i class="pv-dot"></i> 실시간 접수</span><span class="pv-live-pill">오늘 <b>${today}건 접수</b></span><button class="pv-refresh" onclick="syncFromSupabase()">↻ 새로고침</button></div>
+ <div class="work-v3">
+  <div class="wv-hero">
+   <div><div class="wv-eyebrow">STAFF PERFORMANCE · WORK CONTROL</div><h2 class="wv-title">직원 작업관리</h2><p class="wv-sub">QR 접수부터 담당 지정 · 조치 기록 · 완료까지, 직원의 실제 작업을 한 화면에서 관리합니다.</p></div>
+   <div class="wv-live"><span class="wv-pill"><i class="wv-dot"></i> 실시간 접수</span><span class="wv-pill">오늘 <b>${today}건</b></span><button class="wv-refresh" onclick="syncFromSupabase()">↻ 새로고침</button></div>
   </div>
-  <div class="pv-kpis">
-   <div class="pv-kpi"><span class="ico">📥</span><div class="pv-cap">전체 접수</div><div class="pv-num">${all.length}<small>건</small></div><div class="pv-desc">누적 접수 업무</div></div>
-   <div class="pv-kpi warn"><span class="ico">⏱</span><div class="pv-cap">미배정</div><div class="pv-num">${waiting}<small>건</small></div><div class="pv-desc">담당 직원 지정 필요</div></div>
-   <div class="pv-kpi run"><span class="ico">⚙</span><div class="pv-cap">조치 진행</div><div class="pv-num">${running}<small>건</small></div><div class="pv-desc">담당자가 지정된 업무</div></div>
-   <div class="pv-kpi ok"><span class="ico">✓</span><div class="pv-cap">처리 완료</div><div class="pv-num">${done}<small>건</small></div><div class="pv-desc">오늘 완료 ${todayDone}건</div></div>
+  <div class="wv-kpis">
+   <div class="wv-kpi"><span class="ico">📥</span><div class="label">전체 접수</div><div class="num">${all.length}<small>건</small></div><div class="desc">현재 누적된 전체 시설 신고</div></div>
+   <div class="wv-kpi warn"><span class="ico">⏳</span><div class="label">담당 미지정</div><div class="num">${waiting}<small>건</small></div><div class="desc">직원 지정이 필요한 작업</div></div>
+   <div class="wv-kpi run"><span class="ico">🔧</span><div class="label">조치 진행</div><div class="num">${running}<small>건</small></div><div class="desc">담당자가 배정된 미완료 작업</div></div>
+   <div class="wv-kpi done"><span class="ico">✓</span><div class="label">처리 완료</div><div class="num">${done}<small>건</small></div><div class="desc">완료 처리된 작업 누계</div></div>
   </div>
-  <div class="pv-section-title"><h3>업무 처리 흐름</h3><span>QR 접수 시스템 · EAM과 별도 운영</span></div>
-  <div class="pv-workflow">
-   <div class="pv-flow done"><div class="pv-flow-num">1</div><strong>QR 접수</strong><small>시설 이상 신고</small></div>
-   <div class="pv-flow ${waiting?'':'done'}"><div class="pv-flow-num">2</div><strong>담당 지정</strong><small>직원 배정</small></div>
-   <div class="pv-flow ${all.some(x=>x.status==='조치중')?'done':''}"><div class="pv-flow-num">3</div><strong>조치 진행</strong><small>작업내용 기록</small></div>
-   <div class="pv-flow ${done?'done':''}"><div class="pv-flow-num">4</div><strong>조치 완료</strong><small>직원 실적 반영</small></div>
+  <div class="wv-flow">
+   <div class="wv-flow-step"><div class="n"><span class="circle">1</span>QR 접수</div><b>${all.length}</b><small>고객 신고가 접수됩니다</small></div>
+   <div class="wv-flow-step"><div class="n"><span class="circle">2</span>담당 지정</div><b>${waiting}</b><small>담당 직원을 선택합니다</small></div>
+   <div class="wv-flow-step"><div class="n"><span class="circle">3</span>조치 기록</div><b>${pending.filter(x=>x.status==='조치중').length}</b><small>작업 내용을 기록합니다</small></div>
+   <div class="wv-flow-step"><div class="n"><span class="circle">4</span>완료</div><b>${done}</b><small>완료 처리 후 실적에 반영됩니다</small></div>
   </div>
-  <div class="pv-tools">
-   <span class="pv-chip blue">전체 ${all.length}</span><span class="pv-chip">미배정 ${waiting}</span><span class="pv-chip">조치중 ${all.filter(x=>x.status==='조치중').length}</span><span class="pv-chip">완료 ${done}</span>
-   <button class="pv-danger" onclick="deleteAllProcessRequests()">🗑 전체 삭제</button>
+  <div class="wv-section">
+   <div class="wv-section-head"><div><h3>지금 처리해야 할 작업</h3><p>최근 접수순 · 담당 지정과 조치 기록을 바로 처리할 수 있습니다.</p></div><span class="wv-count">미완료 ${pending.length}건</span></div>
+   <div class="wv-queue">
+    ${pending.map(x=>{const status=state(x),note=noteFor(x),safe=cleanWorkContent(x)||'접수 내용 없음';return `<div class="wv-card">
+      <div class="wv-status-col"><span class="wv-state ${stateClass(x)}">● ${xEsc(status)}</span><div class="wv-time">접수<br>${time(x.createdAt)}</div></div>
+      <div><div class="wv-location">${xEsc(x.place||'장소 미기록')}</div><span class="wv-category">${xEsc(x.category||'기타')}</span></div>
+      <div class="wv-content-col"><div class="wv-content-label">신고 내용</div><div class="wv-content">${xEsc(safe)}</div>${x.photo_url?`<button class="wv-photo" onclick="window.open('${x.photo_url}','_blank')">📷 사진 보기</button>`:''}</div>
+      <div class="wv-work-col wv-assign"><div class="wv-content-label">담당 직원</div><select onchange="assign('${x.id}',this.value)"><option value="">담당 직원 선택</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select><div class="wv-handler">현재 담당: <b>${xEsc(x.handlerName||'미지정')}</b></div><div class="wv-content-label" style="margin-top:15px">조치 기록</div><textarea class="wv-note" id="note_${x.id}" placeholder="실제로 조치한 내용을 입력하세요">${xEsc(note)}</textarea><div class="wv-mini">저장하면 상태가 <b>조치 진행</b>으로 변경됩니다.</div></div>
+      <div class="wv-actions"><button class="wv-btn save" onclick="saveWorkProcessing('${x.id}',this)">작업기록 저장</button>${x.handlerId?`<button class="wv-btn complete" onclick="completeIssue('${x.id}')">✓ 조치완료</button>`:''}<button class="wv-btn delete" onclick="deleteProcessRequest('${x.id}')">삭제</button></div>
+     </div>`}).join('')||'<div class="wv-empty"><strong>🎉 처리할 작업이 없습니다.</strong>새로운 QR 신고가 접수되면 이곳에 바로 표시됩니다.</div>'}
+   </div>
   </div>
-  <div class="pv-board">
-   <div class="pv-head"><div>접수일시</div><div>장소 · 구분</div><div>신고 내용</div><div>상태</div><div>담당 직원</div><div>작업 기록</div><div>관리</div></div>
-   ${pending.map(x=>{const note=actionNoteFromIssue(x),status=x.status||'접수',safeContent=cleanWorkContent(x),step1=true,step2=!!x.handlerId,step3=!!note,step4=status==='완료';return `<div class="pv-row">
-    <div class="pv-cell"><div class="pv-date">${esc(timeLabel(x).split(' ')[0])}</div><div class="pv-clock">${esc(timeLabel(x).split(' ').slice(1).join(' '))}</div></div>
-    <div class="pv-cell"><div class="pv-place">${esc(x.place||'장소 미기록')}</div><span class="pv-cat">${esc(x.category||'기타')}</span></div>
-    <div class="pv-cell"><div class="pv-content" title="${esc(safeContent||'접수 내용 없음')}">${esc(safeContent||'접수 내용 없음')}</div>${x.photo_url?`<button class="pv-photo" onclick="window.open('${esc(x.photo_url)}','_blank')">📷 사진 확인</button>`:''}</div>
-    <div class="pv-cell"><span class="pv-status ${statusClass(status)}">● ${esc(status)}</span></div>
-    <div class="pv-cell"><select class="pv-select" onchange="assign('${esc(x.id)}',this.value)"><option value="">담당 직원 선택</option>${workerOptions(x)}</select></div>
-    <div class="pv-cell"><div class="pv-step"><span class="${step1?'done':''}">접수</span><span class="${step2?'done':''}">담당</span><span class="${step3?'done':''}">기록</span><span class="${step4?'done':''}">완료</span></div><div class="pv-history">${x.handlerName?'담당 · '+esc(x.handlerName):'담당 직원 미지정'}<br>${note?'조치내용 등록됨':'조치내용 미등록'}</div><textarea class="pv-note" id="note_${esc(x.id)}" placeholder="조치내용을 입력하세요">${esc(note)}</textarea><button class="pv-save" onclick="saveWorkProcessing('${esc(x.id)}',this)">작업기록 저장</button>${x.handlerId?`<button class="pv-done" onclick="completeIssue('${esc(x.id)}')">✓ 조치완료</button>`:''}</div>
-    <div class="pv-cell"><button class="pv-delete" onclick="deleteProcessRequest('${esc(x.id)}')">삭제</button></div>
-   </div>`}).join('')||'<div class="pv-empty"><b>현재 처리할 작업이 없습니다.</b>새로운 QR 신고가 접수되면 이곳에 자동으로 표시됩니다.</div>'}
+  <div class="wv-section">
+   <div class="wv-section-head"><div><h3>관리 현황</h3><p>장소별 접수 · 최근 신고 · 현재 상태를 한눈에 확인합니다.</p></div></div>
+   <div class="wv-bottom">
+    <div class="wv-panel"><div class="wv-panel-head">📍 장소별 접수 현황</div><div class="wv-panel-body">${placeRows.map(r=>`<div class="wv-place"><span>${xEsc(r.place)}</span><div class="wv-bar"><i style="width:${Math.round(r.count/maxPlace*100)}%"></i></div><b>${r.count}</b></div>`).join('')}</div></div>
+    <div class="wv-panel"><div class="wv-panel-head">🕘 최근 접수</div><div class="wv-panel-body">${all.slice(0,6).map(x=>`<div class="wv-recent"><div><strong>${xEsc(x.place||'-')}</strong><small>${xEsc(cleanWorkContent(x)||'접수 내용 없음')}</small></div><span>${xEsc(state(x))}</span></div>`).join('')||'<div class="wv-empty">접수 내역이 없습니다.</div>'}</div></div>
+    <div class="wv-panel"><div class="wv-panel-head">📊 처리 상태</div><div class="wv-panel-body"><div class="wv-ratio">${statusRows.map(r=>`<div class="wv-rline"><span>${r[0]}</span><i><b style="width:${Math.round(r[1]/statusTotal*100)}%;background:${r[2]}"></b></i><b>${r[1]}</b></div>`).join('')}</div><div class="wv-total">현재 총 <b>${all.length}건</b>을 기준으로 자동 집계됩니다.</div></div></div>
+   </div>
   </div>
-  <div class="pv-lower">
-   <div class="pv-panel"><div class="pv-panel-head">📍 장소별 접수 현황</div><div class="pv-panel-body">${placeRows.map(r=>`<div class="pv-place-line"><span>${esc(r.place)}</span><div class="pv-bar"><i style="width:${Math.round(r.count/maxPlace*100)}%"></i></div><b>${r.count}</b></div>`).join('')}<div class="pv-footer-note"><b>직원 실적 집계 기준</b><br>QR 접수 건에 담당 직원과 조치완료 이력이 누적됩니다.</div></div></div>
-   <div class="pv-panel"><div class="pv-panel-head">🕘 최근 접수 · 실적 흐름</div><div class="pv-panel-body">${all.slice(0,5).map(x=>`<div class="pv-recent"><div><strong>${esc(x.place||'-')}</strong><small>${esc(cleanWorkContent(x)||'접수 내용 없음')}</small></div><span class="pv-recent-state">${esc(x.status||'접수')}</span></div>`).join('')||'<div class="pv-empty">접수 내역이 없습니다.</div>'}<div class="pv-performance"><div class="pv-mini"><span>전체 접수</span><b>${all.length}</b></div><div class="pv-mini"><span>처리 진행</span><b>${running}</b></div><div class="pv-mini"><span>완료</span><b>${done}</b></div></div></div></div>
-   <div class="pv-panel"><div class="pv-panel-head">📊 작업 상태 비율</div><div class="pv-panel-body pv-ratio">${[['미배정',waiting],['조치중',all.filter(x=>x.status==='조치중').length],['완료',done]].map(r=>`<div class="pv-ratio-line"><span>${r[0]}</span><i><b style="width:${Math.round(r[1]/Math.max(1,all.length)*100)}%"></b></i><b>${r[1]}</b></div>`).join('')}<div class="pv-footer-note">현재 <b>${all.length}건</b>을 기준으로 자동 집계합니다.</div></div></div>
-  </div>
-  <div class="pv-section-title" style="margin-top:28px"><h3>최근 조치완료 실적</h3><span>완료 ${done}건</span></div>
-  <div class="pv-completed">${completed.slice(0,20).map(x=>{const note=actionNoteFromIssue(x)||cleanWorkContent(x);return `<div class="pv-card"><div class="pv-card-top"><div class="pv-card-title">${esc(x.place||'-')}</div><span class="pv-status ok">완료</span></div><div class="pv-card-body">${esc(note||'조치내용 미기록')}</div><div class="pv-card-meta"><span class="pv-tag">${esc(x.handlerName||'담당 미기록')}</span><span class="pv-tag">${esc(time(x.completedAt||x.createdAt))}</span></div></div>`}).join('')||'<div class="pv-empty">완료된 작업이 없습니다.</div>'}</div>
+  <div class="wv-section"><div class="wv-section-head"><div><h3>최근 처리완료</h3><p>완료된 작업은 직원 작업 실적 집계의 기준이 됩니다.</p></div><span class="wv-count">완료 ${completed.length}건</span></div><div class="wv-completed">${completed.slice(0,12).map(x=>{const note=noteFor(x)||cleanWorkContent(x);return `<div class="wv-done-card"><div class="wv-done-top"><strong>${xEsc(x.category||'기타')} · ${xEsc(x.place||'-')}</strong><span class="wv-state done">완료</span></div><div class="wv-done-text">${xEsc(note||'조치내용 미기록')}</div><div class="wv-done-meta"><span>${xEsc(x.handlerName||'담당 미기록')}</span><span>완료 ${time(x.completedAt||x.createdAt)}</span></div></div>`}).join('')||'<div class="wv-empty">완료된 작업이 없습니다.</div>'}</div></div>
  </div>`;
 }
 async function deleteProcessRequest(id){
@@ -1734,11 +1712,22 @@ async function deleteAllProcessRequests(){
 function selectProcessType(id,type){const el=document.getElementById('action_'+id);if(el)el.value=type;document.querySelectorAll('[onclick^="selectProcessType(\''+id+'\'"]').forEach(b=>{b.classList.remove('on','self','out');if((b.textContent||'').trim()===type)b.classList.add('on',type==='자체조치'?'self':'out')});}
 
 async function saveWorkProcessing(id,btn){
- const x=(db.issues||[]).find(i=>i.id===id); const sel=document.getElementById('action_'+id); const type=sel?.value||''; const note=(document.getElementById('note_'+id)?.value||'').trim();
- if(!x){alert('작업을 찾을 수 없습니다.');return} if(!x.handlerId){alert('담당 직원을 먼저 선택하세요.');return} if(!note){alert('조치내용을 입력하세요.');return} if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+ const x=(db.issues||[]).find(i=>i.id===id);
+ const note=(document.getElementById('note_'+id)?.value||'').trim();
+ if(!x){alert('작업을 찾을 수 없습니다.');return}
+ if(!x.handlerId){alert('담당 직원을 먼저 선택하세요.');return}
+ if(!note){alert('조치내용을 입력하세요.');return}
+ if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
  if(btn){btn.disabled=true;btn.textContent='저장 중...'}
- try{const content=withWorkMarkers(x.content,'',note); if(x.remoteId){const r=await SUPA.from('requests').update({content,status:'조치중'}).eq('id',x.remoteId);if(r.error)throw r.error}else{x.content=content;x.actionType=type;save();render();return} await syncFromSupabase(); alert('작업기록이 저장되었습니다.')}catch(e){console.error(e);alert('작업기록 저장에 실패했습니다.\n'+(e?.message||''))}finally{if(btn){btn.disabled=false;btn.textContent='저장'}}}
-
+ try{
+   const content=withWorkMarkers(x.content,'',note);
+   if(x.remoteId){const r=await SUPA.from('requests').update({content,status:'조치중'}).eq('id',x.remoteId);if(r.error)throw r.error}
+   else{x.content=content;x.actionType='';x.status='조치중';save();render();return}
+   await syncFromSupabase();
+   alert('작업기록이 저장되었습니다.');
+ }catch(e){console.error(e);alert('작업기록 저장에 실패했습니다.\n'+(e?.message||''))}
+ finally{if(btn){btn.disabled=false;btn.textContent='작업기록 저장'}}
+}
 
 function saveScheduleDay(date){
   const vals=workers.map(w=>document.getElementById(`sch_${w.id}`)?.value||"");
