@@ -145,6 +145,8 @@ body{background:var(--bg)}
 .dash-section{border-left:5px solid #1769c1;padding-left:10px;margin:14px 0 8px;font-size:16px;font-weight:900;}
 .dash2-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:10px;}
 .qr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+/* QR 접수 화면 — 간편 혁신형 */
+.qr-mobile{max-width:680px;margin:0 auto;padding:22px 18px 46px;background:#f4f7fb;min-height:100vh;box-sizing:border-box}.qr-mobile .mobile-brand{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:1000;color:#173b72;margin:2px 4px 18px}.qr-mobile .qr-hero-new{background:#fff;border:1px solid #e3eaf3;border-radius:26px;padding:28px 24px 24px;box-shadow:0 14px 40px rgba(15,43,91,.08);margin-bottom:14px}.qr-mobile .qr-hero-new .eyebrow{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#edf5ff;color:#1769d1;font-size:11px;font-weight:1000}.qr-mobile .qr-hero-new h1{margin:13px 0 7px;font-size:30px;line-height:1.18;letter-spacing:-.8px;color:#12233d}.qr-mobile .qr-hero-new p{margin:0;color:#64748b;font-size:13px;line-height:1.6}.qr-mobile .qr-main-card{background:#fff;border:1px solid #e3eaf3;border-radius:26px;padding:22px;box-shadow:0 14px 40px rgba(15,43,91,.07)}.qr-mobile .qr-label{display:flex;justify-content:space-between;align-items:center;margin:0 0 11px;color:#182b46;font-size:15px;font-weight:1000}.qr-mobile .qr-label span{font-size:11px;color:#e11d48}.qr-mobile .qr-location-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px}.qr-mobile .qr-location-btn{min-height:58px;border:1px solid #dbe4ef;background:#f8fafc;border-radius:15px;font-size:15px;font-weight:900;color:#24364f;cursor:pointer;transition:.15s;box-shadow:0 2px 0 rgba(15,43,91,.03)}.qr-mobile .qr-location-btn:hover{border-color:#8fb7eb;background:#f1f7ff}.qr-mobile .qr-location-btn.active{border:2px solid #1769d1;background:#eef6ff;color:#0d58b5;box-shadow:0 6px 16px rgba(23,105,209,.12)}.qr-mobile .qr-textarea{width:100%;box-sizing:border-box;min-height:126px;resize:vertical;border:1px solid #dbe4ef;border-radius:15px;padding:14px;font-size:14px;line-height:1.6;outline:none;background:#fbfcfe}.qr-mobile .qr-textarea:focus{border-color:#1769d1;box-shadow:0 0 0 3px rgba(23,105,209,.1);background:#fff}.qr-mobile .qr-submit-new{width:100%;height:58px;border:0;border-radius:16px;background:#1769d1;color:#fff;font-size:16px;font-weight:1000;cursor:pointer;margin-top:14px;box-shadow:0 10px 22px rgba(23,105,209,.22)}.qr-mobile .qr-submit-new:disabled{opacity:.55;cursor:not-allowed}.qr-mobile .qr-hint{text-align:center;color:#7a8798;font-size:11px;margin-top:11px}.qr-mobile .qr-selected{font-size:12px;color:#1769d1;font-weight:900}.qr-mobile .qr-progress{display:flex;gap:6px;margin:0 0 15px}.qr-mobile .qr-progress i{height:4px;flex:1;border-radius:999px;background:#e6edf5}.qr-mobile .qr-progress i.on{background:#1769d1}@media(max-width:520px){.qr-mobile{padding:16px 12px 34px}.qr-mobile .qr-hero-new{padding:23px 19px}.qr-mobile .qr-hero-new h1{font-size:27px}.qr-mobile .qr-main-card{padding:18px}.qr-mobile .qr-location-grid{gap:8px}.qr-mobile .qr-location-btn{min-height:55px;font-size:14px}}
 .qr-card{border:1px solid #dbe5ef;border-radius:12px;padding:12px;background:#fff;text-align:center;}
 .qr-card .qr-img{width:150px;height:150px;margin:8px auto;display:block;}
 .qr-card code{font-size:11px;color:#475569;word-break:break-all;}
@@ -2621,20 +2623,36 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
 function mobileQrRequestPage(){
   return `<div class="jgb-mobile qr-mobile">
     <div class="mobile-brand">🛡 장군봉체육관</div>
-    <div class="mobile-hero"><span>스마트폰 간편 접수</span><b>시설 이상 신고</b><small>현장에서 바로 접수하면 관리자 작업관리로 전달됩니다.</small></div>
-    <div class="jgb-card qr-card">
-      <div class="qr-step"><i>1</i><div><b>신고 위치</b><small>문제가 발생한 위치를 선택하세요.</small></div></div>
-      <div class="jgb-field"><label>위치 <em>필수</em></label>
-        <select id="mobileQrPlace"><option value="">신고 위치를 선택하세요</option><option value="남자 샤워실">남자 샤워실</option><option value="여자 샤워실">여자 샤워실</option><option value="여자 화장실">여자 화장실</option><option value="남자 화장실">남자 화장실</option><option value="복도">복도</option><option value="기타">기타</option></select>
+    <div class="qr-hero-new">
+      <span class="eyebrow">QUICK REPORT</span>
+      <h1>시설에 문제가 있나요?</h1>
+      <p>위치를 누르고 이상 내용을 한 줄로 남겨주세요.<br>관리자 작업관리로 바로 전달됩니다.</p>
+    </div>
+    <div class="qr-main-card">
+      <div class="qr-progress"><i class="on"></i><i class="on"></i><i></i></div>
+      <div class="qr-label"><b>어디가 문제인가요?</b><span>필수</span></div>
+      <div class="qr-location-grid">
+        <button type="button" class="qr-location-btn" data-place="남자 샤워실" onclick="selectMobileQrPlace(this)">남자 샤워실</button>
+        <button type="button" class="qr-location-btn" data-place="여자 샤워실" onclick="selectMobileQrPlace(this)">여자 샤워실</button>
+        <button type="button" class="qr-location-btn" data-place="여자 화장실" onclick="selectMobileQrPlace(this)">여자 화장실</button>
+        <button type="button" class="qr-location-btn" data-place="남자 화장실" onclick="selectMobileQrPlace(this)">남자 화장실</button>
+        <button type="button" class="qr-location-btn" data-place="복도" onclick="selectMobileQrPlace(this)">복도</button>
+        <button type="button" class="qr-location-btn" data-place="기타" onclick="selectMobileQrPlace(this)">기타</button>
       </div>
-      <div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 증상을 적어주세요.</small></div></div>
-      <div class="jgb-field"><label>고장·이상 내용 <em>필수</em></label>
-        <textarea id="mobileQrContent" rows="5" placeholder="예: 조명 1개가 켜지지 않습니다."></textarea>
-      </div>
-      <button id="mobileQrSubmit" class="jgb-btn qr-submit" style="width:100%" onclick="addMobileQrIssue()">신고 등록</button>
-      <div class="qr-foot">접수 후 관리자 작업관리에서 담당자를 지정하고 조치합니다.</div>
+      <input type="hidden" id="mobileQrPlace" value="">
+      <div class="qr-label"><b>무슨 문제가 있나요?</b><span>필수</span><em id="mobileQrSelected" class="qr-selected"></em></div>
+      <textarea id="mobileQrContent" class="qr-textarea" rows="5" placeholder="예: 남자 샤워실 조명이 1개 꺼졌습니다."></textarea>
+      <button id="mobileQrSubmit" class="qr-submit-new" onclick="addMobileQrIssue()">신고 접수하기</button>
+      <div class="qr-hint">접수하면 관리자 작업관리에서 담당자 지정 → 조치 → 완료까지 관리합니다.</div>
     </div>
   </div>`;
+}
+function selectMobileQrPlace(btn){
+  document.querySelectorAll('.qr-location-btn').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  const place=btn.dataset.place||'';
+  const input=document.getElementById('mobileQrPlace');if(input)input.value=place;
+  const selected=document.getElementById('mobileQrSelected');if(selected)selected.textContent=' · '+place;
 }
 
 async function addMobileQrIssue(){
