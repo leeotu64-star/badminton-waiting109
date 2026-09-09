@@ -1078,6 +1078,11 @@ function render(){
  const app=document.getElementById("app");
  if(!app)return;
  try{
+  // 스마트폰 QR 접수는 관리자 쉘/사이드바와 완전히 분리된 전용 화면
+  if(page==="mobileqr" || page==="mobileqr_done"){
+   app.innerHTML=body();
+   return;
+  }
  app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","🛠 작업관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}${nav("leakage","💧 누수관리")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v24</span></h1><small>신고 접수 → 작업관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
  }catch(err){
    console.error("화면 렌더링 오류",err);
