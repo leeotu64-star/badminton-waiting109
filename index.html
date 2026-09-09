@@ -1632,7 +1632,7 @@ function processPage(){
  const all=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
  const pending=all.filter(x=>x.status!=='완료'); const completed=all.filter(x=>x.status==='완료');
  const waiting=pending.filter(x=>!x.handlerId).length, running=pending.filter(x=>x.handlerId).length;
- return `<div class="jgb-page-title"><div><h2>작업관리</h2><p>QR 신고 접수부터 담당자 지정, 처리방식, 조치내용 입력, 완료까지 한 화면에서 관리합니다.</p></div><div class="process-actions"><span class="process-status">전체 ${all.length}건</span><span class="process-status wait">담당 미지정 ${waiting}건</span><span class="process-status run">조치중 ${running}건</span><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button></div></div>
+ return `<div class="jgb-page-title"><div><h2>작업관리</h2><p>QR 신고 접수부터 담당자 지정, 처리방식, 조치내용 입력, 완료까지 한 화면에서 관리합니다.</p></div><div class="process-actions"><span class="process-status">전체 ${all.length}건</span><span class="process-status wait">담당 미지정 ${waiting}건</span><span class="process-status run">조치중 ${running}건</span><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button><button class="jgb-btn" style="background:#dc2626;color:#fff;border-color:#dc2626" onclick="deleteAllProcessRequests()">전체 삭제</button></div></div>
  <div class="process-wrap">
   <div class="process-summary">
    <div class="process-kpi"><div class="k-label">전체 접수</div><div class="k-value">${all.length}건</div></div>
@@ -1653,6 +1653,21 @@ function processPage(){
   <div class="jgb-section" style="margin-top:16px">최근 처리완료 ${completed.length}건</div>
   <div class="completed-grid">${completed.slice(0,20).map(x=>{const at=actionTypeFromIssue(x),note=actionNoteFromIssue(x)||cleanWorkContent(x);return `<div class="completed-card"><div class="top"><strong>${xEsc(x.category||'기타')} · ${xEsc(x.place||'-')}</strong><span class="jgb-status ok">완료</span></div><div class="content">${xEsc(note||'조치내용 미기록')}</div><div class="meta"><span>${xEsc(x.handlerName||'담당 미기록')}</span><span>${at||'처리구분 미기록'}</span><span>완료 ${time(x.completedAt||x.createdAt)}</span></div></div>`}).join('')||'<div class="jgb-empty">완료된 작업이 없습니다.</div>'}</div>
  </div>`;
+}
+async function deleteAllProcessRequests(){
+ if(!confirm('작업관리의 QR 접수 내역을 전체 삭제합니다.\n정말 삭제하시겠습니까?'))return;
+ if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+ try{
+  const r=await SUPA.from('requests').delete().not('id','is',null);
+  if(r.error)throw r.error;
+  db.issues=[];
+  localStorage.setItem(KEY,JSON.stringify(db));
+  render();
+  alert('전체 접수 내역이 삭제되었습니다.');
+ }catch(e){
+  console.error(e);
+  alert('전체 삭제에 실패했습니다.\n'+(e?.message||'Supabase 삭제 권한을 확인하세요.'));
+ }
 }
 function selectProcessType(id,type){const el=document.getElementById('action_'+id);if(el)el.value=type;document.querySelectorAll('[onclick^="selectProcessType(\''+id+'\'"]').forEach(b=>{b.classList.remove('on','self','out');if((b.textContent||'').trim()===type)b.classList.add('on',type==='자체조치'?'self':'out')});}
 
