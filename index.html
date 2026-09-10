@@ -2,6 +2,13 @@
     <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
     <style>
+    /* V11: 브라우저 화면이 좌우로 밀리는 가로 스크롤 제거 */
+    html,body{width:100%;max-width:100%;overflow-x:hidden;margin:0;}
+    .app{width:100%;max-width:100%;overflow-x:hidden;}
+    .main{min-width:0;max-width:100%;overflow-x:hidden;}
+    .content{width:100%;max-width:1600px;box-sizing:border-box;}
+    img,video,canvas,svg{max-width:100%;}
+
     *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#eef3f8;color:#172033}button,input,select,textarea{font:inherit}
     .app{min-height:100vh;display:flex}.side{width:185px;background:#061b36;color:#dce8f7;padding:15px 10px;flex:none}.brand{font-size:18px;font-weight:900;padding:8px 10px 22px;color:#fff}.nav{padding:11px 10px;margin:3px 0;border-radius:8px;cursor:pointer;font-weight:700}.nav.active,.nav:hover{background:#1265bb;color:#fff}
     .main{flex:1;min-width:0}.head{height:94px;background:#071d3a;color:#fff;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:0 25px}.title{font-size:25px;font-weight:900}.sub{font-size:12px;opacity:.8;margin-top:5px}.period{text-align:center}.period b{font-size:24px}.period small{display:block;margin-top:5px;opacity:.8}.now{text-align:right;font-size:12px}.live{color:#4be28b;font-weight:800;margin-top:6px}.content{padding:13px;max-width:1600px;margin:auto}
@@ -1290,6 +1297,22 @@ html,body{max-width:100%;overflow-x:hidden!important}
 @media(max-width:1100px){.opx-customer-analytics-v2{grid-template-columns:1fr!important}}
 @media(max-width:700px){.opx-dash{padding-left:8px!important;padding-right:8px!important}.opx-major-section{padding-left:10px!important;padding-right:10px!important}}
 </style>
+
+<style id="JGB_V12_QR_OPERATION_INTELLIGENCE">
+/* V12: QR 접수 데이터 기반 현장 문제·위험도·점검 분석. 직원 실적 영역에는 적용하지 않음. */
+.qr-intel-wrap{margin-top:14px;border:1px solid #d7e3ee;border-radius:18px;background:linear-gradient(180deg,#fbfdff,#f7fafc);overflow:hidden}
+.qr-intel-head{padding:16px 18px;background:linear-gradient(135deg,#eef6ff,#f8fbff);border-bottom:1px solid #d7e3ee;display:flex;justify-content:space-between;gap:14px;align-items:center}
+.qr-intel-head h3{margin:0;font-size:18px;color:#123252;letter-spacing:-.03em}.qr-intel-head p{margin:4px 0 0;font-size:12px;color:#687d91}.qr-intel-badge{font-size:11px;font-weight:900;padding:7px 10px;border-radius:999px;background:#fff;border:1px solid #cbdbea;color:#42627d;white-space:nowrap}
+.qr-intel-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;padding:12px 14px}.qr-intel-kpi{background:#fff;border:1px solid #dce6ef;border-radius:12px;padding:11px 12px;min-width:0}.qr-intel-kpi small{display:block;font-size:10px;color:#718397;font-weight:800}.qr-intel-kpi b{display:block;margin-top:3px;font-size:21px;color:#172f49}.qr-intel-kpi em{display:block;margin-top:3px;font-style:normal;font-size:10px;color:#7b8b9b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qr-intel-kpi.urgent{border-left:4px solid #dc2626}.qr-intel-kpi.warn{border-left:4px solid #f59e0b}.qr-intel-kpi.normal{border-left:4px solid #16a34a}.qr-intel-kpi.blue{border-left:4px solid #2563eb}
+.qr-intel-grid{display:grid;grid-template-columns:1.35fr .9fr .9fr;gap:10px;padding:0 14px 12px}.qr-intel-card{background:#fff;border:1px solid #dce6ef;border-radius:13px;padding:13px;min-width:0}.qr-intel-card h4{margin:0 0 10px;font-size:13px;color:#203b57}.qr-intel-card h4 small{font-size:10px;color:#7a8da0;font-weight:700;margin-left:5px}
+.qr-risk-list{display:grid;gap:7px}.qr-risk-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 9px;border-radius:10px;background:#f8fafc;border:1px solid #e8eef4}.qr-risk-row b{font-size:12px;line-height:1.3}.qr-risk-row span{display:block;font-size:10px;color:#6d7f92;margin-top:2px}.qr-risk-tag{font-size:10px;font-weight:900;padding:5px 7px;border-radius:7px;text-align:center}.qr-risk-tag.urgent{background:#fee2e2;color:#b91c1c}.qr-risk-tag.warn{background:#fef3c7;color:#b45309}.qr-risk-tag.normal{background:#dcfce7;color:#15803d}
+.qr-intel-bars{display:grid;gap:7px}.qr-intel-bar{display:grid;grid-template-columns:74px minmax(0,1fr) 28px;gap:7px;align-items:center;font-size:10px}.qr-intel-bar>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#53687d}.qr-intel-bar>div{height:8px;background:#edf2f6;border-radius:99px;overflow:hidden}.qr-intel-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#4b8ed8,#4fbd91)}.qr-intel-bar b{text-align:right;font-size:11px}
+.qr-action-board{margin:0 14px 12px;border:1px solid #d6e1eb;border-radius:14px;overflow:hidden;background:#fff}.qr-action-head{padding:12px 14px;background:#f1f6fa;border-bottom:1px solid #d9e4ed;display:flex;justify-content:space-between;align-items:center}.qr-action-head b{font-size:14px;color:#173652}.qr-action-head span{font-size:10px;color:#72869a}.qr-action-table{width:100%;border-collapse:collapse;table-layout:fixed}.qr-action-table th{background:#eaf2f8;color:#3c5871;font-size:10px;padding:8px;border-bottom:1px solid #d5e1eb}.qr-action-table td{padding:9px 8px;border-bottom:1px solid #edf1f5;font-size:11px;color:#263f58;vertical-align:top}.qr-action-table tr:last-child td{border-bottom:0}.qr-action-table .risk-col{width:62px;text-align:center}.qr-action-table .place-col{width:15%}.qr-action-table .issue-col{width:18%}.qr-action-table .check-col{width:32%}.qr-action-table .decision-col{width:27%}.qr-action-table .risk-pill{display:inline-block;padding:5px 7px;border-radius:7px;font-size:9px;font-weight:900}.qr-action-table .risk-pill.urgent{background:#fee2e2;color:#b91c1c}.qr-action-table .risk-pill.warn{background:#fef3c7;color:#b45309}.qr-action-table .risk-pill.normal{background:#dcfce7;color:#15803d}.qr-action-table td b{font-size:11px}.qr-action-table td small{display:block;color:#73869a;font-size:9px;margin-top:3px}
+.qr-insight-footer{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;padding:0 14px 14px}.qr-insight-box{border:1px solid #dbe5ee;border-radius:13px;background:#fff;padding:12px 14px}.qr-insight-box h4{margin:0 0 8px;font-size:12px}.qr-insight-box p{margin:5px 0;font-size:11px;line-height:1.55;color:#435c73}.qr-insight-box p b{color:#173c60}.qr-insight-box.alert{background:#fffaf3;border-color:#f2dfba}.qr-insight-box.good{background:#f4fbf7;border-color:#cde8d7}
+.qr-empty{padding:18px;text-align:center;color:#8090a0;font-size:11px}
+@media(max-width:1100px){.qr-intel-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.qr-intel-grid{grid-template-columns:1fr 1fr}.qr-intel-grid>.qr-intel-card:first-child{grid-column:1/-1}}
+@media(max-width:720px){.qr-intel-kpis,.qr-intel-grid,.qr-insight-footer{grid-template-columns:1fr}.qr-action-table{min-width:720px}.qr-action-board{overflow:auto}.qr-intel-head{align-items:flex-start;flex-direction:column}.qr-intel-kpi{min-width:0}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1817,6 +1840,32 @@ html,body{max-width:100%;overflow-x:hidden!important}
       const actionIssue=topIssue?`${xEsc(topIssue[0])} 반복 여부 확인`:'반복 민원 데이터 없음';
       const actionPending=customerPending>0?`미조치 ${customerPending}건 우선 처리`:'미조치 없음 · 대기상태 양호';
       const actionStaff=staffToday?`오늘 ${workingToday}/${staffToday}명 근무`:'오늘 근무자료 없음';
+      /* V12 QR 분석 전용: 직원 실적 변수/레이아웃과 완전히 분리 */
+      const qrText=(x)=>String(x?.content||x?.description||x?.issue||x?.title||'').replace(/\s+/g,' ').trim();
+      const qrClassifyIssue=(x)=>{const t=qrText(x).toLowerCase();if(/미끄|미끄럼|낙상|넘어|파손|깨짐|감전|화재|연기|가스|위험|사고|부상|누전/.test(t))return '안전·위험';if(/누수|물샘|수도|배수|하수|샤워|화장실/.test(t))return '수도·배수';if(/고장|작동|불량|망가|파손|멈춤/.test(t))return '시설고장';if(/조명|등|전등|전기/.test(t))return '조명·전기';if(/냉방|난방|에어컨|온풍|냉난방/.test(t))return '냉난방';if(/청소|쓰레기|먼지|위생/.test(t))return '청소·위생';if(/문의|이용|예약|불편|요청/.test(t))return '이용문의';return '기타';};
+      const qrRisk=(x,placeCount)=>{const t=qrText(x).toLowerCase(), k=qrClassifyIssue(x);if(/미끄|미끄럼|낙상|넘어|감전|화재|연기|가스|누전|부상|사고/.test(t)||k==='안전·위험')return {key:'urgent',label:'긴급',check:k==='안전·위험'?'안전사고 위험요인 즉시 확인':'현장 상태 및 원인 즉시 확인',action:'이용자 안전 확보 후 우선 점검'};if(placeCount>=2||/누수|물샘|고장|작동|불량|망가|배수|조명|전기|냉방|난방/.test(t))return {key:'warn',label:'주의',check:k==='수도·배수'?'누수·배수 및 연결부 상태 확인':k==='조명·전기'?'조명·전기설비 작동상태 확인':k==='냉난방'?'냉난방 설비 작동 및 설정상태 확인':k==='시설고장'?'해당 시설물 작동·파손 상태 확인':'현장 상태 및 반복 발생 여부 확인',action:placeCount>=2?'반복 접수 장소로 집중 점검 권고':'조치 후 동일 문제 재발 여부 확인'};return {key:'normal',label:'일반',check:k==='청소·위생'?'청소·위생 상태 및 관리상태 확인':k==='이용문의'?'이용안내 및 현장 운영상태 확인':'현장 상태 확인 및 필요 시 조치',action:'일반 관리 항목으로 확인 후 조치'};};
+      const qrPlaceCounts={};customerMonth.forEach(x=>{const k=String(x?.place||'미지정');qrPlaceCounts[k]=(qrPlaceCounts[k]||0)+1;});
+      const qrRiskRows=customerMonth.map(x=>{const place=String(x?.place||'미지정'),risk=qrRisk(x,qrPlaceCounts[place]||1),issue=qrClassifyIssue(x);return {x,place,risk,issue,text:qrText(x)};}).sort((a,b)=>({urgent:0,warn:1,normal:2}[a.risk.key]-({urgent:0,warn:1,normal:2}[b.risk.key])||((qrPlaceCounts[b.place]||0)-(qrPlaceCounts[a.place]||0))));
+      const qrUrgent=qrRiskRows.filter(r=>r.risk.key==='urgent').length;
+      const qrWarn=qrRiskRows.filter(r=>r.risk.key==='warn').length;
+      const qrNormal=qrRiskRows.filter(r=>r.risk.key==='normal').length;
+      const qrAssigned=customerMonth.filter(x=>x?.handlerId||x?.handlerName).length;
+      const qrUnassigned=customerMonth.filter(x=>!x?.handlerId&&!x?.handlerName).length;
+      const qrRiskPlaceMap={};qrRiskRows.forEach(r=>{if(r.risk.key!=='normal'){qrRiskPlaceMap[r.place]=(qrRiskPlaceMap[r.place]||0)+1;}});
+      const qrHotRiskPlace=Object.entries(qrRiskPlaceMap).sort((a,b)=>b[1]-a[1])[0];
+      const qrIssueMap2={};qrRiskRows.forEach(r=>{qrIssueMap2[r.issue]=(qrIssueMap2[r.issue]||0)+1;});
+      const qrIssueStats2=Object.entries(qrIssueMap2).sort((a,b)=>b[1]-a[1]);
+      const qrIssueMax2=Math.max(1,...qrIssueStats2.map(x=>x[1]));
+      const qrHourBands=[['06~09시',6,9],['09~12시',9,12],['12~15시',12,15],['15~18시',15,18],['18~21시',18,21],['21~24시',21,24]];
+      const qrHourBandStats=qrHourBands.map(([label,a,b])=>({label,n:customerMonth.filter(x=>{const d=new Date(x?.createdAt||'');return !Number.isNaN(d.getTime())&&d.getHours()>=a&&d.getHours()<b;}).length}));
+      const qrHourMax=Math.max(1,...qrHourBandStats.map(x=>x.n));
+      const qrActionRows=qrRiskRows.slice(0,8).map(r=>{const count=qrPlaceCounts[r.place]||1;const issueDetail=r.text?r.text.slice(0,42)+(r.text.length>42?'…':''):'신고내용 미입력';return `<tr><td class="risk-col"><span class="risk-pill ${r.risk.key}">${r.risk.label}</span></td><td class="place-col"><b>${xEsc(r.place)}</b><small>접수 ${count}건</small></td><td class="issue-col"><b>${xEsc(r.issue)}</b><small>${xEsc(issueDetail)}</small></td><td class="check-col">${xEsc(r.risk.check)}</td><td class="decision-col">${xEsc(r.risk.action)}</td></tr>`;}).join('')||`<tr><td colspan="5"><div class="qr-empty">선택기간 QR 접수 데이터가 없습니다.</div></td></tr>`;
+      const qrTopInsight=qrRiskRows[0];
+      const qrMainMessage=customerReceived?`${qrTopInsight?`${qrTopInsight.risk.label} 수준의 ${qrTopInsight.issue} 문제가 ${xEsc(qrTopInsight.place)}에서 확인되었습니다.`:'QR 접수 내용을 분석하고 있습니다.'}`:'현재 선택기간 접수 데이터가 없어 운영판단을 생성할 수 없습니다.';
+      const qrCheckMessage=qrTopInsight?`${xEsc(qrTopInsight.place)} · ${xEsc(qrTopInsight.risk.check)} · ${xEsc(qrTopInsight.risk.action)}`:'접수 데이터가 확보되면 장소·문제·점검 내용을 자동 생성합니다.';
+      const qrRiskOverall=qrUrgent>0?'긴급 점검 필요':(qrWarn>0?'주의 점검 필요':'일반 관리');
+      const qrRiskOverallClass=qrUrgent>0?'urgent':(qrWarn>0?'warn':'normal');
+      const qrRepeated=Object.entries(qrPlaceCounts).filter(([k,v])=>v>=2).sort((a,b)=>b[1]-a[1]);
       const pendingAlert=customerPending>=3?'미조치 주의':customerPending>0?'미조치 확인':'미조치 없음';
       const pendingAlertClass=customerPending>=3?'red':customerPending>0?'orange':'green';
 
@@ -1900,12 +1949,67 @@ html,body{max-width:100%;overflow-x:hidden!important}
         </section>
 
         <section class="opx-major-section customer-section">
-          <div class="opx-major-title customer-title"><span>고객 접수</span><small>QR 접수 · 조치완료 · 미조치 현황 · 상단 선택기간과 동일 기준</small></div>
+          <div class="opx-major-title customer-title"><span>고객 접수</span><small>QR 접수 데이터 기반 문제·위험도·현장점검 분석 · 상단 선택기간과 동일 기준</small></div>
           <section class="opx-customer-panel">
             <div class="opx-customer-kpis-compact">
               <div class="opx-customer-kpi green"><span>처리완료</span><strong>${customerCompleted}<small>건</small></strong><em>완료율 ${customerRate}%</em></div>
               <div class="opx-customer-kpi red"><span>미조치</span><strong>${customerPending}<small>건</small></strong><em>현재 미완료 접수</em></div>
             </div>
+
+            <div class="qr-intel-wrap">
+              <div class="qr-intel-head">
+                <div><h3>🧠 QR 접수 현장 운영 인텔리전스</h3><p>접수 내용을 장소·문제·위험도로 분석하여 관리자가 바로 점검할 수 있는 문구로 변환합니다.</p></div>
+                <span class="qr-intel-badge">${qrRiskOverall} · ${customerReceived}건 분석</span>
+              </div>
+              <div class="qr-intel-kpis">
+                <div class="qr-intel-kpi blue"><small>QR 접수</small><b>${customerReceived}건</b><em>선택기간 전체</em></div>
+                <div class="qr-intel-kpi urgent"><small>긴급</small><b>${qrUrgent}건</b><em>안전·사고 위험 우선</em></div>
+                <div class="qr-intel-kpi warn"><small>주의</small><b>${qrWarn}건</b><em>고장·누수·반복접수 등</em></div>
+                <div class="qr-intel-kpi normal"><small>일반</small><b>${qrNormal}건</b><em>일반 문의·관리사항</em></div>
+                <div class="qr-intel-kpi blue"><small>담당자 지정</small><b>${qrAssigned}건</b><em>미지정 ${qrUnassigned}건</em></div>
+                <div class="qr-intel-kpi ${customerPending>=3?'urgent':customerPending?'warn':'normal'}"><small>미조치</small><b>${customerPending}건</b><em>${oldestPending?'최장 '+formatDuration(oldestPendingMinutes):'현재 미조치 없음'}</em></div>
+              </div>
+
+              <div class="qr-intel-grid">
+                <div class="qr-intel-card">
+                  <h4>📍 장소별 문제 집중도 <small>어디에서 문제가 발생했는지</small></h4>
+                  <div class="qr-intel-bars">${placeStats.slice(0,8).map(([k,v])=>`<div class="qr-intel-bar"><span>${xEsc(k)}</span><div><i style="width:${Math.round(v/placeMax*100)}%"></i></div><b>${v}</b></div>`).join('')||'<div class="qr-empty">장소 데이터 없음</div>'}</div>
+                </div>
+                <div class="qr-intel-card">
+                  <h4>⚠️ 위험도 분포</h4>
+                  <div class="qr-risk-list">
+                    <div class="qr-risk-row"><span class="qr-risk-tag urgent">긴급</span><div><b>즉시 현장 확인</b><span>안전사고·화재·감전·미끄럼 등</span></div><strong>${qrUrgent}</strong></div>
+                    <div class="qr-risk-row"><span class="qr-risk-tag warn">주의</span><div><b>집중 점검</b><span>누수·고장·반복 접수 등</span></div><strong>${qrWarn}</strong></div>
+                    <div class="qr-risk-row"><span class="qr-risk-tag normal">일반</span><div><b>일반 관리</b><span>문의·청소·이용 관련 등</span></div><strong>${qrNormal}</strong></div>
+                  </div>
+                </div>
+                <div class="qr-intel-card">
+                  <h4>🕒 접수 집중 시간대</h4>
+                  <div class="qr-intel-bars">${qrHourBandStats.map(x=>`<div class="qr-intel-bar"><span>${x.label}</span><div><i style="width:${Math.round(x.n/qrHourMax*100)}%"></i></div><b>${x.n}</b></div>`).join('')}</div>
+                </div>
+              </div>
+
+              <div class="qr-action-board">
+                <div class="qr-action-head"><b>🚨 어디에서 어떤 문제가 발생했고, 무엇을 점검해야 하는가</b><span>QR 접수 자동 분석 결과 · 우선순위 정렬</span></div>
+                <table class="qr-action-table"><thead><tr><th class="risk-col">위험도</th><th class="place-col">장소</th><th class="issue-col">발생 문제</th><th class="check-col">점검 내용</th><th class="decision-col">관리자 판단·조치</th></tr></thead><tbody>${qrActionRows}</tbody></table>
+              </div>
+
+              <div class="qr-insight-footer">
+                <div class="qr-insight-box ${qrUrgent||qrWarn?'alert':'good'}">
+                  <h4>🎯 관리자 우선 판단</h4>
+                  <p><b>${qrMainMessage}</b></p>
+                  <p>${qrCheckMessage}</p>
+                  <p>${qrRepeated.length?`반복 접수 장소: <b>${xEsc(qrRepeated[0][0])}</b> ${qrRepeated[0][1]}건 · 동일 장소의 재발 원인 점검을 권고합니다.`:'동일 장소 반복 접수는 현재 뚜렷하게 확인되지 않습니다.'}</p>
+                </div>
+                <div class="qr-insight-box">
+                  <h4>📋 운영 데이터 해석</h4>
+                  <p>최다 문제 유형: <b>${qrIssueStats2[0]?xEsc(qrIssueStats2[0][0]):'자료 없음'}</b> ${qrIssueStats2[0]?`(${qrIssueStats2[0][1]}건)`:''}</p>
+                  <p>접수 집중 장소: <b>${topPlace?xEsc(topPlace[0]):'자료 없음'}</b> ${topPlace?`(${topPlace[1]}건)`:''}</p>
+                  <p>평균 처리시간: <b>${formatDuration(avgMinutes)}</b> · 담당자 미지정: <b>${qrUnassigned}건</b></p>
+                </div>
+              </div>
+            </div>
+
             <div class="opx-customer-grid2 opx-customer-detail-grid">
               <div class="opx-detail-card"><h4>📍 장소별 접수 집중도</h4><div class="opx-alert ${placeAlertClass}"><b>${topPlace?xEsc(topPlace[0]):'자료 없음'}</b><span>${topPlace?`${topPlace[1]}건 · 전체의 ${topPlaceRate}% · ${placeAlert}`:'이번 기간 접수 없음'}</span></div><div class="opx-mini-bars">${placeStats.slice(0,6).map(([k,v])=>`<div class="opx-mini-row"><span>${xEsc(k)}</span><div><i style="width:${Math.round(v/placeMax*100)}%"></i></div><b>${v}</b></div>`).join('')||'<div class="opx-empty-mini">접수 데이터 없음</div>'}</div></div>
               <div class="opx-detail-card"><h4>🧾 접수 유형별 현황</h4><div class="opx-mini-bars">${issueStats.map(([k,v])=>`<div class="opx-mini-row"><span>${xEsc(k)}</span><div><i style="width:${Math.round(v/issueMax*100)}%"></i></div><b>${v}</b></div>`).join('')||'<div class="opx-empty-mini">신고내용 데이터 없음</div>'}</div></div>
@@ -1930,8 +2034,8 @@ html,body{max-width:100%;overflow-x:hidden!important}
                 <div class="opx-month-bars">${customerYearMonthly.map(x=>`<div><b>${x.total}</b><i style="height:${Math.max(5,Math.round(x.total/customerYearMax*100))}%"></i><span>${x.m}월</span></div>`).join('')}</div>
               </div>
             </div>
-            <div class="opx-customer-operation-status"><span>${opsSignal} · 접수 ${customerReceived}건 · 미조치 ${customerPending}건 · 완료율 ${customerRate}%</span></div>
-            <div class="opx-note"><b>관리자 확인사항</b> · 고객 QR 접수 데이터는 직원실적과 별도로 관리합니다. · 완료율은 실제 접수·완료 데이터 기준으로 자동 계산됩니다.</div>
+            <div class="opx-customer-operation-status"><span>${opsSignal} · 접수 ${customerReceived}건 · 긴급 ${qrUrgent}건 · 주의 ${qrWarn}건 · 미조치 ${customerPending}건 · 완료율 ${customerRate}%</span></div>
+            <div class="opx-note"><b>관리자 확인사항</b> · QR 접수 데이터는 직원실적과 별도로 분석합니다. · 위험도는 접수 문구와 반복 발생 여부를 기준으로 자동 분류하며, 최종 현장 판단은 관리자가 확인합니다.</div>
           </section>
         </section>
       </div>`;
