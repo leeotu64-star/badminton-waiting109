@@ -1970,6 +1970,13 @@ html,body{max-width:100%;overflow-x:hidden!important}
       if(qrPrevRows[0])qrManagerActions.push({level:'개선',title:`예방관리 후보 · ${qrPrevRows[0].place}`,text:`${qrPrevRows[0].issue} 관련 ${qrPrevRows[0].count}건이 반복되어 예방점검 항목 검토가 필요합니다.`});
       if(customerPending>0)qrManagerActions.push({level:'조치',title:'미조치 접수 확인',text:`현재 ${customerPending}건이 미조치 상태입니다. 담당 지정 및 처리상태를 확인하세요.`});
       const qrActionCards=qrManagerActions.slice(0,5);
+      /* V14: 관리자 판단 상태를 위험/주의/양호 색상으로 자동 표시 */
+      const qrJudgementTone=(level)=>{
+        const v=String(level||'');
+        if(/긴급|집중관리|위험/.test(v)) return {key:'danger',label:'위험',bg:'#fff1f2',border:'#fecdd3',accent:'#dc2626',text:'#b91c1c'};
+        if(/주의|개선|조치/.test(v)) return {key:'warn',label:'주의',bg:'#fff7ed',border:'#fed7aa',accent:'#ea580c',text:'#c2410c'};
+        return {key:'good',label:'양호',bg:'#f0fdf4',border:'#bbf7d0',accent:'#16a34a',text:'#15803d'};
+      };
 
       const tableRows=md.map((x,i)=>{
         const p=x.p, r=p.basic.target?Math.min(100,Math.round(p.basic.complete/p.basic.target*100)):0;
@@ -2057,8 +2064,8 @@ html,body{max-width:100%;overflow-x:hidden!important}
 
               <div class="opx-board-panel">
                 <div class="opx-board-panel-head"><b>📌 관리자 판단</b><span>접수내용 기반</span></div>
-                <div style="display:grid;gap:10px;padding:4px 0">
-                  ${qrActionCards.map(a=>`<div style="padding:12px;border:1px solid #e5eaf0;border-radius:10px;background:#fafcff"><div style="font-size:11px;font-weight:900;color:#64748b">${xEsc(a.level)}</div><b style="display:block;margin:3px 0">${xEsc(a.title)}</b><span style="font-size:12px;color:#475569;line-height:1.55">${xEsc(a.text)}</span></div>`).join('')||'<div style="padding:18px;color:#64748b">현재 자동 판단할 접수 데이터가 없습니다.</div>'}
+                <div class="qrx-judgement-list">
+                  ${qrActionCards.map(a=>{const t=qrJudgementTone(a.level);return `<div class="qrx-judgement-card ${t.key}" style="--qj-bg:${t.bg};--qj-border:${t.border};--qj-accent:${t.accent};--qj-text:${t.text}"><div class="qrx-judgement-badge">${t.label}</div><div class="qrx-judgement-main"><b>${xEsc(a.title)}</b><span>${xEsc(a.text)}</span></div></div>`}).join('')||'<div style="padding:18px;color:#64748b">현재 자동 판단할 접수 데이터가 없습니다.</div>'}
                 </div>
               </div>
             </div>
@@ -2068,6 +2075,11 @@ html,body{max-width:100%;overflow-x:hidden!important}
               .qrx-mgmt-card{min-height:126px;padding:18px 20px;border:1px solid #dbe4ee;border-radius:16px;background:#fff;box-sizing:border-box;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(15,23,42,.05)}
               .qrx-mgmt-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#2563eb}.qrx-mgmt-card.green:before{background:#16a34a}.qrx-mgmt-card.orange:before{background:#f59e0b}.qrx-mgmt-card.status:before{background:#16a34a}
               .qrx-mgmt-label{font-size:14px;font-weight:850;color:#64748b}.qrx-mgmt-value{font-size:32px;line-height:1.1;font-weight:950;color:#0f2747;margin-top:9px}.qrx-mgmt-value span{font-size:15px;font-weight:800;color:#64748b;margin-left:3px}
+              .qrx-judgement-list{display:grid;gap:10px;padding:4px 0}
+              .qrx-judgement-card{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--qj-border);border-left:5px solid var(--qj-accent);border-radius:12px;background:var(--qj-bg);box-sizing:border-box;transition:.2s}
+              .qrx-judgement-card:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(15,23,42,.07)}
+              .qrx-judgement-badge{flex:0 0 auto;min-width:46px;text-align:center;padding:6px 8px;border-radius:999px;background:#fff;color:var(--qj-text);font-size:11px;font-weight:950}
+              .qrx-judgement-main{min-width:0;display:grid;gap:3px}.qrx-judgement-main b{font-size:14px;color:#172b4d}.qrx-judgement-main span{font-size:12px;color:#475569;line-height:1.5}
               .qrx-mgmt-card.green .qrx-mgmt-value{color:#16804b}.qrx-mgmt-card.orange .qrx-mgmt-value{color:#b66b00}.qrx-mgmt-card.status .qrx-mgmt-value{color:#237a52}.qrx-mgmt-status{display:inline-block;margin-top:7px;padding:5px 10px;border-radius:999px;background:#eaf7ef;color:#237a52;font-size:13px;font-weight:900}.qrx-mgmt-sub{margin-top:7px;font-size:12px;color:#64748b;font-weight:650}
               @media(max-width:900px){.qrx-management-summary-v9{grid-template-columns:repeat(2,minmax(0,1fr))}}
               @media(max-width:560px){.qrx-management-summary-v9{grid-template-columns:1fr}}
