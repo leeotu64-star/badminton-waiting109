@@ -1258,6 +1258,9 @@
 .opx-v5-live{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;margin-top:14px;border:1px solid #d7e4ef;border-radius:14px;background:#f8fbfe}.opx-v5-live b{font-size:15px}.opx-v5-live span{font-size:12px;font-weight:900;color:#587088}.opx-v5-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#13a66b;box-shadow:0 0 0 4px #e5f7ef;margin-right:7px}
 @media(max-width:900px){.opx-v5-pattern{grid-template-columns:1fr}.opx-v5-live{align-items:flex-start;flex-direction:column}}
 </style>
+<style id="jgb-opx-v6-clean">
+.opx-board-v6{margin-top:18px!important}.opx-board-v6 .opx-board-head{margin-bottom:14px!important}.opx-v6-command{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.opx-v6-status{border:1px solid #dce5ef;border-radius:12px;background:#f8fafc;padding:12px 14px;min-height:82px;display:flex;flex-direction:column;justify-content:center}.opx-v6-status span{font-size:12px;color:#64748b;font-weight:800}.opx-v6-status strong{font-size:20px;line-height:1.2;margin:3px 0;color:#0f172a}.opx-v6-status small{font-size:12px;color:#64748b}.opx-v6-status.good{border-left:4px solid #16a34a}.opx-v6-status.warn{border-left:4px solid #f59e0b}.opx-v6-status.bad{border-left:4px solid #dc2626}.opx-v6-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}.opx-v6-focus{display:grid;gap:8px}.opx-v6-focus>div{display:grid;grid-template-columns:34px 1fr;column-gap:8px;align-items:center;border-bottom:1px solid #edf2f7;padding:8px 2px}.opx-v6-focus>div:last-child{border-bottom:0}.opx-v6-focus span{grid-row:span 2;font-weight:900;color:#2563eb;font-size:13px}.opx-v6-focus b{font-size:14px}.opx-v6-focus small{font-size:12px;color:#64748b}.opx-v6-staff{display:grid;grid-template-columns:auto 1fr;align-items:end;column-gap:8px}.opx-v6-staff strong{font-size:28px;line-height:1}.opx-v6-staff strong small{font-size:14px;color:#64748b}.opx-v6-staff>span{font-size:12px;color:#64748b}.opx-v6-staff-bar{grid-column:1/-1;height:8px;background:#e8eef5;border-radius:99px;overflow:hidden;margin-top:9px}.opx-v6-staff-bar i{display:block;height:100%;background:linear-gradient(90deg,#2563eb,#14b8a6);border-radius:99px}.opx-v6-staff-names{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.opx-v6-staff-names span{font-size:12px;padding:5px 8px;border-radius:8px;background:#f1f5f9;color:#475569}.opx-v6-staff-names span.on{background:#ecfdf5;color:#047857}.opx-v6-staff-names span.off{background:#f8fafc;color:#94a3b8}.opx-v6-metrics{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:12px}.opx-v6-metrics>div{border:1px solid #e1e8f0;border-radius:10px;background:#fff;padding:10px 11px;min-width:0}.opx-v6-metrics span{display:block;font-size:11px;color:#64748b;font-weight:800;white-space:nowrap}.opx-v6-metrics b{display:block;font-size:17px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.opx-v6-metrics b.red{color:#dc2626}.opx-customer-detail-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.opx-customer-analytics-v2{grid-template-columns:1.3fr 1fr!important}@media(max-width:1100px){.opx-v6-command{grid-template-columns:repeat(2,1fr)}.opx-v6-metrics{grid-template-columns:repeat(4,1fr)}}@media(max-width:720px){.opx-v6-command,.opx-v6-grid,.opx-customer-detail-grid,.opx-customer-analytics-v2{grid-template-columns:1fr!important}.opx-v6-metrics{grid-template-columns:repeat(2,1fr)}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1780,77 +1783,44 @@
           </section>
 
           <section class="opx-panel opx-table-panel opx-annual-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><span class="opx-chip">연간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
-          <section class="opx-board">
+          <section class="opx-board opx-board-v6">
             <div class="opx-board-head">
-              <div><span class="opx-board-kicker">LIVE OPERATION BOARD</span><h3>운영게시판</h3><p>직원 업무·고객 접수·체육관 운영상태를 실제 현황 중심으로 확인합니다.</p></div>
+              <div><span class="opx-board-kicker">LIVE OPERATION BOARD</span><h3>운영게시판</h3><p>반복되는 숫자를 줄이고, 관리자가 지금 확인해야 할 내용만 한 화면에 모았습니다.</p></div>
               <div class="opx-board-clock"><b>${year}.${month}.${String(selectedDate).slice(8,10)}</b><span>실시간 운영현황</span></div>
             </div>
-            <div class="opx-board-grid">
-              <div class="opx-board-panel opx-board-feed">
-                <div class="opx-board-panel-head"><b>운영 알림</b><span>자동 집계</span></div>
-                <div class="opx-board-row"><span class="opx-board-tag ${placeAlertClass==='red'?'red':placeAlertClass==='orange'?'orange':'green'}">${placeAlert}</span><div><b>고객 접수 집중관리</b><small>${topPlace?xEsc(topPlace[0])+' · '+topPlace[1]+'건 · 전체의 '+topPlaceRate+'%':'선택기간 접수 데이터 없음'}</small></div><strong>${topPlaceRate}%</strong></div>
-                <div class="opx-board-row"><span class="opx-board-tag ${gymStatusClass==='good'?'green':gymStatusClass==='warn'?'orange':'gray'}">상태</span><div><b>체육관 운영활성도</b><small>현재 운영상태 · ${gymStatus}</small></div><strong>${gymStatus}</strong></div>
-                <div class="opx-board-row"><span class="opx-board-tag violet">실적</span><div><b>직원 실적 집계</b><small>${year}년 ${month}월 기준 · 정규업무 ${sum.basic}건 · 근무편성 ${sum.auto}건 · 업무지시 ${sum.issue}건</small></div><strong>${sum.total}</strong></div>
-              </div>
-              <div class="opx-board-panel opx-board-duty">
-                <div class="opx-board-panel-head"><b>오늘 근무현황</b><span>${selectedDate}</span></div>
-                <div class="opx-board-staff-list">${workersForDate(selectedDate).map(w=>'<div class="opx-board-staff"><span class="opx-staff-dot '+(w.working?'on':'off')+'"></span><div><b>'+xEsc(w.name)+'</b><small>'+xEsc(w.shift)+' · '+xEsc(w.status)+'</small></div><strong class="'+(w.working?'on':'off')+'">'+(w.working?'근무':'비근무')+'</strong></div>').join('')}</div>
-              </div>
+            <div class="opx-v6-command">
+              <div class="opx-v6-status ${serviceLevelClass}"><span>현재 운영상태</span><strong>${serviceLevel}</strong><small>${customerPending>0?'미조치 '+customerPending+'건 확인 필요':'현재 미조치 없음'}</small></div>
+              <div class="opx-v6-status"><span>집중관리 장소</span><strong>${topPlace?xEsc(topPlace[0]):'자료 없음'}</strong><small>${topPlace?topPlace[1]+'건 · 전체 '+topPlaceRate+'%':'선택기간 접수 없음'}</small></div>
+              <div class="opx-v6-status"><span>반복 민원 유형</span><strong>${topIssue?xEsc(topIssue[0]):'자료 없음'}</strong><small>${topIssue?topIssue[1]+'건 · 최다 유형':'유형 데이터 없음'}</small></div>
+              <div class="opx-v6-status"><span>처리 속도</span><strong>${formatDuration(avgMinutes)}</strong><small>${oldestPending?'최장 미조치 '+formatDuration(oldestPendingMinutes):'현재 미조치 없음'}</small></div>
             </div>
-            <div class="opx-board-insight">
-              <div class="opx-insight-head"><b>⚡ 운영 액션 센터</b><span>자동 분석 · 별도 입력 없이 현황 기반 제안</span></div>
-              <div class="opx-insight-grid">
-                <div class="opx-insight-card alert"><span class="label">집중관리 장소</span><strong>${actionPlace}</strong><small>${topPlace?topPlace[1]+'건 · 전체 '+topPlaceRate+'%':'현재 선택기간 데이터 없음'}</small></div>
-                <div class="opx-insight-card violet"><span class="label">반복 민원 포인트</span><strong>${actionIssue}</strong><small>${topIssue?topIssue[1]+'건으로 가장 많이 접수':'접수 유형이 집계되면 자동 표시'}</small></div>
-                <div class="opx-insight-card ${customerPending>0?'alert':'good'}"><span class="label">처리 우선순위</span><strong>${actionPending}</strong><small>${customerRate}% 완료 · 미조치 ${customerPending}건</small></div>
-                <div class="opx-insight-card info"><span class="label">오늘 인력 상태</span><strong>${actionStaff}</strong><small>근무편성 데이터를 기준으로 표시</small></div>
-              </div>
+            <div class="opx-v6-grid">
+              <div class="opx-board-panel"><div class="opx-board-panel-head"><b>📍 현장 우선 확인</b><span>자동 분석</span></div><div class="opx-v6-focus"><div><span>01</span><b>${actionPlace}</b><small>${topPlace?topPlace[1]+'건 · 집중도 '+topPlaceRate+'%':'접수 데이터가 쌓이면 자동 표시'}</small></div><div><span>02</span><b>${actionIssue}</b><small>${topIssue?topIssue[1]+'건':'반복 유형 없음'}</small></div><div><span>03</span><b>${actionPending}</b><small>${unassignedRows.length}건은 담당자 미지정</small></div></div></div>
+              <div class="opx-board-panel"><div class="opx-board-panel-head"><b>👥 오늘 근무현황</b><span>${selectedDate}</span></div><div class="opx-v6-staff"><strong>${workingToday}<small>/ ${staffToday}명</small></strong><span>근무 인원</span><div class="opx-v6-staff-bar"><i style="width:${staffToday?Math.round(workingToday/staffToday*100):0}%"></i></div></div><div class="opx-v6-staff-names">${workersForDate(selectedDate).slice(0,6).map(w=>'<span class="'+(w.working?'on':'off')+'">'+xEsc(w.name)+' · '+(w.working?'근무':'비근무')+'</span>').join('')||'<span>근무자료 없음</span>'}</div></div>
             </div>
-          </section>
-          <section class="opx-operation-detail">
-            <div class="opx-detail-head"><div><span>OPERATION DETAIL</span><h3>운영 세부지표</h3><p>선택기간과 오늘 현황을 분리해 병목·미조치·처리속도를 한눈에 확인합니다.</p></div><strong class="opx-service-pill ${serviceLevelClass}">${serviceLevel}</strong></div>
-            <div class="opx-detail-metrics">
-              <div class="opx-detail-metric blue"><span>오늘 접수</span><strong>${todayReceived}<small>건</small></strong><em>선택일 ${selectedDate}</em></div>
-              <div class="opx-detail-metric green"><span>오늘 조치완료</span><strong>${todayCompleted}<small>건</small></strong><em>당일 완료 처리</em></div>
-              <div class="opx-detail-metric red"><span>현재 미조치</span><strong>${customerPending}<small>건</small></strong><em>미배정 ${unassignedRows.length}건 포함</em></div>
-              <div class="opx-detail-metric violet"><span>평균 처리시간</span><strong>${formatDuration(avgMinutes)}</strong><em>완료된 접수 기준</em></div>
-              <div class="opx-detail-metric orange"><span>최장 미조치</span><strong>${formatDuration(oldestPendingMinutes)}</strong><em>${oldestPending?xEsc(oldestPending.place||'장소 미기록'):'미조치 없음'}</em></div>
-              <div class="opx-detail-metric teal"><span>담당자 지정</span><strong>${customerPending-unassignedRows.length}<small>건</small></strong><em>현재 미조치 중 담당자 지정</em></div>
-            </div>
-            <div class="opx-action-strip">
-              <div><b>현장 판단</b><span>${topPlace?xEsc(topPlace[0])+' 접수 집중도 '+topPlaceRate+'%':'접수 데이터 집계중'}</span></div>
-              <div><b>처리 판단</b><span>${customerPending?`미조치 ${customerPending}건 · ${formatDuration(oldestPendingMinutes)} 경과 건부터 확인`:'현재 미조치 없음'}</span></div>
-              <div><b>반복 확인</b><span>${topIssue?xEsc(topIssue[0])+' 유형 '+topIssue[1]+'건':'유형 데이터 없음'}</span></div>
-            </div>
+            <div class="opx-v6-metrics"><div><span>오늘 접수</span><b>${todayReceived}건</b></div><div><span>오늘 완료</span><b>${todayCompleted}건</b></div><div><span>현재 미조치</span><b class="${customerPending?'red':''}">${customerPending}건</b></div><div><span>담당자 지정</span><b>${customerPending-unassignedRows.length}건</b></div><div><span>완료율</span><b>${customerRate}%</b></div><div><span>접수 집중 요일</span><b>${peakWeekdayText}</b></div><div><span>접수 집중 시간</span><b>${peakHourText}</b></div></div>
           </section>
         </section>
 
         <section class="opx-major-section customer-section">
           <div class="opx-major-title customer-title"><span>고객 접수</span><small>QR 접수 · 조치완료 · 미조치 현황 · 상단 선택기간과 동일 기준</small></div>
           <section class="opx-customer-panel">
-            <div class="opx-customer-kpis opx-customer-kpis-compact">
-              <div class="opx-customer-kpi blue"><span>전체 접수</span><strong>${customerReceived}<small>건</small></strong><em>선택기간 신규 접수</em></div>
-              <div class="opx-customer-kpi green"><span>처리완료</span><strong>${customerCompleted}<small>건</small></strong><em>완료율 ${customerRate}%</em></div>
+<div class="opx-customer-kpi green"><span>처리완료</span><strong>${customerCompleted}<small>건</small></strong><em>완료율 ${customerRate}%</em></div>
               <div class="opx-customer-kpi red"><span>미조치</span><strong>${customerPending}<small>건</small></strong><em>현재 미완료 접수</em></div>
             </div>
             <div class="opx-customer-grid2 opx-customer-detail-grid">
               <div class="opx-detail-card"><h4>📍 장소별 접수 집중도</h4><div class="opx-alert ${placeAlertClass}"><b>${topPlace?xEsc(topPlace[0]):'자료 없음'}</b><span>${topPlace?`${topPlace[1]}건 · 전체의 ${topPlaceRate}% · ${placeAlert}`:'이번 기간 접수 없음'}</span></div><div class="opx-mini-bars">${placeStats.slice(0,6).map(([k,v])=>`<div class="opx-mini-row"><span>${xEsc(k)}</span><div><i style="width:${Math.round(v/placeMax*100)}%"></i></div><b>${v}</b></div>`).join('')||'<div class="opx-empty-mini">접수 데이터 없음</div>'}</div></div>
               <div class="opx-detail-card"><h4>🧾 접수 유형별 현황</h4><div class="opx-mini-bars">${issueStats.map(([k,v])=>`<div class="opx-mini-row"><span>${xEsc(k)}</span><div><i style="width:${Math.round(v/issueMax*100)}%"></i></div><b>${v}</b></div>`).join('')||'<div class="opx-empty-mini">신고내용 데이터 없음</div>'}</div></div>
               <div class="opx-detail-card"><h4>👤 담당직원 처리 현황</h4><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>담당직원</th><th>처리</th></tr></thead><tbody>${handlerRows}</tbody></table></div></div>
-              <div class="opx-detail-card opx-attention-card"><h4>🚨 주의 · 집중관리</h4><div class="opx-attention-list"><div class="${placeAlertClass}"><span>장소 집중도</span><b>${topPlace?xEsc(topPlace[0]):'-'}</b><em>${topPlace?`${topPlace[1]}건 · ${topPlaceRate}% · ${placeAlert}`:'접수 없음'}</em></div><div class="${pendingAlertClass}"><span>미조치 현황</span><b>${customerPending}건</b><em>${pendingAlert}</em></div><div class="${topIssue?'orange':'green'}"><span>최다 접수 유형</span><b>${topIssue?xEsc(topIssue[0]):'-'}</b><em>${topIssue?topIssue[1]+'건':'데이터 없음'}</em></div></div></div>
+</div>
             </div>
             <div class="opx-customer-analytics opx-customer-analytics-v2">
               <div class="opx-analytics-card"><div class="opx-trend-slider-top"><h4 style="margin:0!important">📈 접수 추이</h4><b id="jgbTrendDays">7일</b></div><div id="jgbTrendBars" class="opx-week-bars">${trend7.map(x=>`<div><i style="height:${Math.max(5,Math.round(x.n/trend7Max*100))}%"></i><span>${x.label}</span><b>${x.n}</b></div>`).join('')}</div><div class="opx-trend-slider-v5"><div class="opx-trend-slider-top"><span>기간 슬라이드</span><b id="jgbTrendRangeText">7일</b></div><div class="opx-slider-track"><input id="jgbTrendRange" type="range" min="7" max="30" value="7" step="1" oninput="jgbTrendRender(this.value);document.getElementById('jgbTrendRangeText').textContent=this.value+'일'"></div><div class="opx-slider-labels"><span>최근 7일</span><span>최근 30일</span></div></div></div>
               <div class="opx-analytics-card"><h4>📊 ${year}년 월별 접수 추이</h4><div class="opx-month-bars">${customerYearMonthly.map(x=>`<div><b>${x.total}</b><i style="height:${Math.max(5,Math.round(x.total/customerYearMax*100))}%"></i><span>${x.m}월</span></div>`).join('')}</div></div>
-              <div class="opx-analytics-card"><h4>🚨 운영 주의 신호</h4><div class="opx-alert-list"><div><span>미조치</span><b class="${customerPending?'red':''}">${customerPending}건</b></div><div><span>최다 접수 장소</span><b>${topPlace?xEsc(topPlace[0]):'-'}</b></div><div><span>집중도</span><b>${topPlaceRate}%</b></div><div><span>완료율</span><b>${customerRate}%</b></div></div></div>
+</div>
             </div>
           </section>
-          <div class="opx-v5-pattern">
-            <div class="opx-v5-pattern-card"><span class="k">🎯 지금 먼저 볼 곳</span><strong>${topPlace?xEsc(topPlace[0]):'접수 데이터 없음'}</strong><small>${topPlace?topPlace[1]+'건 · 전체 '+topPlaceRate+'%':'선택기간 데이터가 쌓이면 자동 표시됩니다.'}</small></div>
-            <div class="opx-v5-pattern-card"><span class="k">🕒 접수 집중 시간대</span><strong>${peakHourText}</strong><small>${customerReceived?'선택기간 기준 자동 집계':'자료 없음'}</small></div>
-            <div class="opx-v5-pattern-card"><span class="k">📅 접수 집중 요일</span><strong>${peakWeekdayText}</strong><small>${customerReceived?'선택기간 기준 자동 집계':'자료 없음'}</small></div>
-          </div>
-          <div class="opx-v5-live"><div><span class="opx-v5-dot"></span><b>실시간 운영 판단</b></div><span>${opsSignal} · 접수 ${customerReceived}건 · 미조치 ${customerPending}건 · 완료율 ${customerRate}%</span></div>
+<span>${opsSignal} · 접수 ${customerReceived}건 · 미조치 ${customerPending}건 · 완료율 ${customerRate}%</span></div>
           <div class="opx-note"><b>관리자 확인사항</b> · 고객 QR 접수 데이터는 직원실적과 별도로 관리합니다. · 완료율은 실제 접수·완료 데이터 기준으로 자동 계산됩니다.</div>
         </section>
       </div>`;
