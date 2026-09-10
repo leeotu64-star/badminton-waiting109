@@ -2024,90 +2024,86 @@ html,body{max-width:100%;overflow-x:hidden!important}
           </section>
 
           <section class="opx-panel opx-table-panel opx-annual-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><span class="opx-chip">연간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
-         <section class="opx-board opx-board-v6">
-           <div class="opx-board-head">
-             <div>
-               <span class="opx-board-kicker">CUSTOMER ISSUE → OPERATION INSIGHT</span>
-               <h3>운영게시판</h3>
-               <p>고객 접수내용을 근거로 위험도·처리 우선순위·반복 장소·문제 유형·관리조치를 자동 분석합니다.</p>
-             </div>
-             <div class="opx-board-clock"><b>${year}.${month}.${String(selectedDate).slice(8,10)}</b><span>고객 접수 기반 분석</span></div>
-           </div>
+          <section class="opx-board opx-board-v7">
+            <div class="opx-board-head">
+              <div><span class="opx-board-kicker">QR CUSTOMER OPERATION INTELLIGENCE</span><h3>운영게시판</h3><p>직원실적·레벨은 그대로 두고, 고객 QR 접수 내용만으로 위험도·주의도·반복·빈번시간·요일·처리우선순위를 상세 분석합니다.</p></div>
+              <div class="opx-board-clock"><b>${year}.${month}.${String(selectedDate).slice(8,10)}</b><span>고객접수 기반 실시간 분석</span></div>
+            </div>
 
-           <div class="opx-v6-command">
-             <div class="opx-v6-status ${qrOverallCls}">
-               <span>현재 위험도</span>
-               <strong>${qrOverall}</strong>
-               <small>위험점수 ${qrRiskScore}/100 · 긴급 ${qrRiskSummary.urgent}건 · 주의 ${qrRiskSummary.warn}건</small>
-             </div>
-             <div class="opx-v6-status">
-               <span>최우선 장소</span>
-               <strong>${qrPlaceInsights[0]?xEsc(qrPlaceInsights[0].place):'자료 없음'}</strong>
-               <small>${qrPlaceInsights[0]?qrPlaceInsights[0].total+'건 · 위험점수 '+qrPlaceInsights[0].score:'접수 데이터 없음'}</small>
-             </div>
-             <div class="opx-v6-status">
-               <span>최우선 문제</span>
-               <strong>${qrPlaceInsights[0]?xEsc(qrPlaceInsights[0].topIssue):'자료 없음'}</strong>
-               <small>${qrIssueInsights[0]?qrIssueInsights[0].count+'건 · 주요 유형':'유형 데이터 없음'}</small>
-             </div>
-             <div class="opx-v6-status">
-               <span>처리 우선순위</span>
-               <strong>${qrInsightRows[0]?xEsc(qrInsightRows[0].level):'자료 없음'}</strong>
-               <small>${qrInsightRows[0]?xEsc(qrInsightRows[0].cause):'분석할 접수 없음'} · ${customerPending}건 미조치</small>
-             </div>
-           </div>
+            <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0">
+              <div style="padding:18px;border:1px solid #dbe4ee;border-radius:14px;background:#fff"><small style="color:#64748b;font-weight:800">전체 위험점수</small><div style="font-size:30px;font-weight:950;margin-top:6px">${qrRiskScore}<span style="font-size:14px;color:#64748b"> / 100</span></div><b style="display:inline-block;margin-top:7px;padding:5px 9px;border-radius:999px;background:#f1f5f9">${qrOverall}</b></div>
+              <div style="padding:18px;border:1px solid #dbe4ee;border-radius:14px;background:#fff"><small style="color:#64748b;font-weight:800">긴급</small><div style="font-size:30px;font-weight:950;color:#c62828;margin-top:6px">${qrRiskSummary.urgent}건</div><span style="font-size:12px;color:#64748b">안전·고위험 우선 확인</span></div>
+              <div style="padding:18px;border:1px solid #dbe4ee;border-radius:14px;background:#fff"><small style="color:#64748b;font-weight:800">주의</small><div style="font-size:30px;font-weight:950;color:#b26a00;margin-top:6px">${qrRiskSummary.warn}건</div><span style="font-size:12px;color:#64748b">반복·최근 발생 포함</span></div>
+              <div style="padding:18px;border:1px solid #dbe4ee;border-radius:14px;background:#fff"><small style="color:#64748b;font-weight:800">현재 미조치</small><div style="font-size:30px;font-weight:950;color:${customerPending?'#c62828':'#237a52'};margin-top:6px">${customerPending}건</div><span style="font-size:12px;color:#64748b">담당 미지정 ${unassignedRows.length}건</span></div>
+            </div>
 
-           <div class="opx-v6-grid">
-             <div class="opx-board-panel">
-               <div class="opx-board-panel-head"><b>📌 현장 처리 우선순위</b><span>접수내용 자동 분석</span></div>
-               <div class="qr-v19-risk-list">
-                 ${qrInsightRows.slice(0,5).map((r,i)=>`
-                   <div class="qr-v19-risk-row ${r.cls}">
-                     <b class="rank">${String(i+1).padStart(2,'0')}</b>
-                     <div>
-                       <strong>${xEsc(r.place)} · ${xEsc(r.problem)}</strong>
-                       <span>${xEsc(r.level)} · ${r.score}점 · ${xEsc(r.cause)}${r.pending?' · 미조치':''}</span>
-                     </div>
-                     <b class="score">${r.score}</b>
-                   </div>`).join('') ||
-                   '<div class="qr-empty">선택기간 고객 접수 데이터가 없습니다.</div>'}
-               </div>
-             </div>
+            <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:14px">
+              <div class="opx-board-panel">
+                <div class="opx-board-panel-head"><b>🚨 지금 우선 확인할 고객 접수</b><span>위험도 자동순위</span></div>
+                <div style="overflow:auto">
+                  <table style="width:100%;border-collapse:collapse;font-size:13px">
+                    <thead><tr><th style="padding:10px;text-align:left">등급</th><th style="padding:10px;text-align:left">장소</th><th style="padding:10px;text-align:left">문제</th><th style="padding:10px;text-align:left">원인 신호</th><th style="padding:10px;text-align:left">처리 판단</th></tr></thead>
+                    <tbody>${qrRiskRows.slice(0,8).map(r=>`<tr><td style="padding:10px;border-top:1px solid #edf1f5"><b style="padding:5px 8px;border-radius:999px;background:${r.risk.key==='urgent'?'#fee2e2':r.risk.key==='warn'?'#fff4d6':'#edf7f1'};color:${r.risk.key==='urgent'?'#b42318':r.risk.key==='warn'?'#9a6700':'#237a52'}">${xEsc(r.risk.label)}</b></td><td style="padding:10px;border-top:1px solid #edf1f5"><b>${xEsc(r.place)}</b></td><td style="padding:10px;border-top:1px solid #edf1f5">${xEsc(r.issue)}<small style="display:block;color:#64748b">${xEsc(r.problem)}</small></td><td style="padding:10px;border-top:1px solid #edf1f5">${xEsc(r.risk.check)}</td><td style="padding:10px;border-top:1px solid #edf1f5">${xEsc(r.risk.action)}</td></tr>`).join('')||`<tr><td colspan="5" style="padding:22px;text-align:center;color:#64748b">선택기간 고객 QR 접수 데이터가 없습니다.</td></tr>`}</tbody>
+                  </table>
+                </div>
+              </div>
 
-             <div class="opx-board-panel">
-               <div class="opx-board-panel-head"><b>🛠️ 지금 조치할 내용</b><span>관리자 판단 보조</span></div>
-               <div class="opx-v6-focus">
-                 <div><span>01</span><b>${qrInsightRows[0]?xEsc(qrInsightRows[0].analysis.check):'접수 데이터 없음'}</b><small>${qrInsightRows[0]?xEsc(qrInsightRows[0].analysis.action):'고객 접수내용이 들어오면 자동 분석합니다.'}</small></div>
-                 <div><span>02</span><b>${qrPlaceInsights[0]?xEsc(qrPlaceInsights[0].place)+' 집중 확인':'반복 장소 없음'}</b><small>${qrPlaceInsights[0]?qrPlaceInsights[0].total+'건 · 주요문제 '+xEsc(qrPlaceInsights[0].topIssue):'반복 장소가 확인되면 우선 점검합니다.'}</small></div>
-                 <div><span>03</span><b>${qrPrevRows[0]?xEsc(qrPrevRows[0].place)+' 예방관리':'예방관리 후보 없음'}</b><small>${qrPrevRows[0]?xEsc(qrPrevRows[0].action):'반복·미조치 접수 발생 시 자동 제안합니다.'}</small></div>
-               </div>
-             </div>
-           </div>
+              <div class="opx-board-panel">
+                <div class="opx-board-panel-head"><b>📌 관리자 판단</b><span>접수내용 기반</span></div>
+                <div style="display:grid;gap:10px;padding:4px 0">
+                  ${qrActionCards.map(a=>`<div style="padding:12px;border:1px solid #e5eaf0;border-radius:10px;background:#fafcff"><div style="font-size:11px;font-weight:900;color:#64748b">${xEsc(a.level)}</div><b style="display:block;margin:3px 0">${xEsc(a.title)}</b><span style="font-size:12px;color:#475569;line-height:1.55">${xEsc(a.text)}</span></div>`).join('')||'<div style="padding:18px;color:#64748b">현재 자동 판단할 접수 데이터가 없습니다.</div>'}
+                </div>
+              </div>
+            </div>
 
-           <div class="opx-v6-metrics">
-             <div><span>전체 접수</span><b>${customerReceived}건</b></div>
-             <div><span>긴급</span><b>${qrRiskSummary.urgent}건</b></div>
-             <div><span>주의</span><b>${qrRiskSummary.warn}건</b></div>
-             <div><span>일반</span><b>${qrRiskSummary.normal}건</b></div>
-             <div><span>반복 장소</span><b>${qrRepeated.length}곳</b></div>
-             <div><span>미조치</span><b class="${customerPending?'red':''}">${customerPending}건</b></div>
-             <div><span>최근 7일</span><b>${qrNowTrend}건</b></div>
-           </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+              <div class="opx-board-panel">
+                <div class="opx-board-panel-head"><b>📅 빈번 요일 분석</b><span>선택기간</span></div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:7px;align-items:end;height:150px">
+                  ${weekdayCount.map((n,i)=>{const mx=Math.max(1,...weekdayCount);return `<div style="display:flex;flex-direction:column;justify-content:end;height:100%;text-align:center"><b style="font-size:12px">${n}</b><div style="height:${Math.max(8,Math.round(n/mx*95))}px;background:#dbe7f3;border-radius:6px 6px 2px 2px;margin:5px 3px"></div><small style="font-weight:800;color:#64748b">${weekdayMap[i]}</small></div>`}).join('')}
+                </div>
+                <div style="margin-top:8px;padding:10px;border-radius:9px;background:#f8fafc;font-size:12px">가장 많이 접수된 요일: <b>${peakWeekdayText}</b></div>
+              </div>
 
-           <div class="qr-v19-chart-grid" style="margin-top:12px">
-             <div class="qr-v19-card">
-               <div class="qr-v19-cardhead"><div><h4>📊 문제 유형 분석</h4><p>고객 접수내용을 시설관리 유형으로 분류</p></div></div>
-               <div class="qr-v19-bars">${qrIssueInsights.slice(0,6).map(o=>`<div><span>${xEsc(o.group)}</span><div><i style="width:${Math.round(o.count/Math.max(1,...qrIssueInsights.map(x=>x.count))*100)}%"></i></div><b>${o.count}</b></div>`).join('')||'<div class="qr-empty">자료 없음</div>'}</div>
-             </div>
-             <div class="qr-v19-card">
-               <div class="qr-v19-cardhead"><div><h4>📍 반복·집중 장소</h4><p>접수량과 위험도를 함께 반영</p></div></div>
-               <div class="qr-v19-place-list">${qrPlaceInsights.slice(0,5).map((o,i)=>`<div><b>${i+1}</b><strong>${xEsc(o.place)}</strong><span>${o.total}건 · ${xEsc(o.topIssue)}</span><em>${o.score}점</em></div>`).join('')||'<div class="qr-empty">자료 없음</div>'}</div>
-             </div>
-           </div>
-         </section>
-       </section>
-       </div>`;
+              <div class="opx-board-panel">
+                <div class="opx-board-panel-head"><b>⏰ 빈번 시간대 분석</b><span>선택기간</span></div>
+                <div style="display:grid;gap:8px">
+                  ${qrHourBandStats.map(o=>`<div style="display:grid;grid-template-columns:70px 1fr 38px;gap:8px;align-items:center;font-size:12px"><b>${o.label}</b><div style="height:9px;background:#edf1f5;border-radius:99px;overflow:hidden"><i style="display:block;height:100%;width:${Math.round(o.n/qrHourMax*100)}%;background:#8aa7c2"></i></div><strong style="text-align:right">${o.n}</strong></div>`).join('')}
+                </div>
+                <div style="margin-top:10px;padding:10px;border-radius:9px;background:#f8fafc;font-size:12px">최다 접수 시간대: <b>${peakHourText}</b></div>
+              </div>
+            </div>
 
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+              <div class="opx-board-panel">
+                <div class="opx-board-panel-head"><b>🔁 반복·집중 장소</b><span>재발 가능성</span></div>
+                <div style="display:grid;gap:8px">${qrPlaceInsights.slice(0,6).map((o,i)=>`<div style="display:grid;grid-template-columns:28px 1fr auto;gap:9px;align-items:center;padding:10px;border-bottom:1px solid #edf1f5"><b>${i+1}</b><div><b>${xEsc(o.place)}</b><small style="display:block;color:#64748b">${o.total}건 · ${xEsc(o.topIssue)} · 미조치 ${o.pending}건</small></div><strong>${o.score}</strong></div>`).join('')||'<div style="padding:16px;color:#64748b">장소별 분석 데이터가 없습니다.</div>'}</div>
+              </div>
+              <div class="opx-board-panel">
+                <div class="opx-board-panel-head"><b>🧩 문제 유형별 위험 분석</b><span>반복·위험도</span></div>
+                <div style="display:grid;gap:8px">${qrIssueInsights.slice(0,7).map(o=>`<div style="padding:10px;border:1px solid #edf1f5;border-radius:9px"><div style="display:flex;justify-content:space-between;gap:8px"><b>${xEsc(o.group)}</b><strong>${o.count}건</strong></div><small style="display:block;color:#64748b;margin-top:3px">평균 위험점수 ${o.avg} · 긴급 ${o.urgent} · 주의 ${o.warn}</small></div>`).join('')||'<div style="padding:16px;color:#64748b">문제 유형 데이터가 없습니다.</div>'}</div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+              <div class="opx-board-panel">
+                <div class="opx-board-panel-head"><b>📈 최근 7일 접수 흐름</b><span>${qrTrendText}</span></div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:7px;align-items:end;height:125px">
+                  ${qrTrend7.map(o=>{const mx=Math.max(1,...qrTrend7.map(v=>v.count));return `<div style="height:100%;display:flex;flex-direction:column;justify-content:end;text-align:center"><b style="font-size:11px">${o.count}</b><div style="height:${Math.max(8,Math.round(o.count/mx*78))}px;background:#cbd9e6;border-radius:5px 5px 2px 2px;margin:4px 3px"></div><small style="font-size:10px;color:#64748b">${xEsc(o.label)}</small></div>`}).join('')}
+                </div>
+              </div>
+              <div class="opx-board-panel">
+                <div class="opx-board-panel-head"><b>🛠 예방·개선 우선순위</b><span>반복접수 기반</span></div>
+                <div style="display:grid;gap:8px">${qrPrevRows.slice(0,5).map((o,i)=>`<div style="padding:10px;border-left:4px solid #8aa7c2;background:#f8fafc"><b>${i+1}. ${xEsc(o.place)} · ${xEsc(o.issue)}</b><small style="display:block;color:#64748b;margin-top:3px">관련 ${o.count}건 · 미조치 ${o.pending}건 · ${xEsc(qrIssueGuide[o.issue]||o.checks||'현장 상태 확인')}</small></div>`).join('')||'<div style="padding:16px;color:#64748b">반복 예방관리 후보가 없습니다.</div>'}</div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;padding:15px;border:1px solid #dbe4ee;border-radius:12px;background:#f8fafc;font-size:12px;color:#475569;line-height:1.7"><b style="color:#1e293b">분석 기준</b> · 고객 QR 접수의 신고내용·장소·접수시각·처리상태를 기준으로 위험도, 반복성, 최근성, 미조치 상태를 함께 반영합니다. 직원실적·레벨 산정값은 이 분석에 사용하지 않으며 기존 영역을 그대로 유지합니다.</div>
+          </section>
+        </section>
+
+        
+      </div>`;
     }
 
     function dashboard2(){
