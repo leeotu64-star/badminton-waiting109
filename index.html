@@ -1017,75 +1017,105 @@
 </style>
 
 
-<style id="jgb-header-title-size-align-only">
-/* 요청사항: 각 페이지 맨 위 헤더의 제목 크기 통일 + 헤더 내부 요소 정렬만 수정 */
-.jgb-page-title h1,.jgb-page-title h2,
-.pagebar h1,.pagebar h2,
-.basic-v5-title,
-.leak-head h1,
-.eam-innovation-head h1,
-.eam-xhero h1,
-.ca-title{
-  font-size:36px!important;
-  line-height:1.15!important;
-  margin:0!important;
-  letter-spacing:-.8px!important;
+<style id="jgb-customer-admin-readability-only">
+/* 고객접수관리 화면만 가독성 개선 — 기능/JS/DB 변경 없음 */
+.cc-wrap{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cc-row{
+  grid-template-columns:92px 150px minmax(0,1fr) 95px 76px;
+  min-width:0;
+  min-height:76px;
 }
+.cc-row>div,.cc-row>span{min-width:0;padding:13px 12px}
+.cc-date{font-size:14px}
+.cc-date small{font-size:11px}
+.cc-place b{font-size:16px;line-height:1.3;overflow-wrap:anywhere}
+.cc-place span{font-size:11px}
+.cc-content{font-size:15px;line-height:1.45;min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.cc-worker{font-size:14px;overflow-wrap:anywhere}
+.cc-done{font-size:13px;white-space:nowrap}
 
-/* 헤더 안의 제목/설명/우측 버튼이 각 박스 폭에 맞게 안정적으로 정렬 */
-.jgb-page-title,
-.pagebar,
-.basic-v5-head,
-.leak-head,
-.eam-innovation-head,
-.eam-xhero,
-.ca-hero{
+.ca-table-head{font-size:13px;padding:13px 18px}
+.ca-row{min-height:96px}
+.ca-time{font-size:15px}
+.ca-time small{font-size:12px}
+.ca-place b{font-size:18px}
+.ca-place span{font-size:12px}
+.ca-content{font-size:16px;line-height:1.55}
+.ca-label{font-size:12px}
+.ca-assign select{min-height:44px;padding:10px 12px;font-size:15px;border-radius:9px}
+.ca-handler{font-size:12px}
+.ca-status{padding:9px 12px;font-size:13px}
+.ca-actions{gap:8px}
+.ca-complete,.ca-delete{min-height:42px;padding:10px 11px;font-size:14px;line-height:1.2;border-radius:9px}
+.ca-need{font-size:13px;line-height:1.35}
+
+@media(max-width:1250px){
+  .cc-row{grid-template-columns:82px 135px minmax(0,1fr) 85px 72px}
+}
+@media(max-width:980px){
+  .cc-wrap{grid-template-columns:1fr}
+  .cc-row{grid-template-columns:90px 150px minmax(0,1fr) 95px 76px}
+}
+</style>
+
+
+<style id="jgb-customer-completed-final-align">
+/* 최근 처리완료 카드: 모든 행을 동일한 5열 구조로 고정 */
+.cc-wrap{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  column-gap:14px!important;
+  row-gap:12px!important;
+  align-items:stretch!important;
+}
+.cc-row{
+  display:grid!important;
+  grid-template-columns:88px 145px minmax(0,1fr) 82px 46px!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+.cc-row>*{
+  min-width:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+.cc-content{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.cc-place b,.cc-worker{
+  display:block!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.cc-done{
   display:flex!important;
   align-items:center!important;
-  justify-content:space-between!important;
-  gap:24px!important;
-}
-.jgb-page-title>div:first-child,
-.pagebar>div:first-child,
-.basic-v5-head>div:first-child,
-.leak-head>div:first-child,
-.eam-innovation-head>div:first-child,
-.eam-xhero>div:first-child,
-.ca-hero>div:first-child{
+  justify-content:center!important;
   min-width:0!important;
-  flex:1 1 auto!important;
+  overflow:hidden!important;
 }
-.jgb-page-title p,
-.pagebar p,
-.basic-v5-sub,
-.leak-head p,
-.eam-innovation-head p,
-.eam-xhero p,
-.ca-sub{
-  margin-top:8px!important;
-  line-height:1.5!important;
+
+/* 현재 접수 영역도 같은 원칙으로 칸 밀림 방지 */
+.ca-row>*{
+  min-width:0!important;
+  box-sizing:border-box!important;
 }
-.jgb-page-title button,
-.pagebar button,
-.basic-v5-head button,
-.leak-head button,
-.eam-innovation-head button,
-.eam-xhero button,
-.ca-hero button{
-  flex:0 0 auto!important;
+.ca-content{
+  min-width:0!important;
+  overflow:hidden!important;
+  overflow-wrap:anywhere!important;
 }
-@media(max-width:900px){
-  .jgb-page-title,.pagebar,.basic-v5-head,.leak-head,
-  .eam-innovation-head,.eam-xhero,.ca-hero{
-    align-items:flex-start!important;
-    flex-direction:column!important;
-    gap:12px!important;
-  }
-  .jgb-page-title h1,.jgb-page-title h2,
-  .pagebar h1,.pagebar h2,.basic-v5-title,.leak-head h1,
-  .eam-innovation-head h1,.eam-xhero h1,.ca-title{
-    font-size:32px!important;
-  }
+@media(max-width:980px){
+  .cc-wrap{grid-template-columns:1fr!important}
+  .cc-row{grid-template-columns:88px 145px minmax(0,1fr) 82px 46px!important}
 }
 </style>
 
