@@ -1329,29 +1329,37 @@ html,body{max-width:100%;overflow-x:hidden!important}
 @media(max-width:650px){.qr-v19-head{display:block}.qr-v19-overall{margin-top:10px}.qr-v19-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.qr-v19-main-grid{grid-template-columns:1fr}.qr-v19-risk-card{grid-column:auto}}
 </style>
 
-/* v20: EAM 설비 분류 9개를 한 줄 가로 스크롤로 표시 */
-<style>
+/* v25: EAM 설비 분류 스크롤 안정화 — 9개 카드 고정폭, 분류영역만 가로 이동 */
+<style id="EAM_TYPE_SCROLL_STABLE_V25">
 .eam-type-row{
   display:flex!important;
+  flex-direction:row!important;
   flex-wrap:nowrap!important;
-  overflow-x:auto!important;
+  overflow-x:scroll!important;
   overflow-y:hidden!important;
-  grid-template-columns:none!important;
+  width:100%!important;
+  max-width:1520px!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
   gap:12px!important;
   padding:0 2px 10px!important;
-  margin-bottom:14px!important;
+  margin:0 auto 14px!important;
   scrollbar-width:auto!important;
   scrollbar-color:#8fa8c2 #e7eef5!important;
+  overscroll-behavior-x:contain!important;
+  overscroll-behavior-y:none!important;
+  overflow-anchor:none!important;
 }
 .eam-type-row::-webkit-scrollbar{height:12px!important;display:block!important}
 .eam-type-row::-webkit-scrollbar-track{background:#e7eef5!important;border-radius:8px!important}
-.eam-type-row::-webkit-scrollbar-thumb{background:#8fa8c2!important;border-radius:8px!important}
+.eam-type-row::-webkit-scrollbar-thumb{background:#8fa8c2!important;border-radius:8px!important;min-width:60px!important}
+.eam-type-row::-webkit-scrollbar-thumb:hover{background:#7893ad!important}
 .eam-type{
-  flex:0 0 calc((100% - 72px)/7)!important;
-  min-width:0!important;
-}
-@media(max-width:900px){
-  .eam-type{flex:0 0 210px!important}
+  flex:0 0 210px!important;
+  width:210px!important;
+  min-width:210px!important;
+  max-width:210px!important;
+  box-sizing:border-box!important;
 }
 </style>
 </head><body><div id="app"></div>
@@ -3317,6 +3325,11 @@ html,body{max-width:100%;overflow-x:hidden!important}
         // 누수 관련 자산은 기타설비에 남기지 않고 방수 자산으로 통합한다.
         // 기존 메타/DB의 '기타' 분류보다 설비명·규격·위치에 포함된 '누수'를 우선한다.
         if(/누수/.test(text))return 'waterproof';
+        // 기존 기타설비에 들어 있던 실제 문·창호/위생 자산을 새 분류로 이동한다.
+        // 자산명 기준으로만 분류하며 나머지 기존 자산은 변경하지 않는다.
+        const n=v(x?.name);
+        if(/흰지|힌지|유리문|도어클로저|도어|문짝|창호/.test(n))return 'doors';
+        if(/소변기|양변기|세면대|수전/.test(n))return 'sanitary';
         if(m.category&&CATMAP[m.category])return CATMAP[m.category];
         if(x?.category&&CATMAP[x.category])return CATMAP[x.category];
         const t=v(x?.type);
