@@ -912,7 +912,22 @@ html,body{overflow-x:hidden!important}
 .eam-asset-row .row-copy small{font-size:12px!important;color:#4d6480!important;line-height:1.45!important}
 .eam-asset-row .row-origin{font-size:10px!important;color:#7d8da0!important}
 </style>
-</head><body><div id="app"></div>
+<style>
+.opx-qr-panel{margin-top:18px}
+.opx-qr-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.opx-qr-kpi{border:1px solid #d8e3ef;border-top:4px solid #2d73d5;border-radius:12px;padding:12px 14px;background:#fff}
+.opx-qr-kpi.green{border-top-color:#18a957}.opx-qr-kpi.orange{border-top-color:#ff8a00}.opx-qr-kpi.violet{border-top-color:#7651e8}
+.opx-qr-kpi span{display:block;color:#60748a;font-size:12px}.opx-qr-kpi strong{display:block;font-size:24px;margin-top:4px}.opx-qr-kpi small{font-size:12px;margin-left:2px}
+.opx-qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.opx-qr-box,.opx-qr-months{border:1px solid #d8e3ef;border-radius:12px;background:#fff;padding:14px}
+.opx-qr-box h4,.opx-qr-months h4{margin:0 0 10px;font-size:14px;color:#173b63}
+.opx-qr-row{display:flex;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid #edf2f7;font-size:13px}
+.opx-qr-row:last-child{border-bottom:0}.opx-qr-row b{white-space:nowrap}
+.opx-qr-empty{padding:14px 2px;color:#718096;font-size:13px}
+.opx-qr-months{margin-top:12px}.opx-qr-month-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.opx-qr-month{display:flex;justify-content:space-between;gap:4px;padding:8px 9px;border:1px solid #e1e9f2;border-radius:8px;background:#f8fbff;font-size:12px}
+@media(max-width:900px){.opx-qr-kpis{grid-template-columns:repeat(2,1fr)}.opx-qr-grid{grid-template-columns:1fr}.opx-qr-month-grid{grid-template-columns:repeat(4,1fr)}}
+</style></head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style id="WOW_DASHBOARD_CSS">
@@ -1093,7 +1108,7 @@ function render(){
    app.innerHTML=body();
    return;
   }
- app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","🛠 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}${nav("leakage","💧 누수관리")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v24</span></h1><small>신고 접수 → 고객접수관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+ app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","🛠 작업관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}${nav("leakage","💧 누수관리")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v24</span></h1><small>신고 접수 → 작업관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
  }catch(err){
    console.error("화면 렌더링 오류",err);
    app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
@@ -1360,6 +1375,28 @@ function dashboard(s){
       <small>${x.total}회</small>
     </div>`).join("");
 
+  const qrAll=Array.isArray(db.issues)?db.issues:[];
+  const qrMonth=qrAll.filter(x=>String(x?.createdAt||"").slice(0,7)===ym);
+  const qrDone=qrMonth.filter(x=>x?.status==="완료");
+  const qrPending=qrMonth.filter(x=>x?.status!=="완료");
+  const qrRate=qrMonth.length?Math.round(qrDone.length/qrMonth.length*100):0;
+  const qrPlaceMap={},qrIssueMap={};
+  qrMonth.forEach(x=>{
+    const place=String(x?.place||"미기재").trim()||"미기재";
+    qrPlaceMap[place]=(qrPlaceMap[place]||0)+1;
+    const issue=String(x?.category||x?.content||"기타").trim()||"기타";
+    qrIssueMap[issue]=(qrIssueMap[issue]||0)+1;
+  });
+  const qrPlaces=Object.entries(qrPlaceMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const qrIssues=Object.entries(qrIssueMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const qrPlaceRows=qrPlaces.length?qrPlaces.map((x,i)=>`<div class="opx-qr-row"><span>${i+1}. ${x[0]}</span><b>${x[1]}건</b></div>`).join(""):`<div class="opx-qr-empty">이번 달 QR 접수 데이터가 없습니다.</div>`;
+  const qrIssueRows=qrIssues.length?qrIssues.map((x,i)=>`<div class="opx-qr-row"><span>${i+1}. ${x[0]}</span><b>${x[1]}건</b></div>`).join(""):`<div class="opx-qr-empty">이번 달 신고 데이터가 없습니다.</div>`;
+  const qrMonthRows=Array.from({length:12},(_,i)=>{
+    const m=year+"-"+String(i+1).padStart(2,"0");
+    const n=qrAll.filter(x=>String(x?.createdAt||"").slice(0,7)===m).length;
+    return `<div class="opx-qr-month"><span>${i+1}월</span><b>${n}건</b></div>`;
+  }).join("");
+
   return `
   <div class="opx-dash">
 
@@ -1452,21 +1489,6 @@ function dashboard(s){
       </div>
     </section>
 
-    <section class="opx-panel opx-chart-panel">
-      <div class="opx-head">
-        <div>
-          <h3>${year}년 월별 직원실적 추이</h3>
-          <p>월별 정규업무 · 근무편성 인정 · 업무지시 수행 실적</p>
-        </div>
-        <span class="opx-chip">1월 — 12월</span>
-      </div>
-      <div class="opx-bars">${bars}</div>
-      <div class="opx-legend">
-        <span><i class="b"></i>정규업무</span>
-        <span><i class="g"></i>근무편성 인정</span>
-        <span><i class="o"></i>업무지시</span>
-      </div>
-    </section>
 
     <section class="opx-panel opx-table-panel">
       <div class="opx-head">
@@ -1515,6 +1537,30 @@ function dashboard(s){
           </thead>
           <tbody>${tableRows}</tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="opx-panel opx-qr-panel">
+      <div class="opx-head">
+        <div>
+          <h3>📋 고객 QR 접수 통계</h3>
+          <p>${year}년 ${month}월 · 고객이 QR로 접수한 실제 데이터를 기준으로 집계합니다.</p>
+        </div>
+        <span class="opx-chip">이번 달 ${qrMonth.length}건</span>
+      </div>
+      <div class="opx-qr-kpis">
+        <div class="opx-qr-kpi blue"><span>전체 접수</span><strong>${qrMonth.length}<small>건</small></strong></div>
+        <div class="opx-qr-kpi green"><span>처리완료</span><strong>${qrDone.length}<small>건</small></strong></div>
+        <div class="opx-qr-kpi orange"><span>처리중</span><strong>${qrPending.length}<small>건</small></strong></div>
+        <div class="opx-qr-kpi violet"><span>완료율</span><strong>${qrRate}<small>%</small></strong></div>
+      </div>
+      <div class="opx-qr-grid">
+        <div class="opx-qr-box"><h4>📍 빈번한 접수 장소</h4>${qrPlaceRows}</div>
+        <div class="opx-qr-box"><h4>⚠️ 빈번한 불편사항</h4>${qrIssueRows}</div>
+      </div>
+      <div class="opx-qr-months">
+        <h4>월별 QR 접수</h4>
+        <div class="opx-qr-month-grid">${qrMonthRows}</div>
       </div>
     </section>
 
@@ -1615,11 +1661,11 @@ function dashboard2(){
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
 function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
 function workerRow(w){const d=tasksFor(w.id), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()), md=mine.filter(x=>x.status!=="완료").length, bs=basicWorkerStats(w.id,monthKey());return `<tr><td><b>${w.name}</b></td><td>${w.shift}<br>${w.start?`${w.start}~${w.end}`:"-"}</td><td><span class="badge ${w.working?"":"off"}">${w.working?"근무":"휴무"}</span></td><td>${w.working?`${bs.complete}/${bs.target}일`:"-"}</td><td>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</td><td class="${md?"red":"green"}"><b>${w.working?md:"-"}</b></td><td><b>${mine.length}건</b></td></tr>`}
-function qrRequestPage(){const A=(window.__eamA||[]).filter(a=>String(a.status||'')!=='폐기').sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko'));return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="mobile-hero"><span>시설 이상 신고</span><b>직원용 통합 신고</b><small>QR 하나로 신고하고, 관리자가 작업으로 처리합니다.</small></div><div class="jgb-card qr-card"><div class="qr-step"><i>1</i><div><b>시설·설비 선택</b><small>고장난 설비를 선택하면 EAM 자산과 자동 연결됩니다.</small></div></div><div class="jgb-field"><label>시설·설비 <em>필수</em></label><select id="qrAssetCode" onchange="qrAssetChanged(this.value)"><option value="">시설·설비를 선택하세요</option>${A.map(a=>`<option value="${xEsc(a.asset_code)}">${xEsc(a.name)} · ${xEsc(a.place||'-')} · ${xEsc(a.asset_code)}</option>`).join('')}</select></div><div id="qrAssetInfo" class="qr-asset-info">설비를 선택하면 위치와 자산번호가 표시됩니다.</div><div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 증상을 적어주세요.</small></div></div><div class="jgb-field"><label>고장·이상 내용 <em>필수</em></label><textarea id="content" rows="5" placeholder="예: 주펌프에서 평소보다 큰 소음이 발생합니다."></textarea></div><div class="qr-step"><i>3</i><div><b>현장 사진</b><small>카메라로 바로 촬영할 수 있습니다.</small></div></div><div class="jgb-field"><input id="photo" type="file" accept="image/*" capture="environment"></div><button id="intakeBtn" class="jgb-btn qr-submit" style="width:100%" onclick="addQrIssue()">신고 등록</button><div class="qr-foot">등록 즉시 관리자 고객접수관리로 전달됩니다.</div></div></div>`;}
+function qrRequestPage(){const A=(window.__eamA||[]).filter(a=>String(a.status||'')!=='폐기').sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko'));return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="mobile-hero"><span>시설 이상 신고</span><b>직원용 통합 신고</b><small>QR 하나로 신고하고, 관리자가 작업으로 처리합니다.</small></div><div class="jgb-card qr-card"><div class="qr-step"><i>1</i><div><b>시설·설비 선택</b><small>고장난 설비를 선택하면 EAM 자산과 자동 연결됩니다.</small></div></div><div class="jgb-field"><label>시설·설비 <em>필수</em></label><select id="qrAssetCode" onchange="qrAssetChanged(this.value)"><option value="">시설·설비를 선택하세요</option>${A.map(a=>`<option value="${xEsc(a.asset_code)}">${xEsc(a.name)} · ${xEsc(a.place||'-')} · ${xEsc(a.asset_code)}</option>`).join('')}</select></div><div id="qrAssetInfo" class="qr-asset-info">설비를 선택하면 위치와 자산번호가 표시됩니다.</div><div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 증상을 적어주세요.</small></div></div><div class="jgb-field"><label>고장·이상 내용 <em>필수</em></label><textarea id="content" rows="5" placeholder="예: 주펌프에서 평소보다 큰 소음이 발생합니다."></textarea></div><div class="qr-step"><i>3</i><div><b>현장 사진</b><small>카메라로 바로 촬영할 수 있습니다.</small></div></div><div class="jgb-field"><input id="photo" type="file" accept="image/*" capture="environment"></div><button id="intakeBtn" class="jgb-btn qr-submit" style="width:100%" onclick="addQrIssue()">신고 등록</button><div class="qr-foot">등록 즉시 관리자 작업관리로 전달됩니다.</div></div></div>`;}
 function qrAssetChanged(code){const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));const box=document.getElementById('qrAssetInfo');if(box)box.innerHTML=a?`<b>${xEsc(a.name||'시설·설비')}</b><span>${xEsc(a.place||'-')} · 자산번호 ${xEsc(a.asset_code||'-')}</span>`:'설비를 선택하면 위치와 자산번호가 표시됩니다.';}
-async function addQrIssue(){const c=document.getElementById('content')?.value.trim(),code=document.getElementById('qrAssetCode')?.value||'',a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));if(!a){alert('시설·설비를 먼저 선택하세요.');return}if(!c){alert('고장·이상 내용을 입력하세요.');return}if(!SUPA){alert('Supabase 연결이 필요합니다.');return}const btn=document.getElementById('intakeBtn');if(btn)btn.disabled=true;try{let photo_url='';const f=document.getElementById('photo')?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,'_')}`;const up=await SUPA.storage.from('request-photos').upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+'/storage/v1/object/public/request-photos/'+path}const now=new Date().toISOString();const r=await SUPA.from('requests').insert({category:a.category||'시설',place:a.place||'',content:`[${a.asset_code}] ${c}`,photo_url,status:'접수',received_at:now});if(r.error)throw r.error;alert('신고가 등록되었습니다. 관리자 고객접수관리로 전달됩니다.');location.href=location.pathname+'?page=qr_done'}catch(e){console.error(e);alert('신고 등록에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'))}finally{if(btn)btn.disabled=false}}
+async function addQrIssue(){const c=document.getElementById('content')?.value.trim(),code=document.getElementById('qrAssetCode')?.value||'',a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));if(!a){alert('시설·설비를 먼저 선택하세요.');return}if(!c){alert('고장·이상 내용을 입력하세요.');return}if(!SUPA){alert('Supabase 연결이 필요합니다.');return}const btn=document.getElementById('intakeBtn');if(btn)btn.disabled=true;try{let photo_url='';const f=document.getElementById('photo')?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,'_')}`;const up=await SUPA.storage.from('request-photos').upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+'/storage/v1/object/public/request-photos/'+path}const now=new Date().toISOString();const r=await SUPA.from('requests').insert({category:a.category||'시설',place:a.place||'',content:`[${a.asset_code}] ${c}`,photo_url,status:'접수',received_at:now});if(r.error)throw r.error;alert('신고가 등록되었습니다. 관리자 작업관리로 전달됩니다.');location.href=location.pathname+'?page=qr_done'}catch(e){console.error(e);alert('신고 등록에 실패했습니다.\n'+(e?.message||'Supabase 권한 또는 연결을 확인하세요.'))}finally{if(btn)btn.disabled=false}}
 
-function qrDonePage(){return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="mobile-hero"><span>접수 완료</span><b>신고가 접수되었습니다.</b><small>관리자 고객접수관리에서 담당자 지정 후 조치합니다.</small></div><div class="jgb-card qr-card"><div class="jgb-empty" style="padding:25px 10px;text-align:center">접수 내용은 관리자 고객접수관리로 전달되었습니다.</div><button class="jgb-btn" style="width:100%" onclick="location.href=location.pathname+'?page=qr'">새 신고 등록</button></div></div>`;}
+function qrDonePage(){return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="mobile-hero"><span>접수 완료</span><b>신고가 접수되었습니다.</b><small>관리자 작업관리에서 담당자 지정 후 조치합니다.</small></div><div class="jgb-card qr-card"><div class="jgb-empty" style="padding:25px 10px;text-align:center">접수 내용은 관리자 작업관리로 전달되었습니다.</div><button class="jgb-btn" style="width:100%" onclick="location.href=location.pathname+'?page=qr'">새 신고 등록</button></div></div>`;}
 
 function registerPage(){const defaultCat="시설";const places=PLACE_GROUPS[defaultCat]||PLACE_OPTIONS;const presets=ISSUE_PRESETS[defaultCat]||[];return `<div class="pagebar"><h1>시설·환경·안전 접수</h1><button class="btn gray" onclick="go('dashboard')">종합 대시보드</button></div><div class="notice">구분과 장소를 선택하면 해당 시설에 맞는 장소·접수사항이 자동으로 표시됩니다. 등록자 이름은 저장하지 않습니다.</div><div class="panel"><div class="formgrid"><div class="field"><label>구분</label><select id="cat" onchange="updateRegisterOptions()"><option>시설</option><option>환경</option><option>안전</option><option>기타</option></select></div><div class="field"><label>접수 장소</label><select id="place"><option value="">장소를 선택하세요</option>${places.map(p=>`<option value="${p}">${p}</option>`).join("")}</select></div><div class="field full"><label>시설·접수사항 선택</label><select id="issuePreset" onchange="applyIssuePreset()"><option value="">내용을 선택하세요</option>${presets.map(v=>`<option value="${v}">${v}</option>`).join("")}<option value="직접입력">직접입력</option></select></div><div class="field full"><label>상세 내용</label><textarea id="content" rows="3" placeholder="위 목록에서 선택하거나 필요한 경우 상세 내용을 입력하세요"></textarea></div><div class="field full"><label>사진(선택)</label><input id="photo" type="file" accept="image/*"></div></div><button class="btn" style="margin-top:10px" onclick="addIssue()">접수 등록</button></div><div class="panel" style="margin-top:10px"><h2>최근 접수</h2>${db.issues.slice(-8).reverse().map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수 ${time(x.createdAt)}</div></div><div class="status ${x.status==="완료"?"green":"red"}">${x.status}</div></div>`).join("")||"<div class='small'>접수된 사항이 없습니다.</div>"}</div>`}
 function updateRegisterOptions(){const cat=document.getElementById("cat")?.value||"시설",place=document.getElementById("place"),preset=document.getElementById("issuePreset");if(place){const arr=PLACE_GROUPS[cat]||PLACE_OPTIONS;place.innerHTML='<option value="">장소를 선택하세요</option>'+arr.map(p=>`<option value="${p}">${p}</option>`).join("")}if(preset){const arr=ISSUE_PRESETS[cat]||[];preset.innerHTML='<option value="">내용을 선택하세요</option>'+arr.map(v=>`<option value="${v}">${v}</option>`).join("")+ '<option value="직접입력">직접입력</option>';preset.value=""}}
@@ -1637,7 +1683,7 @@ function processPage(){
  const all=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
  const pending=all.filter(x=>x.status!=='완료'); const completed=all.filter(x=>x.status==='완료');
  const waiting=pending.filter(x=>!x.handlerId).length, running=pending.filter(x=>x.handlerId).length;
- return `<div class="jgb-page-title"><div><h2>고객접수관리</h2><p>QR 고객 접수부터 담당자 지정, 조치완료까지 한 화면에서 관리합니다.</p></div><div class="process-actions"><span class="process-status">전체 ${all.length}건</span><span class="process-status wait">담당 미지정 ${waiting}건</span><span class="process-status run">조치중 ${running}건</span><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button></div></div>
+ return `<div class="jgb-page-title"><div><h2>작업관리</h2><p>QR 신고 접수부터 담당자 지정, 처리방식, 조치내용 입력, 완료까지 한 화면에서 관리합니다.</p></div><div class="process-actions"><span class="process-status">전체 ${all.length}건</span><span class="process-status wait">담당 미지정 ${waiting}건</span><span class="process-status run">조치중 ${running}건</span><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button></div></div>
  <div class="process-wrap">
   <div class="process-summary">
    <div class="process-kpi"><div class="k-label">전체 접수</div><div class="k-value">${all.length}건</div></div>
@@ -2606,7 +2652,7 @@ if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
   };
 
   // QR 신고와 EAM은 분리. 직원 신고 화면에는 자산 선택/EAM 자동연계 문구가 없어야 한다.
-  window.qrRequestPage=function(){return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="mobile-hero"><span>시설 이상 신고</span><b>직원용 통합 신고</b><small>QR 하나로 신고하고, 관리자가 고객접수관리에서 처리합니다.</small></div><div class="jgb-card qr-card"><div class="qr-step"><i>1</i><div><b>신고 위치</b><small>문제가 발생한 위치를 선택하세요.</small></div></div><div class="jgb-field"><label>위치 <em>필수</em></label><select id="qrPlace"><option value="">신고 위치를 선택하세요</option><option>A · 코트</option><option>B · 복도</option><option>C · 사무실</option><option>D · 옥상</option><option>E · 유수장치실</option></select></div><div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 증상을 적어주세요.</small></div></div><div class="jgb-field"><label>고장·이상 내용 <em>필수</em></label><textarea id="content" rows="5" placeholder="예: 조명 1개가 켜지지 않습니다."></textarea></div><div class="qr-step"><i>3</i><div><b>현장 사진</b><small>필요한 경우 사진을 첨부하세요.</small></div></div><div class="jgb-field"><input id="photo" type="file" accept="image/*" capture="environment"></div><button id="intakeBtn" class="jgb-btn qr-submit" style="width:100%" onclick="addQrIssue()">신고 등록</button><div class="qr-foot">등록된 신고는 관리자 고객접수관리에서 처리합니다.</div></div></div>`};
+  window.qrRequestPage=function(){return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="mobile-hero"><span>시설 이상 신고</span><b>직원용 통합 신고</b><small>QR 하나로 신고하고, 관리자가 작업관리에서 처리합니다.</small></div><div class="jgb-card qr-card"><div class="qr-step"><i>1</i><div><b>신고 위치</b><small>문제가 발생한 위치를 선택하세요.</small></div></div><div class="jgb-field"><label>위치 <em>필수</em></label><select id="qrPlace"><option value="">신고 위치를 선택하세요</option><option>A · 코트</option><option>B · 복도</option><option>C · 사무실</option><option>D · 옥상</option><option>E · 유수장치실</option></select></div><div class="qr-step"><i>2</i><div><b>이상 내용</b><small>현장에서 확인한 증상을 적어주세요.</small></div></div><div class="jgb-field"><label>고장·이상 내용 <em>필수</em></label><textarea id="content" rows="5" placeholder="예: 조명 1개가 켜지지 않습니다."></textarea></div><div class="qr-step"><i>3</i><div><b>현장 사진</b><small>필요한 경우 사진을 첨부하세요.</small></div></div><div class="jgb-field"><input id="photo" type="file" accept="image/*" capture="environment"></div><button id="intakeBtn" class="jgb-btn qr-submit" style="width:100%" onclick="addQrIssue()">신고 등록</button><div class="qr-foot">등록된 신고는 관리자 작업관리에서 처리합니다.</div></div></div>`};
   window.addQrIssue=async function(){
     const c=document.getElementById('content')?.value.trim(),place=document.getElementById('qrPlace')?.value||'';
     if(!place){alert('신고 위치를 선택하세요.');return} if(!c){alert('고장·이상 내용을 입력하세요.');return}
@@ -4355,7 +4401,7 @@ if(typeof window.eamPage==='function'){
 function mobileQrRequestPage(){
   return `<div class="jgb-mobile qr-mobile">
     <div class="mobile-brand">🛡 장군봉체육관</div>
-    <div class="mobile-hero"><span>스마트폰 간편 접수</span><b>시설 이상 신고</b><small>현장에서 바로 접수하면 관리자 고객접수관리로 전달됩니다.</small></div>
+    <div class="mobile-hero"><span>스마트폰 간편 접수</span><b>시설 이상 신고</b><small>현장에서 바로 접수하면 관리자 작업관리로 전달됩니다.</small></div>
     <div class="jgb-card qr-card">
       <div class="qr-step"><i>1</i><div><b>신고 위치</b><small>문제가 발생한 위치를 선택하세요.</small></div></div>
       <div class="jgb-field"><label>위치 <em>필수</em></label>
@@ -4366,7 +4412,7 @@ function mobileQrRequestPage(){
         <textarea id="mobileQrContent" rows="5" placeholder="예: 조명 1개가 켜지지 않습니다."></textarea>
       </div>
       <button id="mobileQrSubmit" class="jgb-btn qr-submit" style="width:100%" onclick="addMobileQrIssue()">신고 등록</button>
-      <div class="qr-foot">접수 후 관리자 고객접수관리에서 담당자를 지정하고 조치합니다.</div>
+      <div class="qr-foot">접수 후 관리자 작업관리에서 담당자를 지정하고 조치합니다.</div>
     </div>
   </div>`;
 }
@@ -4391,7 +4437,7 @@ async function addMobileQrIssue(){
 }
 
 function mobileQrDonePage(){
-  return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="jgb-card qr-card" style="text-align:center;padding:36px 22px"><div style="font-size:52px;margin-bottom:14px">✅</div><b style="font-size:22px">신고가 접수되었습니다.</b><small style="display:block;margin-top:10px;color:#64748b;line-height:1.6">관리자 고객접수관리로 전달되었습니다.<br>담당자 지정 후 조치가 진행됩니다.</small><button class="jgb-btn" style="width:100%;margin-top:24px" onclick="location.href=location.pathname+'?page=mobileqr'">새 신고 등록</button></div></div>`;
+  return `<div class="jgb-mobile qr-mobile"><div class="mobile-brand">🛡 장군봉체육관</div><div class="jgb-card qr-card" style="text-align:center;padding:36px 22px"><div style="font-size:52px;margin-bottom:14px">✅</div><b style="font-size:22px">신고가 접수되었습니다.</b><small style="display:block;margin-top:10px;color:#64748b;line-height:1.6">관리자 작업관리로 전달되었습니다.<br>담당자 지정 후 조치가 진행됩니다.</small><button class="jgb-btn" style="width:100%;margin-top:24px" onclick="location.href=location.pathname+'?page=mobileqr'">새 신고 등록</button></div></div>`;
 }
 </script>
 
@@ -4767,41 +4813,5 @@ function mobileQrDonePage(){
  .jgb-history-box-body{grid-template-columns:1fr!important}
  .jgb-history-info{border-right:0!important;border-bottom:2px solid #b7cadb!important}
  .jgb-history-box .jgb-work-photos{justify-content:flex-start!important;overflow-x:auto!important}
-}
-
-/* JGB HEADER UNIFICATION — DESIGN ONLY (FUNCTIONS/JS UNCHANGED) */
-.eam-innovation-head,.eam-xhero,.leak-head,.basic-v5-head,.jgb-page-title{
-  position:relative;overflow:hidden;
-  color:#fff!important;
-  background:linear-gradient(135deg,#06254a 0%,#07599d 55%,#0786b9 100%)!important;
-  border:1px solid rgba(255,255,255,.16)!important;
-  border-radius:24px!important;
-  box-shadow:0 18px 45px rgba(11,59,105,.20)!important;
-  box-sizing:border-box;
-}
-.eam-innovation-head:before,.eam-innovation-head:after,.eam-xhero:before,.eam-xhero:after,.leak-head:before,.leak-head:after,.basic-v5-head:before,.basic-v5-head:after,.jgb-page-title:before,.jgb-page-title:after{
-  content:"";position:absolute;border:1px solid rgba(255,255,255,.13);border-radius:50%;pointer-events:none;
-}
-.eam-innovation-head:before,.eam-xhero:before,.leak-head:before,.basic-v5-head:before,.jgb-page-title:before{width:430px;height:430px;right:-190px;top:-260px}
-.eam-innovation-head:after,.eam-xhero:after,.leak-head:after,.basic-v5-head:after,.jgb-page-title:after{width:330px;height:330px;right:-130px;bottom:-250px}
-.eam-innovation-head,.leak-head{padding:28px 30px!important;align-items:center!important;margin-bottom:18px!important;z-index:0}
-.eam-xhero{padding:28px 30px!important;margin-bottom:18px!important;z-index:0}
-.basic-v5-head,.jgb-page-title{padding:24px 30px!important;margin-bottom:18px!important;align-items:center!important;z-index:0}
-.eam-innovation-head>div,.eam-xhero>div,.leak-head>div,.basic-v5-head>div,.jgb-page-title>div{position:relative;z-index:1}
-.eam-innovation-head .eyebrow,.eam-xeyebrow,.leak-head .eyebrow{color:#8fd8ff!important;font-size:11px!important;letter-spacing:2px!important;font-weight:900!important}
-.eam-innovation-head h1,.eam-xhero h1,.leak-head h1,.basic-v5-title,.jgb-page-title h2{color:#fff!important;font-weight:1000!important;letter-spacing:-1.5px!important;margin:7px 0!important}
-.eam-innovation-head h1,.eam-xhero h1{font-size:34px!important;line-height:1.15!important}
-.leak-head h1,.basic-v5-title,.jgb-page-title h2{font-size:30px!important;line-height:1.2!important}
-.eam-innovation-head p,.eam-xhero p,.leak-head p,.basic-v5-sub,.jgb-page-title p{color:#d5ebff!important;font-size:13px!important;line-height:1.6!important;font-weight:700!important}
-.eam-innovation-head .eam-manage-main,.eam-xhero-right button,.leak-head .actions button,.basic-v5-head input,.jgb-page-title input,.jgb-page-title button{position:relative;z-index:2}
-.eam-innovation-head .eam-manage-main,.eam-xhero-right button,.leak-head .btn.blue,.jgb-page-title .btn.blue{background:rgba(255,255,255,.14)!important;color:#fff!important;border:1px solid rgba(255,255,255,.38)!important;box-shadow:none!important;backdrop-filter:blur(5px)}
-.eam-xhero-right span{color:#8ff2c1!important}
-.eam-xhero-right{position:relative;z-index:2}
-.basic-v5-head input,.jgb-page-title input{background:rgba(255,255,255,.95)!important;color:#17314d!important}
-.basic-v5-head button,.jgb-page-title button{position:relative;z-index:2}
-@media(max-width:900px){
-  .eam-innovation-head,.eam-xhero,.leak-head,.basic-v5-head,.jgb-page-title{padding:22px 20px!important}
-  .eam-innovation-head h1,.eam-xhero h1{font-size:28px!important}
-  .leak-head,.basic-v5-head,.jgb-page-title{flex-direction:column!important;align-items:flex-start!important}
 }
 </style>
