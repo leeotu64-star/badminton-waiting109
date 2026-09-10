@@ -1558,12 +1558,15 @@
 
       const tableRows=md.map((x,i)=>{
         const p=x.p, r=p.basic.target?Math.min(100,Math.round(p.basic.complete/p.basic.target*100)):0;
-        return `<tr><td>${i+1}</td><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic.complete}</td><td class="g">${p.auto.performance}<small> (${p.auto.units}회)</small></td><td class="o">${p.qr.done}</td><td class="t">${p.total}</td><td>${r}%</td></tr>`;
+        return `<tr><td>${i+1}</td><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic.complete}</td><td class="g">${p.auto.performance}<small> (${p.auto.units}회)</small></td><td class="o">${p.qr.done}</td><td class="t">${p.total}</td><td class="opx-rate-cell">${r}%</td></tr>`;
       }).join('');
 
       const annualRows=ys.map((x,i)=>{
         const p=x.p;
         return `<tr><td>${i+1}</td><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic}</td><td class="g">${p.auto}<small> (${p.autoUnits}회)</small></td><td class="o">${p.issueDone}</td><td class="t">${p.total}</td></tr>`;
+      }).join('');
+
+      return `<tr><td>${i+1}</td><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic}</td><td class="g">${p.auto}<small> (${p.autoUnits}회)</small></td><td class="o">${p.issueDone}</td><td class="t">${p.total}</td></tr>`;
       }).join('');
 
       const monthlyRows=monthly.map(x=>`<tr><td>${x.m}월</td><td class="b">${x.basic}</td><td class="g">${x.auto}</td><td class="o">${x.issue}</td><td class="t">${x.total}</td></tr>`).join('');
@@ -1589,7 +1592,8 @@
 
         <section class="opx-major-section employee-section">
           <div class="opx-major-title employee-title"><span>직원 실적</span><small>월간 · 연간 · 직원별 비교</small></div>
-          <section class="opx-kpis">
+          <section class="opx-major-title employee"><span>직원 실적</span></section>
+        <section class="opx-kpis">
             <div class="opx-kpi blue"><span>정규업무 실적</span><strong>${sum.basic}<small>건</small></strong><div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.basic/target*100))}%"></i></div><em>기본업무 10개 완료 = 1실적</em></div>
             <div class="opx-kpi green"><span>근무편성 인정실적</span><strong>${sum.auto}<small>건</small></strong><div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.auto/10*100))}%"></i></div><em>인정 ${md.reduce((n,x)=>n+x.p.auto.units,0)}회 · 10회 단위 환산</em></div>
             <div class="opx-kpi orange"><span>QR 조치완료 수행실적</span><strong>${sum.issue}<small>건</small></strong><div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.issue/20*100))}%"></i></div><em>QR 조치완료 건별 자동 반영</em></div>
@@ -1611,18 +1615,12 @@
               </div>
             </div>
           </section>
-
-          <section class="opx-two-col">
-            <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>${year}년 월별 실적</h3><p>1월부터 12월까지 월별 누적을 표로 확인합니다.</p></div><span class="opx-chip">월별</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>월</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${monthlyRows}</tbody></table></div></section>
-            <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>직원별 연간 누계를 동일 기준으로 비교합니다.</p></div><span class="opx-chip">연간 누계</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
-          </section>
-          <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>월별 · 연간 실적 비교</h3><p>현재 기준월의 월 실적과 연간 누계를 한눈에 비교합니다.</p></div><span class="opx-chip">실적 비교</span></div><div class="opx-compare-cards">${workers.map(w=>{const m=dashboardStaffMonth(w.id,ym),y=dashboardStaffYear(w.id,year);return `<div class="opx-compare-card"><b>${xEsc(w.name)}</b><div><span>월 종합 <strong>${m.total}</strong></span><span>연간 종합 <strong>${y.total}</strong></span></div><small>정규 ${m.basic.complete} · 편성 ${m.auto.performance} · 지시 ${m.qr.done}</small></div>`}).join('')}</div></section>
-          <section class="opx-guide"><div class="opx-guide-quote"><b>🎯 직원 업무실적 운영 원칙</b><p>“누가 더 많이 쉬었는가”가 아니라<br><b>실제 근무한 업무는 실제 실적으로, 쉬는 날은 근무편성 기준으로, 지시받은 업무는 수행 건수대로</b> 투명하게 반영합니다.</p></div><div class="opx-steps"><div class="opx-step"><div class="opx-step-no">1</div><b>기본업무 수행</b><span>근무일 10개 업무를 모두 완료하면 정규업무 1실적</span></div><div class="opx-step"><div class="opx-step-no">2</div><b>근무편성 자동인정</b><span>휴무·주휴일·연가·공가·대휴 등을 자동 집계</span></div><div class="opx-step"><div class="opx-step-no">3</div><b>업무지시 수행</b><span>QR·지시사항을 실제 처리한 직원에게 건별 반영</span></div><div class="opx-step"><div class="opx-step-no">4</div><b>종합 실적 산출</b><span>세 가지 실적을 마지막 단계에서 자동 합산</span></div></div></section>
         </section>
 
         <section class="opx-major-section customer-section">
           <div class="opx-major-title customer-title"><span>고객 접수</span><small>QR 접수 · 조치완료 · 미조치 현황</small></div>
-          <section class="opx-customer-panel">
+          <section class="opx-major-title customer"><span>고객 접수</span></section>
+        <section class="opx-customer-panel">
             <div class="opx-customer-kpis">
               <div class="opx-customer-kpi blue"><span>전체 접수</span><strong>${customerReceived}<small>건</small></strong></div>
               <div class="opx-customer-kpi green"><span>처리완료</span><strong>${customerCompleted}<small>건</small></strong><em>완료율 ${customerRate}%</em></div>
@@ -4856,4 +4854,29 @@
      .jgb-history-info{border-right:0!important;border-bottom:2px solid #b7cadb!important}
      .jgb-history-box .jgb-work-photos{justify-content:flex-start!important;overflow-x:auto!important}
     }
-    </style>
+    
+    /* 직원 실적 / 고객 접수 3대 헤더 정리 */
+    .opx-major-title{margin:22px 0 12px;padding:13px 20px;border-radius:14px;display:flex;align-items:center;min-height:52px;box-sizing:border-box;font-size:25px!important;font-weight:950;letter-spacing:-.7px;background:#fff;border:1px solid #dbe5ef;box-shadow:0 4px 14px rgba(20,45,80,.05)}
+    .opx-major-title.employee{border-left:7px solid #2563eb;color:#1d4ed8;background:linear-gradient(90deg,#eff6ff 0%,#fff 55%)}
+    .opx-major-title.customer{border-left:7px solid #0f9f9a;color:#087f7a;background:linear-gradient(90deg,#ecfdfb 0%,#fff 55%)}
+    .opx-major-title span{display:block}
+    .opx-kpis{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}
+    .opx-kpi{min-height:142px!important;padding:20px!important;box-sizing:border-box}
+    .opx-grid{grid-template-columns:minmax(0,1.55fr) minmax(300px,.85fr)!important;gap:16px!important;align-items:stretch}
+    .opx-panel{min-width:0}
+    .opx-table-wrap{overflow-x:auto}
+    .opx-table{width:100%;table-layout:fixed}
+    .opx-table th,.opx-table td{vertical-align:middle!important}
+    .opx-table th:nth-child(1),.opx-table td:nth-child(1){width:62px}
+    .opx-table th:nth-child(2),.opx-table td:nth-child(2){width:105px}
+    .opx-table th:nth-child(3),.opx-table td:nth-child(3),.opx-table th:nth-child(4),.opx-table td:nth-child(4),.opx-table th:nth-child(5),.opx-table td:nth-child(5){width:115px}
+    .opx-table th:nth-child(6),.opx-table td:nth-child(6){width:105px}
+    .opx-table th:nth-child(7),.opx-table td:nth-child(7){width:100px}
+    .opx-rate-cell{color:#dc2626!important;font-size:22px!important;font-weight:950!important;white-space:nowrap!important;text-align:center!important}
+    .opx-customer-kpis{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}
+    .opx-customer-kpi{min-height:130px!important;padding:19px!important;box-sizing:border-box}
+    .opx-customer-grid2{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}
+    .opx-customer-grid2>div:last-child{grid-column:1 / -1}
+    @media(max-width:900px){.opx-kpis,.opx-customer-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}.opx-grid,.opx-customer-grid2{grid-template-columns:1fr!important}.opx-customer-grid2>div:last-child{grid-column:auto}}
+    @media(max-width:560px){.opx-major-title{font-size:22px!important;min-height:48px}.opx-kpis,.opx-customer-kpis{grid-template-columns:1fr!important}.opx-kpi,.opx-customer-kpi{min-height:118px!important}}
+</style>
