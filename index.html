@@ -2135,16 +2135,6 @@ html,body{max-width:100%;overflow-x:hidden!important}
                 <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📈 최근 7일 접수 흐름</b><span>${qrTrendText}</span></div><div class="qrx-v8-body"><div class="qrx-trend">${qrTrend7.map(o=>{const mx=Math.max(1,...qrTrend7.map(v=>v.count));return `<div class="qrx-trend-day"><b>${o.count}</b><div class="qrx-trend-bar" style="height:${Math.max(7,Math.round(o.count/mx*85))}px"></div><small>${xEsc(o.label)}</small></div>`}).join('')}</div><div style="margin-top:8px;text-align:right;font-size:11px;color:#64748b">최근 7일 ${qrNowTrend}건 · 이전 7일 ${qrPrevTrend}건</div></div></div>
               </div>
 
-              <div class="qrx-v8-grid">
-                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>🧩 반복 문제 · 원인 후보</b><span>재발 방지 관점</span></div><div class="qrx-v8-body"><div class="qrx-issue-list">
-                  ${qrIssueInsights.slice(0,5).map(o=>`<div class="qrx-issue"><div class="qrx-issue-top"><b>${xEsc(o.group)}</b><strong>${o.count}건</strong></div><small>긴급 ${o.urgent} · 주의 ${o.warn} · 평균 위험점수 ${o.avg}</small><div class="qrx-issue-bar"><i style="width:${Math.min(100,Math.max(8,o.avg))}%"></i></div></div>`).join('')||'<div style="padding:12px;color:#64748b">반복 문제 데이터 없음</div>'}
-                </div></div></div>
-
-                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>🛠 예방·개선 우선순위 TOP 3</b><span>반복·미조치 기반</span></div><div class="qrx-v8-body"><div class="qrx-priority">
-                  ${qrPrevRows.slice(0,3).map((o,i)=>`<div class="qrx-priority-item"><b>${i+1}. ${xEsc(o.place)} · ${xEsc(o.issue)}</b><small>관련 ${o.count}건 · 미조치 ${o.pending}건 · ${xEsc(qrIssueGuide[o.issue]||o.checks||'현장 상태 확인')}</small></div>`).join('')||'<div style="padding:12px;color:#64748b">예방관리 후보 없음</div>'}
-                </div></div></div>
-              </div>
-
               <div class="qrx-footer"><b>💡 분석 기준</b> · 고객 QR 접수의 신고내용·장소·접수시각·처리상태를 기준으로 위험도·반복성·최근성·미조치 상태를 함께 분석합니다. <b>직원실적·레벨 산정값은 이 분석에 사용하지 않습니다.</b></div>
             </div>
           </section>
