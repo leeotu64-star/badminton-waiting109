@@ -1,3 +1,4 @@
+<!-- JGB V3: slider + operation insight + photo delete hardening -->
     <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
     <style>
@@ -1204,6 +1205,23 @@
 @media(max-width:1100px){.opx-customer-analytics-v2{grid-template-columns:1fr 1fr!important}.opx-customer-kpis-compact{grid-template-columns:repeat(3,1fr)!important}}
 @media(max-width:800px){.opx-customer-detail-grid{grid-template-columns:1fr!important}.opx-customer-analytics-v2{grid-template-columns:1fr!important}.opx-customer-kpis-compact{grid-template-columns:1fr!important}.opx-attention-list>div{grid-template-columns:90px 1fr}.opx-attention-list em{grid-column:2;text-align:left}}
 </style>
+<style id="JGB_V3_OPERATION_INNOVATION">
+/* V3: 최근접수 슬라이더 + 운영게시판 혁신 인사이트 + 사진삭제 클릭 안정화 */
+.opx-trend-slider{margin-top:10px;padding:10px 12px;border:1px solid #dbe7f0;border-radius:11px;background:#f7fbff}
+.opx-trend-slider-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px}
+.opx-trend-slider-top span{font-size:11px;color:#667b8e;font-weight:900}.opx-trend-slider-top b{font-size:13px;color:#1769c1}
+.opx-trend-slider input[type=range]{width:100%;height:5px;accent-color:#2f80ed;cursor:pointer}
+.opx-trend-scale{display:flex;justify-content:space-between;font-size:9px;color:#8a9aaa;font-weight:800}
+.opx-board-insight{border-top:1px solid #e4ebf2;padding:14px 18px;background:#fbfdff}
+.opx-insight-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.opx-insight-head b{font-size:14px;color:#26384b;font-weight:1000}.opx-insight-head span{font-size:10px;color:#7a8b9d;font-weight:800}
+.opx-insight-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.opx-insight-card{min-width:0;padding:12px;border:1px solid #e0e9f1;border-radius:12px;background:#fff}
+.opx-insight-card .label{display:block;font-size:10px;color:#728397;font-weight:900;margin-bottom:5px}.opx-insight-card strong{display:block;font-size:16px;color:#183d62;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.opx-insight-card small{display:block;margin-top:4px;font-size:10px;color:#8090a0;line-height:1.35}
+.opx-insight-card.alert{border-left:4px solid #e07a00;background:#fffaf3}.opx-insight-card.good{border-left:4px solid #13a568;background:#f5fcf8}.opx-insight-card.info{border-left:4px solid #2f80ed;background:#f5f9ff}.opx-insight-card.violet{border-left:4px solid #7651d8;background:#faf8ff}
+.jgb-equip-photo-delete{position:relative!important;z-index:20!important;cursor:pointer!important;pointer-events:auto!important}.jgb-equip-photo-delete:disabled{cursor:not-allowed!important;opacity:.55!important}.jgb-photo-box{position:relative!important;z-index:1!important}
+@media(max-width:1000px){.opx-insight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.opx-insight-grid{grid-template-columns:1fr}.opx-trend-slider{padding:9px}.opx-insight-grid{gap:8px}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1555,6 +1573,16 @@
 
 
 
+    window.jgbTrendRender=function(days){
+      days=Math.max(7,Math.min(30,Number(days)||7));
+      const data=Array.isArray(window.__jgbTrendData)?window.__jgbTrendData.slice(-days):[];
+      const box=document.getElementById('jgbTrendBars');
+      const label=document.getElementById('jgbTrendDays');
+      if(label)label.textContent=days+'일';
+      if(!box)return;
+      const max=Math.max(1,...data.map(x=>Number(x.n)||0));
+      box.innerHTML=data.map(x=>`<div><i style="height:${Math.max(5,Math.round((Number(x.n)||0)/max*100))}%"></i><span>${xEsc(x.label)}</span><b>${Number(x.n)||0}</b></div>`).join('');
+    };
     function dashboard(s){
       const baseYm=monthKey();
       const savedPeriod=String(localStorage.getItem('JGB_OPX_PERIOD')||'');
@@ -1617,6 +1645,20 @@
       }).join('');
       const customerYearMonthly=Array.from({length:12},(_,i)=>{const mo=year+'-'+String(i+1).padStart(2,'0');const rows=customerAll.filter(x=>String(x?.createdAt||'').slice(0,7)===mo);return {m:i+1,total:rows.length,done:rows.filter(x=>x?.status==='완료').length,pending:rows.filter(x=>x?.status!=='완료').length};});
       const customerYearMax=Math.max(1,...customerYearMonthly.map(x=>x.total));
+      const trendData=Array.from({length:30},(_,i)=>{
+        const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-(29-i));
+        const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        return {key,label:(d.getMonth()+1)+'/'+d.getDate(),n:customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===key).length};
+      });
+      window.__jgbTrendData=trendData;
+      const trend7=trendData.slice(-7);
+      const trend7Max=Math.max(1,...trend7.map(x=>x.n));
+      const workingToday=workersForDate(selectedDate).filter(w=>w.working).length;
+      const staffToday=workersForDate(selectedDate).length;
+      const actionPlace=topPlace?`${xEsc(topPlace[0])} 점검 권장`:'접수 데이터 확보 필요';
+      const actionIssue=topIssue?`${xEsc(topIssue[0])} 반복 여부 확인`:'반복 민원 데이터 없음';
+      const actionPending=customerPending>0?`미조치 ${customerPending}건 우선 처리`:'미조치 없음 · 대기상태 양호';
+      const actionStaff=staffToday?`오늘 ${workingToday}/${staffToday}명 근무`:'오늘 근무자료 없음';
       const topIssue=issueStats[0];
       const pendingAlert=customerPending>=3?'미조치 주의':customerPending>0?'미조치 확인':'미조치 없음';
       const pendingAlertClass=customerPending>=3?'red':customerPending>0?'orange':'green';
@@ -1698,6 +1740,15 @@
                 <div class="opx-board-staff-list">${workersForDate(selectedDate).map(w=>'<div class="opx-board-staff"><span class="opx-staff-dot '+(w.working?'on':'off')+'"></span><div><b>'+xEsc(w.name)+'</b><small>'+xEsc(w.shift)+' · '+xEsc(w.status)+'</small></div><strong class="'+(w.working?'on':'off')+'">'+(w.working?'근무':'비근무')+'</strong></div>').join('')}</div>
               </div>
             </div>
+            <div class="opx-board-insight">
+              <div class="opx-insight-head"><b>⚡ 운영 액션 센터</b><span>자동 분석 · 별도 입력 없이 현황 기반 제안</span></div>
+              <div class="opx-insight-grid">
+                <div class="opx-insight-card alert"><span class="label">집중관리 장소</span><strong>${actionPlace}</strong><small>${topPlace?topPlace[1]+'건 · 전체 '+topPlaceRate+'%':'현재 선택기간 데이터 없음'}</small></div>
+                <div class="opx-insight-card violet"><span class="label">반복 민원 포인트</span><strong>${actionIssue}</strong><small>${topIssue?topIssue[1]+'건으로 가장 많이 접수':'접수 유형이 집계되면 자동 표시'}</small></div>
+                <div class="opx-insight-card ${customerPending>0?'alert':'good'}"><span class="label">처리 우선순위</span><strong>${actionPending}</strong><small>${customerRate}% 완료 · 미조치 ${customerPending}건</small></div>
+                <div class="opx-insight-card info"><span class="label">오늘 인력 상태</span><strong>${actionStaff}</strong><small>근무편성 데이터를 기준으로 표시</small></div>
+              </div>
+            </div>
           </section>
         </section>
 
@@ -1716,7 +1767,7 @@
               <div class="opx-detail-card opx-attention-card"><h4>🚨 주의 · 집중관리</h4><div class="opx-attention-list"><div class="${placeAlertClass}"><span>장소 집중도</span><b>${topPlace?xEsc(topPlace[0]):'-'}</b><em>${topPlace?`${topPlace[1]}건 · ${topPlaceRate}% · ${placeAlert}`:'접수 없음'}</em></div><div class="${pendingAlertClass}"><span>미조치 현황</span><b>${customerPending}건</b><em>${pendingAlert}</em></div><div class="${topIssue?'orange':'green'}"><span>최다 접수 유형</span><b>${topIssue?xEsc(topIssue[0]):'-'}</b><em>${topIssue?topIssue[1]+'건':'데이터 없음'}</em></div></div></div>
             </div>
             <div class="opx-customer-analytics opx-customer-analytics-v2">
-              <div class="opx-analytics-card"><h4>📈 최근 7일 접수 추이</h4><div class="opx-week-bars">${Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));const key=d.toISOString().slice(0,10);const n=customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===key).length;const max=Math.max(1,...Array.from({length:7},(_,j)=>{const q=new Date();q.setDate(q.getDate()-(6-j));const k=q.toISOString().slice(0,10);return customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===k).length}));return `<div><i style="height:${Math.max(5,Math.round(n/max*100))}%"></i><span>${d.getMonth()+1}/${d.getDate()}</span><b>${n}</b></div>`}).join('')}</div></div>
+              <div class="opx-analytics-card"><div class="opx-trend-slider-top"><h4 style="margin:0!important">📈 접수 추이</h4><b id="jgbTrendDays">7일</b></div><div id="jgbTrendBars" class="opx-week-bars">${trend7.map(x=>`<div><i style="height:${Math.max(5,Math.round(x.n/trend7Max*100))}%"></i><span>${x.label}</span><b>${x.n}</b></div>`).join('')}</div><div class="opx-trend-slider"><div class="opx-trend-slider-top"><span>기간 슬라이드</span><b>7일 ↔ 30일</b></div><input type="range" min="7" max="30" value="7" oninput="jgbTrendRender(this.value)"><div class="opx-trend-scale"><span>최근 7일</span><span>최근 30일</span></div></div></div>
               <div class="opx-analytics-card"><h4>📊 ${year}년 월별 접수 추이</h4><div class="opx-month-bars">${customerYearMonthly.map(x=>`<div><b>${x.total}</b><i style="height:${Math.max(5,Math.round(x.total/customerYearMax*100))}%"></i><span>${x.m}월</span></div>`).join('')}</div></div>
               <div class="opx-analytics-card"><h4>🚨 운영 주의 신호</h4><div class="opx-alert-list"><div><span>미조치</span><b class="${customerPending?'red':''}">${customerPending}건</b></div><div><span>최다 접수 장소</span><b>${topPlace?xEsc(topPlace[0]):'-'}</b></div><div><span>집중도</span><b>${topPlaceRate}%</b></div><div><span>완료율</span><b>${customerRate}%</b></div></div></div>
             </div>
@@ -3533,7 +3584,7 @@
         const hs=histories(reg,H);const idx=Number.isFinite(window.__jgbEamHistoryIndex)?window.__jgbEamHistoryIndex:0;const selectedH=hs[idx]||hs[0]||null;const parsed=selectedH?detailFor(selectedH):null;const ins=reg?I.filter(x=>V(x.asset_id)===V(reg.id)).sort((a,b)=>String(b.inspection_date).localeCompare(String(a.inspection_date))):[];const ext=hs.filter(h=>inferType(h)!=='점검');const recentExt=ext[0];
         const equipPhotoDeleted=localStorage.getItem('JGB_EQUIP_PHOTO_DELETED_'+String(sel))==='1';
         const savedEquipPhoto=equipPhotoDeleted?'':((window.__jgbEquipPhotoCache&&window.__jgbEquipPhotoCache[sel])||localStorage.getItem('JGB_EQUIP_PHOTO_'+String(sel))||cur.photo||'');
-        const photo=`<div class="jgb-eam-photo"><div class="jgb-eam-photo-title">📷 설비 사진 (현재)</div><div class="jgb-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(sel)}')" title="클릭하면 사진 선택창이 열립니다">${savedEquipPhoto?`<img src="${E(savedEquipPhoto)}" alt="${E(cur.name||'설비 사진')}" class="jgb-equip-photo-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.stopPropagation();jgbDeleteEquipPhoto('${E(sel)}')" title="사진 삭제">×</button>`:`<div class="cam">📷</div><strong>사진을 등록할 수 있습니다</strong><span>사진 등록 공간 · JPG / PNG · 클릭</span>`}</div><div class="jgb-equip-photo-actions"><button type="button" class="jgb-equip-photo-delete" ${savedEquipPhoto?'':'disabled'} onclick="event.stopPropagation();jgbDeleteEquipPhoto('${E(sel)}')">🗑 사진 삭제</button><span>${savedEquipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'등록된 사진이 없어 삭제할 사진이 없습니다.'}</span></div></div>`;
+        const photo=`<div class="jgb-eam-photo"><div class="jgb-eam-photo-title">📷 설비 사진 (현재)</div><div class="jgb-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(sel)}')" title="클릭하면 사진 선택창이 열립니다">${savedEquipPhoto?`<img src="${E(savedEquipPhoto)}" alt="${E(cur.name||'설비 사진')}" class="jgb-equip-photo-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(sel)}')" title="사진 삭제">×</button>`:`<div class="cam">📷</div><strong>사진을 등록할 수 있습니다</strong><span>사진 등록 공간 · JPG / PNG · 클릭</span>`}</div><div class="jgb-equip-photo-actions"><button type="button" class="jgb-equip-photo-delete" ${savedEquipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(sel)}')">🗑 사진 삭제</button><span>${savedEquipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'등록된 사진이 없어 삭제할 사진이 없습니다.'}</span></div></div>`;
         const info=[['자산코드',window.eamUnifiedCode?window.eamUnifiedCode(cur):(cur.asset_code||cur.code||'-')],['자산명',window.eamDisplayName?window.eamDisplayName(cur):(cur.name||'-')],['설비 종류',cur.category||cur.type||C.label||'-'],['위치',window.placeLabel?window.placeLabel(cur.place):(cur.place||'-')],['모델·규격',cur.model||'-'],['용량',cur.capacity||'-'],['수량',cur.qty??cur.quantity??'-'],['제조사',cur.maker||cur.vendor||'-'],['A/S 연락처',cur.asContact||'-'],['제조일',cur.date||cur.manufactureDate||'-'],['설치일',cur.installDate||'-'],['내용연수',cur.life||'-'],['평가등급',cur.grade||'-'],['보증',cur.warranty||'-'],['기존 A/S 기록',cur.asHistory||'-'],['자산상태',cur.status||'정상'],['취득구분',cur.acquisitionType||'기존 자산']];
         const infoHtml=info.map(z=>`<div class="jgb-eam-info-cell"><small>${E(z[0])}</small><b>${E(z[1])}</b></div>`).join('');
         const lastInspection=ins[0]?.inspection_date||'-';const next=ins[0]?.next_inspection_date||ins[0]?.next_date||'-';const replacement=cur.replacementStatus||'미정';
