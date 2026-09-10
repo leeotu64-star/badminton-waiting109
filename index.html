@@ -1404,21 +1404,26 @@ html,body{max-width:100%;overflow-x:hidden!important}
 <style id="EAM_V31_CLEANUP">/* v31: 고객접수 삭제 오류 수정 및 불필요한 버전 주석 제거 */</style>
 
 <style id="JGB_V36_FINAL_CLEANUP">
-.jgb-brand{color:#fff!important;font-size:20px!important;line-height:1.4!important;font-weight:900!important;white-space:nowrap!important;}
+.jgb-brand{color:#fff!important;font-size:22px!important;line-height:1.4!important;font-weight:900!important;white-space:nowrap!important;}
+.jgb-maker{display:none!important;}
 /* Remove the stray visible text if it is injected dynamically. */
 </style>
 <script>
 (function(){
   function removeStray(){
-    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-    var n,targets=[];
+    var root=document.body||document.documentElement;
+    if(!root) return;
+    var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT), n, targets=[];
     while(n=w.nextNode()){
-      if(/^\s*wnwn\s*$/i.test(n.nodeValue||'')) targets.push(n);
+      if(/^\s*wnwn\s*$/i.test(String(n.nodeValue||''))) targets.push(n);
     }
     targets.forEach(function(n){ if(n.parentNode) n.parentNode.removeChild(n); });
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',removeStray); else removeStray();
-  new MutationObserver(removeStray).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+  function start(){
+    removeStray();
+    new MutationObserver(removeStray).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
 })();
 </script>
 </head><body><div id="app"></div>
