@@ -1780,10 +1780,10 @@
       const peakHour=hourCount.indexOf(Math.max(...hourCount));
       const peakWeekdayText=customerReceived?weekdayMap[peakWeekday]+'요일':'자료 없음';
       const peakHourText=customerReceived?String(peakHour).padStart(2,'0')+'시대':'자료 없음';
+      const topIssue=issueStats[0];
       const opsSignal=customerPending>0?'미조치 우선 처리':(topPlaceRate>=40?'집중 장소 점검':(topIssue?'반복 민원 확인':'정상 운영'));
       const workingToday=workersForDate(selectedDate).filter(w=>w.working).length;
       const staffToday=workersForDate(selectedDate).length;
-      const topIssue=issueStats[0];
       const actionPlace=topPlace?`${xEsc(topPlace[0])} 점검 권장`:'접수 데이터 확보 필요';
       const actionIssue=topIssue?`${xEsc(topIssue[0])} 반복 여부 확인`:'반복 민원 데이터 없음';
       const actionPending=customerPending>0?`미조치 ${customerPending}건 우선 처리`:'미조치 없음 · 대기상태 양호';
