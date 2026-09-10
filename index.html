@@ -1176,6 +1176,9 @@
 @media(max-width:850px){.opx-board-grid{grid-template-columns:1fr}.opx-board-feed{border-right:0;border-bottom:1px solid #e4ebf2}.opx-board-clock{min-width:120px}}
 @media(max-width:600px){.opx-board-head{align-items:flex-start;flex-direction:column;padding:17px}.opx-board-clock{width:100%;box-sizing:border-box;text-align:left}.opx-board-panel{padding:14px}.opx-board-row{grid-template-columns:48px minmax(0,1fr) auto}.opx-board-row small{white-space:normal}}
 </style>
+<style id="OPX_V1_FINAL_STYLE">
+.opx-period-area{margin-top:14px}.opx-period-selector{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:12px 14px;border:1px solid #dbe7f0;border-radius:14px;background:#f7fbff}.opx-period-selector span{font-weight:1000;font-size:15px;margin-right:2px}.opx-period-selector select{min-width:112px;height:40px;border:1px solid #bcd1e1;border-radius:10px;background:#fff;padding:0 12px;font-size:15px;font-weight:900;color:#17324d}.opx-customer-detail-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}.opx-detail-card{min-width:0;border:1px solid #dce8f1;border-radius:14px;background:#fff;padding:15px}.opx-detail-card h4,.opx-analytics-card h4{font-size:17px!important;margin:0 0 12px;font-weight:1000}.opx-alert{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border-radius:10px;margin-bottom:10px}.opx-alert b{font-size:16px}.opx-alert span{font-size:13px;font-weight:900}.opx-alert.red{background:#fff0f0;color:#c72f35}.opx-alert.orange{background:#fff6e8;color:#c66b00}.opx-alert.green{background:#edf9f2;color:#16804a}.opx-mini-bars{display:flex;flex-direction:column;gap:9px}.opx-mini-row{display:grid;grid-template-columns:86px 1fr 30px;gap:8px;align-items:center;font-size:13px;font-weight:900}.opx-mini-row>div{height:10px;background:#edf3f7;border-radius:99px;overflow:hidden}.opx-mini-row i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#2f80ed,#25b7a6)}.opx-mini-row b{text-align:right;font-size:14px}.opx-customer-analytics{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-top:14px}.opx-analytics-card{border:1px solid #dce8f1;border-radius:14px;background:#fff;padding:15px}.opx-week-bars{height:145px;display:flex;align-items:flex-end;justify-content:space-around;gap:10px;border-bottom:1px solid #dce8f1;padding:10px 6px 0}.opx-week-bars>div{height:100%;width:11%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}.opx-week-bars i{width:100%;min-height:5px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#397eea,#20b7a0)}.opx-week-bars span{font-size:11px;color:#60788d;font-weight:800}.opx-week-bars b{font-size:12px}.opx-alert-list{display:grid;grid-template-columns:1fr 1fr;gap:9px}.opx-alert-list div{padding:12px;border-radius:10px;background:#f7fafc;display:flex;flex-direction:column;gap:5px}.opx-alert-list span{font-size:12px;color:#6a7e90;font-weight:900}.opx-alert-list b{font-size:18px;font-weight:1000}.opx-alert-list b.red{color:#d72f3c}.opx-empty-mini{padding:20px;text-align:center;color:#8a9aa8;font-weight:800}@media(max-width:900px){.opx-customer-detail-grid{grid-template-columns:1fr!important}.opx-customer-analytics{grid-template-columns:1fr}.opx-period-selector{flex-wrap:wrap}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1528,9 +1531,14 @@
 
 
     function dashboard(s){
-      const ym=monthKey();
-      const year=Number(ym.slice(0,4));
-      const month=Number(ym.slice(5,7));
+      const baseYm=monthKey();
+      const savedPeriod=String(localStorage.getItem('JGB_OPX_PERIOD')||'');
+      const savedParts=savedPeriod.match(/^(\d{4})-(\d{2})$/);
+      const selectedYear=savedParts?Number(savedParts[1]):Number(baseYm.slice(0,4));
+      const selectedMonth=savedParts?Number(savedParts[2]):Number(baseYm.slice(5,7));
+      const year=(selectedYear>=2026&&selectedYear<=2030)?selectedYear:Number(baseYm.slice(0,4));
+      const month=(selectedMonth>=1&&selectedMonth<=12)?selectedMonth:Number(baseYm.slice(5,7));
+      const ym=year+'-'+String(month).padStart(2,'0');
 
       const md=workers.map(w=>({...w,p:dashboardStaffMonth(w.id,ym)}));
       const ys=workers.map(w=>({...w,p:dashboardStaffYear(w.id,year)}));
@@ -1564,6 +1572,19 @@
       const placeRows=Object.entries(placeMap).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${xEsc(k)}</td><td>${v}건</td></tr>`).join('')||'<tr><td colspan="2">이번 달 접수 없음</td></tr>';
       const handlerMap={}; customerMonth.filter(x=>x?.handlerName).forEach(x=>{const k=String(x.handlerName);handlerMap[k]=(handlerMap[k]||0)+1;});
       const handlerRows=Object.entries(handlerMap).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${xEsc(k)}</td><td>${v}건</td></tr>`).join('')||'<tr><td colspan="2">담당자 처리 기록 없음</td></tr>';
+      const placeStats=Object.entries(placeMap).sort((a,b)=>b[1]-a[1]);
+      const placeMax=Math.max(1,...placeStats.map(x=>x[1]));
+      const topPlace=placeStats[0];
+      const topPlaceRate=customerReceived&&topPlace?Math.round(topPlace[1]/customerReceived*100):0;
+      const placeAlert=topPlace?(topPlaceRate>=40?'집중관리':topPlaceRate>=25?'주의':'정상'):'자료없음';
+      const placeAlertClass=placeAlert==='집중관리'?'red':placeAlert==='주의'?'orange':'green';
+      const issueMap={};
+      customerMonth.forEach(x=>{const t=String(x?.content||x?.description||x?.issue||'').toLowerCase();let k='기타';if(/조명|등|전등/.test(t))k='조명';else if(/냉방|난방|에어컨|온풍|냉난방/.test(t))k='냉난방';else if(/물|수도|샤워|배수|누수|화장실/.test(t))k='수도·위생';else if(/청소|쓰레기|먼지|위생/.test(t))k='청소·위생';else if(/고장|고장남|작동|불량|망가/.test(t))k='시설고장';else if(/안전|미끄|위험/.test(t))k='안전';issueMap[k]=(issueMap[k]||0)+1;});
+      const issueStats=Object.entries(issueMap).sort((a,b)=>b[1]-a[1]);
+      const issueMax=Math.max(1,...issueStats.map(x=>x[1]));
+      const customerPeriodOptions=Array.from({length:5},(_,i)=>2026+i).map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}년</option>`).join('');
+      const customerMonthOptions=Array.from({length:12},(_,i)=>{const m=i+1;return `<option value="${m}" ${m===month?'selected':''}>${m}월</option>`}).join('');
+      const periodSelector=`<div class="opx-period-selector"><span>조회기간</span><select onchange="localStorage.setItem('JGB_OPX_PERIOD',this.value+'-'+String(this.nextElementSibling.value).padStart(2,'0'));render()">${customerPeriodOptions}</select><select onchange="localStorage.setItem('JGB_OPX_PERIOD',this.previousElementSibling.value+'-'+String(this.value).padStart(2,'0'));render()">${customerMonthOptions}</select></div>`;
       const customerMonthlyRows=Array.from({length:12},(_,i)=>{
         const m=String(i+1).padStart(2,'0'), rows=customerAll.filter(x=>String(x?.createdAt||'').slice(0,7)===`${year}-${m}`);
         const done=rows.filter(x=>x?.status==='완료').length;
@@ -1626,9 +1647,12 @@
             </div>
           </section>
 
-          <section class="opx-two-col">
-            <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>${year}년 월별 실적</h3><p>1월부터 12월까지 월별 누적을 표로 확인합니다.</p></div><span class="opx-chip">월별</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>월</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${monthlyRows}</tbody></table></div></section>
-            <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>직원별 연간 누계를 동일 기준으로 비교합니다.</p></div><span class="opx-chip">연간 누계</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
+          <section class="opx-period-area">
+            ${periodSelector}
+            <section class="opx-two-col">
+              <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>${year}년 ${month}월 실적</h3><p>선택한 월의 직원별 실적만 표시합니다.</p></div><span class="opx-chip">월간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th><th>달성률</th></tr></thead><tbody>${tableRows}</tbody></table></div></section>
+              <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><span class="opx-chip">연간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
+            </section>
           </section>
           <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>월별 · 연간 실적 비교</h3><p>현재 기준월의 월 실적과 연간 누계를 한눈에 비교합니다.</p></div><span class="opx-chip">실적 비교</span></div><div class="opx-compare-cards">${workers.map(w=>{const m=dashboardStaffMonth(w.id,ym),y=dashboardStaffYear(w.id,year);return `<div class="opx-compare-card"><b>${xEsc(w.name)}</b><div><span>월 종합 <strong>${m.total}</strong></span><span>연간 종합 <strong>${y.total}</strong></span></div><small>정규 ${m.basic.complete} · 편성 ${m.auto.performance} · 지시 ${m.qr.done}</small></div>`}).join('')}</div></section>
           <section class="opx-board">
@@ -1660,10 +1684,15 @@
               <div class="opx-customer-kpi orange"><span>처리중</span><strong>${customerPending}<small>건</small></strong></div>
               <div class="opx-customer-kpi red"><span>미조치</span><strong>${customerPending}<small>건</small></strong><em>현재 기준</em></div>
             </div>
-            <div class="opx-customer-grid2">
-              <div><h4>📅 월별 접수 현황</h4><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>월</th><th>접수</th><th>완료</th><th>완료율</th></tr></thead><tbody>${customerMonthlyRows}</tbody></table></div></div>
-              <div><h4>📍 장소별 접수 현황</h4><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>장소</th><th>접수건수</th></tr></thead><tbody>${placeRows}</tbody></table></div></div>
-              <div><h4>👤 담당직원별 처리 현황</h4><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>담당직원</th><th>처리건수</th></tr></thead><tbody>${handlerRows}</tbody></table></div></div>
+            ${periodSelector}
+            <div class="opx-customer-grid2 opx-customer-detail-grid">
+              <div class="opx-detail-card"><h4>📍 장소별 접수 집중도</h4><div class="opx-alert ${placeAlertClass}"><b>${topPlace?xEsc(topPlace[0]):'자료 없음'}</b><span>${topPlace?`${topPlace[1]}건 · 전체의 ${topPlaceRate}% · ${placeAlert}`:'이번 기간 접수 없음'}</span></div><div class="opx-mini-bars">${placeStats.slice(0,6).map(([k,v])=>`<div class="opx-mini-row"><span>${xEsc(k)}</span><div><i style="width:${Math.round(v/placeMax*100)}%"></i></div><b>${v}</b></div>`).join('')||'<div class="opx-empty-mini">접수 데이터 없음</div>'}</div></div>
+              <div class="opx-detail-card"><h4>🧾 접수 유형별 현황</h4><div class="opx-mini-bars">${issueStats.map(([k,v])=>`<div class="opx-mini-row"><span>${xEsc(k)}</span><div><i style="width:${Math.round(v/issueMax*100)}%"></i></div><b>${v}</b></div>`).join('')||'<div class="opx-empty-mini">신고내용 데이터 없음</div>'}</div></div>
+              <div class="opx-detail-card"><h4>👤 담당직원 처리 현황</h4><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>담당직원</th><th>처리</th></tr></thead><tbody>${handlerRows}</tbody></table></div></div>
+            </div>
+            <div class="opx-customer-analytics">
+              <div class="opx-analytics-card"><h4>📈 최근 7일 접수 추이</h4><div class="opx-week-bars">${Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));const key=d.toISOString().slice(0,10);const n=customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===key).length;const max=Math.max(1,...Array.from({length:7},(_,j)=>{const q=new Date();q.setDate(q.getDate()-(6-j));const k=q.toISOString().slice(0,10);return customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===k).length}));return `<div><i style="height:${Math.max(5,Math.round(n/max*100))}%"></i><span>${d.getMonth()+1}/${d.getDate()}</span><b>${n}</b></div>`}).join('')}</div></div>
+              <div class="opx-analytics-card"><h4>🚨 운영 주의 신호</h4><div class="opx-alert-list"><div><span>미조치</span><b class="${customerPending?'red':''}">${customerPending}건</b></div><div><span>최다 접수 장소</span><b>${topPlace?xEsc(topPlace[0]):'-'}</b></div><div><span>집중도</span><b>${topPlaceRate}%</b></div><div><span>완료율</span><b>${customerRate}%</b></div></div></div>
             </div>
           </section>
           <section class="opx-operation-summary">
@@ -3484,7 +3513,7 @@
         let sel=V(window.__eamSelCode)&&list.some(x=>V(x.code)===V(window.__eamSelCode))?V(window.__eamSelCode):(list[0]?.code||'');if(sel)window.__eamSelCode=sel;const src=list.find(x=>V(x.code)===sel)||null;const reg=src?A.find(a=>V(a.asset_code)===sel)||null:null;const cur=Object.assign({},src||{},reg||{},meta[sel]||{});if(cat==='fire')cur.place='유수장치실';
         const hs=histories(reg,H);const idx=Number.isFinite(window.__jgbEamHistoryIndex)?window.__jgbEamHistoryIndex:0;const selectedH=hs[idx]||hs[0]||null;const parsed=selectedH?detailFor(selectedH):null;const ins=reg?I.filter(x=>V(x.asset_id)===V(reg.id)).sort((a,b)=>String(b.inspection_date).localeCompare(String(a.inspection_date))):[];const ext=hs.filter(h=>inferType(h)!=='점검');const recentExt=ext[0];
         const savedEquipPhoto=(window.__jgbEquipPhotoCache&&window.__jgbEquipPhotoCache[sel])||localStorage.getItem('JGB_EQUIP_PHOTO_'+String(sel))||cur.photo||'';
-        const photo=`<div class="jgb-eam-photo"><div class="jgb-eam-photo-title">📷 설비 사진 (현재)</div><div class="jgb-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(sel)}')" title="클릭하면 사진 선택창이 열립니다">${savedEquipPhoto?`<img src="${E(savedEquipPhoto)}" alt="${E(cur.name||'설비 사진')}" class="jgb-equip-photo-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.stopPropagation();jgbDeleteEquipPhoto('${E(sel)}')" title="사진 삭제">×</button>`:`<div class="cam">📷</div><strong>사진을 등록할 수 있습니다</strong><span>사진 등록 공간 · JPG / PNG · 클릭</span>`}</div><div class="jgb-equip-photo-actions"><button type="button" class="jgb-equip-photo-delete" ${savedEquipPhoto?'':'disabled'} onclick="event.stopPropagation();jgbDeleteEquipPhoto('${E(sel)}')">🗑 사진 삭제</button><span>${savedEquipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'등록된 사진이 없어 삭제할 사진이 없습니다.'}</span></div></div>`;
+        const photo=`<div class="jgb-eam-photo"><div class="jgb-eam-photo-title">📷 설비 사진 (현재)</div><div class="jgb-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(sel)}')" title="클릭하면 사진 선택창이 열립니다">${savedEquipPhoto?`<img src="${E(savedEquipPhoto)}" alt="${E(cur.name||'설비 사진')}" class="jgb-equip-photo-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.stopPropagation();jgbDeleteEquipPhoto('${E(sel)}')" title="사진 삭제">×</button>`:`<div class="cam">📷</div><strong>사진을 등록할 수 있습니다</strong><span>사진 등록 공간 · JPG / PNG · 클릭</span>`}</div></div>`;
         const info=[['자산코드',window.eamUnifiedCode?window.eamUnifiedCode(cur):(cur.asset_code||cur.code||'-')],['자산명',window.eamDisplayName?window.eamDisplayName(cur):(cur.name||'-')],['설비 종류',cur.category||cur.type||C.label||'-'],['위치',window.placeLabel?window.placeLabel(cur.place):(cur.place||'-')],['모델·규격',cur.model||'-'],['용량',cur.capacity||'-'],['수량',cur.qty??cur.quantity??'-'],['제조사',cur.maker||cur.vendor||'-'],['A/S 연락처',cur.asContact||'-'],['제조일',cur.date||cur.manufactureDate||'-'],['설치일',cur.installDate||'-'],['내용연수',cur.life||'-'],['평가등급',cur.grade||'-'],['보증',cur.warranty||'-'],['기존 A/S 기록',cur.asHistory||'-'],['자산상태',cur.status||'정상'],['취득구분',cur.acquisitionType||'기존 자산']];
         const infoHtml=info.map(z=>`<div class="jgb-eam-info-cell"><small>${E(z[0])}</small><b>${E(z[1])}</b></div>`).join('');
         const lastInspection=ins[0]?.inspection_date||'-';const next=ins[0]?.next_inspection_date||ins[0]?.next_date||'-';const replacement=cur.replacementStatus||'미정';
@@ -4523,14 +4552,7 @@
       new MutationObserver(removeStrayText).observe(document.documentElement,{childList:true,subtree:true});
     })();
     </script>
-    </body>
-<style id="JGB_EQUIP_PHOTO_DELETE_VISIBLE">
-.jgb-equip-photo-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;margin-top:8px!important;padding:0 2px!important}
-.jgb-equip-photo-delete{border:1px solid #d9a0a0!important;background:#fff!important;color:#c33!important;border-radius:7px!important;padding:7px 11px!important;font-size:12px!important;font-weight:900!important;cursor:pointer!important}
-.jgb-equip-photo-delete:disabled{opacity:.45!important;cursor:not-allowed!important}
-.jgb-equip-photo-actions span{font-size:11px!important;color:#7890a0!important}
-</style>
-</html>
+    </body></html>
 
 
     <style id="JGB_EAM_DASHBOARD_FINAL_V2">
