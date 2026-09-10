@@ -955,6 +955,47 @@ html,body{overflow-x:hidden!important}
 }
 </style>
 
+
+<style id="WORK_PROCESS_CLEAN_UI">
+/* 작업관리 화면 디자인만 정리: 기능/데이터 로직은 변경하지 않음 */
+.jgb-page-title{background:linear-gradient(135deg,#0758b8 0%,#087bd2 52%,#10a6d8 100%) !important;color:#fff !important;border-radius:20px !important;padding:24px 28px !important;box-shadow:0 12px 28px rgba(18,104,227,.18) !important;position:relative;overflow:hidden !important}
+.jgb-page-title::after{content:"";position:absolute;width:280px;height:280px;right:-90px;top:-170px;border:1px solid rgba(255,255,255,.18);border-radius:50%;pointer-events:none}
+.jgb-page-title h2{font-size:34px !important;font-weight:950 !important;letter-spacing:-1.5px !important;color:#fff !important;margin:2px 0 7px !important}
+.jgb-page-title p{font-size:15px !important;font-weight:700 !important;color:#fff !important;opacity:.9 !important;margin:0 !important}
+.jgb-page-kicker{font-size:11px;font-weight:950;letter-spacing:1.5px;color:#bde7ff;margin-bottom:2px}
+.jgb-page-title .process-actions{position:relative;z-index:2;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.jgb-page-title .process-status{font-size:13px !important;font-weight:950 !important;padding:10px 13px !important;border-radius:999px !important;background:rgba(255,255,255,.15) !important;color:#fff !important;border:1px solid rgba(255,255,255,.3) !important}
+.jgb-page-title .jgb-btn.gray{font-size:13px !important;font-weight:950 !important;padding:11px 15px !important;background:#fff !important;color:#075bb9 !important;border:0 !important}
+.process-wrap{padding:18px !important;border-radius:20px !important;background:#eef5fb !important}
+.process-summary{grid-template-columns:repeat(4,1fr) !important;gap:12px !important;margin-bottom:16px !important}
+.process-kpi{min-height:104px !important;padding:16px 18px !important;border-radius:15px !important}
+.process-kpi .k-label{font-size:14px !important;font-weight:900 !important}
+.process-kpi .k-value{font-size:34px !important;font-weight:950 !important;margin-top:9px !important}
+.process-kpi .k-value small{font-size:14px !important;margin-left:3px}
+.process-card{border-radius:17px !important;box-shadow:0 7px 20px rgba(31,56,85,.07) !important}
+.process-card-head{padding:15px 18px !important}
+.process-id{font-size:12px !important;font-weight:900 !important;color:#2865ad !important}
+.process-title{font-size:20px !important;font-weight:950 !important}
+.process-sub{font-size:12px !important}
+.process-body{grid-template-columns:1fr 1fr !important;min-height:190px !important}
+.process-col{padding:18px !important}
+.process-col h4{font-size:15px !important;margin-bottom:11px !important}
+.process-info{gap:9px !important}
+.process-info div{padding:11px 12px !important}
+.process-info span{font-size:11px !important}
+.process-info b{font-size:14px !important}
+.process-note{font-size:14px !important;line-height:1.55 !important;padding:12px !important;margin-top:10px !important}
+.process-fields label{font-size:13px !important}
+.process-fields select{font-size:14px !important;padding:12px !important}
+.process-actions .done{font-size:20px !important;font-weight:950 !important;min-height:58px !important}
+.completed-grid{grid-template-columns:repeat(2,1fr) !important;gap:12px !important}
+.completed-card{padding:14px 16px !important;border-radius:14px !important}
+.completed-card strong{font-size:14px !important}
+.completed-card .content{font-size:13px !important}
+.completed-card .meta{font-size:12px !important}
+@media(max-width:1050px){.process-summary{grid-template-columns:repeat(2,1fr) !important}.process-body{grid-template-columns:1fr 1fr !important}}
+@media(max-width:700px){.jgb-page-title{padding:20px !important}.jgb-page-title h2{font-size:29px !important}.jgb-page-title .process-actions{justify-content:flex-start}.process-summary{grid-template-columns:1fr 1fr !important}.process-body{grid-template-columns:1fr !important}.completed-grid{grid-template-columns:1fr !important}}
+</style>
 </head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1680,25 +1721,26 @@ function processPage(){
  const all=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
  const pending=all.filter(x=>x.status!=='완료'); const completed=all.filter(x=>x.status==='완료');
  const waiting=pending.filter(x=>!x.handlerId).length, running=pending.filter(x=>x.handlerId).length;
- return `<div class="jgb-page-title"><div><h2>작업관리</h2><p>QR 신고 접수부터 담당자 지정, 처리방식, 조치내용 입력, 완료까지 한 화면에서 관리합니다.</p></div><div class="process-actions"><span class="process-status">전체 ${all.length}건</span><span class="process-status wait">담당 미지정 ${waiting}건</span><span class="process-status run">조치중 ${running}건</span><button class="jgb-btn gray" onclick="syncFromSupabase()">새로고침</button></div></div>
+ const receivedDate=x=>{const d=new Date(x?.createdAt||0);return Number.isNaN(d.getTime())?'-':`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`};
+ return `<div class="jgb-page-title"><div><div class="jgb-page-kicker">JANGGUNBONG SPORTS CENTER · STAFF OPERATION</div><h2>작업관리</h2><p>고객 QR 접수부터 담당자 지정과 조치완료까지 빠르고 간단하게 관리합니다.</p></div><div class="process-actions"><span class="process-status">전체 ${all.length}건</span><span class="process-status wait">담당 미지정 ${waiting}건</span><span class="process-status run">조치중 ${running}건</span><button class="jgb-btn gray" onclick="syncFromSupabase()">↻ 새로고침</button></div></div>
  <div class="process-wrap">
   <div class="process-summary">
-   <div class="process-kpi"><div class="k-label">전체 접수</div><div class="k-value">${all.length}건</div></div>
-   <div class="process-kpi warn"><div class="k-label">담당 미지정</div><div class="k-value">${waiting}건</div></div>
-   <div class="process-kpi" style="border-top-color:#2563eb"><div class="k-label">조치 진행</div><div class="k-value">${running}건</div></div>
-   <div class="process-kpi ok"><div class="k-label">처리 완료</div><div class="k-value">${completed.length}건</div></div>
+   <div class="process-kpi"><div class="k-label">전체 접수</div><div class="k-value">${all.length}<small>건</small></div></div>
+   <div class="process-kpi warn"><div class="k-label">담당 미지정</div><div class="k-value">${waiting}<small>건</small></div></div>
+   <div class="process-kpi" style="border-top-color:#2563eb"><div class="k-label">조치 진행</div><div class="k-value">${running}<small>건</small></div></div>
+   <div class="process-kpi ok"><div class="k-label">처리 완료</div><div class="k-value">${completed.length}<small>건</small></div></div>
   </div>
   <div class="jgb-section" style="display:none;">처리 대기 · 진행 ${pending.length}건</div>
   <div class="process-list">
-  ${pending.map(x=>{const at=actionTypeFromIssue(x),note=actionNoteFromIssue(x),status=x.status||'미조치';const safeContent=cleanWorkContent(x);return `<div class="process-card">
-    <div class="process-card-head"><div><div class="process-id">접수번호 ${x.remoteId?`R-${x.remoteId}`:x.id}</div><div class="process-title">${xEsc(x.category||'기타')} · ${xEsc(x.place||'장소 미기록')}</div><div class="process-sub">접수 ${time(x.createdAt)} ${x.photo_url?' · 📷 현장사진 있음':''}</div></div><div class="process-status ${status==='조치중'?'run':'wait'}">● ${xEsc(status)}</div></div>
+  ${pending.map(x=>{const status=x.status||'미조치';const safeContent=cleanWorkContent(x);return `<div class="process-card">
+    <div class="process-card-head"><div><div class="process-id">접수 ${receivedDate(x)}</div><div class="process-title">${xEsc(x.category||'기타')} · ${xEsc(x.place||'장소 미기록')}</div><div class="process-sub">${x.photo_url?'📷 현장사진 등록':''}</div></div><div class="process-status ${status==='조치중'?'run':'wait'}">● ${xEsc(status)}</div></div>
     <div class="process-body" style="grid-template-columns:1fr 1fr;">
-      <div class="process-col"><h4>① 접수 내용</h4><div class="process-info"><div><span>구분</span><b>${xEsc(x.category||'기타')}</b></div><div><span>장소</span><b>${xEsc(x.place||'-')}</b></div><div><span>신고 시각</span><b>${time(x.createdAt)}</b></div><div><span>담당자</span><b>${xEsc(x.handlerName||'미지정')}</b></div></div><div class="process-note">${xEsc(safeContent||'접수 내용 없음')}</div>${x.photo_url?`<div class="process-actions"><button class="gray" onclick="window.open('${x.photo_url}','_blank')">📷 사진 확인</button></div>`:''}</div>
-      <div class="process-col" style="display:flex;flex-direction:column;justify-content:flex-start;"><h4>② 처리</h4><div class="process-fields"><label>담당 직원</label><select onchange="assign('${x.id}',this.value)"><option value="">담당자 선택</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select></div><div class="process-actions" style="margin-top:18px;">${x.handlerId?`<button class="done" style="width:100%;min-height:54px;font-size:18px;font-weight:800;" onclick="completeIssue('${x.id}')">✓ 조치완료</button>`:`<button class="done" style="width:100%;min-height:54px;font-size:18px;font-weight:800;opacity:.45;cursor:not-allowed;" disabled>담당 직원 지정 후 조치완료</button>`}</div></div>
+      <div class="process-col"><h4>① 접수 내용</h4><div class="process-info"><div><span>구분</span><b>${xEsc(x.category||'기타')}</b></div><div><span>장소</span><b>${xEsc(x.place||'-')}</b></div><div><span>접수일시</span><b>${receivedDate(x)}</b></div><div><span>담당자</span><b>${xEsc(x.handlerName||'미지정')}</b></div></div><div class="process-note">${xEsc(safeContent||'접수 내용 없음')}</div>${x.photo_url?`<div class="process-actions"><button class="gray" onclick="window.open('${x.photo_url}','_blank')">📷 사진 확인</button></div>`:''}</div>
+      <div class="process-col" style="display:flex;flex-direction:column;justify-content:flex-start;"><h4>② 처리</h4><div class="process-fields"><label>담당 직원</label><select onchange="assign('${x.id}',this.value)"><option value="">담당자 선택</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select></div><div class="process-actions" style="margin-top:18px;">${x.handlerId?`<button class="done" style="width:100%;min-height:58px;font-size:20px;font-weight:950;" onclick="completeIssue('${x.id}')">✓ 조치완료</button>`:`<button class="done" style="width:100%;min-height:58px;font-size:17px;font-weight:900;opacity:.45;cursor:not-allowed;" disabled>담당 직원 지정 후 조치완료</button>`}</div></div>
     </div></div>`}).join('')||'<div class="jgb-empty">현재 처리할 작업이 없습니다.</div>'}
   </div>
   <div class="jgb-section" style="margin-top:16px">최근 처리완료 ${completed.length}건</div>
-  <div class="completed-grid">${completed.slice(0,20).map(x=>{const at=actionTypeFromIssue(x),note=actionNoteFromIssue(x)||cleanWorkContent(x);return `<div class="completed-card"><div class="top"><strong>${xEsc(x.category||'기타')} · ${xEsc(x.place||'-')}</strong><span class="jgb-status ok">완료</span></div><div class="content">${xEsc(note||'조치내용 미기록')}</div><div class="meta"><span>${xEsc(x.handlerName||'담당 미기록')}</span><span>${at||'처리구분 미기록'}</span><span>완료 ${time(x.completedAt||x.createdAt)}</span></div></div>`}).join('')||'<div class="jgb-empty">완료된 작업이 없습니다.</div>'}</div>
+  <div class="completed-grid">${completed.slice(0,20).map(x=>{const note=actionNoteFromIssue(x)||cleanWorkContent(x);return `<div class="completed-card"><div class="top"><strong>${xEsc(x.category||'기타')} · ${xEsc(x.place||'-')}</strong><span class="jgb-status ok">완료</span></div><div class="content">${xEsc(note||'조치내용 미기록')}</div><div class="meta"><span>${xEsc(x.handlerName||'담당 미기록')}</span><span>완료 ${receivedDate({createdAt:x.completedAt||x.createdAt})}</span></div></div>`}).join('')||'<div class="jgb-empty">완료된 작업이 없습니다.</div>'}</div>
  </div>`;
 }
 function selectProcessType(id,type){const el=document.getElementById('action_'+id);if(el)el.value=type;document.querySelectorAll('[onclick^="selectProcessType(\''+id+'\'"]').forEach(b=>{b.classList.remove('on','self','out');if((b.textContent||'').trim()===type)b.classList.add('on',type==='자체조치'?'self':'out')});}
