@@ -2024,84 +2024,90 @@ html,body{max-width:100%;overflow-x:hidden!important}
           </section>
 
           <section class="opx-panel opx-table-panel opx-annual-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><span class="opx-chip">연간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
-          <section class="opx-board opx-board-v6">
-            <div class="opx-board-head">
-              <div><span class="opx-board-kicker">LIVE OPERATION BOARD</span><h3>운영게시판</h3><p>반복되는 숫자를 줄이고, 관리자가 지금 확인해야 할 내용만 한 화면에 모았습니다.</p></div>
-              <div class="opx-board-clock"><b>${year}.${month}.${String(selectedDate).slice(8,10)}</b><span>실시간 운영현황</span></div>
-            </div>
-            <div class="opx-v6-command">
-              <div class="opx-v6-status ${serviceLevelClass}"><span>현재 운영상태</span><strong>${serviceLevel}</strong><small>${customerPending>0?'미조치 '+customerPending+'건 확인 필요':'현재 미조치 없음'}</small></div>
-              <div class="opx-v6-status"><span>집중관리 장소</span><strong>${topPlace?xEsc(topPlace[0]):'자료 없음'}</strong><small>${topPlace?topPlace[1]+'건 · 전체 '+topPlaceRate+'%':'선택기간 접수 없음'}</small></div>
-              <div class="opx-v6-status"><span>반복 민원 유형</span><strong>${topIssue?xEsc(topIssue[0]):'자료 없음'}</strong><small>${topIssue?topIssue[1]+'건 · 최다 유형':'유형 데이터 없음'}</small></div>
-              <div class="opx-v6-status"><span>처리 속도</span><strong>${formatDuration(avgMinutes)}</strong><small>${oldestPending?'최장 미조치 '+formatDuration(oldestPendingMinutes):'현재 미조치 없음'}</small></div>
-            </div>
-            <div class="opx-v6-grid">
-              <div class="opx-board-panel"><div class="opx-board-panel-head"><b>📍 현장 우선 확인</b><span>자동 분석</span></div><div class="opx-v6-focus"><div><span>01</span><b>${actionPlace}</b><small>${topPlace?topPlace[1]+'건 · 집중도 '+topPlaceRate+'%':'접수 데이터가 쌓이면 자동 표시'}</small></div><div><span>02</span><b>${actionIssue}</b><small>${topIssue?topIssue[1]+'건':'반복 유형 없음'}</small></div><div><span>03</span><b>${actionPending}</b><small>${unassignedRows.length}건은 담당자 미지정</small></div></div></div>
-              <div class="opx-board-panel"><div class="opx-board-panel-head"><b>👥 오늘 근무현황</b><span>${selectedDate}</span></div><div class="opx-v6-staff"><strong>${workingToday}<small>/ ${staffToday}명</small></strong><span>근무 인원</span><div class="opx-v6-staff-bar"><i style="width:${staffToday?Math.round(workingToday/staffToday*100):0}%"></i></div></div><div class="opx-v6-staff-names">${workersForDate(selectedDate).slice(0,6).map(w=>'<span class="'+(w.working?'on':'off')+'">'+xEsc(w.name)+' · '+(w.working?'근무':'비근무')+'</span>').join('')||'<span>근무자료 없음</span>'}</div></div>
-            </div>
-            <div class="opx-v6-metrics"><div><span>오늘 접수</span><b>${todayReceived}건</b></div><div><span>오늘 완료</span><b>${todayCompleted}건</b></div><div><span>현재 미조치</span><b class="${customerPending?'red':''}">${customerPending}건</b></div><div><span>담당자 지정</span><b>${customerPending-unassignedRows.length}건</b></div><div><span>완료율</span><b>${customerRate}%</b></div><div><span>접수 집중 요일</span><b>${peakWeekdayText}</b></div><div><span>접수 집중 시간</span><b>${peakHourText}</b></div></div>
-          </section>
-        </section>
+         <section class="opx-board opx-board-v6">
+           <div class="opx-board-head">
+             <div>
+               <span class="opx-board-kicker">CUSTOMER ISSUE → OPERATION INSIGHT</span>
+               <h3>운영게시판</h3>
+               <p>고객 접수내용을 근거로 위험도·처리 우선순위·반복 장소·문제 유형·관리조치를 자동 분석합니다.</p>
+             </div>
+             <div class="opx-board-clock"><b>${year}.${month}.${String(selectedDate).slice(8,10)}</b><span>고객 접수 기반 분석</span></div>
+           </div>
 
-        <section class="opx-major-section customer-section">
-          <div class="opx-major-title customer-title"><span>고객 접수 분석</span><small>고객접수 데이터를 근거로 위험·반복·증가·개선 필요사항을 자동 분석</small></div>
-          <section class="opx-customer-panel">
-            <div class="qr-v19-head">
-              <div><span>QR DATA → OPERATIONS INSIGHT</span><h3>🧠 시설 운영 위험·개선 분석</h3><p>고객게시판의 원문을 이곳에 중복 표시하지 않고, 접수 데이터에서 <b>관리해야 할 문제와 개선 신호</b>를 추출합니다.</p></div>
-              <div class="qr-v19-overall ${qrOverallCls}"><small>현재 운영상태</small><b>${qrOverall}</b><span>위험점수 ${qrRiskScore}/100</span></div>
-            </div>
+           <div class="opx-v6-command">
+             <div class="opx-v6-status ${qrOverallCls}">
+               <span>현재 위험도</span>
+               <strong>${qrOverall}</strong>
+               <small>위험점수 ${qrRiskScore}/100 · 긴급 ${qrRiskSummary.urgent}건 · 주의 ${qrRiskSummary.warn}건</small>
+             </div>
+             <div class="opx-v6-status">
+               <span>최우선 장소</span>
+               <strong>${qrPlaceInsights[0]?xEsc(qrPlaceInsights[0].place):'자료 없음'}</strong>
+               <small>${qrPlaceInsights[0]?qrPlaceInsights[0].total+'건 · 위험점수 '+qrPlaceInsights[0].score:'접수 데이터 없음'}</small>
+             </div>
+             <div class="opx-v6-status">
+               <span>최우선 문제</span>
+               <strong>${qrPlaceInsights[0]?xEsc(qrPlaceInsights[0].topIssue):'자료 없음'}</strong>
+               <small>${qrIssueInsights[0]?qrIssueInsights[0].count+'건 · 주요 유형':'유형 데이터 없음'}</small>
+             </div>
+             <div class="opx-v6-status">
+               <span>처리 우선순위</span>
+               <strong>${qrInsightRows[0]?xEsc(qrInsightRows[0].level):'자료 없음'}</strong>
+               <small>${qrInsightRows[0]?xEsc(qrInsightRows[0].cause):'분석할 접수 없음'} · ${customerPending}건 미조치</small>
+             </div>
+           </div>
 
-            <div class="qr-v19-kpis">
-              <div class="urgent"><small>🔴 긴급</small><b>${qrRiskSummary.urgent}<i>건</i></b><span>안전·사고 가능성</span></div>
-              <div class="warn"><small>🟠 주의</small><b>${qrRiskSummary.warn}<i>건</i></b><span>고장·반복·시설 이상</span></div>
-              <div class="normal"><small>🟢 일반</small><b>${qrRiskSummary.normal}<i>건</i></b><span>비품·문의·일반관리</span></div>
-              <div><small>🔁 반복 장소</small><b>${qrRepeated.length}<i>곳</i></b><span>재발 원인 분석 대상</span></div>
-              <div><small>📈 최근 7일</small><b>${qrNowTrend}<i>건</i></b><span>${xEsc(qrTrendText)}</span></div>
-              <div><small>🛠️ 예방관리</small><b>${qrPrevRows.length}<i>건</i></b><span>반복·미조치 기반 후보</span></div>
-            </div>
+           <div class="opx-v6-grid">
+             <div class="opx-board-panel">
+               <div class="opx-board-panel-head"><b>📌 현장 처리 우선순위</b><span>접수내용 자동 분석</span></div>
+               <div class="qr-v19-risk-list">
+                 ${qrInsightRows.slice(0,5).map((r,i)=>`
+                   <div class="qr-v19-risk-row ${r.cls}">
+                     <b class="rank">${String(i+1).padStart(2,'0')}</b>
+                     <div>
+                       <strong>${xEsc(r.place)} · ${xEsc(r.problem)}</strong>
+                       <span>${xEsc(r.level)} · ${r.score}점 · ${xEsc(r.cause)}${r.pending?' · 미조치':''}</span>
+                     </div>
+                     <b class="score">${r.score}</b>
+                   </div>`).join('') ||
+                   '<div class="qr-empty">선택기간 고객 접수 데이터가 없습니다.</div>'}
+               </div>
+             </div>
 
-            <div class="qr-v19-main-grid">
-              <div class="qr-v19-card qr-v19-risk-card">
-                <div class="qr-v19-cardhead"><div><h4>🚨 위험 우선순위</h4><p>접수 내용 + 반복 + 미조치 + 최근 발생을 종합해 관리 우선도를 산정합니다.</p></div><span>0~100 자동점수</span></div>
-                <div class="qr-v19-risk-list">${qrPlaceInsights.slice(0,7).map((o,i)=>{const cls=o.score>=70?'urgent':o.score>=40?'warn':'normal';const level=o.score>=70?'긴급':o.score>=40?'주의':'일반';return `<div class="qr-v19-risk-row ${cls}"><b class="rank">${String(i+1).padStart(2,'0')}</b><div><strong>${xEsc(o.place)}</strong><span>${level} · ${o.total}건 · 주요문제 ${xEsc(o.topIssue)}${o.pending?' · 미조치 '+o.pending+'건':''}</span></div><b class="score">${o.score}</b></div>`}).join('')||'<div class="qr-empty">분석할 접수 데이터가 없습니다.</div>'}</div>
-              </div>
+             <div class="opx-board-panel">
+               <div class="opx-board-panel-head"><b>🛠️ 지금 조치할 내용</b><span>관리자 판단 보조</span></div>
+               <div class="opx-v6-focus">
+                 <div><span>01</span><b>${qrInsightRows[0]?xEsc(qrInsightRows[0].analysis.check):'접수 데이터 없음'}</b><small>${qrInsightRows[0]?xEsc(qrInsightRows[0].analysis.action):'고객 접수내용이 들어오면 자동 분석합니다.'}</small></div>
+                 <div><span>02</span><b>${qrPlaceInsights[0]?xEsc(qrPlaceInsights[0].place)+' 집중 확인':'반복 장소 없음'}</b><small>${qrPlaceInsights[0]?qrPlaceInsights[0].total+'건 · 주요문제 '+xEsc(qrPlaceInsights[0].topIssue):'반복 장소가 확인되면 우선 점검합니다.'}</small></div>
+                 <div><span>03</span><b>${qrPrevRows[0]?xEsc(qrPrevRows[0].place)+' 예방관리':'예방관리 후보 없음'}</b><small>${qrPrevRows[0]?xEsc(qrPrevRows[0].action):'반복·미조치 접수 발생 시 자동 제안합니다.'}</small></div>
+               </div>
+             </div>
+           </div>
 
-              <div class="qr-v19-card">
-                <div class="qr-v19-cardhead"><div><h4>📊 문제 유형 분포</h4><p>고객 접수 내용을 시설관리 관점으로 분류</p></div></div>
-                <div class="qr-v19-bars">${qrIssueInsights.slice(0,7).map(o=>`<div><span>${xEsc(o.group)}</span><div><i style="width:${Math.round(o.count/Math.max(1,...qrIssueInsights.map(x=>x.count))*100)}%"></i></div><b>${o.count}</b></div>`).join('')||'<div class="qr-empty">자료 없음</div>'}</div>
-              </div>
+           <div class="opx-v6-metrics">
+             <div><span>전체 접수</span><b>${customerReceived}건</b></div>
+             <div><span>긴급</span><b>${qrRiskSummary.urgent}건</b></div>
+             <div><span>주의</span><b>${qrRiskSummary.warn}건</b></div>
+             <div><span>일반</span><b>${qrRiskSummary.normal}건</b></div>
+             <div><span>반복 장소</span><b>${qrRepeated.length}곳</b></div>
+             <div><span>미조치</span><b class="${customerPending?'red':''}">${customerPending}건</b></div>
+             <div><span>최근 7일</span><b>${qrNowTrend}건</b></div>
+           </div>
 
-              <div class="qr-v19-card">
-                <div class="qr-v19-cardhead"><div><h4>📍 문제 집중 장소</h4><p>접수량이 많거나 위험 신호가 집중된 장소</p></div></div>
-                <div class="qr-v19-place-list">${qrPlaceInsights.slice(0,5).map((o,i)=>`<div><b>${i+1}</b><strong>${xEsc(o.place)}</strong><span>${o.total}건 · ${xEsc(o.topIssue)}</span><em>${o.score}점</em></div>`).join('')||'<div class="qr-empty">자료 없음</div>'}</div>
-              </div>
-            </div>
-
-            <div class="qr-v19-action-grid">
-              <div class="qr-v19-card qr-v19-manager-card">
-                <div class="qr-v19-cardhead"><div><h4>🎯 지금 관리자가 봐야 할 것</h4><p>통계가 아니라 실제 관리 행동으로 변환</p></div></div>
-                <div class="qr-v19-actions">${qrActionCards.map(o=>`<div class="qr-v19-action ${o.level==='긴급'?'urgent':o.level==='주의'?'warn':o.level==='개선'?'improve':'normal'}"><b>${xEsc(o.level)}</b><div><strong>${xEsc(o.title)}</strong><span>${xEsc(o.text)}</span></div></div>`).join('')||'<div class="qr-empty">현재 별도 조치 신호가 없습니다.</div>'}</div>
-              </div>
-
-              <div class="qr-v19-card">
-                <div class="qr-v19-cardhead"><div><h4>🛠️ 예방관리·개선 후보</h4><p>고장 후 처리보다 재발을 줄일 수 있는 항목</p></div></div>
-                <div class="qr-v19-improve-list">${qrImprovementPriority.map(o=>`<div><b>${o.rank}</b><div><strong>${xEsc(o.place)} · ${xEsc(o.topIssue)}</strong><span>관련 ${o.total}건 · 위험점수 ${o.score}</span><p>${xEsc(o.action)}</p></div></div>`).join('')||'<div class="qr-empty">반복 또는 미조치 기준의 개선 후보가 없습니다.</div>'}</div>
-              </div>
-            </div>
-
-            <div class="qr-v19-chart-grid">
-              <div class="qr-v19-card">
-                <div class="qr-v19-cardhead"><div><h4>📈 최근 7일 접수 추이</h4><p>${xEsc(qrTrendText)}</p></div><span>일별</span></div>
-                <div class="qr-v19-trend">${qrTrend7.map(o=>`<div><b>${o.count}</b><i style="height:${Math.max(6,Math.round(o.count/Math.max(1,...qrTrend7.map(x=>x.count))*100))}%"></i><span>${xEsc(o.label)}</span></div>`).join('')}</div>
-              </div>
-              <div class="qr-v19-card">
-                <div class="qr-v19-cardhead"><div><h4>🕒 문제 발생 시간대</h4><p>접수가 집중되는 운영시간 파악</p></div></div>
-                <div class="qr-v19-bars">${qrHourBandStats.map(x=>`<div><span>${x.label}</span><div><i style="width:${Math.round(x.n/qrHourMax*100)}%"></i></div><b>${x.n}</b></div>`).join('')}</div>
-              </div>
-            </div>
-       </section>
+           <div class="qr-v19-chart-grid" style="margin-top:12px">
+             <div class="qr-v19-card">
+               <div class="qr-v19-cardhead"><div><h4>📊 문제 유형 분석</h4><p>고객 접수내용을 시설관리 유형으로 분류</p></div></div>
+               <div class="qr-v19-bars">${qrIssueInsights.slice(0,6).map(o=>`<div><span>${xEsc(o.group)}</span><div><i style="width:${Math.round(o.count/Math.max(1,...qrIssueInsights.map(x=>x.count))*100)}%"></i></div><b>${o.count}</b></div>`).join('')||'<div class="qr-empty">자료 없음</div>'}</div>
+             </div>
+             <div class="qr-v19-card">
+               <div class="qr-v19-cardhead"><div><h4>📍 반복·집중 장소</h4><p>접수량과 위험도를 함께 반영</p></div></div>
+               <div class="qr-v19-place-list">${qrPlaceInsights.slice(0,5).map((o,i)=>`<div><b>${i+1}</b><strong>${xEsc(o.place)}</strong><span>${o.total}건 · ${xEsc(o.topIssue)}</span><em>${o.score}점</em></div>`).join('')||'<div class="qr-empty">자료 없음</div>'}</div>
+             </div>
+           </div>
+         </section>
        </section>
        </div>`;
+
     }
 
     function dashboard2(){
