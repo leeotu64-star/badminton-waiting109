@@ -1645,7 +1645,7 @@ function processPage(){
    <div class="process-kpi" style="border-top-color:#2563eb"><div class="k-label">조치 진행</div><div class="k-value">${running}건</div></div>
    <div class="process-kpi ok"><div class="k-label">처리 완료</div><div class="k-value">${completed.length}건</div></div>
   </div>
-  <div class="jgb-section">처리 대기 · 진행 ${pending.length}건</div>
+  <div class="jgb-section" style="display:none;">처리 대기 · 진행 ${pending.length}건</div>
   <div class="process-list">
   ${pending.map(x=>{const at=actionTypeFromIssue(x),note=actionNoteFromIssue(x),status=x.status||'미조치';const safeContent=cleanWorkContent(x);return `<div class="process-card">
     <div class="process-card-head"><div><div class="process-id">접수번호 ${x.remoteId?`R-${x.remoteId}`:x.id}</div><div class="process-title">${xEsc(x.category||'기타')} · ${xEsc(x.place||'장소 미기록')}</div><div class="process-sub">접수 ${time(x.createdAt)} ${x.photo_url?' · 📷 현장사진 있음':''}</div></div><div class="process-status ${status==='조치중'?'run':'wait'}">● ${xEsc(status)}</div></div>
