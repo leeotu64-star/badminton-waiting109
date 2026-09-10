@@ -1240,6 +1240,24 @@
 @media(max-width:1200px){.opx-detail-metrics{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:760px){.opx-detail-head{align-items:flex-start;flex-direction:column}.opx-detail-metrics{grid-template-columns:repeat(2,1fr)}.opx-action-strip{grid-template-columns:1fr}.opx-clean-layout .opx-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 </style>
+
+<style id="jgbV5OpsStyle">
+/* V5: 항상 펼쳐진 슬라이드 바 + 운영 패턴 */
+.opx-trend-slider-v5{margin-top:10px;padding:12px 14px;border:1px solid #d5e3ef;border-radius:12px;background:linear-gradient(180deg,#f8fbff,#f2f7fb)}
+.opx-slider-track{position:relative;height:22px;margin:8px 2px 2px;display:flex;align-items:center}
+.opx-slider-track:before{content:"";position:absolute;left:0;right:0;height:8px;border-radius:99px;background:linear-gradient(90deg,#2f80ed,#20b7a0);box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+.opx-slider-track input[type=range]{position:relative;width:100%;height:22px;margin:0;background:transparent;appearance:none;-webkit-appearance:none;cursor:pointer;z-index:2}
+.opx-slider-track input[type=range]::-webkit-slider-runnable-track{height:8px;background:transparent;border:0}
+.opx-slider-track input[type=range]::-moz-range-track{height:8px;background:transparent;border:0}
+.opx-slider-track input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;margin-top:-7px;border:4px solid #fff;border-radius:50%;background:#1769c1;box-shadow:0 2px 8px rgba(23,105,193,.35)}
+.opx-slider-track input[type=range]::-moz-range-thumb{width:16px;height:16px;border:4px solid #fff;border-radius:50%;background:#1769c1;box-shadow:0 2px 8px rgba(23,105,193,.35)}
+.opx-slider-labels{display:flex;justify-content:space-between;font-size:11px;font-weight:900;color:#687d91;margin-top:3px}
+.opx-v5-pattern{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;margin-top:14px}
+.opx-v5-pattern-card{border:1px solid #dbe6ef;border-radius:14px;background:#fff;padding:14px;min-width:0}
+.opx-v5-pattern-card .k{font-size:11px;font-weight:900;color:#718397}.opx-v5-pattern-card strong{display:block;font-size:22px;color:#153d62;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.opx-v5-pattern-card small{display:block;font-size:11px;color:#8191a1;margin-top:5px}
+.opx-v5-live{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;margin-top:14px;border:1px solid #d7e4ef;border-radius:14px;background:#f8fbfe}.opx-v5-live b{font-size:15px}.opx-v5-live span{font-size:12px;font-weight:900;color:#587088}.opx-v5-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#13a66b;box-shadow:0 0 0 4px #e5f7ef;margin-right:7px}
+@media(max-width:900px){.opx-v5-pattern{grid-template-columns:1fr}.opx-v5-live{align-items:flex-start;flex-direction:column}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1684,6 +1702,14 @@
       window.__jgbTrendData=trendData;
       const trend7=trendData.slice(-7);
       const trend7Max=Math.max(1,...trend7.map(x=>x.n));
+      const weekdayMap=['일','월','화','수','목','금','토'];
+      const weekdayCount=Array(7).fill(0), hourCount=Array(24).fill(0);
+      customerMonth.forEach(x=>{const d=new Date(x?.createdAt||'');if(!Number.isNaN(d.getTime())){weekdayCount[d.getDay()]++;hourCount[d.getHours()]++;}});
+      const peakWeekday=weekdayCount.indexOf(Math.max(...weekdayCount));
+      const peakHour=hourCount.indexOf(Math.max(...hourCount));
+      const peakWeekdayText=customerReceived?weekdayMap[peakWeekday]+'요일':'자료 없음';
+      const peakHourText=customerReceived?String(peakHour).padStart(2,'0')+'시대':'자료 없음';
+      const opsSignal=customerPending>0?'미조치 우선 처리':(topPlaceRate>=40?'집중 장소 점검':(topIssue?'반복 민원 확인':'정상 운영'));
       const workingToday=workersForDate(selectedDate).filter(w=>w.working).length;
       const staffToday=workersForDate(selectedDate).length;
       const topIssue=issueStats[0];
@@ -1814,11 +1840,17 @@
               <div class="opx-detail-card opx-attention-card"><h4>🚨 주의 · 집중관리</h4><div class="opx-attention-list"><div class="${placeAlertClass}"><span>장소 집중도</span><b>${topPlace?xEsc(topPlace[0]):'-'}</b><em>${topPlace?`${topPlace[1]}건 · ${topPlaceRate}% · ${placeAlert}`:'접수 없음'}</em></div><div class="${pendingAlertClass}"><span>미조치 현황</span><b>${customerPending}건</b><em>${pendingAlert}</em></div><div class="${topIssue?'orange':'green'}"><span>최다 접수 유형</span><b>${topIssue?xEsc(topIssue[0]):'-'}</b><em>${topIssue?topIssue[1]+'건':'데이터 없음'}</em></div></div></div>
             </div>
             <div class="opx-customer-analytics opx-customer-analytics-v2">
-              <div class="opx-analytics-card"><div class="opx-trend-slider-top"><h4 style="margin:0!important">📈 접수 추이</h4><b id="jgbTrendDays">7일</b></div><div id="jgbTrendBars" class="opx-week-bars">${trend7.map(x=>`<div><i style="height:${Math.max(5,Math.round(x.n/trend7Max*100))}%"></i><span>${x.label}</span><b>${x.n}</b></div>`).join('')}</div><div class="opx-trend-slider"><div class="opx-trend-slider-top"><span>기간 슬라이드</span><b>7일 ↔ 30일</b></div><input type="range" min="7" max="30" value="7" oninput="jgbTrendRender(this.value)"><div class="opx-trend-scale"><span>최근 7일</span><span>최근 30일</span></div></div></div>
+              <div class="opx-analytics-card"><div class="opx-trend-slider-top"><h4 style="margin:0!important">📈 접수 추이</h4><b id="jgbTrendDays">7일</b></div><div id="jgbTrendBars" class="opx-week-bars">${trend7.map(x=>`<div><i style="height:${Math.max(5,Math.round(x.n/trend7Max*100))}%"></i><span>${x.label}</span><b>${x.n}</b></div>`).join('')}</div><div class="opx-trend-slider-v5"><div class="opx-trend-slider-top"><span>기간 슬라이드</span><b id="jgbTrendRangeText">7일</b></div><div class="opx-slider-track"><input id="jgbTrendRange" type="range" min="7" max="30" value="7" step="1" oninput="jgbTrendRender(this.value);document.getElementById('jgbTrendRangeText').textContent=this.value+'일'"></div><div class="opx-slider-labels"><span>최근 7일</span><span>최근 30일</span></div></div></div>
               <div class="opx-analytics-card"><h4>📊 ${year}년 월별 접수 추이</h4><div class="opx-month-bars">${customerYearMonthly.map(x=>`<div><b>${x.total}</b><i style="height:${Math.max(5,Math.round(x.total/customerYearMax*100))}%"></i><span>${x.m}월</span></div>`).join('')}</div></div>
               <div class="opx-analytics-card"><h4>🚨 운영 주의 신호</h4><div class="opx-alert-list"><div><span>미조치</span><b class="${customerPending?'red':''}">${customerPending}건</b></div><div><span>최다 접수 장소</span><b>${topPlace?xEsc(topPlace[0]):'-'}</b></div><div><span>집중도</span><b>${topPlaceRate}%</b></div><div><span>완료율</span><b>${customerRate}%</b></div></div></div>
             </div>
           </section>
+          <div class="opx-v5-pattern">
+            <div class="opx-v5-pattern-card"><span class="k">🎯 지금 먼저 볼 곳</span><strong>${topPlace?xEsc(topPlace[0]):'접수 데이터 없음'}</strong><small>${topPlace?topPlace[1]+'건 · 전체 '+topPlaceRate+'%':'선택기간 데이터가 쌓이면 자동 표시됩니다.'}</small></div>
+            <div class="opx-v5-pattern-card"><span class="k">🕒 접수 집중 시간대</span><strong>${peakHourText}</strong><small>${customerReceived?'선택기간 기준 자동 집계':'자료 없음'}</small></div>
+            <div class="opx-v5-pattern-card"><span class="k">📅 접수 집중 요일</span><strong>${peakWeekdayText}</strong><small>${customerReceived?'선택기간 기준 자동 집계':'자료 없음'}</small></div>
+          </div>
+          <div class="opx-v5-live"><div><span class="opx-v5-dot"></span><b>실시간 운영 판단</b></div><span>${opsSignal} · 접수 ${customerReceived}건 · 미조치 ${customerPending}건 · 완료율 ${customerRate}%</span></div>
           <div class="opx-note"><b>관리자 확인사항</b> · 고객 QR 접수 데이터는 직원실적과 별도로 관리합니다. · 완료율은 실제 접수·완료 데이터 기준으로 자동 계산됩니다.</div>
         </section>
       </div>`;
