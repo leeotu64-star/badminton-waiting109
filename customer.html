@@ -3,114 +3,71 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>장군봉체육관 | 스마트폰 간편 접수</title>
+<title>장군봉체육관 | 고객 접수</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f3f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Malgun Gothic",sans-serif}
-.wrap{width:100%;max-width:560px;margin:auto;padding:20px 15px 35px}
-.card{background:#fff;border-radius:22px;padding:24px 18px;box-shadow:0 8px 30px rgba(20,40,70,.09)}
-.header{text-align:center;margin-bottom:25px}
-.header h1{font-size:26px;margin:0 0 8px;font-weight:900}
-.header p{margin:0;color:#667085;font-size:15px}
-.title{font-size:18px;font-weight:800;margin:0 0 13px}
-.locations{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.place{border:1px solid #d8dee9;background:#fff;border-radius:13px;padding:15px 8px;font-size:15px;font-weight:700;color:#344054;min-height:52px}
-.place.selected{border:2px solid #1671d9;background:#edf6ff;color:#075db8;padding:14px 7px}
-.label{display:block;font-size:17px;font-weight:800;margin:23px 0 10px}
-textarea{width:100%;min-height:145px;border:1px solid #d8dee9;border-radius:13px;padding:14px;font-size:16px;line-height:1.55;resize:vertical;outline:none}
-textarea:focus{border-color:#1671d9}
-.submit{width:100%;border:0;border-radius:13px;background:#1671d9;color:white;font-size:17px;font-weight:900;padding:16px;margin-top:15px}
-.submit:disabled{opacity:.55}
-.note{margin-top:12px;padding:12px;border-radius:10px;background:#f5f7fa;color:#667085;font-size:13px;line-height:1.5;text-align:center}
-.done{text-align:center;padding:35px 5px 20px}
-.check{width:62px;height:62px;border-radius:50%;margin:0 auto 17px;background:#e8f7ee;color:#149447;font-size:38px;font-weight:900;line-height:62px}
-.done h2{margin:0 0 9px;font-size:23px}
-.done p{margin:0;color:#667085;line-height:1.6;font-size:15px}
-.again{background:#eef2f7;color:#344054;margin-top:22px}
+*{box-sizing:border-box}body{margin:0;background:#f3f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Malgun Gothic",sans-serif}.wrap{width:100%;max-width:560px;margin:auto;padding:20px 15px 35px}.card{background:#fff;border-radius:22px;padding:24px 18px;box-shadow:0 8px 30px rgba(20,40,70,.09)}.header{text-align:center;margin-bottom:25px}.header h1{font-size:26px;margin:0 0 8px;font-weight:900}.header p{margin:0;color:#667085;font-size:15px}.title{font-size:19px;font-weight:900;margin:0 0 13px}.locations{display:grid;grid-template-columns:1fr 1fr;gap:10px}.place{border:1px solid #d8dee9;background:#fff;border-radius:13px;padding:15px 8px;font-size:15px;font-weight:700;color:#344054;min-height:52px}.place.selected{border:2px solid #1671d9;background:#edf6ff;color:#075db8;padding:14px 7px}.label{display:block;font-size:17px;font-weight:800;margin:23px 0 10px}textarea{width:100%;min-height:145px;border:1px solid #d8dee9;border-radius:13px;padding:14px;font-size:16px;line-height:1.55;resize:vertical;outline:none}textarea:focus{border-color:#1671d9}.submit{width:100%;border:0;border-radius:13px;background:#1671d9;color:white;font-size:17px;font-weight:900;padding:16px;margin-top:15px}.submit:disabled{opacity:.55}.note{margin-top:12px;padding:12px;border-radius:10px;background:#f5f7fa;color:#667085;font-size:13px;line-height:1.5;text-align:center}.status{text-align:center;padding:30px 5px 20px}.status-icon{width:70px;height:70px;border-radius:50%;margin:0 auto 17px;background:#eef6ff;color:#1671d9;font-size:34px;font-weight:900;line-height:70px}.status.done .status-icon{background:#e8f7ee;color:#149447}.status h2{margin:0 0 10px;font-size:24px}.status p{margin:0;color:#667085;line-height:1.65;font-size:15px}.status .place-name{font-size:19px;font-weight:900;color:#172033;margin:8px 0 16px}.again{background:#1671d9;color:#fff;margin-top:22px}.muted{color:#667085;font-size:13px;margin-top:12px;line-height:1.5}
 </style>
 </head>
-<body>
-<div class="wrap"><div class="card" id="app"></div></div>
-
+<body><div class="wrap"><div class="card" id="app"></div></div>
 <script>
 const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
 const SUPABASE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
 const PLACES=["남자 샤워실","여자 샤워실","여자 화장실","남자 화장실","복도","기타"];
+const ACTIVE_KEY="jgb_customer_active_request";
 let selectedPlace="";
 
+function saveActive(id){try{localStorage.setItem(ACTIVE_KEY,String(id))}catch(e){}}
+function getActive(){try{return localStorage.getItem(ACTIVE_KEY)||""}catch(e){return ""}}
+function clearActive(){try{localStorage.removeItem(ACTIVE_KEY)}catch(e){}}
+function esc(v){return String(v??"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]))}
+
 function showForm(){
-  selectedPlace="";
-  document.getElementById("app").innerHTML=`
-    <div class="header">
-      <h1>장군봉체육관</h1>
-      <p>스마트폰 간편 접수</p>
-    </div>
-
-    <div class="title">시설 이상 신고</div>
-    <div class="locations">
-      ${PLACES.map(p=>`<button class="place" type="button" data-place="${p}">${p}</button>`).join("")}
-    </div>
-
-    <label class="label" for="issue">이상 내용을 입력해 주세요</label>
-    <textarea id="issue" placeholder="예: 샤워기에서 물이 새고 있습니다."></textarea>
-
-    <button class="submit" id="submit" type="button">접수하기</button>
-    <div class="note">접수된 내용은 관리자 작업관리에서 확인 후 조치합니다.</div>
-  `;
-
-  document.querySelectorAll(".place").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      selectedPlace=btn.dataset.place;
-      document.querySelectorAll(".place").forEach(b=>b.classList.remove("selected"));
-      btn.classList.add("selected");
-    });
-  });
-  document.getElementById("submit").addEventListener("click",submitIssue);
+ selectedPlace="";
+ document.getElementById("app").innerHTML=`<div class="header"><h1>장군봉체육관</h1><p>고객 간편 접수</p></div><div class="title">시설 이상 신고</div><div class="locations">${PLACES.map(p=>`<button class="place" type="button" data-place="${p}">${p}</button>`).join("")}</div><label class="label" for="issue">이상 내용을 입력해 주세요</label><textarea id="issue" placeholder="예: 샤워기에서 물이 새고 있습니다."></textarea><button class="submit" id="submit" type="button">접수하기</button><div class="note">접수 후 화면을 나가셔도 됩니다. 다시 QR을 찍으면 처리상태를 확인할 수 있습니다.</div>`;
+ document.querySelectorAll(".place").forEach(btn=>btn.addEventListener("click",()=>{selectedPlace=btn.dataset.place;document.querySelectorAll(".place").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected")}));
+ document.getElementById("submit").addEventListener("click",submitIssue);
 }
 
 async function submitIssue(){
-  const btn=document.getElementById("submit");
-  const content=document.getElementById("issue").value.trim();
-
-  if(!selectedPlace){alert("발생 장소를 선택해 주세요.");return}
-  if(!content){alert("이상 내용을 입력해 주세요.");return}
-
-  btn.disabled=true;
-  btn.textContent="접수 중...";
-
-  const {error}=await supabaseClient.from("requests").insert([{
-    category:"시설",
-    place:selectedPlace,
-    content:content,
-    status:"접수",
-    received_at:new Date().toISOString()
-  }]);
-
-  if(error){
-    console.error(error);
-    alert("접수에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-    btn.disabled=false;
-    btn.textContent="접수하기";
-    return;
-  }
-  showDone();
+ const btn=document.getElementById("submit"),content=document.getElementById("issue").value.trim();
+ if(!selectedPlace){alert("발생 장소를 선택해 주세요.");return} if(!content){alert("이상 내용을 입력해 주세요.");return}
+ btn.disabled=true;btn.textContent="접수 중...";
+ const {data,error}=await supabaseClient.from("requests").insert([{category:"시설",place:selectedPlace,content,status:"접수",received_at:new Date().toISOString()}]).select("id").single();
+ if(error){console.error(error);alert("접수에 실패했습니다. 잠시 후 다시 시도해 주세요.");btn.disabled=false;btn.textContent="접수하기";return}
+ if(data?.id)saveActive(data.id);
+ showStatus({place:selectedPlace,status:"접수"});
 }
 
-function showDone(){
-  document.getElementById("app").innerHTML=`
-    <div class="done">
-      <div class="check">✓</div>
-      <h2>접수가 완료되었습니다.</h2>
-      <p>시설 이상 신고가 관리자에게 전달되었습니다.<br>확인 후 조치하겠습니다.</p>
-      <button class="submit again" type="button" onclick="showForm()">추가 접수하기</button>
-    </div>
-  `;
+function showStatus(x){
+ const done=x.status==="완료";
+ document.getElementById("app").innerHTML=`<div class="status ${done?"done":""}"><div class="status-icon">${done?"✓":"…"}</div><h2>${done?"조치가 완료되었습니다.":"현재 처리 중입니다."}</h2><div class="place-name">${esc(x.place||"접수하신 시설")}</div><p>${done?"조치가 완료되었습니다. 확인하신 후 새로운 접수를 시작할 수 있습니다.":"접수하신 내용은 관리자에게 전달되었습니다.<br>처리가 완료되면 다시 QR을 찍어 확인해 주세요."}</p>${done?`<button class="submit again" type="button" onclick="confirmComplete()">완료 확인 · 신규접수</button>`:`<button class="submit again" type="button" onclick="checkStatus()">처리상태 확인</button>`}<div class="muted">현재 접수 건을 확인하는 화면입니다.</div></div>`;
 }
 
-showForm();
-</script>
-</body>
-</html>
+async function checkStatus(){
+ const id=getActive();
+ if(!id){showForm();return}
+ const {data,error}=await supabaseClient.from("requests").select("id,place,status,content").eq("id",id).maybeSingle();
+ if(error){console.error(error);alert("상태 확인에 실패했습니다. 잠시 후 다시 시도해 주세요.");return}
+ if(!data){clearActive();showForm();return}
+ showStatus(data);
+}
+
+async function confirmComplete(){
+ const id=getActive();
+ if(id){
+   const {error}=await supabaseClient.from("requests").update({status:"확인완료"}).eq("id",id).eq("status","완료");
+   if(error)console.error(error);
+ }
+ clearActive();
+ showForm();
+}
+
+async function init(){
+ const id=getActive();
+ if(!id){showForm();return}
+ await checkStatus();
+}
+init();
+</script></body></html>
