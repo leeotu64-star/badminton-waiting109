@@ -903,6 +903,16 @@ html,body{overflow-x:hidden!important}
 .eam-asset-row .row-copy small{font-size:12px!important;color:#4d6480!important;line-height:1.45!important}
 .eam-asset-row .row-origin{font-size:10px!important;color:#7d8da0!important}
 </style>
+<style id="JGB_STAFF_DASH_FINAL">
+.opx-two-col{display:grid;grid-template-columns:1.05fr .95fr;gap:12px;margin-top:12px}
+.opx-compare-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.opx-compare-card{border:1px solid #dce6f0;border-radius:13px;padding:12px;background:#f8fbff}
+.opx-compare-card>b{display:block;font-size:14px;color:#123d6b;margin-bottom:8px}.opx-compare-card>div{display:flex;gap:8px}.opx-compare-card span{flex:1;background:#fff;border-radius:9px;padding:8px;font-size:10px;color:#68778a}.opx-compare-card strong{display:block;font-size:18px;color:#1769c1;margin-top:3px}.opx-compare-card small{display:block;margin-top:8px;color:#738296;font-size:10px}
+.opx-customer-panel{background:#fff;border:1px solid #dbe5ef;border-radius:18px;padding:16px;margin-top:12px;box-shadow:0 5px 18px rgba(20,45,80,.06)}
+.opx-customer-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}.opx-customer-kpi{padding:13px 15px;border-radius:13px;border:1px solid #e1e9f1}.opx-customer-kpi span{display:block;font-size:11px;font-weight:800;color:#66778a}.opx-customer-kpi strong{display:block;font-size:26px;color:#163d68;margin-top:4px}.opx-customer-kpi strong small{font-size:11px;margin-left:3px}.opx-customer-kpi em{font-style:normal;font-size:10px;color:#718094}.opx-customer-kpi.blue{background:#f0f7ff;border-top:4px solid #1976e8}.opx-customer-kpi.green{background:#eefaf4;border-top:4px solid #0ca45f}.opx-customer-kpi.orange{background:#fff5e9;border-top:4px solid #ff7800}.opx-customer-kpi.red{background:#fff1f1;border-top:4px solid #df3b3b}.opx-customer-grid2{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:10px;margin-top:12px}.opx-customer-grid2>div{min-width:0}.opx-customer-grid2 h4{font-size:13px;margin:0 0 7px;color:#173e68}
+@media(max-width:1050px){.opx-two-col,.opx-customer-grid2{grid-template-columns:1fr}.opx-customer-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.opx-compare-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.opx-customer-kpis,.opx-compare-cards{grid-template-columns:1fr}}
+</style>
 </head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1251,20 +1261,16 @@ const OPX_STAFF_DASHBOARD_CSS = `
   }
 })()
 
+
+
+
 function dashboard(s){
   const ym=monthKey();
   const year=Number(ym.slice(0,4));
   const month=Number(ym.slice(5,7));
 
-  const md=workers.map(w=>({
-    ...w,
-    p:dashboardStaffMonth(w.id,ym)
-  }));
-
-  const ys=workers.map(w=>({
-    ...w,
-    p:dashboardStaffYear(w.id,year)
-  }));
+  const md=workers.map(w=>({...w,p:dashboardStaffMonth(w.id,ym)}));
+  const ys=workers.map(w=>({...w,p:dashboardStaffYear(w.id,year)}));
 
   const sum=md.reduce((a,x)=>{
     a.basic+=x.p.basic.complete;
@@ -1273,260 +1279,103 @@ function dashboard(s){
     a.total+=x.p.total;
     return a;
   },{basic:0,auto:0,issue:0,total:0});
-
   const target=Math.max(1,md.reduce((n,x)=>n+(x.p.basic.target||0),0));
   const totalTarget=Math.max(1,target+10+20);
   const rate=Math.min(100,Math.round(sum.total/totalTarget*100));
 
   const monthly=Array.from({length:12},(_,i)=>{
-    const mo=year+"-"+String(i+1).padStart(2,"0");
+    const mo=year+'-'+String(i+1).padStart(2,'0');
     const vals=workers.map(w=>dashboardStaffMonth(w.id,mo));
-    return {
-      m:i+1,
-      basic:vals.reduce((n,p)=>n+p.basic.complete,0),
-      auto:vals.reduce((n,p)=>n+p.auto.performance,0),
-      issue:vals.reduce((n,p)=>n+p.qr.done,0),
-      total:vals.reduce((n,p)=>n+p.total,0)
-    };
+    return {m:i+1,basic:vals.reduce((n,p)=>n+p.basic.complete,0),auto:vals.reduce((n,p)=>n+p.auto.performance,0),issue:vals.reduce((n,p)=>n+p.qr.done,0),total:vals.reduce((n,p)=>n+p.total,0)};
   });
 
-  const maxMonth=Math.max(1,...monthly.map(x=>Math.max(x.basic,x.auto,x.issue,x.total)));
-
-  const cards=md.map(x=>{
-    const p=x.p;
-    const basicRate=p.basic.target?Math.min(100,Math.round(p.basic.complete/p.basic.target*100)):0;
-    return `
-      <article class="opx-person">
-        <div class="opx-person-head">
-          <div class="opx-name"><span class="opx-avatar">${x.name}</span>${x.name}</div>
-          <div class="opx-total">${p.total}<small>회</small></div>
-        </div>
-        <div class="opx-mini-grid">
-          <div class="opx-mini blue"><b>${p.basic.complete}</b><span>정규업무</span></div>
-          <div class="opx-mini green"><b>${p.auto.performance}</b><span>근무편성 인정</span></div>
-          <div class="opx-mini orange"><b>${p.qr.done}</b><span>업무지시</span></div>
-        </div>
-        <div class="opx-person-foot">
-          <span>기본업무 달성 ${basicRate}%</span>
-          <span>편성 ${p.auto.units}회</span>
-        </div>
-      </article>`;
-  }).join("");
+  const customerAll=Array.isArray(db.issues)?db.issues:[];
+  const customerMonth=customerAll.filter(x=>String(x?.createdAt||'').slice(0,7)===ym);
+  const customerReceived=customerMonth.length;
+  const customerCompleted=customerMonth.filter(x=>x?.status==='완료').length;
+  const customerPending=customerMonth.filter(x=>x?.status!=='완료').length;
+  const customerRate=customerReceived?Math.round(customerCompleted/customerReceived*100):0;
+  const placeMap={}; customerMonth.forEach(x=>{const k=String(x?.place||'미지정');placeMap[k]=(placeMap[k]||0)+1;});
+  const placeRows=Object.entries(placeMap).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${xEsc(k)}</td><td>${v}건</td></tr>`).join('')||'<tr><td colspan="2">이번 달 접수 없음</td></tr>';
+  const handlerMap={}; customerMonth.filter(x=>x?.handlerName).forEach(x=>{const k=String(x.handlerName);handlerMap[k]=(handlerMap[k]||0)+1;});
+  const handlerRows=Object.entries(handlerMap).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${xEsc(k)}</td><td>${v}건</td></tr>`).join('')||'<tr><td colspan="2">담당자 처리 기록 없음</td></tr>';
+  const customerMonthlyRows=Array.from({length:12},(_,i)=>{
+    const m=String(i+1).padStart(2,'0'), rows=customerAll.filter(x=>String(x?.createdAt||'').slice(0,7)===`${year}-${m}`);
+    const done=rows.filter(x=>x?.status==='완료').length;
+    return `<tr><td>${i+1}월</td><td>${rows.length}건</td><td>${done}건</td><td>${rows.length?Math.round(done/rows.length*100):0}%</td></tr>`;
+  }).join('');
 
   const tableRows=md.map((x,i)=>{
-    const p=x.p;
-    const targetP=p.basic.target?Math.min(100,Math.round(p.basic.complete/p.basic.target*100)):0;
-    return `
-      <tr>
-        <td>${i+1}</td>
-        <td class="nm">${x.name}</td>
-        <td class="b">${p.basic.complete}</td>
-        <td class="g">${p.auto.performance}<small> (${p.auto.units}회)</small></td>
-        <td class="o">${p.qr.done}</td>
-        <td class="t">${p.total}</td>
-        <td>
-          <div class="opx-progress">
-            <div class="opx-progress-track"><i style="width:${targetP}%"></i></div>
-            <small>${targetP}%</small>
-          </div>
-        </td>
-      </tr>`;
-  }).join("");
+    const p=x.p, r=p.basic.target?Math.min(100,Math.round(p.basic.complete/p.basic.target*100)):0;
+    return `<tr><td>${i+1}</td><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic.complete}</td><td class="g">${p.auto.performance}<small> (${p.auto.units}회)</small></td><td class="o">${p.qr.done}</td><td class="t">${p.total}</td><td>${r}%</td></tr>`;
+  }).join('');
 
-  const bars=monthly.map(x=>`
-    <div class="opx-month-col">
-      <div class="opx-bar-stack">
-        <i class="opx-bar blue" style="height:${Math.max(3,Math.round(x.basic/maxMonth*150))}px" title="정규업무 ${x.basic}"></i>
-        <i class="opx-bar green" style="height:${Math.max(3,Math.round(x.auto/maxMonth*150))}px" title="근무편성 인정 ${x.auto}"></i>
-        <i class="opx-bar orange" style="height:${Math.max(3,Math.round(x.issue/maxMonth*150))}px" title="업무지시 ${x.issue}"></i>
-      </div>
-      <label>${x.m}월</label>
-      <small>${x.total}회</small>
-    </div>`).join("");
+  const annualRows=ys.map((x,i)=>{
+    const p=x.p;
+    return `<tr><td>${i+1}</td><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic}</td><td class="g">${p.auto}<small> (${p.autoUnits}회)</small></td><td class="o">${p.issueDone}</td><td class="t">${p.total}</td></tr>`;
+  }).join('');
+
+  const monthlyRows=monthly.map(x=>`<tr><td>${x.m}월</td><td class="b">${x.basic}</td><td class="g">${x.auto}</td><td class="o">${x.issue}</td><td class="t">${x.total}</td></tr>`).join('');
 
   return `
   <div class="opx-dash">
-
     <section class="opx-hero">
       <div>
         <div class="opx-eyebrow">JANGGUNBONG SPORTS CENTER · STAFF OPERATION</div>
         <div class="opx-title">직원 업무실적 운영 대시보드</div>
-        <div class="opx-sub">
-          실제 수행한 정규업무와 업무지시 실적, 근무편성에 따른 인정실적을
-          <b>서로 분리하여 확인하고 최종 종합 실적만 자동 합산</b>합니다.
-        </div>
-        <div class="opx-hero-actions">
-          <button class="opx-btn" onclick="go('schedule')">📅 근무편성 확인</button>
-          <button class="opx-btn" onclick="go('basic')">🧹 기본업무 확인</button>
-        </div>
+        <div class="opx-sub">실제 수행한 정규업무와 업무지시 실적, 근무편성에 따른 인정실적을 <b>서로 분리하여 확인하고 최종 종합 실적만 자동 합산</b>합니다.</div>
+        <div class="opx-hero-actions"><button class="opx-btn" onclick="go('schedule')">📅 근무편성 확인</button><button class="opx-btn" onclick="go('basic')">🧹 기본업무 확인</button></div>
       </div>
-      <div class="opx-hero-side">
-        <div class="opx-live">● 실시간 직원실적 연동</div>
-        <div class="opx-date">기준월 ${year}년 ${month}월</div>
-        <div class="opx-quote">“공정하게 평가하고,<br>투명하게 관리합니다.”<small>장군봉체육관 직원 업무실적 관리 원칙</small></div>
-      </div>
+      <div class="opx-hero-side"><div class="opx-live">● 실시간 직원실적 연동</div><div class="opx-date">기준월 ${year}년 ${month}월</div><div class="opx-quote">“공정하게 평가하고,<br>투명하게 관리합니다.”<small>장군봉체육관 직원 업무실적 관리 원칙</small></div></div>
     </section>
 
     <section class="opx-kpis">
-      <div class="opx-kpi blue">
-        <span>정규업무 실적</span>
-        <strong>${sum.basic}<small>건</small></strong>
-        <div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.basic/target*100))}%"></i></div>
-        <em>기본업무 10개 완료 = 1실적</em>
-      </div>
-      <div class="opx-kpi green">
-        <span>근무편성 인정실적</span>
-        <strong>${sum.auto}<small>건</small></strong>
-        <div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.auto/10*100))}%"></i></div>
-        <em>인정 ${md.reduce((n,x)=>n+x.p.auto.units,0)}회 · 10회 단위 환산</em>
-      </div>
-      <div class="opx-kpi orange">
-        <span>QR 조치완료 수행실적</span>
-        <strong>${sum.issue}<small>건</small></strong>
-        <div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.issue/20*100))}%"></i></div>
-        <em>QR 조치완료 건별 자동 반영</em>
-      </div>
-      <div class="opx-kpi violet">
-        <span>종합 업무실적</span>
-        <strong>${sum.total}<small>건</small></strong>
-        <div class="opx-track"><i style="width:${rate}%"></i></div>
-        <em>세 가지 실적 자동 합산</em>
-      </div>
+      <div class="opx-kpi blue"><span>정규업무 실적</span><strong>${sum.basic}<small>건</small></strong><div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.basic/target*100))}%"></i></div><em>기본업무 10개 완료 = 1실적</em></div>
+      <div class="opx-kpi green"><span>근무편성 인정실적</span><strong>${sum.auto}<small>건</small></strong><div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.auto/10*100))}%"></i></div><em>인정 ${md.reduce((n,x)=>n+x.p.auto.units,0)}회 · 10회 단위 환산</em></div>
+      <div class="opx-kpi orange"><span>QR 조치완료 수행실적</span><strong>${sum.issue}<small>건</small></strong><div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.issue/20*100))}%"></i></div><em>QR 조치완료 건별 자동 반영</em></div>
+      <div class="opx-kpi violet"><span>종합 업무실적</span><strong>${sum.total}<small>건</small></strong><div class="opx-track"><i style="width:${rate}%"></i></div><em>세 가지 실적 자동 합산</em></div>
     </section>
 
     <section class="opx-grid">
       <div class="opx-panel">
-        <div class="opx-head">
-          <div>
-            <h3>직원별 실적 현황</h3>
-            <p>${year}년 ${month}월 · 직원별 세부 실적을 한눈에 비교합니다.</p>
-          </div>
-          <span class="opx-chip">${workers.length}명 운영</span>
-        </div>
-        <div class="opx-cards">${cards}</div>
+        <div class="opx-head"><div><h3>직원별 월별 실적</h3><p>${year}년 ${month}월 · 정규업무·근무편성 인정·업무지시·종합실적</p></div><span class="opx-chip">${workers.length}명</span></div>
+        <div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성 인정</th><th>업무지시</th><th>종합실적</th><th>달성률</th></tr></thead><tbody>${tableRows}</tbody></table></div>
       </div>
-
       <div class="opx-panel">
-        <div class="opx-rule-title">
-          <b>📘 실적 산정 기준</b>
-          <span>관리자 안내서</span>
-        </div>
+        <div class="opx-rule-title"><b>📘 실적 산정 기준</b><span>관리자 안내서</span></div>
         <div class="opx-rule">
-          <div class="opx-rule-box blue">
-            <b>① 정규업무 실적</b>
-            <strong>기본업무 10개 완료 = 1실적</strong>
-            <span>실제 근무일에 수행하는 기본업무를 기준으로 합니다. 기존 기본업무 산정방식은 변경하지 않습니다.</span>
-          </div>
-          <div class="opx-rule-box green">
-            <b>② 근무편성 인정실적</b>
-            <strong>쉬는 날 10회 = 1실적</strong>
-            <span>휴무·주휴일·연가·공가·대휴 등 근무편성상 인정되는 일수를 자동 집계합니다.</span>
-          </div>
-          <div class="opx-rule-box orange">
-            <b>③ 업무지시 수행실적</b>
-            <strong>업무지시 건별 반영</strong>
-            <span>근무일·휴무일 여부와 관계없이 실제 지시사항을 수행한 직원에게 건별 반영합니다.</span>
-          </div>
-          <div class="opx-rule-box purple">
-            <b>④ 종합 업무실적</b>
-            <strong>정규업무 + 근무편성 인정 + 업무지시</strong>
-            <span>서로 다른 세 가지 실적을 분리 관리한 뒤 최종 합계에서만 합산합니다.</span>
-          </div>
+          <div class="opx-rule-box blue"><b>① 정규업무 실적</b><strong>기본업무 10개 완료 = 1실적</strong><span>실제 근무일에 수행하는 기본업무를 기준으로 합니다. 기존 기본업무 산정방식은 변경하지 않습니다.</span></div>
+          <div class="opx-rule-box green"><b>② 근무편성 인정실적</b><strong>쉬는 날 10회 = 1실적</strong><span>휴무·주휴일·연가·공가·대휴 등 근무편성상 인정되는 일수를 자동 집계합니다.</span></div>
+          <div class="opx-rule-box orange"><b>③ 업무지시 수행실적</b><strong>업무지시 건별 반영</strong><span>근무일·휴무일 여부와 관계없이 실제 지시사항을 수행한 직원에게 건별 반영합니다.</span></div>
+          <div class="opx-rule-box purple"><b>④ 종합 업무실적</b><strong>정규업무 + 근무편성 인정 + 업무지시</strong><span>서로 다른 세 가지 실적을 분리 관리한 뒤 최종 합계에서만 합산합니다.</span></div>
         </div>
       </div>
     </section>
 
-    <section class="opx-panel opx-chart-panel">
-      <div class="opx-head">
-        <div>
-          <h3>${year}년 월별 직원실적 추이</h3>
-          <p>월별 정규업무 · 근무편성 인정 · 업무지시 수행 실적</p>
-        </div>
-        <span class="opx-chip">1월 — 12월</span>
+    <section class="opx-two-col">
+      <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>${year}년 월별 실적</h3><p>1월부터 12월까지 월별 누적을 표로 확인합니다.</p></div><span class="opx-chip">막대그래프 없음</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>월</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${monthlyRows}</tbody></table></div></section>
+      <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>직원별 연간 누계를 동일 기준으로 비교합니다.</p></div><span class="opx-chip">연간 누계</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
+    </section>
+
+    <section class="opx-panel opx-table-panel"><div class="opx-head"><div><h3>월별 · 연간 실적 비교</h3><p>현재 기준월의 월 실적과 연간 누계를 한눈에 비교합니다.</p></div><span class="opx-chip">실적 비교</span></div><div class="opx-compare-cards">${workers.map(w=>{const m=dashboardStaffMonth(w.id,ym),y=dashboardStaffYear(w.id,year);return `<div class="opx-compare-card"><b>${xEsc(w.name)}</b><div><span>월 종합 <strong>${m.total}</strong></span><span>연간 종합 <strong>${y.total}</strong></span></div><small>정규 ${m.basic.complete} · 편성 ${m.auto.performance} · 지시 ${m.qr.done}</small></div>`}).join('')}</div></section>
+
+    <section class="opx-customer-panel">
+      <div class="opx-head"><div><h3>📋 고객접수 통계</h3><p>${year}년 ${month}월 · 직원실적과 별도로 고객 QR 접수 현황을 관리합니다.</p></div><span class="opx-chip">직원실적과 별도</span></div>
+      <div class="opx-customer-kpis">
+        <div class="opx-customer-kpi blue"><span>전체 접수</span><strong>${customerReceived}<small>건</small></strong></div>
+        <div class="opx-customer-kpi green"><span>처리완료</span><strong>${customerCompleted}<small>건</small></strong><em>완료율 ${customerRate}%</em></div>
+        <div class="opx-customer-kpi orange"><span>처리중</span><strong>${customerPending}<small>건</small></strong></div>
+        <div class="opx-customer-kpi red"><span>미완료</span><strong>${customerPending}<small>건</small></strong><em>현재 기준</em></div>
       </div>
-      <div class="opx-bars">${bars}</div>
-      <div class="opx-legend">
-        <span><i class="b"></i>정규업무</span>
-        <span><i class="g"></i>근무편성 인정</span>
-        <span><i class="o"></i>업무지시</span>
+      <div class="opx-customer-grid2">
+        <div><h4>📅 월별 접수 현황</h4><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>월</th><th>접수</th><th>완료</th><th>완료율</th></tr></thead><tbody>${customerMonthlyRows}</tbody></table></div></div>
+        <div><h4>📍 장소별 접수 현황</h4><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>장소</th><th>접수건수</th></tr></thead><tbody>${placeRows}</tbody></table></div></div>
+        <div><h4>👤 담당직원별 처리 현황</h4><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>담당직원</th><th>처리건수</th></tr></thead><tbody>${handlerRows}</tbody></table></div></div>
       </div>
     </section>
 
-    <section class="opx-panel opx-table-panel">
-      <div class="opx-head">
-        <div>
-          <h3>${year}년 직원별 연간 실적 비교</h3>
-          <p>월별 실적과 동일한 산정기준으로 연간 누계를 자동 집계합니다.</p>
-        </div>
-        <span class="opx-chip">연간 누계</span>
-      </div>
-      <div class="opx-table-wrap">
-        <table class="opx-table">
-          <thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성 인정</th><th>QR 조치완료</th><th>종합 실적</th><th>기본업무 달성률</th></tr></thead>
-          <tbody>${ys.map((x,i)=>{const p=x.p, r=p.target?Math.min(100,Math.round(p.basic/p.target*100)):0;return `<tr><td>${i+1}</td><td class="nm">${x.name}</td><td class="b">${p.basic}</td><td class="g">${p.auto}<small> (${p.autoUnits}회)</small></td><td class="o">${p.issueDone}</td><td class="t">${p.total}</td><td><div class="opx-progress"><div class="opx-progress-track"><i style="width:${r}%"></i></div><small>${r}%</small></div></td></tr>`}).join('')}</tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="opx-panel opx-table-panel">
-      <div class="opx-head">
-        <div>
-          <h3>직원별 상세 실적</h3>
-          <p>평가 기준을 분리하여 실제 업무수행과 자동 인정실적을 명확하게 구분합니다.</p>
-        </div>
-        <div class="opx-table-tools">
-          <select class="opx-select" onchange="setStaffPerfMonth(this.value)">
-            ${[...Array(12)].map((_,i)=>{
-              const v=year+"-"+String(i+1).padStart(2,"0");
-              return `<option value="${v}" ${v===ym?"selected":""}>${i+1}월</option>`;
-            }).join("")}
-          </select>
-          <button class="btn red" onclick="resetEmployeePerformance()">↻ 실적 리셋</button>
-        </div>
-      </div>
-      <div class="opx-table-wrap">
-        <table class="opx-table">
-          <thead>
-            <tr>
-              <th>순번</th>
-              <th>직원명</th>
-              <th>정규업무<br>실적</th>
-              <th>근무편성 인정<br>실적</th>
-              <th>QR 조치완료<br>수행</th>
-              <th>종합<br>실적</th>
-              <th>기본업무<br>달성률</th>
-            </tr>
-          </thead>
-          <tbody>${tableRows}</tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="opx-guide">
-      <div class="opx-guide-quote">
-        <b>🎯 직원 업무실적 운영 원칙</b>
-        <p>
-          “누가 더 많이 쉬었는가”가 아니라<br>
-          <b>실제 근무한 업무는 실제 실적으로, 쉬는 날은 근무편성 기준으로,
-          지시받은 업무는 수행 건수대로</b> 투명하게 반영합니다.
-        </p>
-      </div>
-      <div class="opx-steps">
-        <div class="opx-step"><div class="opx-step-no">1</div><b>기본업무 수행</b><span>근무일 10개 업무를 모두 완료하면 정규업무 1실적</span></div>
-        <div class="opx-step"><div class="opx-step-no">2</div><b>근무편성 자동인정</b><span>휴무·주휴일·연가·공가·대휴 등을 자동 집계</span></div>
-        <div class="opx-step"><div class="opx-step-no">3</div><b>업무지시 수행</b><span>QR·지시사항을 실제 처리한 직원에게 건별 반영</span></div>
-        <div class="opx-step"><div class="opx-step-no">4</div><b>종합 실적 산출</b><span>세 가지 실적을 마지막 단계에서 자동 합산</span></div>
-      </div>
-    </section>
-
-    <div class="opx-note">
-      <b>관리자 확인사항</b> · 기존 기본업무 방식은 변경하지 않습니다.
-      · 근무편성 인정실적은 10회 단위로 1실적입니다.
-      · 업무지시 수행실적은 근무일 여부와 관계없이 수행 건별 반영됩니다.
-      
-
-    </div>
-
+    <section class="opx-guide"><div class="opx-guide-quote"><b>🎯 직원 업무실적 운영 원칙</b><p>“누가 더 많이 쉬었는가”가 아니라<br><b>실제 근무한 업무는 실제 실적으로, 쉬는 날은 근무편성 기준으로, 지시받은 업무는 수행 건수대로</b> 투명하게 반영합니다.</p></div><div class="opx-steps"><div class="opx-step"><div class="opx-step-no">1</div><b>기본업무 수행</b><span>근무일 10개 업무를 모두 완료하면 정규업무 1실적</span></div><div class="opx-step"><div class="opx-step-no">2</div><b>근무편성 자동인정</b><span>휴무·주휴일·연가·공가·대휴 등을 자동 집계</span></div><div class="opx-step"><div class="opx-step-no">3</div><b>업무지시 수행</b><span>QR·지시사항을 실제 처리한 직원에게 건별 반영</span></div><div class="opx-step"><div class="opx-step-no">4</div><b>종합 실적 산출</b><span>세 가지 실적을 마지막 단계에서 자동 합산</span></div></div></section>
+    <div class="opx-note"><b>관리자 확인사항</b> · 기존 기본업무 방식은 변경하지 않습니다. · 근무편성 인정실적은 10회 단위로 1실적입니다. · 업무지시 수행실적은 근무일 여부와 관계없이 수행 건별 반영됩니다.</div>
   </div>`;
 }
 
