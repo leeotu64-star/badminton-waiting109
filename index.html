@@ -1222,6 +1222,24 @@
 @media(max-width:1000px){.opx-insight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.opx-insight-grid{grid-template-columns:1fr}.opx-trend-slider{padding:9px}.opx-insight-grid{gap:8px}}
 </style>
+
+<style id="JGB_V4_OPERATION_DETAIL">
+/* V4: 기존 4대 KPI + 좌측 운영게시판 구조 유지, 세부 운영지표만 확장 */
+.opx-operation-detail{margin-top:12px;border:1px solid #d6e3ee;border-radius:17px;background:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(15,50,80,.045)}
+.opx-detail-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid #e5edf4;background:linear-gradient(180deg,#f9fcff,#fff)}
+.opx-detail-head>div span{font-size:10px;font-weight:1000;letter-spacing:1.5px;color:#6b7d90}.opx-detail-head h3{margin:3px 0 0;font-size:20px;font-weight:1000;color:#10243a}.opx-detail-head p{margin:4px 0 0;font-size:12px;color:#718096}
+.opx-service-pill{padding:9px 14px;border-radius:999px;font-size:13px;font-weight:1000;white-space:nowrap}.opx-service-pill.good{background:#e9f8ef;color:#16834a}.opx-service-pill.warn{background:#fff5df;color:#b36b00}.opx-service-pill.bad{background:#ffeded;color:#c62828}
+.opx-detail-metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;padding:12px}
+.opx-detail-metric{min-width:0;padding:12px 13px;border-radius:12px;background:#f7fafc;border-top:3px solid #1769c1}.opx-detail-metric.green{border-top-color:#12a05a}.opx-detail-metric.red{border-top-color:#e04a4a}.opx-detail-metric.violet{border-top-color:#7650d8}.opx-detail-metric.orange{border-top-color:#f08a24}.opx-detail-metric.teal{border-top-color:#078e8b}
+.opx-detail-metric span{display:block;font-size:11px;font-weight:900;color:#66788b}.opx-detail-metric strong{display:block;margin-top:4px;font-size:22px;line-height:1.15;color:#122033;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.opx-detail-metric strong small{font-size:12px;margin-left:3px}.opx-detail-metric em{display:block;margin-top:5px;font-size:10px;font-style:normal;color:#8a98a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opx-action-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 12px 12px}.opx-action-strip>div{padding:10px 12px;border:1px dashed #d5e0ea;border-radius:10px;background:#fbfdff}.opx-action-strip b{display:block;font-size:11px;color:#506477;margin-bottom:3px}.opx-action-strip span{font-size:12px;font-weight:800;color:#18283a;line-height:1.4}
+/* 4대 KPI는 기존 디자인을 살리고 화면을 더 안정적으로 정렬 */
+.opx-clean-layout .opx-kpis{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+/* 직원 실적은 순위가 아니라 직원별 현황으로 표시 */
+.opx-table th:first-child,.opx-table td:first-child{white-space:nowrap}
+@media(max-width:1200px){.opx-detail-metrics{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.opx-detail-head{align-items:flex-start;flex-direction:column}.opx-detail-metrics{grid-template-columns:repeat(2,1fr)}.opx-action-strip{grid-template-columns:1fr}.opx-clean-layout .opx-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1645,6 +1663,19 @@
       }).join('');
       const customerYearMonthly=Array.from({length:12},(_,i)=>{const mo=year+'-'+String(i+1).padStart(2,'0');const rows=customerAll.filter(x=>String(x?.createdAt||'').slice(0,7)===mo);return {m:i+1,total:rows.length,done:rows.filter(x=>x?.status==='완료').length,pending:rows.filter(x=>x?.status!=='완료').length};});
       const customerYearMax=Math.max(1,...customerYearMonthly.map(x=>x.total));
+      const selectedDayRows=customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===String(selectedDate));
+      const todayReceived=selectedDayRows.length;
+      const todayCompleted=selectedDayRows.filter(x=>x?.status==='완료').length;
+      const todayPending=selectedDayRows.filter(x=>x?.status!=='완료').length;
+      const activeRows=customerMonth.filter(x=>x?.status!=='완료');
+      const unassignedRows=activeRows.filter(x=>!x?.handlerId && !x?.handlerName);
+      const completedTimes=customerMonth.filter(x=>x?.completedAt && x?.createdAt).map(x=>Math.max(0,Math.round((new Date(x.completedAt)-new Date(x.createdAt))/60000))).filter(n=>Number.isFinite(n));
+      const avgMinutes=completedTimes.length?Math.round(completedTimes.reduce((a,b)=>a+b,0)/completedTimes.length):null;
+      const oldestPending=activeRows.reduce((best,x)=>{if(!best)return x;return new Date(x.createdAt||0)<new Date(best.createdAt||0)?x:best},null);
+      const oldestPendingMinutes=oldestPending?Math.max(0,Math.round((Date.now()-new Date(oldestPending.createdAt||Date.now()))/60000)):0;
+      const formatDuration=(m)=>m==null?'-':(m<60?m+'분':Math.floor(m/60)+'시간 '+(m%60)+'분');
+      const serviceLevel=customerPending===0?'양호':customerPending<=2?'관찰':'즉시 조치';
+      const serviceLevelClass=customerPending===0?'good':customerPending<=2?'warn':'bad';
       const trendData=Array.from({length:30},(_,i)=>{
         const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-(29-i));
         const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1655,22 +1686,22 @@
       const trend7Max=Math.max(1,...trend7.map(x=>x.n));
       const workingToday=workersForDate(selectedDate).filter(w=>w.working).length;
       const staffToday=workersForDate(selectedDate).length;
+      const topIssue=issueStats[0];
       const actionPlace=topPlace?`${xEsc(topPlace[0])} 점검 권장`:'접수 데이터 확보 필요';
       const actionIssue=topIssue?`${xEsc(topIssue[0])} 반복 여부 확인`:'반복 민원 데이터 없음';
       const actionPending=customerPending>0?`미조치 ${customerPending}건 우선 처리`:'미조치 없음 · 대기상태 양호';
       const actionStaff=staffToday?`오늘 ${workingToday}/${staffToday}명 근무`:'오늘 근무자료 없음';
-      const topIssue=issueStats[0];
       const pendingAlert=customerPending>=3?'미조치 주의':customerPending>0?'미조치 확인':'미조치 없음';
       const pendingAlertClass=customerPending>=3?'red':customerPending>0?'orange':'green';
 
       const tableRows=md.map((x,i)=>{
         const p=x.p, r=p.basic.target?Math.min(100,Math.round(p.basic.complete/p.basic.target*100)):0;
-        return `<tr><td>${i+1}</td><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic.complete}</td><td class="g">${p.auto.performance}<small> (${p.auto.units}회)</small></td><td class="o">${p.qr.done}</td><td class="t">${p.total}</td><td>${r}%</td></tr>`;
+        return `<tr><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic.complete}</td><td class="g">${p.auto.performance}<small> (${p.auto.units}회)</small></td><td class="o">${p.qr.done}</td><td class="t">${p.total}</td><td>${r}%</td></tr>`;
       }).join('');
 
       const annualRows=ys.map((x,i)=>{
         const p=x.p;
-        return `<tr><td>${i+1}</td><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic}</td><td class="g">${p.auto}<small> (${p.autoUnits}회)</small></td><td class="o">${p.issueDone}</td><td class="t">${p.total}</td></tr>`;
+        return `<tr><td class="nm">${xEsc(x.name)}</td><td class="b">${p.basic}</td><td class="g">${p.auto}<small> (${p.autoUnits}회)</small></td><td class="o">${p.issueDone}</td><td class="t">${p.total}</td></tr>`;
       }).join('');
 
       const monthlyRows=monthly.map(x=>`<tr><td>${x.m}월</td><td class="b">${x.basic}</td><td class="g">${x.auto}</td><td class="o">${x.issue}</td><td class="t">${x.total}</td></tr>`).join('');
@@ -1709,7 +1740,7 @@
           <section class="opx-grid">
             <div class="opx-panel">
               <div class="opx-head"><div><h3>직원별 월별 실적</h3><p>${year}년 ${month}월 · 정규업무·근무편성 인정·업무지시·종합실적</p></div><span class="opx-chip">${workers.length}명</span></div>
-              <div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성 인정</th><th>업무지시</th><th>종합실적</th><th>달성률</th></tr></thead><tbody>${tableRows}</tbody></table></div>
+              <div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성 인정</th><th>업무지시</th><th>종합실적</th><th>달성률</th></tr></thead><tbody>${tableRows}</tbody></table></div>
             </div>
             <div class="opx-panel">
               <div class="opx-rule-title"><b>📘 실적 산정 기준</b><span>관리자 안내서</span></div>
@@ -1722,7 +1753,7 @@
             </div>
           </section>
 
-          <section class="opx-panel opx-table-panel opx-annual-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><span class="opx-chip">연간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>순번</th><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
+          <section class="opx-panel opx-table-panel opx-annual-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><span class="opx-chip">연간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
           <section class="opx-board">
             <div class="opx-board-head">
               <div><span class="opx-board-kicker">LIVE OPERATION BOARD</span><h3>운영게시판</h3><p>직원 업무·고객 접수·체육관 운영상태를 실제 현황 중심으로 확인합니다.</p></div>
@@ -1748,6 +1779,22 @@
                 <div class="opx-insight-card ${customerPending>0?'alert':'good'}"><span class="label">처리 우선순위</span><strong>${actionPending}</strong><small>${customerRate}% 완료 · 미조치 ${customerPending}건</small></div>
                 <div class="opx-insight-card info"><span class="label">오늘 인력 상태</span><strong>${actionStaff}</strong><small>근무편성 데이터를 기준으로 표시</small></div>
               </div>
+            </div>
+          </section>
+          <section class="opx-operation-detail">
+            <div class="opx-detail-head"><div><span>OPERATION DETAIL</span><h3>운영 세부지표</h3><p>선택기간과 오늘 현황을 분리해 병목·미조치·처리속도를 한눈에 확인합니다.</p></div><strong class="opx-service-pill ${serviceLevelClass}">${serviceLevel}</strong></div>
+            <div class="opx-detail-metrics">
+              <div class="opx-detail-metric blue"><span>오늘 접수</span><strong>${todayReceived}<small>건</small></strong><em>선택일 ${selectedDate}</em></div>
+              <div class="opx-detail-metric green"><span>오늘 조치완료</span><strong>${todayCompleted}<small>건</small></strong><em>당일 완료 처리</em></div>
+              <div class="opx-detail-metric red"><span>현재 미조치</span><strong>${customerPending}<small>건</small></strong><em>미배정 ${unassignedRows.length}건 포함</em></div>
+              <div class="opx-detail-metric violet"><span>평균 처리시간</span><strong>${formatDuration(avgMinutes)}</strong><em>완료된 접수 기준</em></div>
+              <div class="opx-detail-metric orange"><span>최장 미조치</span><strong>${formatDuration(oldestPendingMinutes)}</strong><em>${oldestPending?xEsc(oldestPending.place||'장소 미기록'):'미조치 없음'}</em></div>
+              <div class="opx-detail-metric teal"><span>담당자 지정</span><strong>${customerPending-unassignedRows.length}<small>건</small></strong><em>현재 미조치 중 담당자 지정</em></div>
+            </div>
+            <div class="opx-action-strip">
+              <div><b>현장 판단</b><span>${topPlace?xEsc(topPlace[0])+' 접수 집중도 '+topPlaceRate+'%':'접수 데이터 집계중'}</span></div>
+              <div><b>처리 판단</b><span>${customerPending?`미조치 ${customerPending}건 · ${formatDuration(oldestPendingMinutes)} 경과 건부터 확인`:'현재 미조치 없음'}</span></div>
+              <div><b>반복 확인</b><span>${topIssue?xEsc(topIssue[0])+' 유형 '+topIssue[1]+'건':'유형 데이터 없음'}</span></div>
             </div>
           </section>
         </section>
@@ -4623,7 +4670,25 @@
       new MutationObserver(removeStrayText).observe(document.documentElement,{childList:true,subtree:true});
     })();
     </script>
-    </body></html>
+    
+<script id="JGB_V4_STRAY_TEXT_GUARD">
+(function(){
+  function clean(){
+    try{
+      const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+      const rm=[]; let n;
+      while(n=w.nextNode()){ if(String(n.nodeValue||'').trim().toLowerCase()===('w'+'nwn')) rm.push(n); }
+      rm.forEach(x=>x.parentNode&&x.parentNode.removeChild(x));
+      document.querySelectorAll('*').forEach(el=>{
+        if(el.children.length===0 && String(el.textContent||'').trim().toLowerCase()===('w'+'nwn')) el.remove();
+      });
+    }catch(e){}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean);else clean();
+  new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+</body></html>
 
 
     <style id="JGB_EAM_DASHBOARD_FINAL_V2">
