@@ -1363,7 +1363,7 @@ html,body{max-width:100%;overflow-x:hidden!important}
 </style>
 
 <style id="EAM_TYPE_SCROLL_LOCK_V27">
-/* v27: 설비분류 가로 스크롤 위치가 렌더링 때 왼쪽으로 튀지 않도록 고정 */
+
 .eam-type-row{
   overflow-x:scroll!important;
   overflow-y:hidden!important;
@@ -1372,6 +1372,7 @@ html,body{max-width:100%;overflow-x:hidden!important}
   touch-action:pan-x!important;
 }
 </style>
+<style id="EAM_V31_CLEANUP">/* v31: 고객접수 삭제 오류 수정 및 불필요한 버전 주석 제거 */</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -2930,10 +2931,24 @@ html,body{max-width:100%;overflow-x:hidden!important}
     function xEsc(s){return String(s??'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
     async function addIssue(){const c=document.getElementById("content").value.trim(),p=document.getElementById("place").value,cat=document.getElementById("cat").value;if(!c||!p){alert("접수 장소와 접수사항을 입력하세요.");return}const btn=document.getElementById("intakeBtn");if(btn)btn.disabled=true;let photo_url="";try{const f=document.getElementById("photo")?.files?.[0];if(f){const path=`${Date.now()}_${f.name.replace(/[^\w가-힣.\-]/g,"_")}`;const up=await SUPA.storage.from("request-photos").upload(path,f,{upsert:false});if(up.error)throw up.error;photo_url=SUPABASE_URL+"/storage/v1/object/public/request-photos/"+path}const now=new Date().toISOString();const ins=await SUPA.from("requests").insert({category:cat,place:p,content:c,photo_url,status:"접수",received_at:now});if(ins.error)throw ins.error;alert("접수가 완료되었습니다.");document.getElementById("content").value="";if(document.getElementById("photo"))document.getElementById("photo").value="";await syncFromSupabase();go("process")}catch(e){console.error(e);alert("접수에 실패했습니다. Supabase 연결을 확인하세요.")}finally{if(btn)btn.disabled=false}}
     async function assign(id,wid){const x=db.issues.find(i=>i.id===id);if(!x||!wid)return;const w=workers.find(v=>v.id===wid);if(!w)return;const started=x.startedAt||new Date().toISOString();if(x.remoteId){const r=await SUPA.from("requests").update({handler_name:w.name,status:"조치중",started_at:started}).eq("id",x.remoteId);if(r.error){alert("담당 직원 저장에 실패했습니다.");return}}await syncFromSupabase()}
+    async function deleteProcessRequest(id){
+     if(!SUPA){alert("Supabase 연결이 필요합니다.");return}
+     const x=(db.issues||[]).find(v=>String(v.id)===String(id));
+     const remoteId=x?.remoteId || (String(id).startsWith("R") ? String(id).slice(1) : String(id));
+     if(!remoteId){alert("삭제할 접수 기록을 찾을 수 없습니다.");return}
+     if(!confirm("이 접수 기록을 삭제할까요?\n삭제 후 복구할 수 없습니다."))return;
+     const r=await SUPA.from("requests").delete().eq("id",remoteId);
+     if(r.error){console.error(r.error);alert("접수 삭제에 실패했습니다.\n"+(r.error.message||""));return}
+     await syncFromSupabase();
+     render();
+    }
+
     async function resetAllCustomerReceipts(){
      if(!SUPA){alert("Supabase 연결이 필요합니다.");return}
      if(!confirm("고객접수관리의 모든 접수기록을 전체 리셋할까요?\n\n현재 접수 중인 건과 최근 처리완료 기록이 모두 삭제됩니다.\n삭제한 기록은 복구할 수 없습니다."))return;
-     const r=await SUPA.from("requests").delete().neq("id","");
+     // UUID 컬럼에 빈 문자열을 비교하면 invalid input syntax for type uuid 오류가 발생하므로
+     // 유효한 UUID를 기준으로 전체 삭제 필터를 건다.
+     const r=await SUPA.from("requests").delete().neq("id","00000000-0000-0000-0000-000000000000");
      if(r.error){alert("전체 리셋에 실패했습니다.\n"+r.error.message);return}
      db.issues=(db.issues||[]).filter(x=>false);
      render();
