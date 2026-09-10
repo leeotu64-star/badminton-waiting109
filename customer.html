@@ -1,100 +1,151 @@
-    <!doctype html>
-    <html lang="ko">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>장군봉체육관 | 고객 접수</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-    *{box-sizing:border-box}
-    :root{--blue:#1267d6;--blue2:#2586f5;--navy:#102b4e;--line:#d9e3ef;--muted:#6b7b90}
-    body{margin:0;background:linear-gradient(180deg,#edf6ff 0,#f7faff 42%,#f4f7fb 100%);color:#13243a;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Malgun Gothic",sans-serif}
-    .wrap{width:100%;max-width:560px;margin:auto;padding:14px 12px 28px}
-    .card{overflow:hidden;background:#fff;border-radius:28px;box-shadow:0 14px 38px rgba(22,57,95,.12);border:1px solid rgba(214,226,240,.9)}
-    .header{position:relative;padding:27px 20px 28px;text-align:center;color:#fff;background:linear-gradient(135deg,#0c58b9 0%,#1477df 55%,#31a1f4 100%)}
-    .header:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-55px;top:-70px;background:rgba(255,255,255,.12)}
-    .header:before{content:"";position:absolute;width:110px;height:110px;border-radius:50%;left:-45px;bottom:-60px;background:rgba(255,255,255,.08)}
-    .header>*{position:relative;z-index:1}
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.16);font-size:12px;font-weight:800;letter-spacing:.2px;margin-bottom:10px}
-    .header h1{font-size:28px;line-height:1.15;margin:0 0 7px;font-weight:950;letter-spacing:-1px}.header p{margin:0;font-size:14px;font-weight:600;opacity:.9}
-    .body{padding:22px 17px 18px}.section-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}.title,.label{font-size:18px;font-weight:900;letter-spacing:-.3px}.step{font-size:12px;color:var(--blue);font-weight:900;background:#edf6ff;border-radius:999px;padding:6px 9px}
-    .locations{display:grid;grid-template-columns:1fr 1fr;gap:9px}.place{border:1px solid var(--line);background:#fff;border-radius:15px;padding:14px 8px;font-size:15px;font-weight:800;color:#31445b;min-height:55px;transition:.15s}.place:active{transform:scale(.98)}.place.selected{border:2px solid var(--blue);background:linear-gradient(135deg,#edf6ff,#e2f0ff);color:#075db8;box-shadow:0 5px 15px rgba(18,103,214,.12);padding:13px 7px}
-    .selected-info{display:none;margin-top:9px;padding:9px 12px;border-radius:11px;background:#f2f8ff;color:#2d5f95;font-size:13px;font-weight:700}.selected-info.show{display:block}
-    .label{display:block;margin:23px 0 10px}.textarea-wrap{position:relative}textarea{display:block;width:100%;min-height:145px;border:1px solid var(--line);border-radius:16px;padding:15px 14px 30px;font-size:16px;line-height:1.55;resize:vertical;outline:none;color:#172b43;background:#fbfdff}textarea::placeholder{color:#9aa8b8}textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(18,103,214,.09);background:#fff}.counter{position:absolute;right:12px;bottom:9px;color:#98a6b6;font-size:11px}
-    .submit{width:100%;border:0;border-radius:15px;background:linear-gradient(135deg,#1267d6,#2586f5);color:#fff;font-size:18px;font-weight:950;padding:17px;margin-top:15px;box-shadow:0 9px 20px rgba(18,103,214,.22)}.submit:disabled{opacity:.6;box-shadow:none}.note{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:12px 13px;border-radius:12px;background:#f4f7fb;color:#687a8f;font-size:12px;line-height:1.5}
-    .flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:18px 2px 2px}.flow-item{text-align:center;color:#74859a;font-size:11px;font-weight:700}.flow-icon{width:30px;height:30px;border-radius:50%;margin:0 auto 5px;background:#eaf3ff;color:var(--blue);font-size:15px;line-height:30px;font-weight:900}
-    .status{padding:30px 20px 25px;text-align:center}.status.done{padding-top:24px}.status-icon{width:78px;height:78px;border-radius:50%;margin:0 auto 18px;background:#eaf3ff;color:var(--blue);font-size:40px;font-weight:950;line-height:78px;box-shadow:0 10px 25px rgba(18,103,214,.13)}.status.done .status-icon{background:#dff7e9;color:#13a257;box-shadow:0 10px 25px rgba(19,162,87,.13)}.status h2{margin:0 0 12px;font-size:26px;letter-spacing:-.8px}.status p{margin:0;color:#65768a;line-height:1.7;font-size:15px}.status .place-name{display:inline-block;font-size:15px;font-weight:900;color:#1267d6;background:#edf6ff;border-radius:999px;padding:7px 12px;margin:4px 0 15px}.again{margin-top:22px}.muted{color:#8492a3;font-size:12px;margin-top:12px;line-height:1.5}
-    .done-title{font-size:29px!important;line-height:1.3;margin-bottom:16px!important}.done-title .green{color:#12a45a}.done-message{font-size:15px!important;color:#4f6074!important}.done-badge{display:inline-block;margin:20px 0 2px;padding:10px 18px;border-radius:999px;background:#e8f8ef;color:#109451;font-weight:950;font-size:16px}.thanks{margin-top:22px;padding-top:18px;border-top:1px solid #edf0f4;color:#64758a;font-size:14px;line-height:1.7;font-weight:700}
-    @media(max-width:380px){.header h1{font-size:25px}.body{padding:19px 14px 16px}.place{font-size:14px}.status h2{font-size:23px}}
-    </style>
-    </head>
-    <body><div class="wrap"><div class="card" id="app"></div></div>
-    <script>
-    const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
-    const SUPABASE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
-    const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-    const PLACES=["남자 샤워실","여자 샤워실","여자 화장실","남자 화장실","복도","기타"];
-    const ACTIVE_KEY="jgb_customer_active_request";
-    let selectedPlace="";
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>장군봉체육관 | 스마트폰 간편 접수</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Malgun Gothic",sans-serif}
+.wrap{width:100%;max-width:560px;margin:auto;padding:20px 15px 35px}
+.card{background:#fff;border-radius:22px;padding:24px 18px;box-shadow:0 8px 30px rgba(20,40,70,.09)}
+.header{text-align:center;margin-bottom:25px}
+.header h1{font-size:26px;margin:0 0 8px;font-weight:900}
+.header p{margin:0;color:#667085;font-size:15px}
+.title{font-size:18px;font-weight:800;margin:0 0 13px}
+.place-picker{position:relative}
+.place-select{width:100%;height:58px;border:1px solid #d6deea;background:#fff;border-radius:15px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:800;color:#344054;box-shadow:0 3px 12px rgba(20,40,70,.05);cursor:pointer}
+.place-select:focus{outline:none;border-color:#1671d9;box-shadow:0 0 0 4px rgba(22,113,217,.10)}
+.place-select.placeholder{color:#98a2b3}
+.place-arrow{font-size:18px;color:#667085;transition:transform .2s}
+.place-picker.open .place-arrow{transform:rotate(180deg)}
+.place-menu{display:none;position:absolute;z-index:20;left:0;right:0;top:66px;background:#fff;border:1px solid #d6deea;border-radius:15px;padding:7px;box-shadow:0 14px 35px rgba(20,40,70,.14);max-height:280px;overflow:auto}
+.place-picker.open .place-menu{display:block}
+.place{width:100%;border:0;background:#fff;border-radius:11px;padding:13px 14px;text-align:left;font-size:15px;font-weight:700;color:#344054;cursor:pointer}
+.place:hover{background:#f4f8fd}
+.place.selected{background:#edf6ff;color:#075db8}
+.place-check{float:right;font-weight:900;color:#1671d9}
+.label{display:block;font-size:17px;font-weight:800;margin:23px 0 10px}
+textarea{width:100%;min-height:145px;border:1px solid #d8dee9;border-radius:13px;padding:14px;font-size:16px;line-height:1.55;resize:vertical;outline:none}
+textarea:focus{border-color:#1671d9}
+.submit{width:100%;border:0;border-radius:13px;background:#1671d9;color:white;font-size:17px;font-weight:900;padding:16px;margin-top:15px}
+.submit:disabled{opacity:.55}
+.note{margin-top:12px;padding:12px;border-radius:10px;background:#f5f7fa;color:#667085;font-size:13px;line-height:1.5;text-align:center}
+.done{text-align:center;padding:35px 5px 20px}
+.check{width:62px;height:62px;border-radius:50%;margin:0 auto 17px;background:#e8f7ee;color:#149447;font-size:38px;font-weight:900;line-height:62px}
+.done h2{margin:0 0 9px;font-size:23px}
+.done p{margin:0;color:#667085;line-height:1.6;font-size:15px}
+.again{background:#eef2f7;color:#344054;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card" id="app"></div></div>
 
-    function saveActive(id){try{localStorage.setItem(ACTIVE_KEY,String(id))}catch(e){}}
-    function getActive(){try{return localStorage.getItem(ACTIVE_KEY)||""}catch(e){return ""}}
-    function clearActive(){try{localStorage.removeItem(ACTIVE_KEY)}catch(e){}}
-    function esc(v){return String(v??"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]))}
+<script>
+const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
+const SUPABASE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-    function showForm(){
-     selectedPlace="";
-     document.getElementById("app").innerHTML=`
-     <div class="header"><div class="badge">🏟️ 장군봉체육관 · 시설관리</div><h1>장군봉체육관</h1><p>고객님이 바로 신고하고 확인하는 간편 접수</p></div>
-     <div class="body">
-       <div class="section-head"><div class="title">시설 이상 신고</div><div class="step">1 장소 선택</div></div>
-       <div class="locations">${PLACES.map(p=>`<button class="place" type="button" data-place="${p}">${p}</button>`).join("")}</div>
-       <div id="selectedInfo" class="selected-info"></div>
-       <label class="label" for="issue">이상 내용을 입력해 주세요</label>
-       <div class="textarea-wrap"><textarea id="issue" maxlength="200" placeholder="예: 샤워기에서 물이 새고 있습니다."></textarea><div class="counter"><span id="count">0</span>/200</div></div>
-       <button class="submit" id="submit" type="button">접수하기</button>
-       <div class="note">💡 접수 후 화면을 나가셔도 됩니다. 다시 QR을 찍으면 처리상태를 확인할 수 있습니다.</div>
-       <div class="flow"><div class="flow-item"><div class="flow-icon">✓</div>간편 접수</div><div class="flow-item"><div class="flow-icon">👤</div>담당직원 확인</div><div class="flow-item"><div class="flow-icon">🔧</div>조치 완료</div></div>
-     </div>`;
-     document.querySelectorAll(".place").forEach(btn=>btn.addEventListener("click",()=>{selectedPlace=btn.dataset.place;document.querySelectorAll(".place").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");const info=document.getElementById("selectedInfo");info.textContent="선택한 장소 · "+selectedPlace;info.classList.add("show")}));
-     document.getElementById("issue").addEventListener("input",e=>document.getElementById("count").textContent=e.target.value.length);
-     document.getElementById("submit").addEventListener("click",submitIssue);
+const PLACES=["남자 샤워실","여자 샤워실","여자 화장실","남자 화장실","복도","코트","휴게실","기타"];
+let selectedPlace="";
+
+function showForm(){
+  selectedPlace="";
+  document.getElementById("app").innerHTML=`
+    <div class="header">
+      <h1>장군봉체육관</h1>
+      <p>스마트폰 간편 접수</p>
+    </div>
+
+    <div class="title">시설 이상 신고</div>
+    <div class="place-picker" id="placePicker">
+      <button class="place-select placeholder" id="placeSelect" type="button" aria-expanded="false">
+        <span id="placeText">발생 장소를 선택해 주세요</span><span class="place-arrow">⌄</span>
+      </button>
+      <div class="place-menu" id="placeMenu">
+        ${PLACES.map(p=>`<button class="place" type="button" data-place="${p}">${p}<span class="place-check" hidden>✓</span></button>`).join("")}
+      </div>
+    </div>
+
+    <label class="label" for="issue">이상 내용을 입력해 주세요</label>
+    <textarea id="issue" placeholder="예: 샤워기에서 물이 새고 있습니다."></textarea>
+
+    <button class="submit" id="submit" type="button">접수하기</button>
+    <div class="note">접수된 내용은 관리자 작업관리에서 확인 후 조치합니다.</div>
+  `;
+
+  const picker=document.getElementById("placePicker");
+  const selectBtn=document.getElementById("placeSelect");
+  const placeText=document.getElementById("placeText");
+  selectBtn.addEventListener("click",()=>{
+    const open=picker.classList.toggle("open");
+    selectBtn.setAttribute("aria-expanded",open);
+  });
+  document.querySelectorAll(".place").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      selectedPlace=btn.dataset.place;
+      placeText.textContent=selectedPlace;
+      selectBtn.classList.remove("placeholder");
+      document.querySelectorAll(".place").forEach(b=>{
+        b.classList.remove("selected");
+        b.querySelector(".place-check").hidden=true;
+      });
+      btn.classList.add("selected");
+      btn.querySelector(".place-check").hidden=false;
+      picker.classList.remove("open");
+      selectBtn.setAttribute("aria-expanded","false");
+    });
+  });
+  document.addEventListener("click",e=>{
+    if(!picker.contains(e.target)){
+      picker.classList.remove("open");
+      selectBtn.setAttribute("aria-expanded","false");
     }
+  });
+  document.getElementById("submit").addEventListener("click",submitIssue);
+}
 
-    async function submitIssue(){
-     const existing=getActive();
-     if(existing){ await checkStatus(); return; }
-     const btn=document.getElementById("submit"),content=document.getElementById("issue").value.trim();
-     if(!selectedPlace){alert("발생 장소를 선택해 주세요.");return} if(!content){alert("이상 내용을 입력해 주세요.");return}
-     btn.disabled=true;btn.textContent="접수 중...";
-     const {data,error}=await supabaseClient.from("requests").insert([{category:"시설",place:selectedPlace,content,status:"접수",received_at:new Date().toISOString()}]).select("id").single();
-     if(error){console.error(error);alert("접수에 실패했습니다. 잠시 후 다시 시도해 주세요.");btn.disabled=false;btn.textContent="접수하기";return}
-     if(data?.id)saveActive(data.id);
-     showStatus({place:selectedPlace,status:"접수"});
-    }
+async function submitIssue(){
+  const btn=document.getElementById("submit");
+  const content=document.getElementById("issue").value.trim();
 
-    function showStatus(x){
-     const done=x.status==="완료";
-     document.getElementById("app").innerHTML=`<div class="status ${done?"done":""}">
-       <div class="status-icon">${done?"✓":"…"}</div>
-       ${done?`<h2 class="done-title">시설 불편사항<br><span class="green">조치완료</span></h2><p class="done-message">고객님께서 접수하신<br>불편사항의 조치가 완료되었습니다.</p><div class="done-badge">🟢 조치완료</div><div class="thanks">소중한 의견 감사합니다.<br>더 쾌적한 체육관을 만들겠습니다.</div>`:`<h2>현재 처리 중입니다.</h2><div class="place-name">${esc(x.place||"접수하신 시설")}</div><p>접수하신 내용은 관리자에게 전달되었습니다.<br>처리가 완료되면 다시 QR을 찍어 확인해 주세요.</p><button class="submit again" type="button" onclick="checkStatus()">처리상태 확인</button><div class="muted">현재 접수 건을 확인하는 화면입니다.</div>`}
-     </div>`;
-     if(done){setTimeout(()=>{clearActive();showForm()},1800)}
-    }
+  if(!selectedPlace){alert("발생 장소를 선택해 주세요.");return}
+  if(!content){alert("이상 내용을 입력해 주세요.");return}
 
-    async function checkStatus(){
-     const id=getActive();
-     if(!id){showForm();return}
-     const {data,error}=await supabaseClient.from("requests").select("id,place,status,content").eq("id",id).maybeSingle();
-     if(error){console.error(error);alert("상태 확인에 실패했습니다. 잠시 후 다시 시도해 주세요.");return}
-     if(!data){clearActive();showForm();return}
-     showStatus(data);
-    }
+  btn.disabled=true;
+  btn.textContent="접수 중...";
 
-    async function init(){
-     const id=getActive();
-     if(!id){showForm();return}
-     await checkStatus();
-    }
-    init();
-    </script></body></html>
+  const {error}=await supabaseClient.from("requests").insert([{
+    category:"시설",
+    place:selectedPlace,
+    content:content,
+    status:"접수",
+    received_at:new Date().toISOString()
+  }]);
+
+  if(error){
+    console.error(error);
+    alert("접수에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    btn.disabled=false;
+    btn.textContent="접수하기";
+    return;
+  }
+  showDone();
+}
+
+function showDone(){
+  document.getElementById("app").innerHTML=`
+    <div class="done">
+      <div class="check">✓</div>
+      <h2>접수가 완료되었습니다.</h2>
+      <p>시설 이상 신고가 관리자에게 전달되었습니다.<br>확인 후 조치하겠습니다.</p>
+      <button class="submit again" type="button" onclick="showForm()">추가 접수하기</button>
+    </div>
+  `;
+}
+
+showForm();
+</script>
+</body>
+</html>
