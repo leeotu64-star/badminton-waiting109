@@ -2040,10 +2040,10 @@ html,body{max-width:100%;overflow-x:hidden!important}
             <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:14px">
               <div class="opx-board-panel">
                 <div class="opx-board-panel-head"><b>🚨 지금 우선 확인할 고객 접수</b><span>위험도 자동순위</span></div>
-                <div style="overflow:auto">
-                  <table style="width:100%;border-collapse:collapse;font-size:13px">
+                <div class="qr-priority-scroll-v6">
+                  <table class="qr-priority-table-v6" style="width:100%;border-collapse:collapse;font-size:13px">
                     <thead><tr><th style="padding:10px;text-align:left">등급</th><th style="padding:10px;text-align:left">장소</th><th style="padding:10px;text-align:left">문제</th><th style="padding:10px;text-align:left">원인 신호</th><th style="padding:10px;text-align:left">처리 판단</th></tr></thead>
-                    <tbody>${qrRiskRows.slice(0,8).map(r=>`<tr><td style="padding:10px;border-top:1px solid #edf1f5"><b style="padding:5px 8px;border-radius:999px;background:${r.risk.key==='urgent'?'#fee2e2':r.risk.key==='warn'?'#fff4d6':'#edf7f1'};color:${r.risk.key==='urgent'?'#b42318':r.risk.key==='warn'?'#9a6700':'#237a52'}">${xEsc(r.risk.label)}</b></td><td style="padding:10px;border-top:1px solid #edf1f5"><b>${xEsc(r.place)}</b></td><td style="padding:10px;border-top:1px solid #edf1f5">${xEsc(r.issue)}<small style="display:block;color:#64748b">${xEsc(r.problem)}</small></td><td style="padding:10px;border-top:1px solid #edf1f5">${xEsc(r.risk.check)}</td><td style="padding:10px;border-top:1px solid #edf1f5">${xEsc(r.risk.action)}</td></tr>`).join('')||`<tr><td colspan="5" style="padding:22px;text-align:center;color:#64748b">선택기간 고객 QR 접수 데이터가 없습니다.</td></tr>`}</tbody>
+                    <tbody>${qrRiskRows.map(r=>`<tr><td style="padding:10px;border-top:1px solid #edf1f5"><b style="padding:5px 8px;border-radius:999px;background:${r.risk.key==='urgent'?'#fee2e2':r.risk.key==='warn'?'#fff4d6':'#edf7f1'};color:${r.risk.key==='urgent'?'#b42318':r.risk.key==='warn'?'#9a6700':'#237a52'}">${xEsc(r.risk.label)}</b></td><td style="padding:10px;border-top:1px solid #edf1f5"><b>${xEsc(r.place)}</b></td><td style="padding:10px;border-top:1px solid #edf1f5">${xEsc(r.issue)}<small style="display:block;color:#64748b">${xEsc(r.problem)}</small></td><td style="padding:10px;border-top:1px solid #edf1f5">${xEsc(r.risk.check)}</td><td style="padding:10px;border-top:1px solid #edf1f5">${xEsc(r.risk.action)}</td></tr>`).join('')||`<tr><td colspan="5" style="padding:22px;text-align:center;color:#64748b">선택기간 고객 QR 접수 데이터가 없습니다.</td></tr>`}</tbody>
                   </table>
                 </div>
               </div>
@@ -5335,6 +5335,14 @@ html,body{max-width:100%;overflow-x:hidden!important}
      .jgb-history-box .jgb-work-photos{justify-content:flex-start!important;overflow-x:auto!important}
     }
     
+/* V6: 우선 확인 고객 접수는 3건만 노출하고 나머지는 내부 세로 스크롤 */
+.qr-priority-scroll-v6{height:214px;max-height:214px;overflow-y:auto;overflow-x:hidden;border-bottom:1px solid #edf1f5}
+.qr-priority-table-v6{table-layout:fixed}
+.qr-priority-table-v6 thead th{position:sticky;top:0;z-index:2;background:#eaf2f8;box-shadow:0 1px 0 #d5e1eb}
+.qr-priority-table-v6 tbody tr{height:57px}
+.qr-priority-table-v6 tbody td{height:57px;box-sizing:border-box;vertical-align:middle;line-height:1.35}
+@media(max-width:720px){.qr-priority-scroll-v6{height:214px;max-height:214px}.qr-priority-table-v6{min-width:720px}}
+
 /* V13: 고객 접수 상단 중복 KPI 제거. QR 인텔리전스 KPI를 바로 노출 */
 .opx-customer-panel>.qr-intel-wrap{margin-top:0!important}
 
