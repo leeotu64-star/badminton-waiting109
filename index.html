@@ -2030,11 +2030,11 @@ html,body{max-width:100%;overflow-x:hidden!important}
               <div class="opx-board-clock"><b>${year}.${month}.${String(selectedDate).slice(8,10)}</b><span>고객접수 기반 실시간 분석</span></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0">
-              <div style="padding:18px;border:1px solid #dbe4ee;border-radius:14px;background:#fff"><small style="color:#64748b;font-weight:800">전체 위험점수</small><div style="font-size:30px;font-weight:950;margin-top:6px">${qrRiskScore}<span style="font-size:14px;color:#64748b"> / 100</span></div><b style="display:inline-block;margin-top:7px;padding:5px 9px;border-radius:999px;background:#f1f5f9">${qrOverall}</b></div>
-              <div style="padding:18px;border:1px solid #dbe4ee;border-radius:14px;background:#fff"><small style="color:#64748b;font-weight:800">긴급</small><div style="font-size:30px;font-weight:950;color:#c62828;margin-top:6px">${qrRiskSummary.urgent}건</div><span style="font-size:12px;color:#64748b">안전·고위험 우선 확인</span></div>
-              <div style="padding:18px;border:1px solid #dbe4ee;border-radius:14px;background:#fff"><small style="color:#64748b;font-weight:800">주의</small><div style="font-size:30px;font-weight:950;color:#b26a00;margin-top:6px">${qrRiskSummary.warn}건</div><span style="font-size:12px;color:#64748b">반복·최근 발생 포함</span></div>
-              <div style="padding:18px;border:1px solid #dbe4ee;border-radius:14px;background:#fff"><small style="color:#64748b;font-weight:800">현재 미조치</small><div style="font-size:30px;font-weight:950;color:${customerPending?'#c62828':'#237a52'};margin-top:6px">${customerPending}건</div><span style="font-size:12px;color:#64748b">담당 미지정 ${unassignedRows.length}건</span></div>
+            <div class="qrx-management-summary-v9">
+              <div class="qrx-mgmt-card blue"><div class="qrx-mgmt-label">접수</div><div class="qrx-mgmt-value">${customerReceived}<span>건</span></div><div class="qrx-mgmt-sub">선택기간 고객 QR 접수</div></div>
+              <div class="qrx-mgmt-card green"><div class="qrx-mgmt-label">조치완료</div><div class="qrx-mgmt-value">${customerCompleted}<span>건</span></div><div class="qrx-mgmt-sub">처리율 ${customerRate}%</div></div>
+              <div class="qrx-mgmt-card orange"><div class="qrx-mgmt-label">미조치</div><div class="qrx-mgmt-value">${customerPending}<span>건</span></div><div class="qrx-mgmt-sub">담당 미지정 ${unassignedRows.length}건</div></div>
+              <div class="qrx-mgmt-card status"><div class="qrx-mgmt-label">관리 점수</div><div class="qrx-mgmt-value">${qrRiskScore}<span>/100</span></div><div class="qrx-mgmt-status">${xEsc(qrOverall)}</div><div class="qrx-mgmt-sub">접수·완료·미조치·위험도 종합</div></div>
             </div>
 
             <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:14px">
@@ -2057,6 +2057,13 @@ html,body{max-width:100%;overflow-x:hidden!important}
             </div>
 
             <style>
+              .qrx-management-summary-v9{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
+              .qrx-mgmt-card{min-height:126px;padding:18px 20px;border:1px solid #dbe4ee;border-radius:16px;background:#fff;box-sizing:border-box;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(15,23,42,.05)}
+              .qrx-mgmt-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#2563eb}.qrx-mgmt-card.green:before{background:#16a34a}.qrx-mgmt-card.orange:before{background:#f59e0b}.qrx-mgmt-card.status:before{background:#16a34a}
+              .qrx-mgmt-label{font-size:14px;font-weight:850;color:#64748b}.qrx-mgmt-value{font-size:32px;line-height:1.1;font-weight:950;color:#0f2747;margin-top:9px}.qrx-mgmt-value span{font-size:15px;font-weight:800;color:#64748b;margin-left:3px}
+              .qrx-mgmt-card.green .qrx-mgmt-value{color:#16804b}.qrx-mgmt-card.orange .qrx-mgmt-value{color:#b66b00}.qrx-mgmt-card.status .qrx-mgmt-value{color:#237a52}.qrx-mgmt-status{display:inline-block;margin-top:7px;padding:5px 10px;border-radius:999px;background:#eaf7ef;color:#237a52;font-size:13px;font-weight:900}.qrx-mgmt-sub{margin-top:7px;font-size:12px;color:#64748b;font-weight:650}
+              @media(max-width:900px){.qrx-management-summary-v9{grid-template-columns:repeat(2,minmax(0,1fr))}}
+              @media(max-width:560px){.qrx-management-summary-v9{grid-template-columns:1fr}}
               .qrx-v8-wrap{margin-top:14px;display:grid;gap:14px}
               .qrx-v8-hero{display:grid;grid-template-columns:1.55fr .75fr;gap:14px}
               .qrx-v8-panel{border:1px solid #dbe5f0;border-radius:15px;background:#fff;box-shadow:0 5px 18px rgba(31,64,104,.07);overflow:hidden}
