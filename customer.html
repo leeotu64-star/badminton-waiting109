@@ -19,6 +19,17 @@ const ACTIVE_KEY="jgb_customer_active_request";
 let selectedPlace="";
 
 function saveActive(id){try{localStorage.setItem(ACTIVE_KEY,String(id))}catch(e){}}
+function autoResetIfCompleted(){
+ const id=getActive();
+ if(!id) return;
+ supabaseClient.from("requests").select("id,status").eq("id",id).maybeSingle().then(({data})=>{
+   if(data && data.status==="완료"){
+     clearActive();
+     showForm();
+   }
+ });
+}
+
 function getActive(){try{return localStorage.getItem(ACTIVE_KEY)||""}catch(e){return ""}}
 function clearActive(){try{localStorage.removeItem(ACTIVE_KEY)}catch(e){}}
 function esc(v){return String(v??"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]))}
@@ -54,12 +65,7 @@ async function checkStatus(){
  showStatus(data);
 }
 
-function confirmComplete(){
- // 고객 화면에서만 기존 접수를 종료합니다.
- // 관리자 DB의 "완료" 기록은 그대로 남겨 1개월 보관합니다.
- clearActive();
- showForm();
-}
+function confirmComplete(){ clearActive(); showForm(); }
 
 async function init(){
  const id=getActive();
@@ -68,3 +74,7 @@ async function init(){
 }
 init();
 </script></body></html>
+
+<script>
+window.addEventListener("load",()=>{try{autoResetIfCompleted()}catch(e){console.error(e)}});
+</script>
