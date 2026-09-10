@@ -54,12 +54,9 @@ async function checkStatus(){
  showStatus(data);
 }
 
-async function confirmComplete(){
- const id=getActive();
- if(id){
-   const {error}=await supabaseClient.from("requests").update({status:"확인완료"}).eq("id",id).eq("status","완료");
-   if(error)console.error(error);
- }
+function confirmComplete(){
+ // 고객 화면에서만 기존 접수를 종료합니다.
+ // 관리자 DB의 "완료" 기록은 그대로 남겨 1개월 보관합니다.
  clearActive();
  showForm();
 }
