@@ -1078,7 +1078,7 @@ function render(){
  const app=document.getElementById("app");
  if(!app)return;
  try{
- app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","🛠 작업관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}${nav("leakage","💧 누수관리")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v24</span></h1><small>신고 접수 → 작업관리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+ app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관<br>관리시스템</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}${nav("leakage","💧 누수관리")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("settings","⚙ 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v24</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
  }catch(err){
    console.error("화면 렌더링 오류",err);
    app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
@@ -1612,9 +1612,10 @@ function withActionMarker(content,type){const base=String(content||'').replace(/
 function withWorkMarkers(content,type,note){let base=cleanReporterContent(String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim());if(type)base+=' [[처리구분:'+type+']]';if(note)base+=' [[조치내용:'+String(note).replace(/\]\]/g,'')+']]';return base}
 function actionTypeFromIssue(x){if(x&&ACTION_TYPES.includes(x.actionType))return x.actionType;const m=String(x?.content||'').match(/\[\[처리구분:(자체조치|외부용역)\]\]/);return m?m[1]:''}
 function processPage(){
- const all=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
- const pending=all.filter(x=>x.status!=='완료');
- const completed=all.filter(x=>x.status==='완료');
+ const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+ const all=stored.filter(x=>x.status!=='완료');
+ const pending=all;
+ const completed=stored.filter(x=>x.status==='완료');
  const waiting=pending.filter(x=>!x.handlerId).length;
  const running=pending.filter(x=>x.handlerId).length;
  const done=completed.length;
@@ -1648,7 +1649,7 @@ function processPage(){
  </style>
  <div class="work-v3">
   <div class="wv-hero">
-   <div><div class="wv-eyebrow">STAFF PERFORMANCE · WORK CONTROL</div><h2 class="wv-title">직원 작업관리</h2><p class="wv-sub">QR 접수부터 담당 지정 · 조치 기록 · 완료까지, 직원의 실제 작업을 한 화면에서 관리합니다.</p></div>
+   <div><div class="wv-eyebrow">CUSTOMER INTAKE · WORK CONTROL</div><h2 class="wv-title">고객접수관리</h2><p class="wv-sub">고객 QR 접수부터 담당 지정 · 조치 기록 · 완료까지 접수된 민원을 한 곳에서 관리합니다.</p></div>
    <div class="wv-live"><span class="wv-pill"><i class="wv-dot"></i> 실시간 접수</span><span class="wv-pill">오늘 <b>${today}건</b></span><button class="wv-refresh" onclick="syncFromSupabase()">↻ 새로고침</button></div>
   </div>
   <div class="wv-kpis">
@@ -1683,7 +1684,7 @@ function processPage(){
     <div class="wv-panel"><div class="wv-panel-head">📊 처리 상태</div><div class="wv-panel-body"><div class="wv-ratio">${statusRows.map(r=>`<div class="wv-rline"><span>${r[0]}</span><i><b style="width:${Math.round(r[1]/statusTotal*100)}%;background:${r[2]}"></b></i><b>${r[1]}</b></div>`).join('')}</div><div class="wv-total">현재 총 <b>${all.length}건</b>을 기준으로 자동 집계됩니다.</div></div></div>
    </div>
   </div>
-  <div class="wv-section"><div class="wv-section-head"><div><h3>최근 처리완료</h3><p>완료된 작업은 직원 작업 실적 집계의 기준이 됩니다.</p></div><span class="wv-count">완료 ${completed.length}건</span></div><div class="wv-completed">${completed.slice(0,12).map(x=>{const note=noteFor(x)||cleanWorkContent(x);return `<div class="wv-done-card"><div class="wv-done-top"><strong>${xEsc(x.category||'기타')} · ${xEsc(x.place||'-')}</strong><span class="wv-state done">완료</span></div><div class="wv-done-text">${xEsc(note||'조치내용 미기록')}</div><div class="wv-done-meta"><span>${xEsc(x.handlerName||'담당 미기록')}</span><span>완료 ${time(x.completedAt||x.createdAt)}</span></div></div>`}).join('')||'<div class="wv-empty">완료된 작업이 없습니다.</div>'}</div></div>
+
  </div>`;
 }
 async function deleteProcessRequest(id){
@@ -1707,6 +1708,19 @@ async function deleteAllProcessRequests(){
  if(r.error){console.error(r.error);alert('전체 삭제에 실패했습니다.\n'+(r.error.message||''));return}
  db.issues=[];
  save();
+ render();
+}
+async function deleteAllCompletedProcessRequests(){
+ const list=(db.issues||[]).filter(x=>x.status==='완료' && x.remoteId);
+ if(!list.length){alert('삭제할 처리완료 건이 없습니다.');return}
+ if(!confirm(`최근 처리완료 ${list.length}건을 전체 삭제할까요?\n\n삭제하면 완료 기록도 함께 삭제되며 복구할 수 없습니다.`))return;
+ if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+ const ids=list.map(x=>x.remoteId);
+ const r=await SUPA.from('requests').delete().in('id',ids);
+ if(r.error){console.error(r.error);alert('처리완료 전체 삭제에 실패했습니다.\n'+(r.error.message||''));return}
+ db.issues=(db.issues||[]).filter(x=>x.status!=='완료' || !x.remoteId || !ids.includes(x.remoteId));
+ save();
+ await syncFromSupabase();
  render();
 }
 function selectProcessType(id,type){const el=document.getElementById('action_'+id);if(el)el.value=type;document.querySelectorAll('[onclick^="selectProcessType(\''+id+'\'"]').forEach(b=>{b.classList.remove('on','self','out');if((b.textContent||'').trim()===type)b.classList.add('on',type==='자체조치'?'self':'out')});}
