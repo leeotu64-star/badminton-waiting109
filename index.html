@@ -2517,14 +2517,17 @@ html::before,body::before{
     const sub=v==='floor'?'실제 체육관 평면도 위에서 코트·공간·EAM 자산 위치를 확인합니다.':v==='toilet'?'화장실 상세도에서 위생설비 위치를 확인합니다.':'코트장 조명·전등릴의 실제 교체 이력을 연결합니다.';
     const statusClass=s.status==='주의'?'warn':s.status==='점검필요'?'bad':'';
     const hist=[['2025.09.10','막힘','완료'],['2025.08.21','누수','완료'],['2025.07.15','막힘','완료'],['2025.05.03','센서불량','완료']];
-    const floorHotspots=[
-      ...rooms.map(r=>`<button class="dt-hot ${r.cls} ${r.name.length>6?'room':''}" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}">${esc(r.code||r.name)}</button>`),
+    const lightingHotspots=[
       {name:'코트 조명 L-01',place:'1층 1코트 상부',status:'정상',code:'L-01',category:'조명',cls:'light',x:43,y:28},
       {name:'코트 조명 L-02',place:'1층 2코트 상부',status:'정상',code:'L-02',category:'조명',cls:'light',x:58,y:28},
       {name:'코트 조명 L-03',place:'1층 3코트 상부',status:'정상',code:'L-03',category:'조명',cls:'light',x:43,y:67},
       {name:'코트 조명 L-04',place:'1층 4코트 상부',status:'정상',code:'L-04',category:'조명',cls:'light',x:58,y:67},
       {name:'코트 조명 L-05',place:'1층 중앙 상부',status:'정상',code:'L-05',category:'조명',cls:'light',x:50,y:47}
-    ].map(r=>`<button class="dt-hot ${r.cls} ${r.name.length>6?'room':''}" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}">${esc(r.code)}</button>`).join('');
+    ];
+    const floorHotspots=[
+      ...rooms.map(r=>`<button class="dt-hot ${r.cls} ${String(r.name||'').length>6?'room':''}" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}">${esc(r.code||r.name)}</button>`),
+      ...lightingHotspots.map(r=>`<button class="dt-hot ${r.cls} ${String(r.name||'').length>6?'room':''}" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}">${esc(r.code||r.name)}</button>`)
+    ].join('');
     const lightingMini=`<div class="dt-mini-card"><div class="dt-mini-title"><b>조명·전등릴 교체 이력</b><span>코트장 조명 관리</span></div><img src="${DT.lighting}" alt="장군봉체육관 조명등 및 전등릴 교체 이력"><button onclick="dtView('lighting')">전체 이력 보기 →</button></div>`;
     return `<div class="dt-v43 dt-v43-new">
       <div class="dt-v43-head"><div><div class="dt-v43-kicker">DIGITAL TWIN · JANGGUNBONG</div><div class="dt-v43-title">장군봉체육관 디지털트윈</div><div class="dt-v43-sub">실제 평면도를 중심으로 공간 · 조명 · 위생설비 · EAM 위치를 연결합니다.</div></div><div class="dt-v43-actions"><button class="dt-v43-btn" onclick="go('eam')">EAM 자산관리</button><button class="dt-v43-btn primary" onclick="go('process')">QR 접수관리</button></div></div>
