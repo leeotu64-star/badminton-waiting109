@@ -1945,8 +1945,15 @@ html,body{max-width:100%;overflow-x:hidden!important}
       }).sort((a,b)=>b.score-a.score);
       const qrRiskSummary={urgent:qrInsightRows.filter(r=>r.cls==='urgent').length,warn:qrInsightRows.filter(r=>r.cls==='warn').length,normal:qrInsightRows.filter(r=>r.cls==='normal').length};
       const qrRiskScore=customerReceived?Math.round(qrInsightRows.reduce((a,b)=>a+b.score,0)/qrInsightRows.length):0;
-      const qrOverall=qrRiskScore>=70?'위험 관리 단계':qrRiskScore>=40?'주의 관리 단계':'안정 관리 단계';
-      const qrOverallCls=qrRiskScore>=70?'urgent':qrRiskScore>=40?'warn':'normal';
+      /* V12: 관리 점수는 '위험 점수'가 아니라 실제 관리 상태를 직관적으로 보여주는 점수.
+         처리율 50% + 미조치 없는 상태 20% + 위험도 안정성 30%를 반영하며 높을수록 관리가 잘 된 상태. */
+      const qrCompletionScore=customerReceived?Math.round(customerRate*0.5):0;
+      const qrPendingScore=customerReceived?Math.round((customerPending===0?100:Math.max(0,100-Math.round(customerPending/customerReceived*100)))*0.2):0;
+      const qrStabilityRate=customerReceived?Math.round(((qrNormal||0)+(qrWarn||0)*0.35)/customerReceived*100):0;
+      const qrStabilityScore=customerReceived?Math.round(qrStabilityRate*0.3):0;
+      const qrManagementScore=customerReceived?Math.min(100,Math.max(0,qrCompletionScore+qrPendingScore+qrStabilityScore)):0;
+      const qrOverall=qrManagementScore>=80?'안정적 관리':qrManagementScore>=60?'주의 관리':'집중 관리';
+      const qrOverallCls=qrManagementScore>=80?'normal':qrManagementScore>=60?'warn':'urgent';
       const qrPlaceInsightMap={};
       qrInsightRows.forEach(r=>{const o=qrPlaceInsightMap[r.place]||{place:r.place,total:0,score:0,urgent:0,warn:0,pending:0,issues:{},latest:0};o.total++;o.score=Math.max(o.score,r.score);if(r.cls==='urgent')o.urgent++;if(r.cls==='warn')o.warn++;if(r.x?.status!=='완료')o.pending++;o.issues[r.problem]=(o.issues[r.problem]||0)+1;const t=new Date(r.x?.createdAt||'').getTime();if(Number.isFinite(t))o.latest=Math.max(o.latest,t);qrPlaceInsightMap[r.place]=o;});
       const qrPlaceInsights=Object.values(qrPlaceInsightMap).map(o=>{const top=Object.entries(o.issues).sort((a,b)=>b[1]-a[1])[0];const days=o.latest?Math.floor((Date.now()-o.latest)/86400000):9999;return {...o,topIssue:top?top[0]:'자료 없음',recency:days};}).sort((a,b)=>b.score-a.score||b.total-a.total);
@@ -2034,7 +2041,7 @@ html,body{max-width:100%;overflow-x:hidden!important}
               <div class="qrx-mgmt-card blue"><div class="qrx-mgmt-label">접수</div><div class="qrx-mgmt-value">${customerReceived}<span>건</span></div><div class="qrx-mgmt-sub">선택기간 고객 QR 접수</div></div>
               <div class="qrx-mgmt-card green"><div class="qrx-mgmt-label">조치완료</div><div class="qrx-mgmt-value">${customerCompleted}<span>건</span></div><div class="qrx-mgmt-sub">처리율 ${customerRate}%</div></div>
               <div class="qrx-mgmt-card orange"><div class="qrx-mgmt-label">미조치</div><div class="qrx-mgmt-value">${customerPending}<span>건</span></div><div class="qrx-mgmt-sub">담당 미지정 ${unassignedRows.length}건</div></div>
-              <div class="qrx-mgmt-card status"><div class="qrx-mgmt-label">관리 점수</div><div class="qrx-mgmt-value">${qrRiskScore}<span>/100</span></div><div class="qrx-mgmt-status">${xEsc(qrOverall)}</div><div class="qrx-mgmt-sub">접수·완료·미조치·위험도 종합</div></div>
+              <div class="qrx-mgmt-card status"><div class="qrx-mgmt-label">관리 점수</div><div class="qrx-mgmt-value">${qrManagementScore}<span>/100</span></div><div class="qrx-mgmt-status">${xEsc(qrOverall)}</div><div class="qrx-mgmt-sub">처리율 50% · 미조치 20% · 위험도 안정성 30%</div></div>
             </div>
 
             <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:14px">
