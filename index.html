@@ -2558,13 +2558,13 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     const statusClass=s.status==='주의'?'warn':s.status==='점검필요'?'bad':'';
     const hist=[['2025.09.10','막힘','완료'],['2025.08.21','누수','완료'],['2025.07.15','막힘','완료'],['2025.05.03','센서불량','완료']];
     const lightingHotspots=[];
-    const floorHotspots=rooms.filter(r=>r.view!=='toilet').map(r=>`<button class="dt-hot room" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.name.replace('관리사무실','사무실').replace('휴게실','휴게').replace('창고','2F 창고'))}</span></button>`).join('');
-    const toiletHotspots=rooms.filter(r=>r.view==='toilet').map(r=>`<button class="dt-hot room" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.name.replace('남자 ','남 ').replace('여자 ','여 '))}</span></button>`).join('')+
+    const floorHotspots='<div class="dt-hot-layer floor">'+rooms.filter(r=>r.view!=='toilet').map(r=>`<button class="dt-hot room" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.name.replace('관리사무실','사무실').replace('휴게실','휴게').replace('창고','2F 창고'))}</span></button>`).join('')+'</div>';
+    const toiletHotspots='<div class="dt-hot-layer toilet">'+rooms.filter(r=>r.view==='toilet').map(r=>`<button class="dt-hot room" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.name.replace('남자 ','남 ').replace('여자 ','여 '))}</span></button>`).join('')+
       [
         {name:'남자소변기 수리',place:'남자 화장실',status:'정상',code:'SA-01',category:'위생설비',cls:'asset',x:26,y:42,icon:'SA'},
         {name:'샤워실 하부판',place:'남녀 샤워실',status:'정상',code:'OT-05',category:'기타',cls:'asset',x:18,y:18,icon:'OT'},
         {name:'흰지',place:'샤워실/주출입문',status:'정상',code:'DR-01',category:'문·창호설비',cls:'asset',x:67,y:50,icon:'DR'}
-      ].map(r=>`<button class="dt-hot asset" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.icon)}</span><b>${esc(r.code)}</b></button>`).join('');
+      ].map(r=>`<button class="dt-hot asset" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.icon)}</span><b>${esc(r.code)}</b></button>`).join('')+'</div>';
     const lightingMini=`<div class="dt-mini-card"><div class="dt-mini-title"><b>조명·전등릴 교체 이력</b><span>코트장 조명 관리</span></div><img src="${DT.lighting}" alt="장군봉체육관 조명등 및 전등릴 교체 이력"><button onclick="dtView('lighting')">전체 이력 보기 →</button></div>`;
     return `<div class="dt-v43 dt-v43-new">
       <div class="dt-v43-head"><div><div class="dt-v43-kicker">DIGITAL TWIN · JANGGUNBONG</div><div class="dt-v43-title">장군봉체육관 디지털트윈</div><div class="dt-v43-sub">실제 평면도에 공간 · 코트 · EAM 자산을 연결하고, 조명은 별도 도면에서 관리합니다.</div></div><div class="dt-v43-actions"><button class="dt-v43-btn" onclick="go('eam')">EAM 자산관리</button><button class="dt-v43-btn primary" onclick="go('process')">QR 접수관리</button></div></div>
@@ -5911,4 +5911,16 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   border-radius:0!important;
   box-shadow:none!important;
 }
+</style>
+
+<style id="JGB_DT_BUTTON_ALIGNMENT_V59">
+/* v59: 위치 버튼을 실제 원본 이미지 영역에 맞춰 정렬 */
+.dt-v43-new .dt-v43-map{position:relative!important;width:1100px!important;height:650px!important;min-width:1100px!important;min-height:650px!important;max-width:1100px!important;max-height:650px!important;padding:0!important;overflow:hidden!important;display:block!important}
+.dt-v43-new .dt-v43-map > img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;margin:0!important;display:block!important}
+.dt-hot-layer{position:absolute!important;top:50%!important;left:50%!important;height:100%!important;width:auto!important;pointer-events:none!important}
+.dt-hot-layer.floor{width:95.25%!important;transform:translate(-50%,-50%)!important}
+.dt-hot-layer.toilet{width:69.17%!important;transform:translate(-50%,-50%)!important}
+.dt-hot-layer .dt-hot{pointer-events:auto!important}
+.dt-v43-new .dt-hot.room{z-index:5!important;transform:translate(-50%,-50%)!important;white-space:nowrap!important}
+@media(max-width:1150px){.dt-v43-new .dt-v43-map{transform-origin:top left;transform:scale(calc((100vw - 32px)/1100));margin-bottom:calc(-650px + (650px * ((100vw - 32px)/1100)))!important}}
 </style>
