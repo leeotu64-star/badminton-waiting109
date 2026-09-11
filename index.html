@@ -1516,6 +1516,30 @@ html::before,body::before{
 .dt-v43-new .dt-v43-map img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;display:block!important;}
 @media(max-width:1100px){.dt-v43-new .dt-v43-map{width:1300px!important;height:800px!important;min-height:800px!important;max-width:1300px!important;overflow:auto!important;}}
 </style>
+
+<style id="JGB_DT_LIGHT_COURT_V65">
+.dt-court-map{position:relative;width:100%;height:100%;min-height:520px;background:#f7fafc;border:1px solid #d8e3ec;border-radius:12px;overflow:hidden;padding:34px 22px 22px;box-sizing:border-box}
+.dt-court-map-title{position:absolute;left:18px;top:12px;font-size:11px;font-weight:900;color:#61768b}
+.dt-court-row{display:grid;grid-template-columns:repeat(5,minmax(105px,1fr));gap:10px;width:100%;height:100%;align-items:center}
+.dt-court{position:relative;height:72%;min-height:250px;border:2px solid #8ca8bf;border-radius:8px;background:#fff;box-shadow:0 3px 12px rgba(20,55,90,.07);display:flex;align-items:center;justify-content:center}
+.dt-court:before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed #b8c9d7}
+.dt-court-label{font-size:14px;font-weight:1000;color:#3b5870;letter-spacing:-.3px}
+.dt-ac{position:absolute;z-index:4;width:42px;height:42px;border-radius:50%;border:2px solid #fff;background:#1769c1;color:#fff;font-size:10px;font-weight:1000;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer}
+.dt-ac:hover{transform:scale(1.08)}
+.dt-ac.left{left:-9px;top:50%;transform:translate(-50%,-50%)}
+.dt-ac.right{right:-9px;top:50%;transform:translate(50%,-50%)}
+.dt-ac.left:hover{transform:translate(-50%,-50%) scale(1.08)}
+.dt-ac.right:hover{transform:translate(50%,-50%) scale(1.08)}
+.dt-ac small{display:block;font-size:8px;line-height:1;margin-top:1px}
+.dt-court-empty{color:#91a1af;font-size:10px;text-align:center}
+.dt-asset-quick{margin:12px 15px 15px;border-top:1px solid #e7edf3;padding-top:12px}
+.dt-asset-quick h4{margin:0 0 8px;font-size:13px}
+.dt-asset-quick .qrow{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.dt-asset-quick .qcell{background:#f8fbff;border:1px solid #dbe6ef;border-radius:9px;padding:8px}
+.dt-asset-quick .qcell small{display:block;color:#8191a1;font-size:9px;margin-bottom:2px}
+.dt-asset-quick .qcell b{display:block;font-size:11px;color:#29455d}
+@media(max-width:900px){.dt-court-row{grid-template-columns:repeat(5,140px);overflow-x:auto;padding:0 8px}.dt-court-map{overflow:auto}.dt-court{min-width:120px}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -2558,7 +2582,19 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     const statusClass=s.status==='주의'?'warn':s.status==='점검필요'?'bad':'';
     const hist=[['2025.09.10','막힘','완료'],['2025.08.21','누수','완료'],['2025.07.15','막힘','완료'],['2025.05.03','센서불량','완료']];
     const lightingHotspots=[];
-    const floorHotspots='<div class="dt-hot-layer floor">'+rooms.filter(r=>r.view!=='toilet').map(r=>`<button class="dt-hot room" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.name.replace('관리사무실','사무실').replace('휴게실','휴게').replace('창고','2F 창고'))}</span></button>`).join('')+'</div>';
+    const courtAssetMap=[
+      {code:'AC-05',label:'A-1',court:'1번',side:'좌측'},
+      {code:'AC-02',label:'A-2',court:'1번',side:'우측'},
+      {code:'AC-06',label:'A-3',court:'3번',side:'좌측'},
+      {code:'AC-03',label:'A-4',court:'3번',side:'우측'},
+      {code:'AC-07',label:'A-5',court:'5번',side:'좌측'},
+      {code:'AC-04',label:'A-6',court:'5번',side:'우측'}
+    ];
+    const courtAssetButton=(z)=>{const a=asset(z.code,'냉방기(난방겸용)',z.court+' 코트('+z.side+')','정상','냉난방');return `<button class="dt-ac ${z.side==='좌측'?'left':'right'}" onclick="dtOpenAsset('${z.code}')" title="${esc(z.label+' · '+z.court+' '+z.side)}">${esc(z.label)}<small>${esc(z.side)}</small></button>`};
+    const courtHotspots=`<div class="dt-court-map"><div class="dt-court-map-title">1층 코트 · 에어컨 위치</div><div class="dt-court-row">
+      ${['1번','2번','3번','4번','5번'].map(c=>{const aa=courtAssetMap.filter(z=>z.court===c);return `<div class="dt-court"><span class="dt-court-label">${esc(c)} 코트</span>${aa.map(courtAssetButton).join('')}${aa.length===0?'<span class="dt-court-empty">등록 자산 없음</span>':''}</div>`}).join('')}
+    </div></div>`;
+    const floorHotspots=courtHotspots;
     const toiletHotspots='<div class="dt-hot-layer toilet">'+rooms.filter(r=>r.view==='toilet').map(r=>`<button class="dt-hot room" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.name.replace('남자 ','남 ').replace('여자 ','여 '))}</span></button>`).join('')+
       [
         {name:'남자소변기 수리',place:'남자 화장실',status:'정상',code:'SA-01',category:'위생설비',cls:'asset',x:26,y:42,icon:'SA'},
@@ -2572,7 +2608,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       <div class="dt-twin-strip">
         <div class="dt-floor-main"><div class="dt-v43-maphead"><div><strong>${title}</strong><small>${sub}</small></div><div class="dt-v43-legend"><span><i class="dt-dot g"></i>정상</span><span><i class="dt-dot y"></i>주의</span><span><i class="dt-dot r"></i>점검필요</span></div></div><div class="dt-v43-map"><div class="dt-image-removed">도면 이미지는 용량 절감을 위해 제외했습니다.<br><small>자산 정보와 위치 데이터는 유지됩니다.</small></div>${v==='floor'?floorHotspots:v==='toilet'?toiletHotspots:''}<div class="dt-v43-zoom"><button onclick="dtZoom(.1)">＋</button><button onclick="dtZoom(-.1)">−</button><button onclick="window.__dtZoom=1;render()">1:1</button></div></div></div>
         <div class="dt-right-stack">
-          <aside class="dt-v43-sidecard">${(()=>{const loc=s?.id&&DT_LOCATIONS[s.id]?DT_LOCATIONS[s.id]:s;const assets=s?.code?[asset(s.code,s.name,s.place,s.status,s.category)]:getLocationAssets(loc);const issues=getLocationIssues(loc);const histCount=s?.code?((window.__eamH||[]).filter(h=>{const a=(window.__eamA||[]).find(x=>String(x.id)===String(h.asset_id));return a&&String(a.asset_code)===String(s.code)}).length):assets.reduce((n,a)=>n+(window.__eamH||[]).filter(h=>String(h.asset_id)===String(a.id)).length,0);return `<div class="dt-v43-sidehead"><span>SELECTED LOCATION / ASSET</span><h3>${esc(loc.name||s.name||'선택 없음')}</h3><p>${esc(loc.place||s.place||'도면에서 위치를 선택하세요.')}</p></div><div class="dt-v43-status ${statusClass}">${issues.some(i=>i.status==='미조치')?'⚠ 미조치 접수 있음':'● '+esc(s.status||'정상')}</div><dl class="dt-v43-info"><dt>EAM 자산</dt><dd>${assets.length}개</dd><dt>고장접수</dt><dd>${issues.length}건${issues.filter(i=>i.status==='미조치').length?' · 미조치 '+issues.filter(i=>i.status==='미조치').length+'건':''}</dd><dt>작업/이력</dt><dd>${histCount}건</dd><dt>공간</dt><dd>${esc(loc.place||'-')}</dd></dl><div class="dt-v43-actions2"><button class="primary" onclick="go('eam')">EAM 전체</button><button onclick="go('process')">작업관리</button></div><div style="display:grid;gap:6px;margin-top:10px">${assets.length?assets.map(a=>`<button class="dt-link-asset" onclick="dtOpenAsset('${esc(a.asset_code)}')"><b>${esc(a.asset_code)}</b> · ${esc(a.name||a.product_name||'-')} <span>→</span></button>`).join(''):'<div class="dt-v43-empty">이 위치에 등록된 EAM 자산이 없습니다.</div>'}</div><div class="dt-v43-history"><h4>연결 데이터</h4><div class="dt-v43-hrow"><time>ISSUE</time><b>고장접수 ${issues.length}건</b><span class="dt-v43-badge">${issues.filter(i=>i.status==='미조치').length?'미조치 있음':'확인'}</span></div><div class="dt-v43-hrow"><time>EAM</time><b>자산 ${assets.length}개</b><span class="dt-v43-badge">연결</span></div><div class="dt-v43-hrow"><time>HISTORY</time><b>이력 ${histCount}건</b><span class="dt-v43-badge">연결</span></div></div>`})()}</aside>
+          <aside class="dt-v43-sidecard">${(()=>{const loc=s?.id&&DT_LOCATIONS[s.id]?DT_LOCATIONS[s.id]:s;const selectedAsset=s?.code?(window.__eamA||[]).find(a=>String(a.asset_code)===String(s.code))||asset(s.code,s.name,s.place,s.status,s.category):null;const assets=s?.code?[selectedAsset]:getLocationAssets(loc);const issues=getLocationIssues(loc);const assetHist=selectedAsset?(window.__eamH||[]).filter(h=>String(h.asset_id)===String(selectedAsset.id)||String(h.asset_code||'')===String(selectedAsset.asset_code)):(window.__eamH||[]).filter(h=>assets.some(a=>String(a.id)===String(h.asset_id)));const histCount=assetHist.length;return `<div class="dt-v43-sidehead"><span>SELECTED LOCATION / ASSET</span><h3>${esc(loc.name||s.name||'선택 없음')}</h3><p>${esc(loc.place||s.place||'도면에서 위치를 선택하세요.')}</p></div><div class="dt-v43-status ${statusClass}">${issues.some(i=>i.status==='미조치')?'⚠ 미조치 접수 있음':'● '+esc(s.status||'정상')}</div><dl class="dt-v43-info"><dt>EAM 자산</dt><dd>${assets.length}개</dd><dt>고장접수</dt><dd>${issues.length}건${issues.filter(i=>i.status==='미조치').length?' · 미조치 '+issues.filter(i=>i.status==='미조치').length+'건':''}</dd><dt>작업/이력</dt><dd>${histCount}건</dd><dt>공간</dt><dd>${esc(loc.place||'-')}</dd></dl><div class="dt-v43-actions2"><button class="primary" onclick="go('eam')">EAM 전체</button><button onclick="go('process')">작업관리</button></div><div style="display:grid;gap:6px;margin-top:10px">${assets.length?assets.map(a=>`<button class="dt-link-asset" onclick="dtOpenAsset('${esc(a.asset_code)}')"><b>${esc(a.asset_code)}</b> · ${esc(a.name||a.product_name||'-')} <span>→</span></button>`).join(''):'<div class="dt-v43-empty">이 위치에 등록된 EAM 자산이 없습니다.</div>'}</div>${selectedAsset?`<div class="dt-asset-quick"><h4>자산 상세</h4><div class="qrow"><div class="qcell"><small>자산명</small><b>${esc(selectedAsset.name||selectedAsset.product_name||'-')}</b></div><div class="qcell"><small>설치 위치</small><b>${esc(selectedAsset.place||'-')}</b></div><div class="qcell"><small>상태</small><b>${esc(selectedAsset.status||'정상')}</b></div><div class="qcell"><small>고장 이력</small><b>${esc(selectedAsset.asHistory||'등록된 고장 이력 없음')}</b></div></div>${assetHist.length?`<div style="margin-top:8px;background:#fff;border:1px solid #e1e9f0;border-radius:9px;padding:8px"><small style="color:#8191a1;font-size:9px">작업 이력</small>${assetHist.slice(0,5).map(h=>`<div style="font-size:10px;padding:5px 0;border-bottom:1px solid #eef2f6"><b>${esc(h.event_type||h.action_type||'작업')}</b> · ${esc(h.description||h.result||'-')} <span style="float:right;color:#8a99a7">${esc(h.event_date||h.inspection_date||'')}</span></div>`).join('')}</div>`:'<div style="margin-top:8px;font-size:10px;color:#8191a1">등록된 작업 이력이 없습니다.</div>'}</div>`:''}<div class="dt-v43-history"><h4>연결 데이터</h4><div class="dt-v43-hrow"><time>ISSUE</time><b>고장접수 ${issues.length}건</b><span class="dt-v43-badge">${issues.filter(i=>i.status==='미조치').length?'미조치 있음':'확인'}</span></div><div class="dt-v43-hrow"><time>EAM</time><b>자산 ${assets.length}개</b><span class="dt-v43-badge">연결</span></div><div class="dt-v43-hrow"><time>HISTORY</time><b>이력 ${histCount}건</b><span class="dt-v43-badge">연결</span></div></div>`})()}</aside>
           ${v==='lighting'?lightingMini:''}
         </div>
       </div>
