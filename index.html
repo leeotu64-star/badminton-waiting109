@@ -1540,6 +1540,66 @@ html::before,body::before{
 .dt-asset-quick .qcell b{display:block;font-size:11px;color:#29455d}
 @media(max-width:900px){.dt-court-row{grid-template-columns:repeat(5,140px);overflow-x:auto;padding:0 8px}.dt-court-map{overflow:auto}.dt-court{min-width:120px}}
 </style>
+
+<style id="v71-history-card-align">
+/* v71: 주요설비 이력카드 기본정보를 2개 항목씩 정확히 맞춤 */
+.eam-detail-panel .eam-master .master-grid{
+  display:grid!important;
+  grid-template-columns:96px minmax(0,1fr) 96px minmax(0,1fr)!important;
+  width:100%!important;
+  align-items:stretch!important;
+}
+.eam-detail-panel .eam-master .master-grid>div{
+  display:contents!important;
+  min-height:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+.eam-detail-panel .eam-master .master-grid>div>small{
+  grid-column:auto;
+  display:flex!important;
+  align-items:center!important;
+  min-height:68px!important;
+  margin:0!important;
+  padding:14px 12px!important;
+  background:#f7fafc!important;
+  border-right:1px solid #d7e1eb!important;
+  border-bottom:1px solid #d7e1eb!important;
+  box-sizing:border-box!important;
+  white-space:nowrap!important;
+}
+.eam-detail-panel .eam-master .master-grid>div>b{
+  display:flex!important;
+  align-items:center!important;
+  min-height:68px!important;
+  margin:0!important;
+  padding:14px 15px!important;
+  border-right:1px solid #d7e1eb!important;
+  border-bottom:1px solid #d7e1eb!important;
+  box-sizing:border-box!important;
+  overflow-wrap:anywhere!important;
+}
+.eam-detail-panel .eam-master .master-grid>div:nth-child(14)>small,
+.eam-detail-panel .eam-master .master-grid>div:nth-child(14)>b{grid-column:span 1;}
+.eam-detail-panel .eam-master .master-grid>div.wide{display:contents!important;grid-column:auto!important;}
+.eam-detail-panel .eam-master .master-grid>div.wide>small{grid-column:1!important;}
+.eam-detail-panel .eam-master .master-grid>div.wide>b{grid-column:2 / 5!important;border-right:0!important;}
+.eam-detail-panel .eam-master .master-grid>div:nth-last-child(1)>b{border-right:0!important;}
+/* 기존 중복 숨김 규칙 해제: 위치코드도 실제 카드에 표시 */
+.eam-detail-panel .master-grid>div:nth-child(2),
+.eam-detail-panel .master-grid>div:nth-child(6){display:contents!important;}
+.eam-detail-panel .master-grid>div:nth-child(1) small{font-size:11px!important;}
+.eam-detail-panel .master-grid>div:nth-child(1) small:after{content:none!important;}
+@media(max-width:1000px){
+  .eam-detail-panel .eam-master .master-grid{grid-template-columns:82px minmax(0,1fr) 82px minmax(0,1fr)!important;}
+}
+@media(max-width:650px){
+  .eam-detail-panel .eam-master .master-grid{grid-template-columns:82px minmax(0,1fr)!important;}
+  .eam-detail-panel .eam-master .master-grid>div>small{grid-column:auto!important;}
+  .eam-detail-panel .eam-master .master-grid>div.wide>b{grid-column:2!important;}
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3794,6 +3854,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <div><small>자산명</small><b>${esc(cur.name||'-')}</b></div>
           <div><small>설비 종류</small><b>${esc(cur.category||'-')}</b></div>
           <div><small>위치</small><b>${esc(cur.place||'-')}</b></div>
+          <div><small>위치코드</small><b>${esc(cur.locationCode||placeCode(cur.place)||'-')}</b></div>
           <div><small>모델·규격</small><b>${esc(cur.model||'-')}</b></div>
           <div><small>용량</small><b>${esc(cur.capacity||'-')}</b></div>
           <div><small>수량</small><b>${esc(cur.qty??cur.quantity??'-')}</b></div>
