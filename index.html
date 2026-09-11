@@ -4447,7 +4447,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const equipPhotoDeleted=localStorage.getItem('JGB_EQUIP_PHOTO_DELETED_'+String(sel))==='1';
         const savedEquipPhoto=equipPhotoDeleted?'':((window.__jgbEquipPhotoCache&&window.__jgbEquipPhotoCache[sel])||localStorage.getItem('JGB_EQUIP_PHOTO_'+String(sel))||cur.photo||'');
         const photo=`<div class="jgb-eam-photo"><div class="jgb-eam-photo-title">📷 설비 사진 (현재)</div><div class="jgb-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(sel)}')" title="클릭하면 사진 선택창이 열립니다">${savedEquipPhoto?`<img src="${E(savedEquipPhoto)}" alt="${E(cur.name||'설비 사진')}" class="jgb-equip-photo-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(sel)}')" title="사진 삭제">×</button>`:`<div class="cam">📷</div><strong>사진을 등록할 수 있습니다</strong><span>사진 등록 공간 · JPG / PNG · 클릭</span>`}</div><div class="jgb-equip-photo-actions"><button type="button" class="jgb-equip-photo-delete" ${savedEquipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(sel)}')">🗑 사진 삭제</button><span>${savedEquipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'등록된 사진이 없어 삭제할 사진이 없습니다.'}</span></div></div>`;
-        const info=[['자산코드',window.eamUnifiedCode?window.eamUnifiedCode(cur):(cur.asset_code||cur.code||'-')],['자산명',window.eamDisplayName?window.eamDisplayName(cur):(cur.name||'-')],['설비 종류',cur.category||cur.type||C.label||'-'],['위치',window.placeLabel?window.placeLabel(cur.place):(cur.place||'-')],['모델·규격',cur.model||'-'],['용량',cur.capacity||'-'],['수량',cur.qty??cur.quantity??'-'],['제조사',cur.maker||cur.vendor||'-'],['A/S 연락처',cur.asContact||'-'],['제조일',cur.date||cur.manufactureDate||'-'],['설치일',cur.installDate||'-'],['내용연수',cur.life||'-'],['평가등급',cur.grade||'-'],['보증',cur.warranty||'-'],['기존 A/S 기록',cur.asHistory||'-'],['자산상태',cur.status||'정상'],['취득구분',cur.acquisitionType||'기존 자산']];
+        const info=[['자산코드',window.eamUnifiedCode?window.eamUnifiedCode(cur):(cur.asset_code||cur.code||'-')],['자산명',window.eamDisplayName?window.eamDisplayName(cur):(cur.name||'-')],['설비 종류',cur.category||cur.type||C.label||'-'],['위치',window.placeLabel?window.placeLabel(cur.place):(cur.place||'-')],['위치코드',typeof placeCode==='function'?placeCode(cur.place):'-'],['모델·규격',cur.model||'-'],['용량',cur.capacity||'-'],['수량',cur.qty??cur.quantity??'-'],['제조사',cur.maker||cur.vendor||'-'],['A/S 연락처',cur.asContact||'-'],['제조일',cur.date||cur.manufactureDate||'-'],['설치일',cur.installDate||'-'],['내용연수',cur.life||'-'],['평가등급',cur.grade||'-'],['보증',cur.warranty||'-'],['기존 A/S 기록',cur.asHistory||'-'],['자산상태',cur.status||'정상'],['취득구분',cur.acquisitionType||'기존 자산']];
         const infoHtml=info.map(z=>`<div class="jgb-eam-info-cell"><small>${E(z[0])}</small><b>${E(z[1])}</b></div>`).join('');
         const lastInspection=ins[0]?.inspection_date||'-';const next=ins[0]?.next_inspection_date||ins[0]?.next_date||'-';const replacement=cur.replacementStatus||'미정';
         
@@ -5738,6 +5738,44 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   window.jgbV77FillHistoryDetail=fillHistoryEdit;
 })();
 </script>
+
+<style id="JGB_EAM_CARD_LOCATION_CODE_LINES_V1">
+/* 주요설비 이력카드: 위치코드 추가 + 좌우/상하 구분선 동일 정렬 */
+.jgb-eam-card-final .jgb-eam-info-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  border-top:1px solid #d6e0e8!important;
+  border-left:1px solid #d6e0e8!important;
+  margin:0!important;
+}
+.jgb-eam-card-final .jgb-eam-info-cell{
+  display:grid!important;
+  grid-template-columns:92px minmax(0,1fr)!important;
+  min-height:42px!important;
+  box-sizing:border-box!important;
+  border-right:1px solid #d6e0e8!important;
+  border-bottom:1px solid #d6e0e8!important;
+  margin:0!important;
+}
+.jgb-eam-card-final .jgb-eam-info-cell:nth-child(even){border-right:1px solid #d6e0e8!important}
+.jgb-eam-card-final .jgb-eam-info-cell small{
+  display:flex!important;
+  align-items:center!important;
+  min-height:100%!important;
+  box-sizing:border-box!important;
+  border-right:1px solid #e0e7ed!important;
+  padding:8px 9px!important;
+}
+.jgb-eam-card-final .jgb-eam-info-cell b{
+  display:flex!important;
+  align-items:center!important;
+  min-height:100%!important;
+  box-sizing:border-box!important;
+  padding:8px 10px!important;
+  line-height:1.35!important;
+  word-break:break-word!important;
+}
+</style>
 </body></html>
 
 
