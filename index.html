@@ -7790,3 +7790,521 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   }
 }
 </style>
+
+
+
+<style id="JGB_V103_FULL_REDESIGN">
+/*
+ v103
+ 전면 재설계.
+ 컴팩트형 금지.
+ '주요설비 이력카드' 자체가 한 장의 종이 이력카드처럼 보이도록
+ 일반 크기 / 굵은 기준선 / 동일 글씨 / 정확한 표 구조.
+ 기능과 데이터 로직은 변경하지 않음.
+*/
+
+/* ===== 전체 이력카드 ===== */
+.jgb-eam-card-final,
+.jgb-maint-final{
+  width:100%!important;
+  margin:14px 0!important;
+  padding:0!important;
+  background:#fff!important;
+  border:2px solid #455b6c!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+  color:#172f42!important;
+}
+
+/* ===== 상단 제목 ===== */
+.jgb-eam-card-final .jgb-card-top,
+.jgb-maint-head{
+  height:48px!important;
+  min-height:48px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:0 16px!important;
+  box-sizing:border-box!important;
+  background:#e9eef2!important;
+  color:#18374d!important;
+  border:0!important;
+  border-bottom:2px solid #455b6c!important;
+}
+
+.jgb-eam-card-final .jgb-card-top{
+  font-size:18px!important;
+  font-weight:900!important;
+}
+
+.jgb-maint-head h3{
+  margin:0!important;
+  font-size:18px!important;
+  font-weight:900!important;
+  color:#18374d!important;
+}
+
+/* 수정/등록 버튼은 작지만 동일한 종이서식 */
+.jgb-eam-card-final .jgb-card-top button,
+.jgb-maint-head button{
+  border:1px solid #6f8290!important;
+  border-radius:2px!important;
+  background:#fff!important;
+  color:#24475d!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  padding:6px 12px!important;
+}
+
+/* ===== 기본정보 + 사진 : 50:50 ===== */
+.jgb-eam-card-final .jgb-eam-card-body{
+  display:grid!important;
+  grid-template-columns:50% 50%!important;
+  gap:0!important;
+  width:100%!important;
+  padding:0!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-eam-info,
+.jgb-eam-photo{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+}
+
+.jgb-eam-info{
+  border-right:2px solid #455b6c!important;
+}
+
+/* 섹션 제목 */
+.jgb-eam-info-title,
+.jgb-eam-photo-title,
+.jgb-history-photos-title{
+  height:38px!important;
+  min-height:38px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:0 12px!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  background:#dfe7ec!important;
+  color:#1d4057!important;
+  border:0!important;
+  border-bottom:2px solid #6d8291!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  text-align:left!important;
+}
+
+/* ===== 기본정보 표 : 두 쌍, 동일 폭 ===== */
+.jgb-eam-info-grid{
+  display:grid!important;
+  grid-template-columns:50% 50%!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-eam-info-cell{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  min-height:52px!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+  border:0!important;
+  border-right:1.5px solid #7d919f!important;
+  border-bottom:1.5px solid #7d919f!important;
+}
+
+.jgb-eam-info-cell:nth-child(2n){
+  border-right:0!important;
+}
+
+.jgb-eam-info-cell small{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  background:#e8edf1!important;
+  color:#1d3f55!important;
+  border-right:1.5px solid #7d919f!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  line-height:1.25!important;
+  text-align:left!important;
+}
+
+.jgb-eam-info-cell b{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px 11px!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+  color:#122f44!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1.25!important;
+  text-align:left!important;
+  white-space:normal!important;
+  word-break:keep-all!important;
+}
+
+/* ===== 사진 : 넉넉한 일반 크기 ===== */
+.jgb-eam-photo{
+  background:#fff!important;
+}
+
+.jgb-photo-box{
+  width:calc(100% - 28px)!important;
+  height:300px!important;
+  margin:14px!important;
+  box-sizing:border-box!important;
+  border:1.5px dashed #7990a1!important;
+  border-radius:0!important;
+  background:#fbfcfd!important;
+}
+
+.jgb-equip-photo-actions{
+  padding:0 14px 14px!important;
+  font-size:11px!important;
+}
+
+/* ===== 자동이력 : 2쌍 동일 표 ===== */
+.jgb-eam-card-final .jgb-eam-auto{
+  display:grid!important;
+  grid-template-columns:50% 50%!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-top:2px solid #455b6c!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-eam-card-final .jgb-eam-auto>div{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1.5px solid #7d919f!important;
+  border-bottom:1.5px solid #7d919f!important;
+}
+
+.jgb-eam-card-final .jgb-eam-auto>div:nth-child(even){
+  border-right:0!important;
+}
+
+.jgb-eam-card-final .jgb-eam-auto small{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  background:#e8edf1!important;
+  border-right:1.5px solid #7d919f!important;
+  color:#1d3f55!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  line-height:1.25!important;
+  text-align:left!important;
+}
+
+.jgb-eam-card-final .jgb-eam-auto b{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px 11px!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+  color:#122f44!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1.25!important;
+  text-align:left!important;
+}
+
+/* ===== 시설개선계획 / 특이사항 : 각각 한 줄 ===== */
+.jgb-eam-card-final .jgb-eam-notes-bottom{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  width:100%!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-bottom:1.5px solid #7d919f!important;
+}
+
+.jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note small{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  background:#e8edf1!important;
+  border-right:1.5px solid #7d919f!important;
+  color:#1d3f55!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  text-align:left!important;
+}
+
+.jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note b{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  padding:8px 11px!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+  color:#122f44!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  text-align:left!important;
+}
+
+/* ===== 유지관리 이력 : 동일한 일반형 이력카드 ===== */
+.jgb-maint-final{
+  margin-top:18px!important;
+}
+
+.jgb-history-box{
+  width:calc(100% - 20px)!important;
+  margin:10px!important;
+  border:1.5px solid #6f8290!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:#fff!important;
+}
+
+.jgb-history-box-head{
+  height:42px!important;
+  min-height:42px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:0 12px!important;
+  box-sizing:border-box!important;
+  background:#e6edf2!important;
+  border:0!important;
+  border-bottom:2px solid #6f8290!important;
+}
+
+.jgb-history-box-head strong{
+  font-size:14px!important;
+  color:#17384e!important;
+  font-weight:900!important;
+}
+
+.jgb-history-box-head span{
+  font-size:11px!important;
+  color:#536a7b!important;
+}
+
+/* 유지관리 좌우 50:50 */
+.jgb-history-box-body{
+  display:grid!important;
+  grid-template-columns:50% 50%!important;
+  gap:0!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-history-info{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:2px solid #6f8290!important;
+  background:#fff!important;
+}
+
+.jgb-history-info-grid{
+  display:grid!important;
+  grid-template-columns:50% 50%!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-history-info-item{
+  display:grid!important;
+  grid-template-columns:110px minmax(0,1fr)!important;
+  min-height:50px!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1.5px solid #7d919f!important;
+  border-bottom:1.5px solid #7d919f!important;
+  background:#fff!important;
+}
+
+.jgb-history-info-item:nth-child(2n){
+  border-right:0!important;
+}
+
+.jgb-history-info-item.full{
+  grid-column:1/-1!important;
+  grid-template-columns:110px minmax(0,1fr)!important;
+  border-right:0!important;
+}
+
+.jgb-history-info-item small{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  min-width:0!important;
+  padding:8px 9px!important;
+  box-sizing:border-box!important;
+  background:#e8edf1!important;
+  border-right:1.5px solid #7d919f!important;
+  color:#1d3f55!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  line-height:1.25!important;
+  text-align:left!important;
+}
+
+.jgb-history-info-item b{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  min-width:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+  color:#122f44!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1.25!important;
+  text-align:left!important;
+}
+
+/* 작업사진 */
+.jgb-history-photos{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+}
+
+.jgb-history-photos-title{
+  height:38px!important;
+  min-height:38px!important;
+  border-bottom:1.5px solid #7d919f!important;
+}
+
+.jgb-history-box .jgb-work-photos{
+  display:grid!important;
+  grid-template-columns:repeat(3,1fr)!important;
+  gap:12px!important;
+  width:100%!important;
+  min-height:210px!important;
+  padding:18px!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  align-items:start!important;
+}
+
+.jgb-history-box .jgb-work-photo{
+  width:100%!important;
+  height:135px!important;
+  min-width:0!important;
+  min-height:135px!important;
+  max-width:none!important;
+  max-height:none!important;
+  box-sizing:border-box!important;
+  border:1.5px dashed #8297a7!important;
+  border-radius:0!important;
+  background:#fbfcfd!important;
+}
+
+/* 첨부파일 */
+.jgb-history-attach{
+  min-height:38px!important;
+  padding:9px 12px!important;
+  box-sizing:border-box!important;
+  background:#f1f5f7!important;
+  border-top:1.5px solid #7d919f!important;
+  color:#536a7b!important;
+  font-size:11px!important;
+}
+
+/* ===== 모든 이력카드 텍스트 기준 ===== */
+.jgb-eam-card-final,
+.jgb-maint-final,
+.jgb-history-box{
+  font-family:inherit!important;
+}
+
+/* 모바일 */
+@media(max-width:800px){
+  .jgb-eam-card-final .jgb-eam-card-body,
+  .jgb-history-box-body{
+    grid-template-columns:1fr!important;
+  }
+  .jgb-eam-info{
+    border-right:0!important;
+  }
+  .jgb-eam-photo,
+  .jgb-history-photos{
+    border-top:2px solid #455b6c!important;
+  }
+}
+
+@media(max-width:600px){
+  .jgb-eam-info-grid,
+  .jgb-eam-card-final .jgb-eam-auto,
+  .jgb-history-info-grid{
+    grid-template-columns:1fr!important;
+  }
+  .jgb-eam-info-cell,
+  .jgb-eam-card-final .jgb-eam-auto>div,
+  .jgb-history-info-item{
+    border-right:0!important;
+  }
+}
+</style>
