@@ -4593,7 +4593,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <div class="eam-type-row">${order.map(k=>{const z=cats[k];return `<button type="button" class="eam-type ${k===cat?'on':''}" onclick="eamPick('${k}')"><span>${z.ico}</span><strong>${E(z.label)}</strong><em>${z.items.length}</em><small>${E(z.desc)}</small></button>`}).join('')}</div>
           <div class="eam-innovation-layout"><aside class="eam-assets-panel"><div class="eam-assets-head"><div><b>${C.ico} ${E(C.label)}</b><span>${list.length}개 자산</span></div><div class="eam-filter-row"><select id="eamProLocationFilter" onchange="eamProFilter('',this.value)"><option value="">전체 위치</option><option value="A">A · 코트</option><option value="B">B · 복도</option><option value="C">C · 사무실</option><option value="D">D · 옥상</option><option value="E">E · 유수장치실</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option></select></div></div><div id="eamproGrid" class="eam-asset-list">${list.map(x=>{const m=meta[x.code]||{},a=A.find(z=>V(z.asset_code)===V(x.code))||null,merged=Object.assign({},x,a||{},m);if(cat==='fire')merged.place='유수장치실';const st=a?.status||m.status||'원본';return `<button type="button" class="eam-asset-row ${V(x.code)===V(sel)?'on':''}" data-code="${E(x.code)}" data-loc="${E(typeof placeCode==='function'?placeCode(merged.place):'')}" onclick="eamPick('${cat}','${E(x.code)}')"><span class="row-code">${E(window.eamUnifiedCode?window.eamUnifiedCode(merged):x.code)}</span><span class="row-copy"><b>${E(window.eamDisplayName?window.eamDisplayName(merged):merged.name||'-')}</b><small>${E(window.placeLabel?window.placeLabel(merged.place):merged.place||'-')}</small></span><i class="${st==='정상'?'ok':st==='원본'?'source':'bad'}">${E(st)}</i></button>`}).join('')||'<div class="eam-empty">등록된 자산이 없습니다.</div>'}</div></aside>
           <main class="eam-detail-panel">${src?`<div class="eam-detail-hero"><div><div class="hero-code">${E(window.eamUnifiedCode?window.eamUnifiedCode(cur):sel)}</div><h2>${E(window.eamDisplayName?window.eamDisplayName(cur):cur.name||'-')}</h2><div class="hero-meta"><span>${E(C.label)}</span><b>${E(window.placeLabel?window.placeLabel(cur.place):cur.place||'-')}</b><span>위치코드 ${E(typeof placeCode==='function'?placeCode(cur.place):'-')}</span></div></div><span class="hero-status ${String(cur.status||'원본')==='정상'?'good':'source'}">${E(cur.status||'원본')}</span></div>
-            <section class="jgb-eam-card-final"><div class="jgb-card-top"><span>📋 주요설비 이력카드</span><button onclick="event.preventDefault();event.stopPropagation();jgbOpenAssetHistoryEditor()">✏️ 수정</button></div><div class="jgb-eam-card-body"><div class="jgb-eam-info"><div class="jgb-eam-info-title">📄 기본정보</div><div class="jgb-eam-info-grid">${infoHtml}</div><div class="jgb-eam-note"><small>시설개선계획</small><b>${E(cur.improvementPlan||'-')}</b></div><div class="jgb-eam-note"><small>특이사항</small><b>${E(cur.note||'-')}</b></div></div>${photo}</div><div class="jgb-eam-auto"><div><small>최근 점검일</small><b>${E(lastInspection)}</b></div><div><small>최근 외부정비일</small><b>${E(dateOnly(recentExt?.event_date))}</b></div><div><small>누적 외부정비 건수</small><b>${ext.length}건</b></div><div><small>최근 조치내용</small><b>${E(recentExt?((detailFor(recentExt).action)||recentExt.description||'-'):'-')}</b></div><div><small>차기 점검일</small><b>${E(next)}</b></div><div><small>교체·폐기 예정 여부</small><b>${E(replacement)}</b></div></div></section>
+            <section class="jgb-eam-card-final"><div class="jgb-card-top"><span>📋 주요설비 이력카드</span><button onclick="event.preventDefault();event.stopPropagation();jgbOpenAssetHistoryEditor()">✏️ 수정</button></div><div class="jgb-eam-card-body"><div class="jgb-eam-info"><div class="jgb-eam-info-title">📄 기본정보</div><div class="jgb-eam-info-grid">${infoHtml}</div></div>${photo}</div><div class="jgb-eam-auto"><div><small>최근 점검일</small><b>${E(lastInspection)}</b></div><div><small>최근 외부정비일</small><b>${E(dateOnly(recentExt?.event_date))}</b></div><div><small>누적 외부정비 건수</small><b>${ext.length}건</b></div><div><small>최근 조치내용</small><b>${E(recentExt?((detailFor(recentExt).action)||recentExt.description||'-'):'-')}</b></div><div><small>차기 점검일</small><b>${E(next)}</b></div><div><small>교체·폐기 예정 여부</small><b>${E(replacement)}</b></div></div><div class="jgb-eam-notes-bottom"><div class="jgb-eam-note"><small>시설개선계획</small><b>${E(cur.improvementPlan||'-')}</b></div><div class="jgb-eam-note"><small>특이사항</small><b>${E(cur.note||'-')}</b></div></div></section>
             <section class="jgb-maint-final"><div class="jgb-maint-head"><h3>🔧 유지관리 이력</h3><span class="counts">외부정비 ${ext.length}건 · 전체 ${hs.length}건 · 점검 ${hs.filter(h=>inferType(h)==='점검').length}건</span><button type="button" id="jgbMaintRegisterBtn" class="jgb-maint-register-btn">＋ 등록</button></div><div class="jgb-history-box-list">${historyBoxes||'<div class="jgb-maint-empty">등록된 유지관리 이력이 없습니다.</div>'} </div></section>
           </main></div></div>`:'<div class="eam-empty">설비 종류에서 자산을 선택하세요.</div>'}</main></div></div>`;
       };
@@ -5994,6 +5994,72 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   .jgb-eam-card-final .jgb-eam-auto{grid-template-columns:1fr!important}
   .jgb-eam-card-final .jgb-eam-info-cell,
   .jgb-eam-card-final .jgb-eam-auto>div{border-right:0!important}
+}
+</style>
+
+<style id="JGB_EAM_V83_ALIGNMENT_FINAL">
+/* 하단 이력정보는 기본정보의 왼쪽 시작선/전체 폭 기준으로 정렬 */
+.jgb-eam-card-final .jgb-eam-auto{
+  width:72%!important;
+  max-width:72%!important;
+  margin:0!important;
+  padding:0!important;
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:0!important;
+  border-left:1px solid #d6e0e8!important;
+  border-right:1px solid #d6e0e8!important;
+  box-sizing:border-box!important;
+}
+.jgb-eam-card-final .jgb-eam-auto>div{
+  min-width:0!important;
+  min-height:55px!important;
+  display:grid!important;
+  grid-template-columns:92px minmax(0,1fr)!important;
+  margin:0!important;
+  padding:0!important;
+  border-right:1px solid #d6e0e8!important;
+  border-bottom:1px solid #d6e0e8!important;
+  box-sizing:border-box!important;
+}
+.jgb-eam-card-final .jgb-eam-auto>div:nth-child(2n){border-right:0!important}
+.jgb-eam-card-final .jgb-eam-auto>div small{
+  display:flex!important;align-items:center!important;box-sizing:border-box!important;
+  min-height:55px!important;margin:0!important;padding:8px 9px!important;
+  background:#f7fafc!important;border-right:1px solid #e0e7ed!important;
+  color:#5f7489!important;font-size:11px!important;line-height:1.25!important;font-weight:700!important;
+}
+.jgb-eam-card-final .jgb-eam-auto>div b{
+  display:flex!important;align-items:center!important;box-sizing:border-box!important;
+  min-height:55px!important;margin:0!important;padding:8px 10px!important;
+  background:#fff!important;color:#132e4b!important;font-size:13px!important;line-height:1.35!important;
+}
+.jgb-eam-card-final .jgb-eam-notes-bottom{
+  width:72%!important;max-width:72%!important;margin:0!important;padding:0!important;
+  border-left:1px solid #d6e0e8!important;border-right:1px solid #d6e0e8!important;
+  box-sizing:border-box!important;
+}
+.jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note{
+  display:grid!important;grid-template-columns:92px minmax(0,1fr)!important;
+  min-height:52px!important;margin:0!important;padding:0!important;
+  border:0!important;border-bottom:1px solid #d6e0e8!important;border-radius:0!important;
+  box-sizing:border-box!important;background:#fff!important;
+}
+.jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note small{
+  display:flex!important;align-items:center!important;min-height:52px!important;
+  margin:0!important;padding:8px 9px!important;background:#f7fafc!important;
+  border-right:1px solid #e0e7ed!important;color:#5f7489!important;font-size:11px!important;font-weight:700!important;
+  box-sizing:border-box!important;
+}
+.jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note b{
+  display:flex!important;align-items:center!important;min-height:52px!important;
+  margin:0!important;padding:8px 10px!important;background:#fff!important;color:#132e4b!important;
+  font-size:13px!important;line-height:1.35!important;box-sizing:border-box!important;
+}
+@media(max-width:850px){
+ .jgb-eam-card-final .jgb-eam-auto,.jgb-eam-card-final .jgb-eam-notes-bottom{width:100%!important;max-width:100%!important}
+ .jgb-eam-card-final .jgb-eam-auto{grid-template-columns:1fr!important}
+ .jgb-eam-card-final .jgb-eam-auto>div{grid-template-columns:92px minmax(0,1fr)!important;border-right:0!important}
 }
 </style>
 </body></html>
