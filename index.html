@@ -5602,6 +5602,115 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 }
 </style>
 
+
+<style id="JGB_V76_CONSUMABLE_AND_DETAIL_FIX">
+.jgb-v76-consumable-btn{margin-top:7px;width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:9px;background:#f8fafc;color:#334155;font-weight:800;cursor:pointer;text-align:left}
+.jgb-v76-consumable-btn:hover{background:#eef2f7}
+</style>
+<script id="JGB_V76_CONSUMABLE_AND_DETAIL_FIX">
+(function(){
+  const DETAIL = [
+    '유수장치실','기계실','사무실','휴게실','옥상',
+    '1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)',
+    '3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)',
+    '5번 코트(좌측)','5번 코트(우측)','남자 탈의실','여자 탈의실',
+    '남자 샤워실','여자 샤워실','남자 화장실','여자 화장실','복도','창고','좌측 외곽','우측 외곽'
+  ];
+  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  function normalizePlace(v){
+    const s=String(v??'').trim();
+    const m=s.match(/^A-([1-5])번\s*(좌측|우측)$/);
+    return m ? `${m[1]}번 코트(${m[2]})` : s;
+  }
+  function fillDetail(id,current){
+    const box=document.getElementById(id); if(!box)return;
+    const cur=normalizePlace(current);
+    const arr=[...DETAIL,'직접 입력'];
+    box.innerHTML=arr.map(z=>`<option value="${esc(z)}" ${cur===z?'selected':''}>${esc(z)}</option>`).join('');
+    if(cur && !arr.includes(cur)){
+      box.innerHTML += `<option value="__custom__" selected>직접 입력</option>`;
+      const inp=document.getElementById(id.replace('Place','CustomPlace'));
+      if(inp){inp.style.display='block';inp.value=cur}
+    }
+  }
+  window.eamV76NormalizePlace=normalizePlace;
+
+  // 자산 전체정보 수정: 마지막으로 덮어써지는 위치 변경 함수를 다시 정의
+  window.eamEditLocationChange=function(value,currentPlace){
+    const box=document.getElementById('editDetailPlace'); if(!box)return;
+    const cur=normalizePlace(currentPlace || box.value);
+    fillDetail('editDetailPlace',cur);
+    const custom=document.getElementById('editCustomPlace');
+    if(custom){
+      if(box.value==='직접 입력' || box.value==='__custom__'){custom.style.display='block';if(!custom.value)custom.value=cur}
+      else {custom.style.display='none';custom.value=''}
+    }
+  };
+
+  // 주요설비 이력카드 수정: 세부 위치가 비어 보이지 않도록 강제 복구
+  window.eamHistoryCardLocationChange=function(){
+    const cat=document.getElementById('jgbHC_category')?.value||'';
+    const loc=document.getElementById('jgbHC_locCode');
+    const box=document.getElementById('jgbHC_place');
+    if(!box)return;
+    if(cat==='소방·방재' && loc)loc.value='E';
+    const old=normalizePlace(box.value);
+    const arr=[...DETAIL,'직접 입력'];
+    box.innerHTML=arr.map(z=>`<option value="${esc(z)}">${esc(z)}</option>`).join('');
+    if(arr.includes(old))box.value=old;
+    else if(old){box.value='직접 입력';const c=document.getElementById('jgbHC_customPlace');if(c){c.style.display='block';c.value=old}}
+    else if(cat==='소방·방재')box.value='유수장치실';
+    const c=document.getElementById('jgbHC_customPlace');
+    if(c)c.style.display=box.value==='직접 입력'?'block':'none';
+  };
+
+  // 신규 등록 화면의 세부 위치 바로 아래에 코드 없는 소모품 이력관리 버튼 추가
+  const addConsumableButton=()=>{
+    const box=document.getElementById('eamRegDetailPlace');
+    if(!box || document.getElementById('jgbV76ConsumableBtn'))return;
+    const label=box.closest('label');
+    if(!label)return;
+    const b=document.createElement('button');
+    b.type='button';b.id='jgbV76ConsumableBtn';b.className='jgb-v76-consumable-btn';
+    b.textContent='🧰 소모품 이력관리 (자산코드 없음)';
+    b.onclick=()=>{
+      document.getElementById('jgbV76ConsumableModal')?.remove();
+      document.body.insertAdjacentHTML('beforeend',`<div id="jgbV76ConsumableModal" class="eam-modal" onclick="if(event.target===this)this.remove()"><div class="eam-modal-card">
+        <div class="eam-modal-head"><div><span>CONSUMABLE HISTORY</span><h3>소모품 이력관리</h3><small>자산코드는 생성하지 않습니다. 전기·창호 등 분야별 이력만 기록합니다.</small></div><button type="button" onclick="this.closest('#jgbV76ConsumableModal').remove()">×</button></div>
+        <div class="eam-modal-grid">
+          <label>분야 *<select id="jgbV76ConCategory"><option>전기</option><option>창호</option><option>기타</option></select></label>
+          <label>품목명 *<input id="jgbV76ConName" placeholder="예: LED 전등, 스위치, 콘센트"></label>
+          <label>세부 위치<select id="jgbV76ConPlace">${DETAIL.map(z=>`<option>${esc(z)}</option>`).join('')}<option>직접 입력</option></select></label>
+          <label>수량<input id="jgbV76ConQty" placeholder="예: 2"></label>
+          <label class="wide">이력 내용<textarea id="jgbV76ConNote" rows="4" placeholder="점검·수리·교체 내용"></textarea></label>
+        </div>
+        <div class="eam-modal-note">※ 이 화면에서는 AST-XX, AC-XX 같은 자산코드를 만들지 않습니다.</div>
+        <div class="eam-modal-actions"><button class="btn gray" type="button" onclick="this.closest('#jgbV76ConsumableModal').remove()">취소</button><button class="btn blue" type="button" onclick="window.jgbV76SaveConsumableHistory()">이력 저장</button></div>
+      </div></div>`);
+    };
+    label.appendChild(b);
+  };
+  window.jgbV76SaveConsumableHistory=function(){
+    const cat=document.getElementById('jgbV76ConCategory')?.value||'';
+    const name=document.getElementById('jgbV76ConName')?.value.trim()||'';
+    const place=document.getElementById('jgbV76ConPlace')?.value||'';
+    const qty=document.getElementById('jgbV76ConQty')?.value.trim()||'';
+    const note=document.getElementById('jgbV76ConNote')?.value.trim()||'';
+    if(!name){alert('품목명을 입력하세요.');return}
+    const key='JGB_EAM_CONSUMABLE_HISTORY_V76';
+    let rows=[];try{rows=JSON.parse(localStorage.getItem(key)||'[]')||[]}catch(e){}
+    rows.unshift({id:'CON-'+Date.now(),category:cat,name,place,qty,note,date:new Date().toISOString().slice(0,10)});
+    localStorage.setItem(key,JSON.stringify(rows));
+    alert('소모품 이력이 저장되었습니다.\n자산코드는 생성하지 않았습니다.');
+    document.getElementById('jgbV76ConsumableModal')?.remove();
+  };
+
+  // 신규등록 함수가 화면을 만든 직후 버튼을 붙일 수 있도록 감시
+  const watch=()=>addConsumableButton();
+  const mo=new MutationObserver(watch);mo.observe(document.body,{childList:true,subtree:true});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch);else watch();
+})();
+</script>
 </body></html>
 
 
