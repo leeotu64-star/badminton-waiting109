@@ -2967,23 +2967,31 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
     function eamStatusText(a){ return String(a?.status||"정상"); }
 
+    const EAM_DETAIL_LOCATION_LIST=[
+      '유수장치실','기계실','사무실','휴게실','옥상',
+      '1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)',
+      '3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)',
+      '5번 코트(좌측)','5번 코트(우측)',
+      '남자 탈의실','여자 탈의실','남자 샤워실','여자 샤워실',
+      '남자 화장실','여자 화장실','복도','창고','좌측 외곽','우측 외곽','직접 입력'
+    ];
     const EAM_LOCATION_OPTIONS={
-      A:{label:'A · 코트',detail:['A-1번 좌측','A-2번 우측','A-3번 좌측','A-4번 우측','A-5번 좌측','A-6번 우측']},
-      B:{label:'B · 복도',detail:['복도']},
-      C:{label:'C · 사무실',detail:['사무실']},
-      D:{label:'D · 옥상',detail:['옥상']},
-      E:{label:'E · 유수장치실',detail:['유수장치실']},
-      F:{label:'F · 창고',detail:['2층 창고']},
-      G:{label:'G · 휴게실',detail:['휴게실']},
-      H:{label:'H · 남자 화장실',detail:['남자 화장실']},
-      I:{label:'I · 여자 화장실',detail:['여자 화장실']},
-      J:{label:'J · 남자 샤워실',detail:['남자 샤워실']},
-      K:{label:'K · 여자 샤워실',detail:['여자 샤워실']},
-      L:{label:'L · 좌측 외곽',detail:['좌측 외곽']},
-      M:{label:'M · 우측 외곽',detail:['우측 외곽']}
+      A:{label:'A · 코트',detail:EAM_DETAIL_LOCATION_LIST},
+      B:{label:'B · 복도',detail:EAM_DETAIL_LOCATION_LIST},
+      C:{label:'C · 사무실',detail:EAM_DETAIL_LOCATION_LIST},
+      D:{label:'D · 옥상',detail:EAM_DETAIL_LOCATION_LIST},
+      E:{label:'E · 유수장치실',detail:EAM_DETAIL_LOCATION_LIST},
+      F:{label:'F · 창고',detail:EAM_DETAIL_LOCATION_LIST},
+      G:{label:'G · 휴게실',detail:EAM_DETAIL_LOCATION_LIST},
+      H:{label:'H · 남자 화장실',detail:EAM_DETAIL_LOCATION_LIST},
+      I:{label:'I · 여자 화장실',detail:EAM_DETAIL_LOCATION_LIST},
+      J:{label:'J · 남자 샤워실',detail:EAM_DETAIL_LOCATION_LIST},
+      K:{label:'K · 여자 샤워실',detail:EAM_DETAIL_LOCATION_LIST},
+      L:{label:'L · 좌측 외곽',detail:EAM_DETAIL_LOCATION_LIST},
+      M:{label:'M · 우측 외곽',detail:EAM_DETAIL_LOCATION_LIST}
     };
     function eamLocationCodeOptions(selected){return Object.entries(EAM_LOCATION_OPTIONS).map(([k,v])=>`<option value="${k}" ${selected===k?'selected':''}>${v.label}</option>`).join('')}
-    function eamLocationDetails(code,current){const v=EAM_LOCATION_OPTIONS[code]||EAM_LOCATION_OPTIONS.A; const arr=[...v.detail,'__custom__']; return arr.map(z=>`<option value="${xEsc(z)}" ${current===z?'selected':''}>${z==='__custom__'?'직접 입력':xEsc(z)}</option>`).join('')}
+    function eamLocationDetails(code,current){const arr=[...EAM_DETAIL_LOCATION_LIST,'__custom__']; return arr.map(z=>`<option value="${xEsc(z)}" ${current===z?'selected':''}>${z==='__custom__'?'직접 입력':xEsc(z)}</option>`).join('')}
     function eamShowCustomPlace(selectId,inputId){const s=document.getElementById(selectId),i=document.getElementById(inputId);if(!s||!i)return;if(s.value==='__custom__'){i.style.display='block';i.focus()}else{i.style.display='none';i.value=''}}
     function eamRegLocationChange(code,current){const box=document.getElementById('eamRegDetailPlace');if(!box)return;box.innerHTML=eamLocationDetails(code,current);eamShowCustomPlace('eamRegDetailPlace','eamRegCustomPlace');}
     function eamRegisterNewAsset(defaultCategory){
@@ -3898,17 +3906,17 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const code=v(window.__eamSelCode);if(!code){alert('수정할 시설·설비를 선택하세요.');return}if(typeof SUPA==='undefined'||!SUPA){alert('Supabase 연결이 필요합니다.');return}
         let a=(window.__eamA||[]).find(z=>v(z.asset_code)===code);if(!a&&typeof eamEnsureEditableAsset==='function')a=await eamEnsureEditableAsset();if(!a)return;
         const src=sourceRows().find(z=>v(z.code)===code)||{},m=Object.assign({},src,a,readMeta()[code]||{});let k=catKey(m),cat=categoryLabel(k),lc=k==='fire'?'E':placeCode(m.place);
-        const detail=lc==='A'?['A-1번 좌측','A-2번 우측','A-3번 좌측','A-4번 우측','A-5번 좌측','A-6번 우측']:lc==='B'?['복도']:lc==='C'?['사무실']:lc==='D'?['옥상']:lc==='E'?['유수장치실']:lc==='F'?['2층 창고']:lc==='G'?['휴게실']:lc==='H'?['남자 화장실']:lc==='I'?['여자 화장실']:lc==='J'?['남자 샤워실']:lc==='K'?['여자 샤워실']:lc==='L'?['좌측 외곽']:['우측 외곽'];
+        const detail=[...EAM_DETAIL_LOCATION_LIST];
         document.getElementById('eamEditModal')?.remove();document.body.insertAdjacentHTML('beforeend',`<div id="eamEditModal" class="eam-edit-overlay" onclick="if(event.target===this)this.remove()"><div class="eam-edit-card"><div class="eam-edit-head"><div><span>ASSET MASTER EDIT</span><h2>주요설비 이력카드 수정</h2><p>자산 기본정보와 이력카드 정보를 한 번에 수정합니다.</p></div><button type="button" onclick="document.getElementById('eamEditModal').remove()">×</button></div><div class="eam-edit-grid">
           <label>관리코드<input value="${esc(eamUnifiedCode(m))}" readonly></label><label>설비 종류<select id="editCategory" onchange="eamEditLocationChange(this.value)">${CATDEF.map(z=>`<option ${cat===z[2]?'selected':''}>${z[2]}</option>`).join('')}</select></label><label class="wide">소분류(자산명)<input id="editName" value="${esc(m.name||window.eamDisplayName(m))}"></label>
-          <label>위치코드<select id="editLocCode" onchange="eamEditLocationChange(this.value)"><option value="A" ${lc==='A'?'selected':''}>A · 코트</option><option value="B" ${lc==='B'?'selected':''}>B · 복도</option><option value="C" ${lc==='C'?'selected':''}>C · 사무실</option><option value="D" ${lc==='D'?'selected':''}>D · 옥상</option><option value="E" ${lc==='E'?'selected':''}>E · 유수장치실</option><option value="F" ${lc==='F'?'selected':''}>F · 창고</option><option value="G" ${lc==='G'?'selected':''}>G · 휴게실</option><option value="H" ${lc==='H'?'selected':''}>H · 남자 화장실</option><option value="I" ${lc==='I'?'selected':''}>I · 여자 화장실</option><option value="J" ${lc==='J'?'selected':''}>J · 남자 샤워실</option><option value="K" ${lc==='K'?'selected':''}>K · 여자 샤워실</option><option value="L" ${lc==='L'?'selected':''}>L · 좌측 외곽</option><option value="M" ${lc==='M'?'selected':''}>M · 우측 외곽</option></select></label><label>세부 위치<select id="editDetailPlace">${detail.map(z=>`<option ${v(m.place)===z?'selected':''}>${esc(z)}</option>`).join('')}</select></label>
+          <label>위치코드<select id="editLocCode" onchange="eamEditLocationChange(this.value)"><option value="A" ${lc==='A'?'selected':''}>A · 코트</option><option value="B" ${lc==='B'?'selected':''}>B · 복도</option><option value="C" ${lc==='C'?'selected':''}>C · 사무실</option><option value="D" ${lc==='D'?'selected':''}>D · 옥상</option><option value="E" ${lc==='E'?'selected':''}>E · 유수장치실</option><option value="F" ${lc==='F'?'selected':''}>F · 창고</option><option value="G" ${lc==='G'?'selected':''}>G · 휴게실</option><option value="H" ${lc==='H'?'selected':''}>H · 남자 화장실</option><option value="I" ${lc==='I'?'selected':''}>I · 여자 화장실</option><option value="J" ${lc==='J'?'selected':''}>J · 남자 샤워실</option><option value="K" ${lc==='K'?'selected':''}>K · 여자 샤워실</option><option value="L" ${lc==='L'?'selected':''}>L · 좌측 외곽</option><option value="M" ${lc==='M'?'selected':''}>M · 우측 외곽</option></select></label><label>세부 위치<select id="editDetailPlace" onchange="eamShowCustomPlace('editDetailPlace','editCustomPlace')">${detail.map(z=>`<option ${v(m.place)===z?'selected':''}>${esc(z)}</option>`).join('')}</select><input id="editCustomPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
           <label>모델·규격<input id="editModel" value="${esc(m.model||'')}"></label><label>용량<input id="editCapacity" value="${esc(m.capacity||'')}"></label><label>수량<input id="editQty" value="${esc(m.qty??m.quantity??'')}"></label><label>제조사<input id="editVendor" value="${esc(m.vendor||m.maker||'')}"></label><label>A/S 연락처<input id="editAs" value="${esc(m.asContact||'')}"></label><label>제조일<input id="editManufactureDate" value="${esc(m.date||m.manufactureDate||'')}"></label><label>설치일<input id="editInstall" value="${esc(m.installDate||'')}"></label><label>내용연수<input id="editLife" value="${esc(m.life||'')}"></label><label>평가등급<input id="editGrade" value="${esc(m.grade||'')}"></label><label>보증<input id="editWarranty" value="${esc(m.warranty||'')}"></label><label>기존 A/S 기록<input id="editAsHistory" value="${esc(m.asHistory||'')}"></label><label>상태<select id="editStatus"><option ${v(m.status||'정상')==='정상'?'selected':''}>정상</option><option ${v(m.status)==='점검필요'?'selected':''}>점검필요</option><option ${v(m.status)==='조치필요'?'selected':''}>조치필요</option></select></label><label class="wide">시설개선계획<input id="editImprovementPlan" value="${esc(m.improvementPlan||'')}"></label><label class="wide">특이사항<textarea id="editNote" rows="3">${esc(m.note||'')}</textarea></label>
           </div><div class="eam-edit-actions"><button class="btn gray" type="button" onclick="document.getElementById('eamEditModal').remove()">취소</button><button class="btn blue" type="button" id="eamEditSave" onclick="eamSaveFullEdit('${esc(code)}')">저장</button></div></div></div>`);eamEditLocationChange(lc,m.place);
       };
-      window.eamEditLocationChange=function(value,current){const cat=document.getElementById('editCategory')?.value||'';const lc=cat==='소방·방재'?'E':value;const box=document.getElementById('editDetailPlace');if(!box)return;const opts={A:['A-1번 좌측','A-2번 우측','A-3번 좌측','A-4번 우측','A-5번 좌측','A-6번 우측'],B:['복도'],C:['사무실'],D:['옥상'],E:['유수장치실'],F:['2층 창고'],G:['휴게실'],H:['남자 화장실'],I:['여자 화장실'],J:['남자 샤워실'],K:['여자 샤워실'],L:['좌측 외곽'],M:['우측 외곽']};box.innerHTML=(opts[lc]||opts.A).map(z=>`<option value="${esc(z)}">${esc(z)}</option>`).join('');if(current&&[...box.options].some(o=>o.value===current)&&lc!=='E')box.value=current;if(cat==='소방·방재'){const s=document.getElementById('editLocCode');if(s)s.value='E';box.value='유수장치실'}};
+      window.eamEditLocationChange=function(value,current){const cat=document.getElementById('editCategory')?.value||'';const lc=cat==='소방·방재'?'E':String(value||'A');const box=document.getElementById('editDetailPlace');if(!box)return;const arr=[...EAM_DETAIL_LOCATION_LIST];box.innerHTML=arr.map(z=>`<option value="${esc(z)}">${esc(z)}</option>`).join('');if(current&&[...box.options].some(o=>o.value===current))box.value=current;if(cat==='소방·방재'){const s=document.getElementById('editLocCode');if(s)s.value='E';box.value='유수장치실'}const custom=document.getElementById('editCustomPlace');if(custom){custom.style.display=box.value==='직접 입력'?'block':'none';if(box.value!=='직접 입력')custom.value=''}};
       window.eamSaveFullEdit=async function(code){
         const a=(window.__eamA||[]).find(z=>v(z.asset_code)===String(code));if(!a){alert('자산을 찾을 수 없습니다.');return}if(typeof SUPA==='undefined'||!SUPA){alert('Supabase 연결이 필요합니다.');return}
-        const g=id=>document.getElementById(id)?.value?.trim()||'',category=g('editCategory')||'기타설비',name=g('editName');let lc=g('editLocCode'),place=g('editDetailPlace');if(category==='소방·방재'){lc='E';place='유수장치실'}if(!name){alert('소분류(자산명)를 입력하세요.');return}
+        const g=id=>document.getElementById(id)?.value?.trim()||'',category=g('editCategory')||'기타설비',name=g('editName');let lc=g('editLocCode'),place=g('editDetailPlace');if(place==='직접 입력')place=g('editCustomPlace');if(category==='소방·방재'){lc='E';place='유수장치실'}if(!name){alert('소분류(자산명)를 입력하세요.');return}
         const meta={asset_code:String(code),name,category,locationCode:lc,place,model:g('editModel'),qty:g('editQty'),vendor:g('editVendor'),maker:g('editVendor'),asContact:g('editAs'),manufactureDate:g('editManufactureDate'),date:g('editManufactureDate'),installDate:g('editInstall'),life:g('editLife'),capacity:g('editCapacity'),grade:g('editGrade'),warranty:g('editWarranty'),asHistory:g('editAsHistory'),status:g('editStatus')||'정상',improvementPlan:g('editImprovementPlan'),note:g('editNote')};
         const btn=document.getElementById('eamEditSave');if(btn){btn.disabled=true;btn.textContent='저장 중…'}
         try{
@@ -3991,7 +3999,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const catKeyMap={'냉난방':'cooling','소방·방재':'fire','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'};
         const k=catKeyMap[category]||'other';
         const lc=k==='fire'?'E':placeCode(m.place);
-        const detail=lc==='A'?['A-1번 좌측','A-2번 우측','A-3번 좌측','A-4번 우측','A-5번 좌측','A-6번 우측']:lc==='B'?['복도']:lc==='C'?['사무실']:lc==='D'?['옥상']:lc==='E'?['유수장치실']:lc==='F'?['2층 창고']:lc==='G'?['휴게실']:lc==='H'?['남자 화장실']:lc==='I'?['여자 화장실']:lc==='J'?['남자 샤워실']:lc==='K'?['여자 샤워실']:lc==='L'?['좌측 외곽']:['우측 외곽'];
+        const detail=[...EAM_DETAIL_LOCATION_LIST];
         const grid=card.querySelector('.source-grid');
         if(!grid)return;
         grid.innerHTML=`<div class="jgb-inline-grid jgb-full-edit-grid">
@@ -3999,7 +4007,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <label>자산명<input id="jgbHC_name" value="${esc2(m.name||'')}"></label>
           <label>설비 종류<select id="jgbHC_category" onchange="eamHistoryCardLocationChange()">${['냉난방','소방·방재','보일러·온수','전기설비','코트조명','방수','위생설비','문·창호설비','기타설비'].map(z=>`<option value="${esc2(z)}" ${category===z?'selected':''}>${esc2(z)}</option>`).join('')}</select></label>
           <label>위치코드<select id="jgbHC_locCode" onchange="eamHistoryCardLocationChange()"><option value="A" ${lc==='A'?'selected':''}>A · 코트</option><option value="B" ${lc==='B'?'selected':''}>B · 복도</option><option value="C" ${lc==='C'?'selected':''}>C · 사무실</option><option value="D" ${lc==='D'?'selected':''}>D · 옥상</option><option value="E" ${lc==='E'?'selected':''}>E · 유수장치실</option><option value="F" ${lc==='F'?'selected':''}>F · 창고</option><option value="G" ${lc==='G'?'selected':''}>G · 휴게실</option><option value="H" ${lc==='H'?'selected':''}>H · 남자 화장실</option><option value="I" ${lc==='I'?'selected':''}>I · 여자 화장실</option><option value="J" ${lc==='J'?'selected':''}>J · 남자 샤워실</option><option value="K" ${lc==='K'?'selected':''}>K · 여자 샤워실</option><option value="L" ${lc==='L'?'selected':''}>L · 좌측 외곽</option><option value="M" ${lc==='M'?'selected':''}>M · 우측 외곽</option></select></label>
-          <label>세부 위치<select id="jgbHC_place" onchange="eamHistoryCardLocationChange()">${detail.map(z=>`<option value="${esc2(z)}" ${String(m.place||'')===z?'selected':''}>${esc2(z)}</option>`).join('')}</select><input id="jgbHC_customPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
+          <label>세부 위치<select id="jgbHC_place" onchange="eamHistoryCardLocationChange();eamShowCustomPlace('jgbHC_place','jgbHC_customPlace')">${detail.map(z=>`<option value="${esc2(z)}" ${String(m.place||'')===z?'selected':''}>${esc2(z)}</option>`).join('')}</select><input id="jgbHC_customPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
           <label>모델·규격<input id="jgbHC_model" value="${esc2(m.model||'')}"></label>
           <label>용량<input id="jgbHC_capacity" value="${esc2(m.capacity||'')}"></label>
           <label>수량<input id="jgbHC_qty" value="${esc2(m.qty??m.quantity??'')}"></label>
@@ -4027,12 +4035,11 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const loc=document.getElementById('jgbHC_locCode');
         if(loc)loc.value=lc;
         if(!place)return;
-        const opts={A:['A-1번 좌측','A-2번 우측','A-3번 좌측','A-4번 우측','A-5번 좌측','A-6번 우측'],B:['복도'],C:['사무실'],D:['옥상'],E:['유수장치실'],F:['2층 창고'],G:['휴게실'],H:['남자 화장실'],I:['여자 화장실'],J:['남자 샤워실'],K:['여자 샤워실'],L:['좌측 외곽'],M:['우측 외곽']};
-        const old=place.value;const arr=[...(opts[lc]||opts.A),'__custom__'];place.innerHTML=arr.map(z=>`<option value="${esc2(z)}">${z==='__custom__'?'직접 입력':esc2(z)}</option>`).join('');
+        const old=place.value;const arr=[...EAM_DETAIL_LOCATION_LIST];place.innerHTML=arr.map(z=>`<option value="${esc2(z)}">${esc2(z)}</option>`).join('');
         const custom=document.getElementById('jgbHC_customPlace');
         if([...place.options].some(o=>o.value===old)&&old!=='__custom__')place.value=old;
         else if(old&&old!=='__custom__'){place.value='__custom__';if(custom){custom.style.display='block';custom.value=old}}
-        if(lc==='E')place.value='유수장치실';
+        
       };
       window.eamHistoryCardCancel=function(){
         const code=String(window.__eamSelCode||'');
@@ -4051,7 +4058,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         if(!a){alert('등록된 EAM 자산을 찾을 수 없습니다.');return}
         const g=id=>document.getElementById(id)?.value?.trim()||'';
         const name=g('jgbHC_name'),category=g('jgbHC_category')||'기타설비';
-        let locationCode=g('jgbHC_locCode')||'A',place=g('jgbHC_place')||'';
+        let locationCode=g('jgbHC_locCode')||'A',place=g('jgbHC_place')||'';if(place==='직접 입력')place=g('jgbHC_customPlace');
         if(category==='소방·방재'){locationCode='E';place='유수장치실'}
         if(!name||!place){alert('자산명과 위치를 입력하세요.');return}
         const old=getMeta2()[code]||{};
@@ -5408,7 +5415,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
             <label>자산명<input id="jha_name" value="${E(c.name||'')}"></label>
             <label>설비 종류<select id="jha_category">${['냉난방','소방·방재','보일러·온수','전기설비','코트조명','방수','위생설비','문·창호설비','기타설비'].map(x=>`<option ${x===cat?'selected':''}>${E(x)}</option>`).join('')}</select></label>
             <label>위치코드<select id="jha_loc">${Object.entries(EAM_LOCATION_OPTIONS).map(([k,z])=>`<option value="${k}">${E(z.label)}</option>`).join('')}</select></label>
-            <label>세부 위치<select id="jha_place"></select></label>
+            <label>세부 위치<select id="jha_place" onchange="eamShowCustomPlace('jha_place','jha_customPlace')"></select><input id="jha_customPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
             <label>모델·규격<input id="jha_model" value="${E(c.model||'')}"></label>
             <label>용량<input id="jha_capacity" value="${E(c.capacity||'')}"></label>
             <label>수량<input id="jha_qty" value="${E(c.qty??c.quantity??'')}"></label>
@@ -5429,14 +5436,14 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         </div></div>`);
         const locCode=V(c.locationCode)||placeCode(place)||'A';
         const locSelect=document.getElementById('jha_loc');if(locSelect)locSelect.value=locCode;
-        const fill=()=>{const cat2=val('jha_category'), code2=val('jha_loc').charAt(0), box=document.getElementById('jha_place');if(!box)return;const arr=cat2==='소방·방재'?EAM_LOCATION_OPTIONS.E.detail:(EAM_LOCATION_OPTIONS[code2]||EAM_LOCATION_OPTIONS.A).detail;box.innerHTML=arr.map(x=>`<option value="${E(x)}">${E(x)}</option>`).join('');if(arr.includes(place))box.value=place;if(cat2==='소방·방재'){if(locSelect)locSelect.value='E';box.value='유수장치실'}};
+        const fill=()=>{const cat2=val('jha_category'),code2=val('jha_loc').charAt(0),box=document.getElementById('jha_place');if(!box)return;const arr=[...EAM_DETAIL_LOCATION_LIST];box.innerHTML=arr.map(x=>`<option value="${E(x)}">${E(x)}</option>`).join('');if(arr.includes(place))box.value=place;else if(place){box.value='직접 입력';const ci=document.getElementById('jha_customPlace');if(ci){ci.style.display='block';ci.value=place}}if(cat2==='소방·방재'){if(locSelect)locSelect.value='E';box.value='유수장치실'}eamShowCustomPlace('jha_place','jha_customPlace')};
         document.getElementById('jha_category').addEventListener('change',fill);document.getElementById('jha_loc').addEventListener('change',fill);fill();
       };
       window.jgbSaveAssetHistoryCard=async function(code){
         if(typeof SUPA==='undefined'||!SUPA){alert('Supabase 연결이 필요합니다.');return}
         const a=(window.__eamA||[]).find(x=>V(x.asset_code)===V(code));
         if(!a){alert('등록된 EAM 자산을 찾을 수 없습니다.');return}
-        const name=val('jha_name'),category=val('jha_category')||'기타설비';let place=val('jha_place');
+        const name=val('jha_name'),category=val('jha_category')||'기타설비';let place=val('jha_place');if(place==='직접 입력')place=val('jha_customPlace');
         if(category==='소방·방재')place='유수장치실';
         if(!name||!place){alert('자산명과 위치는 필수입니다.');return}
         const lc=val('jha_loc').charAt(0)||'A';
