@@ -5711,6 +5711,33 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch);else watch();
 })();
 </script>
+
+<script id="JGB_V77_HISTORY_DETAIL_FORCE_FIX">
+(function(){
+  const DETAIL=['유수장치실','기계실','사무실','휴게실','옥상','1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','남자 탈의실','여자 탈의실','남자 샤워실','여자 샤워실','남자 화장실','여자 화장실','복도','창고','좌측 외곽','우측 외곽'];
+  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const norm=v=>{const s=String(v??'').trim();const m=s.match(/^A-([1-5])번\s*(좌측|우측)$/);return m?`${m[1]}번 코트(${m[2]})`:s};
+  function fillHistoryEdit(){
+    const box=document.getElementById('jha_place');
+    if(!box)return;
+    const custom=document.getElementById('jha_customPlace');
+    const old=norm(box.value || '');
+    const existing=box.dataset.jgbV77Current || old;
+    const cur=norm(existing);
+    box.innerHTML=DETAIL.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('')+'<option value="직접 입력">직접 입력</option>';
+    if(DETAIL.includes(cur)){box.value=cur;if(custom){custom.style.display='none';custom.value='';}}
+    else if(cur){box.value='직접 입력';if(custom){custom.style.display='block';custom.value=cur;}}
+    else {box.value=DETAIL[0];if(custom){custom.style.display='none';custom.value='';}}
+    box.onchange=function(){
+      if(this.value==='직접 입력'){if(custom){custom.style.display='block';custom.focus();}}
+      else if(custom){custom.style.display='none';custom.value='';}
+    };
+  }
+  const mo=new MutationObserver(()=>{if(document.getElementById('jha_place')){const b=document.getElementById('jha_place');if(b.options.length===0 || b.value==='')fillHistoryEdit();}});
+  try{mo.observe(document.body,{childList:true,subtree:true});}catch(e){}
+  window.jgbV77FillHistoryDetail=fillHistoryEdit;
+})();
+</script>
 </body></html>
 
 
