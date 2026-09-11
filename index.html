@@ -2916,8 +2916,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       if(current && meta[sel]) current={...current,...meta[sel]};
       const code=current?.asset_code||current?.code||'';
       const hs=reg?H.filter(v=>v.asset_id===reg.id):[], ins=reg?I.filter(v=>v.asset_id===reg.id):[];
-      const placeCode=obj=>{const p=String(obj?.place||'');if(p.includes('유수장치실'))return 'E';if(p.includes('옥상'))return 'D';if(p.includes('사무실'))return 'C';if(p.includes('복도'))return 'B';if(p.includes('코트'))return 'A';return '-'};
-      const displayPlace=obj=>{const p=String(obj?.place||'-');const c=placeCode(obj);if(c==='E')return 'E · 유수장치실';if(c==='D')return 'D · 옥상';if(c==='C')return 'C · 사무실';if(c==='B')return 'B · 복도';if(c==='A')return 'A · '+p;return p};
+      const placeCode=obj=>{const p=String(obj?.place||'');if(p.includes('유수장치실'))return 'E';if(p.includes('2층 창고'))return 'D';if(p.includes('옥상'))return 'D';if(p.includes('사무실'))return 'C';if(p.includes('복도'))return 'B';if(p.includes('코트'))return 'A';return '-'};
+      const displayPlace=obj=>{const p=String(obj?.place||'-');const c=placeCode(obj);if(c==='E')return 'E · 유수장치실';if(c==='D')return p.includes('2층 창고')?'D · 2층 창고':'D · 옥상';if(c==='C')return 'C · 사무실';if(c==='B')return 'B · 복도';if(c==='A')return 'A · '+p;return p};
       const status=current?.status||'원본';
       return `<div class="eam-innovation">
         <div class="eam-innovation-head"><div><div class="eyebrow">ENTERPRISE ASSET MANAGEMENT</div><h1>시설물 EAM 관제</h1><p>설비 종류 → 자산 선택 → 기본정보 → 유지보수 이력</p></div><button class="eam-manage-main eam-manage-top" onclick="eamOpenManageMenu()">⚙ 자산 관리</button></div>
@@ -3026,7 +3026,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const src=eamSelectedSource()||{}; const meta=(window.__eamMetaByCode||{})[code]||{};
       const merged={...src,...a,...meta};
       const currentCat=merged.category||({'냉난방':'냉난방','소방':'소방·방재','온수·난방':'온수·난방','전기':'전기설비','코트조명':'코트조명','방수':'방수'})[merged.type]||'기타설비';
-      const pos=(()=>{const p=String(merged.place||''); if(p.includes('유수장치실'))return 'E';if(p.includes('옥상'))return 'D';if(p.includes('사무실'))return 'C';if(p.includes('복도'))return 'B';if(p.includes('코트'))return 'A';return 'X'})();
+      const pos=(()=>{const p=String(merged.place||''); if(p.includes('유수장치실'))return 'E';if(p.includes('2층 창고'))return 'D';if(p.includes('옥상'))return 'D';if(p.includes('사무실'))return 'C';if(p.includes('복도'))return 'B';if(p.includes('코트'))return 'A';return 'X'})();
       const detail=(()=>{const p=String(merged.place||'');if(pos==='A')return p;return p})();
       const existingOpt=pos==='X'?`<option value="X" selected>기존 위치 · ${xEsc(detail||'-')}</option>`:'';
       document.getElementById('eamEditModal')?.remove();
@@ -3035,7 +3035,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         <label>설비 종류<select id="editCategory"><option ${currentCat==='냉난방'?'selected':''}>냉난방</option><option ${currentCat==='소방·방재'?'selected':''}>소방·방재</option><option ${currentCat==='온수·난방'?'selected':''}>온수·난방</option><option ${currentCat==='전기설비'?'selected':''}>전기설비</option><option ${currentCat==='코트조명'?'selected':''}>코트조명</option><option ${currentCat==='방수'?'selected':''}>방수</option><option ${currentCat==='기타설비'?'selected':''}>기타설비</option></select></label>
         <label class="wide">소분류(자산명)<input id="editName" value="${xEsc(merged.name||merged.model||'')}"></label>
         <label>위치코드<select id="editLocCode" onchange="eamEditLocationChange(this.value)"><option value="A" ${pos==='A'?'selected':''}>A · 코트</option><option value="B" ${pos==='B'?'selected':''}>B · 복도</option><option value="C" ${pos==='C'?'selected':''}>C · 사무실</option><option value="D" ${pos==='D'?'selected':''}>D · 옥상</option><option value="E" ${pos==='E'?'selected':''}>E · 유수장치실</option>${existingOpt}</select></label>
-        <label>세부 위치<select id="editDetailPlace">${['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트','복도','사무실','옥상','유수장치실'].map(p=>`<option value="${xEsc(p)}">${xEsc(p)}</option>`).join('')}</select></label>
+        <label>세부 위치<select id="editDetailPlace">${['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트','복도','사무실','옥상','2층 창고','유수장치실'].map(p=>`<option value="${xEsc(p)}">${xEsc(p)}</option>`).join('')}</select></label>
         <label>모델·규격<input id="editModel" value="${xEsc(merged.model||'')}"></label><label>수량<input id="editQty" value="${xEsc(merged.qty??merged.quantity??'')}"></label>
         <label>제작·구매<input id="editVendor" value="${xEsc(merged.vendor||merged.maker||'')}"></label><label>A/S 연락처<input id="editAs" value="${xEsc(merged.asContact||'')}"></label>
         <label>설치일<input id="editInstall" value="${xEsc(merged.installDate||merged.date||'')}"></label><label>보증<input id="editWarranty" value="${xEsc(merged.warranty||'')}"></label>
@@ -3046,7 +3046,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
     function eamEditLocationChange(v,currentPlace){
       const box=document.getElementById('editDetailPlace'); if(!box)return;
-      const opts={A:['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트'],B:['복도'],C:['사무실'],D:['옥상'],E:['유수장치실'],X:[String(currentPlace||'')||'기존 위치']};
+      const opts={A:['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트'],B:['복도'],C:['사무실'],D:['옥상','2층 창고'],E:['유수장치실'],X:[String(currentPlace||'')||'기존 위치']};
       box.innerHTML=(opts[v]||opts.A).map(p=>`<option value="${xEsc(p)}">${xEsc(p)}</option>`).join('');
       if(currentPlace && [...box.options].some(o=>o.value===currentPlace))box.value=currentPlace;
     }
@@ -3443,7 +3443,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const code=current?.asset_code||current?.code||'';
         const hs=reg?H.filter(v=>String(v.asset_id)===String(reg.id)):[], ins=reg?I.filter(v=>String(v.asset_id)===String(reg.id)):[];
         const placeCode=obj=>{const p=vstr(obj?.place);if(p.includes('유수장치실'))return'E';if(p.includes('옥상'))return'D';if(p.includes('사무실'))return'C';if(p.includes('복도'))return'B';if(p.includes('코트'))return'A';return'-'};
-        const displayPlace=obj=>{const p=vstr(obj?.place)||'-',c=placeCode(obj);return c==='E'?'E · 유수장치실':c==='D'?'D · 옥상':c==='C'?'C · 사무실':c==='B'?'B · 복도':c==='A'?'A · '+p:p};
+        const displayPlace=obj=>{const p=vstr(obj?.place)||'-',c=placeCode(obj);return c==='E'?'E · 유수장치실':c==='D'?(p.includes('2층 창고')?'D · 2층 창고':'D · 옥상'):c==='C'?'C · 사무실':c==='B'?'B · 복도':c==='A'?'A · '+p:p};
         const status=current?.status||'원본';
         const sourceHistory=src && (src.capacity||src.life||src.vendor||src.grade||src.date||src.installDate);
         return `<div class="eam-innovation">
@@ -3591,7 +3591,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       }
       function categoryLabel(k){return (CATDEF.find(x=>x[0]===k)||[])[2]||'기타설비'}
       function placeCode(p){p=v(p);if(p.includes('유수장치실'))return'E';if(p.includes('옥상'))return'D';if(p.includes('사무실'))return'C';if(p.includes('복도'))return'B';if(p.includes('코트'))return'A';return'-'}
-      function placeLabel(p){const c=placeCode(p);if(c==='E')return'E · 유수장치실';if(c==='D')return'D · 옥상';if(c==='C')return'C · 사무실';if(c==='B')return'B · 복도';if(c==='A')return'A · '+v(p);return v(p)||'-'}
+      function placeLabel(p){const c=placeCode(p);if(c==='E')return'E · 유수장치실';if(c==='D')return p.includes('2층 창고')?'D · 2층 창고':'D · 옥상';if(c==='C')return'C · 사무실';if(c==='B')return'B · 복도';if(c==='A')return'A · '+v(p);return v(p)||'-'}
       function rawRows(){
         const main=typeof JGB_MAIN_EQUIPMENT!=='undefined'&&Array.isArray(JGB_MAIN_EQUIPMENT)?JGB_MAIN_EQUIPMENT:[];
         const excel=typeof JGB_EXCEL_EQUIPMENT!=='undefined'&&Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[];
@@ -3772,14 +3772,14 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const code=v(window.__eamSelCode);if(!code){alert('수정할 시설·설비를 선택하세요.');return}if(typeof SUPA==='undefined'||!SUPA){alert('Supabase 연결이 필요합니다.');return}
         let a=(window.__eamA||[]).find(z=>v(z.asset_code)===code);if(!a&&typeof eamEnsureEditableAsset==='function')a=await eamEnsureEditableAsset();if(!a)return;
         const src=sourceRows().find(z=>v(z.code)===code)||{},m=Object.assign({},src,a,readMeta()[code]||{});let k=catKey(m),cat=categoryLabel(k),lc=k==='fire'?'E':placeCode(m.place);
-        const detail=lc==='A'?['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트']:lc==='B'?['복도']:lc==='C'?['사무실']:lc==='D'?['옥상']:['유수장치실'];
+        const detail=lc==='A'?['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트']:lc==='B'?['복도']:lc==='C'?['사무실']:lc==='D'?['옥상','2층 창고']:['유수장치실'];
         document.getElementById('eamEditModal')?.remove();document.body.insertAdjacentHTML('beforeend',`<div id="eamEditModal" class="eam-edit-overlay" onclick="if(event.target===this)this.remove()"><div class="eam-edit-card"><div class="eam-edit-head"><div><span>ASSET MASTER EDIT</span><h2>주요설비 이력카드 수정</h2><p>자산 기본정보와 이력카드 정보를 한 번에 수정합니다.</p></div><button type="button" onclick="document.getElementById('eamEditModal').remove()">×</button></div><div class="eam-edit-grid">
           <label>관리코드<input value="${esc(eamUnifiedCode(m))}" readonly></label><label>설비 종류<select id="editCategory" onchange="eamEditLocationChange(this.value)">${CATDEF.map(z=>`<option ${cat===z[2]?'selected':''}>${z[2]}</option>`).join('')}</select></label><label class="wide">소분류(자산명)<input id="editName" value="${esc(m.name||window.eamDisplayName(m))}"></label>
           <label>위치코드<select id="editLocCode" onchange="eamEditLocationChange(this.value)"><option value="A" ${lc==='A'?'selected':''}>A · 코트</option><option value="B" ${lc==='B'?'selected':''}>B · 복도</option><option value="C" ${lc==='C'?'selected':''}>C · 사무실</option><option value="D" ${lc==='D'?'selected':''}>D · 옥상</option><option value="E" ${lc==='E'?'selected':''}>E · 유수장치실</option></select></label><label>세부 위치<select id="editDetailPlace">${detail.map(z=>`<option ${v(m.place)===z?'selected':''}>${esc(z)}</option>`).join('')}</select></label>
           <label>모델·규격<input id="editModel" value="${esc(m.model||'')}"></label><label>용량<input id="editCapacity" value="${esc(m.capacity||'')}"></label><label>수량<input id="editQty" value="${esc(m.qty??m.quantity??'')}"></label><label>제조사<input id="editVendor" value="${esc(m.vendor||m.maker||'')}"></label><label>A/S 연락처<input id="editAs" value="${esc(m.asContact||'')}"></label><label>제조일<input id="editManufactureDate" value="${esc(m.date||m.manufactureDate||'')}"></label><label>설치일<input id="editInstall" value="${esc(m.installDate||'')}"></label><label>내용연수<input id="editLife" value="${esc(m.life||'')}"></label><label>평가등급<input id="editGrade" value="${esc(m.grade||'')}"></label><label>보증<input id="editWarranty" value="${esc(m.warranty||'')}"></label><label>기존 A/S 기록<input id="editAsHistory" value="${esc(m.asHistory||'')}"></label><label>상태<select id="editStatus"><option ${v(m.status||'정상')==='정상'?'selected':''}>정상</option><option ${v(m.status)==='점검필요'?'selected':''}>점검필요</option><option ${v(m.status)==='조치필요'?'selected':''}>조치필요</option></select></label><label class="wide">시설개선계획<input id="editImprovementPlan" value="${esc(m.improvementPlan||'')}"></label><label class="wide">특이사항<textarea id="editNote" rows="3">${esc(m.note||'')}</textarea></label>
           </div><div class="eam-edit-actions"><button class="btn gray" type="button" onclick="document.getElementById('eamEditModal').remove()">취소</button><button class="btn blue" type="button" id="eamEditSave" onclick="eamSaveFullEdit('${esc(code)}')">저장</button></div></div></div>`);eamEditLocationChange(lc,m.place);
       };
-      window.eamEditLocationChange=function(value,current){const cat=document.getElementById('editCategory')?.value||'';const lc=cat==='소방·방재'?'E':value;const box=document.getElementById('editDetailPlace');if(!box)return;const opts={A:['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트'],B:['복도'],C:['사무실'],D:['옥상'],E:['유수장치실']};box.innerHTML=(opts[lc]||opts.A).map(z=>`<option value="${esc(z)}">${esc(z)}</option>`).join('');if(current&&[...box.options].some(o=>o.value===current)&&lc!=='E')box.value=current;if(cat==='소방·방재'){const s=document.getElementById('editLocCode');if(s)s.value='E';box.value='유수장치실'}};
+      window.eamEditLocationChange=function(value,current){const cat=document.getElementById('editCategory')?.value||'';const lc=cat==='소방·방재'?'E':value;const box=document.getElementById('editDetailPlace');if(!box)return;const opts={A:['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트'],B:['복도'],C:['사무실'],D:['옥상','2층 창고'],E:['유수장치실']};box.innerHTML=(opts[lc]||opts.A).map(z=>`<option value="${esc(z)}">${esc(z)}</option>`).join('');if(current&&[...box.options].some(o=>o.value===current)&&lc!=='E')box.value=current;if(cat==='소방·방재'){const s=document.getElementById('editLocCode');if(s)s.value='E';box.value='유수장치실'}};
       window.eamSaveFullEdit=async function(code){
         const a=(window.__eamA||[]).find(z=>v(z.asset_code)===String(code));if(!a){alert('자산을 찾을 수 없습니다.');return}if(typeof SUPA==='undefined'||!SUPA){alert('Supabase 연결이 필요합니다.');return}
         const g=id=>document.getElementById(id)?.value?.trim()||'',category=g('editCategory')||'기타설비',name=g('editName');let lc=g('editLocCode'),place=g('editDetailPlace');if(category==='소방·방재'){lc='E';place='유수장치실'}if(!name){alert('소분류(자산명)를 입력하세요.');return}
@@ -3865,7 +3865,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const catKeyMap={'냉난방':'cooling','소방·방재':'fire','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','기타설비':'other'};
         const k=catKeyMap[category]||'other';
         const lc=k==='fire'?'E':placeCode(m.place);
-        const detail=lc==='A'?['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트']:lc==='B'?['복도']:lc==='C'?['사무실']:lc==='D'?['옥상']:['유수장치실'];
+        const detail=lc==='A'?['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트']:lc==='B'?['복도']:lc==='C'?['사무실']:lc==='D'?['옥상','2층 창고']:['유수장치실'];
         const grid=card.querySelector('.source-grid');
         if(!grid)return;
         grid.innerHTML=`<div class="jgb-inline-grid jgb-full-edit-grid">
@@ -3901,7 +3901,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const loc=document.getElementById('jgbHC_locCode');
         if(loc)loc.value=lc;
         if(!place)return;
-        const opts={A:['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트'],B:['복도'],C:['사무실'],D:['옥상'],E:['유수장치실']};
+        const opts={A:['1번 코트(좌측)','1번 코트(우측)','2번 코트(좌측)','2번 코트(우측)','3번 코트(좌측)','3번 코트(우측)','4번 코트(좌측)','4번 코트(우측)','5번 코트(좌측)','5번 코트(우측)','코트'],B:['복도'],C:['사무실'],D:['옥상','2층 창고'],E:['유수장치실']};
         const old=place.value;place.innerHTML=(opts[lc]||opts.A).map(z=>`<option value="${esc2(z)}">${esc2(z)}</option>`).join('');
         if([...place.options].some(o=>o.value===old)&&lc!=='E')place.value=old;
         if(lc==='E')place.value='유수장치실';
@@ -5097,7 +5097,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         '4번 코트(좌측)','4번 코트(우측)',
         '5번 코트(좌측)','5번 코트(우측)'
       ];
-      const OTHER_PLACES=['유수장치실','기계실','사무실','휴게실','옥상','남자 탈의실','여자 탈의실','남자 샤워실','여자 샤워실','남자 화장실','여자 화장실','복도','기타'];
+      const OTHER_PLACES=['유수장치실','기계실','사무실','휴게실','옥상','2층 창고','남자 탈의실','여자 탈의실','남자 샤워실','여자 샤워실','남자 화장실','여자 화장실','복도','기타'];
       const ALL_PLACES=[...COURT_PLACES,...OTHER_PLACES];
       const norm=(v)=>{
         const x=String(v||'').trim();
