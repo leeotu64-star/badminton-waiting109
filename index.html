@@ -1736,6 +1736,77 @@ html::before,body::before{
   .jgb-history-card .jgb-eam-auto>div{grid-template-columns:92px minmax(0,1fr)!important;border-right:0!important}
 }
 </style>
+
+<style id="jgb-v87-card-lines">
+/* v87: 주요설비 이력카드 전체를 동일한 2쌍/4칸 기준선으로 고정 */
+.jgb-history-card .source-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:0!important;
+  width:100%!important;
+  background:#9fb2c8!important;
+  border-top:2px solid #7f97ad!important;
+  border-left:1px solid #9fb2c8!important;
+  box-sizing:border-box!important;
+}
+.jgb-history-card .source-grid>div{
+  min-width:0!important;
+  min-height:58px!important;
+  display:grid!important;
+  grid-template-columns:108px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+  border:0!important;
+  border-right:2px solid #9fb2c8!important;
+  border-bottom:2px solid #9fb2c8!important;
+  border-radius:0!important;
+}
+.jgb-history-card .source-grid>div:nth-child(2n){border-right:0!important}
+.jgb-history-card .source-grid>div.wide{
+  grid-column:1/-1!important;
+  grid-template-columns:108px minmax(0,1fr)!important;
+  min-height:64px!important;
+  border-right:0!important;
+}
+.jgb-history-card .source-grid>div>small{
+  height:100%!important;
+  min-height:58px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  background:#e7eef5!important;
+  color:#18344f!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  border-right:2px solid #9fb2c8!important;
+  white-space:normal!important;
+  line-height:1.25!important;
+}
+.jgb-history-card .source-grid>div> b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  min-height:58px!important;
+  padding:0 12px!important;
+  box-sizing:border-box!important;
+  color:#102d49!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  line-height:1.35!important;
+  white-space:normal!important;
+  word-break:keep-all!important;
+}
+.jgb-history-card .source-grid>div.wide>small,
+.jgb-history-card .source-grid>div.wide>b{min-height:64px!important}
+@media(max-width:1000px){
+ .jgb-history-card .source-grid{grid-template-columns:1fr!important}
+ .jgb-history-card .source-grid>div,.jgb-history-card .source-grid>div.wide{grid-column:1!important;border-right:0!important}
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3994,32 +4065,22 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const d=maintenanceData(reg,H,I), next=d.next;
         const cardCode=String(cur.asset_code||cur.code||window.__eamSelCode||'');
         const cardOpen=window.eamHistoryCardOpen(cardCode);
+        const F=(label,value,cls='')=>`<div class="${cls}"><small>${esc(label)}</small><b>${esc(value??'-')}</b></div>`;
         return `<details class="eam-source-card jgb-history-card" ${cardOpen?'open':''} ontoggle="eamPersistHistoryCard(this,'${esc(cardCode)}')"><summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();jgbOpenAssetHistoryEditor()">✏️ 수정</button></div></summary><div class="source-grid">
-          <div><small>자산코드</small><b>${esc(cur.asset_code||cur.code||'-')}</b></div>
-          <div><small>자산명</small><b>${esc(cur.name||'-')}</b></div>
-          <div><small>설비 종류</small><b>${esc(cur.category||'-')}</b></div>
-          <div><small>위치</small><b>${esc(cur.place||'-')}</b></div>
-          <div><small>위치코드</small><b>${esc(cur.locationCode||placeCode(cur.place)||'-')}</b></div>
-          <div><small>모델·규격</small><b>${esc(cur.model||'-')}</b></div>
-          <div><small>용량</small><b>${esc(cur.capacity||'-')}</b></div>
-          <div><small>수량</small><b>${esc(cur.qty??cur.quantity??'-')}</b></div>
-          <div><small>제조사</small><b>${esc(cur.maker||cur.vendor||'-')}</b></div>
-          <div><small>A/S 연락처</small><b>${esc(cur.asContact||'-')}</b></div>
-          <div><small>제조일</small><b>${esc(cur.date||cur.manufactureDate||'-')}</b></div>
-          <div><small>설치일</small><b>${esc(cur.installDate||'-')}</b></div>
-          <div><small>내용연수</small><b>${esc(cur.life||'-')}</b></div>
-          <div><small>평가등급</small><b>${esc(cur.grade||'-')}</b></div>
-          <div><small>보증</small><b>${esc(cur.warranty||'-')}</b></div>
-          <div><small>기존 A/S 기록</small><b>${esc(cur.asHistory||'-')}</b></div>
-          <div><small>자산상태</small><b>${esc(cur.status||'정상')}</b></div>
-          <div><small>취득구분</small><b>${esc(cur.acquisitionType||'기존 자산')}</b></div>
-          <div class="wide"><small>시설개선계획</small><b>${esc(cur.improvementPlan||'-')}</b></div>
-          <div class="wide"><small>특이사항</small><b>${esc(cur.note||'-')}</b></div>
-          <div><small>최근 점검일</small><b>${esc(d.inspections[0]?.inspection_date||'-')}</b></div>
-          <div><small>최근 외부정비일</small><b>${esc(d.recentExt?.event_date||'-')}</b></div>
-          <div><small>누적 외부정비 건수</small><b>${d.ext.length}건</b></div>
-          <div><small>최근 조치내용</small><b>${esc(d.recentExt?.description||'-')}</b></div>
-          <div><small>차기 점검일</small><b>${esc(next)}</b></div>
+          ${F('자산코드',cur.asset_code||cur.code||'-')}${F('자산명',cur.name||'-')}
+          ${F('설비 종류',cur.category||'-')}${F('위치',cur.place||'-')}
+          ${F('위치코드',cur.locationCode||placeCode(cur.place)||'-')}${F('모델·규격',cur.model||'-')}
+          ${F('용량',cur.capacity||'-')}${F('수량',cur.qty??cur.quantity??'-')}
+          ${F('제조사',cur.maker||cur.vendor||'-')}${F('A/S 연락처',cur.asContact||'-')}
+          ${F('제조일',cur.date||cur.manufactureDate||'-')}${F('설치일',cur.installDate||'-')}
+          ${F('내용연수',cur.life||'-')}${F('평가등급',cur.grade||'-')}
+          ${F('보증',cur.warranty||'-')}${F('기존 A/S 기록',cur.asHistory||'-')}
+          ${F('자산상태',cur.status||'정상')}${F('취득구분',cur.acquisitionType||'기존 자산')}
+          ${F('최근 점검일',d.inspections[0]?.inspection_date||'-')}${F('최근 외부정비일',d.recentExt?.event_date||'-')}
+          ${F('누적 외부정비 건수',d.ext.length+'건')}${F('최근 조치내용',d.recentExt?.description||'-')}
+          ${F('차기 점검일',next||'-')}${F('교체·폐기 예정 여부',cur.disposalPlan||cur.retirementPlan||'미정')}
+          ${F('시설개선계획',cur.improvementPlan||'-','wide')}
+          ${F('특이사항',cur.note||'-','wide')}
         </div></details>`;
       }
       window.eamPage=function(){
