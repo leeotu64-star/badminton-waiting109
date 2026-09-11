@@ -7341,100 +7341,112 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 
 
 
-<style id="JGB_V97_COMPACT_BOTH_FINAL">
-/* v97
-   v92 기준 최종 컴팩트형
-   - 주요설비 이력카드 + 유지관리 이력 모두 같은 페이퍼 표 스타일
-   - 모든 칸 선은 border-collapse/box-sizing 기준으로 끊김 없이 통일
-   - 기능/DB/버튼/사진 업로드 로직은 변경하지 않음
-*/
+<style id="JGB_V102_HISTORY_CARD_REBUILD">
+/*
+ v102
+ '주요설비 이력카드'와 '유지관리 이력'을 하나의 실제 종이 이력카드처럼 전면 재구성.
+ 기존 JS/DB/등록/수정/삭제/사진 기능은 건드리지 않고 화면 CSS만 재구성.
+ */
 
-/* ===== 공통 페이퍼 톤 ===== */
+/* ===== 전체 카드 : 종이 서식 ===== */
 .jgb-eam-card-final,
-.jgb-maint-final,
-.jgb-history-box{
+.jgb-maint-final{
+  width:100%!important;
+  box-sizing:border-box!important;
+  margin:10px 0!important;
   background:#fff!important;
-  border:1px solid #b9c9d6!important;
-  border-radius:4px!important;
+  border:2px solid #657b8d!important;
+  border-radius:3px!important;
   box-shadow:none!important;
-  color:#23384a!important;
-}
-
-/* ===== 주요설비 이력카드 : 컴팩트 ===== */
-.jgb-eam-card-final{
-  margin:8px 0 10px!important;
   overflow:hidden!important;
 }
 
+/* 카드 제목 */
+.jgb-eam-card-final .jgb-card-top,
+.jgb-maint-head{
+  height:42px!important;
+  min-height:42px!important;
+  padding:0 13px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  background:#e6edf2!important;
+  color:#17384f!important;
+  border-bottom:2px solid #657b8d!important;
+}
+
 .jgb-eam-card-final .jgb-card-top{
-  min-height:38px!important;
-  height:38px!important;
-  padding:0 10px!important;
-  background:#eaf2f8!important;
-  color:#183d59!important;
-  border-bottom:1px solid #aebfcd!important;
-  font-size:15px!important;
+  font-size:16px!important;
   font-weight:900!important;
 }
 
-.jgb-eam-card-final .jgb-card-top button{
-  border:1px solid #aebfcd!important;
-  background:#fff!important;
-  color:#214965!important;
-  border-radius:3px!important;
-  padding:4px 9px!important;
-  font-size:11px!important;
-  font-weight:800!important;
+.jgb-maint-head h3{
+  font-size:16px!important;
+  color:#17384f!important;
+  font-weight:900!important;
 }
 
+/* ===== 주요설비 : 정확히 50 : 50 ===== */
 .jgb-eam-card-final .jgb-eam-card-body{
   display:grid!important;
-  grid-template-columns:minmax(0,1fr) 150px!important;
+  grid-template-columns:50% 50%!important;
   gap:0!important;
   padding:0!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-eam-info,
+.jgb-eam-photo{
+  width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#fff!important;
 }
 
 .jgb-eam-info{
-  min-width:0!important;
-  border:0!important;
-  border-right:1px solid #b9c9d6!important;
-  border-radius:0!important;
+  border-right:2px solid #657b8d!important;
 }
 
+/* 섹션 제목 */
 .jgb-eam-info-title,
 .jgb-eam-photo-title{
-  min-height:30px!important;
-  height:30px!important;
+  height:34px!important;
+  min-height:34px!important;
   display:flex!important;
   align-items:center!important;
+  padding:0 10px!important;
   box-sizing:border-box!important;
-  background:#f1f6fa!important;
-  color:#254861!important;
+  background:#edf2f5!important;
+  color:#24465d!important;
+  border-bottom:1px solid #8295a4!important;
   font-size:12px!important;
   font-weight:900!important;
-  padding:0 9px!important;
-  border-bottom:1px solid #c1cfda!important;
 }
 
+/* 기본정보 2쌍 */
 .jgb-eam-info-grid{
   display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:0!important;
+  grid-template-columns:50% 50%!important;
   width:100%!important;
+  gap:0!important;
   margin:0!important;
   padding:0!important;
-  border:0!important;
+  box-sizing:border-box!important;
 }
 
 .jgb-eam-info-cell{
   display:grid!important;
-  grid-template-columns:88px minmax(0,1fr)!important;
-  min-height:35px!important;
+  grid-template-columns:96px minmax(0,1fr)!important;
+  min-width:0!important;
+  min-height:42px!important;
   margin:0!important;
   padding:0!important;
-  border-right:1px solid #c1cfda!important;
-  border-bottom:1px solid #c1cfda!important;
   box-sizing:border-box!important;
+  border-right:1px solid #9aabb7!important;
+  border-bottom:1px solid #9aabb7!important;
   background:#fff!important;
 }
 
@@ -7446,93 +7458,68 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   display:flex!important;
   align-items:center!important;
   min-width:0!important;
-  margin:0!important;
-  padding:5px 7px!important;
+  padding:6px 7px!important;
   box-sizing:border-box!important;
-  background:#eef3f7!important;
-  color:#41596b!important;
-  border-right:1px solid #c7d3dc!important;
-  font-size:11px!important;
+  background:#e8eef2!important;
+  border-right:1px solid #9aabb7!important;
+  color:#25475e!important;
+  font-size:12px!important;
   font-weight:800!important;
   line-height:1.15!important;
-  white-space:normal!important;
+  text-align:left!important;
 }
 
 .jgb-eam-info-cell b{
   display:flex!important;
   align-items:center!important;
   min-width:0!important;
-  margin:0!important;
-  padding:5px 8px!important;
+  padding:6px 8px!important;
   box-sizing:border-box!important;
-  color:#18384f!important;
+  color:#142f43!important;
   font-size:12px!important;
   font-weight:700!important;
   line-height:1.2!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
+  text-align:left!important;
+  white-space:normal!important;
+  word-break:keep-all!important;
 }
 
-/* 사진도 컴팩트하게 */
-.jgb-eam-photo{
-  min-width:0!important;
-  border:0!important;
-  background:#fff!important;
-}
-
+/* 사진 영역 */
 .jgb-photo-box{
-  height:112px!important;
-  margin:7px!important;
-  border:1px dashed #9fb5c6!important;
-  border-radius:2px!important;
-  background:#fbfdfe!important;
+  width:calc(100% - 20px)!important;
+  height:235px!important;
+  margin:10px!important;
   box-sizing:border-box!important;
-}
-
-.jgb-photo-box .cam{
-  font-size:20px!important;
-}
-
-.jgb-photo-box strong{
-  font-size:10px!important;
-}
-
-.jgb-photo-box span{
-  font-size:8px!important;
+  border:1px dashed #879eae!important;
+  border-radius:2px!important;
+  background:#fbfcfd!important;
 }
 
 .jgb-equip-photo-actions{
-  padding:0 7px 7px!important;
-  font-size:9px!important;
+  padding:0 10px 10px!important;
+  font-size:10px!important;
 }
 
-.jgb-equip-photo-actions button{
-  font-size:9px!important;
-  padding:3px 6px!important;
-}
-
-/* ===== 자동 이력 : 기본정보와 동일한 표 선 ===== */
+/* ===== 자동이력 : 2쌍 박스 ===== */
 .jgb-eam-card-final .jgb-eam-auto{
   display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-template-columns:50% 50%!important;
   width:100%!important;
   margin:0!important;
   padding:0!important;
-  border:0!important;
-  border-top:1px solid #9fb3c2!important;
+  border-top:2px solid #657b8d!important;
   box-sizing:border-box!important;
 }
 
 .jgb-eam-card-final .jgb-eam-auto>div{
   display:grid!important;
-  grid-template-columns:88px minmax(0,1fr)!important;
-  min-height:35px!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  min-height:42px!important;
   margin:0!important;
   padding:0!important;
-  border-right:1px solid #c1cfda!important;
-  border-bottom:1px solid #c1cfda!important;
   box-sizing:border-box!important;
+  border-right:1px solid #9aabb7!important;
+  border-bottom:1px solid #9aabb7!important;
 }
 
 .jgb-eam-card-final .jgb-eam-auto>div:nth-child(even){
@@ -7542,173 +7529,108 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 .jgb-eam-card-final .jgb-eam-auto small{
   display:flex!important;
   align-items:center!important;
-  margin:0!important;
-  padding:5px 7px!important;
-  background:#eef3f7!important;
-  color:#41596b!important;
-  border-right:1px solid #c7d3dc!important;
+  padding:6px 8px!important;
   box-sizing:border-box!important;
-  font-size:11px!important;
+  background:#e8eef2!important;
+  border-right:1px solid #9aabb7!important;
+  color:#25475e!important;
+  font-size:12px!important;
   font-weight:800!important;
   line-height:1.15!important;
+  text-align:left!important;
 }
 
 .jgb-eam-card-final .jgb-eam-auto b{
   display:flex!important;
   align-items:center!important;
   min-width:0!important;
-  margin:0!important;
-  padding:5px 8px!important;
-  color:#18384f!important;
+  padding:6px 8px!important;
   box-sizing:border-box!important;
+  color:#142f43!important;
   font-size:12px!important;
   font-weight:700!important;
-  line-height:1.2!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
+  text-align:left!important;
 }
 
-/* 시설개선계획/특이사항도 같은 2칸 기준 */
+/* ===== 시설개선계획 / 특이사항 : 각각 정확히 한 줄 ===== */
 .jgb-eam-card-final .jgb-eam-notes-bottom{
   display:block!important;
   width:100%!important;
   margin:0!important;
   padding:0!important;
   border:0!important;
+  box-sizing:border-box!important;
 }
 
 .jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note{
   display:grid!important;
-  grid-template-columns:88px minmax(0,1fr)!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
   width:100%!important;
-  min-height:36px!important;
+  min-height:42px!important;
   margin:0!important;
   padding:0!important;
-  border:0!important;
-  border-bottom:1px solid #c1cfda!important;
   box-sizing:border-box!important;
+  border-bottom:1px solid #9aabb7!important;
 }
 
 .jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note small{
   display:flex!important;
   align-items:center!important;
-  margin:0!important;
-  padding:5px 7px!important;
-  background:#eef3f7!important;
-  color:#41596b!important;
-  border-right:1px solid #c7d3dc!important;
-  box-sizing:border-box!important;
-  font-size:11px!important;
+  padding:6px 8px!important;
+  background:#e8eef2!important;
+  border-right:1px solid #9aabb7!important;
+  color:#25475e!important;
+  font-size:12px!important;
   font-weight:800!important;
+  text-align:left!important;
 }
 
 .jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note b{
   display:flex!important;
   align-items:center!important;
-  min-width:0!important;
-  margin:0!important;
-  padding:5px 8px!important;
-  color:#18384f!important;
-  box-sizing:border-box!important;
+  padding:6px 8px!important;
+  color:#142f43!important;
   font-size:12px!important;
   font-weight:700!important;
-  line-height:1.2!important;
+  text-align:left!important;
 }
 
-.jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note-empty{
-  display:none!important;
-}
-
-/* ===== 유지관리 이력 : 동일한 컴팩트 페이퍼 표 ===== */
-.jgb-maint-final{
-  margin-top:8px!important;
-  overflow:hidden!important;
-  border-radius:4px!important;
-}
-
-.jgb-maint-head{
-  min-height:38px!important;
-  height:38px!important;
-  padding:0 10px!important;
-  display:flex!important;
-  align-items:center!important;
-  box-sizing:border-box!important;
-  background:#eaf2f8!important;
-  border-bottom:1px solid #aebfcd!important;
-}
-
-.jgb-maint-head h3{
-  margin:0!important;
-  font-size:15px!important;
-  line-height:1!important;
-  color:#183d59!important;
-}
-
-.jgb-maint-head .counts{
-  margin-left:auto!important;
-  margin-right:8px!important;
-  font-size:10px!important;
-  color:#5c7181!important;
-}
-
-.jgb-maint-head button{
-  font-size:10px!important;
-  padding:4px 8px!important;
-  min-width:auto!important;
-  border-radius:3px!important;
-}
-
-/* 이력 한 건 */
+/* ===== 유지관리 이력 : 정확히 50 : 50 ===== */
 .jgb-history-box{
+  width:calc(100% - 14px)!important;
   margin:7px!important;
-  overflow:hidden!important;
-  border:1px solid #c0ced8!important;
+  box-sizing:border-box!important;
+  border:1px solid #7d919f!important;
   border-radius:2px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
 }
 
 .jgb-history-box-head{
-  min-height:34px!important;
-  padding:0 9px!important;
+  height:38px!important;
+  min-height:38px!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
   display:flex!important;
   align-items:center!important;
-  box-sizing:border-box!important;
-  background:#f1f6fa!important;
-  border-bottom:1px solid #b8c8d4!important;
-  cursor:pointer!important;
-}
-
-.jgb-history-box-head>div:first-child{
-  min-width:0!important;
+  background:#e6edf2!important;
+  border-bottom:2px solid #7d919f!important;
 }
 
 .jgb-history-box-head strong{
-  font-size:12px!important;
-  color:#21465f!important;
+  font-size:13px!important;
+  color:#17384f!important;
 }
 
 .jgb-history-box-head span{
   font-size:10px!important;
-  color:#62788a!important;
-}
-
-.jgb-history-head-actions{
-  margin-left:auto!important;
-  display:flex!important;
-  align-items:center!important;
-  gap:5px!important;
-}
-
-.jgb-hbox-toggle,
-.jgb-hbox-del{
-  font-size:9px!important;
-  padding:3px 6px!important;
-  border-radius:2px!important;
+  color:#566d7e!important;
 }
 
 .jgb-history-box-body{
   display:grid!important;
-  grid-template-columns:minmax(0,1fr) 315px!important;
+  grid-template-columns:50% 50%!important;
   gap:0!important;
   width:100%!important;
   margin:0!important;
@@ -7716,271 +7638,155 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   box-sizing:border-box!important;
 }
 
+/* 왼쪽 유지관리 정보 */
 .jgb-history-info{
+  width:100%!important;
   min-width:0!important;
-  border-right:1px solid #c0ced8!important;
+  border:0!important;
+  border-right:2px solid #7d919f!important;
+  box-sizing:border-box!important;
   background:#fff!important;
 }
 
 .jgb-history-info-grid{
   display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  grid-template-columns:50% 50%!important;
   gap:0!important;
   width:100%!important;
   margin:0!important;
   padding:0!important;
-  border:0!important;
+  box-sizing:border-box!important;
 }
 
 .jgb-history-info-item{
   display:grid!important;
-  grid-template-columns:72px minmax(0,1fr)!important;
+  grid-template-columns:92px minmax(0,1fr)!important;
+  min-height:43px!important;
   min-width:0!important;
-  min-height:35px!important;
   margin:0!important;
   padding:0!important;
-  border-right:1px solid #c5d2dc!important;
-  border-bottom:1px solid #c5d2dc!important;
   box-sizing:border-box!important;
+  border-right:1px solid #9aabb7!important;
+  border-bottom:1px solid #9aabb7!important;
   background:#fff!important;
 }
 
-.jgb-history-info-item:nth-child(3n){
+.jgb-history-info-item:nth-child(2n){
   border-right:0!important;
 }
 
 .jgb-history-info-item.full{
   grid-column:1/-1!important;
-  grid-template-columns:72px minmax(0,1fr)!important;
+  grid-template-columns:92px minmax(0,1fr)!important;
   border-right:0!important;
 }
 
 .jgb-history-info-item small{
   display:flex!important;
   align-items:center!important;
-  min-width:0!important;
-  margin:0!important;
-  padding:5px 6px!important;
+  padding:6px 7px!important;
   box-sizing:border-box!important;
-  background:#eef3f7!important;
-  color:#41596b!important;
-  border-right:1px solid #c7d3dc!important;
-  font-size:10px!important;
+  background:#e8eef2!important;
+  border-right:1px solid #9aabb7!important;
+  color:#25475e!important;
+  font-size:12px!important;
   font-weight:800!important;
   line-height:1.15!important;
-  white-space:normal!important;
+  text-align:left!important;
 }
 
 .jgb-history-info-item b{
   display:flex!important;
   align-items:center!important;
   min-width:0!important;
-  margin:0!important;
-  padding:5px 7px!important;
+  padding:6px 8px!important;
   box-sizing:border-box!important;
   background:#fff!important;
-  color:#18384f!important;
-  font-size:11px!important;
+  color:#142f43!important;
+  font-size:12px!important;
   font-weight:700!important;
   line-height:1.2!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
+  text-align:left!important;
 }
 
-/* 작업사진도 같은 카드 안에서 컴팩트 */
+/* 오른쪽 작업사진 */
 .jgb-history-photos{
+  width:100%!important;
   min-width:0!important;
-  padding:0!important;
+  box-sizing:border-box!important;
   background:#fff!important;
 }
 
 .jgb-history-photos-title{
-  height:30px!important;
+  height:34px!important;
   display:flex!important;
   align-items:center!important;
-  margin:0!important;
-  padding:0 8px!important;
+  padding:0 10px!important;
   box-sizing:border-box!important;
-  background:#f1f6fa!important;
-  border-bottom:1px solid #c1cfda!important;
-  color:#254861!important;
-  font-size:11px!important;
+  background:#edf2f5!important;
+  border-bottom:1px solid #8295a4!important;
+  color:#24465d!important;
+  font-size:12px!important;
   font-weight:900!important;
 }
 
 .jgb-history-box .jgb-work-photos{
-  display:flex!important;
-  flex-direction:row!important;
-  flex-wrap:nowrap!important;
-  justify-content:center!important;
-  align-items:center!important;
-  gap:6px!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,1fr)!important;
+  gap:8px!important;
   width:100%!important;
-  min-height:115px!important;
-  padding:8px!important;
+  min-height:135px!important;
+  padding:10px!important;
   box-sizing:border-box!important;
   overflow:hidden!important;
 }
 
 .jgb-history-box .jgb-work-photo{
-  position:relative!important;
-  flex:0 0 92px!important;
-  width:92px!important;
-  height:92px!important;
-  min-width:92px!important;
-  max-width:92px!important;
-  min-height:92px!important;
-  max-height:92px!important;
-  box-sizing:border-box!important;
-  border:1px dashed #9fb5c6!important;
-  border-radius:2px!important;
-  background:#fbfdfe!important;
-}
-
-.jgb-history-box .jgb-work-photo b{
-  font-size:9px!important;
-}
-
-.jgb-history-box .jgb-work-photo small{
-  font-size:8px!important;
-}
-
-.jgb-history-attach{
-  min-height:28px!important;
-  padding:6px 8px!important;
-  box-sizing:border-box!important;
-  background:#f8fbfd!important;
-  border-top:1px solid #c1cfda!important;
-  color:#657a8a!important;
-  font-size:9px!important;
-}
-
-/* 접힘 상태 */
-.jgb-history-box.is-collapsed .jgb-history-box-body,
-.jgb-history-box.is-collapsed .jgb-history-attach{
-  display:none!important;
-}
-
-/* ===== 모바일 ===== */
-@media(max-width:900px){
-  .jgb-eam-card-final .jgb-eam-card-body{
-    grid-template-columns:minmax(0,1fr) 130px!important;
-  }
-  .jgb-history-box-body{
-    grid-template-columns:1fr!important;
-  }
-  .jgb-history-info{
-    border-right:0!important;
-  }
-  .jgb-history-photos{
-    border-top:1px solid #c0ced8!important;
-  }
-}
-
-@media(max-width:700px){
-  .jgb-eam-card-final .jgb-eam-card-body{
-    grid-template-columns:1fr!important;
-  }
-  .jgb-eam-photo{
-    border-top:1px solid #c1cfda!important;
-  }
-  .jgb-eam-info-grid{
-    grid-template-columns:1fr!important;
-  }
-  .jgb-eam-info-cell{
-    border-right:0!important;
-  }
-  .jgb-eam-card-final .jgb-eam-auto{
-    grid-template-columns:1fr!important;
-  }
-  .jgb-eam-card-final .jgb-eam-auto>div{
-    border-right:0!important;
-  }
-  .jgb-history-info-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  }
-  .jgb-history-info-item:nth-child(3n){
-    border-right:1px solid #c5d2dc!important;
-  }
-  .jgb-history-info-item:nth-child(2n){
-    border-right:0!important;
-  }
-}
-</style>
-
-
-
-<style id="JGB_V101_5050_BOX_LOCKED">
-/*
- v101
- 사용자가 지정한 50:50 박스형.
- v97의 디자인/색상/기능은 그대로 두고,
- 좌우 구도만 정확히 50:50으로 맞춤.
-*/
-
-/* 주요설비: 기본정보 50% / 설비사진 50% */
-.jgb-eam-card-final .jgb-eam-card-body{
-  display:grid!important;
-  grid-template-columns:50% 50%!important;
-  gap:0!important;
   width:100%!important;
-  box-sizing:border-box!important;
-}
-
-/* 유지관리: 작업정보 50% / 작업사진 50% */
-.jgb-history-box-body{
-  display:grid!important;
-  grid-template-columns:50% 50%!important;
-  gap:0!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-}
-
-/* 두 영역 모두 박스 안에서 선이 정확히 이어지도록 */
-.jgb-eam-info,
-.jgb-eam-photo,
-.jgb-history-info,
-.jgb-history-photos{
+  height:95px!important;
   min-width:0!important;
+  min-height:95px!important;
+  max-width:none!important;
+  max-height:none!important;
   box-sizing:border-box!important;
+  border:1px dashed #879eae!important;
+  border-radius:2px!important;
+  background:#fbfcfd!important;
 }
 
-/* 사진칸이 오른쪽으로 밀리지 않게 */
-.jgb-eam-photo{
-  width:100%!important;
-  border-left:0!important;
-}
-
-.jgb-history-photos{
-  width:100%!important;
-}
-
-/* 표 내부 선은 현재 구조 그대로 유지 */
-.jgb-eam-info-grid,
-.jgb-eam-card-final .jgb-eam-auto,
-.jgb-eam-card-final .jgb-eam-notes-bottom,
-.jgb-history-info-grid{
-  width:100%!important;
+/* 첨부파일 */
+.jgb-history-attach{
+  min-height:30px!important;
+  padding:7px 10px!important;
   box-sizing:border-box!important;
+  background:#f4f7f9!important;
+  border-top:1px solid #7d919f!important;
+  color:#5b7080!important;
+  font-size:10px!important;
 }
 
-/* 페이퍼형 박스: 기존 색상과 스타일을 건드리지 않음 */
-.jgb-eam-card-final,
-.jgb-history-box{
-  overflow:hidden!important;
-}
-
-/* 모바일에서는 기존 반응형 동작 유지 */
-@media(max-width:900px){
-  .jgb-history-box-body{
-    grid-template-columns:50% 50%!important;
-  }
-}
+/* 모바일 */
 @media(max-width:700px){
   .jgb-eam-card-final .jgb-eam-card-body,
   .jgb-history-box-body{
     grid-template-columns:1fr!important;
+  }
+  .jgb-eam-info{
+    border-right:0!important;
+  }
+  .jgb-eam-photo,
+  .jgb-history-photos{
+    border-top:2px solid #657b8d!important;
+  }
+  .jgb-eam-info-grid,
+  .jgb-eam-card-final .jgb-eam-auto,
+  .jgb-history-info-grid{
+    grid-template-columns:1fr!important;
+  }
+  .jgb-eam-info-cell,
+  .jgb-eam-card-final .jgb-eam-auto>div,
+  .jgb-history-info-item{
+    border-right:0!important;
   }
 }
 </style>
