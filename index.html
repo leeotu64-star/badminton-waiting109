@@ -9497,3 +9497,370 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   box-sizing:border-box!important;
 }
 </style>
+
+
+
+<!-- =========================================================
+     JGB V112 : 이력카드 선 정렬 최종 FIX
+     기존 데이터/기능/사진 구성은 건드리지 않고
+     이력카드의 격자선만 하나의 기준선으로 통일
+     ========================================================= -->
+<style id="JGB_V112_HISTORY_CARD_LINE_FIX">
+
+/* ===== 주요설비 이력카드 : 좌우 50:50 기준선 ===== */
+.jgb-history-card .jgb-paper-card-body{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:0!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-history-card .jgb-paper-info,
+.jgb-history-card .jgb-paper-photo{
+  min-width:0!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-history-card .jgb-paper-info{
+  border-right:2px solid #718492!important;
+}
+
+/* 기본정보 표 자체를 '1px 선 배경 + 동일 간격' 방식으로 통일 */
+.jgb-history-card .jgb-paper-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:1px!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#718492!important;
+  border:0!important;
+}
+
+.jgb-history-card .jgb-paper-grid > .jgb-paper-cell{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  align-items:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:52px!important;
+  height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+}
+
+.jgb-history-card .jgb-paper-grid > .jgb-paper-cell small{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  background:#d9e1e5!important;
+  color:#203c4f!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  line-height:1.2!important;
+  text-align:left!important;
+}
+
+.jgb-history-card .jgb-paper-grid > .jgb-paper-cell b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:14px!important;
+  font-weight:750!important;
+  line-height:1.25!important;
+  text-align:left!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+}
+
+/* ===== 자동 산출 이력 : 위 기본정보와 동일한 선 규격 ===== */
+.jgb-history-card .jgb-eam-auto{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:1px!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#718492!important;
+  border:0!important;
+}
+
+.jgb-history-card .jgb-eam-auto > .jgb-paper-cell{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  width:100%!important;
+  min-width:0!important;
+  height:52px!important;
+  min-height:52px!important;
+  max-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+}
+
+.jgb-history-card .jgb-eam-auto > .jgb-paper-cell small{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  background:#d9e1e5!important;
+  color:#203c4f!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  line-height:1.2!important;
+  text-align:left!important;
+}
+
+.jgb-history-card .jgb-eam-auto > .jgb-paper-cell b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:14px!important;
+  font-weight:750!important;
+  line-height:1.25!important;
+  text-align:left!important;
+}
+
+/* 자동이력 외곽선 */
+.jgb-history-card .jgb-eam-auto{
+  border-left:2px solid #718492!important;
+  border-right:2px solid #718492!important;
+}
+
+/* 시설개선계획 / 특이사항도 같은 기준선 */
+.jgb-history-card .jgb-eam-notes-bottom{
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border-left:2px solid #718492!important;
+  border-right:2px solid #718492!important;
+}
+
+.jgb-history-card .jgb-eam-notes-bottom > .jgb-paper-cell.wide{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-bottom:1px solid #718492!important;
+  background:#faf8f2!important;
+}
+
+/* ===== 유지관리 이력 : 좌우 정보/사진 기준선 ===== */
+.jgb-history-box{
+  border:2px solid #718492!important;
+  border-radius:8px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+
+.jgb-history-box .jgb-history-box-body{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:0!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+
+.jgb-history-box .jgb-history-info{
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border-right:2px solid #718492!important;
+}
+
+.jgb-history-box .jgb-history-info-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:1px!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#718492!important;
+  border:0!important;
+}
+
+.jgb-history-box .jgb-history-info-item{
+  display:grid!important;
+  grid-template-columns:86px minmax(0,1fr)!important;
+  align-items:center!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:58px!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#fff!important;
+}
+
+.jgb-history-box .jgb-history-info-item:nth-child(2n){
+  border-right:0!important;
+}
+
+.jgb-history-box .jgb-history-info-item.full{
+  grid-column:1/-1!important;
+}
+
+.jgb-history-box .jgb-history-info-item small{
+  min-width:0!important;
+  margin:0!important;
+  padding:0 8px 0 0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  color:#526d81!important;
+  white-space:nowrap!important;
+}
+
+.jgb-history-box .jgb-history-info-item b{
+  min-width:0!important;
+  margin:0!important;
+  padding:0 0 0 9px!important;
+  box-sizing:border-box!important;
+  font-size:14px!important;
+  font-weight:800!important;
+  color:#173f59!important;
+  line-height:1.35!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+/* 사진 영역도 정보영역과 정확히 같은 시작선 */
+.jgb-history-box .jgb-history-photos{
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+}
+
+.jgb-history-box .jgb-history-photos-title{
+  height:48px!important;
+  margin:0!important;
+  padding:0 16px!important;
+  display:flex!important;
+  align-items:center!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-bottom:2px solid #718492!important;
+  background:#f0f6fb!important;
+  font-size:17px!important;
+  font-weight:900!important;
+}
+
+.jgb-history-box .jgb-work-photos{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:10px!important;
+  width:100%!important;
+  min-height:220px!important;
+  margin:0!important;
+  padding:16px!important;
+  box-sizing:border-box!important;
+  align-items:center!important;
+  overflow:hidden!important;
+}
+
+.jgb-history-box .jgb-work-photo{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:125px!important;
+  min-height:125px!important;
+  max-height:125px!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  border:2px dashed #718492!important;
+  border-radius:0!important;
+}
+
+/* 모바일 */
+@media(max-width:750px){
+  .jgb-history-card .jgb-paper-card-body,
+  .jgb-history-box .jgb-history-box-body{
+    grid-template-columns:1fr!important;
+  }
+
+  .jgb-history-card .jgb-paper-info,
+  .jgb-history-box .jgb-history-info{
+    border-right:0!important;
+  }
+
+  .jgb-history-card .jgb-paper-photo,
+  .jgb-history-box .jgb-history-photos{
+    border-top:2px solid #718492!important;
+  }
+
+  .jgb-history-card .jgb-paper-grid,
+  .jgb-history-card .jgb-eam-auto,
+  .jgb-history-box .jgb-history-info-grid{
+    grid-template-columns:1fr!important;
+  }
+
+  .jgb-history-box .jgb-work-photos{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    overflow:auto!important;
+  }
+}
+
+</style>
+
+
+
+<!-- JGB V113 : 자산코드 쪽 중복 외곽선 제거 -->
+<style id="JGB_V113_ASSET_CODE_DUP_LINE_FIX">
+.jgb-history-card .jgb-paper-grid > .jgb-paper-cell:first-child{
+  border-right:0!important;
+}
+.jgb-history-card .jgb-paper-grid > .jgb-paper-cell:first-child small{
+  border-right:1px solid #718492!important;
+}
+</style>
