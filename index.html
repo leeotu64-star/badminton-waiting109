@@ -4930,7 +4930,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <div class="eam-type-row">${order.map(k=>{const z=cats[k];return `<button type="button" class="eam-type ${k===cat?'on':''}" onclick="eamPick('${k}')"><span>${z.ico}</span><strong>${E(z.label)}</strong><em>${z.items.length}</em><small>${E(z.desc)}</small></button>`}).join('')}</div>
           <div class="eam-innovation-layout"><aside class="eam-assets-panel"><div class="eam-assets-head"><div><b>${C.ico} ${E(C.label)}</b><span>${list.length}개 자산</span></div><div class="eam-filter-row"><select id="eamProLocationFilter" onchange="eamProFilter('',this.value)"><option value="">전체 위치</option><option value="A">A · 코트</option><option value="B">B · 복도</option><option value="C">C · 사무실</option><option value="D">D · 옥상</option><option value="E">E · 유수장치실</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option></select></div></div><div id="eamproGrid" class="eam-asset-list">${list.map(x=>{const m=meta[x.code]||{},a=A.find(z=>V(z.asset_code)===V(x.code))||null,merged=Object.assign({},x,a||{},m);if(cat==='fire')merged.place='유수장치실';const st=a?.status||m.status||'원본';return `<button type="button" class="eam-asset-row ${V(x.code)===V(sel)?'on':''}" data-code="${E(x.code)}" data-loc="${E(typeof placeCode==='function'?placeCode(merged.place):'')}" onclick="eamPick('${cat}','${E(x.code)}')"><span class="row-code">${E(window.eamUnifiedCode?window.eamUnifiedCode(merged):x.code)}</span><span class="row-copy"><b>${E(window.eamDisplayName?window.eamDisplayName(merged):merged.name||'-')}</b><small>${E(window.placeLabel?window.placeLabel(merged.place):merged.place||'-')}</small></span><i class="${st==='정상'?'ok':st==='원본'?'source':'bad'}">${E(st)}</i></button>`}).join('')||'<div class="eam-empty">등록된 자산이 없습니다.</div>'}</div></aside>
           <main class="eam-detail-panel">${src?`<div class="eam-detail-hero"><div><div class="hero-code">${E(window.eamUnifiedCode?window.eamUnifiedCode(cur):sel)}</div><h2>${E(window.eamDisplayName?window.eamDisplayName(cur):cur.name||'-')}</h2><div class="hero-meta"><span>${E(C.label)}</span><b>${E(window.placeLabel?window.placeLabel(cur.place):cur.place||'-')}</b><span>위치코드 ${E(typeof placeCode==='function'?placeCode(cur.place):'-')}</span></div></div><span class="hero-status ${String(cur.status||'원본')==='정상'?'good':'source'}">${E(cur.status||'원본')}</span></div>
-            <section class="jgb-eam-card-final"><div class="jgb-card-top"><span>📋 주요설비 이력카드</span><button onclick="event.preventDefault();event.stopPropagation();jgbOpenAssetHistoryEditor()">✏️ 수정</button></div><div class="jgb-eam-card-body"><div class="jgb-eam-info"><div class="jgb-eam-info-title">📄 기본정보</div><div class="jgb-eam-info-grid">${infoHtml}</div></div>${photo}</div><div class="jgb-eam-auto"><div><small>최근 점검일</small><b>${E(dateOnly(lastInspection))}</b></div><div><small>최근 외부정비일</small><b>${E(dateOnly(recentExt?.event_date))}</b></div><div><small>누적 외부정비 건수</small><b>${ext.length}건</b></div><div><small>최근 조치내용</small><b>${E(recentExt?((detailFor(recentExt).action)||recentExt.description||'-'):'-')}</b></div><div><small>차기 점검일</small><b>${E(next)}</b></div><div><small>교체·폐기 예정 여부</small><b>${E(replacement)}</b></div><div class="jgb-eam-disposal-total"><small>누적 교체·폐기 건수</small><b>${E(String(cur.replacementCount??cur.disposalCount??cur.retirementCount??'-'))}</b></div></div><div class="jgb-eam-notes-bottom"><div class="jgb-eam-note"><small>시설개선계획</small><b>${E(cur.improvementPlan||'-')}</b><span class="jgb-eam-note-empty"></span><span class="jgb-eam-note-empty"></span></div><div class="jgb-eam-note"><small>특이사항</small><b>${E(cur.note||'-')}</b><span class="jgb-eam-note-empty"></span><span class="jgb-eam-note-empty"></span></div></div></section>
+            <section class="jgb-eam-card-final"><div class="jgb-card-top"><span>📋 주요설비 이력카드</span><button onclick="event.preventDefault();event.stopPropagation();jgbOpenAssetHistoryEditor()">✏️ 수정</button></div><div class="jgb-eam-card-body"><div class="jgb-eam-info"><div class="jgb-eam-info-title">📄 기본정보</div><div class="jgb-eam-info-grid">${infoHtml}</div></div>${photo}</div><div class="jgb-eam-auto"><div data-eam="recent-inspection"><small>최근 점검일</small><b>${E(dateOnly(lastInspection))}</b></div><div data-eam="recent-external"><small>최근 외부정비일</small><b>${E(dateOnly(recentExt?.event_date))}</b></div><div data-eam="recent-action"><small>최근 조치내용</small><b>${E(recentExt?((detailFor(recentExt).action)||recentExt.description||'-'):'-')}</b></div><div data-eam="external-count"><small>누적 외부정비 건수</small><b>${ext.length}건</b></div><div data-eam="next-inspection"><small>차기 점검일</small><b>${E(next)}</b></div><div data-eam="replacement-plan"><small>교체·폐기 예정 여부</small><b>${E(replacement)}</b></div><div class="jgb-eam-disposal-total" data-eam="disposal-count"><small>누적 교체·폐기 건수</small><b>${E(String(cur.replacementCount??cur.disposalCount??cur.retirementCount??'-'))}</b></div></div><div class="jgb-eam-notes-bottom"><div class="jgb-eam-note"><small>시설개선계획</small><b>${E(cur.improvementPlan||'-')}</b><span class="jgb-eam-note-empty"></span><span class="jgb-eam-note-empty"></span></div><div class="jgb-eam-note"><small>특이사항</small><b>${E(cur.note||'-')}</b><span class="jgb-eam-note-empty"></span><span class="jgb-eam-note-empty"></span></div></div></section>
             <section class="jgb-maint-final"><div class="jgb-maint-head"><h3>🔧 유지관리 이력</h3><span class="counts">외부정비 ${ext.length}건 · 전체 ${hs.length}건 · 점검 ${hs.filter(h=>inferType(h)==='점검').length}건</span><button type="button" id="jgbMaintRegisterBtn" class="jgb-maint-register-btn">＋ 등록</button></div><div class="jgb-history-box-list">${historyBoxes||'<div class="jgb-maint-empty">등록된 유지관리 이력이 없습니다.</div>'} </div></section>
           </main></div></div>`:'<div class="eam-empty">설비 종류에서 자산을 선택하세요.</div>'}</main></div></div>`;
       };
@@ -10579,4 +10579,248 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   overflow:hidden!important;
   text-overflow:ellipsis!important;
 }
+</style>
+
+
+
+<!-- JGB V121 : 사용자가 지정한 최종 표시 순서 + 페이퍼 스타일 -->
+<style id="JGB_V121_FINAL_USER_ORDER">
+
+/* 하단 표는 흰색 종이 느낌 */
+.jgb-eam-card-final .jgb-eam-auto,
+.jgb-eam-card-final .jgb-eam-notes-bottom{
+  background:#fff!important;
+}
+
+/* 선은 진하고 일정하게 */
+.jgb-eam-card-final .jgb-eam-auto{
+  border-top:2px solid #526675!important;
+}
+.jgb-eam-card-final .jgb-eam-auto > div{
+  border-bottom:1.5px solid #718595!important;
+}
+.jgb-eam-card-final .jgb-eam-auto > div:nth-child(odd){
+  border-right:1.5px solid #718595!important;
+}
+.jgb-eam-card-final .jgb-eam-auto > div:nth-child(even){
+  border-right:0!important;
+}
+
+/* 제목/라벨 색상은 확실하게 */
+.jgb-eam-card-final .jgb-eam-info-title,
+.jgb-eam-card-final .jgb-eam-notes-bottom > .jgb-eam-note > small,
+.jgb-eam-card-final .jgb-eam-auto > div > small{
+  background:#d8e4eb!important;
+  color:#17384e!important;
+  font-weight:900!important;
+}
+
+/* 값 칸은 완전 흰색 */
+.jgb-eam-card-final .jgb-eam-auto > div > b,
+.jgb-eam-card-final .jgb-eam-notes-bottom > .jgb-eam-note > b{
+  background:#fff!important;
+  color:#17364c!important;
+  font-size:14px!important;
+  font-weight:800!important;
+}
+
+/* 제목 글씨 확대 */
+.jgb-eam-card-final .jgb-card-top span,
+.jgb-eam-card-final .jgb-eam-info-title{
+  font-size:16px!important;
+  font-weight:900!important;
+}
+
+/* 시설개선계획/특이사항은 각각 전체 한 줄 */
+.jgb-eam-card-final .jgb-eam-notes-bottom > .jgb-eam-note{
+  grid-column:1/-1!important;
+  width:100%!important;
+}
+
+</style>
+
+
+
+<style id="JGB_V122_ABSOLUTE_FORCE">
+
+/* ===== 이력카드 하단: 사용자가 지정한 최종 위치를 절대 고정 ===== */
+.jgb-eam-card-final > .jgb-eam-auto{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  grid-template-rows:48px 48px 48px 48px!important;
+  grid-auto-flow:row!important;
+  gap:0!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+  border-top:3px solid #405665!important;
+}
+
+/* 1행: 최근 점검일 | 최근 외부정비일
+   2행: 최근 조치내용 | 누적 외부정비 건수
+   3행: 차기 점검일 | 교체·폐기 예정 여부
+   4행: 왼쪽 빈칸 | 누적 교체·폐기 건수 */
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="recent-inspection"]{
+  grid-column:1!important; grid-row:1!important;
+}
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="recent-external"]{
+  grid-column:2!important; grid-row:1!important;
+}
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="recent-action"]{
+  grid-column:1!important; grid-row:2!important;
+}
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="external-count"]{
+  grid-column:2!important; grid-row:2!important;
+}
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="next-inspection"]{
+  grid-column:1!important; grid-row:3!important;
+}
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="replacement-plan"]{
+  grid-column:2!important; grid-row:3!important;
+}
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="disposal-count"]{
+  grid-column:2!important; grid-row:4!important;
+}
+
+/* 왼쪽 4행 빈 공간 */
+.jgb-eam-card-final > .jgb-eam-auto::after{
+  content:""!important;
+  display:block!important;
+  grid-column:1!important;
+  grid-row:4!important;
+  height:48px!important;
+  background:#fff!important;
+  border-bottom:1.5px solid #405665!important;
+}
+
+/* 각 칸: 흰 종이 + 진한 선 */
+.jgb-eam-card-final > .jgb-eam-auto > div{
+  display:grid!important;
+  grid-template-columns:112px minmax(0,1fr)!important;
+  width:100%!important;
+  height:48px!important;
+  min-height:48px!important;
+  max-height:48px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-bottom:1.5px solid #405665!important;
+  background:#fff!important;
+}
+
+/* 중앙선 */
+.jgb-eam-card-final > .jgb-eam-auto > div:nth-child(odd),
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="recent-inspection"],
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="recent-action"],
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="next-inspection"]{
+  border-right:1.5px solid #405665!important;
+}
+
+/* 라벨은 색을 넣되 값 칸은 완전 흰색 */
+.jgb-eam-card-final > .jgb-eam-auto > div > small{
+  display:flex!important;
+  align-items:center!important;
+  width:112px!important;
+  min-width:112px!important;
+  height:48px!important;
+  margin:0!important;
+  padding:6px 8px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1.5px solid #405665!important;
+  background:#d7e3ea!important;
+  color:#16384f!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+}
+.jgb-eam-card-final > .jgb-eam-auto > div > b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  height:48px!important;
+  margin:0!important;
+  padding:6px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#fff!important;
+  color:#162f43!important;
+  font-size:14px!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+/* 누적 교체·폐기 건수도 같은 표 형식 */
+.jgb-eam-card-final > .jgb-eam-auto > [data-eam="disposal-count"]{
+  border-right:0!important;
+}
+
+/* 시설개선계획 / 특이사항: 각각 전체 한 줄 */
+.jgb-eam-card-final > .jgb-eam-notes-bottom{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  background:#fff!important;
+  border:0!important;
+}
+.jgb-eam-card-final > .jgb-eam-notes-bottom > .jgb-eam-note{
+  display:grid!important;
+  grid-template-columns:112px minmax(0,1fr)!important;
+  width:100%!important;
+  height:48px!important;
+  min-height:48px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-bottom:1.5px solid #405665!important;
+  background:#fff!important;
+}
+.jgb-eam-card-final > .jgb-eam-notes-bottom > .jgb-eam-note > small{
+  display:flex!important;
+  align-items:center!important;
+  width:112px!important;
+  min-width:112px!important;
+  height:48px!important;
+  margin:0!important;
+  padding:6px 8px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1.5px solid #405665!important;
+  background:#d7e3ea!important;
+  color:#16384f!important;
+  font-size:14px!important;
+  font-weight:900!important;
+}
+.jgb-eam-card-final > .jgb-eam-notes-bottom > .jgb-eam-note > b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  height:48px!important;
+  margin:0!important;
+  padding:6px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#fff!important;
+  color:#162f43!important;
+  font-size:14px!important;
+  font-weight:800!important;
+}
+
+/* 제목 */
+.jgb-eam-card-final > .jgb-card-top{
+  background:#d7e3ea!important;
+  color:#12364d!important;
+}
+.jgb-eam-card-final > .jgb-card-top > span{
+  font-size:17px!important;
+  font-weight:900!important;
+}
+
 </style>
