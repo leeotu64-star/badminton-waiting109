@@ -3564,25 +3564,26 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
     async function addAssetHistory(assetId){alert('작업 이력은 자산에 연결된 작업·점검 과정에서 기록합니다.');}
     function renderEamHistory(hs,ins){
-  const parseMaint = (h)=>{
-    let d={}; const raw=String(h?.description??'');
-    if(raw.startsWith('MAINT::')){try{d=JSON.parse(raw.slice(7))||{}}catch(e){d={}}}
-    return d;
-  };
+  const parseMaint=(h)=>{let d={};const raw=String(h?.description??'');if(raw.startsWith('MAINT::')){try{d=JSON.parse(raw.slice(7))||{}}catch(e){d={}}}return d};
   const val=(v)=>xEsc(v==null||v===''?'-':String(v));
   const date=(v)=>{const s=String(v||'');const m=s.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:(s?s.slice(0,10):'-')};
-  if(!hs.length) return '<div class="eamx-empty">등록된 작업·교체 이력이 없습니다.</div>';
+  if(!hs.length)return '<div class="eamx-empty">등록된 작업·교체 이력이 없습니다.</div>';
   return `<div class="jgb-eam-history-rebuild">${hs.slice(0,10).map((h,i)=>{
-    const d=parseMaint(h), method=d.maintenanceMethod||d.method||h.event_type||'외주정비';
-    const type=d.type||'수리', mtype=d.maintenanceType||d.type||'예방정비';
-    const issue=d.issue||'-', action=d.action||'-', cause=d.cause||'-', part=d.part||'-';
-    const start=d.startDate||d.workStartDate||h.event_date||'', end=d.endDate||d.workEndDate||'', next=d.nextDate||d.nextInspectionDate||'-';
-    const result=d.result||'조치완료', note=d.note||'-', vendor=h.worker_name||d.vendor||'-';
-    const cost=Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-';
-    const hid=val(h.id||('hist-'+i));
-    const photo=(label)=>`<div class="jgb-eam-history-photo" onclick="window.jgbPickWorkPhoto&&jgbPickWorkPhoto('${hid}','${label}')"><span>📷</span><b>${label}</b><small>사진 등록 · 클릭</small></div>`;
-    return `<article class="jgb-eam-history-card">
-      <div class="jgb-eam-history-head"><strong>이력 ${i+1}</strong><span>${val(date(h.event_date))} · ${val(type)} · ${val(mtype)}</span><button type="button" onclick="event.stopPropagation();window.eamDeleteMaintenanceHistory&&eamDeleteMaintenanceHistory('${hid}')">삭제</button></div>
+    const d=parseMaint(h),method=d.maintenanceMethod||d.method||h.event_type||'외주정비',type=d.type||'수리',mtype=d.maintenanceType||d.type||'예방정비';
+    const issue=d.issue||'-',action=d.action||'-',cause=d.cause||'-',part=d.part||'-';
+    const start=d.startDate||d.workStartDate||h.event_date||'',end=d.endDate||d.workEndDate||'',next=d.nextDate||d.nextInspectionDate||'-';
+    const result=d.result||'조치완료',note=d.note||'-',vendor=h.worker_name||d.vendor||'-';
+    const cost=Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-',hid=String(h.id||('hist-'+i));
+    const photo=(label)=>`<div class="jgb-eam-history-photo" onclick="window.jgbPickWorkPhoto&&jgbPickWorkPhoto('${val(hid)}','${label}')"><span>📷</span><b>${label}</b><small>사진 등록 · 클릭</small></div>`;
+    return `<article class="jgb-eam-history-card" data-maint-history-id="${val(hid)}">
+      <div class="jgb-eam-history-head">
+        <div class="jgb-eam-history-head-title"><strong>이력 ${i+1}</strong><span>${val(date(h.event_date))} · ${val(type)} · ${val(mtype)}</span></div>
+        <div class="jgb-eam-history-actions">
+          <button type="button" class="jgb-real-toggle" onclick="event.preventDefault();event.stopPropagation();jgbRealToggleHistory(this)">접기</button>
+          <button type="button" class="jgb-real-edit" onclick="event.preventDefault();event.stopPropagation();window.eamEditMaintenanceHistory&&eamEditMaintenanceHistory('${val(hid)}')">수정</button>
+          <button type="button" class="jgb-real-delete" onclick="event.preventDefault();event.stopPropagation();window.eamDeleteMaintenanceHistory&&eamDeleteMaintenanceHistory('${val(hid)}')">삭제</button>
+        </div>
+      </div>
       <div class="jgb-eam-history-body">
         <div class="jgb-eam-history-info">
           <div><small>작업일자</small><b>${val(date(h.event_date))}</b></div><div><small>정비구분</small><b>${val(type)}</b></div>
@@ -3599,6 +3600,13 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     </article>`;
   }).join('')}</div>`;
 }
+    window.jgbRealToggleHistory=function(btn){
+      const card=btn?.closest('.jgb-eam-history-card');if(!card)return;
+      const body=card.querySelector('.jgb-eam-history-body');if(!body)return;
+      const collapsed=card.classList.toggle('is-collapsed');
+      body.style.display=collapsed?'none':'';
+      btn.textContent=collapsed?'펼치기':'접기';
+    };
     function eamHistoryTab(mode){const box=document.getElementById('eamHistoryView');if(!box)return;const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];const code=window.__eamSelCode||'';const a=A.find(x=>x.asset_code===code);const hs=a?H.filter(v=>v.asset_id===a.id||v.asset_code===code):[];const ins=a?I.filter(v=>v.asset_id===a.id||v.asset_code===code):[];if(mode==='inspection')box.innerHTML=ins.length?ins.map(v=>`<div class="eamx-hrow"><b>${xEsc(v.result||'-')}</b><span>${xEsc(v.inspector_name||'-')}</span><time>${time(v.inspection_date)}</time></div>`).join(''):'<div class="eamx-empty">등록된 점검 이력이 없습니다.</div>';else box.innerHTML=renderEamHistory(hs,[])}
     function eamToggleForm(){return}
     function eamShowHistory(){const e=document.querySelector('.eamx-history');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})}
@@ -6924,6 +6932,22 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 .eam-detail-section.eam-history .jgb-hbox-del{min-width:48px!important;border:2px solid #b21f1f!important;background:#d92d2d!important;color:#fff!important}
 @media(max-width:700px){.eam-detail-section.eam-history .jgb-history-box-head{padding-right:8px!important}.eam-detail-section.eam-history .jgb-history-head-actions{gap:4px!important}.eam-detail-section.eam-history .jgb-hbox-toggle,.eam-detail-section.eam-history .jgb-hbox-edit,.eam-detail-section.eam-history .jgb-hbox-del{min-width:44px!important;padding:0 7px!important;font-size:12px!important}}
 </style>
+
+<style id="JGB_V135_REAL_MAINT_BUTTONS">
+/* V135: 실제 renderEamHistory() 구조에 버튼을 직접 적용 */
+.jgb-eam-history-card .jgb-eam-history-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;min-height:54px!important;padding:9px 12px!important;box-sizing:border-box!important;background:#e7f2fa!important;border-bottom:2px solid #7f95a6!important;}
+.jgb-eam-history-card .jgb-eam-history-head-title{display:flex!important;align-items:center!important;gap:12px!important;min-width:0!important;flex:1 1 auto!important;}
+.jgb-eam-history-card .jgb-eam-history-head-title strong{font-size:17px!important;font-weight:900!important;color:#173f59!important;white-space:nowrap!important;}
+.jgb-eam-history-card .jgb-eam-history-head-title span{font-size:12px!important;font-weight:800!important;color:#526b7e!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+.jgb-eam-history-card .jgb-eam-history-actions{display:flex!important;align-items:center!important;gap:6px!important;flex:0 0 auto!important;visibility:visible!important;opacity:1!important;z-index:999!important;position:relative!important;}
+.jgb-eam-history-card .jgb-eam-history-actions button{display:inline-flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;cursor:pointer!important;height:32px!important;min-width:58px!important;padding:0 12px!important;border-radius:4px!important;font-size:13px!important;font-weight:900!important;line-height:1!important;white-space:nowrap!important;box-sizing:border-box!important;}
+.jgb-eam-history-card .jgb-real-toggle{background:#fff!important;color:#173f59!important;border:2px solid #536a79!important;}
+.jgb-eam-history-card .jgb-real-edit{background:#2674a8!important;color:#fff!important;border:2px solid #1d567e!important;}
+.jgb-eam-history-card .jgb-real-delete{background:#d92d2d!important;color:#fff!important;border:2px solid #b51f1f!important;}
+.jgb-eam-history-card.is-collapsed .jgb-eam-history-head{border-bottom:0!important;}
+@media(max-width:700px){.jgb-eam-history-card .jgb-eam-history-head{align-items:flex-start!important}.jgb-eam-history-card .jgb-eam-history-head-title{flex-direction:column!important;align-items:flex-start!important;gap:2px!important}.jgb-eam-history-card .jgb-eam-history-actions{gap:3px!important}.jgb-eam-history-card .jgb-eam-history-actions button{min-width:48px!important;padding:0 7px!important;font-size:12px!important;}}
+</style>
+
 </body></html>
 
 
