@@ -1409,6 +1409,14 @@ html,body{max-width:100%;overflow-x:hidden!important}
 /* Remove the stray visible text if it is injected dynamically. */
 </style>
 <script>
+// V130: E undefined 오류 방지 — EAM 화면에서 사용하는 HTML escape helper
+function E(value){
+  return String(value ?? '').replace(/[&<>"']/g, function(ch){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]);
+  });
+}
+</script>
+<script>
 (function(){
   function removeStray(){
     var root=document.body||document.documentElement;
