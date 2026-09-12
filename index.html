@@ -3563,7 +3563,42 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       </div>`;
     }
     async function addAssetHistory(assetId){alert('작업 이력은 자산에 연결된 작업·점검 과정에서 기록합니다.');}
-    function renderEamHistory(hs,ins){return `<div>${hs.length?hs.slice(0,10).map(v=>`<div class="eamx-hrow"><b>${xEsc(v.event_type||'조치')}</b><span>${xEsc(v.description||'-')} · ${xEsc(v.worker_name||v.vendor_name||'-')}</span><time>${time(v.event_date)}</time></div>`).join(''):'<div class="eamx-empty">등록된 작업·교체 이력이 없습니다.</div>'}</div>`}
+    function renderEamHistory(hs,ins){
+  const parseMaint = (h)=>{
+    let d={}; const raw=String(h?.description??'');
+    if(raw.startsWith('MAINT::')){try{d=JSON.parse(raw.slice(7))||{}}catch(e){d={}}}
+    return d;
+  };
+  const val=(v)=>xEsc(v==null||v===''?'-':String(v));
+  const date=(v)=>{const s=String(v||'');const m=s.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:(s?s.slice(0,10):'-')};
+  if(!hs.length) return '<div class="eamx-empty">등록된 작업·교체 이력이 없습니다.</div>';
+  return `<div class="jgb-eam-history-rebuild">${hs.slice(0,10).map((h,i)=>{
+    const d=parseMaint(h), method=d.maintenanceMethod||d.method||h.event_type||'외주정비';
+    const type=d.type||'수리', mtype=d.maintenanceType||d.type||'예방정비';
+    const issue=d.issue||'-', action=d.action||'-', cause=d.cause||'-', part=d.part||'-';
+    const start=d.startDate||d.workStartDate||h.event_date||'', end=d.endDate||d.workEndDate||'', next=d.nextDate||d.nextInspectionDate||'-';
+    const result=d.result||'조치완료', note=d.note||'-', vendor=h.worker_name||d.vendor||'-';
+    const cost=Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-';
+    const hid=val(h.id||('hist-'+i));
+    const photo=(label)=>`<div class="jgb-eam-history-photo" onclick="window.jgbPickWorkPhoto&&jgbPickWorkPhoto('${hid}','${label}')"><span>📷</span><b>${label}</b><small>사진 등록 · 클릭</small></div>`;
+    return `<article class="jgb-eam-history-card">
+      <div class="jgb-eam-history-head"><strong>이력 ${i+1}</strong><span>${val(date(h.event_date))} · ${val(type)} · ${val(mtype)}</span><button type="button" onclick="event.stopPropagation();window.eamDeleteMaintenanceHistory&&eamDeleteMaintenanceHistory('${hid}')">삭제</button></div>
+      <div class="jgb-eam-history-body">
+        <div class="jgb-eam-history-info">
+          <div><small>작업일자</small><b>${val(date(h.event_date))}</b></div><div><small>정비구분</small><b>${val(type)}</b></div>
+          <div><small>정비유형</small><b>${val(mtype)}</b></div><div><small>정비방식</small><b>${val(method)}</b></div>
+          <div><small>정비업체</small><b>${val(vendor)}</b></div><div><small>정비비용</small><b>${val(cost)}</b></div>
+          <div><small>고장·이상내용</small><b>${val(issue)}</b></div><div><small>고장원인</small><b>${val(cause)}</b></div>
+          <div><small>조치내용</small><b>${val(action)}</b></div><div><small>교체부품</small><b>${val(part)}</b></div>
+          <div><small>작업시작일</small><b>${val(date(start))}</b></div><div><small>작업완료일</small><b>${val(date(end))}</b></div>
+          <div><small>차기 점검일</small><b>${val(date(next))}</b></div><div><small>조치상태</small><b>${val(result)}</b></div>
+          <div class="wide"><small>비고</small><b>${val(note)}</b></div>
+        </div>
+        <div class="jgb-eam-history-right"><h4>📷 작업사진 <em>최대 4장</em></h4><div class="jgb-eam-history-photos">${photo('작업 전')}${photo('작업 중')}${photo('작업 후')}${photo('완료')}</div><div class="jgb-eam-history-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></div>
+      </div>
+    </article>`;
+  }).join('')}</div>`;
+}
     function eamHistoryTab(mode){const box=document.getElementById('eamHistoryView');if(!box)return;const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];const code=window.__eamSelCode||'';const a=A.find(x=>x.asset_code===code);const hs=a?H.filter(v=>v.asset_id===a.id||v.asset_code===code):[];const ins=a?I.filter(v=>v.asset_id===a.id||v.asset_code===code):[];if(mode==='inspection')box.innerHTML=ins.length?ins.map(v=>`<div class="eamx-hrow"><b>${xEsc(v.result||'-')}</b><span>${xEsc(v.inspector_name||'-')}</span><time>${time(v.inspection_date)}</time></div>`).join(''):'<div class="eamx-empty">등록된 점검 이력이 없습니다.</div>';else box.innerHTML=renderEamHistory(hs,[])}
     function eamToggleForm(){return}
     function eamShowHistory(){const e=document.querySelector('.eamx-history');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})}
@@ -6824,6 +6859,31 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 .jgb-history-attach{min-height:34px!important;padding:8px 10px!important;background:#f1f6fa!important;border-top:1.5px solid #9fb3c5!important;color:#526d81!important;font-size:11px!important;box-sizing:border-box!important}
 @media(max-width:1000px){.jgb-compact-main{grid-template-columns:1fr!important}.jgb-compact-info{border-right:0!important}.jgb-history-photos{border-top:1.5px solid #9fb3c5!important}.jgb-compact-history .jgb-work-photos{grid-template-columns:repeat(4,1fr)!important}}
 </style>
+
+<style id="JGB_EAM_HISTORY_REBUILD_V131">
+.jgb-eam-history-rebuild{width:100%;box-sizing:border-box;}
+.jgb-eam-history-card{margin:10px 0;border:2px solid #526674;border-radius:4px;background:#faf8f1;overflow:hidden;box-sizing:border-box;}
+.jgb-eam-history-head{height:42px;display:flex;align-items:center;gap:12px;padding:0 12px;background:#d9e1e5;border-bottom:2px solid #526674;box-sizing:border-box;}
+.jgb-eam-history-head strong{font-size:14px;font-weight:900;color:#173f59;white-space:nowrap;}
+.jgb-eam-history-head span{font-size:12px;font-weight:700;color:#526b7e;flex:1;}
+.jgb-eam-history-head button{border:0;background:#d33;color:#fff;font-weight:900;padding:6px 12px;border-radius:4px;cursor:pointer;}
+.jgb-eam-history-body{display:grid;grid-template-columns:52% 48%;min-width:0;}
+.jgb-eam-history-info{display:grid;grid-template-columns:1fr 1fr;min-width:0;border-right:2px solid #526674;}
+.jgb-eam-history-info>div{display:grid;grid-template-columns:92px minmax(0,1fr);min-width:0;min-height:48px;border-bottom:2px solid #718492;box-sizing:border-box;}
+.jgb-eam-history-info>div:nth-child(odd){border-right:2px solid #718492;}
+.jgb-eam-history-info>div.wide{grid-column:1/-1;border-right:0;}
+.jgb-eam-history-info small{display:flex;align-items:center;padding:7px 8px;background:#d9e1e5;border-right:2px solid #718492;font-size:12px;font-weight:900;color:#173f59;white-space:nowrap;}
+.jgb-eam-history-info b{display:flex;align-items:center;padding:7px 9px;background:#fff;font-size:13px;font-weight:800;color:#173f59;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.jgb-eam-history-right{min-width:0;background:#fff;}
+.jgb-eam-history-right h4{height:42px;margin:0;padding:0 12px;display:flex;align-items:center;gap:8px;border-bottom:2px solid #718492;font-size:14px;color:#173f59;}
+.jgb-eam-history-right h4 em{font-size:11px;font-style:normal;font-weight:700;color:#718492;}
+.jgb-eam-history-photos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px;border-bottom:2px solid #718492;}
+.jgb-eam-history-photo{height:92px;border:2px dashed #718492;background:#faf8f1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-sizing:border-box;overflow:hidden;}
+.jgb-eam-history-photo span{font-size:20px}.jgb-eam-history-photo b{font-size:11px;color:#173f59}.jgb-eam-history-photo small{font-size:9px;color:#718492;}
+.jgb-eam-history-attach{min-height:42px;padding:10px 12px;display:flex;align-items:center;font-size:11px;font-weight:800;color:#526b7e;background:#f4f7f8;box-sizing:border-box;}
+@media(max-width:800px){.jgb-eam-history-body{grid-template-columns:1fr}.jgb-eam-history-info{border-right:0;border-bottom:2px solid #526674}.jgb-eam-history-photos{grid-template-columns:repeat(2,minmax(0,1fr));}}
+</style>
+
 </body></html>
 
 
