@@ -4398,27 +4398,39 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         </div></div></div>`);
       };
       function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-      function maintenanceData(reg,H,I){
-        let assetId=reg?.id||null;
-        if(!assetId && reg){
-          const code=v(reg.asset_code||reg.code), name=v(reg.name), model=v(reg.product_name||reg.model);
-          const found=(Array.isArray(window.__eamA)?window.__eamA:[]).find(a=>
-            (code&&v(a.asset_code)===code) ||
-            (name&&v(a.name)===name&&(!model||v(a.product_name)===model))
-          );
-          assetId=found?.id||null;
+      function maintenanceData(reg,H,I,code){
+        const AA=Array.isArray(window.__eamA)?window.__eamA:[];
+        const key=v(code||reg?.asset_code||reg?.code||window.__eamSelCode);
+        let linked=reg||null;
+        if(!linked && key) linked=AA.find(a=>v(a.asset_code)===key)||null;
+        if(!linked && reg){
+          const name=v(reg.name), model=v(reg.product_name||reg.model);
+          linked=AA.find(a=>name&&v(a.name)===name&&(!model||v(a.product_name||a.model)===model))||null;
         }
-        const hs=assetId?H.filter(h=>v(h.asset_id)===v(assetId)&&!['자산정보수정','자산등록'].includes(v(h.event_type))):[];
+        const assetId=linked?.id||reg?.id||null;
+        const hs=(Array.isArray(H)?H:[]).filter(h=>{
+          if(['자산정보수정','자산등록'].includes(v(h.event_type)))return false;
+          const hid=v(h.asset_id), hcode=v(h.asset_code);
+          return (assetId&&hid===v(assetId)) || (key&&hcode===key);
+        }).sort((a,b)=>v(b.event_date).localeCompare(v(a.event_date)));
         const parseMaint=h=>{
           const raw=v(h?.description);
-          if(raw.startsWith('MAINT::')){try{return JSON.parse(raw.slice(7))}catch(e){}}
-          if(raw.startsWith('MAINT:')){try{return JSON.parse(raw.slice(6))}catch(e){}}
-          return null;
+          if(raw.startsWith('MAINT::')){try{return JSON.parse(raw.slice(7))||{}}catch(e){}}
+          if(raw.startsWith('MAINT:')){try{return JSON.parse(raw.slice(6))||{}}catch(e){}}
+          return {};
         };
-        const ext=hs.filter(h=>/외부정비|외부수리|업체/.test(v(h.event_type)+' '+v(h.action_type)+' '+v(h.worker_name)));
-        const recentExt=ext[0]||null, recent=hs[0]||null; // 외부정비 건수는 DB asset_history의 해당 자산 이력에서 매 렌더링마다 자동 재계산
-        const inspections=reg?I.filter(x=>v(x.asset_id)===v(reg.id)):[];
-        const next=inspections.find(x=>x.next_inspection_date||x.next_date)?.next_inspection_date||inspections.find(x=>x.next_inspection_date||x.next_date)?.next_date||'-';
+        const methodOf=h=>{
+          const d=parseMaint(h);
+          return v(d.maintenanceMethod||d.method||h?.event_type||h?.action_type).replace(/\s/g,'');
+        };
+        const ext=hs.filter(h=>{
+          const m=methodOf(h), text=(m+' '+v(h?.event_type)+' '+v(h?.action_type)).replace(/\s/g,'');
+          return m==='외주정비'||m==='외부정비'||m==='외부수리'||m==='외주수리'||text.includes('외주정비')||text.includes('외부정비')||text.includes('외부수리');
+        });
+        const recentExt=ext[0]||null, recent=hs[0]||null;
+        const inspections=(Array.isArray(I)?I:[]).filter(x=>assetId&&v(x.asset_id)===v(assetId));
+        const ins=inspections.find(x=>x.next_inspection_date||x.next_date);
+        const next=ins?.next_inspection_date||ins?.next_date||'-';
         const replace=hs.some(h=>/폐기|교체/.test(v(h.event_type)+' '+v(h.action_type)+' '+v(h.description)));
         const recentMaint=parseMaint(recentExt);
         const dateOnly=x=>{const z=v(x);const m=z.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:(z||'-')};
@@ -4468,7 +4480,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           const key=String(cur?.asset_code||cur?.code||window.__eamSelCode||'').trim();
           linkedReg=(Array.isArray(window.__eamA)?window.__eamA:[]).find(a=>String(a?.asset_code||'').trim()===key)||null;
         }
-        const d=maintenanceData(linkedReg,H,I), next=d.next;
+        const d=maintenanceData(linkedReg,H,I,cur?.asset_code||cur?.code||window.__eamSelCode), next=d.next;
         const cardCode=String(cur.asset_code||cur.code||window.__eamSelCode||'');
         const cardOpen=window.eamHistoryCardOpen(cardCode);
         const equipDeleted=localStorage.getItem('JGB_EQUIP_PHOTO_DELETED_'+String(cardCode))==='1';
@@ -4549,8 +4561,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
             </section>
           </div>
           <div class="jgb-paper-auto">
-            ${F('최근 외부정비일',d.dateOnly(d.recentExt?.event_date))}
-            ${F('누적 외부정비 건수',d.ext.length+'건')}
+            ${F('최근 외주정비일',d.dateOnly(d.recentExt?.event_date))}
+            ${F('누적 외주정비 건수',d.ext.length+'건')}
             ${F('최근 조치내용',d.recentMaint?.action||'-')}
             ${F('차기 점검일',next||'-')}
             ${F('교체·폐기 예정 여부',cur.disposalPlan||cur.retirementPlan||'미정')}
@@ -4567,7 +4579,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const src=list.find(x=>v(x.code)===v(sel))||null,reg=src?(typeof registeredForSource==='function'?registeredForSource(src,A):(A.find(a=>v(a.asset_code)===v(src.code))||null)):null,cur=Object.assign({},src||{},reg||{},meta[sel]||{});
         if(cat==='fire')cur.place='유수장치실';
         const codes=displayCodesByCat(list,cat),dc=sel?(codes[sel]||sel):'';
-        const d=maintenanceData(reg,H,I),hs=d.hs;
+        const d=maintenanceData(reg,H,I,sel),hs=d.hs;
         return `<div class="eam-innovation"><div class="eam-innovation-head"><div><div class="eyebrow">ENTERPRISE ASSET MANAGEMENT</div><h1>시설물 EAM 관리</h1><p>설비 종류 → 자산 선택 → 통합 자산마스터 → 주요설비 이력카드 → 유지관리 이력</p></div><button class="eam-manage-main eam-manage-top" onclick="eamOpenManageMenu()">⚙ 자산 관리</button></div>
           <div class="eam-type-row">${order.map(k=>{const z=cats[k];return `<button type="button" class="eam-type ${k===cat?'on':''}" onclick="eamPick('${k}')"><span>${z.ico}</span><strong>${z.label}</strong><em>${z.items.length}</em><small>${z.desc}</small></button>`}).join('')}</div>
           <div class="eam-innovation-layout"><aside class="eam-assets-panel"><div class="eam-assets-head"><div><b>${C.ico} ${C.label}</b><span>${list.length}개 자산</span></div><div class="eam-filter-row"><select id="eamProLocationFilter" onchange="eamProFilter('',this.value)"><option value="">전체 위치</option><option value="A">A · 코트</option><option value="B">B · 복도</option><option value="C">C · 사무실</option><option value="D">D · 옥상</option><option value="E">E · 유수장치실</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option></select></div></div><div id="eamproGrid" class="eam-asset-list">${list.map(x=>{const m=meta[x.code]||{},a=A.find(z=>v(z.asset_code)===v(x.code))||null,merged=Object.assign({},x,a||{},m);if(cat==='fire')merged.place='유수장치실';const st=a?.status||m.status||'원본';return `<button type="button" class="eam-asset-row ${v(x.code)===v(sel)?'on':''}" data-code="${esc(x.code)}" data-loc="${esc(placeCode(merged.place))}" onclick="eamPick('${cat}','${esc(x.code)}')"><span class="row-code">${esc(codes[x.code]||x.code)}</span><span class="row-copy"><b>${esc(window.eamDisplayName(merged))}</b><small>${esc(placeLabel(merged.place))}</small></span><i class="${st==='정상'?'ok':st==='원본'?'source':'bad'}">${esc(st)}</i></button>`}).join('')||'<div class="eam-empty">등록된 자산이 없습니다.</div>'}</div></aside>
@@ -5184,7 +5196,10 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         try{
           const r=await db.from('asset_history').insert({asset_id:assetId,event_type:method,description:'MAINT::'+JSON.stringify(data),worker_name:method==='외주정비'?(g('jf_vendor')||'-'):'자체정비',cost:Number(g('jf_cost'))||0,event_date:g('jf_date')||new Date().toISOString().slice(0,10)});
           if(r.error)throw r.error;
-          document.getElementById('jgbMaintFinalModal')?.remove();await window.eamLoad();window.__eamSelCode=selected().code;render();
+          document.getElementById('jgbMaintFinalModal')?.remove();
+          await window.eamLoad();
+          window.__eamSelCode=selected().code;
+          if(typeof window.render==='function')window.render(); else location.reload();
         }catch(e){console.error(e);alert('유지관리 이력 등록 실패\n'+(e?.message||''))}finally{if(btn){btn.disabled=false;btn.textContent='등록'}}
       };
       window.eamSelectHistory=function(idx){window.__jgbEamHistoryIndex=Number(idx);render()}
@@ -12586,7 +12601,7 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
         <label>세부 위치<select id="jha_place">${details.map(x=>`<option value="${esc(x)}" ${V(x)===place?'selected':''}>${esc(x)}</option>`).join('')}</select><input id="jha_customPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
         ${input('모델·규격','jha_model',c.model||'')}${input('용량','jha_capacity',c.capacity||'')}${input('수량','jha_qty',c.qty??c.quantity??'')}${input('제조사','jha_maker',c.maker||c.vendor||'')}${input('A/S 연락처','jha_as',c.asContact||'')}${input('제조일','jha_date',c.date||c.manufactureDate||'')}${input('설치일','jha_install',c.installDate||'')}${input('내용연수','jha_life',c.life||'')}${input('평가등급','jha_grade',c.grade||'')}${input('보증','jha_warranty',c.warranty||'')}${input('A/S 기록','jha_asHistory',c.asHistory||'')}
         ${select('자산상태','jha_status',statuses,status)}${select('취득구분','jha_acq',acqs,acq)}
-        ${ro('최근 외부정비일','jha_extDate',ext.date)}${ro('누적 외부정비 건수','jha_extCount',ext.count+'건')}${ro('최근 조치내용','jha_extAction',ext.action||'-')}
+        ${ro('최근 외주정비일','jha_extDate',ext.date)}${ro('누적 외주정비 건수','jha_extCount',ext.count+'건')}${ro('최근 조치내용','jha_extAction',ext.action||'-')}
         ${input('차기 점검일','jha_next',c.nextDate||c.nextInspectionDate||'','type="date"')}${select('교체·폐기 예정 여부','jha_disposal',dispos,disposal)}
         <label class="wide">시설개선계획<textarea id="jha_plan">${esc(c.improvementPlan||'')}</textarea></label>
         <label class="wide">특이사항<textarea id="jha_note">${esc(c.note||'')}</textarea></label>
