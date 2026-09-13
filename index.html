@@ -2116,6 +2116,29 @@ html::before,body::before{
 .jgb-v136-record.is-collapsed .jgb-v136-record-head{border-bottom:2px solid #3d5363!important}
 @media(max-width:800px){.eam-detail-panel .eam-master .master-grid{grid-template-columns:112px minmax(0,1fr)!important}.eam-detail-panel .eam-master .master-grid>div{grid-column:1/-1!important;border-right:0!important}.jgb-v136-body{grid-template-columns:1fr!important}.jgb-v136-photo{border-left:0!important;border-top:2px solid #3d5363!important}}
 </style>
+
+<style id="JGB_V149_TRUE_REBUILD">
+/* V149: 기본정보와 설비사진 영역을 실제 표시 경로에서 통째로 재구성 */
+.jgb-history-card .jgb-basic-table-rebuild{display:block!important;width:100%!important;margin:0!important;padding:0!important;border:2px solid #334b5b!important;box-sizing:border-box!important;overflow:visible!important;background:#fff!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-table-row{display:grid!important;grid-template-columns:20% 30% 20% 30%!important;width:100%!important;min-height:48px!important;border:0!important;border-bottom:1.5px solid #334b5b!important;box-sizing:border-box!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-label,.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-value{min-width:0!important;min-height:48px!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;padding:8px 10px!important;margin:0!important;border:0!important;border-right:1.5px solid #334b5b!important;font-size:14px!important;line-height:1.25!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-label{background:#dbe7ee!important;color:#102b3d!important;font-weight:800!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-value{background:#fffdf8!important;color:#102b3d!important;font-weight:600!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-table-row>:nth-child(4){border-right:0!important}
+.jgb-photo-area-v149{overflow:visible!important;background:#fff!important}
+.jgb-photo-area-v149 .jgb-equip-photo-stage{min-height:calc(7cm + 24px)!important;padding:12px!important;box-sizing:border-box!important}
+.jgb-photo-area-v149 .jgb-v149-detail-title{border-top:2px solid #334b5b!important;background:#eaf2f7!important;color:#17384d!important;font-size:14px!important;font-weight:800!important;padding:8px 10px!important}
+.jgb-photo-area-v149 .jgb-v149-detail-scroll{overflow-x:auto!important;overflow-y:hidden!important;padding:8px!important;box-sizing:border-box!important}
+.jgb-photo-area-v149 .jgb-v149-detail-grid{display:grid!important;grid-template-columns:repeat(4,4cm)!important;gap:6px!important;width:max-content!important}
+.jgb-photo-area-v149 .jgb-v149-detail-item{text-align:center!important;min-width:4cm!important}
+.jgb-photo-area-v149 .jgb-v149-detail-box{position:relative!important;width:4cm!important;height:4cm!important;box-sizing:border-box!important;border:1.5px dashed #7890a2!important;background:#fbfaf6!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;cursor:pointer!important}
+.jgb-photo-area-v149 .jgb-v149-detail-box img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+.jgb-photo-area-v149 .jgb-v149-detail-box span{font-size:11px!important;line-height:1.3!important;color:#60798b!important}
+.jgb-photo-area-v149 .jgb-v149-detail-box input{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0!important;cursor:pointer!important;z-index:2!important}
+.jgb-photo-area-v149 .jgb-v149-detail-del{position:absolute!important;right:3px!important;top:3px!important;width:22px!important;height:22px!important;border:0!important;border-radius:50%!important;background:#d33b3b!important;color:#fff!important;font-weight:900!important;z-index:4!important;cursor:pointer!important}
+.jgb-photo-area-v149 .jgb-v149-detail-item>b{display:block!important;margin-top:4px!important;font-size:14px!important;line-height:1.2!important;color:#17384d!important;white-space:nowrap!important}
+.jgb-photo-area-v149 .jgb-v149-detail-item>small{display:block!important;margin-top:2px!important;font-size:11px!important;line-height:1.2!important;color:#60798b!important;white-space:nowrap!important}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -4482,18 +4505,30 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                 </div>
               </div>
             </section>
-            <section class="jgb-paper-photo jgb-equip-photo-rebuilt">
+            <section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149">
               <div class="jgb-paper-section-title">📷 설비 사진 (현재)</div>
               <div class="jgb-equip-photo-stage">
                 <div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">
                   ${equipPhoto
                     ? `<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')" title="사진 삭제">×</button>`
                     : `<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}
+                  <input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택">
                 </div>
               </div>
               <div class="jgb-equip-photo-actions-rebuilt">
                 <button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button>
                 <span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span>
+              </div>
+              <div class="jgb-v149-detail-title">설비 상세사진 · 각 4×4cm</div>
+              <div class="jgb-v149-detail-scroll">
+                <div class="jgb-v149-detail-grid">
+                  ${['정면','측면','명판','설치환경'].map((label,i)=>{
+                    const key='JGB_EQUIP_SUBPHOTO_'+String(cardCode)+'_'+i;
+                    let src=''; try{src=localStorage.getItem(key)||''}catch(e){}
+                    const desc=['설비 정면 사진','설비 측면 사진','제조·규격 명판','설치 상태 사진'][i];
+                    return `<div class="jgb-v149-detail-item"><div class="jgb-v149-detail-box" onclick="window.jgbV145PickSubPhoto&&window.jgbV145PickSubPhoto('${E(cardCode)}',${i})" title="${E(label)} 사진 등록">${src?`<img src="${E(src)}" alt="${E(label)}"><button type="button" class="jgb-v149-detail-del" onclick="event.preventDefault();event.stopPropagation();window.jgbV145DeleteSubPhoto&&window.jgbV145DeleteSubPhoto('${E(cardCode)}',${i})">×</button>`:`<span>📷<br>사진 등록</span>`}</div><b>${E(label)}</b><small>${E(desc)}</small></div>`;
+                  }).join('')}
+                </div>
               </div>
             </section>
           </div>
