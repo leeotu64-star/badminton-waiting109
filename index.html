@@ -3970,7 +3970,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const groupIndex={};
       const courtPos={1:[85,50],2:[68,50],3:[50,50],4:[32,50],5:[15,50]};
       const markers=leaks.slice().sort((a,b)=>String(a.leakCode||'').localeCompare(String(b.leakCode||''),undefined,{numeric:true})).map(x=>{
-        const c=catOf(x.location), loc=String(x.location||''), cm=loc.match(/코트\s*([1-5])/i), courtNo=cm?Number(cm[1]):0;
+        const c=catOf(x.location), loc=String(x.location||''), cm=loc.match(/(?:코트\s*([1-5])|([1-5])\s*번\s*코트)/i), courtNo=cm?Number(cm[1]||cm[2]):0;
         const n=groupIndex[c]||0; groupIndex[c]=n+1;
         let px,py;
         if(c==='코트' && courtNo){
