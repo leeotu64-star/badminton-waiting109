@@ -3669,9 +3669,9 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       <div class="jgb-eam-history-head">
         <div class="jgb-eam-history-head-title"><strong>이력 ${i+1}</strong><span>${val(date(h.event_date))} · ${val(type)} · ${val(mtype)}</span></div>
         <div class="jgb-eam-history-actions">
-          <button type="button" class="jgb-real-toggle" onclick="event.preventDefault();event.stopPropagation();jgbRealToggleHistory(this)">접기</button>
-          
-          <button type="button" class="jgb-real-delete" onclick="event.preventDefault();event.stopPropagation();window.eamDeleteMaintenanceHistory&&eamDeleteMaintenanceHistory('${val(hid)}')">삭제</button>
+          <button type="button" class="jgb-real-toggle" onclick="event.preventDefault();event.stopImmediatePropagation();jgbRealToggleHistory(this)">접기</button>
+          <button type="button" class="jgb-real-edit" onclick="event.preventDefault();event.stopImmediatePropagation();window.jgbV136OpenEdit&&window.jgbV136OpenEdit('${val(hid)}')">수정</button>
+          <button type="button" class="jgb-real-delete" onclick="event.preventDefault();event.stopImmediatePropagation();window.eamDeleteMaintenanceHistory&&eamDeleteMaintenanceHistory('${val(hid)}')">삭제</button>
         </div>
       </div>
       <div class="jgb-eam-history-body">
@@ -4417,7 +4417,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           ? `<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-paper-equip-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')" title="사진 삭제">×</button>`
           : `<div class="jgb-paper-cam">📷</div><strong>설비 사진 1장</strong><span>사진 등록 · JPG / PNG · 클릭</span>`;
         return `<details class="eam-source-card jgb-history-card" ${cardOpen?'open':''} ontoggle="eamPersistHistoryCard(this,'${esc(cardCode)}')">
-          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';jgbOpenAssetHistoryEditor('${E(cardCode)}')">✏️ 수정</button></div></summary>
+          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="return window.jgbV3EditAsset('${E(cardCode)}')">✏️ 수정</button></div></summary>
           <div class="jgb-paper-card-body">
             <section class="jgb-paper-info">
               <div class="jgb-paper-section-title">📄 기본정보</div>
@@ -4717,7 +4717,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         if(!card||card.dataset.directFix==='1'||card.dataset.editing==='1')return;
         card.dataset.directFix='1';
         const summary=card.querySelector('summary');
-        if(summary){summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';jgbOpenAssetHistoryEditor('${E(cardCode)}')">✏️ 수정</button></div>`}
+        if(summary){summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="return window.jgbV3EditAsset('${E(cardCode)}')">✏️ 수정</button></div>`}
       }
       document.addEventListener('DOMContentLoaded',decorate);
       setTimeout(decorate,300);
@@ -7077,7 +7077,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   }
   function record(h,i){
     const d=parse(h),id=V(h.id), method=d.maintenanceMethod||d.method||h.event_type||'외주정비', vendor=h.worker_name||d.vendor||'-',cost=Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-';
-    return `<article class="jgb-v136-record" data-id="${E(id)}"><div class="jgb-v136-record-head"><div class="jgb-v136-record-title"><strong>이력 ${i+1}</strong><span>${E(date(h.event_date))} · ${E(d.type||'수리')} · ${E(d.maintenanceType||'예방정비')}</span></div><div class="jgb-v136-record-actions"><button type="button" class="jgb-v136-mini jgb-v136-toggle">접기</button><button type="button" class="jgb-v136-mini edit" onclick="window.jgbV136OpenEdit('${E(id)}')">수정</button><button type="button" class="jgb-v136-mini delete" onclick="window.jgbV136Delete('${E(id)}')">삭제</button></div></div><div class="jgb-v136-body"><div class="jgb-v136-info">${item('작업일자',date(h.event_date))}${item('정비구분',d.type||'수리')}${item('정비유형',d.maintenanceType||'예방정비')}${item('정비방식',method)}${item('정비업체',vendor)}${item('정비비용',cost)}${item('고장·이상내용',d.issue)}${item('고장원인',d.cause)}${item('조치내용',d.action)}${item('교체부품',d.part)}${item('작업시작일',date(d.startDate||d.workStartDate||h.event_date))}${item('작업완료일',date(d.endDate||d.workEndDate))}${item('차기 점검일',date(d.nextDate||d.nextInspectionDate))}${item('조치상태',d.result||'조치완료')}${item('비고',d.note,'wide')}</div><div class="jgb-v136-photo"><div class="jgb-v136-photo-title">📷 작업사진 <span style="font-size:10px;color:#6b8191">최대 4장</span></div><div class="jgb-v136-photos">${slot(id,'사용부품')}${slot(id,'작업 중')}${slot(id,'작업 후')}${slot(id,'완료')}</div><div class="jgb-v136-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></div></div></article>`;
+    return `<article class="jgb-v136-record" data-id="${E(id)}" data-history-id="${E(id)}"><div class="jgb-v136-record-head"><div class="jgb-v136-record-title"><strong>이력 ${i+1}</strong><span>${E(date(h.event_date))} · ${E(d.type||'수리')} · ${E(d.maintenanceType||'예방정비')}</span></div><div class="jgb-v136-record-actions"><button type="button" class="jgb-v136-mini jgb-v136-toggle">접기</button><button type="button" class="jgb-v136-mini edit" onclick="event.preventDefault();event.stopImmediatePropagation();window.jgbV136OpenEdit('${E(id)}')">수정</button><button type="button" class="jgb-v136-mini delete" onclick="event.preventDefault();event.stopImmediatePropagation();window.jgbV136Delete('${E(id)}')">삭제</button></div></div><div class="jgb-v136-body"><div class="jgb-v136-info">${item('작업일자',date(h.event_date))}${item('정비구분',d.type||'수리')}${item('정비유형',d.maintenanceType||'예방정비')}${item('정비방식',method)}${item('정비업체',vendor)}${item('정비비용',cost)}${item('고장·이상내용',d.issue)}${item('고장원인',d.cause)}${item('조치내용',d.action)}${item('교체부품',d.part)}${item('작업시작일',date(d.startDate||d.workStartDate||h.event_date))}${item('작업완료일',date(d.endDate||d.workEndDate))}${item('차기 점검일',date(d.nextDate||d.nextInspectionDate))}${item('조치상태',d.result||'조치완료')}${item('비고',d.note,'wide')}</div><div class="jgb-v136-photo"><div class="jgb-v136-photo-title">📷 작업사진 <span style="font-size:10px;color:#6b8191">최대 4장</span></div><div class="jgb-v136-photos">${slot(id,'사용부품')}${slot(id,'작업 중')}${slot(id,'작업 후')}${slot(id,'완료')}</div><div class="jgb-v136-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></div></div></article>`;
   }
   function rerender(){try{if(typeof window.eamLoad==='function')window.eamLoad().then(()=>{if(typeof window.render==='function')window.render();else location.reload()});else if(typeof window.render==='function')window.render();else location.reload()}catch(e){location.reload()}}
   function formHtml(title, data, id){
@@ -7085,7 +7085,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     return `<div id="jgbV136Modal" class="jgb-v136-modal"><div class="jgb-v136-card"><div class="jgb-v136-modal-head"><h3>${E(title)}</h3><button type="button" class="jgb-v136-close" onclick="document.getElementById('jgbV136Modal')?.remove()">×</button></div><div class="jgb-v136-form"><label>작업일자<input id="v136_date" type="date" value="${E(date(d.event_date||today))}"></label><label>정비구분<select id="v136_type"><option ${d.type==='점검'?'selected':''}>점검</option><option ${d.type==='수리'||!d.type?'selected':''}>수리</option><option ${d.type==='부품교체'?'selected':''}>부품교체</option><option ${d.type==='설비교체'?'selected':''}>설비교체</option><option ${d.type==='기타'?'selected':''}>기타</option></select></label><label>정비유형<select id="v136_sub"><option ${d.maintenanceType==='예방정비'||!d.maintenanceType?'selected':''}>예방정비</option><option ${d.maintenanceType==='고장정비'?'selected':''}>고장정비</option><option ${d.maintenanceType==='계획정비'?'selected':''}>계획정비</option></select></label><label>정비방식<select id="v136_method"><option ${d.maintenanceMethod==='자체정비'||d.method==='자체정비'?'selected':''}>자체정비</option><option ${d.maintenanceMethod==='외주정비'||d.method==='외주정비'||(!d.method&&!d.maintenanceMethod)?'selected':''}>외주정비</option></select></label><label>정비업체<input id="v136_vendor" value="${E(data?.worker_name||d.vendor||'')}"></label><label>정비비용(원)<input id="v136_cost" type="number" min="0" value="${E(data?.cost??0)}"></label><label>고장·이상내용<input id="v136_issue" value="${E(d.issue||'')}"></label><label>고장원인<input id="v136_cause" value="${E(d.cause||'')}"></label><label class="full">조치내용<textarea id="v136_action">${E(d.action||'')}</textarea></label><label>교체부품<input id="v136_part" value="${E(d.part||'')}"></label><label>작업시작일<input id="v136_start" type="date" value="${E(date(d.startDate||d.workStartDate||today))}"></label><label>작업완료일<input id="v136_end" type="date" value="${E(date(d.endDate||d.workEndDate||today))}"></label><label>차기 점검일<input id="v136_next" type="date" value="${E(date(d.nextDate||d.nextInspectionDate||''))}"></label><label>조치상태<select id="v136_result"><option ${d.result==='조치완료'||!d.result?'selected':''}>조치완료</option><option ${d.result==='조치필요'?'selected':''}>조치필요</option></select></label><label class="full">비고<textarea id="v136_note">${E(d.note||'')}</textarea></label></div><div class="jgb-v136-actions"><button type="button" class="cancel" onclick="document.getElementById('jgbV136Modal')?.remove()">취소</button><button type="button" class="save" onclick="window.jgbV136Save('${E(id||'')}')">${edit?'수정 저장':'등록'}</button></div></div></div>`;
   }
   window.jgbV136OpenRegister=function(){const a=getAsset();if(!a?.id){alert('먼저 등록할 자산을 선택하세요.');return}document.getElementById('jgbV136Modal')?.remove();document.body.insertAdjacentHTML('beforeend',formHtml('유지관리 이력 등록',null,''));};
-  window.jgbV136OpenEdit=function(id){const h=(window.__eamH||[]).find(x=>V(x.id)===V(id));if(!h){alert('수정할 유지관리 이력을 찾을 수 없습니다.');return}document.getElementById('jgbV136Modal')?.remove();document.body.insertAdjacentHTML('beforeend',formHtml('유지관리 이력 수정',Object.assign({},h,parse(h)),id));};
+  window.jgbV136OpenEdit=async function(id){id=V(id);if(!id){alert('수정할 유지관리 이력을 먼저 선택하세요.');return}let h=(window.__eamH||[]).find(x=>V(x.id)===id)||null;if(!h&&window.SUPA){try{const r=await SUPA.from('asset_history').select('*').eq('id',id).maybeSingle();if(r.error)throw r.error;h=r.data||null}catch(e){console.error(e);alert('유지관리 이력 조회에 실패했습니다.\\n'+(e?.message||e));return}}if(!h){alert('수정할 유지관리 이력을 찾을 수 없습니다.');return}document.getElementById('jgbV136Modal')?.remove();document.body.insertAdjacentHTML('beforeend',formHtml('유지관리 이력 수정',Object.assign({},h,parse(h)),id));};
   window.jgbV136Save=async function(id){if(!window.SUPA){alert('Supabase 연결이 필요합니다.');return}const a=getAsset();if(!a?.id){alert('자산을 선택하세요.');return}const g=k=>V(document.getElementById(k)?.value);const action=g('v136_action');if(!action){alert('조치내용을 입력하세요.');return}const method=g('v136_method')||'외주정비';const d={maintenanceMethod:method,method,maintenanceType:g('v136_sub')||'예방정비',type:g('v136_type')||'수리',issue:g('v136_issue')||'-',cause:g('v136_cause')||'-',action,part:g('v136_part')||'-',startDate:g('v136_start'),endDate:g('v136_end'),workStartDate:g('v136_start'),workEndDate:g('v136_end'),nextDate:g('v136_next'),result:g('v136_result')||'조치완료',note:g('v136_note')||'-'};const payload={event_type:method,description:'MAINT::'+JSON.stringify(d),worker_name:g('v136_vendor')||'-',cost:Number(g('v136_cost'))||0,event_date:g('v136_date')||new Date().toISOString().slice(0,10)};const btn=document.querySelector('#jgbV136Modal .save');if(btn){btn.disabled=true;btn.textContent='저장 중…'}try{const r=id?await SUPA.from('asset_history').update(payload).eq('id',id):await SUPA.from('asset_history').insert(Object.assign({asset_id:a.id},payload));if(r.error)throw r.error;document.getElementById('jgbV136Modal')?.remove();await window.eamLoad();window.__eamSelCode=selectedCode();if(typeof window.render==='function')window.render();else location.reload()}catch(e){console.error(e);alert((id?'수정':'등록')+' 실패\n'+(e?.message||e))}finally{if(btn){btn.disabled=false;btn.textContent=id?'수정 저장':'등록'}}};
   window.jgbV136Delete=async function(id){if(!window.SUPA){alert('Supabase 연결이 필요합니다.');return}if(!confirm('선택한 유지관리 이력을 삭제할까요?\n삭제 후 복구할 수 없습니다.'))return;try{const r=await SUPA.from('asset_history').delete().eq('id',id);if(r.error)throw r.error;await window.eamLoad();window.__eamSelCode=selectedCode();if(typeof window.render==='function')window.render();else location.reload()}catch(e){console.error(e);alert('삭제 실패\n'+(e?.message||e))}};
   window.jgbV136PickPhoto=function(id,label){let old=document.getElementById('jgbV136PhotoInput');old?.remove();const input=document.createElement('input');input.type='file';input.accept='image/*';input.id='jgbV136PhotoInput';input.style.display='none';input.onchange=function(){const f=this.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{const k='JGB_MAINT_PHOTO_'+id+'_'+label;window.__jgbMaintPhotos=window.__jgbMaintPhotos||{};window.__jgbMaintPhotos[k]=String(r.result||'');try{localStorage.setItem(k,String(r.result||''))}catch(e){};renderSectionAfterReload()};r.readAsDataURL(f)};document.body.appendChild(input);input.click()};
@@ -12638,6 +12638,31 @@ window.eamDeleteSelectedAsset=async function(){
     if(c) openEditor(c);
   },true);
 
+})();
+</script>
+
+
+<script id="JGB_V3_HISTORY_EDIT_CLICK_FINAL">
+(function(){
+  'use strict';
+  window.jgbV3EditAsset=function(code){
+    try{
+      var c=String(code||window.__eamSelCode||'').trim();
+      if(!c){alert('먼저 수정할 자산을 선택하세요.');return false;}
+      window.__eamSelCode=c;
+      var fn=window.jgbOpenAssetHistoryEditor;
+      if(typeof fn!=='function'){
+        alert('수정 화면을 불러오지 못했습니다. 페이지를 새로고침해 주세요.');
+        return false;
+      }
+      fn.call(window,c);
+      return false;
+    }catch(e){
+      console.error('JGB_V3_HISTORY_EDIT_CLICK_FINAL',e);
+      alert('수정 화면을 열지 못했습니다.\n'+(e&&e.message?e.message:e));
+      return false;
+    }
+  };
 })();
 </script>
 
