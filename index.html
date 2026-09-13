@@ -12038,7 +12038,6 @@ jgb-eam-card-final .jgb-eam-lower-v125 .v125-full .v125-label{
     document.querySelectorAll('.jgb-equip-photo-rebuilt').forEach(photo=>{
       if(photo.querySelector('.jgb-v145-subphotos'))return;
       const actions=photo.querySelector('.jgb-equip-photo-actions-rebuilt');if(!actions)return;
-      const title=document.createElement('div');title.className='jgb-v145-subtitle';title.textContent='설비 상세사진 · 각 4×4cm';actions.after(title);
       const wrap=document.createElement('div');wrap.className='jgb-v145-subphotos';
       labels.forEach((label,i)=>{
         const src=read(code,i), d=descs[i];
@@ -12049,8 +12048,12 @@ jgb-eam-card-final .jgb-eam-lower-v125 .v125-full .v125-label{
       actions.after(wrap);
     });
   }
-  function run(){setTimeout(build,50);setTimeout(build,300);setTimeout(build,1000);}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
-  new MutationObserver(run).observe(document.body,{childList:true,subtree:true});
+  let timer=0;
+  function schedule(){
+    if(timer)return;
+    timer=setTimeout(function(){timer=0;build();},80);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
+  new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
