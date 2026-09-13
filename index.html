@@ -3731,72 +3731,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
       return a||r.data;
     }
-    function eamOpenManageMenu(){
-      document.getElementById('eamManageModal')?.remove();
-      const src=eamSelectedSource();
-      const reg=src?eamRegisteredForSource(src):((window.__eamA||[]).find(v=>String(v.asset_code)===String(window.__eamSelCode||''))||null);
-      const exists=!!reg;
-      document.body.insertAdjacentHTML('beforeend',`<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()">
-        <div class="eam-manage-card">
-          <div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>${xEsc(src?eamDisplayName(src):'자산 관리')}</h3><small>${exists?'등록 자산 관리':'기존 원본 자산을 DB에 등록 후 관리'}</small></div><button onclick="document.getElementById('eamManageModal').remove()">×</button></div>
-          <div class="eam-manage-grid">
-            <button onclick="eamEditSelectedAsset();document.getElementById('eamManageModal')?.remove()">✏️ <b>${exists?'자산 수정':'기존 자산 등록·수정'}</b><small>명칭 · 위치 · 기본정보</small></button>
-            ${exists?`<button onclick="eamRegisterMaintenance('${xEsc(reg.id)}','internal');document.getElementById('eamManageModal')?.remove()">🔵 <b>내부수리</b><small>직접 점검·수리 이력</small></button>
-            <button onclick="eamRegisterMaintenance('${xEsc(reg.id)}','external');document.getElementById('eamManageModal')?.remove()">🟠 <b>외부수리</b><small>업체 수리·교체 이력</small></button>
-            <button onclick="eamShowHistory();document.getElementById('eamManageModal')?.remove()">📋 <b>작업 이력</b><small>전체 유지보수 기록</small></button>
-            <button onclick="eamRetireSelectedAsset();document.getElementById('eamManageModal')?.remove()">♻️ <b>폐기·교체</b><small>수명주기 처리</small></button>
-            <button class="danger" onclick="eamDeleteSelectedAsset();document.getElementById('eamManageModal')?.remove()">🗑 <b>삭제</b><small>등록 자산 삭제</small></button>`:''}
-          </div>
-        </div></div>`);
-    }
-    async function eamEditSelectedAsset(){
-      // 단일 표준 수정창으로 연결. 기존 레거시 수정창의 Supabase 선검사를 하지 않습니다.
-      if(typeof window.jgbOpenAssetHistoryEditor==='function'){window.jgbOpenAssetHistoryEditor();return}
-      alert('주요설비 이력카드 수정 기능을 불러오지 못했습니다.');
-    }
-    function eamEditLocationChange(v,currentPlace){
-      const box=document.getElementById('editDetailPlace'); if(!box)return;
-      box.innerHTML=eamLocationDetails(v,currentPlace);
-      const custom=document.getElementById('editCustomPlace');
-      if(currentPlace && ![...(EAM_LOCATION_OPTIONS[v]?.detail||[])].includes(currentPlace)){box.value='__custom__';if(custom){custom.style.display='block';custom.value=currentPlace}}
-      else if(custom){custom.style.display='none';custom.value=''}
-    }
-    async function eamSaveFullEdit(code){
-      if(typeof window.jgbSaveAssetHistoryCard==='function'){await window.jgbSaveAssetHistoryCard(code);return}
-      alert('주요설비 이력카드 저장 기능을 불러오지 못했습니다.');
-    }
 
-    async function eamDeleteSelectedAsset(){
-      const code=window.__eamSelCode||''; if(!code){alert('삭제할 시설·설비를 선택하세요.');return}
-      if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
-      const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
-      if(!a){alert('등록된 EAM 자산을 찾을 수 없습니다.');return}
-      if(!confirm(`'${a.name||code}' 시설·설비를 삭제할까요?\n연결된 작업 이력도 함께 삭제됩니다.`))return;
-      const hr=await SUPA.from('asset_history').delete().eq('asset_id',a.id);
-      if(hr.error){console.error(hr.error);alert('연결된 작업 이력 삭제에 실패했습니다.');return}
-      const ir=await SUPA.from('inspections').delete().eq('asset_id',a.id);
-      if(ir.error){console.error(ir.error);alert('연결된 점검 이력 삭제에 실패했습니다.');return}
-      const ar=await SUPA.from('assets').delete().eq('id',a.id);
-      if(ar.error){console.error(ar.error);alert('EAM 자산 삭제에 실패했습니다.');return}
-      window.__eamSelCode=''; await eamLoad(); render();
-    }
-
-
-
-    async function eamRetireSelectedAsset(){
-      const code=window.__eamSelCode||''; if(!code){alert('폐기할 시설·설비를 선택하세요.');return}
-      if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
-      const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
-      if(!a){alert('등록된 EAM 자산을 찾을 수 없습니다.');return}
-      if(String(a.status)==='폐기'){alert('이미 폐기 처리된 자산입니다.');return}
-      const reason=prompt('폐기 사유를 입력하세요.','제품 교체'); if(reason===null)return;
-      const date=prompt('폐기일을 입력하세요. (YYYY-MM-DD)',new Date().toISOString().slice(0,10)); if(date===null)return;
-      const ur=await SUPA.from('assets').update({status:'폐기'}).eq('id',a.id);
-      if(ur.error){console.error(ur.error);alert('폐기 처리에 실패했습니다.');return}
-      const hr=await SUPA.from('asset_history').insert({asset_id:a.id,event_type:'폐기',description:`자산 폐기 · ${String(reason).trim()||'사유 미기재'}`,worker_name:'',cost:0,event_date:date});
-      if(hr.error){console.error(hr.error);alert('폐기 이력 저장에 실패했습니다.');return}
-      await eamLoad(); render();
-    }
     async function eamRegisterReplacementAsset(){
       if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
       const oldCode=window.__eamSelCode||'';
@@ -4389,14 +4324,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           window.__eamSelCode=code;window.__eamCat=CATMAP[category]||'other';closeEamRegisterModal();await window.eamLoad();render();
         }catch(e){console.error(e);alert('신규 자산 등록 실패\n'+(e?.message||''))}finally{if(btn){btn.disabled=false;btn.textContent='EAM 자산 생성'}}
       };
-      window.eamOpenManageMenu=function(){
-        document.getElementById('eamManageModal')?.remove();
-        const code=v(window.__eamSelCode);
-        document.body.insertAdjacentHTML('beforeend',`<div id="eamManageModal" class="eam-modal" onclick="if(event.target===this)this.remove()"><div class="eam-modal-card"><div class="eam-modal-head"><div><span>EAM ASSET MANAGEMENT</span><h3>자산 관리</h3><small>신규 등록부터 유지관리 이력까지 한 곳에서 관리합니다.</small></div><button type="button" onclick="this.closest('#eamManageModal')?.remove()">×</button></div><div class="eam-manage-grid">
-          <button type="button" class="eam-manage-btn blue" onclick="eamRegisterNewAsset();document.getElementById('eamManageModal')?.remove()">＋ 신규 자산 등록</button>
-          <button type="button" class="eam-manage-btn danger" onclick="eamDeleteSelectedAsset();document.getElementById('eamManageModal')?.remove()">🗑 자산 삭제</button>
-        </div></div></div>`);
-      };
       function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
       function maintenanceData(reg,H,I,code){
         const AA=Array.isArray(window.__eamA)?window.__eamA:[];
@@ -4490,7 +4417,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           ? `<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-paper-equip-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')" title="사진 삭제">×</button>`
           : `<div class="jgb-paper-cam">📷</div><strong>설비 사진 1장</strong><span>사진 등록 · JPG / PNG · 클릭</span>`;
         return `<details class="eam-source-card jgb-history-card" ${cardOpen?'open':''} ontoggle="eamPersistHistoryCard(this,'${esc(cardCode)}')">
-          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();jgbOpenAssetHistoryEditor('${E(cardCode)}')">✏️ 수정</button></div></summary>
+          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';jgbOpenAssetHistoryEditor('${E(cardCode)}')">✏️ 수정</button></div></summary>
           <div class="jgb-paper-card-body">
             <section class="jgb-paper-info">
               <div class="jgb-paper-section-title">📄 기본정보</div>
@@ -4855,7 +4782,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         if(!card||card.dataset.directFix==='1'||card.dataset.editing==='1')return;
         card.dataset.directFix='1';
         const summary=card.querySelector('summary');
-        if(summary){summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();jgbOpenAssetHistoryEditor('${E(cardCode)}')">✏️ 수정</button></div>`}
+        if(summary){summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';jgbOpenAssetHistoryEditor('${E(cardCode)}')">✏️ 수정</button></div>`}
       }
       document.addEventListener('DOMContentLoaded',decorate);
       setTimeout(decorate,300);
@@ -12628,7 +12555,7 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
 
 
 
-<script id="JGB_V182_SINGLE_FINAL">
+<script id="JGB_V183_SINGLE_FINAL">
 (function(){
 'use strict';
 const V=x=>String(x??'').trim(), DEL='JGB_EAM_DELETED_CODES';
@@ -12653,7 +12580,7 @@ window.eamOpenManageMenu=function(){
  document.body.insertAdjacentHTML('beforeend',`<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()"><div class="eam-manage-card"><div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>${esc(name)}</h3><small>자산코드: ${esc(c)}</small></div><button type="button" onclick="this.closest('#eamManageModal')?.remove()">×</button></div><div class="eam-manage-grid"><button type="button" onclick="window.eamRegisterNewAsset();this.closest('#eamManageModal')?.remove()">➕ <b>신규 등록</b><small>AC-코드 자동 생성</small></button><button type="button" class="danger" onclick="window.eamDeleteSelectedAsset()">🗑 <b>삭제</b><small>왼쪽·오른쪽 이력카드 통째 삭제</small></button></div></div></div>`);
 };
 // 주요설비 이력카드의 수정 버튼은 기존 단일 편집기로 연결.
-window.eamEditSelectedAsset=function(){const c=code();if(!c){alert('먼저 수정할 자산을 선택하세요.');return}try{if(typeof window.jgbOpenAssetHistoryEditor==='function'){window.jgbOpenAssetHistoryEditor(c);return}alert('수정 화면을 불러오지 못했습니다.')}catch(e){alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e))}};window.eamHistoryCardEdit=window.eamEditSelectedAsset;
+window.eamEditSelectedAsset=function(){const c=code();if(!c){alert('먼저 수정할 자산을 선택하세요.');return}window.__eamSelCode=c;try{const fn=window.jgbOpenAssetHistoryEditor;if(typeof fn==='function'){fn.call(window,c);return}alert('수정 화면을 불러오지 못했습니다.')}catch(e){console.error('JGB_EDIT',e);alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e))}};window.eamHistoryCardEdit=window.eamEditSelectedAsset;
 // 삭제는 asset_code로 DB를 직접 찾는다. 기존 __eamA 의존 때문에 AC-01 삭제가 실패하던 문제를 제거.
 window.eamDeleteSelectedAsset=async function(){
  const c=code();if(!c){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
