@@ -12610,5 +12610,52 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
 })();
 
 </script>
+
+<script>
+/* V163: 원본 자산도 수정·삭제 동작을 동일하게 처리 */
+(function(){
+  'use strict';
+  const KEY='JGB_EAM_DELETED_CODES';
+  const V=x=>String(x??'').trim();
+  function deleted(){try{return new Set(JSON.parse(localStorage.getItem(KEY)||'[]').map(V))}catch(e){return new Set()}}
+  function saveDeleted(set){try{localStorage.setItem(KEY,JSON.stringify([...set]))}catch(e){}}
+  const originalSourceAssets=window.eamSourceAssets;
+  if(typeof originalSourceAssets==='function' && !originalSourceAssets.__v163){
+    const filtered=function(){const d=deleted();return (originalSourceAssets()||[]).filter(x=>!d.has(V(x?.code||x?.asset_code)))};
+    filtered.__v163=true; window.eamSourceAssets=filtered;
+  }
+  async function getDb(){
+    try{if(typeof getSupa==='function'){const x=getSupa();const d=x&&typeof x.then==='function'?await x:x;if(d)return d}}catch(e){}
+    try{if(window.SUPA)return window.SUPA}catch(e){}
+    try{if(window.supabase&&typeof window.supabase.createClient==='function'&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return window.SUPA}}catch(e){}
+    return null;
+  }
+  window.eamDeleteSelectedAsset=async function(){
+    const code=V(window.__eamSelCode);
+    if(!code){alert('삭제할 시설·설비를 선택하세요.');return}
+    const A=Array.isArray(window.__eamA)?window.__eamA:[];
+    const a=A.find(x=>V(x?.asset_code)===code)||null;
+    const src=(typeof originalSourceAssets==='function'?(originalSourceAssets()||[]):[]).find(x=>V(x?.code)===code)||null;
+    const name=V(a?.name||src?.name||code);
+    if(!confirm(`'${name}' 시설·설비를 삭제할까요?\n연결된 작업 이력도 함께 삭제됩니다.`))return;
+    try{
+      if(a?.id){
+        const d=await getDb(); if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+        const h=await d.from('asset_history').delete().eq('asset_id',a.id); if(h.error)throw h.error;
+        const i=await d.from('inspections').delete().eq('asset_id',a.id); if(i.error)throw i.error;
+        const r=await d.from('assets').delete().eq('id',a.id); if(r.error)throw r.error;
+      }else if(src){
+        const set=deleted();set.add(code);saveDeleted(set);
+        try{const m=typeof metas==='function'?(metas()||{}):JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{};delete m[code];if(typeof saveMeta==='function')saveMeta(m);else localStorage.setItem('JGB_EAM_META',JSON.stringify(m))}catch(e){}
+      }else{
+        alert('선택한 자산을 찾을 수 없습니다.');return;
+      }
+      window.__eamSelCode='';
+      if(typeof window.eamLoad==='function')await window.eamLoad();
+      if(typeof window.render==='function')window.render();
+    }catch(e){console.error(e);alert('자산 삭제에 실패했습니다.\n'+(e?.message||e))}
+  };
+})();
+</script>
 </body>
 </html>
