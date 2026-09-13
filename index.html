@@ -12357,7 +12357,7 @@ window.eamOpenManageMenu=function(){
  document.body.insertAdjacentHTML('beforeend',`<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()"><div class="eam-manage-card"><div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>${esc(name)}</h3><small>자산코드: ${esc(c)}</small></div><button type="button" onclick="this.closest('#eamManageModal')?.remove()">×</button></div><div class="eam-manage-grid"><button type="button" onclick="window.eamRegisterNewAsset();this.closest('#eamManageModal')?.remove()">➕ <b>신규 등록</b><small>AC-코드 자동 생성</small></button><button type="button" class="danger" onclick="window.eamDeleteSelectedAsset()">🗑 <b>삭제</b><small>왼쪽·오른쪽 이력카드 통째 삭제</small></button></div></div></div>`);
 };
 // 주요설비 이력카드의 수정 버튼은 기존 단일 편집기로 연결.
-window.eamEditSelectedAsset=function(){const c=code();if(!c){alert('먼저 수정할 자산을 선택하세요.');return}window.__eamSelCode=c;try{const fn=window.jgbOpenAssetHistoryEditor;if(typeof fn==='function'){fn.call(window,c);return}alert('수정 화면을 불러오지 못했습니다.')}catch(e){console.error('JGB_EDIT',e);alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e))}};window.eamHistoryCardEdit=window.eamEditSelectedAsset;
+window.eamEditSelectedAsset=function(){const c=code();if(!c){alert('먼저 수정할 자산을 선택하세요.');return}window.__eamSelCode=c;try{const fn=window.jgbOpenAssetHistoryEditor;if(typeof fn==='function'){fn.call(window,c);return}alert('수정 화면을 불러오지 못했습니다.')}catch(e){console.error('JGB_EDIT',e);alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e))}};
 // 삭제는 asset_code로 DB를 직접 찾는다. 기존 __eamA 의존 때문에 AC-01 삭제가 실패하던 문제를 제거.
 window.eamDeleteSelectedAsset=async function(){
  const c=code();if(!c){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
@@ -12625,7 +12625,7 @@ window.eamDeleteSelectedAsset=async function(){
   window.eamEditSelectedAsset=function(code){
     return openEditor(code || window.__eamSelCode);
   };
-  window.eamHistoryCardEdit=window.eamEditSelectedAsset;
+  
 
   // 수정 버튼 클릭은 캡처 단계에서 단 한 번만 처리
   document.addEventListener('click',function(ev){
@@ -12642,29 +12642,20 @@ window.eamDeleteSelectedAsset=async function(){
 </script>
 
 
-<script id="JGB_V3_HISTORY_EDIT_CLICK_FINAL">
+
+
+<script id="JGB_MAJOR_HISTORY_EDIT_DIRECT">
 (function(){
-  'use strict';
-  window.jgbV3EditAsset=function(code){
-    try{
-      var c=String(code||window.__eamSelCode||'').trim();
-      if(!c){alert('먼저 수정할 자산을 선택하세요.');return false;}
-      window.__eamSelCode=c;
-      var fn=window.jgbOpenAssetHistoryEditor;
-      if(typeof fn!=='function'){
-        alert('수정 화면을 불러오지 못했습니다. 페이지를 새로고침해 주세요.');
-        return false;
-      }
-      fn.call(window,c);
-      return false;
-    }catch(e){
-      console.error('JGB_V3_HISTORY_EDIT_CLICK_FINAL',e);
-      alert('수정 화면을 열지 못했습니다.\n'+(e&&e.message?e.message:e));
-      return false;
-    }
-  };
+  document.addEventListener('click',function(e){
+    var b=e.target.closest && e.target.closest('.jgb-card-edit,[data-eam-edit-asset]');
+    if(!b)return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    var c=String(b.getAttribute('data-code')||window.__eamSelCode||'').trim();
+    if(!c){alert('먼저 수정할 자산을 선택하세요.');return;}
+    if(typeof window.jgbOpenAssetHistoryEditor==='function'){window.jgbOpenAssetHistoryEditor(c);}
+    else{alert('주요설비 이력카드 수정 기능을 불러오지 못했습니다.');}
+  },true);
 })();
 </script>
-
 </body>
 </html>
