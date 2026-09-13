@@ -4443,16 +4443,16 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <div class="jgb-paper-card-body">
             <section class="jgb-paper-info">
               <div class="jgb-paper-section-title">📄 기본정보</div>
-              <div class="jgb-paper-grid">
-                ${F('자산코드',cur.asset_code||cur.code||'-')}${F('자산명',cur.name||'-')}
-                ${F('설비 종류',cur.category||cur.type||'-')}${F('위치',cur.place||'-')}
-                ${F('위치코드',cur.locationCode||placeCode(cur.place)||'-')}${F('모델·규격',cur.model||'-')}
-                ${F('용량',cur.capacity||'-')}${F('수량',cur.qty??cur.quantity??'-')}
-                ${F('제조사',cur.maker||cur.vendor||'-')}${F('A/S 연락처',cur.asContact||'-')}
-                ${F('제조일',cur.date||cur.manufactureDate||'-')}${F('설치일',cur.installDate||'-')}
-                ${F('내용연수',cur.life||'-')}${F('평가등급',cur.grade||'-')}
-                ${F('보증',cur.warranty||'-')}${F('기존 A/S 기록',cur.asHistory||'-')}
-                ${F('자산상태',cur.status||'정상')}${F('취득구분',cur.acquisitionType||'기존 자산')}
+              <div class="jgb-paper-grid jgb-basic-rebuilt">
+                <div class="jgb-basic-row">${F('자산코드',cur.asset_code||cur.code||'-')}${F('자산명',cur.name||'-')}</div>
+                <div class="jgb-basic-row">${F('설비 종류',cur.category||cur.type||'-')}${F('위치',cur.place||'-')}</div>
+                <div class="jgb-basic-row">${F('위치코드',cur.locationCode||placeCode(cur.place)||'-')}${F('모델·규격',cur.model||'-')}</div>
+                <div class="jgb-basic-row">${F('용량',cur.capacity||'-')}${F('수량',cur.qty??cur.quantity??'-')}</div>
+                <div class="jgb-basic-row">${F('제조사',cur.maker||cur.vendor||'-')}${F('A/S 연락처',cur.asContact||'-')}</div>
+                <div class="jgb-basic-row">${F('제조일',cur.date||cur.manufactureDate||'-')}${F('설치일',cur.installDate||'-')}</div>
+                <div class="jgb-basic-row">${F('내용연수',cur.life||'-')}${F('평가등급',cur.grade||'-')}</div>
+                <div class="jgb-basic-row">${F('보증',cur.warranty||'-')}${F('기존 A/S 기록',cur.asHistory||'-')}</div>
+                <div class="jgb-basic-row">${F('자산상태',cur.status||'정상')}${F('취득구분',cur.acquisitionType||'기존 자산')}</div>
               </div>
             </section>
             <section class="jgb-paper-photo jgb-equip-photo-rebuilt">
@@ -11707,4 +11707,47 @@ jgb-eam-card-final .jgb-eam-lower-v125 .v125-full .v125-label{
 .jgb-history-card .jgb-equip-photo-box .jgb-equip-photo-x,.jgb-history-card .jgb-equip-photo-box .jgb-equip-photo-del{z-index:20!important;}
 .jgb-history-card .jgb-equip-photo-box:has(img) .jgb-equip-photo-file{z-index:1!important;}
 .jgb-history-card .jgb-equip-photo-box:has(img) .jgb-equip-photo-del,.jgb-history-card .jgb-equip-photo-box:has(img) .jgb-equip-photo-x{z-index:30!important;}
+</style>
+<style id="JGB_V142_BASIC_INFO_FULL_REBUILD">
+/* V142: 주요설비 이력카드 기본정보를 실제 행 단위 표로 재작성. 기존 데이터/기능/배경 유지 */
+.jgb-history-card .jgb-basic-rebuilt{
+  display:block!important; width:100%!important; margin:0!important; padding:0!important;
+  background:#faf8f2!important; border:0!important; box-sizing:border-box!important;
+}
+.jgb-history-card .jgb-basic-rebuilt .jgb-basic-row{
+  display:grid!important; grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  width:100%!important; min-height:50px!important; height:50px!important;
+  margin:0!important; padding:0!important; box-sizing:border-box!important;
+  border-bottom:2px solid #4e6473!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-basic-rebuilt .jgb-basic-row:last-child{border-bottom:0!important}
+.jgb-history-card .jgb-basic-rebuilt .jgb-paper-cell{
+  display:grid!important; grid-template-columns:125px minmax(0,1fr)!important;
+  width:auto!important; min-width:0!important; height:50px!important; min-height:50px!important;
+  margin:0!important; padding:0!important; box-sizing:border-box!important;
+  border:0!important; border-right:2px solid #4e6473!important;
+  background:#faf8f2!important; overflow:hidden!important;
+}
+.jgb-history-card .jgb-basic-rebuilt .jgb-basic-row .jgb-paper-cell:last-child{border-right:0!important}
+.jgb-history-card .jgb-basic-rebuilt .jgb-paper-cell small{
+  display:flex!important; align-items:center!important; min-width:0!important;
+  padding:7px 9px!important; box-sizing:border-box!important;
+  background:#dfe6ea!important; color:#223c4e!important;
+  border-right:2px solid #4e6473!important;
+  font-size:14px!important; font-weight:900!important; line-height:1.15!important;
+  white-space:nowrap!important; word-break:keep-all!important; overflow:hidden!important;
+}
+.jgb-history-card .jgb-basic-rebuilt .jgb-paper-cell b{
+  display:flex!important; align-items:center!important; min-width:0!important;
+  padding:7px 10px!important; box-sizing:border-box!important;
+  background:#faf8f2!important; color:#172f40!important;
+  font-size:14px!important; font-weight:750!important; line-height:1.2!important;
+  white-space:normal!important; word-break:keep-all!important; overflow:hidden!important;
+}
+@media(max-width:850px){
+ .jgb-history-card .jgb-basic-rebuilt .jgb-basic-row{grid-template-columns:1fr!important;height:auto!important;min-height:50px!important}
+ .jgb-history-card .jgb-basic-rebuilt .jgb-basic-row .jgb-paper-cell{border-right:0!important;border-bottom:2px solid #4e6473!important}
+ .jgb-history-card .jgb-basic-rebuilt .jgb-basic-row .jgb-paper-cell:last-child{border-bottom:0!important}
+}
 </style>
