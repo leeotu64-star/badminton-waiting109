@@ -4032,67 +4032,21 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       try{wpV72SaveCards(keep);localStorage.removeItem('JGB_V48_WP_CARDS')}catch(e){}
       return keepCode;
     }
-    function jgbV87MigrateAndNextLK(){
-      const key='JGB_V72_WP_CARDS', seqKey='JGB_V87_LK_SEQ'; let all=wpV72Cards(), changed=false;
-      const entries=Object.entries(all);
-      let max=0;
-      entries.forEach(([k,m])=>{const c=String(m?.code||k); const mm=c.match(/^LK-(\d+)$/i); if(mm)max=Math.max(max,Number(mm[1])||0)});
-      try{max=Math.max(max,Number(localStorage.getItem(seqKey)||0)||0)}catch(e){}
-      entries.forEach(([k,m])=>{
-        const oldCode=String(m?.code||k);
-        if(/^LK-\d+$/i.test(oldCode))return;
-        max+=1; const newCode='LK-'+String(max).padStart(3,'0');
-        const data={...(m||{}),code:newCode}; delete all[k]; all[newCode]=data; changed=true;
-        try{const S=jgbV47Store();S.saveWp(S.wp.map(h=>String(h.cardCode||'')===oldCode?{...h,cardCode:newCode}:h))}catch(e){}
-      });
-      try{localStorage.setItem(seqKey,String(max))}catch(e){}
-      if(changed)wpV72SaveCards(all);
-      return all;
-    }
-    function jgbV87PeekNextLK(){
-      const all=jgbV87MigrateAndNextLK(); let max=0; Object.keys(all).forEach(k=>{const m=String(all[k]?.code||k).match(/^LK-(\d+)$/i);if(m)max=Math.max(max,Number(m[1])||0)}); try{max=Math.max(max,Number(localStorage.getItem('JGB_V87_LK_SEQ')||0)||0)}catch(e){} return 'LK-'+String(max+1).padStart(3,'0');
-    }
-    function jgbV87NextLK(){
-      const all=jgbV87MigrateAndNextLK(), used=new Set(Object.keys(all).map(String)); let max=0;
-      Object.keys(all).forEach(k=>{const m=String(all[k]?.code||k).match(/^LK-(\d+)$/i);if(m)max=Math.max(max,Number(m[1])||0)});
-      try{max=Math.max(max,Number(localStorage.getItem('JGB_V87_LK_SEQ')||0)||0)}catch(e){}
-      let code=''; do{max+=1;code='LK-'+String(max).padStart(3,'0')}while(used.has(code));
-      try{localStorage.setItem('JGB_V87_LK_SEQ',String(max))}catch(e){}
-      return code;
-    }
-    function jgbV87LeakCode(leaf){
-      const base=Array.isArray(leaf)?leaf:[]; let max=0;
-      base.forEach(x=>{const m=String(x?.leakCode||'').match(/^LK-(\d+)$/i);if(m)max=Math.max(max,Number(m[1])||0)});
-      try{max=Math.max(max,Number(localStorage.getItem('JGB_V87_LK_SEQ')||0)||0)}catch(e){}
-      max+=1; const code='LK-'+String(max).padStart(3,'0'); try{localStorage.setItem('JGB_V87_LK_SEQ',String(max))}catch(e){} return code;
-    }
     function jgbV90NormalizeCode(v,prefix){
       let x=String(v||'').trim().toUpperCase();
       if(!x)return '';
       if(/^\d+$/.test(x))x=prefix+x;
-      if(x.startsWith('WP-'))x=prefix+x.slice(3);
-      if(prefix==='WA-' && x.startsWith('LK-'))x=prefix+x.slice(3);
-      if(prefix==='LK-' && x.startsWith('WA-'))x=prefix+x.slice(3);
       return x;
     }
     function jgbV90NormalizeWpCards(){
-      const key='JGB_V72_WP_CARDS'; let all=wpV72Cards(), out={}, changed=false;
+      const key='JGB_V72_WP_CARDS';
+      const all=wpV72Cards();
+      const out={};
       Object.entries(all).forEach(([k,m])=>{
-        const oldCode=String(m?.code||k).trim();
-        let code=oldCode.toUpperCase();
-        if(/^LK-\d+$/i.test(code))code='WA-'+code.slice(3);
-        else if(/^WP-\d+$/i.test(code))code='WA-'+code.slice(3);
-        if(code!==oldCode || k!==code){changed=true; out[code]={...(m||{}),code};}
-        else out[k]=m;
+        const code=String(m?.code||k).trim().toUpperCase();
+        if(code) out[code]={...(m||{}),code};
       });
-      if(changed){
-        const S=jgbV47Store();
-        const map={}; Object.entries(all).forEach(([k,m])=>{let c=String(m?.code||k).trim().toUpperCase();if(/^LK-\d+$/i.test(c)||/^WP-\d+$/i.test(c))c='WA-'+c.slice(3);map[k]=c});
-        S.saveWp(S.wp.map(h=>{const c=map[h.cardCode];return c?{...h,cardCode:c}:h}));
-        wpV72SaveCards(out);
-        all=out;
-      }
-      return all;
+      return out;
     }
     function jgbV48OpenCardEditor(code,isNew){
       const all=jgbV90NormalizeWpCards(), old=isNew?{}:(all[String(code)]||{}), esc=v=>xEsc(v==null?'':String(v)), initial=isNew?'WA-':String(old.code||code||'');
