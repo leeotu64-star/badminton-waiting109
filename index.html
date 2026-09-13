@@ -12626,119 +12626,52 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
 
 </script>
 
-<script id="JGB_V181_CLEAN_ASSET_MANAGE">
+
+
+<script id="JGB_V182_SINGLE_FINAL">
 (function(){
-  'use strict';
-  const V=x=>String(x??'').trim();
-  const DELKEY='JGB_EAM_DELETED_CODES';
-  function deleted(){try{return new Set(JSON.parse(localStorage.getItem(DELKEY)||'[]').map(V))}catch(e){return new Set()}}
-  function saveDeleted(set){try{localStorage.setItem(DELKEY,JSON.stringify([...set]))}catch(e){}}
-  function code(){return V(window.__eamSelCode)}
-  function source(code){
-    try{
-      const fn=window.eamSourceAssets;
-      if(typeof fn==='function') return (fn()||[]).find(x=>V(x?.code||x?.asset_code)===code)||null;
-    }catch(e){}
-    return null;
-  }
-  function dbAsset(code){
-    try{return (Array.isArray(window.__eamA)?window.__eamA:[]).find(x=>V(x?.asset_code)===code)||null}catch(e){return null}
-  }
-  function getDb(){
-    try{if(typeof db==='function')return db()}catch(e){}
-    try{if(window.SUPA)return Promise.resolve(window.SUPA)}catch(e){}
-    try{
-      if(window.supabase&&typeof window.supabase.createClient==='function'&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){
-        window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return Promise.resolve(window.SUPA)
-      }
-    }catch(e){}
-    return Promise.resolve(null)
-  }
-  function esc(x){return V(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-
-  // 왼쪽 정적 자산도 DB 자산과 동일하게 선택/삭제 대상으로 취급하되,
-  // 삭제된 코드만 화면에서 숨긴다. 기존 원본/신규 구분은 사용하지 않는다.
-  const oldSource=window.eamSourceAssets;
-  if(typeof oldSource==='function' && !oldSource.__v181){
-    const wrapped=function(){
-      const gone=deleted();
-      return (oldSource()||[]).filter(x=>!gone.has(V(x?.code||x?.asset_code)));
-    };
-    wrapped.__v181=true;
-    window.eamSourceAssets=wrapped;
-  }
-
-  // 자산관리 창은 딱 두 항목만: 신규 등록 / 삭제
-  window.eamOpenManageMenu=function(){
-    const c=code();
-    if(!c){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return;}
-    document.getElementById('eamManageModal')?.remove();
-    const a=dbAsset(c), s=source(c), name=esc(a?.name||a?.asset_name||s?.name||s?.asset_name||c);
-    document.body.insertAdjacentHTML('beforeend',
-      `<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()">`+
-      `<div class="eam-manage-card"><div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>${name}</h3><small>자산코드: ${esc(c)}</small></div><button type="button" onclick="this.closest('#eamManageModal')?.remove()">×</button></div>`+
-      `<div class="eam-manage-grid">`+
-      `<button type="button" onclick="window.eamRegisterNewAsset();this.closest('#eamManageModal')?.remove()">➕ <b>신규 등록</b><small>AC-코드 자동 생성</small></button>`+
-      `<button type="button" class="danger" onclick="window.eamDeleteSelectedAsset()">🗑 <b>삭제</b><small>왼쪽·오른쪽 이력카드 통째 삭제</small></button>`+
-      `</div></div></div>`
-    );
-  };
-
-  // 주요설비 이력카드의 수정은 이 함수 하나만 사용한다.
-  window.eamEditSelectedAsset=function(){
-    const c=code();
-    if(!c){alert('먼저 수정할 자산을 선택하세요.');return;}
-    try{
-      if(typeof window.jgbOpenAssetHistoryEditor==='function'){
-        window.jgbOpenAssetHistoryEditor(c); return;
-      }
-      alert('수정 화면을 불러오지 못했습니다.');
-    }catch(e){console.error('JGB_V181_EDIT',e);alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e));}
-  };
-  window.eamHistoryCardEdit=window.eamEditSelectedAsset;
-
-  // 삭제는 한 곳에서만 처리한다: DB 자산이면 DB에서 관련 데이터까지 삭제하고,
-  // 정적 목록 자산이면 삭제 코드로 표시하여 왼쪽/오른쪽 모두 숨긴다.
-  window.eamDeleteSelectedAsset=async function(){
-    const c=code();
-    if(!c){alert('먼저 왼쪽 자산목록에서 삭제할 자산을 선택하세요.');return;}
-    const a=dbAsset(c), s=source(c), name=V(a?.name||a?.asset_name||s?.name||s?.asset_name||c);
-    if(!a && !s){alert('선택한 자산을 찾을 수 없습니다.\n자산코드: '+c);return;}
-    if(!confirm(`'${name}' 시설·설비를 삭제할까요?\n왼쪽 목록과 오른쪽 이력카드가 함께 삭제됩니다.`))return;
-    const modal=document.getElementById('eamManageModal');
-    try{
-      // DB 등록 자산이면 연결된 이력/점검/자산을 실제 DB에서 삭제한다.
-      if(a?.id){
-        const d=await getDb();
-        if(!d)throw new Error('Supabase 연결에 실패했습니다.');
-        let r=await d.from('asset_history').delete().eq('asset_id',a.id);
-        if(r.error)throw r.error;
-        try{
-          r=await d.from('inspections').delete().eq('asset_id',a.id);
-          if(r.error && !/does not exist|relation/i.test(r.error.message))throw r.error;
-        }catch(e){if(!/does not exist|relation/i.test(e?.message||''))throw e;}
-        r=await d.from('assets').delete().eq('id',a.id);
-        if(r.error)throw r.error;
-      }
-      // 정적 목록에서도 같은 AC 코드를 완전히 숨긴다.
-      const gone=deleted(); gone.add(c); saveDeleted(gone);
-      try{
-        const m=(typeof metaAll==='function'?metaAll():JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}'))||{};
-        delete m[c]; localStorage.setItem('JGB_EAM_META',JSON.stringify(m));
-      }catch(e){}
-      window.__eamSelCode='';
-      window.__eamSelAsset=null; window.__eamCurrentAsset=null; window.__eamSelectedAsset=null;
-      modal?.remove();
-      if(typeof window.eamLoad==='function')await window.eamLoad();
-      window.__eamSelCode='';
-      if(typeof window.render==='function')window.render();
-      window.__eamSelCode='';
-      alert('삭제되었습니다.');
-    }catch(e){
-      console.error('JGB_V181_DELETE',e);
-      alert('삭제하지 못했습니다.\n'+(e?.message||e));
-    }
-  };
+'use strict';
+const V=x=>String(x??'').trim(), DEL='JGB_EAM_DELETED_CODES';
+function gone(){try{return new Set(JSON.parse(localStorage.getItem(DEL)||'[]').map(V).filter(Boolean))}catch(e){return new Set()}}
+function saveGone(a){try{localStorage.setItem(DEL,JSON.stringify([...a]))}catch(e){}}
+function code(){return V(window.__eamSelCode)}
+function esc(x){return V(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+async function db(){
+ try{if(window.SUPA)return window.SUPA}catch(e){}
+ try{if(typeof getSupa==='function'){const x=getSupa();return x&&typeof x.then==='function'?await x:x}}catch(e){}
+ try{if(window.supabase?.createClient&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return window.SUPA}}catch(e){}
+ return null;
+}
+// 왼쪽 목록의 실제 데이터 공급원까지 삭제코드를 적용한다.
+if(typeof window.eamCategoryDefs==='function'&&!window.eamCategoryDefs.__v182){const old=window.eamCategoryDefs;const f=function(){const g=gone(),o=old.apply(this,arguments)||{};Object.keys(o).forEach(k=>{if(Array.isArray(o[k]?.items))o[k]={...o[k],items:o[k].items.filter(x=>!g.has(V(x?.code||x?.asset_code)))}});return o};f.__v182=true;window.eamCategoryDefs=f}
+if(typeof window.eamSourceAssets==='function'&&!window.eamSourceAssets.__v182){const old=window.eamSourceAssets;const f=function(){const g=gone();return (old()||[]).filter(x=>!g.has(V(x?.code||x?.asset_code)))};f.__v182=true;window.eamSourceAssets=f}
+// 자산관리 창은 신규 등록 / 삭제만.
+window.eamOpenManageMenu=function(){
+ const c=code();if(!c){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
+ let name=c;try{const A=Array.isArray(window.__eamA)?window.__eamA:[];const a=A.find(x=>V(x?.asset_code)===c);if(a?.name)name=a.name;const S=typeof window.eamSourceAssets==='function'?window.eamSourceAssets():[];const s=S.find(x=>V(x?.code||x?.asset_code)===c);if(s?.name)name=s.name}catch(e){}
+ document.getElementById('eamManageModal')?.remove();
+ document.body.insertAdjacentHTML('beforeend',`<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()"><div class="eam-manage-card"><div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>${esc(name)}</h3><small>자산코드: ${esc(c)}</small></div><button type="button" onclick="this.closest('#eamManageModal')?.remove()">×</button></div><div class="eam-manage-grid"><button type="button" onclick="window.eamRegisterNewAsset();this.closest('#eamManageModal')?.remove()">➕ <b>신규 등록</b><small>AC-코드 자동 생성</small></button><button type="button" class="danger" onclick="window.eamDeleteSelectedAsset()">🗑 <b>삭제</b><small>왼쪽·오른쪽 이력카드 통째 삭제</small></button></div></div></div>`);
+};
+// 주요설비 이력카드의 수정 버튼은 기존 단일 편집기로 연결.
+window.eamEditSelectedAsset=function(){const c=code();if(!c){alert('먼저 수정할 자산을 선택하세요.');return}try{if(typeof window.jgbOpenAssetHistoryEditor==='function'){window.jgbOpenAssetHistoryEditor(c);return}alert('수정 화면을 불러오지 못했습니다.')}catch(e){alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e))}};window.eamHistoryCardEdit=window.eamEditSelectedAsset;
+// 삭제는 asset_code로 DB를 직접 찾는다. 기존 __eamA 의존 때문에 AC-01 삭제가 실패하던 문제를 제거.
+window.eamDeleteSelectedAsset=async function(){
+ const c=code();if(!c){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
+ let name=c;try{const A=Array.isArray(window.__eamA)?window.__eamA:[];const a=A.find(x=>V(x?.asset_code)===c);if(a?.name)name=V(a.name)}catch(e){}
+ if(!confirm(`'${name}' 시설·설비를 삭제할까요?\n왼쪽 목록과 오른쪽 이력카드가 함께 삭제됩니다.`))return;
+ try{
+   const d=await db();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+   const q=await d.from('assets').select('id').eq('asset_code',c).maybeSingle();if(q.error)throw q.error;
+   const id=q.data?.id;
+   if(id){let r=await d.from('asset_history').delete().eq('asset_id',id);if(r.error)throw r.error;try{r=await d.from('inspections').delete().eq('asset_id',id);if(r.error&&!/does not exist|relation/i.test(r.error.message))throw r.error}catch(e){if(!/does not exist|relation/i.test(e?.message||''))throw e}r=await d.from('assets').delete().eq('id',id);if(r.error)throw r.error}
+   const g=gone();g.add(c);saveGone(g);
+   try{const m=JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}');delete m[c];localStorage.setItem('JGB_EAM_META',JSON.stringify(m))}catch(e){}
+   window.__eamSelCode='';document.getElementById('eamManageModal')?.remove();
+   if(typeof window.eamLoad==='function')await window.eamLoad();
+   window.__eamSelCode='';if(typeof window.render==='function')window.render();
+   alert('삭제되었습니다.');
+ }catch(e){console.error('JGB_V182_DELETE',e);alert('삭제하지 못했습니다.\n'+(e?.message||e))}
+};
 })();
 </script>
 </body>
