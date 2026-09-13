@@ -4407,8 +4407,23 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           const key=String(cur?.asset_code||cur?.code||window.__eamSelCode||'').trim();
           linkedReg=(Array.isArray(window.__eamA)?window.__eamA:[]).find(a=>String(a?.asset_code||'').trim()===key)||null;
         }
-        const d=maintenanceData(linkedReg,H,I,cur?.asset_code||cur?.code||window.__eamSelCode), next=d.next;
         const cardCode=String(cur.asset_code||cur.code||window.__eamSelCode||'');
+        // 주요설비 이력카드와 유지관리 이력은 완전 분리한다.
+        // 유지관리에서 가져오는 값은 '누적 외주정비 건수' 하나뿐이다.
+        const linkedAssetId=String(linkedReg?.id||'');
+        const linkedCode=String(cur?.asset_code||cur?.code||window.__eamSelCode||'').trim();
+        const extCount=(Array.isArray(H)?H:[]).filter(h=>{
+          const hid=String(h?.asset_id||'');
+          const hcode=String(h?.asset_code||'').trim();
+          if(!(linkedAssetId&&hid===linkedAssetId) && !(linkedCode&&hcode===linkedCode)) return false;
+          const raw=String(h?.description||'');
+          let md={};
+          if(raw.startsWith('MAINT::')){try{md=JSON.parse(raw.slice(7))||{}}catch(e){}}
+          else if(raw.startsWith('MAINT:')){try{md=JSON.parse(raw.slice(6))||{}}catch(e){}}
+          const method=String(md.maintenanceMethod||md.method||h?.event_type||h?.action_type||'').replace(/\s/g,'');
+          const text=(method+' '+String(h?.event_type||'')+' '+String(h?.action_type||'')).replace(/\s/g,'');
+          return method==='외주정비'||method==='외부정비'||method==='외부수리'||method==='외주수리'||text.includes('외주정비')||text.includes('외부정비')||text.includes('외부수리');
+        }).length;
         const cardOpen=window.eamHistoryCardOpen(cardCode);
         const equipDeleted=localStorage.getItem('JGB_EQUIP_PHOTO_DELETED_'+String(cardCode))==='1';
         const equipPhoto=equipDeleted?'':((window.__jgbEquipPhotoCache&&window.__jgbEquipPhotoCache[cardCode])||localStorage.getItem('JGB_EQUIP_PHOTO_'+String(cardCode))||cur.photo||'');
@@ -4489,7 +4504,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           </div>
           <div class="jgb-paper-auto">
             ${F('최근 외주정비일','-')}
-            ${F('누적 외주정비 건수',d.ext.length+'건')}
+            ${F('누적 외주정비 건수',extCount+'건')}
             ${F('최근 조치내용','-')}
             ${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}
             ${F('교체·폐기 예정 여부',cur.disposalPlan||cur.retirementPlan||'미정')}
