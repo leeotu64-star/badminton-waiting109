@@ -3964,6 +3964,9 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   const CARDKEY='JGB_V72_WP_CARDS';
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   let cards=jgbV87MigrateAndNextWA();
+  /* 방수 이력카드는 1개만 유지. 중복 카드와 해당 카드 이력은 정리 */
+  jgbV87KeepOnlyOneWpCard();
+  cards=jgbV87MigrateAndNextWA();
   /* 기존 v48 위치키 카드를 v72 고유 관리번호 카드로 1회 이관 */
   try{
     const legacy=JSON.parse(localStorage.getItem('JGB_V48_WP_CARDS')||'{}')||{};
@@ -3975,6 +3978,9 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     });
     if(changed)localStorage.setItem(CARDKEY,JSON.stringify(cards));
   }catch(e){}
+  /* 레거시 카드가 다시 중복 생성되지 않도록 정리 */
+  try{localStorage.removeItem('JGB_V48_WP_CARDS')}catch(e){}
+  cards=jgbV87KeepOnlyOneWpCard(); cards=jgbV87MigrateAndNextWA();
   /* 기존 이력은 같은 위치의 기존 카드에만 연결. 이후부터는 반드시 cardCode로 분리 */
   try{
     let changed=false, arr=hs.map(h=>{
@@ -4013,6 +4019,19 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     function wpHistoryCard(x,i,esc){const photos=Array.isArray(x.photos)?x.photos:[];return `<article class="jgb-v48-history-card"><div class="jgb-v48-history-head"><div><span class="jgb-v48-history-no">이력 ${i+1}</span><strong>${esc(x.date||'-')}</strong><em class="${x.method==='외주'?'external':''}">${esc(x.method||'자체')}</em></div><div class="jgb-v48-history-actions"><button type="button" class="btn gray" data-v47-action="edit-wp" data-id="${esc(x.id)}">✏️ 수정</button><button type="button" class="btn danger" data-v47-action="delete-wp" data-id="${esc(x.id)}">삭제</button></div></div><div class="jgb-v48-history-grid"><div class="jgb-v48-history-info"><div><small>작업일자</small><b>${esc(x.date||'-')}</b></div><div><small>작업구분</small><b>${esc(x.method||'자체')}</b></div><div><small>업체명</small><b>${esc(x.method==='외주'?x.vendor||'-':'자체')}</b></div><div><small>작업비용</small><b>${Number(x.cost||0).toLocaleString()}원</b></div><div><small>작업기간</small><b>${esc((x.start||'-')+' ~ '+(x.end||'-'))}</b></div><div><small>작업결과</small><b>${esc(x.result||'-')}</b></div><div class="wide"><small>작업내용</small><b>${esc(x.content||'-')}</b></div><div class="wide"><small>비고</small><b>${esc(x.note||'-')}</b></div></div><div class="jgb-v48-work-photos"><h4>작업사진 <span>최대 3장</span></h4><div>${photos.length?photos.slice(0,3).map((src,j)=>`<figure><img src="${esc(src)}"><figcaption>${['작업 전','작업 중','작업 후'][j]}</figcaption></figure>`).join(''):'<div class="jgb-v48-photo-empty small">작업사진 없음</div>'}</div></div></div></article>`}
     function wpV72Cards(){try{return JSON.parse(localStorage.getItem('JGB_V72_WP_CARDS')||'{}')||{}}catch(e){return {}}}
     function wpV72SaveCards(o){localStorage.setItem('JGB_V72_WP_CARDS',JSON.stringify(o||{}))}
+    function jgbV87KeepOnlyOneWpCard(){
+      const key='JGB_V72_WP_CARDS';
+      let all=wpV72Cards();
+      const entries=Object.entries(all);
+      if(entries.length<=1)return entries[0]?.[0]||'';
+      const keepCode=String(entries[0][1]?.code||entries[0][0]);
+      const keep={}; keep[keepCode]={...(entries[0][1]||{}),code:keepCode};
+      const S=jgbV47Store();
+      const keepRows=(Array.isArray(S.wp)?S.wp:[]).filter(h=>String(h.cardCode||'')===keepCode);
+      try{S.saveWp(keepRows)}catch(e){}
+      try{wpV72SaveCards(keep);localStorage.removeItem('JGB_V48_WP_CARDS')}catch(e){}
+      return keepCode;
+    }
     function jgbV87MigrateAndNextWA(){
       const key='JGB_V72_WP_CARDS', seqKey='JGB_V87_WA_SEQ'; let all=wpV72Cards(), changed=false;
       const entries=Object.entries(all);
