@@ -5055,7 +5055,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const lastInspection=ins[0]?.inspection_date||'-';const next=ins[0]?.next_inspection_date||ins[0]?.next_date||'-';const replacement=cur.replacementStatus||'미정';
         
       const dateOnly=v=>{const s=V(v);if(!s)return'-';const m=s.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:s.slice(0,10)};const historyBoxes=hs.map((h,n)=>{const p=detailFor(h),end=p.endDate||p.workEndDate||h.work_end_date||'',hid=V(h.id)||('row-'+n);const collapsed=window.jgbHistoryBoxState(hid);const val=v=>E(v||'-');const item=(label,value,cls='')=>`<div class="jgb-citem ${cls}"><span>${E(label)}</span><b>${val(value)}</b></div>`; return `<article class="jgb-history-box jgb-compact-history ${collapsed?'is-collapsed':''}" data-history-id="${E(hid)}"><div class="jgb-history-box-head" onclick="jgbToggleHistoryBox(this)"><div><strong>이력 ${n+1}</strong><span>${val(dateOnly(h.event_date))} · ${val(p.type||inferType(h))} · ${val(p.maintenanceType||'예방정비')}</span></div><div class="jgb-history-head-actions"><button type="button" class="jgb-hbox-toggle" onclick="event.stopPropagation();jgbToggleHistoryBox(this.closest('.jgb-history-box-head'))">접기</button><button type="button" class="jgb-hbox-edit" onclick="event.stopPropagation();eamEditMaintenanceHistory('${E(h.id)}')">수정</button><button type="button" class="jgb-hbox-del" onclick="event.stopPropagation();eamDeleteMaintenanceHistory('${E(h.id)}')">삭제</button></div></div><div class="jgb-compact-main"><div class="jgb-compact-info"><div class="jgb-compact-topgrid">${item('작업일자',dateOnly(h.event_date))}${item('정비구분',p.type||inferType(h))}${item('정비유형',p.maintenanceType||'예방정비')}${item('정비방식',p.method||h.maintenanceMethod||h.method||h.event_type)}${item('고장·이상내용',p.issue,'wide')}${item('조치내용',p.action||h.description,'wide')}</div><div class="jgb-compact-bottomgrid">${item('교체부품',p.part)}${item('정비업체',h.worker_name)}${item('정비비용',Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-')}${item('작업완료일',dateOnly(end))}${item('차기 점검일',dateOnly(p.nextDate||p.nextInspectionDate||h.next_date))}${item('조치상태',p.result||'조치완료')}${item('고장원인',p.cause)}${item('비고',p.note||h.note,'wide6')}</div></div><div class="jgb-history-photos"><div class="jgb-history-photos-title">📷 작업사진</div><div class="jgb-work-photos">${photoBox(hid,'작업 전')}${photoBox(hid,'작업 중')}${photoBox(hid,'작업 후')}${photoBox(hid,'완료')}</div></div></div><div class="jgb-history-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></article>`}).join('');
-</section>
           </main></div></div>`:'<div class="eam-empty">설비 종류에서 자산을 선택하세요.</div>'}</main></div></div>`;
       };
       if(typeof eamPage==='function'){try{eamPage=window.eamPage}catch(e){}}
@@ -7103,7 +7102,77 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   bind();setTimeout(bind,200);setTimeout(bind,800);setTimeout(bind,1600);
 })();
 </script>
-\n<style id="JGB_V138_FINAL_LAYOUT">\n/* V138: 이력카드 사진 6cm x 7cm, 정중앙 */\n.jgb-paper-equip-img,.jgb-equip-photo-img{\n  width:6cm!important;height:7cm!important;max-width:6cm!important;max-height:7cm!important;\n  min-width:6cm!important;min-height:7cm!important;object-fit:contain!important;\n  display:block!important;margin:0 auto!important;position:relative!important;left:auto!important;top:auto!important;\n}\n.jgb-photo-box,.jgb-paper-photo-box,.jgb-photo-click{\n  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;\n  text-align:center!important;\n}\n.jgb-photo-box .cam,.jgb-paper-photo-box .cam,.jgb-photo-click .cam,\n.jgb-photo-box strong,.jgb-paper-photo-box strong,.jgb-photo-click strong,\n.jgb-photo-box span,.jgb-paper-photo-box span,.jgb-photo-click span{margin-left:auto!important;margin-right:auto!important;text-align:center!important}\n.jgb-equip-photo-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;min-height:42px!important;border-top:1px solid #263844!important}\n.jgb-equip-photo-delete{display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}\n/* V138: 실제 유지관리 이력 헤더 버튼 3개 강제 표시 */\n.jgb-history-box-head,.jgb-eam-history-head,.jgb-v136-record-head{\n  display:flex!important;align-items:center!important;justify-content:space-between!important;\n  min-height:46px!important;position:relative!important;overflow:visible!important;\n}\n.jgb-history-head-actions,.jgb-eam-history-actions,.jgb-v136-record-actions{\n  display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;\n  visibility:visible!important;opacity:1!important;position:relative!important;z-index:10000!important;\n  flex:0 0 auto!important;min-width:max-content!important;overflow:visible!important;\n}\n.jgb-history-head-actions button,.jgb-eam-history-actions button,.jgb-v136-record-actions button{\n  display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;\n  align-items:center!important;justify-content:center!important;min-width:58px!important;height:32px!important;\n  padding:0 12px!important;border:2px solid #536a79!important;border-radius:4px!important;\n  background:#fff!important;color:#17384e!important;font-size:13px!important;font-weight:900!important;\n  line-height:1!important;white-space:nowrap!important;box-sizing:border-box!important;cursor:pointer!important;\n}\n.jgb-history-head-actions .jgb-hbox-edit,.jgb-eam-history-actions .jgb-real-edit,.jgb-v136-record-actions .edit{background:#2674a8!important;color:#fff!important;border-color:#1d567e!important}\n.jgb-history-head-actions .jgb-hbox-del,.jgb-eam-history-actions .jgb-real-delete,.jgb-v136-record-actions .delete{background:#d92d2d!important;color:#fff!important;border-color:#b51f1f!important}\n.jgb-history-head-actions .jgb-hbox-toggle,.jgb-eam-history-actions .jgb-real-toggle,.jgb-v136-record-actions .jgb-v136-toggle{background:#fff!important;color:#17384e!important;border-color:#536a79!important}\n.jgb-history-box.is-collapsed .jgb-history-box-head,.jgb-eam-history-card.is-collapsed .jgb-eam-history-head,.jgb-v136-record.is-collapsed .jgb-v136-record-head{display:flex!important;visibility:visible!important;opacity:1!important}\n.jgb-history-box.is-collapsed .jgb-history-head-actions,.jgb-eam-history-card.is-collapsed .jgb-eam-history-actions,.jgb-v136-record.is-collapsed .jgb-v136-record-actions{display:flex!important;visibility:visible!important;opacity:1!important}\n/* 버튼이 부모의 overflow 때문에 잘리지 않게 */\n.jgb-maint-final,.jgb-v136-maint,.jgb-eam-history-rebuild,.jgb-history-box,.jgb-eam-history-card,.jgb-v136-record{overflow:visible!important}\n</style>\n</body></html>
+\n<style id="JGB_V138_FINAL_LAYOUT">\n/* V138: 이력카드 사진 6cm x 7cm, 정중앙 */\n.jgb-paper-equip-img,.jgb-equip-photo-img{\n  width:6cm!important;height:7cm!important;max-width:6cm!important;max-height:7cm!important;\n  min-width:6cm!important;min-height:7cm!important;object-fit:contain!important;\n  display:block!important;margin:0 auto!important;position:relative!important;left:auto!important;top:auto!important;\n}\n.jgb-photo-box,.jgb-paper-photo-box,.jgb-photo-click{\n  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;\n  text-align:center!important;\n}\n.jgb-photo-box .cam,.jgb-paper-photo-box .cam,.jgb-photo-click .cam,\n.jgb-photo-box strong,.jgb-paper-photo-box strong,.jgb-photo-click strong,\n.jgb-photo-box span,.jgb-paper-photo-box span,.jgb-photo-click span{margin-left:auto!important;margin-right:auto!important;text-align:center!important}\n.jgb-equip-photo-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;min-height:42px!important;border-top:1px solid #263844!important}\n.jgb-equip-photo-delete{display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}\n/* V138: 실제 유지관리 이력 헤더 버튼 3개 강제 표시 */\n.jgb-history-box-head,.jgb-eam-history-head,.jgb-v136-record-head{\n  display:flex!important;align-items:center!important;justify-content:space-between!important;\n  min-height:46px!important;position:relative!important;overflow:visible!important;\n}\n.jgb-history-head-actions,.jgb-eam-history-actions,.jgb-v136-record-actions{\n  display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;\n  visibility:visible!important;opacity:1!important;position:relative!important;z-index:10000!important;\n  flex:0 0 auto!important;min-width:max-content!important;overflow:visible!important;\n}\n.jgb-history-head-actions button,.jgb-eam-history-actions button,.jgb-v136-record-actions button{\n  display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;\n  align-items:center!important;justify-content:center!important;min-width:58px!important;height:32px!important;\n  padding:0 12px!important;border:2px solid #536a79!important;border-radius:4px!important;\n  background:#fff!important;color:#17384e!important;font-size:13px!important;font-weight:900!important;\n  line-height:1!important;white-space:nowrap!important;box-sizing:border-box!important;cursor:pointer!important;\n}\n.jgb-history-head-actions .jgb-hbox-edit,.jgb-eam-history-actions .jgb-real-edit,.jgb-v136-record-actions .edit{background:#2674a8!important;color:#fff!important;border-color:#1d567e!important}\n.jgb-history-head-actions .jgb-hbox-del,.jgb-eam-history-actions .jgb-real-delete,.jgb-v136-record-actions .delete{background:#d92d2d!important;color:#fff!important;border-color:#b51f1f!important}\n.jgb-history-head-actions .jgb-hbox-toggle,.jgb-eam-history-actions .jgb-real-toggle,.jgb-v136-record-actions .jgb-v136-toggle{background:#fff!important;color:#17384e!important;border-color:#536a79!important}\n.jgb-history-box.is-collapsed .jgb-history-box-head,.jgb-eam-history-card.is-collapsed .jgb-eam-history-head,.jgb-v136-record.is-collapsed .jgb-v136-record-head{display:flex!important;visibility:visible!important;opacity:1!important}\n.jgb-history-box.is-collapsed .jgb-history-head-actions,.jgb-eam-history-card.is-collapsed .jgb-eam-history-actions,.jgb-v136-record.is-collapsed .jgb-v136-record-actions{display:flex!important;visibility:visible!important;opacity:1!important}\n/* 버튼이 부모의 overflow 때문에 잘리지 않게 */\n.jgb-maint-final,.jgb-v136-maint,.jgb-eam-history-rebuild,.jgb-history-box,.jgb-eam-history-card,.jgb-v136-record{overflow:visible!important}\n</style>\n
+<style id="JGB_V141_EAM_BUTTON_PHOTO_REPAIR">
+/* V141: 실제 EAM 렌더에 최종 적용. 기존 충돌 CSS와 무관하게 버튼/사진 입력을 살린다. */
+.jgb-history-box-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;min-height:48px!important;position:relative!important;overflow:visible!important}
+.jgb-history-head-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:99999!important;flex:0 0 auto!important;min-width:max-content!important;overflow:visible!important}
+.jgb-history-head-actions button{display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:relative!important;z-index:100000!important;align-items:center!important;justify-content:center!important;height:32px!important;min-width:58px!important;padding:0 12px!important;border:2px solid #536a79!important;border-radius:4px!important;background:#fff!important;color:#17384e!important;font-size:13px!important;font-weight:900!important;line-height:1!important;white-space:nowrap!important;cursor:pointer!important}
+.jgb-history-head-actions .jgb-hbox-edit{background:#2878ad!important;color:#fff!important;border-color:#1d5b83!important}
+.jgb-history-head-actions .jgb-hbox-del{background:#d93636!important;color:#fff!important;border-color:#b52222!important}
+.jgb-maint-register-top{display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:relative!important;z-index:99999!important;cursor:pointer!important}
+.jgb-equip-photo-file{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0!important;cursor:pointer!important;z-index:20!important;display:block!important}
+.jgb-photo-box,.jgb-equip-photo-box{position:relative!important;overflow:hidden!important}
+</style>
+<script id="JGB_V141_EAM_BUTTON_PHOTO_REPAIR_JS">
+(function(){
+  function pickEquip(code){
+    var old=document.getElementById('JGB_V141_EQUIP_FILE'); if(old) old.remove();
+    var input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.id='JGB_V141_EQUIP_FILE'; input.style.position='fixed'; input.style.left='-9999px';
+    input.addEventListener('change',function(){
+      var f=input.files&&input.files[0]; if(!f)return;
+      if(!/^image\//.test(f.type)){alert('이미지 파일만 등록할 수 있습니다.');return;}
+      var reader=new FileReader(); reader.onload=function(){
+        try{localStorage.setItem('JGB_EQUIP_PHOTO_'+String(code),String(reader.result||''));localStorage.removeItem('JGB_EQUIP_PHOTO_DELETED_'+String(code));}catch(e){alert('사진 저장 공간이 부족합니다.');return;}
+        window.__jgbEquipPhotoCache=window.__jgbEquipPhotoCache||{}; window.__jgbEquipPhotoCache[String(code)]=String(reader.result||'');
+        if(typeof window.render==='function') window.render(); else if(typeof window.eamPage==='function') window.eamPage();
+      }; reader.readAsDataURL(f);
+    });
+    document.body.appendChild(input); input.click();
+  }
+  window.jgbV141PickEquipPhoto=pickEquip;
+  function repair(){
+    document.querySelectorAll('.eam-detail-section.eam-history .jgb-history-box').forEach(function(card){
+      var head=card.querySelector('.jgb-history-box-head'); if(!head)return;
+      var acts=head.querySelector('.jgb-history-head-actions');
+      if(!acts){
+        acts=document.createElement('div'); acts.className='jgb-history-head-actions'; head.appendChild(acts);
+      }
+      var id=card.getAttribute('data-history-id')||'';
+      if(!acts.querySelector('.jgb-hbox-toggle')){
+        var b=document.createElement('button'); b.type='button'; b.className='jgb-hbox-toggle'; b.textContent=card.classList.contains('is-collapsed')?'펼치기':'접기';
+        b.onclick=function(e){e.preventDefault();e.stopPropagation();if(typeof window.jgbToggleHistoryBox==='function')window.jgbToggleHistoryBox(head);else card.classList.toggle('is-collapsed');b.textContent=card.classList.contains('is-collapsed')?'펼치기':'접기';}; acts.appendChild(b);
+      }
+      if(!acts.querySelector('.jgb-hbox-edit')){
+        var e=document.createElement('button');e.type='button';e.className='jgb-hbox-edit';e.textContent='수정';e.onclick=function(ev){ev.preventDefault();ev.stopPropagation();if(typeof window.eamEditMaintenanceHistory==='function')window.eamEditMaintenanceHistory(id);};acts.appendChild(e);
+      }
+      if(!acts.querySelector('.jgb-hbox-del')){
+        var d=document.createElement('button');d.type='button';d.className='jgb-hbox-del';d.textContent='삭제';d.onclick=function(ev){ev.preventDefault();ev.stopPropagation();if(typeof window.eamDeleteMaintenanceHistory==='function')window.eamDeleteMaintenanceHistory(id);};acts.appendChild(d);
+      }
+    });
+    document.querySelectorAll('.eam-detail-section.eam-history .jgb-maint-register-top').forEach(function(btn){
+      btn.onclick=function(e){e.preventDefault();e.stopImmediatePropagation();
+        if(typeof window.eamOpenMaintenanceRegister==='function') return window.eamOpenMaintenanceRegister();
+        alert('유지관리 등록 기능이 준비되지 않았습니다. 페이지를 새로고침해 주세요.');
+      };
+    });
+    document.querySelectorAll('.jgb-eam-photo .jgb-photo-box, .jgb-paper-photo .jgb-equip-photo-box').forEach(function(box){
+      var code=window.__eamSelCode||'';
+      if(!code)return;
+      box.onclick=function(e){
+        if(e.target.closest('button'))return;
+        e.preventDefault();e.stopImmediatePropagation();pickEquip(code);
+      };
+      box.querySelectorAll('input[type=file]').forEach(function(inp){inp.style.display='none';});
+    });
+  }
+  document.addEventListener('DOMContentLoaded',repair);
+  window.addEventListener('load',repair);
+  new MutationObserver(function(){repair();}).observe(document.documentElement,{childList:true,subtree:true});
+  setTimeout(repair,300);setTimeout(repair,1000);setTimeout(repair,2000);
+})();
+</script>
+</body></html>
 
 
     <style id="JGB_EAM_DASHBOARD_FINAL_V2">
