@@ -13211,5 +13211,50 @@ if(typeof oldPick==='function'){
   };
 })();
 </script>
+<script id="JGB_V172_DELETE_LEFT_SYNC">
+(function(){
+  'use strict';
+  const DELKEY='JGB_EAM_DELETED_CODES';
+  const V=x=>String(x??'').trim();
+  function deleted(){try{return new Set((JSON.parse(localStorage.getItem(DELKEY)||'[]')||[]).map(V))}catch(e){return new Set()}}
+  function removeFromLeft(code){
+    const k=V(code); if(!k)return;
+    document.querySelectorAll('[data-code]').forEach(el=>{
+      if(V(el.getAttribute('data-code'))===k){
+        const row=el.closest('.eam-asset-row,.eamx-sub,[role="option"]')||el;
+        if(row && row.parentNode) row.parentNode.removeChild(row);
+      }
+    });
+  }
+  function filterSource(fn){
+    if(typeof fn!=='function' || fn.__jgbV172)return fn;
+    const wrap=function(){
+      const d=deleted();
+      return (fn.apply(this,arguments)||[]).filter(x=>!d.has(V(x?.code||x?.asset_code)));
+    };
+    wrap.__jgbV172=true; wrap.__jgbV172Base=fn;
+    return wrap;
+  }
+  try{
+    if(typeof window.eamSourceAssets==='function') window.eamSourceAssets=filterSource(window.eamSourceAssets);
+  }catch(e){}
+
+  const oldDelete=window.eamDeleteSelectedAsset;
+  if(typeof oldDelete==='function'){
+    window.eamDeleteSelectedAsset=async function(){
+      const code=V(window.__eamSelCode);
+      try{
+        await oldDelete.apply(this,arguments);
+      }finally{
+        if(code){
+          setTimeout(()=>removeFromLeft(code),50);
+          setTimeout(()=>removeFromLeft(code),500);
+          setTimeout(()=>removeFromLeft(code),1200);
+        }
+      }
+    };
+  }
+})();
+</script>
 </body>
 </html>
