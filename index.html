@@ -12348,54 +12348,111 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
 }
 </style>
 
-<script>
-
+<script id="JGB_V159_CANONICAL_ASSET_EDITOR">
 (function(){
-  // V155: 기존 중복 수정기를 사실상 덮어쓰고, 이력카드와 동일한 데이터로 수정/저장
   const esc2 = window.E || (x=>String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])));
   const val2 = id => document.getElementById(id)?.value?.trim() || '';
+  const V = x => String(x??'').trim();
+  const CATMAP={'냉난방':'cooling','소방·방재':'fire','보일러·온수':'water','온수·난방':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','위생설비':'sanitary','문·창호설비':'doors','기타설비':'other'};
+
   async function db(){
-    try{ if(typeof getSupa==='function'){ const d=await getSupa(); if(d)return d; } }catch(e){}
+    try{ if(typeof getSupa==='function'){const x=await getSupa();if(x)return x;} }catch(e){}
     try{ if(window.SUPA)return window.SUPA; }catch(e){}
-    try{ if(window.supabase&&typeof window.supabase.createClient==='function'){ window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY); return window.SUPA; } }catch(e){}
+    try{
+      if(window.supabase&&typeof window.supabase.createClient==='function'&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){
+        window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return window.SUPA;
+      }
+    }catch(e){}
+    return null;
+  }
+  function metaAll(){
+    try{if(typeof metas==='function')return metas()||{}}catch(e){}
+    try{return JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{}}catch(e){return {}}
+  }
+  function saveMetaAll(x){
+    try{if(typeof saveMeta==='function'){saveMeta(x);return true}}catch(e){}
+    try{if(typeof writeMeta==='function'){writeMeta(x);return true}}catch(e){}
+    try{localStorage.setItem('JGB_EAM_META',JSON.stringify(x||{}));return true}catch(e){return false}
+  }
+  function sourceRows(){try{return typeof window.eamSourceAssets==='function'?(window.eamSourceAssets()||[]):[]}catch(e){return[]}}
+  function displayCode(x){
+    const k=V(x?.code||x?.asset_code);
+    try{if(typeof window.eamUnifiedCode==='function')return V(window.eamUnifiedCode(x))||k}catch(e){}
+    return k;
+  }
+  function sourceForCode(code){
+    const key=V(code), rows=sourceRows();
+    return rows.find(x=>V(x.code)===key)||rows.find(x=>displayCode(x)===key)||null;
+  }
+  function registeredForSource(src,A){
+    if(!src)return null;
+    const raw=V(src.code), A2=Array.isArray(A)?A:[];
+    let a=A2.find(x=>V(x.asset_code)===raw)||null;
+    if(a)return a;
+    const name=V(src.name), model=V(src.model);
+    if(name){a=A2.find(x=>V(x.name)===name && (!model||V(x.product_name)===model))||null;if(a)return a;}
     return null;
   }
   function current(){
-    try{ if(typeof selected==='function')return selected(); }catch(e){}
-    const code=String(window.__eamSelCode||'');
+    const key=V(window.__eamSelCode);
     const A=Array.isArray(window.__eamA)?window.__eamA:[];
-    const a=A.find(x=>String(x.asset_code)===code)||{};
-    return {code,cur:a};
+    const meta=metaAll();
+    const src=sourceForCode(key);
+    const reg=registeredForSource(src,A) || A.find(x=>V(x.asset_code)===key) || null;
+    const m=meta[key]||{};
+    const cur=Object.assign({},src||{},reg||{},m||{});
+    return {code:key,src,reg,cur};
   }
+  async function resolveAsset(code,dbx){
+    const key=V(code), A=Array.isArray(window.__eamA)?window.__eamA:[], src=sourceForCode(key), m=metaAll()[key]||{};
+    let a=registeredForSource(src,A)||A.find(x=>V(x.asset_code)===key)||null;
+    if(a)return a;
+    const candidates=[];
+    if(src?.code)candidates.push(V(src.code));
+    if(m?.asset_code)candidates.push(V(m.asset_code));
+    candidates.push(key);
+    for(const c of [...new Set(candidates)].filter(Boolean)){
+      try{const r=await dbx.from('assets').select('*').eq('asset_code',c).maybeSingle();if(!r.error&&r.data)return r.data}catch(e){}
+    }
+    // 정적 설비표의 표시코드와 DB 실제코드가 다른 경우 이름/모델로 마지막 확인
+    if(src?.name){
+      try{const q=await dbx.from('assets').select('*').eq('name',V(src.name));if(!q.error&&Array.isArray(q.data)&&q.data.length===1)return q.data[0]}catch(e){}
+    }
+    return null;
+  }
+  function setSelect(id,value){const el=document.getElementById(id);if(!el)return;const v=V(value);if([...el.options].some(o=>o.value===v))el.value=v}
+
   window.jgbOpenAssetHistoryEditor=function(){
     document.getElementById('jgbAssetHistoryEditor')?.remove();
-    const s=current(); if(!s.code){alert('먼저 수정할 자산을 선택하세요.');return;}
+    const s=current();
+    if(!s.code){alert('먼저 수정할 자산을 선택하세요.');return;}
     const c=s.cur||{};
-    const cat=c.category||c.type||'기타설비';
-    const status=c.status||'정상', acq=c.acquisitionType||'기존 자산';
     const cats=['냉난방','소방·방재','보일러·온수','전기설비','코트조명','방수','위생설비','문·창호설비','기타설비'];
+    const cat=V(c.category||c.type)||'기타설비';
+    const status=V(c.status)||'정상', acq=V(c.acquisitionType)||'기존 자산';
     const locs=typeof EAM_LOCATION_OPTIONS==='object'?EAM_LOCATION_OPTIONS:{};
     const locOpts=Object.entries(locs).map(([k,z])=>`<option value="${esc2(k)}">${esc2(z.label||k)}</option>`).join('');
-    const detail=Array.isArray(window.EAM_DETAIL_LOCATION_LIST)?window.EAM_DETAIL_LOCATION_LIST:[];
+    const detail=Array.isArray(window.EAM_DETAIL_LOCATION_LIST)?window.EAM_DETAIL_LOCATION_LIST:['유수장치실','기계실','사무실','휴게실','옥상','1번 코트(좌측)','1번 코트(우측)','복도','창고','남자 화장실','여자 화장실','남자 샤워실','여자 샤워실','좌측 외곽','우측 외곽','직접 입력'];
+    const field=(label,id,value,extra='')=>`<label>${esc2(label)}<input id="${id}" value="${esc2(value)}" ${extra}></label>`;
     document.body.insertAdjacentHTML('beforeend',`<div id="jgbAssetHistoryEditor" class="jgb-v155-editor" onclick="if(event.target===this)this.remove()"><div class="jgb-ah-card">
       <div class="jgb-ah-head"><div><h3>📋 주요설비 이력카드 수정</h3><small>현재 이력카드의 내용을 그대로 불러옵니다.</small></div><button type="button" onclick="document.getElementById('jgbAssetHistoryEditor').remove()">×</button></div>
       <div class="jgb-ah-grid">
-        <label>자산코드<input id="jha_code" value="${esc2(s.code)}" readonly></label>
-        <label>자산명<input id="jha_name" value="${esc2(c.name||'')}"></label>
-        <label>설비 종류<select id="jha_category">${cats.map(x=>`<option ${x===cat?'selected':''}>${esc2(x)}</option>`).join('')}</select></label>
+        ${field('자산코드','jha_code',s.code,'readonly')}
+        ${field('자산명','jha_name',c.name||'')}
+        <label>설비 종류<select id="jha_category">${cats.map(x=>`<option value="${esc2(x)}" ${x===cat?'selected':''}>${esc2(x)}</option>`).join('')}</select></label>
         <label>위치코드<select id="jha_loc">${locOpts}</select></label>
         <label>세부 위치<select id="jha_place"></select><input id="jha_customPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
-        <label>모델·규격<input id="jha_model" value="${esc2(c.model||'')}"></label>
-        <label>용량<input id="jha_capacity" value="${esc2(c.capacity||'')}"></label>
-        <label>수량<input id="jha_qty" value="${esc2(c.qty??c.quantity??'')}"></label>
-        <label>제조사<input id="jha_maker" value="${esc2(c.maker||c.vendor||'')}"></label>
-        <label>A/S 연락처<input id="jha_as" value="${esc2(c.asContact||'')}"></label>
-        <label>제조일<input id="jha_date" value="${esc2(c.date||c.manufactureDate||'')}"></label>
-        <label>설치일<input id="jha_install" value="${esc2(c.installDate||'')}"></label>
-        <label>내용연수<input id="jha_life" value="${esc2(c.life||'')}"></label>
-        <label>평가등급<input id="jha_grade" value="${esc2(c.grade||'')}"></label>
-        <label>보증<input id="jha_warranty" value="${esc2(c.warranty||'')}"></label>
-        <label>A/S 기록<input id="jha_asHistory" value="${esc2(c.asHistory||'')}"></label>
+        ${field('모델·규격','jha_model',c.model||'')}
+        ${field('용량','jha_capacity',c.capacity||'')}
+        ${field('수량','jha_qty',c.qty??c.quantity??'')}
+        ${field('제조사','jha_maker',c.maker||c.vendor||'')}
+        ${field('A/S 연락처','jha_as',c.asContact||'')}
+        ${field('제조일','jha_date',c.date||c.manufactureDate||'')}
+        ${field('설치일','jha_install',c.installDate||'')}
+        ${field('내용연수','jha_life',c.life||'')}
+        ${field('평가등급','jha_grade',c.grade||'')}
+        ${field('보증','jha_warranty',c.warranty||'')}
+        ${field('A/S 기록','jha_asHistory',c.asHistory||'')}
         <label>자산상태<select id="jha_status"><option ${status==='정상'?'selected':''}>정상</option><option ${status==='점검필요'?'selected':''}>점검필요</option><option ${status==='조치필요'?'selected':''}>조치필요</option><option ${status==='교체 예정'?'selected':''}>교체 예정</option><option ${status==='폐기'?'selected':''}>폐기</option></select></label>
         <label>취득구분<select id="jha_acq"><option ${acq==='기존 자산'?'selected':''}>기존 자산</option><option ${acq==='신규 취득'?'selected':''}>신규 취득</option></select></label>
         <label class="wide">시설개선계획<textarea id="jha_plan">${esc2(c.improvementPlan||'')}</textarea></label>
@@ -12403,41 +12460,52 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
       </div>
       <div class="jgb-ah-actions"><button type="button" class="cancel" onclick="document.getElementById('jgbAssetHistoryEditor').remove()">취소</button><button type="button" class="jgb-ah-save" id="jgbAhSave" onclick="jgbSaveAssetHistoryCard('${esc2(s.code)}')">저장</button></div>
     </div></div>`);
-    const lc=c.locationCode||((typeof placeCode==='function')?placeCode(c.place||''):'A');
-    const loc=document.getElementById('jha_loc'); if(loc)loc.value=lc;
+    const lc=V(c.locationCode)||((typeof placeCode==='function')?placeCode(c.place||''):'A');setSelect('jha_loc',lc);
     const fill=()=>{
-      const box=document.getElementById('jha_place'); if(!box)return;
-      const arr=detail.length?detail:['코트','복도','사무실','옥상','유수장치실','창고','휴게실','남자 화장실','여자 화장실','남자 샤워실','여자 샤워실','좌측 외곽','우측 외곽','직접 입력'];
-      box.innerHTML=arr.map(x=>`<option value="${esc2(x)}">${esc2(x)}</option>`).join('');
-      const place=c.place||'';
-      if(arr.includes(place))box.value=place; else if(place){box.value='직접 입력';const ci=document.getElementById('jha_customPlace');if(ci){ci.style.display='block';ci.value=place;}}
-      const custom=document.getElementById('jha_customPlace'); if(custom)custom.style.display=box.value==='직접 입력'?'block':'none';
-      if(val2('jha_category')==='소방·방재'){if(loc)loc.value='E';box.value='유수장치실';if(custom)custom.style.display='none';}
+      const box=document.getElementById('jha_place');if(!box)return;
+      box.innerHTML=detail.map(x=>`<option value="${esc2(x)}">${esc2(x)}</option>`).join('');
+      const place=V(c.place);
+      if(detail.includes(place))box.value=place;
+      else if(place){box.value='직접 입력';const ci=document.getElementById('jha_customPlace');if(ci){ci.style.display='block';ci.value=place;}}
+      const custom=document.getElementById('jha_customPlace');if(custom&&box.value!=='직접 입력')custom.style.display='none';
+      if(val2('jha_category')==='소방·방재'){setSelect('jha_loc','E');if([...box.options].some(o=>o.value==='유수장치실'))box.value='유수장치실';if(custom)custom.style.display='none';}
     };
-    document.getElementById('jha_category')?.addEventListener('change',fill); document.getElementById('jha_loc')?.addEventListener('change',fill); document.getElementById('jha_place')?.addEventListener('change',()=>{const q=document.getElementById('jha_customPlace');if(q)q.style.display=val2('jha_place')==='직접 입력'?'block':'none'}); fill();
+    document.getElementById('jha_category')?.addEventListener('change',fill);
+    document.getElementById('jha_place')?.addEventListener('change',()=>{const q=document.getElementById('jha_customPlace');if(q)q.style.display=val2('jha_place')==='직접 입력'?'block':'none'});
+    fill();
   };
+
   window.jgbSaveAssetHistoryCard=async function(code){
-    const dbx=await db(); if(!dbx){alert('Supabase 연결에 실패했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.');return;}
-    const a=(window.__eamA||[]).find(x=>String(x.asset_code)===String(code)); if(!a){alert('등록된 EAM 자산을 찾을 수 없습니다.');return;}
-    let place=val2('jha_place'); if(place==='직접 입력')place=val2('jha_customPlace');
-    const category=val2('jha_category')||'기타설비'; if(category==='소방·방재')place='유수장치실';
-    const name=val2('jha_name'); if(!name||!place){alert('자산명과 위치는 필수입니다.');return;}
-    const metaData={asset_code:String(code),name,category,locationCode:category==='소방·방재'?'E':(val2('jha_loc').charAt(0)||'A'),place,model:val2('jha_model'),capacity:val2('jha_capacity'),qty:val2('jha_qty'),quantity:val2('jha_qty'),maker:val2('jha_maker'),vendor:val2('jha_maker'),asContact:val2('jha_as'),date:val2('jha_date'),manufactureDate:val2('jha_date'),installDate:val2('jha_install'),life:val2('jha_life'),grade:val2('jha_grade'),warranty:val2('jha_warranty'),asHistory:val2('jha_asHistory'),status:val2('jha_status')||'정상',acquisitionType:val2('jha_acq')||'기존 자산',improvementPlan:val2('jha_plan'),note:val2('jha_note')};
+    const dbx=await db();if(!dbx){alert('Supabase 연결에 실패했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.');return;}
+    const s=current(), src=s.src, m0=metaAll();
+    let a=await resolveAsset(code,dbx);
+    let place=val2('jha_place');if(place==='직접 입력')place=val2('jha_customPlace');
+    const category=val2('jha_category')||'기타설비';if(category==='소방·방재')place='유수장치실';
+    const name=val2('jha_name');if(!name||!place){alert('자산명과 위치는 필수입니다.');return;}
+    const rawCode=V(src?.code)||V(code);
+    const payload={name,category,place,status:val2('jha_status')||'정상',product_name:val2('jha_model')||category};
+    const metaData={asset_code:V(code),name,category,locationCode:category==='소방·방재'?'E':(val2('jha_loc').charAt(0)||'A'),place,model:val2('jha_model'),capacity:val2('jha_capacity'),qty:val2('jha_qty'),quantity:val2('jha_qty'),maker:val2('jha_maker'),vendor:val2('jha_maker'),asContact:val2('jha_as'),date:val2('jha_date'),manufactureDate:val2('jha_date'),installDate:val2('jha_install'),life:val2('jha_life'),grade:val2('jha_grade'),warranty:val2('jha_warranty'),asHistory:val2('jha_asHistory'),status:payload.status,acquisitionType:val2('jha_acq')||'기존 자산',improvementPlan:val2('jha_plan'),note:val2('jha_note')};
     const btn=document.getElementById('jgbAhSave');if(btn){btn.disabled=true;btn.textContent='저장 중…'}
     try{
-      const r=await dbx.from('assets').update({name,category,place,status:metaData.status,product_name:metaData.model||category}).eq('id',a.id); if(r.error)throw r.error;
-      let all={}; try{all=typeof metas==='function'?metas():{};}catch(e){} all[String(code)]=metaData; try{if(typeof saveMeta==='function')saveMeta(all);else if(typeof writeMeta==='function')writeMeta(all);}catch(e){}
-      window.__eamMetaByCode=all;
+      if(a){
+        const r=await dbx.from('assets').update(payload).eq('id',a.id);if(r.error)throw r.error;
+      }else{
+        // 정적 이력카드에는 존재하지만 EAM assets 테이블에는 아직 없는 기존 설비도
+        // '수정' 화면에서 그대로 등록할 수 있게 한다. asset_history/META 이력은 생성하지 않는다.
+        const ins={asset_code:rawCode||V(code),...payload};
+        const r=await dbx.from('assets').insert(ins).select('*').single();if(r.error)throw r.error;a=r.data||null;
+      }
+      const all=Object.assign({},m0,{[V(code)]:metaData});saveMetaAll(all);window.__eamMetaByCode=all;
       document.getElementById('jgbAssetHistoryEditor')?.remove();
-      if(typeof window.eamLoad==='function')await window.eamLoad(); window.__eamSelCode=String(code); window.__eamCat=({'냉난방':'cooling','소방·방재':'fire','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','위생설비':'other','문·창호설비':'other','기타설비':'other'})[category]||'other';
-      if(typeof render==='function')render(); else location.reload();
+      if(typeof window.eamLoad==='function')await window.eamLoad();
+      window.__eamSelCode=V(code);window.__eamCat=CATMAP[category]||'other';
+      if(typeof render==='function')render();else location.reload();
     }catch(e){console.error(e);alert('이력카드 저장에 실패했습니다.\n'+(e?.message||e));}
     finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
   };
   window.eamEditSelectedAsset=window.jgbOpenAssetHistoryEditor;
   window.eamHistoryCardEdit=window.jgbOpenAssetHistoryEditor;
 })();
-
 </script>
 
 </body>
