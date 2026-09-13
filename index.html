@@ -13256,5 +13256,179 @@ if(typeof oldPick==='function'){
   }
 })();
 </script>
-</body>
+<script id="JGB_V173_SELECTION_DELETE_REAL_FINAL">
+(function(){
+'use strict';
+const V=x=>String(x??'').trim();
+const DELKEY='JGB_EAM_DELETED_CODES';
+function selectedCode(){
+  const w=V(window.__eamSelCode); if(w)return w;
+  const el=document.querySelector('.eam-asset-row.on[data-code], .eamx-sub.on[data-code], [data-eam-selected="true"][data-code]');
+  return V(el?.getAttribute('data-code'));
+}
+function sourceList(){
+  const out=[];
+  const add=a=>{if(Array.isArray(a))a.forEach(x=>{if(x&&V(x.code||x.asset_code))out.push(x)})};
+  try{if(typeof window.eamSourceAssets==='function')add(window.eamSourceAssets())}catch(e){}
+  // originalSourceAssets는 window 속성이 아닌 전역 lexical const일 수 있으므로 직접 접근
+  try{if(typeof originalSourceAssets==='function')add(originalSourceAssets())}catch(e){}
+  try{if(typeof JGB_EXCEL_EQUIPMENT!=='undefined')add(JGB_EXCEL_EQUIPMENT)}catch(e){}
+  try{if(typeof JGB_MAIN_EQUIPMENT!=='undefined')add(JGB_MAIN_EQUIPMENT)}catch(e){}
+  const seen=new Set();
+  return out.filter(x=>{const k=V(x.code||x.asset_code);if(seen.has(k))return false;seen.add(k);return true});
+}
+function source(code){const k=V(code);return sourceList().find(x=>V(x.code||x.asset_code)===k)||null}
+function dbAsset(code){const A=Array.isArray(window.__eamA)?window.__eamA:[];return A.find(x=>V(x.asset_code)===V(code))||null}
+function deleted(){try{return new Set((JSON.parse(localStorage.getItem(DELKEY)||'[]')||[]).map(V))}catch(e){return new Set()}}
+function saveDeleted(set){localStorage.setItem(DELKEY,JSON.stringify([...set]))}
+function removeLeft(code){const k=V(code);document.querySelectorAll('[data-code]').forEach(el=>{if(V(el.getAttribute('data-code'))===k){const row=el.closest('.eam-asset-row,.eamx-sub,[role="option"]')||el;if(row?.parentNode)row.parentNode.removeChild(row)}})}
+async function getDb(){
+  try{if(typeof getSupa==='function'){let d=getSupa();if(d?.then)d=await d;if(d)return d}}catch(e){}
+  try{if(window.SUPA)return window.SUPA}catch(e){}
+  try{if(window.supabase?.createClient&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return window.SUPA}}catch(e){}
+  return null;
+}
+window.eamOpenManageMenu=function(){
+ const code=selectedCode(); if(!code){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
+ window.__eamSelCode=code;document.getElementById('eamManageModal')?.remove();
+ const a=dbAsset(code),s=source(code),name=V(a?.name||s?.name||code).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+ document.body.insertAdjacentHTML('beforeend',`<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()"><div class="eam-manage-card"><div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>${name}</h3><small>자산코드: ${code}</small></div><button type="button" onclick="this.closest('#eamManageModal')?.remove()">×</button></div><div class="eam-manage-grid"><button type="button" onclick="eamEditSelectedAsset();this.closest('#eamManageModal')?.remove()">✏️ <b>수정</b><small>주요설비 이력카드와 자동 연동</small></button><button type="button" onclick="eamRegisterNewAsset();this.closest('#eamManageModal')?.remove()">➕ <b>신규 등록</b><small>AC-코드 자동 생성</small></button><button type="button" class="danger" onclick="eamDeleteSelectedAsset()">🗑 <b>삭제</b><small>선택한 자산 삭제</small></button></div></div></div>`);
+};
+window.eamDeleteSelectedAsset=async function(){
+ const code=selectedCode(); if(!code){alert('먼저 왼쪽 자산목록에서 삭제할 자산을 선택하세요.');return}
+ window.__eamSelCode=code;
+ let a=dbAsset(code),s=source(code);
+ // DB 목록이 아직 늦게 올라온 경우 한 번만 재조회
+ if(!a && !s){try{if(typeof window.eamLoad==='function')await window.eamLoad()}catch(e){} a=dbAsset(code);s=source(code)}
+ if(!a&&!s){alert('선택한 자산을 찾을 수 없습니다.\n자산코드: '+code);return}
+ const name=V(a?.name||s?.name||code);
+ if(!confirm("'"+name+"' 시설·설비를 삭제할까요?\n삭제 후 왼쪽 목록에서 사라집니다."))return;
+ try{
+  if(a?.id){
+   const d=await getDb();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+   const h=await d.from('asset_history').delete().eq('asset_id',a.id);if(h.error)throw new Error('유지관리 이력 삭제 실패: '+h.error.message);
+   const i=await d.from('inspections').delete().eq('asset_id',a.id);if(i.error&&!/does not exist|relation/i.test(i.error.message))throw new Error('점검 이력 삭제 실패: '+i.error.message);
+   const r=await d.from('assets').delete().eq('id',a.id);if(r.error)throw new Error('자산 삭제 실패: '+r.error.message);
+  }else{
+   const set=deleted();set.add(code);saveDeleted(set);
+   try{const m=JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{};delete m[code];localStorage.setItem('JGB_EAM_META',JSON.stringify(m))}catch(e){}
+  }
+  removeLeft(code);document.getElementById('eamManageModal')?.remove();
+  window.__eamSelCode='';
+  if(typeof window.eamLoad==='function'){try{await window.eamLoad()}catch(e){}}
+  if(typeof window.render==='function'){try{window.render()}catch(e){}}
+  removeLeft(code);
+  alert('삭제되었습니다.');
+ }catch(e){console.error(e);alert('삭제하지 못했습니다.\n'+(e?.message||e))}
+};
+})();
+</script>\n</body>
+
+<script id="JGB_V174_SINGLE_ASSET_NO_ORIGINAL">
+(function(){
+'use strict';
+/* V174: 원본/등록자산 이중개념 제거. 화면에서는 모든 자산을 동일한 자산으로 취급하고 AC-XX를 유일한 연결키로 사용한다. */
+const V=x=>String(x??'').trim();
+const DELKEY='JGB_EAM_DELETED_CODES';
+function deleted(){try{return new Set((JSON.parse(localStorage.getItem(DELKEY)||'[]')||[]).map(V))}catch(e){return new Set()}}
+function activeExcel(){
+  const d=deleted();
+  const a=Array.isArray(window.JGB_EXCEL_EQUIPMENT)?window.JGB_EXCEL_EQUIPMENT:[];
+  return a.filter(x=>!d.has(V(x?.code||x?.asset_code)));
+}
+/* 기존 정적 설비목록은 '원본'이 아니라 시스템에 이미 존재하는 기존 자산 목록으로 사용한다. */
+const oldSource=window.eamSourceAssets;
+window.eamSourceAssets=function(){
+  const out=[]; const seen=new Set();
+  const add=a=>{if(!Array.isArray(a))return;a.forEach(x=>{const c=V(x?.code||x?.asset_code);if(c&&!seen.has(c)&&!deleted().has(c)){seen.add(c);out.push(x)}})};
+  add(activeExcel());
+  try{if(typeof oldSource==='function')add(oldSource())}catch(e){}
+  return out;
+};
+window.eamSourceAssets.__v174=true;
+/* 선택 자산을 AC 코드 하나로 통일 */
+function selectedCode(){
+  const w=V(window.__eamSelCode);if(w)return w;
+  const el=document.querySelector('.eam-asset-row.on[data-code], .eamx-sub.on[data-code], [data-eam-selected="true"][data-code]');
+  return V(el?.getAttribute('data-code'));
+}
+function dbAsset(code){return (Array.isArray(window.__eamA)?window.__eamA:[]).find(x=>V(x?.asset_code)===V(code))||null}
+function existingAsset(code){
+  const c=V(code), a=dbAsset(c); if(a)return a;
+  return activeExcel().find(x=>V(x?.code||x?.asset_code)===c)||null;
+}
+window.__jgbSingleAsset=function(code){return existingAsset(code)};
+/* 삭제: DB 자산은 DB에서, 기존 자산은 삭제목록에 기록. 어느 쪽도 '원본'으로 부르지 않는다. */
+window.eamDeleteSelectedAsset=async function(){
+  const code=selectedCode();
+  if(!code){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
+  window.__eamSelCode=code;
+  const a=dbAsset(code), x=existingAsset(code), name=V(a?.name||x?.name||code);
+  if(!x){alert('선택한 자산을 찾을 수 없습니다.\n자산코드: '+code);return}
+  if(!confirm("'"+name+"' 시설·설비를 삭제할까요?\n삭제 후 왼쪽 목록에서도 사라집니다."))return;
+  try{
+    if(a?.id){
+      let d=null;
+      try{if(typeof getSupa==='function'){d=getSupa();if(d?.then)d=await d}}catch(e){}
+      if(!d&&window.SUPA)d=window.SUPA;
+      if(!d&&window.supabase?.createClient&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){
+        d=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);window.SUPA=d;
+      }
+      if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+      const h=await d.from('asset_history').delete().eq('asset_id',a.id);if(h.error)throw h.error;
+      const i=await d.from('inspections').delete().eq('asset_id',a.id);
+      if(i.error && !/does not exist|relation/i.test(i.error.message))throw i.error;
+      const r=await d.from('assets').delete().eq('id',a.id);if(r.error)throw r.error;
+    }
+    const set=deleted();set.add(code);localStorage.setItem(DELKEY,JSON.stringify([...set]));
+    try{const m=JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{};delete m[code];localStorage.setItem('JGB_EAM_META',JSON.stringify(m))}catch(e){}
+    window.__eamSelCode='';
+    try{if(typeof window.eamLoad==='function')await window.eamLoad()}catch(e){}
+    try{if(typeof window.render==='function')window.render()}catch(e){}
+    alert('삭제되었습니다.');
+  }catch(e){console.error(e);alert('삭제하지 못했습니다.\n'+(e?.message||e))}
+};
+/* 자산관리 메뉴는 수정/신규등록/삭제만. 모두 동일한 자산으로 표시 */
+window.eamOpenManageMenu=function(){
+  const code=selectedCode();
+  if(!code){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
+  window.__eamSelCode=code;
+  const x=existingAsset(code), name=V(x?.name||code);
+  document.getElementById('eamManageModal')?.remove();
+  const esc=s=>V(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  document.body.insertAdjacentHTML('beforeend',
+    '<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()">'+
+    '<div class="eam-manage-card"><div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>'+esc(name)+'</h3><small>자산코드: '+esc(code)+'</small></div><button type="button" onclick="this.closest(\'#eamManageModal\')?.remove()">×</button></div>'+
+    '<div class="eam-manage-grid">'+
+    '<button type="button" onclick="eamEditSelectedAsset();this.closest(\'#eamManageModal\')?.remove()">✏️ <b>수정</b><small>주요설비 이력카드와 자동 연동</small></button>'+
+    '<button type="button" onclick="eamRegisterNewAsset();this.closest(\'#eamManageModal\')?.remove()">➕ <b>신규 등록</b><small>AC-코드 자동 생성</small></button>'+
+    '<button type="button" class="danger" onclick="eamDeleteSelectedAsset()">🗑 <b>삭제</b><small>선택한 자산 삭제</small></button>'+
+    '</div></div></div>'
+  );
+};
+/* 화면에 남아 있는 구형 '원본' 표기를 제거한다. 데이터는 삭제하지 않는다. */
+function cleanOriginalUI(){
+  try{
+    document.querySelectorAll('.eam-asset-row i').forEach(el=>{if(V(el.textContent)==='원본')el.textContent='정상';el.classList.remove('source');el.classList.add('ok')});
+    document.querySelectorAll('.hero-status').forEach(el=>{if(V(el.textContent)==='원본'){el.textContent='정상';el.classList.remove('source');el.classList.add('good')}});
+    document.querySelectorAll('.eam-source-card').forEach(el=>el.remove());
+    document.querySelectorAll('.eam-detail-hero small,.eam-detail-hero span,.eam-manage-head small').forEach(el=>{if(V(el.textContent).includes('원본'))el.textContent=V(el.textContent).replaceAll('원본','기존 자산')});
+    document.querySelectorAll('*').forEach(el=>{
+      if(el.children.length===0 && V(el.textContent)==='원본') el.textContent='정상';
+    });
+  }catch(e){}
+}
+const oldRender=window.render;
+if(typeof oldRender==='function' && !oldRender.__v174){
+  const wrapped=function(){const r=oldRender.apply(this,arguments);setTimeout(cleanOriginalUI,0);return r};
+  wrapped.__v174=true;window.render=wrapped;
+}
+const oldEamLoad=window.eamLoad;
+if(typeof oldEamLoad==='function' && !oldEamLoad.__v174){
+  const wrapped=async function(){const r=await oldEamLoad.apply(this,arguments);setTimeout(cleanOriginalUI,0);return r};
+  wrapped.__v174=true;window.eamLoad=wrapped;
+}
+setTimeout(cleanOriginalUI,0);
+})();
+</script>
 </html>
