@@ -4477,6 +4477,14 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                 <div class="jgb-basic-row-v151"><div class="jgb-basic-label-v151">보증</div><div class="jgb-basic-value-v151">${E(cur.warranty||'-')}</div><div class="jgb-basic-label-v151">기존 A/S 기록</div><div class="jgb-basic-value-v151">${E(cur.asHistory||'-')}</div></div>
                 <div class="jgb-basic-row-v151"><div class="jgb-basic-label-v151">자산상태</div><div class="jgb-basic-value-v151">${E(cur.status||'정상')}</div><div class="jgb-basic-label-v151">취득구분</div><div class="jgb-basic-value-v151">${E(cur.acquisitionType||'기존 자산')}</div></div>
               </div>
+            <div class="jgb-paper-auto jgb-paper-auto-inline">
+            ${F('최근 외부정비일',d.recentExt?.event_date||'-')}
+            ${F('누적 외부정비 건수',d.ext.length+'건')}
+            ${F('최근 조치내용',d.recentExt?.description||'-')}
+            ${F('차기 점검일',next||'-')}
+            ${F('교체·폐기 예정 여부',cur.disposalPlan||cur.retirementPlan||'미정')}
+          
+            </div>
             </section>
             <section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149">
               <div class="jgb-paper-section-title">📷 설비 사진 (현재)</div>
@@ -4504,15 +4512,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                 </div>
               </div>
             </section>
-          </div>
-          <div class="jgb-paper-auto">
-            ${F('최근 외부정비일',d.recentExt?.event_date||'-')}
-            ${F('누적 외부정비 건수',d.ext.length+'건')}
-            ${F('최근 조치내용',d.recentExt?.description||'-')}
-            ${F('차기 점검일',next||'-')}
-            ${F('교체·폐기 예정 여부',cur.disposalPlan||cur.retirementPlan||'미정')}
-          </div>
-          <div class="jgb-paper-notes">
+          </div>          <div class="jgb-paper-notes">
             ${F('시설개선계획',cur.improvementPlan||'-','wide')}
             ${F('특이사항',cur.note||'-','wide')}
           </div>
@@ -12397,5 +12397,91 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix);
   new MutationObserver(function(){setTimeout(fix,0)}).observe(document.body,{childList:true,subtree:true});
   [100,300,800,1500,3000].forEach(function(t){setTimeout(fix,t)});
+})();
+</script>
+
+<style id="JGB_V154_CONNECTED_LOWER_LAYOUT">
+/* V154: 기본정보 아래의 하단 정보를 왼쪽 빈 공간에 연결. 사진 영역은 필요한 만큼만 사용. */
+.jgb-history-card.jgb-v154-connected .jgb-paper-card-body{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  align-items:start!important;
+  height:auto!important;min-height:0!important;max-height:none!important;
+  gap:0!important;padding:0!important;
+}
+.jgb-history-card.jgb-v154-connected .jgb-paper-info{
+  height:auto!important;min-height:0!important;max-height:none!important;
+  align-self:start!important;overflow:visible!important;
+  border-right:2px solid #334e63!important;
+}
+.jgb-history-card.jgb-v154-connected .jgb-paper-photo{
+  height:auto!important;min-height:0!important;max-height:none!important;
+  align-self:start!important;overflow:visible!important;
+}
+/* 기본정보 표 아래에 자동정보를 바로 연결 */
+.jgb-history-card.jgb-v154-connected .jgb-paper-info .jgb-paper-auto-inline{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  margin:0!important;padding:0!important;border-top:2px solid #334e63!important;
+  background:#718492!important;box-sizing:border-box!important;
+}
+.jgb-history-card.jgb-v154-connected .jgb-paper-auto-inline > .jgb-paper-cell{
+  min-width:0!important;height:43px!important;min-height:43px!important;
+  box-sizing:border-box!important;margin:0!important;padding:0!important;
+  background:#faf8f2!important;border:0!important;border-bottom:1px solid #718492!important;
+}
+.jgb-history-card.jgb-v154-connected .jgb-paper-auto-inline > .jgb-paper-cell small{
+  display:flex!important;align-items:center!important;height:43px!important;min-height:43px!important;
+  box-sizing:border-box!important;padding:5px 8px!important;
+  background:#dbe7ee!important;border-right:1px solid #718492!important;
+  font-size:14px!important;line-height:1.1!important;white-space:normal!important;word-break:keep-all!important;
+}
+.jgb-history-card.jgb-v154-connected .jgb-paper-auto-inline > .jgb-paper-cell b{
+  display:flex!important;align-items:center!important;min-width:0!important;height:43px!important;
+  box-sizing:border-box!important;padding:5px 9px!important;background:#faf8f2!important;
+  font-size:14px!important;line-height:1.15!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+}
+/* 사진 상단/하단 불필요한 여백 축소. 큰 사진은 6×7cm 유지 */
+.jgb-history-card.jgb-v154-connected .jgb-paper-photo .jgb-paper-section-title{height:34px!important;padding:0 9px!important;}
+.jgb-history-card.jgb-v154-connected .jgb-paper-photo .jgb-equip-photo-stage{
+  padding:7px!important;height:280px!important;min-height:280px!important;max-height:280px!important;
+  box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;
+}
+.jgb-history-card.jgb-v154-connected .jgb-paper-photo .jgb-equip-photo-box{
+  width:6cm!important;height:7cm!important;min-width:6cm!important;min-height:7cm!important;
+  max-width:6cm!important;max-height:7cm!important;margin:0 auto!important;
+}
+.jgb-history-card.jgb-v154-connected .jgb-paper-photo .jgb-equip-photo-actions-rebuilt{
+  min-height:30px!important;height:30px!important;padding:4px 9px!important;box-sizing:border-box!important;
+}
+.jgb-history-card.jgb-v154-connected .jgb-paper-photo .jgb-v149-detail-title{padding:5px 8px!important;}
+.jgb-history-card.jgb-v154-connected .jgb-paper-photo .jgb-v149-detail-scroll{padding:5px!important;}
+/* 상세사진은 4×4cm 유지 */
+.jgb-history-card.jgb-v154-connected .jgb-v149-detail-box{width:4cm!important;height:4cm!important;min-width:4cm!important;min-height:4cm!important;}
+/* 계획/특이사항은 자동정보 아래 전체폭으로 연결 */
+.jgb-history-card.jgb-v154-connected .jgb-paper-notes{height:auto!important;min-height:0!important;max-height:none!important;}
+.jgb-history-card.jgb-v154-connected .jgb-paper-notes .jgb-paper-cell.wide{height:43px!important;min-height:43px!important;}
+@media(max-width:900px){
+ .jgb-history-card.jgb-v154-connected .jgb-paper-card-body{grid-template-columns:1fr!important}
+ .jgb-history-card.jgb-v154-connected .jgb-paper-info{border-right:0!important}
+ .jgb-history-card.jgb-v154-connected .jgb-paper-auto-inline{grid-template-columns:1fr!important}
+}
+</style>
+<script id="JGB_V154_CONNECTED_LOWER_RUNTIME">
+(function(){
+  function apply(){
+    document.querySelectorAll('.jgb-history-card').forEach(function(card){
+      card.classList.add('jgb-v154-connected');
+      var body=card.querySelector('.jgb-paper-card-body');
+      if(body){body.style.height='auto';body.style.minHeight='0';body.style.maxHeight='none';}
+      card.querySelectorAll('.jgb-paper-info,.jgb-paper-photo,.jgb-paper-auto-inline,.jgb-paper-notes').forEach(function(el){
+        el.style.height='auto';el.style.minHeight='0';el.style.maxHeight='none';
+      });
+    });
+  }
+  apply();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply);
+  new MutationObserver(function(){setTimeout(apply,0)}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
