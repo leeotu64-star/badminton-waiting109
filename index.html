@@ -13344,5 +13344,85 @@ window.eamDeleteSelectedAsset=async function(){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',clean); else clean();
   try{ new MutationObserver(clean).observe(document.body,{childList:true,subtree:true}); }catch(e){}
 })();
-</script>\n</body>
+</script>\n<script id="JGB_V176_HISTORY_DELETE_FINAL">
+(function(){
+  'use strict';
+  /* V176: 자산관리의 삭제 버튼을 이력삭제로 변경하고 선택 자산의 왼쪽 목록과
+     오른쪽 주요설비 이력카드를 한 세트로 제거한다. */
+  const DELKEY='JGB_EAM_DELETED_CODES';
+  const V=s=>String(s??'').trim();
+  function getCode(){
+    try{if(typeof selectedCode==='function'){const c=V(selectedCode());if(c)return c;}}catch(e){}
+    return V(window.__eamSelCode);
+  }
+  function deletedSet(){try{return new Set((JSON.parse(localStorage.getItem(DELKEY)||'[]')||[]).map(V));}catch(e){return new Set();}}
+  function saveDeleted(s){try{localStorage.setItem(DELKEY,JSON.stringify([...s]));}catch(e){}}
+  function removeRows(code){
+    const k=V(code);
+    document.querySelectorAll('[data-code]').forEach(el=>{
+      if(V(el.getAttribute('data-code'))===k){
+        const row=el.closest('.eam-asset-row,.eamx-sub,[role="option"]')||el;
+        try{row.remove();}catch(e){if(row.parentNode)row.parentNode.removeChild(row);}
+      }
+    });
+  }
+  async function dbClient(){
+    try{if(typeof getDb==='function'){const d=await getDb();if(d)return d;}}catch(e){}
+    try{if(window.SUPA)return window.SUPA;}catch(e){}
+    try{if(window.supabase?.createClient&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){
+      window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return window.SUPA;
+    }}catch(e){}
+    return null;
+  }
+  async function findDbAsset(d,code){
+    try{const r=await d.from('assets').select('id,asset_code,name').eq('asset_code',code).maybeSingle();if(!r.error&&r.data)return r.data;}catch(e){}
+    return null;
+  }
+  function getName(code){
+    let name=code;
+    try{const A=Array.isArray(window.__eamA)?window.__eamA:[];const x=A.find(v=>V(v.asset_code)===code);if(x?.name)name=V(x.name);}catch(e){}
+    try{if(typeof window.eamSourceAssets==='function'){const x=(window.eamSourceAssets()||[]).find(v=>V(v.code||v.asset_code)===code);if(x?.name)name=V(x.name);}}catch(e){}
+    return name;
+  }
+  window.eamDeleteSelectedAsset=async function(){
+    const code=getCode();
+    if(!code){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return;}
+    window.__eamSelCode=code;
+    let d=null,a=null;
+    try{d=await dbClient();if(d)a=await findDbAsset(d,code);}catch(e){console.warn(e);}
+    const name=getName(code);
+    if(!confirm(`'${name}' (${code}) 이력카드를 삭제할까요?\n왼쪽 자산목록과 오른쪽 이력카드가 함께 사라집니다.`))return;
+    try{
+      if(a?.id){
+        if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+        const h=await d.from('asset_history').delete().eq('asset_id',a.id);
+        if(h.error)throw new Error('유지관리 이력 삭제 실패: '+h.error.message);
+        const i=await d.from('inspections').delete().eq('asset_id',a.id);
+        if(i.error&&!/does not exist|relation/i.test(i.error.message))throw new Error('점검 이력 삭제 실패: '+i.error.message);
+        const r=await d.from('assets').delete().eq('id',a.id);
+        if(r.error)throw new Error('자산 삭제 실패: '+r.error.message);
+      }
+      const set=deletedSet();set.add(code);saveDeleted(set);
+      try{const m=JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{};delete m[code];localStorage.setItem('JGB_EAM_META',JSON.stringify(m));}catch(e){}
+      document.getElementById('eamManageModal')?.remove();
+      window.__eamSelCode='';
+      removeRows(code);
+      if(typeof window.eamLoad==='function'){try{await window.eamLoad();}catch(e){console.warn(e);}}
+      if(typeof window.render==='function'){try{window.render();}catch(e){console.warn(e);}}
+      removeRows(code);
+      window.__eamSelCode='';
+      alert('이력카드가 삭제되었습니다.');
+    }catch(e){console.error(e);alert('이력카드를 삭제하지 못했습니다.\n'+(e?.message||e));}
+  };
+  window.eamOpenManageMenu=function(){
+    const code=getCode();
+    if(!code){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return;}
+    window.__eamSelCode=code;document.getElementById('eamManageModal')?.remove();
+    const name=getName(code);
+    const esc=s=>V(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    document.body.insertAdjacentHTML('beforeend',`<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()"><div class="eam-manage-card"><div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>${esc(name)}</h3><small>자산코드: ${esc(code)}</small></div><button type="button" onclick="this.closest('#eamManageModal')?.remove()">×</button></div><div class="eam-manage-grid"><button type="button" onclick="eamEditSelectedAsset();this.closest('#eamManageModal')?.remove()">✏️ <b>수정</b><small>주요설비 이력카드와 자동 연동</small></button><button type="button" onclick="eamRegisterNewAsset();this.closest('#eamManageModal')?.remove()">➕ <b>신규 등록</b><small>AC-코드 자동 생성</small></button><button type="button" class="danger" onclick="eamDeleteSelectedAsset()">🗑 <b>이력삭제</b><small>왼쪽 목록·오른쪽 이력카드 통째 삭제</small></button></div></div></div>`);
+  };
+})();
+</script>
+</body>
 </html>
