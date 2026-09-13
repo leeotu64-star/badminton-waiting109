@@ -12664,5 +12664,85 @@ window.eamDeleteSelectedAsset=async function(){
   setTimeout(bindCardEdits,500);
 })();
 </script>
+<script id="JGB_V187_FINAL_EDIT_SAVE">
+(function(){
+'use strict';
+const S=x=>String(x??'').trim();
+function code(){return S(window.__eamSelCode)}
+function el(id){return document.getElementById(id)}
+function val(id){return S(el(id)?.value)}
+function metaAll(){try{return JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{}}catch(e){return{}}}
+function saveMetaAll(m){localStorage.setItem('JGB_EAM_META',JSON.stringify(m||{}));window.__eamMetaByCode=m||{}}
+async function db(){
+  try{if(window.SUPA)return window.SUPA}catch(e){}
+  try{if(typeof getSupa==='function'){const d=getSupa();return d&&typeof d.then==='function'?await d:d}}catch(e){}
+  try{if(window.supabase?.createClient&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined')return window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY)}catch(e){}
+  return null
+}
+window.jgbSaveAssetHistoryCard=async function(givenCode){
+  const c=S(givenCode||code());
+  if(!c){alert('먼저 수정할 자산을 선택하세요.');return false}
+  const btn=el('jgbAhSave'); if(btn){btn.disabled=true;btn.textContent='저장 중…'}
+  try{
+    const name=val('jha_name');
+    const category=val('jha_category')||'기타설비';
+    let place=val('jha_place'); if(place==='직접 입력')place=val('jha_customPlace');
+    if(category==='소방·방재')place='유수장치실';
+    if(!name||!place){alert('자산명과 위치는 필수입니다.');return false}
+    const status=val('jha_status')||'정상';
+    const payload={name,category,place,status,product_name:val('jha_model')||category};
+    const d=await db();
+    if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+    // 반드시 asset_code로 직접 조회하여 현재 선택 자산을 수정한다.
+    let qr=await d.from('assets').select('*').eq('asset_code',c).maybeSingle();
+    if(qr.error)throw qr.error;
+    let a=qr.data||null;
+    if(a){
+      const r=await d.from('assets').update(payload).eq('id',a.id).select('*').single();
+      if(r.error)throw r.error; a=r.data||a;
+    }else{
+      const r=await d.from('assets').insert({asset_code:c,...payload}).select('*').single();
+      if(r.error)throw r.error; a=r.data;
+    }
+    const old=metaAll()[c]||{};
+    const meta=Object.assign({},old,{
+      asset_code:c,name,category,place,status,locationCode:category==='소방·방재'?'E':(val('jha_loc')||'A'),
+      model:val('jha_model'),capacity:val('jha_capacity'),qty:val('jha_qty'),quantity:val('jha_qty'),
+      maker:val('jha_maker'),vendor:val('jha_maker'),asContact:val('jha_as'),date:val('jha_date'),
+      manufactureDate:val('jha_date'),installDate:val('jha_install'),life:val('jha_life'),grade:val('jha_grade'),
+      warranty:val('jha_warranty'),asHistory:val('jha_asHistory'),acquisitionType:val('jha_acq')||'기존 자산',
+      nextDate:val('jha_next'),nextInspectionDate:val('jha_next'),disposalPlan:val('jha_disposal'),
+      improvementPlan:val('jha_plan'),note:val('jha_note')
+    });
+    const all=metaAll(); all[c]=meta; saveMetaAll(all);
+    window.__eamSelCode=c;
+    el('jgbAssetHistoryEditor')?.remove();
+    if(typeof window.eamLoad==='function')await window.eamLoad();
+    window.__eamSelCode=c;
+    if(typeof window.render==='function')window.render();
+    alert('수정 내용이 저장되었습니다.');
+    return true;
+  }catch(e){console.error('JGB_V187_SAVE',e);alert('수정 내용 저장에 실패했습니다.\n'+(e?.message||e));return false}
+  finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
+};
+// 수정 버튼은 수정 전용. inline handler도 삭제 함수와 연결하지 않는다.
+window.eamEditSelectedAsset=function(givenCode){
+  const c=S(givenCode||window.__eamSelCode);
+  if(!c){alert('먼저 수정할 자산을 선택하세요.');return false}
+  window.__eamSelCode=c;
+  const fn=window.jgbOpenAssetHistoryEditor;
+  if(typeof fn!=='function'){alert('주요설비 이력카드 수정 화면을 불러오지 못했습니다.');return false}
+  try{fn.call(window,c)}catch(e){console.error(e);alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e))}
+  return false;
+};
+window.eamHistoryCardEdit=window.eamEditSelectedAsset;
+document.addEventListener('click',function(ev){
+  const b=ev.target.closest('.jgb-card-edit,[data-eam-edit-asset]');
+  if(!b)return;
+  ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+  const c=S(b.getAttribute('data-code')||window.__eamSelCode);if(c)window.eamEditSelectedAsset(c);
+},true);
+})();
+</script>
 </body>
 </html>
