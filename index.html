@@ -3999,7 +3999,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   let cards=jgbV90NormalizeWpCards();
   /* 방수 이력카드는 1개만 유지. 중복 카드와 해당 카드 이력은 정리 */
-  jgbV87KeepOnlyOneWpCard();
   cards=jgbV90NormalizeWpCards();
   /* 기존 v48 위치키 카드를 v72 고유 관리번호 카드로 1회 이관 */
   try{
@@ -4014,7 +4013,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   }catch(e){}
   /* 레거시 카드가 다시 중복 생성되지 않도록 정리 */
   try{localStorage.removeItem('JGB_V48_WP_CARDS')}catch(e){}
-  cards=jgbV87KeepOnlyOneWpCard(); cards=jgbV90NormalizeWpCards();
+  cards=jgbV90NormalizeWpCards();
   /* 기존 이력은 같은 위치의 기존 카드에만 연결. 이후부터는 반드시 cardCode로 분리 */
   try{
     let changed=false, arr=hs.map(h=>{
@@ -4077,19 +4076,20 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const all=wpV72Cards();
       const out={};
       Object.entries(all).forEach(([k,m])=>{
-        const code=String(m?.code||k).trim().toUpperCase();
+        let code=String(m?.code||k).trim().toUpperCase();
+        if(/^LK-\d+$/.test(code)) code='WA-'+code.slice(3);
         if(code) out[code]={...(m||{}),code};
       });
       return out;
     }
     function jgbV48OpenCardEditor(code,isNew){
-      const all=jgbV90NormalizeWpCards(), old=isNew?{}:(all[String(code)]||{}), esc=v=>xEsc(v==null?'':String(v)), initial=isNew?'LK-':String(old.code||code||'');
-      const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>📋 방수공사 이력카드 ${isNew?'등록':'수정'}</h2><button type="button" data-v47-action="close-modal">×</button></div><div class="jgb-v47-form-grid"><label>누수코드<input id="v48_code" value="${esc(initial)}" placeholder="예: LK-001"></label><label>시설명<input id="v48_facility" value="${esc(old.facility||'장군봉체육관')}"></label><label>방수 위치<input id="v48_location" value="${esc(old.location||'')}" placeholder="예: 2층 여자화장실"></label><label>건물·구역<input id="v48_area" value="${esc(old.area||'')}"></label><label>주요 방수부위<input id="v48_part" value="${esc(old.part||'')}"></label><label>방수공사 종류<input id="v48_kind" value="${esc(old.kind||'방수 보수·보강')}"></label><label>방수 면적<input id="v48_areaSize" value="${esc(old.areaSize||'')}"></label><label>최초 방수일<input id="v48_firstDate" type="date" value="${esc(old.firstDate||'')}"></label><label>현재 상태<select id="v48_status"><option ${old.status==='정상'||!old.status?'selected':''}>정상</option><option ${old.status==='점검필요'?'selected':''}>점검필요</option><option ${old.status==='보수필요'?'selected':''}>보수필요</option></select></label><label>담당자<input id="v48_manager" value="${esc(old.manager||'')}"></label><label>연락처<input id="v48_contact" value="${esc(old.contact||'')}"></label><label>시공업체<input id="v48_contractor" value="${esc(old.contractor||'')}"></label><label>보증기간<input id="v48_warranty" value="${esc(old.warranty||'')}"></label><label>공사 목적<input id="v48_purpose" value="${esc(old.purpose||'시설물 보호 및 누수 예방')}"></label><label>주요 공법<input id="v48_method" value="${esc(old.method||'')}"></label><label>사용 자재<input id="v48_material" value="${esc(old.material||'')}"></label><label>공사 범위<input id="v48_scope" value="${esc(old.scope||'')}"></label><label class="wide">특이사항<textarea id="v48_note" rows="3">${esc(old.note||'')}</textarea></label><label class="wide">방수 위치 사진<input id="v48_card_photo" type="file" accept="image/*"><small>대표 사진 1장</small></label></div><div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" data-v47-action="save-wp-card" data-code="${esc(code||'')}" data-new="${isNew?'1':'0'}">저장</button></div></div>`;document.body.appendChild(modal);
+      const all=jgbV90NormalizeWpCards(), old=isNew?{}:(all[String(code)]||{}), esc=v=>xEsc(v==null?'':String(v)), initial=isNew?'WA-':String(old.code||code||'');
+      const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>📋 방수공사 이력카드 ${isNew?'등록':'수정'}</h2><button type="button" data-v47-action="close-modal">×</button></div><div class="jgb-v47-form-grid"><label>방수관리번호<input id="v48_code" value="${esc(initial)}" placeholder="예: WA-001"></label><label>시설명<input id="v48_facility" value="${esc(old.facility||'장군봉체육관')}"></label><label>방수 위치<input id="v48_location" value="${esc(old.location||'')}" placeholder="예: 2층 여자화장실"></label><label>건물·구역<input id="v48_area" value="${esc(old.area||'')}"></label><label>주요 방수부위<input id="v48_part" value="${esc(old.part||'')}"></label><label>방수공사 종류<input id="v48_kind" value="${esc(old.kind||'방수 보수·보강')}"></label><label>방수 면적<input id="v48_areaSize" value="${esc(old.areaSize||'')}"></label><label>최초 방수일<input id="v48_firstDate" type="date" value="${esc(old.firstDate||'')}"></label><label>현재 상태<select id="v48_status"><option ${old.status==='정상'||!old.status?'selected':''}>정상</option><option ${old.status==='점검필요'?'selected':''}>점검필요</option><option ${old.status==='보수필요'?'selected':''}>보수필요</option></select></label><label>담당자<input id="v48_manager" value="${esc(old.manager||'')}"></label><label>연락처<input id="v48_contact" value="${esc(old.contact||'')}"></label><label>시공업체<input id="v48_contractor" value="${esc(old.contractor||'')}"></label><label>보증기간<input id="v48_warranty" value="${esc(old.warranty||'')}"></label><label>공사 목적<input id="v48_purpose" value="${esc(old.purpose||'시설물 보호 및 누수 예방')}"></label><label>주요 공법<input id="v48_method" value="${esc(old.method||'')}"></label><label>사용 자재<input id="v48_material" value="${esc(old.material||'')}"></label><label>공사 범위<input id="v48_scope" value="${esc(old.scope||'')}"></label><label class="wide">특이사항<textarea id="v48_note" rows="3">${esc(old.note||'')}</textarea></label><label class="wide">방수 위치 사진<input id="v48_card_photo" type="file" accept="image/*"><small>대표 사진 1장</small></label></div><div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" data-v47-action="save-wp-card" data-code="${esc(code||'')}" data-new="${isNew?'1':'0'}">저장</button></div></div>`;document.body.appendChild(modal);
     }
     async function jgbV48SaveCard(code,isNew){
-      const g=id=>document.getElementById(id)?.value?.trim()||'', oldAll=jgbV90NormalizeWpCards(), old=isNew?{}:(oldAll[String(code)]||{}), newCode=jgbV90NormalizeCode(g('v48_code'),'LK-');
+      const g=id=>document.getElementById(id)?.value?.trim()||'', oldAll=jgbV90NormalizeWpCards(), old=isNew?{}:(oldAll[String(code)]||{}), newCode=jgbV90NormalizeCode(g('v48_code'),'WA-');
       const loc=g('v48_location'); if(!loc){alert('방수 위치를 입력하세요.');return}
-      if(!/^LK-\d+$/.test(newCode)){alert('누수코드는 LK-001 형식으로 입력하세요.');return}
+      if(!/^WA-\d+$/.test(newCode)){alert('방수관리번호는 WA-001 형식으로 입력하세요.');return}
       const oldKey=String(code||old.code||'');
       const duplicate=Object.keys(oldAll).some(k=>String(k).toUpperCase()===newCode && String(k)!==oldKey);
       if(duplicate){alert('이미 사용 중인 방수관리번호입니다. 다른 번호를 입력하세요.');return}
