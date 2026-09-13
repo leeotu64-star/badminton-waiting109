@@ -11975,16 +11975,23 @@ if(typeof window.eamCategoryDefs==='function'&&!window.eamCategoryDefs.__v182){c
 if(typeof window.eamSourceAssets==='function'&&!window.eamSourceAssets.__v182){const old=window.eamSourceAssets;const f=function(){const g=gone();return (old()||[]).filter(x=>!g.has(V(x?.code||x?.asset_code)))};f.__v182=true;window.eamSourceAssets=f}
 // 자산관리 창은 신규 등록 / 삭제만.
 window.eamOpenManageMenu=function(){
- const c=code();
  document.getElementById('eamManageModal')?.remove();
- if(!c){
-   // 왼쪽 자산목록이 비어 있어도 자산관리 버튼은 바로 신규등록을 열어야 한다.
-   document.getElementById('eamManageModal')?.remove();
-   if(typeof window.eamRegisterNewAsset==='function'){
-     window.eamRegisterNewAsset();
-     return;
+ // 실제 왼쪽 자산이 하나도 없으면 선택값이 남아 있어도 무조건 신규등록을 연다.
+ let c=code();
+ let hasActual=false;
+ try{
+   const A=Array.isArray(window.__eamA)?window.__eamA:[];
+   const S=typeof window.eamSourceAssets==='function'?(window.eamSourceAssets()||[]):[];
+   hasActual=A.length>0||S.length>0;
+   if(c){
+     const inA=A.some(x=>V(x?.asset_code)===c);
+     const inS=S.some(x=>V(x?.code||x?.asset_code)===c);
+     if(!inA&&!inS)c='';
    }
-   alert('신규 등록 화면을 불러오지 못했습니다.');
+ }catch(e){ if(!c)c=''; }
+ if(!hasActual||!c){
+   window.__eamSelCode='';
+   if(typeof window.eamRegisterNewAsset==='function'){window.eamRegisterNewAsset();return;}
    return;
  }
  let name=c;try{const A=Array.isArray(window.__eamA)?window.__eamA:[];const a=A.find(x=>V(x?.asset_code)===c);if(a?.name)name=a.name;const S=typeof window.eamSourceAssets==='function'?window.eamSourceAssets():[];const ss=S.find(x=>V(x?.code||x?.asset_code)===c);if(ss?.name)name=ss.name}catch(e){}
