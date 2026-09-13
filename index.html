@@ -301,6 +301,14 @@
   .jgb-v65-history-content{grid-template-columns:1fr}
   .jgb-v65-work-photos{border-left:0;border-top:1px solid #9aabba}
 }
+
+/* V67: 방수 화면 단일 렌더러 최종 */
+.jgb-v66-wrap{width:100%;box-sizing:border-box;padding:10px 12px;overflow-x:hidden}
+.jgb-v66-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.jgb-v66-top h2{margin:0;font-size:22px}.jgb-v66-top button,.jgb-v66-head button,.jgb-v66-history-head button{border:1px solid #8ea3b2;background:#fff;border-radius:6px;padding:6px 9px;font-weight:800;cursor:pointer}.jgb-v66-top button,.jgb-v66-history-head button{background:#1769aa;color:#fff;border-color:#1769aa}
+.jgb-v66-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}.jgb-v66-set{min-width:0;border:2px solid #7892a5;border-radius:8px;background:#fff;overflow:hidden}.jgb-v66-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;background:#edf4f8;border-bottom:2px solid #7892a5}.jgb-v66-head strong{font-size:16px}.jgb-v66-head>div{display:flex;gap:4px}.jgb-v66-body.closed{display:none}
+.jgb-v66-card{margin:8px;border:1px solid #9aabba}.jgb-v66-section,.jgb-v66-photo-label{padding:7px 9px;background:#edf4f8;border-bottom:1px solid #9aabba;font-weight:900;font-size:13px;color:#17364d}.jgb-v66-card-layout{display:grid;grid-template-columns:minmax(0,1fr) 5cm}.jgb-v66-card-layout>div:first-child{min-width:0}.jgb-v66-row{display:grid;grid-template-columns:105px minmax(0,1fr);min-height:35px;border-bottom:1px solid #9aabba}.jgb-v66-row strong{display:flex;align-items:center;padding:5px 8px;background:#f1f6f9;border-right:1px solid #9aabba;font-size:12px}.jgb-v66-row span{display:flex;align-items:center;padding:5px 8px;font-size:12px;overflow-wrap:anywhere}.jgb-v66-card-photo{border-left:1px solid #9aabba;width:5cm;min-width:5cm}.jgb-v66-card-photo .jgb-v66-photo-label{border-left:0}.jgb-v66-card-photo img,.jgb-v66-location-empty{width:5cm;height:5cm;object-fit:cover;margin:9px auto;box-sizing:border-box;border:1px dashed #9aabba}.jgb-v66-location-empty{display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;color:#647989}
+.jgb-v66-history{margin:0 8px 8px;border:1px solid #9aabba}.jgb-v66-history-head{display:flex;justify-content:space-between;align-items:center;padding:8px 9px;background:#edf4f8;border-bottom:1px solid #9aabba}.jgb-v66-history-head strong{font-size:14px}.jgb-v66-history-item{margin:8px;border:1px solid #9aabba}.jgb-v66-history-title{display:flex;gap:9px;align-items:center;padding:7px 8px;background:#f3f7fa;border-bottom:1px solid #9aabba;font-size:12px}.jgb-v66-history-content{display:grid;grid-template-columns:minmax(0,1fr) auto}.jgb-v66-work-photos{padding:8px;border-left:1px solid #9aabba}.jgb-v66-photo-label{border:0;padding:0 0 7px}.jgb-v66-photo-label em{font-style:normal;font-size:11px;margin-left:4px}.jgb-v66-work-photo-grid{display:grid;grid-template-columns:repeat(3,4cm);gap:7px}.jgb-v66-work-photo-grid img,.jgb-v66-work-empty{width:4cm;height:4cm;object-fit:cover;box-sizing:border-box;border:1px solid #9aabba}.jgb-v66-work-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#fafafa;font-size:11px}.jgb-v66-work-empty small{margin-top:3px}.jgb-v66-empty,.jgb-v66-none{text-align:center;padding:20px;color:#657985}.jgb-v66-none{grid-column:1/-1}
+@media(max-width:1000px){.jgb-v66-grid{grid-template-columns:1fr}.jgb-v66-history-content{grid-template-columns:1fr}.jgb-v66-work-photos{border-left:0;border-top:1px solid #9aabba}.jgb-v66-work-photo-grid{grid-template-columns:repeat(3,4cm);overflow-x:auto}}
 </style></style>
     <style id="EMPLOYEE_OVERVIEW_STYLE">
     .eov-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
@@ -3788,115 +3796,30 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 
     function waterproofPage(){
   const S=jgbV47Store();
-  const cards=Array.isArray(S.cards)?S.cards:[];
   const hs=Array.isArray(S.wp)?S.wp:[];
+  const locations=[...new Set(hs.map(x=>String(x.location||'').trim()).filter(Boolean))];
+  const metas=(()=>{try{return JSON.parse(localStorage.getItem('JGB_V48_WP_CARDS')||'{}')}catch(e){return {}}})();
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  const val=(c,...ks)=>{
-    for(const k of ks){if(c&&c[k]!=null&&String(c[k]).trim()!=='')return c[k];}
-    return '-';
+  const cardFor=(loc,idx)=>{
+    const meta=metas[loc]||{};
+    const rows=hs.filter(x=>String(x.location||'').trim()===loc).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+    const photo=Array.isArray(meta.photos)&&meta.photos[0]?meta.photos[0]:'';
+    const code=String(meta.code||'WP-'+String(idx+1).padStart(3,'0'));
+    const field=(a,b)=>`<div class="jgb-v66-row"><strong>${esc(a)}</strong><span>${esc(b||'-')}</span></div>`;
+    const history=rows.length?rows.map((h,n)=>`<article class="jgb-v66-history-item">
+      <div class="jgb-v66-history-title"><b>이력 ${n+1}</b><span>${esc(h.date||'-')}</span><span>${esc(h.method||'-')}</span><span>${esc(h.result||'-')}</span></div>
+      <div class="jgb-v66-history-content">
+        <div>${field('작업일자',h.date)}${field('작업구분',h.method)}${field('외주업체명',h.vendor)}${field('작업비용',h.cost)}${field('작업내용',h.content)}${field('작업결과',h.result)}${field('관련 누수',h.related)}${field('특이사항',h.note)}</div>
+        <div class="jgb-v66-work-photos"><div class="jgb-v66-photo-label">📷 작업사진 <em>4 × 4 · 3장</em></div><div class="jgb-v66-work-photo-grid">${[0,1,2].map(k=>h.photos&&h.photos[k]?`<img src="${esc(h.photos[k])}" alt="작업사진 ${k+1}">`:`<div class="jgb-v66-work-empty">사진 ${k+1}<small>등록 자리</small></div>`).join('')}</div></div>
+      </div></article>`).join(''):`<div class="jgb-v66-empty">등록된 방수공사 이력내역이 없습니다.</div>`;
+    return `<section class="jgb-v66-set" data-wp-code="${esc(code)}">
+      <div class="jgb-v66-head"><strong>🛡 방수공사 이력카드</strong><div><button type="button" data-v47-action="edit-wp-card" data-location="${esc(loc)}">✏ 수정</button><button type="button" data-v47-action="new-wp" data-location="${esc(loc)}">＋ 이력내역</button><button type="button" class="jgb-v66-fold" aria-expanded="true">▲</button></div></div>
+      <div class="jgb-v66-body">
+        <div class="jgb-v66-card"><div class="jgb-v66-section">기본정보</div><div class="jgb-v66-card-layout"><div>${field('시설명',meta.facility||'장군봉체육관')}${field('방수 위치',loc)}${field('건물·구역',meta.area)}${field('주요 방수부위',meta.part||loc)}${field('방수공사 종류',meta.kind||'방수 보수·보강')}${field('방수 면적',meta.areaSize)}${field('최초 방수일',meta.firstDate||rows.at(-1)?.date)}${field('최근 방수일',rows[0]?.date||meta.lastDate)}${field('현재 상태',meta.status||'정상')}${field('담당자',meta.manager)}${field('연락처',meta.contact)}${field('시공업체',meta.contractor)}${field('보증기간',meta.warranty)}${field('공사 목적',meta.purpose||'시설물 보호 및 누수 예방')}${field('주요 공법',meta.method||'우레탄시트 등')}${field('사용 자재',meta.material)}${field('공사 범위',meta.scope)}${field('총 공사비',totalForLocation(rows)+'원')}${field('특이사항',meta.note)}</div><div class="jgb-v66-card-photo"><div class="jgb-v66-photo-label">📷 방수 위치 사진 <em>5 × 5 · 1장</em></div>${photo?`<img src="${esc(photo)}" alt="방수 위치 사진">`:`<div class="jgb-v66-location-empty">사진 등록 자리<br><small>5 × 5 · 1장</small></div>`}</div></div></div>
+        <section class="jgb-v66-history"><div class="jgb-v66-history-head"><strong>📋 방수공사 이력내역</strong><button type="button" data-v47-action="new-wp" data-location="${esc(loc)}">＋ 이력내역 등록</button></div>${history}</section>
+      </div></section>`;
   };
-  const histFor=(c)=>{
-    const code=String(c.code||c.id||'');
-    const loc=String(c.area||c.location||'').trim();
-    return hs.filter(h=>{
-      const hc=String(h.cardCode||h.wpCode||'').trim();
-      const hl=String(h.location||'').trim();
-      return (hc && hc===code) || (!hc && loc && hl===loc);
-    });
-  };
-
-  const makeHistory=(h,n)=>`
-    <article class="jgb-v65-history-item">
-      <div class="jgb-v65-history-title">
-        <b>이력 ${n}</b>
-        <span>${esc(h.date||'-')}</span>
-        <span>${esc(h.method||'-')}</span>
-        <span>${esc(h.result||'-')}</span>
-        <div class="jgb-v65-history-actions">
-          <button type="button" onclick="event.stopPropagation()">✏ 수정</button>
-          <button type="button" onclick="event.stopPropagation()">삭제</button>
-        </div>
-      </div>
-      <div class="jgb-v65-history-content">
-        <div class="jgb-v65-history-info">
-          ${[
-            ['작업일자',h.date],['작업구분',h.method],['외주업체명',h.vendor],
-            ['작업비용',h.cost],['작업내용',h.content],['작업결과',h.result],
-            ['관련 누수',h.related],['특이사항',h.note]
-          ].map(r=>`<div class="jgb-v65-row"><strong>${esc(r[0])}</strong><span>${esc(r[1]||'-')}</span></div>`).join('')}
-        </div>
-        <div class="jgb-v65-work-photos">
-          <div class="jgb-v65-photo-label">📷 작업사진 <em>4 × 4 · 3장</em></div>
-          <div class="jgb-v65-work-photo-grid">
-            ${[0,1,2].map(i=>{
-              const p=h.photos&&h.photos[i];
-              return p?`<img src="${esc(p)}" alt="작업사진 ${i+1}">`:`<div class="jgb-v65-work-empty">사진 ${i+1}<small>등록</small></div>`;
-            }).join('')}
-          </div>
-        </div>
-      </div>
-    </article>`;
-
-  const makeSet=(c,idx)=> {
-    const code=String(c.code||c.id||('WP-'+String(idx+1).padStart(3,'0')));
-    const histories=histFor(c);
-    const photo=(c.photos&&c.photos[0])||'';
-    return `
-    <section class="jgb-v65-set" data-wp-code="${esc(code)}">
-      <div class="jgb-v65-set-head">
-        <strong>🛡 방수공사 이력카드</strong>
-        <div>
-          <button type="button" onclick="event.stopPropagation();window.JGB_V47_EDIT_WP_CARD&&window.JGB_V47_EDIT_WP_CARD('${esc(code)}')">✏ 수정</button>
-          <button type="button" onclick="event.stopPropagation();window.JGB_V47_NEW_WP&&window.JGB_V47_NEW_WP('${esc(code)}')">＋ 이력내역</button>
-          <button type="button" class="jgb-v65-fold" aria-expanded="true">▲</button>
-        </div>
-      </div>
-      <div class="jgb-v65-set-body">
-        <div class="jgb-v65-card">
-          <div class="jgb-v65-section-title">기본정보</div>
-          <div class="jgb-v65-card-layout">
-            <div class="jgb-v65-info">
-              ${[
-                ['시설명',val(c,'facility')],['방수 위치',val(c,'area','location')],
-                ['건물·구역',val(c,'building','buildingArea')],['주요 방수부위',val(c,'part')],
-                ['방수공사 종류',val(c,'kind')],['방수 면적',val(c,'areaSize')],
-                ['최초 방수일',val(c,'firstDate')],['최근 방수일',val(c,'recentDate','firstDate')],
-                ['현재 상태',val(c,'status')],['담당자',val(c,'manager')],
-                ['연락처',val(c,'contact')],['시공업체',val(c,'contractor')],
-                ['보증기간',val(c,'warranty')],['공사 목적',val(c,'purpose')],
-                ['주요 공법',val(c,'method')],['사용 자재',val(c,'material')],
-                ['공사 범위',val(c,'scope')],['총 공사비',val(c,'cost')],
-                ['특이사항',val(c,'note')]
-              ].map(r=>`<div class="jgb-v65-row"><strong>${esc(r[0])}</strong><span>${esc(r[1])}</span></div>`).join('')}
-            </div>
-            <div class="jgb-v65-card-photo">
-              <div class="jgb-v65-photo-label">📷 방수 위치 사진 <em>5 × 5 · 1장</em></div>
-              ${photo?`<img src="${esc(photo)}" alt="방수 위치 사진">`:`<div class="jgb-v65-location-empty">사진 등록 자리<br><small>5 × 5 · 1장</small></div>`}
-            </div>
-          </div>
-        </div>
-
-        <section class="jgb-v65-history">
-          <div class="jgb-v65-history-head">
-            <strong>📋 방수공사 이력내역</strong>
-            <button type="button" onclick="window.JGB_V47_NEW_WP&&window.JGB_V47_NEW_WP('${esc(code)}')">＋ 이력내역 등록</button>
-          </div>
-          <div class="jgb-v65-history-list">
-            ${histories.length?histories.map((h,n)=>makeHistory(h,n+1)).join(''):
-              `<div class="jgb-v65-history-empty">등록된 이력내역이 없습니다.</div>`}
-          </div>
-        </section>
-      </div>
-    </section>`;
-  };
-
-  return `<div class="jgb-v65-wrap">
-    <div class="jgb-v65-top">
-      <h2>🛡 방수공사 관리대장</h2>
-      <button type="button" onclick="window.JGB_V47_NEW_WP&&window.JGB_V47_NEW_WP()">＋ 신규 이력카드 생성</button>
-    </div>
-    <div class="jgb-v65-grid">${cards.map(makeSet).join('')}</div>
-  </div>`;
+  return `<div class="jgb-v66-wrap"><div class="jgb-v66-top"><h2>🛡 방수공사 관리대장</h2><button type="button" data-v47-action="new-wp">＋ 신규 이력카드 생성</button></div><div class="jgb-v66-grid">${locations.map(cardFor).join('')||'<div class="jgb-v66-none">등록된 방수공사 이력카드가 없습니다.<br><button type="button" data-v47-action="new-wp">＋ 신규 이력카드 생성</button></div>'}</div></div>`;
 }
     function wpSetCard(location,idx,esc){
       if(!location)return `<section class="jgb-v52-set"><div class="jgb-v48-card panel jgb-v52-card"><div class="jgb-v48-card-head"><div><h2>📋 방수공사 이력카드</h2><p>방수 대상 시설의 기본정보를 관리합니다.</p></div><div class="jgb-v48-card-actions"><button type="button" class="btn gray" disabled>✏️ 이력카드 수정</button></div></div><div class="jgb-v52-empty">방수 위치를 등록하면 이력카드가 표시됩니다.</div></div><section class="jgb-v48-history panel jgb-v52-history"><div class="jgb-v48-card-head"><div><h2>📝 방수공사 이력내역</h2></div></div><div class="jgb-v52-empty">등록된 방수작업 이력이 없습니다.</div></section></section>`;
@@ -12324,22 +12247,7 @@ window.eamDeleteSelectedAsset=async function(){
 })();
 </script>
 
-<script>(function(){document.addEventListener('click',function(e){var b=e.target.closest('.j63-fold');if(!b)return;var body=b.closest('.j63-set').querySelector('.j63-body');body.classList.toggle('closed');b.textContent=body.classList.contains('closed')?'▼':'▲';});})();</script><script>(function(){if(window.__JGB_V64_FOLD)return;window.__JGB_V64_FOLD=true;document.addEventListener("click",function(e){const b=e.target.closest(".j64-fold");if(!b)return;e.preventDefault();e.stopPropagation();const body=b.closest(".j64-set")?.querySelector(".j64-body");if(!body)return;body.classList.toggle("closed");b.textContent=body.classList.contains("closed")?"▼":"▲";},true);})();</script>
-<script>
-(function(){
-  if(window.__JGB_V65_FOLD)return;
-  window.__JGB_V65_FOLD=true;
-  document.addEventListener('click',function(e){
-    const b=e.target.closest('.jgb-v65-fold');
-    if(!b)return;
-    const set=b.closest('.jgb-v65-set');
-    const body=set&&set.querySelector('.jgb-v65-set-body');
-    if(!body)return;
-    const closed=body.classList.toggle('closed');
-    b.textContent=closed?'▼':'▲';
-    b.setAttribute('aria-expanded',String(!closed));
-  });
-})();
-</script>
-</body>
+
+
+<script>(function(){if(window.__JGB_V66_FOLD)return;window.__JGB_V66_FOLD=true;document.addEventListener('click',function(e){var b=e.target.closest('.jgb-v66-fold');if(!b)return;var body=b.closest('.jgb-v66-set')?.querySelector('.jgb-v66-body');if(!body)return;var c=body.classList.toggle('closed');b.textContent=c?'▼':'▲';b.setAttribute('aria-expanded',String(!c));});})();</script></body>
 </html>
