@@ -11978,3 +11978,70 @@ jgb-eam-card-final .jgb-eam-lower-v125 .v125-full .v125-label{
   setTimeout(patch,200);setTimeout(patch,800);setTimeout(patch,1600);
 })();
 </script>
+
+<style id="JGB_V145_PHOTO_FOUR_SLOTS">
+/* V145: 기존 큰 설비사진은 그대로. 그 아래 4x4cm 보조사진 4칸만 추가 */
+.jgb-eam-photo .jgb-v145-subphotos{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;
+  padding:8px 10px 6px!important;background:#faf8f2!important;border-top:1px solid #334e63!important;
+  box-sizing:border-box!important;
+}
+.jgb-eam-photo .jgb-v145-subphoto{
+  min-width:0!important;text-align:center!important;box-sizing:border-box!important;
+}
+.jgb-eam-photo .jgb-v145-subbox{
+  position:relative!important;width:4cm!important;height:4cm!important;max-width:4cm!important;max-height:4cm!important;
+  min-width:4cm!important;min-height:4cm!important;margin:0 auto!important;box-sizing:border-box!important;
+  border:1px dashed #7890a2!important;background:#fff!important;display:flex!important;align-items:center!important;
+  justify-content:center!important;overflow:hidden!important;cursor:pointer!important;
+}
+.jgb-eam-photo .jgb-v145-subbox img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+.jgb-eam-photo .jgb-v145-subbox span{font-size:11px!important;color:#60798b!important;line-height:1.2!important}
+.jgb-eam-photo .jgb-v145-subbox input{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0!important;cursor:pointer!important;z-index:2!important}
+.jgb-eam-photo .jgb-v145-subdel{position:absolute!important;right:3px!important;top:3px!important;width:22px!important;height:22px!important;border:0!important;border-radius:50%!important;background:#d52f2f!important;color:#fff!important;font-weight:900!important;z-index:4!important;cursor:pointer!important}
+.jgb-eam-photo .jgb-v145-subcaption{margin-top:4px!important;font-size:13px!important;font-weight:900!important;color:#17384d!important;line-height:1.2!important;white-space:nowrap!important}
+.jgb-eam-photo .jgb-v145-subdesc{margin-top:2px!important;font-size:10px!important;color:#60798b!important;line-height:1.2!important;white-space:nowrap!important}
+/* 작업사진도 사진 바로 아래 설명을 선명하게 */
+.jgb-history-box .jgb-work-photo b{font-size:13px!important;font-weight:900!important}
+.jgb-history-box .jgb-work-photo small{display:block!important;font-size:10px!important;color:#60798b!important;margin-top:2px!important}
+@media(max-width:900px){
+ .jgb-eam-photo .jgb-v145-subphotos{gap:5px!important;padding:7px 6px!important}
+ .jgb-eam-photo .jgb-v145-subbox{width:4cm!important;height:4cm!important}
+}
+</style>
+<script id="JGB_V145_PHOTO_FOUR_SLOTS_JS">
+(function(){
+  const labels=['정면','측면','명판','설치환경'];
+  const descs=['설비 정면 사진','설비 측면 사진','제조·규격 명판','설치 상태 사진'];
+  function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function key(code,i){return 'JGB_EQUIP_SUBPHOTO_'+String(code)+'_'+i}
+  function getCode(){return String(window.__eamSelCode||'');}
+  function read(code,i){try{return localStorage.getItem(key(code,i))||''}catch(e){return ''}}
+  window.jgbV145PickSubPhoto=function(code,i){
+    let old=document.getElementById('jgbV145SubInput');if(old)old.remove();
+    const input=document.createElement('input');input.type='file';input.accept='image/*';input.id='jgbV145SubInput';input.style.display='none';
+    input.onchange=function(){const f=this.files&&this.files[0];if(!f)return;if(!f.type.startsWith('image/')){alert('JPG 또는 PNG 등 이미지 파일만 등록할 수 있습니다.');return;}
+      const r=new FileReader();r.onload=function(){try{localStorage.setItem(key(code,i),String(r.result||''));}catch(e){alert('사진 저장에 실패했습니다.');return;}if(typeof window.eamPage==='function')window.eamPage();};r.readAsDataURL(f);
+    };document.body.appendChild(input);input.click();
+  };
+  window.jgbV145DeleteSubPhoto=function(code,i){try{localStorage.removeItem(key(code,i))}catch(e){}if(typeof window.eamPage==='function')window.eamPage();};
+  function build(){
+    const code=getCode();if(!code)return;
+    document.querySelectorAll('.jgb-eam-photo').forEach(photo=>{
+      if(photo.querySelector('.jgb-v145-subphotos'))return;
+      const actions=photo.querySelector('.jgb-equip-photo-actions');if(!actions)return;
+      const wrap=document.createElement('div');wrap.className='jgb-v145-subphotos';
+      labels.forEach((label,i)=>{
+        const src=read(code,i), d=descs[i];
+        const el=document.createElement('div');el.className='jgb-v145-subphoto';
+        el.innerHTML=`<div class="jgb-v145-subbox" onclick="window.jgbV145PickSubPhoto('${esc(code)}',${i})">${src?`<img src="${esc(src)}" alt="${esc(label)}"><button type="button" class="jgb-v145-subdel" onclick="event.preventDefault();event.stopPropagation();window.jgbV145DeleteSubPhoto('${esc(code)}',${i})">×</button>`:`<span>📷<br>사진 등록</span>`}</div><div class="jgb-v145-subcaption">${esc(label)}</div><div class="jgb-v145-subdesc">${esc(d)}</div>`;
+        wrap.appendChild(el);
+      });
+      actions.after(wrap);
+    });
+  }
+  function run(){setTimeout(build,50);setTimeout(build,300);setTimeout(build,1000);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+  new MutationObserver(run).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
