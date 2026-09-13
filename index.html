@@ -2116,6 +2116,29 @@ html::before,body::before{
 .jgb-v136-record.is-collapsed .jgb-v136-record-head{border-bottom:2px solid #3d5363!important}
 @media(max-width:800px){.eam-detail-panel .eam-master .master-grid{grid-template-columns:112px minmax(0,1fr)!important}.eam-detail-panel .eam-master .master-grid>div{grid-column:1/-1!important;border-right:0!important}.jgb-v136-body{grid-template-columns:1fr!important}.jgb-v136-photo{border-left:0!important;border-top:2px solid #3d5363!important}}
 </style>
+
+<style id="JGB_V149_TRUE_REBUILD">
+/* V149: 기본정보와 설비사진 영역을 실제 표시 경로에서 통째로 재구성 */
+.jgb-history-card .jgb-basic-table-rebuild{display:block!important;width:100%!important;margin:0!important;padding:0!important;border:2px solid #334b5b!important;box-sizing:border-box!important;overflow:visible!important;background:#fff!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-table-row{display:grid!important;grid-template-columns:20% 30% 20% 30%!important;width:100%!important;min-height:48px!important;border:0!important;border-bottom:1.5px solid #334b5b!important;box-sizing:border-box!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-label,.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-value{min-width:0!important;min-height:48px!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;padding:8px 10px!important;margin:0!important;border:0!important;border-right:1.5px solid #334b5b!important;font-size:14px!important;line-height:1.25!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-label{background:#dbe7ee!important;color:#102b3d!important;font-weight:800!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-value{background:#fffdf8!important;color:#102b3d!important;font-weight:600!important}
+.jgb-history-card .jgb-basic-table-rebuild .jgb-basic-table-row>:nth-child(4){border-right:0!important}
+.jgb-photo-area-v149{overflow:visible!important;background:#fff!important}
+.jgb-photo-area-v149 .jgb-equip-photo-stage{min-height:calc(7cm + 24px)!important;padding:12px!important;box-sizing:border-box!important}
+.jgb-photo-area-v149 .jgb-v149-detail-title{border-top:2px solid #334b5b!important;background:#eaf2f7!important;color:#17384d!important;font-size:14px!important;font-weight:800!important;padding:8px 10px!important}
+.jgb-photo-area-v149 .jgb-v149-detail-scroll{overflow-x:auto!important;overflow-y:hidden!important;padding:8px!important;box-sizing:border-box!important}
+.jgb-photo-area-v149 .jgb-v149-detail-grid{display:grid!important;grid-template-columns:repeat(4,4cm)!important;gap:6px!important;width:max-content!important}
+.jgb-photo-area-v149 .jgb-v149-detail-item{text-align:center!important;min-width:4cm!important}
+.jgb-photo-area-v149 .jgb-v149-detail-box{position:relative!important;width:4cm!important;height:4cm!important;box-sizing:border-box!important;border:1.5px dashed #7890a2!important;background:#fbfaf6!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;cursor:pointer!important}
+.jgb-photo-area-v149 .jgb-v149-detail-box img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+.jgb-photo-area-v149 .jgb-v149-detail-box span{font-size:11px!important;line-height:1.3!important;color:#60798b!important}
+.jgb-photo-area-v149 .jgb-v149-detail-box input{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0!important;cursor:pointer!important;z-index:2!important}
+.jgb-photo-area-v149 .jgb-v149-detail-del{position:absolute!important;right:3px!important;top:3px!important;width:22px!important;height:22px!important;border:0!important;border-radius:50%!important;background:#d33b3b!important;color:#fff!important;font-weight:900!important;z-index:4!important;cursor:pointer!important}
+.jgb-photo-area-v149 .jgb-v149-detail-item>b{display:block!important;margin-top:4px!important;font-size:14px!important;line-height:1.2!important;color:#17384d!important;white-space:nowrap!important}
+.jgb-photo-area-v149 .jgb-v149-detail-item>small{display:block!important;margin-top:2px!important;font-size:11px!important;line-height:1.2!important;color:#60798b!important;white-space:nowrap!important}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -4482,18 +4505,30 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                 </div>
               </div>
             </section>
-            <section class="jgb-paper-photo jgb-equip-photo-rebuilt">
+            <section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149">
               <div class="jgb-paper-section-title">📷 설비 사진 (현재)</div>
               <div class="jgb-equip-photo-stage">
                 <div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">
                   ${equipPhoto
                     ? `<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')" title="사진 삭제">×</button>`
                     : `<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}
+                  <input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택">
                 </div>
               </div>
               <div class="jgb-equip-photo-actions-rebuilt">
                 <button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button>
                 <span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span>
+              </div>
+              <div class="jgb-v149-detail-title">설비 상세사진 · 각 4×4cm</div>
+              <div class="jgb-v149-detail-scroll">
+                <div class="jgb-v149-detail-grid">
+                  ${['정면','측면','명판','설치환경'].map((label,i)=>{
+                    const key='JGB_EQUIP_SUBPHOTO_'+String(cardCode)+'_'+i;
+                    let src=''; try{src=localStorage.getItem(key)||''}catch(e){}
+                    const desc=['설비 정면 사진','설비 측면 사진','제조·규격 명판','설치 상태 사진'][i];
+                    return `<div class="jgb-v149-detail-item"><div class="jgb-v149-detail-box" onclick="window.jgbV145PickSubPhoto&&window.jgbV145PickSubPhoto('${E(cardCode)}',${i})" title="${E(label)} 사진 등록">${src?`<img src="${E(src)}" alt="${E(label)}"><button type="button" class="jgb-v149-detail-del" onclick="event.preventDefault();event.stopPropagation();window.jgbV145DeleteSubPhoto&&window.jgbV145DeleteSubPhoto('${E(cardCode)}',${i})">×</button>`:`<span>📷<br>사진 등록</span>`}</div><b>${E(label)}</b><small>${E(desc)}</small></div>`;
+                  }).join('')}
+                </div>
               </div>
             </section>
           </div>
@@ -5070,7 +5105,11 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const hs=histories(reg,H);const idx=Number.isFinite(window.__jgbEamHistoryIndex)?window.__jgbEamHistoryIndex:0;const selectedH=hs[idx]||hs[0]||null;const parsed=selectedH?detailFor(selectedH):null;const ins=reg?I.filter(x=>V(x.asset_id)===V(reg.id)).sort((a,b)=>String(b.inspection_date).localeCompare(String(a.inspection_date))):[];const ext=hs.filter(h=>inferType(h)!=='점검');const recentExt=ext[0];
         const equipPhotoDeleted=localStorage.getItem('JGB_EQUIP_PHOTO_DELETED_'+String(sel))==='1';
         const savedEquipPhoto=equipPhotoDeleted?'':((window.__jgbEquipPhotoCache&&window.__jgbEquipPhotoCache[sel])||localStorage.getItem('JGB_EQUIP_PHOTO_'+String(sel))||cur.photo||'');
-        const photo=`<div class="jgb-eam-photo"><div class="jgb-eam-photo-title">📷 설비 사진 (현재)</div><div class="jgb-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(sel)}')" title="클릭하면 사진 선택창이 열립니다">${savedEquipPhoto?`<img src="${E(savedEquipPhoto)}" alt="${E(cur.name||'설비 사진')}" class="jgb-equip-photo-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(sel)}')" title="사진 삭제">×</button>`:`<div class="cam">📷</div><strong>사진을 등록할 수 있습니다</strong><span>사진 등록 공간 · JPG / PNG · 클릭</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(sel)}')" aria-label="설비 사진 선택"></div><div class="jgb-equip-photo-actions"><button type="button" class="jgb-equip-photo-delete" ${savedEquipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(sel)}')">🗑 사진 삭제</button><span>${savedEquipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'등록된 사진이 없어 삭제할 사진이 없습니다.'}</span></div></div>`;
+        const subLabels=['정면','측면','명판','설치환경'];
+        const subDescs=['설비 정면 사진','설비 측면 사진','제조·규격 명판','설치 상태 사진'];
+        const subSrc=i=>{try{return localStorage.getItem('JGB_EQUIP_SUBPHOTO_'+String(sel)+'_'+i)||''}catch(e){return ''}};
+        const subPhotoHtml=subLabels.map((label,i)=>{const src=subSrc(i);return `<div class="jgb-eam-subphoto-item"><div class="jgb-eam-subphoto-box" onclick="window.jgbV145PickSubPhoto&&window.jgbV145PickSubPhoto('${E(sel)}',${i})" title="${E(label)} 사진 등록">${src?`<img src="${E(src)}" alt="${E(label)}"><button type="button" class="jgb-eam-subphoto-del" onclick="event.preventDefault();event.stopPropagation();window.jgbV145DeleteSubPhoto&&window.jgbV145DeleteSubPhoto('${E(sel)}',${i})">×</button>`:`<span>📷<br>사진 등록</span>`}</div><div class="jgb-eam-subphoto-caption">${E(label)}</div><div class="jgb-eam-subphoto-desc">${E(subDescs[i])}</div></div>`}).join('');
+        const photo=`<div class="jgb-eam-photo"><div class="jgb-eam-photo-title">📷 설비 사진 (현재)</div><div class="jgb-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(sel)}')" title="클릭하면 사진 선택창이 열립니다">${savedEquipPhoto?`<img src="${E(savedEquipPhoto)}" alt="${E(cur.name||'설비 사진')}" class="jgb-equip-photo-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(sel)}')" title="사진 삭제">×</button>`:`<div class="cam">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(sel)}')" aria-label="설비 사진 선택"></div><div class="jgb-equip-photo-actions"><button type="button" class="jgb-equip-photo-delete" ${savedEquipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(sel)}')">🗑 사진 삭제</button><span>${savedEquipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div><div class="jgb-eam-subphoto-section"><div class="jgb-eam-subphoto-title">설비 상세사진 · 각 4×4cm</div><div class="jgb-eam-subphotos">${subPhotoHtml}</div></div></div>`;
         const info=[['자산코드',window.eamUnifiedCode?window.eamUnifiedCode(cur):(cur.asset_code||cur.code||'-')],['자산명',window.eamDisplayName?window.eamDisplayName(cur):(cur.name||'-')],['설비 종류',cur.category||cur.type||C.label||'-'],['위치',window.placeLabel?window.placeLabel(cur.place):(cur.place||'-')],['위치코드',typeof placeCode==='function'?placeCode(cur.place):'-'],['모델·규격',cur.model||'-'],['용량',cur.capacity||'-'],['수량',cur.qty??cur.quantity??'-'],['제조사',cur.maker||cur.vendor||'-'],['A/S 연락처',cur.asContact||'-'],['제조일',cur.date||cur.manufactureDate||'-'],['설치일',cur.installDate||'-'],['내용연수',cur.life||'-'],['평가등급',cur.grade||'-'],['보증',cur.warranty||'-'],['기존 A/S 기록',cur.asHistory||'-'],['자산상태',cur.status||'정상'],['취득구분',cur.acquisitionType||'기존 자산']];
         /* V128: 기본정보를 4열 x 9행의 실제 행 구조로 전면 재작성 */
         const infoRows=[];
@@ -12045,3 +12084,200 @@ jgb-eam-card-final .jgb-eam-lower-v125 .v125-full .v125-label{
   new MutationObserver(run).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+
+<style id="JGB_V146_BASIC_INFO_LABEL_FIX">
+/* V146: 기본정보 라벨 잘림만 수정. 사진/유지관리 영역은 변경하지 않음. */
+.jgb-eam-card-final .jgb-eam-info-grid > .jgb-eam-info-cell{
+  grid-template-columns:125px minmax(0,1fr)!important;
+}
+.jgb-eam-card-final .jgb-eam-info-grid > .jgb-eam-info-cell > small{
+  width:125px!important;
+  min-width:125px!important;
+  max-width:125px!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  font-size:14px!important;
+  line-height:1.15!important;
+  padding-left:8px!important;
+  padding-right:8px!important;
+}
+.jgb-eam-card-final .jgb-eam-info-grid > .jgb-eam-info-cell > b{
+  min-width:0!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  white-space:nowrap!important;
+}
+</style>
+
+<style id="JGB_V147_DIRECT_PHOTO_AND_LABEL_FIX">
+/* V147: 요청사항 3가지만 실제 렌더 구조에 직접 적용 */
+.jgb-eam-card-final .jgb-eam-info-row{
+  grid-template-columns:128px minmax(0,1fr) 128px minmax(0,1fr)!important;
+}
+.jgb-eam-card-final .jgb-eam-info-label{
+  white-space:nowrap!important; overflow:visible!important; text-overflow:clip!important;
+  font-size:14px!important; line-height:1!important; padding:0 8px!important;
+}
+.jgb-eam-card-final .jgb-eam-info-value{
+  white-space:nowrap!important; overflow:visible!important; text-overflow:clip!important;
+  font-size:14px!important; line-height:1.15!important;
+}
+/* 기존 큰 설비사진은 유지하고, 바로 아래에 4×4cm 4칸을 실제 DOM으로 배치 */
+.jgb-eam-card-final .jgb-eam-subphoto-section{
+  border-top:1.5px solid #334b5a!important; background:#faf8f2!important;
+  padding:8px 10px 9px!important; box-sizing:border-box!important;
+}
+.jgb-eam-card-final .jgb-eam-subphoto-title{
+  font-size:13px!important; font-weight:900!important; color:#17384d!important;
+  margin:0 0 6px!important; text-align:left!important;
+}
+.jgb-eam-card-final .jgb-eam-subphotos{
+  display:grid!important; grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:7px!important; align-items:start!important;
+}
+.jgb-eam-card-final .jgb-eam-subphoto-item{min-width:0!important; text-align:center!important}
+.jgb-eam-card-final .jgb-eam-subphoto-box{
+  position:relative!important; width:4cm!important; height:4cm!important;
+  max-width:4cm!important; max-height:4cm!important; min-width:4cm!important; min-height:4cm!important;
+  margin:0 auto!important; border:1.5px dashed #7890a2!important; background:#fff!important;
+  display:flex!important; align-items:center!important; justify-content:center!important;
+  box-sizing:border-box!important; overflow:hidden!important; cursor:pointer!important;
+}
+jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+.jgb-eam-card-final .jgb-eam-subphoto-box span{font-size:11px!important;line-height:1.25!important;color:#60798b!important}
+.jgb-eam-card-final .jgb-eam-subphoto-caption{margin-top:4px!important;font-size:13px!important;font-weight:900!important;color:#17384d!important;line-height:1.2!important;white-space:nowrap!important}
+.jgb-eam-card-final .jgb-eam-subphoto-desc{margin-top:2px!important;font-size:10px!important;color:#60798b!important;line-height:1.15!important;white-space:nowrap!important}
+.jgb-eam-card-final .jgb-eam-subphoto-del{position:absolute!important;right:3px!important;top:3px!important;width:22px!important;height:22px!important;border:0!important;border-radius:50%!important;background:#d52f2f!important;color:#fff!important;font-weight:900!important;z-index:5!important;cursor:pointer!important}
+/* 유지관리 작업사진: 주요설비 이력카드 글씨 크기 기준 + 제목은 사진 바로 아래 */
+.jgb-history-box .jgb-work-photo b{font-size:14px!important;font-weight:900!important;line-height:1.1!important}
+.jgb-history-box .jgb-work-photo small{font-size:11px!important;line-height:1.15!important}
+</style>
+
+
+<style id="JGB_V148_FINAL_STRUCTURE_FIX">
+/* V148: 요청한 부분만 최종 강제. 기존 사진/기능은 유지하고 실제 사진영역의 클리핑만 제거 */
+.jgb-eam-card-final .jgb-eam-card-body > .jgb-eam-photo{
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+  align-self:start!important;
+}
+/* 기존 큰 설비사진 박스는 유지하되, 아래 상세사진 4칸이 잘리지 않도록 높이를 자연스럽게 */
+.jgb-eam-card-final .jgb-eam-photo .jgb-photo-box{
+  height:300px!important;
+  min-height:300px!important;
+  max-height:none!important;
+  overflow:hidden!important;
+}
+/* 큰 사진 아래 4칸: 실제 화면에 반드시 보이도록 별도 행으로 구성 */
+.jgb-eam-card-final .jgb-eam-photo .jgb-eam-subphoto-section{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+  box-sizing:border-box!important;
+  padding:8px 10px 10px!important;
+  border-top:2px solid #334e63!important;
+  background:#faf8f2!important;
+}
+.jgb-eam-card-final .jgb-eam-photo .jgb-eam-subphotos{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:7px!important;
+  width:100%!important;
+  overflow:visible!important;
+  align-items:start!important;
+}
+.jgb-eam-card-final .jgb-eam-photo .jgb-eam-subphoto-box{
+  width:4cm!important;
+  height:4cm!important;
+  min-width:4cm!important;
+  min-height:4cm!important;
+  max-width:4cm!important;
+  max-height:4cm!important;
+  margin:0 auto!important;
+  box-sizing:border-box!important;
+}
+.jgb-eam-card-final .jgb-eam-photo .jgb-eam-subphoto-caption{
+  display:block!important;
+  margin-top:4px!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+}
+.jgb-eam-card-final .jgb-eam-photo .jgb-eam-subphoto-desc{
+  display:block!important;
+  margin-top:2px!important;
+  font-size:11px!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+}
+/* 기본정보 라벨은 글씨를 줄이지 않고 긴 제목이 들어갈 폭을 확보 */
+.jgb-eam-card-final .jgb-eam-info-row{
+  grid-template-columns:128px minmax(0,1fr) 128px minmax(0,1fr)!important;
+  width:100%!important;
+  min-width:0!important;
+}
+.jgb-eam-card-final .jgb-eam-info-label{
+  min-width:0!important;
+  width:auto!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  word-break:keep-all!important;
+  font-size:14px!important;
+  line-height:1.15!important;
+  box-sizing:border-box!important;
+}
+.jgb-eam-card-final .jgb-eam-info-value{
+  min-width:0!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  font-size:14px!important;
+  line-height:1.15!important;
+}
+/* 유지관리 작업사진 제목은 사진 바로 아래, 이력카드 기준 글씨 */
+.jgb-history-box .jgb-work-photos .jgb-work-photo b,
+.jgb-history-box .jgb-work-photo b{
+  font-size:14px!important;
+  line-height:1.15!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+}
+@media(max-width:900px){
+  .jgb-eam-card-final .jgb-eam-photo .jgb-eam-subphotos{gap:4px!important}
+  .jgb-eam-card-final .jgb-eam-photo .jgb-eam-subphoto-box{width:4cm!important;height:4cm!important;min-width:4cm!important;min-height:4cm!important}
+}
+</style>
+<style id="JGB_V150_BASIC_LABEL_NO_CLIP">
+/* 기본정보 라벨 실제 행 구조 기준: 긴 제목도 잘리지 않도록 라벨 폭을 확보 */
+.jgb-eam-card-final .jgb-eam-info-grid{overflow:visible!important;}
+.jgb-eam-card-final .jgb-eam-info-row{
+  grid-template-columns:110px minmax(0,1fr) 110px minmax(0,1fr)!important;
+  overflow:visible!important;
+}
+.jgb-eam-card-final .jgb-eam-info-row>div{
+  overflow:visible!important;
+  min-width:0!important;
+}
+.jgb-eam-card-final .jgb-eam-info-label{
+  width:110px!important;
+  min-width:110px!important;
+  flex:0 0 110px!important;
+  padding:0 8px!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  font-size:14px!important;
+  line-height:1.2!important;
+}
+</style>
