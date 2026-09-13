@@ -12806,5 +12806,74 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
   };
 })();
 </script>
+
+<script id="JGB_V168_SINGLE_SOURCE_LINK_FINAL">
+(function(){
+  'use strict';
+  /* V168: 왼쪽 자산목록을 선택 기준으로 삼고, 카드/유지관리/사진을 같은 자산코드로 묶는다. */
+  const V=x=>String(x??'').trim();
+  const DEL='JGB_EAM_DELETED_CODES';
+  function esc(x){return V(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+  function readMeta(){try{if(typeof metas==='function')return metas()||{};}catch(e){}try{return JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{}}catch(e){return {}}}
+  function writeMeta(m){try{if(typeof saveMeta==='function'){saveMeta(m);return true}}catch(e){}try{localStorage.setItem('JGB_EAM_META',JSON.stringify(m||{}));return true}catch(e){return false}}
+  function deleted(){try{return new Set((JSON.parse(localStorage.getItem(DEL)||'[]')||[]).map(V))}catch(e){return new Set()}}
+  function sourceRows(){try{const f=window.eamSourceAssets;if(typeof f==='function')return f.__v168Base?f.__v168Base():f();}catch(e){}return []}
+  function baseSourceRows(){
+    const main=Array.isArray(window.JGB_MAIN_EQUIPMENT)?window.JGB_MAIN_EQUIPMENT:[];
+    const excel=Array.isArray(window.JGB_EXCEL_EQUIPMENT)?window.JGB_EXCEL_EQUIPMENT:[];
+    const map=new Map();
+    [...main,...excel].filter(x=>x&&x.code).forEach(x=>{const c=V(x.code);if(!c||deleted().has(c)||map.has(c))return;const fire=V(x.type).includes('소방');map.set(c,{code:c,name:V(x.name)||'-',type:V(x.type)||'기타설비',category:V(x.category)||'',place:fire?'유수장치실':(V(x.place)||'-'),model:V(x.model||x.capacity)||'-',qty:x.quantity??'-',quantity:x.quantity??'-',vendor:V(x.vendor||x.maker)||'-',maker:V(x.maker||x.vendor)||'-',asContact:V(x.asContact||x.contact)||'-',installDate:V(x.installDate||x.date)||'-',warranty:V(x.warranty)||'-',asHistory:V(x.asHistory)||'-',note:V(x.note)||'-',photo:x.photo||null});});
+    return [...map.values()];
+  }
+  function locFromPlace(p){p=V(p);if(p.includes('유수장치실'))return'E';if(p.includes('옥상'))return'D';if(p.includes('창고'))return'F';if(p.includes('사무실'))return'C';if(p.includes('복도'))return'B';if(p.includes('코트'))return'A';if(p.includes('휴게실'))return'G';if(p.includes('남자 화장실'))return'H';if(p.includes('여자 화장실'))return'I';if(p.includes('남자 샤워실'))return'J';if(p.includes('여자 샤워실'))return'K';if(p.includes('좌측 외곽'))return'L';if(p.includes('우측 외곽'))return'M';return'-'}
+  function categoryOf(x){const t=V(x?.category||x?.type);if(t.includes('냉난방'))return'냉난방';if(t.includes('소방'))return'소방·방재';if(t.includes('온수')||t.includes('보일러')||t.includes('난방'))return'보일러·온수';if(t.includes('전기'))return'전기설비';if(t.includes('조명'))return'코트조명';if(t.includes('방수'))return'방수';if(t.includes('위생'))return'위생설비';if(t.includes('문')||t.includes('창호')||t.includes('도어'))return'문·창호설비';return V(x?.category||x?.type)||'기타설비'}
+  function findDb(code){const A=Array.isArray(window.__eamA)?window.__eamA:[];const k=V(code);return A.find(a=>V(a.asset_code)===k)||null}
+  function findSrc(code){const k=V(code);return baseSourceRows().find(a=>V(a.code)===k)||null}
+  function current(code){const k=V(code||window.__eamSelCode),m=readMeta(),src=findSrc(k),reg=findDb(k);const cur=Object.assign({},src||{},reg||{},m[k]||{});const cat=categoryOf(cur);let place=V(cur.place||src?.place||reg?.place);if(cat==='소방·방재')place='유수장치실';const lc=cat==='소방·방재'?'E':locFromPlace(place);cur.place=place;cur.locationCode=lc;cur.category=cat;cur.asset_code=k;return {code:k,src,reg,cur,meta:m};}
+  function syncMeta(){
+    const m=readMeta();let changed=false;
+    baseSourceRows().forEach(src=>{const k=V(src.code),reg=findDb(k),old=m[k]||{},cur=Object.assign({},src,reg||{},old),cat=categoryOf(cur);let place=V(cur.place||src.place||reg?.place);if(cat==='소방·방재')place='유수장치실';const lc=cat==='소방·방재'?'E':locFromPlace(place);if(lc!=='-'&&(old.locationCode!==lc||old.place!==place||old.category!==cat)){m[k]=Object.assign({},old,{locationCode:lc,place,category:cat,asset_code:k});changed=true;}});
+    if(changed){writeMeta(m);window.__eamMetaByCode=m;}
+  }
+  /* source 목록 자체도 V168 기준으로 고정 */
+  const original=window.eamSourceAssets;
+  function unifiedSource(){
+    const rows=baseSourceRows(),A=Array.isArray(window.__eamA)?window.__eamA:[],m=readMeta(),dead=deleted();
+    return rows.filter(x=>!dead.has(V(x.code))).map(x=>{const k=V(x.code),a=A.find(z=>V(z.asset_code)===k)||null,mm=m[k]||{},y=Object.assign({},x,a||{},mm);const cat=categoryOf(y);if(cat==='소방·방재')y.place='유수장치실';y.locationCode=cat==='소방·방재'?'E':locFromPlace(y.place);y.category=cat;y.asset_code=k;return y;});
+  }
+  unifiedSource.__v168Base=()=>baseSourceRows();
+  window.eamSourceAssets=unifiedSource;
+  syncMeta();
+
+  /* 기존 eamPage를 호출하되, 렌더 직전에 선택 자산의 위치코드를 반드시 실제 위치에서 재계산 */
+  const oldPage=window.eamPage;
+  if(typeof oldPage==='function'&&!oldPage.__v168){
+    const wrappedPage=function(){
+      syncMeta();
+      const code=V(window.__eamSelCode),c=current(code);
+      if(code&&c.src){
+        const m=readMeta();m[code]=Object.assign({},m[code]||{},{asset_code:code,category:c.cur.category,place:c.cur.place,locationCode:c.cur.locationCode});writeMeta(m);window.__eamMetaByCode=m;
+      }
+      const html=oldPage.apply(this,arguments);
+      return html;
+    };
+    wrappedPage.__v168=true;window.eamPage=wrappedPage;
+  }
+
+  /* 선택은 오직 자산코드 하나로 관리 */
+  const oldPick=window.eamPick;
+  if(typeof oldPick==='function'&&!oldPick.__v168){
+    const wrappedPick=function(cat,code){window.__eamCat=V(cat)||'cooling';window.__eamSelCode=V(code);syncMeta();return oldPick.apply(this,arguments)};
+    wrappedPick.__v168=true;window.eamPick=wrappedPick;
+  }
+
+  /* 주요설비 이력카드 수정도 같은 자산코드를 사용 */
+  window.__jgbV168Current=function(code){return current(code)};
+  window.jgbV168Sync=function(code){
+    const c=current(code),k=c.code;if(!k)return c;
+    const m=readMeta();m[k]=Object.assign({},m[k]||{},{asset_code:k,category:c.cur.category,place:c.cur.place,locationCode:c.cur.locationCode});writeMeta(m);window.__eamMetaByCode=m;return c;
+  };
+})();
+</script>
 </body>
 </html>
