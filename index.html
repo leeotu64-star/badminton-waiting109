@@ -12875,5 +12875,119 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
   };
 })();
 </script>
+
+<script id="JGB_V169_ASSET_MANAGEMENT_REBUILD">
+(function(){
+  'use strict';
+  const V=x=>String(x??'').trim();
+  const DELKEY='JGB_EAM_DELETED_CODES';
+  const locs={A:'코트',B:'복도',C:'사무실',D:'옥상',E:'유수장치실',F:'창고',G:'휴게실',H:'남자 화장실',I:'여자 화장실',J:'남자 샤워실',K:'여자 샤워실',L:'좌측 외곽',M:'우측 외곽'};
+  const cats=['냉난방','소방·방재','보일러·온수','전기설비','코트조명','방수','위생설비','문·창호설비','기타설비'];
+  const places=Object.values(locs);
+  function deleted(){try{return new Set((JSON.parse(localStorage.getItem(DELKEY)||'[]')||[]).map(V))}catch(e){return new Set()}}
+  function saveDeleted(set){localStorage.setItem(DELKEY,JSON.stringify([...set]));}
+  async function db(){
+    try{if(typeof getSupa==='function'){let x=getSupa();if(x&&typeof x.then==='function')x=await x;if(x)return x}}catch(e){}
+    if(window.SUPA)return window.SUPA;
+    if(window.supabase&&typeof window.supabase.createClient==='function'&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){
+      window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return window.SUPA;
+    }
+    return null;
+  }
+  function selectedCode(){return V(window.__eamSelCode)}
+  function source(code){
+    try{const f=window.eamSourceAssets;if(typeof f==='function')return (f()||[]).find(x=>V(x?.code||x?.asset_code)===code)||null}catch(e){}
+    return null;
+  }
+  function dbAsset(code){const A=Array.isArray(window.__eamA)?window.__eamA:[];return A.find(x=>V(x?.asset_code)===code)||null}
+  function refresh(code){
+    window.__eamSelCode=V(code||'');
+    return Promise.resolve(typeof window.eamLoad==='function'?window.eamLoad():null).then(()=>{
+      window.__eamSelCode=V(code||'');
+      if(typeof window.render==='function')window.render();
+    });
+  }
+  function nextCode(rows){
+    let max=0;(rows||[]).forEach(x=>{const m=/^AST-(\d+)$/.exec(V(x?.asset_code));if(m)max=Math.max(max,Number(m[1]))});
+    return 'AST-'+String(max+1).padStart(3,'0');
+  }
+  function esc(x){return V(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+  window.eamOpenManageMenu=function(){
+    document.getElementById('eamManageModal')?.remove();
+    const code=selectedCode();
+    if(!code){alert('먼저 관리할 자산을 선택하세요.');return}
+    const a=dbAsset(code),s=source(code),name=esc(a?.name||s?.name||code);
+    document.body.insertAdjacentHTML('beforeend',
+      '<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()">'+
+      '<div class="eam-manage-card">'+
+      '<div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>'+name+'</h3><small>자산 관리</small></div><button type="button" onclick="document.getElementById(\'eamManageModal\')?.remove()">×</button></div>'+
+      '<div class="eam-manage-grid">'+
+      '<button type="button" onclick="eamRegisterNewAsset();document.getElementById(\'eamManageModal\')?.remove()">➕ <b>신규 등록</b><small>새 시설·설비 자산 등록</small></button>'+
+      '<button type="button" class="danger" onclick="eamDeleteSelectedAsset();document.getElementById(\'eamManageModal\')?.remove()">🗑 <b>삭제</b><small>선택한 자산 삭제</small></button>'+
+      '</div></div></div>'
+    );
+  };
+
+  window.eamRegisterNewAsset=function(){
+    document.getElementById('eamRegisterModal')?.remove();
+    const catOpts=cats.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');
+    const locOpts=Object.entries(locs).map(([k,v])=>'<option value="'+k+'">'+k+' · '+esc(v)+'</option>').join('');
+    const placeOpts=places.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join('');
+    document.body.insertAdjacentHTML('beforeend',
+      '<div id="eamRegisterModal" class="eam-modal" onclick="if(event.target===this)this.remove()"><div class="eam-modal-card">'+
+      '<div class="eam-modal-head"><div><span>EAM ASSET MASTER</span><h3>신규 자산 등록</h3><small>새 시설·설비를 EAM에 등록합니다.</small></div><button type="button" onclick="document.getElementById(\'eamRegisterModal\')?.remove()">×</button></div>'+
+      '<div class="eam-modal-grid">'+
+      '<label>시설·설비명 *<input id="v169_name" placeholder="시설·설비명"></label>'+
+      '<label>분류 *<select id="v169_cat">'+catOpts+'</select></label>'+
+      '<label>위치코드 *<select id="v169_loc">'+locOpts+'</select></label>'+
+      '<label>세부 위치 *<select id="v169_place">'+placeOpts+'</select></label>'+
+      '<label>설치일<input id="v169_date" type="date" value="'+new Date().toISOString().slice(0,10)+'"></label>'+
+      '</div><div class="eam-modal-note">등록 후 자산코드를 기준으로 주요설비 이력카드·유지관리 이력이 연결됩니다.</div>'+
+      '<div class="eam-modal-actions"><button class="btn gray" type="button" onclick="document.getElementById(\'eamRegisterModal\')?.remove()">취소</button><button class="btn blue" id="v169_submit" type="button" onclick="submitEamRegister()">신규 등록</button></div>'+
+      '</div></div>'
+    );
+    const loc=document.getElementById('v169_loc'),place=document.getElementById('v169_place');
+    function sync(){if(!loc||!place)return;const map={A:'코트',B:'복도',C:'사무실',D:'옥상',E:'유수장치실',F:'창고',G:'휴게실',H:'남자 화장실',I:'여자 화장실',J:'남자 샤워실',K:'여자 샤워실',L:'좌측 외곽',M:'우측 외곽'};place.value=map[loc.value]||'코트'}
+    loc?.addEventListener('change',sync); sync();
+  };
+
+  window.submitEamRegister=async function(){
+    const name=V(document.getElementById('v169_name')?.value),category=V(document.getElementById('v169_cat')?.value)||'기타설비',loc=V(document.getElementById('v169_loc')?.value)||'A',place=V(document.getElementById('v169_place')?.value),date=V(document.getElementById('v169_date')?.value)||new Date().toISOString().slice(0,10);
+    if(!name||!place){alert('시설·설비명과 세부 위치는 필수입니다.');return}
+    const btn=document.getElementById('v169_submit');if(btn){btn.disabled=true;btn.textContent='등록 중…'}
+    try{
+      const d=await db();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+      const existing=Array.isArray(window.__eamA)?window.__eamA:[];const code=nextCode(existing);
+      const r=await d.from('assets').insert({asset_code:code,name,category,place,status:'정상',product_name:category}).select('*').single();
+      if(r.error)throw r.error;
+      try{await d.from('asset_history').insert({asset_id:r.data.id,event_type:'자산등록',description:'신규 자산 등록',worker_name:'관리자',cost:0,event_date:date})}catch(e){console.warn('등록 이력 저장 생략:',e)}
+      document.getElementById('eamRegisterModal')?.remove();await refresh(code);
+      alert('신규 자산이 등록되었습니다.\n자산코드: '+code);
+    }catch(e){console.error(e);alert('신규 등록에 실패했습니다.\n'+(e?.message||e))}
+    finally{if(btn){btn.disabled=false;btn.textContent='신규 등록'}}
+  };
+
+  window.eamDeleteSelectedAsset=async function(){
+    const code=selectedCode();if(!code){alert('먼저 삭제할 자산을 선택하세요.');return}
+    const a=dbAsset(code),s=source(code),name=V(a?.name||s?.name||code);
+    if(!a&&!s){alert('선택한 자산을 찾을 수 없습니다.');return}
+    if(!confirm("'"+name+"' 시설·설비를 삭제할까요?\n삭제 후 목록에서 사라집니다."))return;
+    try{
+      if(a?.id){
+        const d=await db();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+        const h=await d.from('asset_history').delete().eq('asset_id',a.id);if(h.error)throw new Error('유지관리 이력 삭제 실패: '+h.error.message);
+        const i=await d.from('inspections').delete().eq('asset_id',a.id);if(i.error)throw new Error('점검 이력 삭제 실패: '+i.error.message);
+        const r=await d.from('assets').delete().eq('id',a.id);if(r.error)throw new Error('자산 삭제 실패: '+r.error.message);
+      }else{
+        const set=deleted();set.add(code);saveDeleted(set);
+        try{const m=JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{};delete m[code];localStorage.setItem('JGB_EAM_META',JSON.stringify(m))}catch(e){}
+      }
+      window.__eamSelCode='';await refresh('');
+      alert('삭제되었습니다.');
+    }catch(e){console.error(e);alert('삭제하지 못했습니다.\n'+(e?.message||e))}
+  };
+})();
+</script>
 </body>
 </html>
