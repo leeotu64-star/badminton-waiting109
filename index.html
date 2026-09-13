@@ -4440,10 +4440,19 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                 ${F('자산상태',cur.status||'정상')}${F('취득구분',cur.acquisitionType||'기존 자산')}
               </div>
             </section>
-            <section class="jgb-paper-photo">
+            <section class="jgb-paper-photo jgb-equip-photo-rebuilt">
               <div class="jgb-paper-section-title">📷 설비 사진 (현재)</div>
-              <div class="jgb-paper-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="클릭하면 사진 선택창이 열립니다">${photo}</div>
-              <div class="jgb-paper-photo-actions"><button type="button" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button><span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div>
+              <div class="jgb-equip-photo-stage">
+                <div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">
+                  ${equipPhoto
+                    ? `<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')" title="사진 삭제">×</button>`
+                    : `<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}
+                </div>
+              </div>
+              <div class="jgb-equip-photo-actions-rebuilt">
+                <button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button>
+                <span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span>
+              </div>
             </section>
           </div>
           <div class="jgb-paper-auto">
@@ -11558,4 +11567,52 @@ jgb-eam-card-final .jgb-eam-lower-v125 .v125-full .v125-label{
 .jgb-paper-head button,.jgb-eam-card-final button[onclick*="eamEdit"],.eam-detail-panel button[onclick*="eamEdit"]{
   opacity:1!important;visibility:visible!important;filter:none!important;
 }
+</style>
+
+<style id="JGB_V139_EQUIP_PHOTO_FULL_REBUILD">
+/* 설비 사진 영역 전체 재작성: 6cm × 7cm, 정가운데 */
+.jgb-history-card .jgb-paper-photo.jgb-equip-photo-rebuilt{
+  min-width:0!important; box-sizing:border-box!important; background:#fff!important;
+}
+.jgb-history-card .jgb-equip-photo-rebuilt .jgb-paper-section-title{
+  width:100%!important; box-sizing:border-box!important;
+}
+.jgb-history-card .jgb-equip-photo-stage{
+  width:100%!important; min-height:calc(7cm + 28px)!important;
+  display:flex!important; align-items:center!important; justify-content:center!important;
+  padding:14px!important; box-sizing:border-box!important; background:#fff!important;
+}
+.jgb-history-card .jgb-equip-photo-box{
+  position:relative!important; width:6cm!important; height:7cm!important;
+  min-width:6cm!important; max-width:6cm!important; min-height:7cm!important; max-height:7cm!important;
+  box-sizing:border-box!important; margin:0!important;
+  border:1.5px dashed #7890a2!important; border-radius:0!important;
+  background:#fbfaf6!important; display:flex!important; align-items:center!important; justify-content:center!important;
+  flex-direction:column!important; gap:6px!important; overflow:hidden!important; cursor:pointer!important;
+}
+.jgb-history-card .jgb-equip-photo-box .jgb-equip-photo-fixed{
+  width:100%!important; height:100%!important; object-fit:contain!important; display:block!important;
+}
+.jgb-history-card .jgb-equip-empty-icon{font-size:28px!important; line-height:1!important; opacity:.65!important}
+.jgb-history-card .jgb-equip-photo-box strong{font-size:13px!important; color:#29475b!important; white-space:nowrap!important}
+.jgb-history-card .jgb-equip-photo-box span{font-size:10px!important; color:#6b8192!important; white-space:nowrap!important}
+.jgb-history-card .jgb-equip-photo-x{
+  position:absolute!important; right:5px!important; top:5px!important; width:26px!important; height:26px!important;
+  border:0!important; border-radius:50%!important; background:#d33b3b!important; color:#fff!important;
+  font-size:20px!important; line-height:26px!important; padding:0!important; cursor:pointer!important; z-index:5!important;
+}
+.jgb-history-card .jgb-equip-photo-actions-rebuilt{
+  min-height:42px!important; padding:8px 12px!important; box-sizing:border-box!important;
+  border-top:1px solid #334b5a!important; display:flex!important; align-items:center!important;
+  gap:10px!important; background:#fff!important;
+}
+.jgb-history-card .jgb-equip-photo-delete-rebuilt{
+  display:inline-flex!important; align-items:center!important; justify-content:center!important;
+  min-width:90px!important; height:30px!important; padding:0 10px!important;
+  border:1px solid #8a9aa6!important; background:#fff!important; color:#243b4a!important;
+  border-radius:3px!important; font-size:12px!important; cursor:pointer!important;
+}
+.jgb-history-card .jgb-equip-photo-delete-rebuilt:disabled{opacity:.5!important; cursor:not-allowed!important}
+.jgb-history-card .jgb-equip-photo-actions-rebuilt span{font-size:11px!important; color:#60798b!important}
+@media(max-width:900px){.jgb-history-card .jgb-equip-photo-stage{min-height:calc(7cm + 20px)!important;padding:10px!important}}
 </style>
