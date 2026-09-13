@@ -4503,9 +4503,9 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
             </section>
           </div>
           <div class="jgb-paper-auto">
-            ${F('최근 외주정비일','-')}
+            ${F('최근 외주정비일',cur.recentExternalMaintenanceDate||cur.externalMaintenanceDate||'-')}
             ${F('누적 외주정비 건수',extCount+'건')}
-            ${F('최근 조치내용','-')}
+            ${F('최근 조치내용',cur.recentExternalMaintenanceAction||cur.externalMaintenanceAction||'-')}
             ${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}
             ${F('교체·폐기 예정 여부',cur.disposalPlan||cur.retirementPlan||'미정')}
           </div>
@@ -12535,7 +12535,7 @@ window.eamDeleteSelectedAsset=async function(){
         <label>세부 위치<select id="jha_place">${detailOpts}</select><input id="jha_customPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
         ${field('모델·규격','jha_model',x.model||x.product_name||'')}${field('용량','jha_capacity',x.capacity||'-')}${field('수량','jha_qty',x.qty??x.quantity??'-')}${field('제조사','jha_maker',x.maker||x.vendor||'-')}${field('A/S 연락처','jha_as',x.asContact||'-')}${field('제조일','jha_date',x.date||x.manufactureDate||'-')}${field('설치일','jha_install',x.installDate||'-')}${field('내용연수','jha_life',x.life||'-')}${field('평가등급','jha_grade',x.grade||'-')}${field('보증','jha_warranty',x.warranty||'-')}${field('A/S 기록','jha_asHistory',x.asHistory||'-')}
         <label>자산상태<select id="jha_status">${stOpts}</select></label><label>취득구분<select id="jha_acq">${aqOpts}</select></label>
-        ${field('최근 외주정비일','jha_extDate','-','readonly')}${field('누적 외주정비 건수','jha_extCount',x.externalMaintenanceCount??0,'readonly')}${field('최근 조치내용','jha_extAction','-','readonly')}
+        ${field('최근 외주정비일','jha_extDate',x.recentExternalMaintenanceDate||x.externalMaintenanceDate||'','type="date"')}${field('누적 외주정비 건수','jha_extCount',x.externalMaintenanceCount??0,'readonly')}${field('최근 조치내용','jha_extAction',x.recentExternalMaintenanceAction||x.externalMaintenanceAction||'','type="date"')}
         <label class="wide">시설개선계획<textarea id="jha_plan">${esc2(x.improvementPlan||'')}</textarea></label><label class="wide">특이사항<textarea id="jha_note">${esc2(x.note||'')}</textarea></label>
       </div><div class="jgb-ah-actions"><button type="button" class="cancel" onclick="document.getElementById('jgbAssetHistoryEditor')?.remove()">취소</button><button type="button" class="jgb-ah-save" id="jgbAhSave" data-code="${esc2(c)}">저장</button></div>
     </div></div>`);
@@ -12555,7 +12555,7 @@ window.eamDeleteSelectedAsset=async function(){
     if(!name||!place){alert('자산명과 위치는 필수입니다.');return false}
     if(btn){btn.disabled=true;btn.textContent='저장 중…'}
     const payload={name,category,place,status:S(document.getElementById('jha_status')?.value)||'정상',product_name:S(document.getElementById('jha_model')?.value)||category};
-    const meta=Object.assign({},metaRead()[c]||{}, {asset_code:c,name,category,locationCode:category==='소방·방재'?'E':S(document.getElementById('jha_loc')?.value||'A').charAt(0)||'A',place,model:S(document.getElementById('jha_model')?.value),capacity:S(document.getElementById('jha_capacity')?.value),qty:S(document.getElementById('jha_qty')?.value),quantity:S(document.getElementById('jha_qty')?.value),maker:S(document.getElementById('jha_maker')?.value),vendor:S(document.getElementById('jha_maker')?.value),asContact:S(document.getElementById('jha_as')?.value),date:S(document.getElementById('jha_date')?.value),manufactureDate:S(document.getElementById('jha_date')?.value),installDate:S(document.getElementById('jha_install')?.value),life:S(document.getElementById('jha_life')?.value),grade:S(document.getElementById('jha_grade')?.value),warranty:S(document.getElementById('jha_warranty')?.value),asHistory:S(document.getElementById('jha_asHistory')?.value),status:payload.status,acquisitionType:S(document.getElementById('jha_acq')?.value)||'기존 자산',improvementPlan:S(document.getElementById('jha_plan')?.value),note:S(document.getElementById('jha_note')?.value)});
+    const meta=Object.assign({},metaRead()[c]||{}, {asset_code:c,name,category,locationCode:category==='소방·방재'?'E':S(document.getElementById('jha_loc')?.value||'A').charAt(0)||'A',place,model:S(document.getElementById('jha_model')?.value),capacity:S(document.getElementById('jha_capacity')?.value),qty:S(document.getElementById('jha_qty')?.value),quantity:S(document.getElementById('jha_qty')?.value),maker:S(document.getElementById('jha_maker')?.value),vendor:S(document.getElementById('jha_maker')?.value),asContact:S(document.getElementById('jha_as')?.value),date:S(document.getElementById('jha_date')?.value),manufactureDate:S(document.getElementById('jha_date')?.value),installDate:S(document.getElementById('jha_install')?.value),life:S(document.getElementById('jha_life')?.value),grade:S(document.getElementById('jha_grade')?.value),warranty:S(document.getElementById('jha_warranty')?.value),asHistory:S(document.getElementById('jha_asHistory')?.value),status:payload.status,acquisitionType:S(document.getElementById('jha_acq')?.value)||'기존 자산',recentExternalMaintenanceDate:S(document.getElementById('jha_extDate')?.value),externalMaintenanceDate:S(document.getElementById('jha_extDate')?.value),recentExternalMaintenanceAction:S(document.getElementById('jha_extAction')?.value),externalMaintenanceAction:S(document.getElementById('jha_extAction')?.value),improvementPlan:S(document.getElementById('jha_plan')?.value),note:S(document.getElementById('jha_note')?.value)});
     try{
       const d=await supa();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
       let a=(Array.isArray(window.__eamA)?window.__eamA:[]).find(x=>S(x.asset_code)===c)||null;
