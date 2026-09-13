@@ -258,6 +258,43 @@
 .jgb-v48-subtitle{display:none!important}
 .jgb-history-no{font-size:13px;font-weight:900;margin-left:6px}
 .jgb-v52-set{break-inside:avoid}
+
+/* V60: 독립 세트 접기/펼치기 + 2개씩 가로 배치 */
+.jgb-v52-sets{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:16px!important;
+  align-items:start!important;
+}
+.jgb-v52-set{
+  min-width:0!important;
+  width:100%!important;
+  position:relative!important;
+  box-sizing:border-box!important;
+}
+.jgb-v60-toggle{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin:0 0 8px;
+  padding:9px 12px;
+  border:2px solid #6d8496;
+  border-radius:7px;
+  background:#edf4f8;
+  color:#17364d;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+  box-sizing:border-box;
+}
+.jgb-v60-toggle .arrow{font-size:16px;line-height:1}
+.jgb-v60-body{display:block}
+.jgb-v60-body.closed{display:none!important}
+@media(max-width:900px){
+  .jgb-v52-sets{grid-template-columns:1fr!important}
+}
 </style>
     <style id="EMPLOYEE_OVERVIEW_STYLE">
     .eov-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
@@ -12194,6 +12231,39 @@ window.eamDeleteSelectedAsset=async function(){
   }
   numberHistories();
   new MutationObserver(numberHistories).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+<script>
+(function(){
+  if(window.__JGB_V60_COLLAPSE)return;
+  window.__JGB_V60_COLLAPSE=true;
+
+  function setup(){
+    document.querySelectorAll('.jgb-v52-set').forEach(function(set,idx){
+      if(set.querySelector('.jgb-v60-toggle')) return;
+
+      var children=Array.from(set.children);
+      var body=document.createElement('div');
+      body.className='jgb-v60-body';
+      children.forEach(function(ch){ body.appendChild(ch); });
+
+      var btn=document.createElement('button');
+      btn.type='button';
+      btn.className='jgb-v60-toggle';
+      btn.innerHTML='<span>🛡 방수공사 이력카드 · 이력내역</span><span class="arrow">▲</span>';
+      btn.addEventListener('click',function(){
+        var closed=body.classList.toggle('closed');
+        btn.querySelector('.arrow').textContent=closed?'▼':'▲';
+      });
+
+      set.appendChild(btn);
+      set.appendChild(body);
+    });
+  }
+
+  setup();
+  new MutationObserver(setup).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 </body>
