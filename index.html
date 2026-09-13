@@ -4432,7 +4432,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           ? `<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-paper-equip-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')" title="사진 삭제">×</button>`
           : `<div class="jgb-paper-cam">📷</div><strong>설비 사진 1장</strong><span>사진 등록 · JPG / PNG · 클릭</span>`;
         return `<details class="eam-source-card jgb-history-card" ${cardOpen?'open':''} ontoggle="eamPersistHistoryCard(this,'${esc(cardCode)}')">
-          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';window.eamEditSelectedAsset('${E(cardCode)}')">✏️ 수정</button></div></summary>
+          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';window.jgbInlineAssetCardEdit('${E(cardCode)}')">✏️ 수정</button></div></summary>
           <div class="jgb-paper-card-body">
             <section class="jgb-paper-info">
               <div class="jgb-paper-section-title">📄 기본정보</div>
@@ -4681,7 +4681,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const getMeta2=()=>{try{return JSON.parse(localStorage.getItem('JGB_EAM_ASSET_META_V39')||'{}')||{}}catch(e){return {}}};
       const putMeta2=o=>{try{localStorage.setItem('JGB_EAM_ASSET_META_V39',JSON.stringify(o||{}))}catch(e){console.warn(e)}};
 
-      window.eamHistoryCardEdit=function(){
+      window.jgbInlineAssetCardEdit=function(){
         const card=document.querySelector('.jgb-history-card');
         const code=String(window.__eamSelCode||'');
         if(!card||!code){alert('수정할 자산을 선택하세요.');return}
@@ -4721,7 +4721,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <label class="wide">특이사항<textarea id="jgbHC_note">${esc2(m.note||'')}</textarea></label>
         </div><div class="jgb-inline-actions"><button type="button" class="jgb-inline-cancel" onclick="eamHistoryCardCancel()">취소</button><button type="button" class="jgb-inline-save" id="jgbHC_save" onclick="eamHistoryCardSave('${esc2(code)}')">저장</button></div>`;
         const summary=card.querySelector('summary');
-        if(summary)summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드 <em style="font-style:normal;color:#64778b;font-size:11px;font-weight:700">전체 수정 중</em></span></div>`;
+        if(summary)summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드 <em style="font-style:normal;color:#64778b;font-size:11px;font-weight:700">수정 중</em></span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();window.eamHistoryCardSave('${E(cardCode)}')">완료</button></div>`;
         window.eamHistoryCardLocationChange();
       };
       window.eamHistoryCardLocationChange=function(){
@@ -4797,7 +4797,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         if(!card||card.dataset.directFix==='1'||card.dataset.editing==='1')return;
         card.dataset.directFix='1';
         const summary=card.querySelector('summary');
-        if(summary){summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';window.eamEditSelectedAsset('${E(cardCode)}')">✏️ 수정</button></div>`}
+        if(summary){summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';window.jgbInlineAssetCardEdit('${E(cardCode)}')">✏️ 수정</button></div>`}
       }
       document.addEventListener('DOMContentLoaded',decorate);
       setTimeout(decorate,300);
@@ -12651,7 +12651,7 @@ window.eamDeleteSelectedAsset=async function(){
       ev.stopPropagation();
       if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
       const code=V(btn.getAttribute('data-code')||currentCode());
-      if(code)window.eamEditSelectedAsset(code);
+      if(code){window.__eamSelCode=code;window.jgbInlineAssetCardEdit(code);}
       return;
     }
     // 다른 EAM 수정 버튼도 삭제 이벤트와 섞이지 않게 직접 수정 함수로 고정.
