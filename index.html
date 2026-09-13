@@ -12989,5 +12989,227 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
   };
 })();
 </script>
+<script id="JGB_V170_SELECTION_DELETE_FINAL">
+(function(){
+'use strict';
+const V=x=>String(x??'').trim();
+const DELKEY='JGB_EAM_DELETED_CODES';
+function domCode(){
+  const el=document.querySelector('.eam-asset-row.on[data-code], .eamx-sub.on[data-code], [data-eam-selected="true"][data-code]');
+  return V(el?.getAttribute('data-code'));
+}
+function sel(){ return V(window.__eamSelCode)||domCode(); }
+function allSources(code){
+  const out=[];
+  const add=a=>{if(Array.isArray(a))a.forEach(x=>{const k=V(x?.code||x?.asset_code);if(k===code)out.push(x)})};
+  try{if(typeof window.eamSourceAssets==='function')add(window.eamSourceAssets())}catch(e){}
+  try{if(typeof window.originalSourceAssets==='function')add(window.originalSourceAssets())}catch(e){}
+  try{add(window.JGB_EXCEL_EQUIPMENT)}catch(e){}
+  return out[0]||null;
+}
+function dbAsset(code){
+  const A=Array.isArray(window.__eamA)?window.__eamA:[];
+  return A.find(x=>V(x?.asset_code)===code)||null;
+}
+async function getDb(){
+  try{if(typeof getSupa==='function'){let d=getSupa();if(d?.then)d=await d;if(d)return d}}catch(e){}
+  if(window.SUPA)return window.SUPA;
+  if(window.supabase?.createClient && typeof SUPABASE_URL!=='undefined' && typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){
+    window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return window.SUPA;
+  }
+  return null;
+}
+async function reload(code){
+  window.__eamSelCode=V(code||'');
+  try{if(typeof window.eamLoad==='function')await window.eamLoad()}catch(e){console.warn(e)}
+  window.__eamSelCode=V(code||'');
+  try{if(typeof window.render==='function')window.render()}catch(e){console.warn(e)}
+}
+window.eamOpenManageMenu=function(){
+  const code=sel();
+  if(!code){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
+  window.__eamSelCode=code;
+  document.getElementById('eamManageModal')?.remove();
+  const a=dbAsset(code),s=allSources(code),name=V(a?.name||s?.name||code);
+  document.body.insertAdjacentHTML('beforeend',`<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()">
+  <div class="eam-manage-card"><div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>${name.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}</h3><small>선택 자산: ${code}</small></div><button type="button" onclick="this.closest('#eamManageModal')?.remove()">×</button></div>
+  <div class="eam-manage-grid"><button type="button" onclick="eamRegisterNewAsset();this.closest('#eamManageModal')?.remove()">➕ <b>신규 등록</b></button><button type="button" class="danger" onclick="eamDeleteSelectedAsset()">🗑 <b>삭제</b></button></div></div></div>`);
+};
+window.eamDeleteSelectedAsset=async function(){
+  const code=sel();
+  if(!code){alert('먼저 왼쪽 자산목록에서 삭제할 자산을 선택하세요.');return}
+  window.__eamSelCode=code;
+  const a=dbAsset(code),s=allSources(code),name=V(a?.name||s?.name||code);
+  if(!a&&!s){
+    // 화면에 선택된 행은 있지만 데이터 배열이 늦게 로드된 경우 다시 로드 후 재확인
+    try{if(typeof window.eamLoad==='function')await window.eamLoad()}catch(e){}
+    const a2=dbAsset(code),s2=allSources(code);
+    if(!a2&&!s2){alert(`선택한 자산을 찾을 수 없습니다.\n자산코드: ${code}`);return}
+  }
+  if(!confirm(`'${name}' 시설·설비를 삭제할까요?\n삭제 후 목록에서 사라집니다.`))return;
+  try{
+    const liveA=dbAsset(code);
+    if(liveA?.id){
+      const d=await getDb();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+      const h=await d.from('asset_history').delete().eq('asset_id',liveA.id);if(h.error)throw h.error;
+      const i=await d.from('inspections').delete().eq('asset_id',liveA.id);if(i.error && !/does not exist|relation/i.test(i.error.message))throw i.error;
+      const r=await d.from('assets').delete().eq('id',liveA.id);if(r.error)throw r.error;
+    }else{
+      let set=new Set();try{set=new Set(JSON.parse(localStorage.getItem(DELKEY)||'[]').map(V))}catch(e){}
+      set.add(code);localStorage.setItem(DELKEY,JSON.stringify([...set]));
+      try{const m=JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{};delete m[code];localStorage.setItem('JGB_EAM_META',JSON.stringify(m))}catch(e){}
+    }
+    document.getElementById('eamManageModal')?.remove();
+    await reload('');
+    alert('삭제되었습니다.');
+  }catch(e){console.error(e);alert('삭제하지 못했습니다.\n'+(e?.message||e))}
+};
+// 선택 클릭 자체를 최종적으로 고정: 왼쪽 행의 data-code를 단일 연결키로 사용
+const oldPick=window.eamPick;
+if(typeof oldPick==='function'){
+  window.eamPick=function(cat,code){
+    const k=V(code||domCode());
+    if(k)window.__eamSelCode=k;
+    window.__eamCat=V(cat)||window.__eamCat||'other';
+    return oldPick.apply(this,[cat,k]);
+  };
+}
+})();
+</script>
+<script id="JGB_V171_SIMPLE_ASSET_MASTER_FINAL">
+(function(){
+  'use strict';
+  /* V171: 단일 기준 - 자산코드가 연결키. 신규등록은 AC-01, AC-02... 자동 생성. 수정/삭제도 같은 선택 자산을 사용. */
+  const V=x=>String(x??'').trim();
+  const esc=x=>V(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const DELKEY='JGB_EAM_DELETED_CODES';
+  function deleted(){try{return new Set((JSON.parse(localStorage.getItem(DELKEY)||'[]')||[]).map(V))}catch(e){return new Set()}}
+  function selectedCode(){
+    const w=V(window.__eamSelCode); if(w)return w;
+    const el=document.querySelector('.eam-asset-row.on[data-code], .eamx-sub.on[data-code], [data-eam-selected="true"][data-code]');
+    return V(el?.getAttribute('data-code'));
+  }
+  function sourceRows(){
+    const out=[]; const add=a=>{if(Array.isArray(a))a.forEach(x=>{if(x&&V(x.code||x.asset_code))out.push(x)})};
+    try{add(window.JGB_EXCEL_EQUIPMENT)}catch(e){}
+    try{add(window.JGB_MAIN_EQUIPMENT)}catch(e){}
+    try{if(typeof window.eamSourceAssets==='function')add(window.eamSourceAssets())}catch(e){}
+    return out;
+  }
+  function allCodes(){
+    const set=new Set();
+    sourceRows().forEach(x=>set.add(V(x.code||x.asset_code)));
+    (Array.isArray(window.__eamA)?window.__eamA:[]).forEach(x=>set.add(V(x.asset_code||x.code)));
+    return [...set].filter(Boolean);
+  }
+  function nextACCode(){
+    let max=0;
+    allCodes().forEach(c=>{const m=/^AC-(\d+)$/i.exec(c);if(m)max=Math.max(max,Number(m[1]))});
+    let n=max+1,code='AC-'+String(n).padStart(2,'0');
+    const used=new Set(allCodes());
+    while(used.has(code)){n++;code='AC-'+String(n).padStart(2,'0')}
+    return code;
+  }
+  async function getDb(){
+    try{if(typeof getSupa==='function'){let d=getSupa();if(d&&typeof d.then==='function')d=await d;if(d)return d}}catch(e){}
+    if(window.SUPA)return window.SUPA;
+    if(window.supabase?.createClient && typeof SUPABASE_URL!=='undefined' && typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){
+      window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return window.SUPA;
+    }
+    return null;
+  }
+  function source(code){
+    const k=V(code);return sourceRows().find(x=>V(x.code||x.asset_code)===k)||null;
+  }
+  function dbAsset(code){return (Array.isArray(window.__eamA)?window.__eamA:[]).find(x=>V(x.asset_code)===V(code))||null}
+  async function reload(code){
+    window.__eamSelCode=V(code||'');
+    try{if(typeof window.eamLoad==='function')await window.eamLoad()}catch(e){console.warn(e)}
+    window.__eamSelCode=V(code||'');
+    try{if(typeof window.render==='function')window.render()}catch(e){console.warn(e)}
+  }
+
+  window.eamOpenManageMenu=function(){
+    const code=selectedCode();
+    if(!code){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
+    window.__eamSelCode=code;
+    document.getElementById('eamManageModal')?.remove();
+    const a=dbAsset(code),s=source(code),name=esc(a?.name||s?.name||code);
+    document.body.insertAdjacentHTML('beforeend',
+      '<div id="eamManageModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()">'+
+      '<div class="eam-manage-card">'+
+      '<div class="eam-manage-head"><div><span>EAM ASSET MANAGEMENT</span><h3>'+name+'</h3><small>자산코드: '+esc(code)+'</small></div><button type="button" onclick="this.closest(\'#eamManageModal\')?.remove()">×</button></div>'+
+      '<div class="eam-manage-grid">'+
+      '<button type="button" onclick="eamEditSelectedAsset();this.closest(\'#eamManageModal\')?.remove()">✏️ <b>수정</b><small>주요설비 이력카드와 자동 연동</small></button>'+
+      '<button type="button" onclick="eamRegisterNewAsset();this.closest(\'#eamManageModal\')?.remove()">➕ <b>신규 등록</b><small>AC-코드 자동 생성</small></button>'+
+      '<button type="button" class="danger" onclick="eamDeleteSelectedAsset()">🗑 <b>삭제</b><small>선택한 자산 삭제</small></button>'+
+      '</div></div></div>'
+    );
+  };
+
+  window.eamEditSelectedAsset=async function(){
+    const code=selectedCode();
+    if(!code){alert('먼저 수정할 자산을 선택하세요.');return}
+    window.__eamSelCode=code;
+    try{
+      if(typeof window.jgbOpenAssetHistoryEditor==='function'){window.jgbOpenAssetHistoryEditor();return}
+      alert('수정 화면을 불러오지 못했습니다.');
+    }catch(e){console.error(e);alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e))}
+  };
+
+  /* 신규등록: 기존 AC-01이 있으면 AC-02, 가장 큰 번호 다음 번호를 사용 */
+  window.submitEamRegister=async function(){
+    const name=V(document.getElementById('v169_name')?.value);
+    const category=V(document.getElementById('v169_cat')?.value)||'기타설비';
+    const place=V(document.getElementById('v169_place')?.value);
+    const date=V(document.getElementById('v169_date')?.value)||new Date().toISOString().slice(0,10);
+    if(!name||!place){alert('시설·설비명과 세부 위치는 필수입니다.');return}
+    const btn=document.getElementById('v169_submit');if(btn){btn.disabled=true;btn.textContent='등록 중…'}
+    try{
+      const d=await getDb();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+      let code=nextACCode();
+      /* 동시 등록으로 같은 코드가 생기는 경우 한 번 더 다음 번호로 시도 */
+      for(let attempt=0;attempt<5;attempt++){
+        const r=await d.from('assets').insert({asset_code:code,name,category,place,status:'정상',product_name:category}).select('*').single();
+        if(!r.error){
+          try{await d.from('asset_history').insert({asset_id:r.data.id,event_type:'자산등록',description:'신규 자산 등록',worker_name:'관리자',cost:0,event_date:date})}catch(e){console.warn('등록 이력 저장 생략:',e)}
+          document.getElementById('eamRegisterModal')?.remove();
+          await reload(code);
+          alert('신규 등록되었습니다.\n자산코드: '+code);
+          return;
+        }
+        if(!/duplicate|unique|23505/i.test(r.error?.message||r.error?.code||''))throw r.error;
+        const nums=allCodes().map(c=>{const m=/^AC-(\d+)$/i.exec(c);return m?Number(m[1]):0});
+        code='AC-'+String(Math.max(0,...nums)+1).padStart(2,'0');
+      }
+      throw new Error('새 자산코드 생성 중 중복이 발생했습니다.');
+    }catch(e){console.error(e);alert('신규 등록에 실패했습니다.\n'+(e?.message||e))}
+    finally{if(btn){btn.disabled=false;btn.textContent='신규 등록'}}
+  };
+
+  window.eamDeleteSelectedAsset=async function(){
+    const code=selectedCode();
+    if(!code){alert('먼저 삭제할 자산을 선택하세요.');return}
+    window.__eamSelCode=code;
+    const a=dbAsset(code),s=source(code),name=V(a?.name||s?.name||code);
+    if(!a&&!s){alert('선택한 자산을 찾을 수 없습니다.\n자산코드: '+code);return}
+    if(!confirm("'"+name+"' 시설·설비를 삭제할까요?\n삭제 후 목록에서 사라집니다."))return;
+    try{
+      if(a?.id){
+        const d=await getDb();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+        const h=await d.from('asset_history').delete().eq('asset_id',a.id);if(h.error)throw new Error('유지관리 이력 삭제 실패: '+h.error.message);
+        const i=await d.from('inspections').delete().eq('asset_id',a.id);if(i.error&&!/does not exist|relation/i.test(i.error.message))throw new Error('점검 이력 삭제 실패: '+i.error.message);
+        const r=await d.from('assets').delete().eq('id',a.id);if(r.error)throw new Error('자산 삭제 실패: '+r.error.message);
+      }else{
+        const set=deleted();set.add(code);localStorage.setItem(DELKEY,JSON.stringify([...set]));
+        try{const m=JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{};delete m[code];localStorage.setItem('JGB_EAM_META',JSON.stringify(m))}catch(e){}
+      }
+      document.getElementById('eamManageModal')?.remove();
+      await reload('');
+      alert('삭제되었습니다.');
+    }catch(e){console.error(e);alert('삭제하지 못했습니다.\n'+(e?.message||e))}
+  };
+})();
+</script>
 </body>
 </html>
