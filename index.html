@@ -12617,209 +12617,6 @@ window.eamDeleteSelectedAsset=async function(){
 })();
 </script>
 
-<script id="JGB_V186_EDIT_ONLY_FINAL">
-(function(){
-  'use strict';
-  function V(x){return String(x??'').trim()}
-  function currentCode(){return V(window.__eamSelCode||'')}
-
-  // 수정은 오직 수정창만 연다. 삭제 함수와 절대 연결하지 않는다.
-  window.eamEditSelectedAsset=function(code){
-    const c=V(code||currentCode());
-    if(!c){alert('먼저 수정할 자산을 선택하세요.');return false}
-    window.__eamSelCode=c;
-    const fn=window.jgbOpenAssetHistoryEditor;
-    if(typeof fn!=='function'){
-      alert('주요설비 이력카드 수정 화면을 불러오지 못했습니다.');
-      return false;
-    }
-    try{
-      fn.call(window,c);
-    }catch(e){
-      console.error('JGB_V186_EDIT',e);
-      alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e));
-    }
-    return false;
-  };
-  window.eamHistoryCardEdit=window.eamEditSelectedAsset;
-
-  // 카드의 수정 버튼은 기존 document 이벤트보다 먼저 가로채서 수정만 실행.
-  document.addEventListener('click',function(ev){
-    const btn=ev.target.closest('.jgb-card-edit');
-    if(btn){
-      ev.preventDefault();
-      ev.stopPropagation();
-      if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
-      const code=V(btn.getAttribute('data-code')||currentCode());
-      if(code){window.__eamSelCode=code;window.jgbInlineAssetCardEdit(code);}
-      return;
-    }
-    // 다른 EAM 수정 버튼도 삭제 이벤트와 섞이지 않게 직접 수정 함수로 고정.
-    const edit=ev.target.closest('[data-eam-edit-asset]');
-    if(edit){
-      ev.preventDefault();
-      ev.stopPropagation();
-      if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
-      const code=V(edit.getAttribute('data-code')||currentCode());
-      window.eamEditSelectedAsset(code);
-    }
-  },true);
-
-  // 현재 렌더링되는 카드의 inline 수정 onclick도 안전하게 교체한다.
-  function bindCardEdits(){
-    document.querySelectorAll('.jgb-card-edit').forEach(function(btn){
-      if(btn.dataset.jgbEditBound==='1')return;
-      btn.dataset.jgbEditBound='1';
-      btn.removeAttribute('onclick');
-      btn.setAttribute('data-code',currentCode());
-    });
-  }
-  document.addEventListener('DOMContentLoaded',bindCardEdits);
-  setTimeout(bindCardEdits,100);
-  setTimeout(bindCardEdits,500);
-})();
-</script>
-<script id="JGB_V187_FINAL_EDIT_SAVE">
-(function(){
-'use strict';
-const S=x=>String(x??'').trim();
-function code(){return S(window.__eamSelCode)}
-function el(id){return document.getElementById(id)}
-function val(id){return S(el(id)?.value)}
-function metaAll(){try{return JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{}}catch(e){return{}}}
-function saveMetaAll(m){localStorage.setItem('JGB_EAM_META',JSON.stringify(m||{}));window.__eamMetaByCode=m||{}}
-async function db(){
-  try{if(window.SUPA)return window.SUPA}catch(e){}
-  try{if(typeof getSupa==='function'){const d=getSupa();return d&&typeof d.then==='function'?await d:d}}catch(e){}
-  try{if(window.supabase?.createClient&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined')return window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY)}catch(e){}
-  return null
-}
-window.jgbSaveAssetHistoryCard=async function(givenCode){
-  const c=S(givenCode||code());
-  if(!c){alert('먼저 수정할 자산을 선택하세요.');return false}
-  const btn=el('jgbAhSave'); if(btn){btn.disabled=true;btn.textContent='저장 중…'}
-  try{
-    const name=val('jha_name');
-    const category=val('jha_category')||'기타설비';
-    let place=val('jha_place'); if(place==='직접 입력')place=val('jha_customPlace');
-    if(category==='소방·방재')place='유수장치실';
-    if(!name||!place){alert('자산명과 위치는 필수입니다.');return false}
-    const status=val('jha_status')||'정상';
-    const payload={name,category,place,status,product_name:val('jha_model')||category};
-    const d=await db();
-    if(!d)throw new Error('Supabase 연결에 실패했습니다.');
-    // 반드시 asset_code로 직접 조회하여 현재 선택 자산을 수정한다.
-    let qr=await d.from('assets').select('*').eq('asset_code',c).maybeSingle();
-    if(qr.error)throw qr.error;
-    let a=qr.data||null;
-    if(a){
-      const r=await d.from('assets').update(payload).eq('id',a.id).select('*').single();
-      if(r.error)throw r.error; a=r.data||a;
-    }else{
-      const r=await d.from('assets').insert({asset_code:c,...payload}).select('*').single();
-      if(r.error)throw r.error; a=r.data;
-    }
-    const old=metaAll()[c]||{};
-    const meta=Object.assign({},old,{
-      asset_code:c,name,category,place,status,locationCode:category==='소방·방재'?'E':(val('jha_loc')||'A'),
-      model:val('jha_model'),capacity:val('jha_capacity'),qty:val('jha_qty'),quantity:val('jha_qty'),
-      maker:val('jha_maker'),vendor:val('jha_maker'),asContact:val('jha_as'),date:val('jha_date'),
-      manufactureDate:val('jha_date'),installDate:val('jha_install'),life:val('jha_life'),grade:val('jha_grade'),
-      warranty:val('jha_warranty'),asHistory:val('jha_asHistory'),acquisitionType:val('jha_acq')||'기존 자산',
-      nextDate:val('jha_next'),nextInspectionDate:val('jha_next'),disposalPlan:val('jha_disposal'),
-      improvementPlan:val('jha_plan'),note:val('jha_note')
-    });
-    const all=metaAll(); all[c]=meta; saveMetaAll(all);
-    window.__eamSelCode=c;
-    el('jgbAssetHistoryEditor')?.remove();
-    if(typeof window.eamLoad==='function')await window.eamLoad();
-    window.__eamSelCode=c;
-    if(typeof window.render==='function')window.render();
-    alert('수정 내용이 저장되었습니다.');
-    return true;
-  }catch(e){console.error('JGB_V187_SAVE',e);alert('수정 내용 저장에 실패했습니다.\n'+(e?.message||e));return false}
-  finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
-};
-// 수정 버튼은 수정 전용. inline handler도 삭제 함수와 연결하지 않는다.
-window.eamEditSelectedAsset=function(givenCode){
-  const c=S(givenCode||window.__eamSelCode);
-  if(!c){alert('먼저 수정할 자산을 선택하세요.');return false}
-  window.__eamSelCode=c;
-  const fn=window.jgbOpenAssetHistoryEditor;
-  if(typeof fn!=='function'){alert('주요설비 이력카드 수정 화면을 불러오지 못했습니다.');return false}
-  try{fn.call(window,c)}catch(e){console.error(e);alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e))}
-  return false;
-};
-window.eamHistoryCardEdit=window.eamEditSelectedAsset;
-document.addEventListener('click',function(ev){
-  const b=ev.target.closest('.jgb-card-edit,[data-eam-edit-asset]');
-  if(!b)return;
-  ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
-  const c=S(b.getAttribute('data-code')||window.__eamSelCode);if(c)window.eamEditSelectedAsset(c);
-},true);
-})();
-</script>
-
-<script id="JGB_V188_EDIT_REAL_FINAL">
-(function(){
-'use strict';
-const S=x=>String(x??'').trim();
-const get=id=>document.getElementById(id);
-const value=id=>S(get(id)?.value);
-function currentCode(){return S(window.__eamSelCode)}
-function readMeta(){try{return JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{}}catch(e){return{}}}
-function writeMeta(m){localStorage.setItem('JGB_EAM_META',JSON.stringify(m||{}));window.__eamMetaByCode=m||{}}
-async function supa(){
- try{if(window.SUPA)return window.SUPA}catch(e){}
- try{if(typeof getSupa==='function'){const x=getSupa();return x&&typeof x.then==='function'?await x:x}}catch(e){}
- if(window.supabase?.createClient&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){
-   window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY); return window.SUPA;
- }
- return null;
-}
-window.jgbSaveAssetHistoryCard=async function(given){
- const c=S(given||currentCode()); if(!c){alert('수정할 자산이 없습니다.');return false}
- const name=value('jha_name'), category=value('jha_category')||'기타설비';
- let place=value('jha_place'); if(place==='직접 입력')place=value('jha_customPlace');
- if(category==='소방·방재')place='유수장치실';
- if(!name||!place){alert('자산명과 위치는 필수입니다.');return false}
- const meta=Object.assign({},readMeta()[c]||{}, {
-   asset_code:c,name,category,place,status:value('jha_status')||'정상',
-   locationCode:category==='소방·방재'?'E':(value('jha_loc')||'A'),model:value('jha_model'),capacity:value('jha_capacity'),
-   qty:value('jha_qty'),quantity:value('jha_qty'),maker:value('jha_maker'),vendor:value('jha_maker'),asContact:value('jha_as'),
-   date:value('jha_date'),manufactureDate:value('jha_date'),installDate:value('jha_install'),life:value('jha_life'),grade:value('jha_grade'),
-   warranty:value('jha_warranty'),asHistory:value('jha_asHistory'),acquisitionType:value('jha_acq')||'기존 자산',
-   nextDate:value('jha_next'),nextInspectionDate:value('jha_next'),disposalPlan:value('jha_disposal'),improvementPlan:value('jha_plan'),note:value('jha_note')
- });
- // 1) 화면/로컬 데이터를 먼저 즉시 반영한다.
- const all=readMeta();all[c]=meta;writeMeta(all);
- if(Array.isArray(window.__eamA)){
-   const a=window.__eamA.find(x=>S(x.asset_code)===c);
-   if(a)Object.assign(a,{asset_code:c,name,category,place,status:meta.status,product_name:meta.model||category});
- }
- // 2) DB 반영은 별도로 수행한다. DB 권한 문제 때문에 화면 수정까지 막지 않는다.
- let dbError='';
- try{
-   const d=await supa(); if(!d)throw new Error('Supabase 연결 실패');
-   const q=await d.from('assets').select('id').eq('asset_code',c).maybeSingle(); if(q.error)throw q.error;
-   if(q.data){const r=await d.from('assets').update({name,category,place,status:meta.status,product_name:meta.model||category}).eq('id',q.data.id);if(r.error)throw r.error}
-   else {const r=await d.from('assets').insert({asset_code:c,name,category,place,status:meta.status,product_name:meta.model||category});if(r.error)throw r.error}
- }catch(e){dbError=e?.message||String(e)}
- document.getElementById('jgbAssetHistoryEditor')?.remove();window.__eamSelCode=c;
- if(typeof window.eamLoad==='function'){try{await window.eamLoad()}catch(e){console.warn(e)}}
- window.__eamSelCode=c;
- if(typeof window.render==='function')window.render();
- if(dbError)alert('화면에는 수정 내용을 적용했습니다.\n다만 DB 저장은 실패했습니다.\n\n'+dbError);
- else alert('수정 내용이 저장되었습니다.');
- return true;
-};
-// 수정 버튼은 이 함수 하나만 사용
-window.eamEditSelectedAsset=function(given){const c=S(given||window.__eamSelCode);if(!c){alert('먼저 자산을 선택하세요.');return false}window.__eamSelCode=c;try{window.jgbOpenAssetHistoryEditor(c)}catch(e){alert('수정 화면을 열지 못했습니다.\n'+(e?.message||e))}return false};
-window.eamHistoryCardEdit=window.eamEditSelectedAsset;
-document.addEventListener('click',function(ev){const b=ev.target.closest('.jgb-card-edit,[data-eam-edit-asset]');if(!b)return;ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation?.();const c=S(b.getAttribute('data-code')||window.__eamSelCode);if(c)window.eamEditSelectedAsset(c)},true);
-})();
-</script>
-
 <script id="JGB_FINAL_EDIT_SINGLE_SOURCE">
 (function(){
   'use strict';
@@ -12901,19 +12698,25 @@ document.addEventListener('click',function(ev){const b=ev.target.closest('.jgb-c
     }catch(e){console.error('JGB_FINAL_EDIT_SAVE',e);alert('수정 저장에 실패했습니다.\n'+(e?.message||e));return false}
     finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
   }
-  // 수정 경로는 여기 하나만 사용
+  // 주요설비 이력카드 수정/저장 전용. 유지관리 수정 함수와 공유하지 않는다.
   window.jgbOpenAssetHistoryEditor=openEditor;
   window.jgbSaveAssetHistoryCard=saveEditor;
-  // 주요설비 이력카드 전용 수정 경로. 기존 카드 안에서 직접 수정한다.
-  // 유지관리 수정 함수와 공유하지 않는다.
   window.eamEditSelectedAsset=function(code){
     const c=S(code||selectedCode());
     if(!c){alert('먼저 수정할 자산을 선택하세요.');return false}
     window.__eamSelCode=c;
-    if(typeof window.eamHistoryCardEdit==='function') return window.eamHistoryCardEdit.call(window);
-    return false;
+    return openEditor(c);
   };
-  // 위에서 정의된 이력카드 직접수정 함수를 그대로 유지한다.
+  window.eamHistoryCardEdit=window.eamEditSelectedAsset;
+  document.addEventListener('click',function(ev){
+    const b=ev.target.closest('.jgb-card-edit,[data-eam-edit-asset]');
+    if(!b)return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+    const c=S(b.getAttribute('data-code')||window.__eamSelCode);
+    if(c)window.eamEditSelectedAsset(c);
+  },true);
 
 })();
 </script>
