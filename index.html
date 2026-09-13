@@ -4432,7 +4432,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           ? `<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-paper-equip-img"><button type="button" class="jgb-photo-del jgb-equip-photo-del" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')" title="사진 삭제">×</button>`
           : `<div class="jgb-paper-cam">📷</div><strong>설비 사진 1장</strong><span>사진 등록 · JPG / PNG · 클릭</span>`;
         return `<details class="eam-source-card jgb-history-card" ${cardOpen?'open':''} ontoggle="eamPersistHistoryCard(this,'${esc(cardCode)}')">
-          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';window.jgbInlineAssetCardEdit('${E(cardCode)}')">✏️ 수정</button></div></summary>
+          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';window.jgbOpenAssetHistoryEditor('${E(cardCode)}')">✏️ 수정</button></div></summary>
           <div class="jgb-paper-card-body">
             <section class="jgb-paper-info">
               <div class="jgb-paper-section-title">📄 기본정보</div>
@@ -4797,7 +4797,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         if(!card||card.dataset.directFix==='1'||card.dataset.editing==='1')return;
         card.dataset.directFix='1';
         const summary=card.querySelector('summary');
-        if(summary){summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';window.jgbInlineAssetCardEdit('${E(cardCode)}')">✏️ 수정</button></div>`}
+        if(summary){summary.innerHTML=`<div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';window.jgbOpenAssetHistoryEditor('${E(cardCode)}')">✏️ 수정</button></div>`}
       }
       document.addEventListener('DOMContentLoaded',decorate);
       setTimeout(decorate,300);
@@ -12479,8 +12479,8 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
     }catch(e){console.error(e);alert('이력카드 저장에 실패했습니다.\n'+(e?.message||e));}
     finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
   };
-  window.eamEditSelectedAsset=window.jgbOpenAssetHistoryEditor;
-  window.eamHistoryCardEdit=window.jgbOpenAssetHistoryEditor;
+  window.eamEditSelectedAsset=function(code){return window.jgbOpenAssetHistoryEditor(code||window.__eamSelCode)};
+  window.eamHistoryCardEdit=function(code){return window.jgbOpenAssetHistoryEditor(code||window.__eamSelCode)};
 })();
 </script>
 
@@ -12708,15 +12708,8 @@ window.eamDeleteSelectedAsset=async function(){
     return openEditor(c);
   };
   window.eamHistoryCardEdit=window.eamEditSelectedAsset;
-  document.addEventListener('click',function(ev){
-    const b=ev.target.closest('.jgb-card-edit,[data-eam-edit-asset]');
-    if(!b)return;
-    ev.preventDefault();
-    ev.stopPropagation();
-    if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
-    const c=S(b.getAttribute('data-code')||window.__eamSelCode);
-    if(c)window.eamEditSelectedAsset(c);
-  },true);
+  // 이력카드 수정 버튼은 카드의 inline handler에서 전용 편집기로 직접 진입한다.
+  // 전역 capture 이벤트로 가로채지 않는다.
 
 })();
 </script>
