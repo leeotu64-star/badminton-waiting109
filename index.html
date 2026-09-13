@@ -2168,7 +2168,21 @@ html::before,body::before{
     <script>
     const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
-    const SUPA=(window.supabase&&typeof window.supabase.createClient==="function")?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
+    let SUPA=(window.supabase&&typeof window.supabase.createClient==="function")?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
+    // CDN이 늦게 로드되어도 기존 함수들이 동일한 SUPA 변수를 사용할 수 있도록 지연 초기화
+    if(!SUPA){
+      let __supabaseTry=0;
+      const __supabaseTimer=setInterval(()=>{
+        try{
+          if(window.supabase&&typeof window.supabase.createClient==="function"){
+            SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+            window.SUPA=SUPA;
+            clearInterval(__supabaseTimer);
+          }
+        }catch(e){}
+        if(++__supabaseTry>=100)clearInterval(__supabaseTimer);
+      },100);
+    }else{window.SUPA=SUPA;}
     const PLACE_GROUPS={
       시설:["유수장치실","기계실","사무실","휴게실","1번 코트(좌측)","1번 코트(우측)","2번 코트(좌측)","2번 코트(우측)","3번 코트(좌측)","3번 코트(우측)","4번 코트(좌측)","4번 코트(우측)","5번 코트(좌측)","5번 코트(우측)","옥상","남자 탈의실","여자 탈의실","남자 샤워실","여자 샤워실","남자 화장실","여자 화장실","복도","기타"],
       환경:["남자 화장실","여자 화장실","남자 탈의실","여자 탈의실","남자 샤워실","여자 샤워실","1번 코트(좌측)","1번 코트(우측)","2번 코트(좌측)","2번 코트(우측)","3번 코트(좌측)","3번 코트(우측)","4번 코트(좌측)","4번 코트(우측)","5번 코트(좌측)","5번 코트(우측)","복도","휴게실","사무실","기타"],
@@ -3736,30 +3750,9 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         </div></div>`);
     }
     async function eamEditSelectedAsset(){
-      const code=window.__eamSelCode||''; if(!code){alert('수정할 시설·설비를 선택하세요.');return}
-      if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
-      let a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));
-      if(!a){a=await eamEnsureEditableAsset();if(!a)return}
-      const src=eamSelectedSource()||{}; const meta=(window.__eamMetaByCode||{})[code]||{};
-      const merged={...src,...a,...meta};
-      const currentCat=merged.category||({'냉난방':'냉난방','소방':'소방·방재','온수·난방':'온수·난방','전기':'전기설비','코트조명':'코트조명','방수':'방수'})[merged.type]||'기타설비';
-      const pos=(()=>{const p=String(merged.place||''); if(p.includes('유수장치실'))return 'E';if(p.includes('2층 창고'))return 'F';if(p.includes('옥상'))return 'D';if(p.includes('사무실'))return 'C';if(p.includes('복도'))return 'B';if(/^A-\d+번/.test(p)||p.includes('코트'))return 'A';return 'X'})();
-      const detail=(()=>{const p=String(merged.place||'');if(pos==='A')return p;return p})();
-      const existingOpt=pos==='X'?`<option value="X" selected>기존 위치 · ${xEsc(detail||'-')}</option>`:'';
-      document.getElementById('eamEditModal')?.remove();
-      document.body.insertAdjacentHTML('beforeend',`<div id="eamEditModal" class="eam-edit-overlay" onclick="if(event.target===this)this.remove()"><div class="eam-edit-card"><div class="eam-edit-head"><div><span>ASSET MASTER EDIT</span><h2>자산 전체정보 수정</h2><p>자산코드는 식별을 위해 유지하고 나머지 정보를 수정합니다.</p></div><button onclick="document.getElementById('eamEditModal').remove()">×</button></div><div class="eam-edit-grid">
-        <label>자산코드<input value="${xEsc(code)}" readonly></label>
-        <label>설비 종류<select id="editCategory"><option ${currentCat==='냉난방'?'selected':''}>냉난방</option><option ${currentCat==='소방·방재'?'selected':''}>소방·방재</option><option ${currentCat==='온수·난방'?'selected':''}>온수·난방</option><option ${currentCat==='전기설비'?'selected':''}>전기설비</option><option ${currentCat==='코트조명'?'selected':''}>코트조명</option><option ${currentCat==='방수'?'selected':''}>방수</option><option ${currentCat==='기타설비'?'selected':''}>기타설비</option></select></label>
-        <label class="wide">소분류(자산명)<input id="editName" value="${xEsc(merged.name||merged.model||'')}"></label>
-        <label>위치코드<select id="editLocCode" onchange="eamEditLocationChange(this.value)">${eamLocationCodeOptions(pos)}</select></label>
-        <label>세부 위치<select id="editDetailPlace" onchange="eamShowCustomPlace('editDetailPlace','editCustomPlace')">${eamLocationDetails(pos,detail)}</select><input id="editCustomPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
-        <label>모델·규격<input id="editModel" value="${xEsc(merged.model||'')}"></label><label>수량<input id="editQty" value="${xEsc(merged.qty??merged.quantity??'')}"></label>
-        <label>제작·구매<input id="editVendor" value="${xEsc(merged.vendor||merged.maker||'')}"></label><label>A/S 연락처<input id="editAs" value="${xEsc(merged.asContact||'')}"></label>
-        <label>설치일<input id="editInstall" value="${xEsc(merged.installDate||merged.date||'')}"></label><label>보증<input id="editWarranty" value="${xEsc(merged.warranty||'')}"></label>
-        <label>A/S 기록<input id="editAsHistory" value="${xEsc(merged.asHistory||'')}"></label><label>상태<select id="editStatus"><option ${String(merged.status||'정상')==='정상'?'selected':''}>정상</option><option ${String(merged.status||'')==='점검필요'?'selected':''}>점검필요</option><option ${String(merged.status||'')==='조치필요'?'selected':''}>조치필요</option></select></label>
-        <label class="wide">비고<textarea id="editNote" rows="3">${xEsc(merged.note||'')}</textarea></label>
-      </div><div class="eam-edit-actions"><button class="btn gray" onclick="document.getElementById('eamEditModal').remove()">취소</button><button class="btn blue" id="eamEditSave" onclick="eamSaveFullEdit('${xEsc(code)}')">저장</button></div></div></div>`);
-      eamEditLocationChange(pos,detail);
+      // 단일 표준 수정창으로 연결. 기존 레거시 수정창의 Supabase 선검사를 하지 않습니다.
+      if(typeof window.jgbOpenAssetHistoryEditor==='function'){window.jgbOpenAssetHistoryEditor();return}
+      alert('주요설비 이력카드 수정 기능을 불러오지 못했습니다.');
     }
     function eamEditLocationChange(v,currentPlace){
       const box=document.getElementById('editDetailPlace'); if(!box)return;
@@ -3769,16 +3762,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       else if(custom){custom.style.display='none';custom.value=''}
     }
     async function eamSaveFullEdit(code){
-      const a=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code)); if(!a){alert('자산을 찾을 수 없습니다.');return}
-      const cat=document.getElementById('editCategory').value, name=document.getElementById('editName').value.trim(), lc=document.getElementById('editLocCode').value, dp0=document.getElementById('editDetailPlace').value, dp=dp0==='__custom__'?(document.getElementById('editCustomPlace')?.value.trim()||''):dp0;
-      if(!name){alert('소분류(자산명)를 입력하세요.');return}
-      const place=dp;
-      const meta={asset_code:code,name,category:cat,place,model:document.getElementById('editModel').value.trim(),qty:document.getElementById('editQty').value.trim(),vendor:document.getElementById('editVendor').value.trim(),asContact:document.getElementById('editAs').value.trim(),installDate:document.getElementById('editInstall').value.trim(),warranty:document.getElementById('editWarranty').value.trim(),asHistory:document.getElementById('editAsHistory').value.trim(),note:document.getElementById('editNote').value.trim()};
-      const payload={name,category:cat,place,status:document.getElementById('editStatus').value,product_name:meta.model||cat};
-      const r=await SUPA.from('assets').update(payload).eq('id',a.id); if(r.error){console.error(r.error);alert('자산 기본정보 저장에 실패했습니다.');return}
-          // 자산정보 수정은 assets/meta만 저장하며 유지관리 이력에는 기록하지 않습니다.
-      if(h.error){console.warn(h.error);alert('기본정보는 저장됐지만 상세 메모 저장에 실패했습니다.');}
-      document.getElementById('eamEditModal')?.remove(); await eamLoad(); window.__eamSelCode=code; const map={'냉난방':'cooling','소방·방재':'fire','온수·난방':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','위생설비':'sanitary','문·창호설비':'doors','기타설비':'other'}; window.__eamCat=map[cat]||'other'; render();
+      if(typeof window.jgbSaveAssetHistoryCard==='function'){await window.jgbSaveAssetHistoryCard(code);return}
+      alert('주요설비 이력카드 저장 기능을 불러오지 못했습니다.');
     }
 
     async function eamDeleteSelectedAsset(){
@@ -4807,7 +4792,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           if(r.error)throw r.error;
           const all=Object.assign({},getMeta2(),{[String(code)]:meta});putMeta2(all);window.__eamMetaByCode=all;
           // 자산정보 수정은 assets/meta만 저장하며 유지관리 이력에는 기록하지 않습니다.
-          if(h.error)throw h.error;
           document.querySelector('.jgb-history-card')?.setAttribute('data-editing','0');
           await window.eamLoad();window.__eamSelCode=String(code);window.__eamCat=CATMAP[category]||'other';render();
           requestAnimationFrame(()=>{const c=document.querySelector('.jgb-history-card');if(c)c.open=true});
@@ -12455,4 +12439,6 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
 })();
 
 </script>
-</body></html>
+
+</body>
+</html>
