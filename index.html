@@ -4443,16 +4443,43 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <div class="jgb-paper-card-body">
             <section class="jgb-paper-info">
               <div class="jgb-paper-section-title">📄 기본정보</div>
-              <div class="jgb-paper-grid jgb-basic-rebuilt">
-                <div class="jgb-basic-row">${F('자산코드',cur.asset_code||cur.code||'-')}${F('자산명',cur.name||'-')}</div>
-                <div class="jgb-basic-row">${F('설비 종류',cur.category||cur.type||'-')}${F('위치',cur.place||'-')}</div>
-                <div class="jgb-basic-row">${F('위치코드',cur.locationCode||placeCode(cur.place)||'-')}${F('모델·규격',cur.model||'-')}</div>
-                <div class="jgb-basic-row">${F('용량',cur.capacity||'-')}${F('수량',cur.qty??cur.quantity??'-')}</div>
-                <div class="jgb-basic-row">${F('제조사',cur.maker||cur.vendor||'-')}${F('A/S 연락처',cur.asContact||'-')}</div>
-                <div class="jgb-basic-row">${F('제조일',cur.date||cur.manufactureDate||'-')}${F('설치일',cur.installDate||'-')}</div>
-                <div class="jgb-basic-row">${F('내용연수',cur.life||'-')}${F('평가등급',cur.grade||'-')}</div>
-                <div class="jgb-basic-row">${F('보증',cur.warranty||'-')}${F('기존 A/S 기록',cur.asHistory||'-')}</div>
-                <div class="jgb-basic-row">${F('자산상태',cur.status||'정상')}${F('취득구분',cur.acquisitionType||'기존 자산')}</div>
+              <div class="jgb-basic-table-rebuild">
+                <div class="jgb-basic-table-row">
+                  <div class="jgb-basic-label">자산코드</div><div class="jgb-basic-value">${E(cur.asset_code||cur.code||'-')}</div>
+                  <div class="jgb-basic-label">자산명</div><div class="jgb-basic-value">${E(cur.name||'-')}</div>
+                </div>
+                <div class="jgb-basic-table-row">
+                  <div class="jgb-basic-label">설비 종류</div><div class="jgb-basic-value">${E(cur.category||cur.type||'-')}</div>
+                  <div class="jgb-basic-label">위치</div><div class="jgb-basic-value">${E(cur.place||'-')}</div>
+                </div>
+                <div class="jgb-basic-table-row">
+                  <div class="jgb-basic-label">위치코드</div><div class="jgb-basic-value">${E(cur.locationCode||placeCode(cur.place)||'-')}</div>
+                  <div class="jgb-basic-label">모델·규격</div><div class="jgb-basic-value">${E(cur.model||'-')}</div>
+                </div>
+                <div class="jgb-basic-table-row">
+                  <div class="jgb-basic-label">용량</div><div class="jgb-basic-value">${E(cur.capacity||'-')}</div>
+                  <div class="jgb-basic-label">수량</div><div class="jgb-basic-value">${E(cur.qty??cur.quantity??'-')}</div>
+                </div>
+                <div class="jgb-basic-table-row">
+                  <div class="jgb-basic-label">제조사</div><div class="jgb-basic-value">${E(cur.maker||cur.vendor||'-')}</div>
+                  <div class="jgb-basic-label">A/S 연락처</div><div class="jgb-basic-value">${E(cur.asContact||'-')}</div>
+                </div>
+                <div class="jgb-basic-table-row">
+                  <div class="jgb-basic-label">제조일</div><div class="jgb-basic-value">${E(cur.date||cur.manufactureDate||'-')}</div>
+                  <div class="jgb-basic-label">설치일</div><div class="jgb-basic-value">${E(cur.installDate||'-')}</div>
+                </div>
+                <div class="jgb-basic-table-row">
+                  <div class="jgb-basic-label">내용연수</div><div class="jgb-basic-value">${E(cur.life||'-')}</div>
+                  <div class="jgb-basic-label">평가등급</div><div class="jgb-basic-value">${E(cur.grade||'-')}</div>
+                </div>
+                <div class="jgb-basic-table-row">
+                  <div class="jgb-basic-label">보증</div><div class="jgb-basic-value">${E(cur.warranty||'-')}</div>
+                  <div class="jgb-basic-label">기존 A/S 기록</div><div class="jgb-basic-value">${E(cur.asHistory||'-')}</div>
+                </div>
+                <div class="jgb-basic-table-row">
+                  <div class="jgb-basic-label">자산상태</div><div class="jgb-basic-value">${E(cur.status||'정상')}</div>
+                  <div class="jgb-basic-label">취득구분</div><div class="jgb-basic-value">${E(cur.acquisitionType||'기존 자산')}</div>
+                </div>
               </div>
             </section>
             <section class="jgb-paper-photo jgb-equip-photo-rebuilt">
@@ -5054,7 +5081,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const infoHtml=infoRows.join('');
         const lastInspection=ins[0]?.inspection_date||'-';const next=ins[0]?.next_inspection_date||ins[0]?.next_date||'-';const replacement=cur.replacementStatus||'미정';
         
-      const dateOnly=v=>{const s=V(v);if(!s)return'-';const m=s.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:s.slice(0,10)};const historyBoxes=hs.map((h,n)=>{const p=detailFor(h),end=p.endDate||p.workEndDate||h.work_end_date||'',hid=V(h.id)||('row-'+n);const collapsed=window.jgbHistoryBoxState(hid);const val=v=>E(v||'-');const item=(label,value,cls='')=>`<div class="jgb-citem ${cls}"><span>${E(label)}</span><b>${val(value)}</b></div>`; return `<article class="jgb-history-box jgb-compact-history ${collapsed?'is-collapsed':''}" data-history-id="${E(hid)}"><div class="jgb-history-box-head" onclick="jgbToggleHistoryBox(this)"><div><strong>이력 ${n+1}</strong><span>${val(dateOnly(h.event_date))} · ${val(p.type||inferType(h))} · ${val(p.maintenanceType||'예방정비')}</span></div><div class="jgb-history-head-actions"><button type="button" class="jgb-hbox-toggle" onclick="event.stopPropagation();jgbToggleHistoryBox(this.closest('.jgb-history-box-head'))">접기</button><button type="button" class="jgb-hbox-edit" onclick="event.stopPropagation();eamEditMaintenanceHistory('${E(h.id)}')">수정</button><button type="button" class="jgb-hbox-del" onclick="event.stopPropagation();eamDeleteMaintenanceHistory('${E(h.id)}')">삭제</button></div></div><div class="jgb-compact-main"><div class="jgb-compact-info"><div class="jgb-compact-topgrid">${item('작업일자',dateOnly(h.event_date))}${item('정비구분',p.type||inferType(h))}${item('정비유형',p.maintenanceType||'예방정비')}${item('정비방식',p.method||h.maintenanceMethod||h.method||h.event_type)}${item('고장·이상내용',p.issue,'wide')}${item('조치내용',p.action||h.description,'wide')}</div><div class="jgb-compact-bottomgrid">${item('교체부품',p.part)}${item('정비업체',h.worker_name)}${item('정비비용',Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-')}${item('작업완료일',dateOnly(end))}${item('차기 점검일',dateOnly(p.nextDate||p.nextInspectionDate||h.next_date))}${item('조치상태',p.result||'조치완료')}${item('고장원인',p.cause)}${item('비고',p.note||h.note,'wide6')}</div></div><div class="jgb-history-photos"><div class="jgb-history-photos-title">📷 작업사진</div><div class="jgb-work-photos">${photoBox(hid,'작업 전')}${photoBox(hid,'작업 중')}${photoBox(hid,'작업 후')}${photoBox(hid,'완료')}</div></div></div><div class="jgb-history-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></article>`}).join('');
+      const dateOnly=v=>{const s=V(v);if(!s)return'-';const m=s.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:s.slice(0,10)};const historyBoxes=hs.map((h,n)=>{const p=detailFor(h),end=p.endDate||p.workEndDate||h.work_end_date||'',hid=V(h.id)||('row-'+n);const collapsed=window.jgbHistoryBoxState(hid);const val=v=>E(v||'-');const item=(label,value,cls='')=>`<div class="jgb-citem ${cls}"><span>${E(label)}</span><b>${val(value)}</b></div>`; return `<article class="jgb-history-box jgb-compact-history ${collapsed?'is-collapsed':''}" data-history-id="${E(hid)}"><div class="jgb-history-box-head" onclick="jgbToggleHistoryBox(this)"><div><strong>이력 ${n+1}</strong><span>${val(dateOnly(h.event_date))} · ${val(p.type||inferType(h))} · ${val(p.maintenanceType||'예방정비')}</span></div><div class="jgb-history-head-actions"><button type="button" class="jgb-hbox-toggle" onclick="event.stopPropagation();jgbToggleHistoryBox(this.closest('.jgb-history-box-head'))">접기</button><button type="button" class="jgb-hbox-edit" onclick="event.stopPropagation();eamEditMaintenanceHistory('${E(h.id)}')">수정</button><button type="button" class="jgb-hbox-del" onclick="event.stopPropagation();eamDeleteMaintenanceHistory('${E(h.id)}')">삭제</button></div></div><div class="jgb-compact-main"><div class="jgb-compact-info"><div class="jgb-compact-topgrid">${item('작업일자',dateOnly(h.event_date))}${item('정비구분',p.type||inferType(h))}${item('정비유형',p.maintenanceType||'예방정비')}${item('정비방식',p.method||h.maintenanceMethod||h.method||h.event_type)}${item('고장·이상내용',p.issue,'wide')}${item('조치내용',p.action||h.description,'wide')}</div><div class="jgb-compact-bottomgrid">${item('교체부품',p.part)}${item('정비업체',h.worker_name)}${item('정비비용',Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-')}${item('작업완료일',dateOnly(end))}${item('차기 점검일',dateOnly(p.nextDate||p.nextInspectionDate||h.next_date))}${item('조치상태',p.result||'조치완료')}${item('고장원인',p.cause)}${item('비고',p.note||h.note,'wide6')}</div></div><div class="jgb-history-photos"><div class="jgb-history-photos-title">📷 작업사진</div><div class="jgb-work-photos">${photoBox(hid,'사용부품')}${photoBox(hid,'작업 중')}${photoBox(hid,'작업 후')}${photoBox(hid,'완료')}</div></div></div><div class="jgb-history-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></article>`}).join('');
           </main></div></div>`:'<div class="eam-empty">설비 종류에서 자산을 선택하세요.</div>'}</main></div></div>`;
       };
       if(typeof eamPage==='function'){try{eamPage=window.eamPage}catch(e){}}
@@ -7050,7 +7077,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   }
   function record(h,i){
     const d=parse(h),id=V(h.id), method=d.maintenanceMethod||d.method||h.event_type||'외주정비', vendor=h.worker_name||d.vendor||'-',cost=Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-';
-    return `<article class="jgb-v136-record" data-id="${E(id)}"><div class="jgb-v136-record-head"><div class="jgb-v136-record-title"><strong>이력 ${i+1}</strong><span>${E(date(h.event_date))} · ${E(d.type||'수리')} · ${E(d.maintenanceType||'예방정비')}</span></div><div class="jgb-v136-record-actions"><button type="button" class="jgb-v136-mini jgb-v136-toggle">접기</button><button type="button" class="jgb-v136-mini edit" onclick="window.jgbV136OpenEdit('${E(id)}')">수정</button><button type="button" class="jgb-v136-mini delete" onclick="window.jgbV136Delete('${E(id)}')">삭제</button></div></div><div class="jgb-v136-body"><div class="jgb-v136-info">${item('작업일자',date(h.event_date))}${item('정비구분',d.type||'수리')}${item('정비유형',d.maintenanceType||'예방정비')}${item('정비방식',method)}${item('정비업체',vendor)}${item('정비비용',cost)}${item('고장·이상내용',d.issue)}${item('고장원인',d.cause)}${item('조치내용',d.action)}${item('교체부품',d.part)}${item('작업시작일',date(d.startDate||d.workStartDate||h.event_date))}${item('작업완료일',date(d.endDate||d.workEndDate))}${item('차기 점검일',date(d.nextDate||d.nextInspectionDate))}${item('조치상태',d.result||'조치완료')}${item('비고',d.note,'wide')}</div><div class="jgb-v136-photo"><div class="jgb-v136-photo-title">📷 작업사진 <span style="font-size:10px;color:#6b8191">최대 4장</span></div><div class="jgb-v136-photos">${slot(id,'작업 전')}${slot(id,'작업 중')}${slot(id,'작업 후')}${slot(id,'완료')}</div><div class="jgb-v136-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></div></div></article>`;
+    return `<article class="jgb-v136-record" data-id="${E(id)}"><div class="jgb-v136-record-head"><div class="jgb-v136-record-title"><strong>이력 ${i+1}</strong><span>${E(date(h.event_date))} · ${E(d.type||'수리')} · ${E(d.maintenanceType||'예방정비')}</span></div><div class="jgb-v136-record-actions"><button type="button" class="jgb-v136-mini jgb-v136-toggle">접기</button><button type="button" class="jgb-v136-mini edit" onclick="window.jgbV136OpenEdit('${E(id)}')">수정</button><button type="button" class="jgb-v136-mini delete" onclick="window.jgbV136Delete('${E(id)}')">삭제</button></div></div><div class="jgb-v136-body"><div class="jgb-v136-info">${item('작업일자',date(h.event_date))}${item('정비구분',d.type||'수리')}${item('정비유형',d.maintenanceType||'예방정비')}${item('정비방식',method)}${item('정비업체',vendor)}${item('정비비용',cost)}${item('고장·이상내용',d.issue)}${item('고장원인',d.cause)}${item('조치내용',d.action)}${item('교체부품',d.part)}${item('작업시작일',date(d.startDate||d.workStartDate||h.event_date))}${item('작업완료일',date(d.endDate||d.workEndDate))}${item('차기 점검일',date(d.nextDate||d.nextInspectionDate))}${item('조치상태',d.result||'조치완료')}${item('비고',d.note,'wide')}</div><div class="jgb-v136-photo"><div class="jgb-v136-photo-title">📷 작업사진 <span style="font-size:10px;color:#6b8191">최대 4장</span></div><div class="jgb-v136-photos">${slot(id,'사용부품')}${slot(id,'작업 중')}${slot(id,'작업 후')}${slot(id,'완료')}</div><div class="jgb-v136-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></div></div></article>`;
   }
   function rerender(){try{if(typeof window.eamLoad==='function')window.eamLoad().then(()=>{if(typeof window.render==='function')window.render();else location.reload()});else if(typeof window.render==='function')window.render();else location.reload()}catch(e){location.reload()}}
   function formHtml(title, data, id){
@@ -11751,3 +11778,203 @@ jgb-eam-card-final .jgb-eam-lower-v125 .v125-full .v125-label{
  .jgb-history-card .jgb-basic-rebuilt .jgb-basic-row .jgb-paper-cell:last-child{border-bottom:0!important}
 }
 </style>
+
+<style id="JGB_V143_BASIC_TABLE_ONLY">
+/* 기본정보 영역만 통째로 재작성: 실제 행/셀 경계를 강제 */
+.jgb-history-card .jgb-paper-info .jgb-basic-table-rebuild{
+  display:block !important; width:100% !important; margin:0 !important; padding:0 !important;
+  border:2px solid #334b5b !important; border-bottom:0 !important; box-sizing:border-box !important;
+  background:#fff !important; overflow:hidden !important;
+}
+.jgb-history-card .jgb-paper-info .jgb-basic-table-row{
+  display:grid !important; grid-template-columns:16% 34% 16% 34% !important;
+  width:100% !important; min-height:48px !important;
+  margin:0 !important; padding:0 !important;
+  border:0 !important; border-bottom:1.5px solid #334b5b !important;
+  box-sizing:border-box !important;
+}
+.jgb-history-card .jgb-paper-info .jgb-basic-table-row:last-child{border-bottom:2px solid #334b5b !important;}
+.jgb-history-card .jgb-paper-info .jgb-basic-label,
+.jgb-history-card .jgb-paper-info .jgb-basic-value{
+  min-width:0 !important; min-height:48px !important;
+  display:flex !important; align-items:center !important;
+  box-sizing:border-box !important;
+  padding:9px 12px !important; margin:0 !important;
+  border:0 !important; border-right:1.5px solid #334b5b !important;
+  line-height:1.3 !important; font-size:14px !important;
+  white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
+}
+.jgb-history-card .jgb-paper-info .jgb-basic-label{
+  background:#dbe7ee !important; color:#102b3d !important; font-weight:700 !important;
+}
+.jgb-history-card .jgb-paper-info .jgb-basic-value{
+  background:#fffdf8 !important; color:#102b3d !important; font-weight:600 !important;
+}
+.jgb-history-card .jgb-paper-info .jgb-basic-table-row > :nth-child(4){border-right:0 !important;}
+</style>
+
+
+
+<style id="JGB_V144_FINAL_USER_REQUESTS">
+/* V144 최종: 사용자가 지정한 표/글씨/사진 캡션만 적용. 기존 기능 JS는 유지. */
+
+/* 1) 주요설비 기본정보: 실제 각 항목 셀에 진한 가로선 + 세로선 */
+.jgb-eam-card-final .jgb-eam-info-grid{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:0!important;
+  width:100%!important;
+  border:0!important;
+  background:#fff!important;
+}
+.jgb-eam-card-final .jgb-eam-info-cell{
+  display:grid!important;
+  grid-template-columns:105px minmax(0,1fr)!important;
+  min-width:0!important;
+  height:50px!important;
+  min-height:50px!important;
+  box-sizing:border-box!important;
+  border-right:2px solid #334e63!important;
+  border-bottom:2px solid #334e63!important;
+  background:#fff!important;
+}
+.jgb-eam-card-final .jgb-eam-info-cell:nth-child(2n){border-right:2px solid #334e63!important}
+.jgb-eam-card-final .jgb-eam-info-cell small{
+  display:flex!important;align-items:center!important;
+  min-width:0!important;padding:7px 9px!important;box-sizing:border-box!important;
+  background:#dbe7ef!important;color:#18384d!important;
+  border-right:2px solid #334e63!important;
+  font-size:14px!important;font-weight:900!important;line-height:1.15!important;
+  white-space:nowrap!important;word-break:keep-all!important;
+}
+.jgb-eam-card-final .jgb-eam-info-cell b{
+  display:flex!important;align-items:center!important;min-width:0!important;
+  padding:7px 11px!important;box-sizing:border-box!important;
+  background:#faf8f2!important;color:#17384d!important;
+  font-size:14px!important;font-weight:800!important;line-height:1.2!important;
+}
+
+/* 2) 주요설비 사진: 6cm × 7cm, 중앙 유지. 기존 업로드/삭제 이벤트는 손대지 않음. */
+.jgb-eam-card-final .jgb-eam-photo,
+.jgb-history-card .jgb-paper-photo{
+  background:#faf8f2!important;
+}
+.jgb-eam-card-final .jgb-photo-box,
+.jgb-history-card .jgb-paper-photo-box{
+  min-height:260px!important;
+  height:300px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex-direction:column!important;
+  text-align:center!important;
+}
+.jgb-eam-card-final .jgb-paper-equip-img,
+.jgb-eam-card-final .jgb-equip-photo-img,
+.jgb-history-card .jgb-paper-equip-img{
+  width:6cm!important;height:7cm!important;
+  max-width:6cm!important;max-height:7cm!important;
+  min-width:6cm!important;min-height:7cm!important;
+  object-fit:contain!important;display:block!important;margin:0 auto!important;
+}
+
+/* 3) 유지관리 이력: 주요설비 이력카드 기본정보와 같은 14px 글씨 */
+.eam-detail-section.eam-history .jgb-history-info-item small,
+.eam-detail-section.eam-history .jgb-history-info-item b,
+.eam-detail-section.eam-history .jgb-compact-info .jgb-citem span,
+.eam-detail-section.eam-history .jgb-compact-info .jgb-citem b,
+.eam-detail-section.eam-history .jgb-v136-info .jgb-v136-item small,
+.eam-detail-section.eam-history .jgb-v136-info .jgb-v136-item b{
+  font-size:14px!important;
+}
+
+/* 4) 유지관리 작업사진 4칸: 사진 바로 아래 제목을 각각 표시 */
+.eam-detail-section.eam-history .jgb-history-box .jgb-work-photos,
+.jgb-history-box .jgb-work-photos{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:10px!important;
+  align-items:start!important;
+}
+.jgb-history-box .jgb-work-photo{
+  position:relative!important;
+  height:150px!important;
+  min-height:150px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.jgb-history-box .jgb-work-photo img{
+  display:block!important;
+  width:100%!important;
+  height:115px!important;
+  object-fit:cover!important;
+  margin:0!important;
+}
+.jgb-history-box .jgb-work-photo b{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  height:30px!important;
+  margin:0!important;
+  padding:0 2px!important;
+  box-sizing:border-box!important;
+  background:#dbe7ef!important;
+  color:#17384d!important;
+  border-top:1px solid #334e63!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+}
+.jgb-history-box .jgb-work-photo small{
+  font-size:10px!important;
+  line-height:1.1!important;
+}
+.jgb-history-box .jgb-photo-del{
+  position:absolute!important;
+  top:4px!important;right:4px!important;
+  z-index:5!important;
+}
+
+/* 5) 유지관리 헤더 버튼: 접기/수정/삭제 모두 보이게 */
+.eam-detail-section.eam-history .jgb-history-head-actions{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  align-items:center!important;gap:7px!important;position:relative!important;z-index:99999!important;
+  flex:0 0 auto!important;min-width:max-content!important;
+}
+.eam-detail-section.eam-history .jgb-history-head-actions .jgb-hbox-toggle,
+.eam-detail-section.eam-history .jgb-history-head-actions .jgb-hbox-edit,
+.eam-detail-section.eam-history .jgb-history-head-actions .jgb-hbox-del{
+  display:inline-flex!important;visibility:visible!important;opacity:1!important;
+  pointer-events:auto!important;position:relative!important;z-index:100000!important;
+  min-width:58px!important;height:32px!important;padding:0 12px!important;
+  align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;border-radius:4px!important;
+  font-size:13px!important;font-weight:900!important;line-height:1!important;
+  white-space:nowrap!important;cursor:pointer!important;
+}
+.eam-detail-section.eam-history .jgb-history-head-actions .jgb-hbox-toggle{background:#fff!important;color:#17384d!important;border:2px solid #526674!important}
+.eam-detail-section.eam-history .jgb-history-head-actions .jgb-hbox-edit{background:#2674a8!important;color:#fff!important;border:2px solid #1d567e!important}
+.eam-detail-section.eam-history .jgb-history-head-actions .jgb-hbox-del{background:#d92d2d!important;color:#fff!important;border:2px solid #b51f1f!important}
+</style>
+
+<script id="JGB_V144_PHOTO_CAPTION_PATCH">
+(function(){
+  /* 실제 사진 4칸 제목을 사용부품/작업 중/작업 후/완료로 동기화 */
+  function patch(){
+    document.querySelectorAll('.jgb-history-box .jgb-work-photo').forEach(function(box,idx){
+      var labels=['사용부품','작업 중','작업 후','완료'];
+      var b=box.querySelector('b');
+      if(b) b.textContent=labels[idx]||b.textContent;
+    });
+  }
+  patch();
+  new MutationObserver(patch).observe(document.body,{childList:true,subtree:true});
+  setTimeout(patch,200);setTimeout(patch,800);setTimeout(patch,1600);
+})();
+</script>
