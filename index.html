@@ -4463,7 +4463,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           : `<div class="jgb-paper-cam">📷</div><strong>설비 사진 1장</strong><span>사진 등록 · JPG / PNG · 클릭</span>`;
         return `<details class="eam-source-card jgb-history-card" ${cardOpen?'open':''} ontoggle="eamPersistHistoryCard(this,'${esc(cardCode)}')">
           <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();jgbOpenAssetHistoryEditor()">✏️ 수정</button></div></summary>
-          <div class="jgb-paper-card-body">
+          <div class="jgb-paper-card-body jgb-v155-card-body">
             <section class="jgb-paper-info">
               <div class="jgb-paper-section-title">📄 기본정보</div>
               <div class="jgb-basic-table-v151">
@@ -4477,7 +4477,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                 <div class="jgb-basic-row-v151"><div class="jgb-basic-label-v151">보증</div><div class="jgb-basic-value-v151">${E(cur.warranty||'-')}</div><div class="jgb-basic-label-v151">기존 A/S 기록</div><div class="jgb-basic-value-v151">${E(cur.asHistory||'-')}</div></div>
                 <div class="jgb-basic-row-v151"><div class="jgb-basic-label-v151">자산상태</div><div class="jgb-basic-value-v151">${E(cur.status||'정상')}</div><div class="jgb-basic-label-v151">취득구분</div><div class="jgb-basic-value-v151">${E(cur.acquisitionType||'기존 자산')}</div></div>
               </div>
-            <div class="jgb-paper-auto jgb-paper-auto-inline">
+                        <div class="jgb-paper-auto jgb-paper-auto-inline">
             ${F('최근 외부정비일',d.recentExt?.event_date||'-')}
             ${F('누적 외부정비 건수',d.ext.length+'건')}
             ${F('최근 조치내용',d.recentExt?.description||'-')}
@@ -4486,7 +4486,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           
             </div>
             </section>
-            <section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149">
+                        <section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149">
               <div class="jgb-paper-section-title">📷 설비 사진 (현재)</div>
               <div class="jgb-equip-photo-stage">
                 <div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">
@@ -4500,6 +4500,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                 <button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button>
                 <span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span>
               </div>
+            </section>
+            <section class="jgb-paper-photo jgb-v149-detail-photo-v155">
               <div class="jgb-v149-detail-title">설비 상세사진 · 각 4×4cm</div>
               <div class="jgb-v149-detail-scroll">
                 <div class="jgb-v149-detail-grid">
@@ -4512,7 +4514,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                 </div>
               </div>
             </section>
-          </div>          <div class="jgb-paper-notes">
+          </div>
+          <div class="jgb-paper-notes">
             ${F('시설개선계획',cur.improvementPlan||'-','wide')}
             ${F('특이사항',cur.note||'-','wide')}
           </div>
@@ -12485,3 +12488,64 @@ jgb-eam-card-final .jgb-eam-subphoto-box img{width:100%!important;height:100%!im
   new MutationObserver(function(){setTimeout(apply,0)}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+
+<style id="JGB_V155_CARD_REBUILD_NO_BLANK">
+/* V155: 이력카드 구조만 재배치. 기존 색상/폰트/기능은 유지하고, 오른쪽 사진 높이 때문에 왼쪽에 생기던 빈 공간만 제거. */
+.jgb-history-card .jgb-v155-card-body{
+  display:grid!important;
+  grid-template-columns:minmax(0,48%) minmax(0,52%)!important;
+  grid-template-rows:auto auto!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  align-items:start!important;
+  box-sizing:border-box!important;
+}
+.jgb-history-card .jgb-v155-card-body > .jgb-paper-info{
+  grid-column:1!important;grid-row:1!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  align-self:start!important;overflow:visible!important;
+}
+.jgb-history-card .jgb-v155-card-body > .jgb-paper-auto-inline{
+  grid-column:1!important;grid-row:2!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  align-self:start!important;margin:0!important;
+  border-top:2px solid #334e63!important;
+}
+.jgb-history-card .jgb-v155-card-body > .jgb-paper-photo.jgb-equip-photo-rebuilt{
+  grid-column:2!important;grid-row:1!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  align-self:start!important;overflow:visible!important;
+}
+.jgb-history-card .jgb-v155-card-body > .jgb-v149-detail-photo-v155{
+  grid-column:2!important;grid-row:2!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  align-self:start!important;overflow:hidden!important;
+  border-left:0!important;
+}
+/* 기존 기본정보의 글씨/선/배경은 유지하면서 열 폭만 유연하게 */
+.jgb-history-card .jgb-v155-card-body .jgb-basic-table-v151{width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;}
+.jgb-history-card .jgb-v155-card-body .jgb-basic-row-v151{height:auto!important;min-height:38px!important;max-height:none!important;}
+.jgb-history-card .jgb-v155-card-body .jgb-basic-label-v151{min-width:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;}
+.jgb-history-card .jgb-v155-card-body .jgb-basic-value-v151{min-width:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;}
+/* 큰 설비사진: 기존 6×7cm 크기 유지, 불필요한 높이만 제거 */
+.jgb-history-card .jgb-v155-card-body .jgb-equip-photo-stage{height:280px!important;min-height:280px!important;max-height:280px!important;padding:7px!important;box-sizing:border-box!important;}
+.jgb-history-card .jgb-v155-card-body .jgb-equip-photo-box{width:6cm!important;height:7cm!important;min-width:6cm!important;min-height:7cm!important;max-width:6cm!important;max-height:7cm!important;margin:0 auto!important;box-sizing:border-box!important;}
+/* 상세사진 4칸은 오른쪽 칸 안에서 4개가 한 줄에 맞도록 비율만 조정 */
+.jgb-history-card .jgb-v155-card-body .jgb-v149-detail-scroll{width:100%!important;max-width:100%!important;overflow:hidden!important;box-sizing:border-box!important;padding:5px!important;}
+.jgb-history-card .jgb-v155-card-body .jgb-v149-detail-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;}
+.jgb-history-card .jgb-v155-card-body .jgb-v149-detail-item{min-width:0!important;width:100%!important;box-sizing:border-box!important;text-align:center!important;}
+.jgb-history-card .jgb-v155-card-body .jgb-v149-detail-box{width:4cm!important;height:4cm!important;min-width:0!important;min-height:4cm!important;max-width:100%!important;box-sizing:border-box!important;margin:0 auto!important;}
+.jgb-history-card .jgb-v155-card-body .jgb-v149-detail-item b,.jgb-history-card .jgb-v155-card-body .jgb-v149-detail-item small{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;text-align:center!important;}
+@media(max-width:900px){
+ .jgb-history-card .jgb-v155-card-body{grid-template-columns:1fr!important;grid-template-rows:auto!important;}
+ .jgb-history-card .jgb-v155-card-body > .jgb-paper-info{grid-column:1!important;grid-row:auto!important;}
+ .jgb-history-card .jgb-v155-card-body > .jgb-paper-auto-inline{grid-column:1!important;grid-row:auto!important;}
+ .jgb-history-card .jgb-v155-card-body > .jgb-paper-photo.jgb-equip-photo-rebuilt{grid-column:1!important;grid-row:auto!important;}
+ .jgb-history-card .jgb-v155-card-body > .jgb-v149-detail-photo-v155{grid-column:1!important;grid-row:auto!important;}
+}
+</style>
