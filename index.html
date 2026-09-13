@@ -12181,34 +12181,22 @@ window.eamDeleteSelectedAsset=async function(){
 </script>
 
 
-<script>
-(function(){
-  function numberHistories(){
-    document.querySelectorAll('.jgb-v52-set').forEach(function(set){
-      var n=0;
-      set.querySelectorAll('[data-history-index]').forEach(function(el){
-        n++;
-        el.textContent=' '+n;
-      });
-    });
-  }
-  numberHistories();
-  new MutationObserver(numberHistories).observe(document.body,{childList:true,subtree:true});
-})();
-</script>
+
 <script>
 (function(){
   if(window.__JGB_V61_COLLAPSE)return;
   window.__JGB_V61_COLLAPSE=true;
   document.addEventListener('click',function(e){
-    var btn=e.target.closest('.jgb-v61-toggle');
+    var btn=e.target && e.target.closest ? e.target.closest('.jgb-v61-toggle') : null;
     if(!btn)return;
-    e.preventDefault(); e.stopPropagation();
     var body=btn.nextElementSibling;
-    if(!body || !body.classList.contains('jgb-v61-body')) return;
-    var closed=body.classList.toggle('is-closed');
-    var arrow=btn.querySelector('span:last-child');
-    if(arrow) arrow.textContent=closed?'▼':'▲';
+    if(!body || !body.classList.contains('jgb-v61-body'))return;
+    e.preventDefault();
+    e.stopPropagation();
+    body.classList.toggle('is-closed');
+    var arrow=btn.querySelector('.arrow');
+    if(!arrow) arrow=btn.querySelector('span:last-child');
+    if(arrow)arrow.textContent=body.classList.contains('is-closed')?'▼':'▲';
   },false);
 })();
 </script>
