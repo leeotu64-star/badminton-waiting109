@@ -12804,5 +12804,100 @@ window.eamHistoryCardEdit=window.eamEditSelectedAsset;
 document.addEventListener('click',function(ev){const b=ev.target.closest('.jgb-card-edit,[data-eam-edit-asset]');if(!b)return;ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation?.();const c=S(b.getAttribute('data-code')||window.__eamSelCode);if(c)window.eamEditSelectedAsset(c)},true);
 })();
 </script>
+
+<script id="JGB_FINAL_EDIT_SINGLE_SOURCE">
+(function(){
+  'use strict';
+  const S=x=>String(x??'').trim();
+  const esc2=x=>S(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  function selectedCode(){ return S(window.__eamSelCode); }
+  function metaRead(){ try{return typeof metas==='function'?(metas()||{}):JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}')||{}}catch(e){return{}} }
+  function metaWrite(x){ try{if(typeof saveMeta==='function'){saveMeta(x);return true}}catch(e){} try{localStorage.setItem('JGB_EAM_META',JSON.stringify(x||{}));return true}catch(e){return false} }
+  async function supa(){
+    try{if(typeof getSupa==='function'){const d=await getSupa();if(d)return d}}catch(e){}
+    try{if(window.SUPA)return window.SUPA}catch(e){}
+    try{if(window.supabase&&typeof window.supabase.createClient==='function'&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined')return window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY)}catch(e){}
+    return null;
+  }
+  function source(code){
+    try{const a=typeof window.eamSourceAssets==='function'?window.eamSourceAssets():[];return a.find(x=>S(x.code||x.asset_code)===S(code))||null}catch(e){return null}
+  }
+  function current(code){
+    const c=S(code||selectedCode()), src=source(c), A=Array.isArray(window.__eamA)?window.__eamA:[];
+    const reg=A.find(x=>S(x.asset_code)===c)||null, m=metaRead()[c]||{};
+    return {code:c,src,reg,cur:Object.assign({},src||{},reg||{},m)};
+  }
+  function field(label,id,value,extra=''){return `<label>${esc2(label)}<input id="${id}" value="${esc2(value)}" ${extra}></label>`}
+  function openEditor(code){
+    const c=S(code||selectedCode()); if(!c){alert('먼저 수정할 자산을 선택하세요.');return false}
+    window.__eamSelCode=c; document.getElementById('jgbAssetHistoryEditor')?.remove();
+    const s=current(c), x=s.cur||{};
+    const cats=['냉난방','소방·방재','보일러·온수','전기설비','코트조명','방수','위생설비','문·창호설비','기타설비'];
+    const statuses=['정상','점검필요','조치필요','교체 예정','폐기'];
+    const acqs=['기존 자산','신규 취득'];
+    const locs=typeof EAM_LOCATION_OPTIONS==='object'?EAM_LOCATION_OPTIONS:{};
+    const details=Array.isArray(window.EAM_DETAIL_LOCATION_LIST)?window.EAM_DETAIL_LOCATION_LIST:['유수장치실','기계실','사무실','휴게실','옥상','1번 코트(좌측)','1번 코트(우측)','복도','창고','남자 화장실','여자 화장실','남자 샤워실','여자 샤워실','좌측 외곽','우측 외곽','직접 입력'];
+    const cat=S(x.category||x.type)||'기타설비', st=S(x.status)||'정상', aq=S(x.acquisitionType)||'기존 자산', place=S(x.place), lc=S(x.locationCode)||(typeof placeCode==='function'?placeCode(place):'A');
+    const catOpts=cats.map(v=>`<option value="${esc2(v)}" ${v===cat?'selected':''}>${esc2(v)}</option>`).join('');
+    const stOpts=statuses.map(v=>`<option value="${esc2(v)}" ${v===st?'selected':''}>${esc2(v)}</option>`).join('');
+    const aqOpts=acqs.map(v=>`<option value="${esc2(v)}" ${v===aq?'selected':''}>${esc2(v)}</option>`).join('');
+    const locOpts=Object.entries(locs).map(([k,z])=>`<option value="${esc2(k)}" ${S(k)===lc?'selected':''}>${esc2(z?.label||k)}</option>`).join('');
+    const detailOpts=details.map(v=>`<option value="${esc2(v)}" ${v===place?'selected':''}>${esc2(v)}</option>`).join('');
+    document.body.insertAdjacentHTML('beforeend',`<div id="jgbAssetHistoryEditor" class="jgb-v155-editor" onclick="if(event.target===this)this.remove()"><div class="jgb-ah-card">
+      <div class="jgb-ah-head"><div><h3>📋 주요설비 이력카드 수정</h3><small>현재 이력카드 정보를 수정합니다.</small></div><button type="button" onclick="document.getElementById('jgbAssetHistoryEditor')?.remove()">×</button></div>
+      <div class="jgb-ah-grid">
+        ${field('자산코드','jha_code',c,'readonly')}${field('자산명','jha_name',x.name||'')}
+        <label>설비 종류<select id="jha_category">${catOpts}</select></label><label>위치코드<select id="jha_loc">${locOpts}</select></label>
+        <label>세부 위치<select id="jha_place">${detailOpts}</select><input id="jha_customPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
+        ${field('모델·규격','jha_model',x.model||x.product_name||'')}${field('용량','jha_capacity',x.capacity||'-')}${field('수량','jha_qty',x.qty??x.quantity??'-')}${field('제조사','jha_maker',x.maker||x.vendor||'-')}${field('A/S 연락처','jha_as',x.asContact||'-')}${field('제조일','jha_date',x.date||x.manufactureDate||'-')}${field('설치일','jha_install',x.installDate||'-')}${field('내용연수','jha_life',x.life||'-')}${field('평가등급','jha_grade',x.grade||'-')}${field('보증','jha_warranty',x.warranty||'-')}${field('A/S 기록','jha_asHistory',x.asHistory||'-')}
+        <label>자산상태<select id="jha_status">${stOpts}</select></label><label>취득구분<select id="jha_acq">${aqOpts}</select></label>
+        ${field('최근 외주정비일','jha_extDate',x.recentExternalMaintenanceDate||'-','readonly')}${field('누적 외주정비 건수','jha_extCount',x.externalMaintenanceCount??0,'readonly')}${field('최근 조치내용','jha_extAction',x.recentAction||'-','readonly')}
+        <label class="wide">시설개선계획<textarea id="jha_plan">${esc2(x.improvementPlan||'')}</textarea></label><label class="wide">특이사항<textarea id="jha_note">${esc2(x.note||'')}</textarea></label>
+      </div><div class="jgb-ah-actions"><button type="button" class="cancel" onclick="document.getElementById('jgbAssetHistoryEditor')?.remove()">취소</button><button type="button" class="jgb-ah-save" id="jgbAhSave" data-code="${esc2(c)}">저장</button></div>
+    </div></div>`);
+    const p=document.getElementById('jha_place'), custom=document.getElementById('jha_customPlace');
+    if(p&&!details.includes(place)&&place){p.value='직접 입력';if(custom){custom.style.display='block';custom.value=place}}
+    if(p&&p.value==='직접 입력'&&custom)custom.style.display='block';
+    if(cat==='소방·방재'){const l=document.getElementById('jha_loc');if(l)l.value='E';if(p&&details.includes('유수장치실'))p.value='유수장치실';if(custom)custom.style.display='none'}
+    document.getElementById('jha_category')?.addEventListener('change',function(){if(this.value==='소방·방재'){const l=document.getElementById('jha_loc');if(l)l.value='E';if(p&&details.includes('유수장치실'))p.value='유수장치실';if(custom)custom.style.display='none'}});
+    p?.addEventListener('change',()=>{if(custom)custom.style.display=p.value==='직접 입력'?'block':'none'});
+    document.getElementById('jgbAhSave')?.addEventListener('click',()=>saveEditor(c));
+    return false;
+  }
+  async function saveEditor(code){
+    const c=S(code||selectedCode()), btn=document.getElementById('jgbAhSave'); if(!c)return false;
+    const name=S(document.getElementById('jha_name')?.value), category=S(document.getElementById('jha_category')?.value)||'기타설비';
+    let place=S(document.getElementById('jha_place')?.value);if(place==='직접 입력')place=S(document.getElementById('jha_customPlace')?.value);if(category==='소방·방재')place='유수장치실';
+    if(!name||!place){alert('자산명과 위치는 필수입니다.');return false}
+    if(btn){btn.disabled=true;btn.textContent='저장 중…'}
+    const payload={name,category,place,status:S(document.getElementById('jha_status')?.value)||'정상',product_name:S(document.getElementById('jha_model')?.value)||category};
+    const meta=Object.assign({},metaRead()[c]||{}, {asset_code:c,name,category,locationCode:category==='소방·방재'?'E':S(document.getElementById('jha_loc')?.value||'A').charAt(0)||'A',place,model:S(document.getElementById('jha_model')?.value),capacity:S(document.getElementById('jha_capacity')?.value),qty:S(document.getElementById('jha_qty')?.value),quantity:S(document.getElementById('jha_qty')?.value),maker:S(document.getElementById('jha_maker')?.value),vendor:S(document.getElementById('jha_maker')?.value),asContact:S(document.getElementById('jha_as')?.value),date:S(document.getElementById('jha_date')?.value),manufactureDate:S(document.getElementById('jha_date')?.value),installDate:S(document.getElementById('jha_install')?.value),life:S(document.getElementById('jha_life')?.value),grade:S(document.getElementById('jha_grade')?.value),warranty:S(document.getElementById('jha_warranty')?.value),asHistory:S(document.getElementById('jha_asHistory')?.value),status:payload.status,acquisitionType:S(document.getElementById('jha_acq')?.value)||'기존 자산',improvementPlan:S(document.getElementById('jha_plan')?.value),note:S(document.getElementById('jha_note')?.value)});
+    try{
+      const d=await supa();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
+      let a=(Array.isArray(window.__eamA)?window.__eamA:[]).find(x=>S(x.asset_code)===c)||null;
+      if(!a){const q=await d.from('assets').select('*').eq('asset_code',c).maybeSingle();if(q.error)throw q.error;a=q.data||null}
+      if(a){const r=await d.from('assets').update(payload).eq('id',a.id);if(r.error)throw r.error}
+      else{const r=await d.from('assets').insert({asset_code:c,...payload}).select('*').single();if(r.error)throw r.error}
+      const all=metaRead();all[c]=meta;metaWrite(all);window.__eamMetaByCode=all;window.__eamSelCode=c;
+      document.getElementById('jgbAssetHistoryEditor')?.remove();
+      if(typeof window.eamLoad==='function')await window.eamLoad();
+      window.__eamSelCode=c;if(typeof render==='function')render();
+      return true;
+    }catch(e){console.error('JGB_FINAL_EDIT_SAVE',e);alert('수정 저장에 실패했습니다.\n'+(e?.message||e));return false}
+    finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
+  }
+  // 수정 경로는 여기 하나만 사용
+  window.jgbOpenAssetHistoryEditor=openEditor;
+  window.jgbSaveAssetHistoryCard=saveEditor;
+  window.eamEditSelectedAsset=function(code){return openEditor(code||selectedCode())};
+  window.eamHistoryCardEdit=window.eamEditSelectedAsset;
+  document.addEventListener('click',function(ev){
+    const b=ev.target.closest('.jgb-card-edit,[data-eam-edit-asset]');if(!b)return;
+    ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+    const c=S(b.getAttribute('data-code')||window.__eamSelCode);if(c)openEditor(c);
+  },true);
+})();
+</script>
+
 </body>
 </html>
