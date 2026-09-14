@@ -3258,7 +3258,60 @@ html::before,body::before{
               @media(max-width:760px){.qrx-v8-hero,.qrx-v8-grid,.qrx-v8-grid-3{grid-template-columns:1fr}.qrx-judgement-main{font-size:17px}}
             </style>
 
-            <div class="qrx-v8-wrap">
+            
+<style id="JGB_V51_DASHBOARD_SPACING">
+/* V51: 민원 대시보드 간격 정리 + 각 정보영역 개별 스크롤 */
+.qrx-v8-wrap{gap:18px!important}
+.qrx-v8-grid-3{gap:18px!important;align-items:stretch!important}
+.qrx-v8-panel{min-width:0!important;border-radius:16px!important}
+.qrx-v8-head{padding:0 18px!important}
+.qrx-v8-body{padding:16px 18px!important}
+
+/* 내용이 길어져도 카드끼리 눌리지 않도록 개별 스크롤 */
+.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body{
+  max-height:230px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-gutter:stable!important;
+}
+.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body::-webkit-scrollbar{width:9px}
+.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body::-webkit-scrollbar-track{background:#edf3f8;border-radius:8px}
+.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body::-webkit-scrollbar-thumb{background:#a9bacb;border-radius:8px;border:2px solid #edf3f8}
+.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body::-webkit-scrollbar-thumb:hover{background:#8197aa}
+
+/* 상단 '우선 확인' / '관리자 판단'도 카드 안에서 독립 스크롤 */
+.opx-board-panel{min-width:0!important}
+.opx-board-panel .qr-priority-scroll-v6{
+  max-height:210px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-gutter:stable!important;
+}
+.opx-board-panel .qrx-judgement-list{
+  max-height:210px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding-right:5px!important;
+  scrollbar-gutter:stable!important;
+}
+.opx-board-panel .qr-priority-scroll-v6::-webkit-scrollbar,
+.opx-board-panel .qrx-judgement-list::-webkit-scrollbar{width:9px}
+.opx-board-panel .qr-priority-scroll-v6::-webkit-scrollbar-track,
+.opx-board-panel .qrx-judgement-list::-webkit-scrollbar-track{background:#edf3f8;border-radius:8px}
+.opx-board-panel .qr-priority-scroll-v6::-webkit-scrollbar-thumb,
+.opx-board-panel .qrx-judgement-list::-webkit-scrollbar-thumb{background:#a9bacb;border-radius:8px;border:2px solid #edf3f8}
+
+/* 작은 화면에서도 옆으로 잘리지 않게 */
+@media(max-width:1050px){
+  .qrx-v8-grid-3{grid-template-columns:1fr 1fr!important}
+}
+@media(max-width:760px){
+  .qrx-v8-grid-3{grid-template-columns:1fr!important}
+  .qrx-v8-wrap{gap:16px!important}
+}
+</style>
+
+<div class="qrx-v8-wrap">
               
 
               <div class="qrx-v8-grid-3">
@@ -3293,14 +3346,7 @@ html::before,body::before{
                   ${qrHourBandStats.map(o=>`<div class="qrx-barrow"><b>${o.label}</b><div class="qrx-track"><i class="qrx-fill" style="width:${Math.max(o.n?8:0,Math.round(o.n/qrHourMax*100))}%"></i></div><strong>${o.n}</strong></div>`).join('')}
                 </div><div style="margin-top:12px;padding:9px 11px;border-radius:9px;background:#f5f3ff;color:#4c1d95;font-size:11px;font-weight:800">⚡ 집중 시간대 · ${xEsc(peakHourText)}</div></div></div>
               </div>
-
-              <div class="qrx-v8-grid">
-                
-
-                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📈 최근 7일 접수 흐름</b><span>${qrTrendText}</span></div><div class="qrx-v8-body"><div class="qrx-trend">${qrTrend7.map(o=>{const mx=Math.max(1,...qrTrend7.map(v=>v.count));return `<div class="qrx-trend-day"><b>${o.count}</b><div class="qrx-trend-bar" style="height:${Math.max(7,Math.round(o.count/mx*85))}px"></div><small>${xEsc(o.label)}</small></div>`}).join('')}</div><div style="margin-top:8px;text-align:right;font-size:11px;color:#64748b">최근 7일 ${qrNowTrend}건 · 이전 7일 ${qrPrevTrend}건</div></div></div>
-              </div>
-
-              <div class="qrx-footer"><b>💡 분석 기준</b> · 고객 QR 접수의 신고내용·장소·접수시각·처리상태를 기준으로 위험도·반복성·최근성·미조치 상태를 함께 분석합니다. <b>직원실적·레벨 산정값은 이 분석에 사용하지 않습니다.</b></div>
+<div class="qrx-footer"><b>💡 분석 기준</b> · 고객 QR 접수의 신고내용·장소·접수시각·처리상태를 기준으로 위험도·반복성·최근성·미조치 상태를 함께 분석합니다. <b>직원실적·레벨 산정값은 이 분석에 사용하지 않습니다.</b></div>
             </div>
           </section>
         </section>
