@@ -3214,7 +3214,7 @@ html::before,body::before{
               </div>
 
               <div class="opx-board-panel">
-                <div class="opx-board-panel-head"><b>📌 관리자 판단</b><span>접수내용 기반</span></div>
+                <div class="opx-board-panel-head"><b>🚨 오늘 관리자 판단</b><span>접수내용 기반</span></div>
                 <div class="qrx-judgement-list">
                   ${qrActionCards.map(a=>{const t=qrJudgementTone(a.level);return `<div class="qrx-judgement-card ${t.key}" style="--qj-bg:${t.bg};--qj-border:${t.border};--qj-accent:${t.accent};--qj-text:${t.text}"><div class="qrx-judgement-badge">${t.label}</div><div class="qrx-judgement-main"><b>${xEsc(a.title)}</b><span>${xEsc(a.text)}</span></div></div>`}).join('')||'<div style="padding:18px;color:#64748b">현재 자동 판단할 접수 데이터가 없습니다.</div>'}
                 </div>
@@ -3259,19 +3259,7 @@ html::before,body::before{
             </style>
 
             <div class="qrx-v8-wrap">
-              <div class="qrx-v8-hero">
-                <div class="qrx-v8-panel qrx-judgement"><div class="qrx-v8-body">
-                  <div class="qrx-judgement-title">🚨 오늘 관리자 판단 <span>${qrRiskOverall}</span></div>
-                  <div class="qrx-judgement-main">${qrTopInsight?`${xEsc(qrTopInsight.place)} 우선 확인`:'현재 우선 확인 대상 없음'}</div>
-                  <ul>
-                    <li>${qrTrendChange>0?`최근 7일 접수 ${qrTrendChange}% 증가`:`최근 7일 접수 ${qrNowTrend}건`}</li>
-                    <li>${qrRepeated.length?`반복 접수 장소 ${qrRepeated.length}곳 · 최다 ${qrRepeated[0][0]} ${qrRepeated[0][1]}건`:'반복 접수 장소 없음'}</li>
-                    <li>${customerPending>0?`미조치 ${customerPending}건 · 처리상태 우선 확인`:'미조치 접수 없음'}</li>
-                    <li>${qrTopInsight?xEsc(qrTopInsight.risk.action):'접수 원문을 기준으로 현장 상태를 확인하세요.'}</li>
-                  </ul>
-                </div></div>
-                <div class="qrx-v8-panel"><div class="qrx-alertbox"><div><strong>${qrUrgent}</strong><small>긴급 접수 · 즉시 확인 권장</small></div></div></div>
-              </div>
+              
 
               <div class="qrx-v8-grid-3">
                 ${(()=>{
@@ -3307,10 +3295,7 @@ html::before,body::before{
               </div>
 
               <div class="qrx-v8-grid">
-                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📅 요일 × 시간 집중 패턴</b><span>접수 빈도 히트맵</span></div><div class="qrx-v8-body">
-                  <div class="qrx-heat">${weekdayMap.map((d,i)=>{const n=weekdayCount[i]||0;const max=Math.max(1,...weekdayCount);const alpha=Math.min(.9,.12+n/max*.78);return `<div class="qrx-heat-cell" style="background:rgba(59,130,246,${alpha})"><b>${d}</b><small>${n}건</small></div>`}).join('')}</div>
-                  <div style="margin-top:12px;padding:9px 11px;border-radius:9px;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:800">🔥 최다 요일 · ${xEsc(peakWeekdayText)} · 최다 시간 · ${xEsc(peakHourText)}</div>
-                </div></div>
+                
 
                 <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📈 최근 7일 접수 흐름</b><span>${qrTrendText}</span></div><div class="qrx-v8-body"><div class="qrx-trend">${qrTrend7.map(o=>{const mx=Math.max(1,...qrTrend7.map(v=>v.count));return `<div class="qrx-trend-day"><b>${o.count}</b><div class="qrx-trend-bar" style="height:${Math.max(7,Math.round(o.count/mx*85))}px"></div><small>${xEsc(o.label)}</small></div>`}).join('')}</div><div style="margin-top:8px;text-align:right;font-size:11px;color:#64748b">최근 7일 ${qrNowTrend}건 · 이전 7일 ${qrPrevTrend}건</div></div></div>
               </div>
