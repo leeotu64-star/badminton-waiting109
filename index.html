@@ -2677,19 +2677,19 @@ html::before,body::before{
 .eam-innovation{width:100%;max-width:100%;box-sizing:border-box}
 
 /* 누수현황과 비슷한 앞면/뒷면 카드 */
-.eam-xanalysis-flip{perspective:1200px!important;min-height:340px!important;background:transparent!important;border:0!important;box-shadow:none!important}
-.eam-xflip-inner{position:relative!important;width:100%!important;min-height:340px!important;transform-style:preserve-3d!important;transition:transform .55s ease!important}
-.eam-xanalysis-flip.flipped .eam-xflip-inner{transform:rotateY(180deg)!important}
-.eam-xflip-face{position:absolute!important;inset:0!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important;border:1px solid #c9d9e8!important;border-radius:12px!important;background:inherit!important;overflow:hidden!important}
-.eam-xflip-back{transform:rotateY(180deg)!important;overflow:auto!important}
-.eam-xanalysis-summary{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;padding:24px!important}
-.eam-xanalysis-summary>div{border:1px solid #d4e1ed!important;border-radius:10px!important;padding:18px!important;background:inherit!important}
-.eam-xanalysis-summary span,.eam-xanalysis-summary small{display:block!important}
-.eam-xanalysis-summary b{display:block!important;font-size:1.5em!important;margin:8px 0!important}
-.eam-xflip-btn{margin:0 24px 20px!important;padding:11px 18px!important;border-radius:8px!important;border:1px solid #b9cee2!important;background:inherit!important;cursor:pointer!important;font-weight:800!important}
-.eam-xanalysis-detail-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;padding:14px!important}
-.eam-xanalysis-detail-grid>.eam-xpanel{margin:0!important}
-@media(max-width:800px){.eam-xanalysis-summary,.eam-xanalysis-detail-grid{grid-template-columns:1fr!important}}
+
+
+.eam-xanalysis-flip.flipped 
+
+
+
+
+
+
+
+
+
+@media(max-width:800px){.eam-xanalysis-summary,}
 </style>
 <script id="JGB_V70_EAM_FLIP_JS">
 function eamFlipAnalysis(){document.getElementById('eamAnalysisFlip')?.classList.toggle('flipped')}
@@ -2701,13 +2701,43 @@ function eamFlipAnalysis(){document.getElementById('eamAnalysisFlip')?.classList
 .eam-innovation-layout,
 .eam-xgrid2,
 .eam-xmonthly,
-.eam-xanalysis-flip{
-  width:100%!important;
-  max-width:100%!important;
-  box-sizing:border-box!important;
-}
-.eam-xanalysis-summary{box-sizing:border-box!important}
+
+
 </style>
+<style id="JGB_V72_EAM_ACCORDION_TABS">
+/* V72 — 기존 색상/디자인 유지, 카드 뒤집기 대신 아코디언+탭 */
+.eam-xanalysis-accordion{overflow:hidden!important}
+.eam-xaccordion-summary{cursor:pointer!important;min-height:62px!important}
+.eam-xanalysis-quick{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important;padding:14px 16px!important}
+.eam-xanalysis-quick>div{padding:13px 15px!important;border:1px solid #d4e1ed!important;border-radius:9px!important}
+.eam-xanalysis-quick span,.eam-xanalysis-quick b{display:block!important;font-weight:900!important}
+.eam-xanalysis-quick b{font-size:1.15em!important;font-weight:950!important;margin-top:4px!important}
+.eam-xanalysis-body{display:none!important;border-top:1px solid #d4e1ed!important;padding:14px 16px 18px!important}
+.eam-xanalysis-accordion.open .eam-xanalysis-body{display:block!important}
+.eam-xanalysis-tabs{display:flex!important;gap:8px!important;flex-wrap:wrap!important;margin-bottom:12px!important}
+.eam-xanalysis-tab{padding:10px 15px!important;border:1px solid #c9d9e8!important;border-radius:8px!important;background:inherit!important;cursor:pointer!important;font-weight:950!important}
+.eam-xanalysis-pane{display:none!important;border:1px solid #d4e1ed!important;border-radius:10px!important;overflow:hidden!important}
+.eam-xanalysis-pane.active{display:block!important}
+.eam-xanalysis-pane .eam-xhead{margin:0!important}
+.eam-xanalysis-pane strong,.eam-xanalysis-pane span,.eam-xanalysis-pane b,.eam-xanalysis-pane small,.eam-xanalysis-pane em{font-weight:850!important}
+.eam-xanalysis-pane .eam-dx-ranks,.eam-xanalysis-pane .eam-dx-list{font-size:1.05em!important}
+@media(max-width:800px){.eam-xanalysis-quick{grid-template-columns:repeat(2,minmax(0,1fr))!important}.eam-xanalysis-tabs{display:grid!important;grid-template-columns:repeat(2,1fr)!important}}
+</style>
+<script id="JGB_V72_EAM_ACCORDION_TABS_JS">
+function eamToggleAnalysis(){
+ const box=document.getElementById('eamAnalysisAccordion'),btn=document.getElementById('eamAnalysisToggleBtn');
+ if(!box)return;
+ const open=box.classList.toggle('open');
+ if(btn)btn.textContent=open?'− 접기':'＋ 상세보기';
+}
+function eamAnalysisTab(name,el){
+ document.querySelectorAll('.eam-xanalysis-tab').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('.eam-xanalysis-pane').forEach(p=>p.classList.remove('active'));
+ if(el)el.classList.add('active');
+ const pane=document.getElementById('eamAnalysisPane'+name.charAt(0).toUpperCase()+name.slice(1));
+ if(pane)pane.classList.add('active');
+}
+</script>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3799,26 +3829,40 @@ function eamFlipAnalysis(){document.getElementById('eamAnalysisFlip')?.classList
        <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비방식</strong><small>${year}년 자체정비와 외주정비</small></div><em>METHOD</em></div><div class="eam-dx-method"><div class="internal"><span>자체정비</span><b>${yearSelf}<small>건</small></b><strong>${qYear.length?Math.round(yearSelf/qYear.length*100):0}%</strong></div><div class="external"><span>외주정비</span><b>${yearOut}<small>건</small></b><strong>${qYear.length?Math.round(yearOut/qYear.length*100):0}%</strong></div></div></div>
        <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비유형</strong><small>예방점검 · 고장정비 · 계획정비</small></div><em>MAINTENANCE TYPE</em></div><div class="eam-dx-list">${typeRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b></div>`).join('')}</div></div>
       </section>
-      <section class="eam-xpanel eam-xanalysis-flip" id="eamAnalysisFlip">
-       <div class="eam-xflip-inner">
-        <div class="eam-xflip-face eam-xflip-front">
-         <div class="eam-xhead"><div><strong>📊 자산 분석</strong><small>상세 분석은 카드를 클릭하세요</small></div><em>CLICK TO FLIP</em></div>
-         <div class="eam-xanalysis-summary">
-          <div><span>⚠️ 고장 발생 TOP 5</span><b>${failureTop.length}건</b><small>반복 고장 자산</small></div>
-          <div><span>🔧 정비 집중 자산</span><b>${burdenTop.length}건</b><small>유지관리 집중 자산</small></div>
-          <div><span>📋 정비구분</span><b>${catRows.reduce((n,r)=>n+r.count,0)}건</b><small>전체 유지관리 이력</small></div>
-          <div><span>📅 내용연수 분석</span><b>${lifecycle.length}건</b><small>분석 가능 자산</small></div>
-         </div>
-         <button type="button" class="eam-xflip-btn" onclick="eamFlipAnalysis()">상세 분석 보기 ↻</button>
+      <section class="eam-xpanel eam-xanalysis-accordion" id="eamAnalysisAccordion">
+       <div class="eam-xhead eam-xaccordion-summary" onclick="eamToggleAnalysis()">
+        <div><strong>📊 자산 분석</strong><small>핵심 요약 · 상세 분석</small></div>
+        <button type="button" class="btn gray" id="eamAnalysisToggleBtn" onclick="event.stopPropagation();eamToggleAnalysis()">＋ 상세보기</button>
+       </div>
+       <div class="eam-xanalysis-quick">
+        <div><span>⚠️ 고장 발생</span><b>${failureTop.length}건</b></div>
+        <div><span>🔧 정비 집중</span><b>${burdenTop.length}건</b></div>
+        <div><span>📋 정비구분</span><b>${catRows.reduce((n,r)=>n+r.count,0)}건</b></div>
+        <div><span>📅 내용연수</span><b>${lifecycle.length}건</b></div>
+       </div>
+       <div class="eam-xanalysis-body" id="eamAnalysisBody">
+        <div class="eam-xanalysis-tabs">
+         <button type="button" class="eam-xanalysis-tab active" onclick="eamAnalysisTab('failure',this)">⚠️ 고장 발생</button>
+         <button type="button" class="eam-xanalysis-tab" onclick="eamAnalysisTab('burden',this)">🔧 정비 집중</button>
+         <button type="button" class="eam-xanalysis-tab" onclick="eamAnalysisTab('category',this)">📋 정비구분</button>
+         <button type="button" class="eam-xanalysis-tab" onclick="eamAnalysisTab('life',this)">📅 내용연수</button>
         </div>
-        <div class="eam-xflip-face eam-xflip-back">
-         <div class="eam-xhead"><div><strong>📊 자산 분석 상세</strong><small>고장 · 정비 · 내용연수 통합 분석</small></div><button type="button" class="btn gray" onclick="eamFlipAnalysis()">↩ 요약으로</button></div>
-         <div class="eam-xanalysis-detail-grid">
-          <div class="eam-xpanel"><div class="eam-xhead"><div><strong>고장 발생 TOP 5</strong><small>${year}년 반복 고장 자산</small></div><em>FAILURE TOP 5</em></div><div class="eam-dx-ranks">${renderRank(failureTop)}</div></div>
-          <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비 집중 자산 TOP 5</strong><small>${year}년 유지관리 집중 자산</small></div><em>MAINT TOP 5</em></div><div class="eam-dx-ranks">${renderRank(burdenTop)}</div></div>
-          <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비구분</strong><small>점검 · 보수 · 부품교체 · 설비교체</small></div><em>CATEGORY</em></div><div class="eam-dx-list">${catRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b></div>`).join('')}</div></div>
-          <div class="eam-xpanel"><div class="eam-xhead"><div><strong>내용연수 현황</strong><small>설치일·내용연수가 입력된 자산 기준</small></div><em>LIFECYCLE</em></div><div class="eam-xlife-total"><b>${lifecycle.length}</b><span>분석 가능 자산</span></div><div class="eam-xlife"><div><span>정상 사용<i></i></span><b>${lifeCounts.normal}건</b></div><div><span>내용연수 임박<i class="near"></i></span><b>${lifeCounts.near}건</b></div><div><span>내용연수 초과<i class="over"></i></span><b>${lifeCounts.over}건</b></div></div></div>
-         </div>
+        <div class="eam-xanalysis-pane active" id="eamAnalysisPaneFailure">
+         <div class="eam-xhead"><div><strong>고장 발생 TOP 5</strong><small>${year}년 반복 고장 자산</small></div><em>FAILURE TOP 5</em></div>
+         <div class="eam-dx-ranks">${renderRank(failureTop)}</div>
+        </div>
+        <div class="eam-xanalysis-pane" id="eamAnalysisPaneBurden">
+         <div class="eam-xhead"><div><strong>정비 집중 자산 TOP 5</strong><small>${year}년 유지관리 집중 자산</small></div><em>MAINT TOP 5</em></div>
+         <div class="eam-dx-ranks">${renderRank(burdenTop)}</div>
+        </div>
+        <div class="eam-xanalysis-pane" id="eamAnalysisPaneCategory">
+         <div class="eam-xhead"><div><strong>정비구분</strong><small>점검 · 보수 · 부품교체 · 설비교체</small></div><em>CATEGORY</em></div>
+         <div class="eam-dx-list">${catRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b></div>`).join('')}</div>
+        </div>
+        <div class="eam-xanalysis-pane" id="eamAnalysisPaneLife">
+         <div class="eam-xhead"><div><strong>내용연수 현황</strong><small>설치일·내용연수가 입력된 자산 기준</small></div><em>LIFECYCLE</em></div>
+         <div class="eam-xlife-total"><b>${lifecycle.length}</b><span>분석 가능 자산</span></div>
+         <div class="eam-xlife"><div><span>정상 사용<i></i></span><b>${lifeCounts.normal}건</b></div><div><span>내용연수 임박<i class="near"></i></span><b>${lifeCounts.near}건</b></div><div><span>내용연수 초과<i class="over"></i></span><b>${lifeCounts.over}건</b></div></div>
         </div>
        </div>
       </section>
