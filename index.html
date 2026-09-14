@@ -2660,6 +2660,17 @@ html::before,body::before{
 }
 </style>
 
+
+<style id="JGB_V68_CHANGE_TOPLINE">
+/* V68: '오늘의 변화' 줄 바로 위에 상단 영역과 같은 블루 구분선 추가 */
+.qrx-v8-grid-3{
+  border-top:3px solid #1265a8!important;
+  padding-top:14px!important;
+  margin-top:22px!important;
+  border-radius:0!important;
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -4399,20 +4410,20 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         if(rs.includes('재조치 필요')) return '재조치 필요';
         if(rs.includes('보수 후 관찰')) return '보수 후 관찰';
         if(rs.includes('조치 완료') || rs.includes('완료')) return '조치 완료';
-        return String(leak.status||'조치필요')==='조치필요'?'재조치 필요':String(leak.status||'')==='조치완료'?'완료':String(leak.status||'')==='조치진행중'?'보수 후 관찰':'재조치 필요';
+        return String(leak.status||'조치필요')==='조치필요'?'재조치 필요':String(leak.status||'')==='조치완료'?'조치 완료':String(leak.status||'')==='조치진행중'?'보수 후 관찰':'재조치 필요';
       };
       const observationLeaks=leaks.filter(x=>resultForLeak(x)==='보수 후 관찰').length;
-      const progress=leaks.filter(x=>resultForLeak(x)==='보수 후 관찰' && !waRowsForLeak(x).length).length;
-      const done=leaks.filter(x=>resultForLeak(x)==='완료').length;
+      const progress=0;
+      const done=leaks.filter(x=>resultForLeak(x)==='조치 완료').length;
       const need=leaks.filter(x=>resultForLeak(x)==='재조치 필요').length;
       const active=need+progress+observationLeaks;
       const categories=['코트','화장실','샤워실','휴게실','기타'];
       const catOf=loc=>{const v=String(loc||'');if(v.includes('코트'))return '코트';if(v.includes('화장실'))return '화장실';if(v.includes('샤워실'))return '샤워실';if(v.includes('휴게실'))return '휴게실';return '기타'};
-      const linked=wp.filter(h=>leakCodeOfWp(h)).length;
+      const linked=wp.filter(h=>{const lk=leakCodeOfWp(h);return /^LK-\d+$/.test(lk)&&leaks.some(l=>String(l.leakCode||'').trim().toUpperCase()===lk)}).length;
       const safetyScore=Math.max(0,Math.min(100,100-(need*25)-(progress*10)-(observationLeaks*5)+(linked*5)));
       const safetyGrade=safetyScore>=90?'안전':safetyScore>=75?'양호':safetyScore>=60?'주의':safetyScore>=40?'경계':'위험';
       const safetyClass=safetyScore>=90?'safe':safetyScore>=75?'blue':safetyScore>=60?'yellow':safetyScore>=40?'orange':'red';
-      const catCounts=categories.map(c=>({c,total:leaks.filter(x=>catOf(x.location)===c).length,open:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치필요').length,mid:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치진행중').length,done:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치완료').length}));
+      const catCounts=categories.map(c=>({c,total:leaks.filter(x=>catOf(x.location)===c).length,open:leaks.filter(x=>catOf(x.location)===c&&resultForLeak(x)==='재조치 필요').length,mid:leaks.filter(x=>catOf(x.location)===c&&resultForLeak(x)==='보수 후 관찰').length,done:leaks.filter(x=>catOf(x.location)===c&&resultForLeak(x)==='조치 완료').length}));
       const colors={코트:'blue',화장실:'red',샤워실:'cyan',휴게실:'green',기타:'gray'};
       const statRows=catCounts.map(x=>{const catLeaks=leaks.filter(l=>catOf(l.location)===x.c);const obs=catLeaks.filter(l=>waRowsForLeak(l).some(h=>String(h.result||'')==='보수 후 관찰')).length;const linkedCat=catLeaks.reduce((n,l)=>n+waRowsForLeak(l).length,0);const detail=catLeaks.slice(0,3).map(l=>`${esc(l.leakCode||'-')} · ${esc(l.location||'-')}`).join('<br>')||'등록된 누수 없음';return `<div class="jgb-v134-flip" data-v134-flip="1" data-cat="${esc(x.c)}" tabindex="0" role="button"><div class="jgb-v134-inner"><div class="jgb-v134-face jgb-v134-front"><span class="name">${esc(x.c)}</span><b class="count">${x.total}</b><span class="states">🔴 ${x.open} · 🟠 ${x.mid||0} · 🟡 ${obs} · 🟢 ${x.done}</span><span class="hint">카드를 누르면 상세 현황 ↻</span></div><div class="jgb-v134-face jgb-v134-back"><div class="back-head"><strong>📍 ${esc(x.c)} 상세</strong><b>${x.total}건</b></div><div class="back-body">${detail}<br><b>보수 후 관찰 ${obs}건 · 방수 연계 ${linkedCat}건</b></div><button type="button" class="back-action" data-v104-filter="${esc(x.c)}">해당 위치 보기 →</button></div></div></div>`}).join('');
       const filterButtons=categories.map(c=>`<button type="button" class="jgb-v104-filter ${colors[c]}" data-v104-filter="${esc(c)}">${esc(c)}</button>`).join('');
@@ -4430,17 +4441,17 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           const base=pos[c]||[50,50], offsets=[[0,0],[-4,-5],[4,-5],[-5,5],[5,5],[0,9],[-9,0],[9,0]], o=offsets[n%offsets.length];
           px=Math.max(6,Math.min(94,base[0]+o[0])); py=Math.max(7,Math.min(93,base[1]+o[1]));
         }
-        const st=String(x.status||'조치필요'), cls=st==='조치완료'?'done':st==='조치진행중'?'mid':'open';
+        const st=resultForLeak(x), cls=st==='조치 완료'?'done':st==='보수 후 관찰'?'mid':'open';
         const savedX=Number.isFinite(Number(x.mapX))?Number(x.mapX):px, savedY=Number.isFinite(Number(x.mapY))?Number(x.mapY):py; return `<button type="button" class="jgb-v104-marker ${cls}" style="left:${savedX}%;top:${savedY}%" data-v104-place="${esc(c)}" data-v47-action="go-wp-by-leak" data-id="${esc(x.id)}" data-map-x="${savedX}" data-map-y="${savedY}" title="드래그하여 위치 이동 · ${esc(loc)} · ${esc(x.leakCode||'-')}">${esc(x.leakCode||'-')}</button>`;
       }).join('');
       const rows=leaks.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).map((x,i)=>{
-        const was=waForLeak(x), wa=was[0]||'';
+        const was=waForLeak(x), wa=was[0]||'', currentResult=resultForLeak(x);
         const waHtml=wa?`<button type="button" class="jgb-v104-wa" data-v47-action="show-wp-by-leak" data-leak="${esc(x.leakCode)}">${esc(wa)}</button>${was.length>1?`<small> 외 ${was.length-1}건 (총 ${was.length}건)</small>`:''}`:'-';
         return `<article class="jgb-v104-leak-card" data-v104-place="${esc(catOf(x.location))}">
           <table><tbody>
             <tr><th>No.</th><td>${i+1}</td><th>누수코드</th><td><button type="button" class="jgb-v104-code" data-v47-action="edit-leak" data-id="${esc(x.id)}">${esc(x.leakCode||'-')}</button></td></tr>
             <tr><th>발생위치</th><td>${esc(x.location||'-')}</td><th>발견일</th><td>${esc(x.date||'-')}</td></tr>
-            <tr><th>상태</th><td><span class="jgb-v104-badge ${x.status==='조치완료'?'done':x.status==='조치진행중'?'mid':'open'}">${esc(x.status||'조치필요')}</span></td><th>방수 이력</th><td>${waHtml}</td></tr>
+            <tr><th>상태</th><td><span class="jgb-v104-badge ${currentResult==='조치 완료'?'done':currentResult==='보수 후 관찰'?'mid':'open'}">${esc(currentResult)}</span></td><th>방수 이력</th><td>${waHtml}</td></tr>
             <tr><th>조치내용</th><td>${esc(x.content||'-')}</td><th>비고</th><td>${esc(x.note||'-')}</td></tr>
           </tbody></table>
           <div class="jgb-v104-leak-manage"><button type="button" class="btn gray" data-v47-action="edit-leak" data-id="${esc(x.id)}">상세보기</button></div>
