@@ -4765,7 +4765,19 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   /* 레거시 카드가 다시 중복 생성되지 않도록 정리 */
   try{localStorage.removeItem('JGB_V48_WP_CARDS')}catch(e){}
   cards=jgbV90NormalizeWpCards();
-  const list=Object.entries(cards).map(([code,m])=>({code:String(m?.code||code),meta:m||{}})).filter(x=>x.code);
+  /* 방수카드가 아직 생성되지 않았어도 누수관리의 LK를 기준으로 화면에 먼저 표시 */
+  const leakRows=Array.isArray(S.leaks)?S.leaks:[];
+  const cardByLK=new Map();
+  Object.entries(cards).forEach(([code,m])=>{
+    const lk=String(m?.leakCode||'').trim().toUpperCase();
+    if(/^LK-\d+$/.test(lk)) cardByLK.set(lk,{code:String(m?.code||code),meta:m||{}});
+  });
+  leakRows.forEach(l=>{
+    const lk=String(l?.leakCode||l?.lkCode||l?.code||'').trim().toUpperCase();
+    if(!/^LK-\d+$/.test(lk)||cardByLK.has(lk))return;
+    cardByLK.set(lk,{code:lk,meta:{code:lk,leakCode:lk,location:String(l?.location||'').trim(),facility:'장군봉체육관'}});
+  });
+  const list=Array.from(cardByLK.values()).filter(x=>x.code);
   const cardFor=(card,idx)=>{
     const code=card.code, meta=card.meta||{}, loc=String(meta.location||'').trim();
     const rows=hs.filter(x=>String(x.related||'').trim().toUpperCase()===String(meta.leakCode||'').trim().toUpperCase()).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
@@ -13516,3 +13528,70 @@ window.eamDeleteSelectedAsset=async function(){
 
 </body>
 </html>
+<script id="JGB_V93_WP_CARD_CREATE_FIX">
+(function(){
+  if(window.__JGB_V93_WP_CREATE_FIX)return;
+  window.__JGB_V93_WP_CREATE_FIX=true;
+  function esc(v){return typeof xEsc==='function'?xEsc(v==null?'':String(v)):String(v==null?'':v).replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]))}
+  function getLeaks(){
+    try{
+      const raw=JSON.parse(localStorage.getItem('JGB_V47_LEAKS')||'[]');
+      const arr=Array.isArray(raw)?raw:[]; const seen=new Set();
+      return arr.map(x=>({lk:String(x?.leakCode||x?.lkCode||x?.code||'').trim().toUpperCase(),location:String(x?.location||'').trim()}))
+        .filter(x=>/^LK-\d+$/.test(x.lk)&&!seen.has(x.lk)&&seen.add(x.lk))
+        .sort((a,b)=>a.lk.localeCompare(b.lk,undefined,{numeric:true}));
+    }catch(e){return []}
+  }
+  function openCreate(){
+    const leaks=getLeaks();
+    const oldCards=(()=>{try{return JSON.parse(localStorage.getItem('JGB_V72_WP_CARDS')||'{}')||{}}catch(e){return {}}})();
+    const existing=new Set(Object.values(oldCards).map(x=>String(x?.leakCode||'').trim().toUpperCase()));
+    const options=leaks.map(x=>`<option value="${esc(x.lk)}" data-location="${esc(x.location)}">${esc(x.lk)} · ${esc(x.location||'위치 미등록')}</option>`).join('');
+    const modal=document.createElement('div');
+    modal.id='jgbV47Modal'; modal.className='jgb-v47-modal';
+    modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>📋 방수공사 이력카드 등록</h2><button type="button" data-v47-action="close-modal">×</button></div>
+      <div class="jgb-v47-form-grid">
+        <label>연결 누수코드(LK)<select id="v93_lk">${options||'<option value="">등록된 누수코드가 없습니다</option>'}</select><small>누수관리에서 등록된 LK-01 등의 누수코드를 선택합니다.</small></label>
+        <label>시설명<input id="v93_facility" value="장군봉체육관"></label>
+        <label>방수 위치<input id="v93_location" readonly value="${esc(leaks[0]?.location||'')}"></label>
+        <label>건물·구역<input id="v93_area"></label>
+        <label>주요 방수부위<input id="v93_part"></label>
+        <label>방수공사 종류<input id="v93_kind" value="방수 보수·보강"></label>
+        <label>방수 면적<input id="v93_areaSize"></label>
+        <label>최초 방수일<input id="v93_firstDate" type="date"></label>
+        <label>현재 상태<select id="v93_status"><option>정상</option><option>점검필요</option><option>보수필요</option></select></label>
+        <label>담당자<input id="v93_manager"></label>
+        <label>연락처<input id="v93_contact"></label>
+        <label>시공업체<input id="v93_contractor"></label>
+        <label>보증기간<input id="v93_warranty"></label>
+        <label>공사 목적<input id="v93_purpose" value="시설물 보호 및 누수 예방"></label>
+        <label>주요 공법<input id="v93_method"></label>
+        <label>사용 자재<input id="v93_material"></label>
+        <label>공사 범위<input id="v93_scope"></label>
+        <label class="wide">특이사항<textarea id="v93_note" rows="3"></textarea></label>
+      </div>
+      <div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" id="v93_save_card">저장</button></div></div>`;
+    document.body.appendChild(modal);
+    const sel=modal.querySelector('#v93_lk'), loc=modal.querySelector('#v93_location');
+    if(sel)sel.addEventListener('change',()=>{const o=sel.options[sel.selectedIndex];if(loc)loc.value=o?.dataset?.location||''});
+    const save=modal.querySelector('#v93_save_card');
+    save?.addEventListener('click',()=>{
+      const lk=String(sel?.value||'').trim().toUpperCase();
+      if(!/^LK-\d+$/.test(lk)){alert('연결 누수코드(LK)를 선택하세요.');return}
+      const leak=leaks.find(x=>x.lk===lk)||{}; const location=String(leak.location||loc?.value||'').trim();
+      if(!location){alert('선택한 LK에 발생 위치가 없습니다. 누수관리에서 위치를 먼저 등록하세요.');return}
+      if(existing.has(lk)){alert('이 LK에는 이미 방수 이력카드가 있습니다. 기존 카드를 사용하세요.');return}
+      const code='CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+      const val=id=>modal.querySelector('#'+id)?.value?.trim()||'';
+      const card={code,leakCode:lk,location,facility:val('v93_facility')||'장군봉체육관',area:val('v93_area'),part:val('v93_part')||location,kind:val('v93_kind')||'방수 보수·보강',areaSize:val('v93_areaSize'),firstDate:val('v93_firstDate'),status:val('v93_status')||'정상',manager:val('v93_manager'),contact:val('v93_contact'),contractor:val('v93_contractor'),warranty:val('v93_warranty'),purpose:val('v93_purpose')||'시설물 보호 및 누수 예방',method:val('v93_method'),material:val('v93_material'),scope:val('v93_scope'),note:val('v93_note'),photos:[]};
+      const all={...oldCards,[code]:card}; localStorage.setItem('JGB_V72_WP_CARDS',JSON.stringify(all));
+      modal.remove(); if(typeof render==='function')render();
+    });
+  }
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('[data-v47-action="new-wp-card"]');
+    if(!b)return;
+    e.preventDefault(); e.stopImmediatePropagation(); openCreate();
+  },true);
+})();
+</script>
