@@ -4834,9 +4834,37 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       });
       return out;
     }
+    function jgbV90LeakList(){
+      const out=[];
+      const seen=new Set();
+      const add=(rawCode,rawLocation)=>{
+        const lk=String(rawCode||'').trim().toUpperCase();
+        if(!/^LK-\d+$/.test(lk)||seen.has(lk))return;
+        seen.add(lk);
+        out.push({leakCode:lk,location:String(rawLocation||'').trim()});
+      };
+      // 1순위: 누수관리의 실제 저장 데이터
+      const S=jgbV47Store();
+      (Array.isArray(S.leaks)?S.leaks:[]).forEach(l=>add(l?.leakCode||l?.lkCode||l?.code,l?.location));
+      // 2순위: 기존 방수 이력카드에 남아 있는 LK
+      const cards=wpV72Cards();
+      Object.values(cards||{}).forEach(c=>add(c?.leakCode||c?.related,c?.location));
+      // 3순위: 기존 WA 이력의 related(LK)
+      (Array.isArray(S.wp)?S.wp:[]).forEach(h=>{
+        const lk=String(h?.related||'').trim().toUpperCase();
+        const parent=(Array.isArray(S.leaks)?S.leaks:[]).find(l=>String(l?.leakCode||'').trim().toUpperCase()===lk);
+        add(lk,parent?.location||h?.location);
+      });
+      // 4순위: 마지막으로 선택했던 LK가 있으면 목록에 복구
+      try{
+        const saved=String(localStorage.getItem('JGB_V48_WP_SELECTED_LEAK')||'').trim().toUpperCase();
+        if(/^LK-\d+$/.test(saved))add(saved,'');
+      }catch(e){}
+      return out.sort((a,b)=>a.leakCode.localeCompare(b.leakCode,undefined,{numeric:true}));
+    }
     function jgbV48OpenCardEditor(code,isNew){
       const all=jgbV90NormalizeWpCards(), old=isNew?{}:(all[String(code)]||{}), esc=v=>xEsc(v==null?'':String(v));
-      const S=jgbV47Store(), leaks=Array.isArray(S.leaks)?S.leaks:[], initial=String(old.code||code||('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()));
+      const leaks=jgbV90LeakList(), initial=String(old.code||code||('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()));
       const leakInitial=String(old.leakCode||'').toUpperCase();
       const leakOptions=leaks.map(l=>{const lk=String(l.leakCode||'').toUpperCase(),loc=String(l.location||'');return `<option value="${esc(lk)}" data-location="${esc(loc)}" ${lk===leakInitial?'selected':''}>${esc(lk)} · ${esc(loc||'위치 미등록')}</option>`}).join('');
       const fallback=leakInitial&&!leaks.some(l=>String(l.leakCode||'').toUpperCase()===leakInitial)?`<option value="${esc(leakInitial)}" selected>⚠ ${esc(leakInitial)} · 기존 연결</option>`:'';
