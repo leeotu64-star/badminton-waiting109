@@ -2811,6 +2811,28 @@ function eamOpenMaintenanceStatus(){
 }
 function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78MaintModal');if(box)box.classList.remove('show')}
 </script>
+<style id="JGB_V81_EAM_50_50">
+/* V81: 월별 흐름 50% + 주의 자산/다음 관리 예정 50% */
+.eam-xmonth-half-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:16px!important;align-items:stretch!important}
+.eam-xmonth-half-grid>.eam-xpanel{min-width:0!important;margin:0!important}
+.eam-xmonth-left .eam-dx-flow{min-height:190px!important}
+.eam-xmonth-right{overflow:hidden!important}
+.eam-xmonth-right .eam-dx-ranks{padding:14px 16px!important}
+.eam-xmonth-right .eam-dx-rank{margin-bottom:8px!important}
+.eam-xnext-head{margin-top:4px!important;border-top:1px solid #d9e4ed!important}
+.eam-xnext-list{padding:10px 16px 14px!important}
+.eam-xnext-item{display:grid!important;grid-template-columns:92px 1fr auto!important;gap:8px!important;align-items:center!important;padding:8px 0!important;border-bottom:1px solid #e2eaf0!important;font-size:13px!important}
+.eam-xnext-item>b{font-weight:900!important}
+.eam-xnext-item>span{font-weight:800!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.eam-xnext-item>small{font-weight:750!important}
+@media(max-width:900px){.eam-xmonth-half-grid{grid-template-columns:1fr!important}}
+</style>
+<style id="JGB_V82_EAM_PANORAMA">
+.eam-xpanorama{overflow:hidden!important;min-width:0!important}.eam-xpanorama-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}.eam-xpanorama-nav{display:flex!important;align-items:center!important;gap:5px!important}.eam-xpanorama-nav button{width:30px!important;height:30px!important;border:1px solid #d4e1ed!important;border-radius:7px!important;background:inherit!important;font-size:21px!important;font-weight:900!important;cursor:pointer!important}.eam-xpanorama-nav span{min-width:52px!important;text-align:center!important;font-size:11px!important;font-weight:900!important}.eam-xpanorama-viewport{overflow:hidden!important;width:100%!important}.eam-xpanorama-track{display:flex!important;width:300%!important;transition:transform .45s ease!important}.eam-xpanorama-slide{width:33.333333%!important;min-width:33.333333%!important;box-sizing:border-box!important;padding:8px 0 4px!important}.eam-xpanorama-slide .eam-dx-ranks,.eam-xpanorama-slide .eam-xnext-list,.eam-xpanorama-slide .eam-xrecent-list{padding:8px 16px 14px!important}.eam-xrecent-item{display:grid!important;grid-template-columns:90px 1fr!important;gap:4px 10px!important;padding:9px 0!important;border-bottom:1px solid #e2eaf0!important}.eam-xrecent-item b{grid-row:span 2!important;font-weight:900!important}.eam-xrecent-item span{font-weight:850!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.eam-xrecent-item small{font-weight:750!important}.eam-xpanorama-labels{display:flex!important;justify-content:center!important;gap:6px!important;padding:7px 8px 10px!important;border-top:1px solid #e2eaf0!important}.eam-xpanorama-labels span{font-size:11px!important;font-weight:800!important;cursor:pointer!important;padding:5px 6px!important}.eam-xpanorama-labels span.active{font-weight:950!important}@media(max-width:900px){.eam-xmonth-half-grid{grid-template-columns:1fr!important}}
+</style>
+<script id="JGB_V82_EAM_PANORAMA_JS">
+(function(){let idx=0,timer=null,paused=false;const titles=[['⚠️ 주의 자산 TOP 5','반복 고장·정비이력이 많은 자산'],['📅 다음 관리 예정','등록된 다음 점검·관리 예정일'],['🛠 최근 정비 이력','최근 처리된 유지관리 이력']];function renderP(){const r=document.getElementById('eamMaintenancePanorama');if(!r)return;const t=r.querySelector('#eamPanoramaTrack');if(t)t.style.transform='translateX(-'+idx*33.333333+'%)';r.querySelector('#eamPanoramaTitle').textContent=titles[idx][0];r.querySelector('#eamPanoramaSub').textContent=titles[idx][1];r.querySelector('#eamPanoramaDots').textContent=[0,1,2].map(i=>i===idx?'●':'○').join(' ');r.querySelectorAll('.eam-xpanorama-labels span').forEach((e,i)=>e.classList.toggle('active',i===idx))}function reset(){clearInterval(timer);timer=setInterval(()=>{if(!paused){idx=(idx+1)%3;renderP()}},7000)}window.eamPanoramaNext=function(){idx=(idx+1)%3;renderP();reset()};window.eamPanoramaPrev=function(){idx=(idx+2)%3;renderP();reset()};window.eamPanoramaGo=function(n){idx=Math.max(0,Math.min(2,n));renderP();reset()};function init(){const r=document.getElementById('eamMaintenancePanorama');if(!r)return;r.addEventListener('mouseenter',()=>paused=true);r.addEventListener('mouseleave',()=>paused=false);renderP();reset()}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init()})();
+</script>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3897,8 +3919,27 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
        </div></div>
        <div class="eam-xpanel"><div class="eam-xhead"><div><strong>ASSET HEALTH</strong><small>현재 등록 자산 상태</small></div><em>STATUS</em></div><div class="eam-xstatus-big"><b>${assets.length?Math.round(normal/assets.length*100):0}<small>%</small></b><span>정상 자산 비율</span></div><div class="eam-xstatus-list"><div><span>● 정상</span><b>${normal}건</b><div><i style="width:${assets.length?Math.round(normal/assets.length*100):0}%"></i></div></div><div><span>● 조치 필요</span><b>${attention}건</b><div><i style="width:${assets.length?Math.round(attention/assets.length*100):0}%"></i></div></div></div></div>
       </section>
-      <section class="eam-xpanel eam-xmonthly"><div class="eam-xhead"><div><strong>${year}년 월별 유지관리 흐름</strong><small>예방점검 · 자체정비 · 외주정비 · 미처리 정비 · 고장·이상 발생</small></div><em>JAN — DEC</em></div><div class="eam-dx-flow">${months.map(m=>`<div class="eam-dx-flow-month"><b>${m.m}월</b><div class="eam-dx-flow-bars"><i class="prevent" style="height:${Math.max(4,m.prevent/maxFlow*150)}px" title="예방점검 ${m.prevent}건"></i><i class="self" style="height:${Math.max(4,m.self/maxFlow*150)}px" title="자체정비 ${m.self}건"></i><i class="out" style="height:${Math.max(4,m.out/maxFlow*150)}px" title="외주정비 ${m.out}건"></i><i class="pending" style="height:${Math.max(4,m.pending/maxFlow*150)}px" title="미처리 정비 ${m.pending}건"></i><i class="failure" style="height:${Math.max(4,m.failure/maxFlow*150)}px" title="고장·이상 ${m.failure}건"></i></div><small>예방 ${m.prevent} · 자체 ${m.self} · 외주 ${m.out}</small></div>`).join('')}</div><div class="eam-dx-legend"><span><i class="prevent"></i>예방점검</span><span><i class="self"></i>자체정비</span><span><i class="out"></i>외주정비</span><span><i class="pending"></i>미처리</span><span><i class="failure"></i>고장·이상</span></div><div class="eam-dx-annual"><div><small>연간 유지관리</small><b>${qYear.length}<i>건</i></b></div><div><small>예방점검</small><b>${yearPrevent}<i>건</i></b></div><div><small>자체정비</small><b>${yearSelf}<i>건</i></b></div><div><small>외주정비</small><b>${yearOut}<i>건</i></b></div><div><small>고장·이상</small><b>${yearFailure}<i>건</i></b></div></div></section>
-      
+      <section class="eam-xmonth-half-grid">
+       <div class="eam-xpanel eam-xmonthly eam-xmonth-left">
+        <div class="eam-xhead"><div><strong>${year}년 월별 유지관리 흐름</strong><small>예방점검 · 자체정비 · 외주정비 · 미처리 · 고장·이상</small></div><em>JAN — DEC</em></div>
+        <div class="eam-dx-flow">${months.map(m=>`<div class="eam-dx-flow-month"><b>${m.m}월</b><div class="eam-dx-flow-bars"><i class="prevent" style="height:${Math.max(4,m.prevent/maxFlow*150)}px" title="예방점검 ${m.prevent}건"></i><i class="self" style="height:${Math.max(4,m.self/maxFlow*150)}px" title="자체정비 ${m.self}건"></i><i class="out" style="height:${Math.max(4,m.out/maxFlow*150)}px" title="외주정비 ${m.out}건"></i><i class="pending" style="height:${Math.max(4,m.pending/maxFlow*150)}px" title="미처리 정비 ${m.pending}건"></i><i class="failure" style="height:${Math.max(4,m.failure/maxFlow*150)}px" title="고장·이상 ${m.failure}건"></i></div><small>예방 ${m.prevent} · 자체 ${m.self} · 외주 ${m.out}</small></div>`).join('')}</div>
+        <div class="eam-dx-legend"><span><i class="prevent"></i>예방점검</span><span><i class="self"></i>자체정비</span><span><i class="out"></i>외주정비</span><span><i class="pending"></i>미처리</span><span><i class="failure"></i>고장·이상</span></div>
+       </div>
+       <div class="eam-xpanel eam-xmonth-right eam-xpanorama" id="eamMaintenancePanorama">
+ <div class="eam-xhead eam-xpanorama-head">
+  <div><strong id="eamPanoramaTitle">⚠️ 주의 자산 TOP 5</strong><small id="eamPanoramaSub">반복 고장·정비이력이 많은 자산</small></div>
+  <div class="eam-xpanorama-nav"><button type="button" onclick="eamPanoramaPrev()">‹</button><span id="eamPanoramaDots">● ○ ○</span><button type="button" onclick="eamPanoramaNext()">›</button></div>
+ </div>
+ <div class="eam-xpanorama-viewport"><div class="eam-xpanorama-track" id="eamPanoramaTrack">
+  <div class="eam-xpanorama-slide"><div class="eam-dx-ranks">${failureTop.length?failureTop.map((x,i)=>`<div class="eam-dx-rank"><b>${String(i+1).padStart(2,'0')}</b><span>${esc(x.asset.name||x.asset.model||x.asset.asset_code||'자산')}</span><strong>${x.count}<small>건</small></strong></div>`).join(''):'<div class="eam-xempty">주의가 필요한 자산이 없습니다.</div>'}</div></div>
+  <div class="eam-xpanorama-slide"><div class="eam-xnext-list">${(()=>{const rows=[];const seen=new Set();(Array.isArray(db?.maint)?db.maint:[]).forEach(d=>{d=d||{};const ds=String(d.nextDate||d.nextInspectionDate||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(ds))return;const a=getAsset(d),name=a?.name||a?.model||a?.asset_code||d.asset_code||d.assetName||'자산',k=ds+'|'+name;if(seen.has(k))return;seen.add(k);rows.push({ds,name,type:d.maintenanceType||d.type||d.result||'정비'})});rows.sort((a,b)=>a.ds.localeCompare(b.ds));return rows.slice(0,6).map(r=>`<div class="eam-xnext-item"><b>${esc(r.ds)}</b><span>${esc(r.name)}</span><small>${esc(r.type)}</small></div>`).join('')||'<div class="eam-xempty">등록된 다음 관리 예정이 없습니다.</div>'})()}</div></div>
+  <div class="eam-xpanorama-slide"><div class="eam-xrecent-list">${(()=>{const rows=(Array.isArray(db?.maint)?db.maint:[]).map(d=>{d=d||{};const a=getAsset(d);return {date:String(d.date||d.workDate||d.created_at||'').slice(0,10),name:a?.name||a?.model||a?.asset_code||d.asset_code||d.assetName||'자산',type:d.maintenanceType||d.type||d.result||'정비'}}).filter(x=>x.date).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);return rows.map(r=>`<div class="eam-xrecent-item"><b>${esc(r.date)}</b><span>${esc(r.name)}</span><small>${esc(r.type)}</small></div>`).join('')||'<div class="eam-xempty">최근 정비 이력이 없습니다.</div>'})()}</div></div>
+ </div></div>
+ <div class="eam-xpanorama-labels"><span class="active" onclick="eamPanoramaGo(0)">주의 자산</span><span onclick="eamPanoramaGo(1)">다음 관리 예정</span><span onclick="eamPanoramaGo(2)">최근 정비 이력</span></div>
+</div>
+
+      </section>
+
       <section class="eam-xpanel eam-xanalysis-accordion" id="eamAnalysisAccordion">
        <div class="eam-xhead eam-xaccordion-summary" onclick="eamToggleAnalysis()">
         <div><strong>📊 자산 분석</strong><small>핵심 요약 · 상세 분석</small></div>
