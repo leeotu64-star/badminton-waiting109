@@ -2742,6 +2742,20 @@ function eamAnalysisTab(name,el){
 /* V73: 방수 작업결과 명칭을 '조치 / 보수 후 관찰 / 재조치 필요'로 통일 */
 .jgb-v47-modal-box select#v47_result{font-weight:800!important}
 </style>
+<style id="JGB_V75_EAM_MAINT_MERGE">
+/* V75: 정비방식 + 정비유형을 하나의 정비 현황 영역으로 통합 */
+.eam-xmaintenance-summary{margin-bottom:18px!important}
+.eam-xmaint-merged{display:grid!important;grid-template-columns:1.15fr 1px .85fr!important;gap:22px!important;align-items:stretch!important;padding:20px 22px!important}
+.eam-xmaint-block h3{margin:0 0 14px!important;font-size:16px!important;font-weight:950!important;color:#183d5a!important}
+.eam-xmethod-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important}
+.eam-xmethod-row .eam-xmethod{min-height:120px!important;box-sizing:border-box!important}
+.eam-xmaint-divider{width:1px!important;background:#d9e4ed!important}
+.eam-xmaint-type-list{display:grid!important;gap:0!important;border-top:1px solid #d9e4ed!important}
+.eam-xmaint-type-list>div{display:flex!important;justify-content:space-between!important;align-items:center!important;padding:11px 4px!important;border-bottom:1px solid #d9e4ed!important}
+.eam-xmaint-type-list span{font-weight:850!important}
+.eam-xmaint-type-list b{font-weight:950!important}
+@media(max-width:800px){.eam-xmaint-merged{grid-template-columns:1fr!important}.eam-xmaint-divider{display:none!important}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3829,9 +3843,22 @@ function eamAnalysisTab(name,el){
        <div class="eam-xpanel"><div class="eam-xhead"><div><strong>ASSET HEALTH</strong><small>현재 등록 자산 상태</small></div><em>STATUS</em></div><div class="eam-xstatus-big"><b>${assets.length?Math.round(normal/assets.length*100):0}<small>%</small></b><span>정상 자산 비율</span></div><div class="eam-xstatus-list"><div><span>● 정상</span><b>${normal}건</b><div><i style="width:${assets.length?Math.round(normal/assets.length*100):0}%"></i></div></div><div><span>● 조치 필요</span><b>${attention}건</b><div><i style="width:${assets.length?Math.round(attention/assets.length*100):0}%"></i></div></div></div></div>
       </section>
       <section class="eam-xpanel eam-xmonthly"><div class="eam-xhead"><div><strong>${year}년 월별 유지관리 흐름</strong><small>예방점검 · 자체정비 · 외주정비 · 미처리 정비 · 고장·이상 발생</small></div><em>JAN — DEC</em></div><div class="eam-dx-flow">${months.map(m=>`<div class="eam-dx-flow-month"><b>${m.m}월</b><div class="eam-dx-flow-bars"><i class="prevent" style="height:${Math.max(4,m.prevent/maxFlow*150)}px" title="예방점검 ${m.prevent}건"></i><i class="self" style="height:${Math.max(4,m.self/maxFlow*150)}px" title="자체정비 ${m.self}건"></i><i class="out" style="height:${Math.max(4,m.out/maxFlow*150)}px" title="외주정비 ${m.out}건"></i><i class="pending" style="height:${Math.max(4,m.pending/maxFlow*150)}px" title="미처리 정비 ${m.pending}건"></i><i class="failure" style="height:${Math.max(4,m.failure/maxFlow*150)}px" title="고장·이상 ${m.failure}건"></i></div><small>예방 ${m.prevent} · 자체 ${m.self} · 외주 ${m.out}</small></div>`).join('')}</div><div class="eam-dx-legend"><span><i class="prevent"></i>예방점검</span><span><i class="self"></i>자체정비</span><span><i class="out"></i>외주정비</span><span><i class="pending"></i>미처리</span><span><i class="failure"></i>고장·이상</span></div><div class="eam-dx-annual"><div><small>연간 유지관리</small><b>${qYear.length}<i>건</i></b></div><div><small>예방점검</small><b>${yearPrevent}<i>건</i></b></div><div><small>자체정비</small><b>${yearSelf}<i>건</i></b></div><div><small>외주정비</small><b>${yearOut}<i>건</i></b></div><div><small>고장·이상</small><b>${yearFailure}<i>건</i></b></div></div></section>
-      <section class="eam-xgrid2">
-       <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비방식</strong><small>${year}년 자체정비와 외주정비</small></div><em>METHOD</em></div><div class="eam-dx-method"><div class="internal"><span>자체정비</span><b>${yearSelf}<small>건</small></b><strong>${qYear.length?Math.round(yearSelf/qYear.length*100):0}%</strong></div><div class="external"><span>외주정비</span><b>${yearOut}<small>건</small></b><strong>${qYear.length?Math.round(yearOut/qYear.length*100):0}%</strong></div></div></div>
-       <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비유형</strong><small>예방점검 · 고장정비 · 계획정비</small></div><em>MAINTENANCE TYPE</em></div><div class="eam-dx-list">${typeRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b></div>`).join('')}</div></div>
+      <section class="eam-xpanel eam-xmaintenance-summary">
+       <div class="eam-xhead"><div><strong>정비 현황</strong><small>${year}년 정비방식 · 정비유형 통합 현황</small></div><em>MAINTENANCE STATUS</em></div>
+       <div class="eam-xmaint-merged">
+        <div class="eam-xmaint-block">
+         <h3>정비방식</h3>
+         <div class="eam-xmethod-row">
+          <div class="eam-xmethod internal"><span>자체정비</span><b>${yearSelf}<small>건</small></b><strong>${qYear.length?Math.round(yearSelf/qYear.length*100):0}%</strong></div>
+          <div class="eam-xmethod external"><span>외주정비</span><b>${yearOut}<small>건</small></b><strong>${qYear.length?Math.round(yearOut/qYear.length*100):0}%</strong></div>
+         </div>
+        </div>
+        <div class="eam-xmaint-divider"></div>
+        <div class="eam-xmaint-block">
+         <h3>정비유형</h3>
+         <div class="eam-xmaint-type-list">${typeRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b></div>`).join('')}</div>
+        </div>
+       </div>
       </section>
       <section class="eam-xpanel eam-xanalysis-accordion" id="eamAnalysisAccordion">
        <div class="eam-xhead eam-xaccordion-summary" onclick="eamToggleAnalysis()">
