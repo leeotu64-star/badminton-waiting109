@@ -2756,6 +2756,61 @@ function eamAnalysisTab(name,el){
 .eam-xmaint-type-list b{font-weight:950!important}
 @media(max-width:800px){.eam-xmaint-merged{grid-template-columns:1fr!important}.eam-xmaint-divider{display:none!important}}
 </style>
+<style id="JGB_V78_EAM_MAINT_BUTTON">
+/* V78: 삭제한 정비 현황은 상단 버튼으로 확인 */
+.eam-xhero-right{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important}
+.eam-xhero-right button{cursor:pointer!important}
+.jgb-v78-maint-modal{position:fixed!important;inset:0!important;z-index:99999!important;background:rgba(15,31,48,.45)!important;display:none!important;align-items:center!important;justify-content:center!important;padding:20px!important}
+.jgb-v78-maint-modal.show{display:flex!important}
+.jgb-v78-maint-box{width:min(760px,96vw)!important;background:#fff!important;border-radius:16px!important;box-shadow:0 20px 60px rgba(0,0,0,.22)!important;overflow:hidden!important}
+.jgb-v78-maint-head{padding:18px 22px!important;border-bottom:1px solid #d4e1ed!important;display:flex!important;justify-content:space-between!important;align-items:center!important}
+.jgb-v78-maint-head strong{font-size:20px!important;font-weight:950!important}
+.jgb-v78-maint-close{border:0!important;background:transparent!important;font-size:24px!important;cursor:pointer!important}
+.jgb-v78-maint-body{padding:20px 22px!important}
+.jgb-v78-maint-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:18px!important}
+.jgb-v78-maint-section{border:1px solid #d4e1ed!important;border-radius:10px!important;padding:16px!important}
+.jgb-v78-maint-section h3{margin:0 0 12px!important;font-size:16px!important;font-weight:950!important}
+.jgb-v78-maint-methods{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
+.jgb-v78-maint-method{padding:14px!important;border-radius:9px!important;border:1px solid #d4e1ed!important}
+.jgb-v78-maint-method.internal{border-left:4px solid #20a86b!important;background:#f5fbf8!important}
+.jgb-v78-maint-method.external{border-left:4px solid #ff861d!important;background:#fff9f1!important}
+.jgb-v78-maint-method span,.jgb-v78-maint-method b{display:block!important;font-weight:900!important}
+.jgb-v78-maint-method b{font-size:22px!important;margin-top:6px!important}
+.jgb-v78-maint-types{border-top:1px solid #d9e4ed!important}
+.jgb-v78-maint-types div{display:flex!important;justify-content:space-between!important;padding:10px 2px!important;border-bottom:1px solid #d9e4ed!important}
+.jgb-v78-maint-types span{font-weight:800!important}.jgb-v78-maint-types b{font-weight:950!important}
+@media(max-width:650px){.jgb-v78-maint-grid{grid-template-columns:1fr!important}.jgb-v78-maint-methods{grid-template-columns:1fr!important}}
+</style>
+<script id="JGB_V78_EAM_MAINT_BUTTON_JS">
+function eamOpenMaintenanceStatus(){
+  const q=typeof qYear!=='undefined'?qYear:[];
+  const yearSelf=typeof window.yearSelf!=='undefined'?window.yearSelf:q.filter(h=>typeof method==='function'&&method(h)==='자체정비').length;
+  const yearOut=typeof window.yearOut!=='undefined'?window.yearOut:q.filter(h=>typeof method==='function'&&method(h)==='외주정비').length;
+  const year=typeof window.year!=='undefined'?window.year:new Date().getFullYear();
+  const typeNames=['예방점검','고장정비','계획정비','기타'];
+  const counts=typeNames.map(n=>q.filter(h=>typeof maintType==='function'&&maintType(h)===n).length);
+  let box=document.getElementById('jgbV78MaintModal');
+  if(!box){
+    box=document.createElement('div');box.id='jgbV78MaintModal';box.className='jgb-v78-maint-modal';
+    document.body.appendChild(box);
+  }
+  box.innerHTML=`<div class="jgb-v78-maint-box" role="dialog" aria-modal="true">
+   <div class="jgb-v78-maint-head"><strong>🔧 정비 현황</strong><button class="jgb-v78-maint-close" onclick="eamCloseMaintenanceStatus()">×</button></div>
+   <div class="jgb-v78-maint-body"><div class="jgb-v78-maint-grid">
+    <div class="jgb-v78-maint-section"><h3>정비방식</h3><div class="jgb-v78-maint-methods">
+     <div class="jgb-v78-maint-method internal"><span>자체정비</span><b>${yearSelf}건</b></div>
+     <div class="jgb-v78-maint-method external"><span>외주정비</span><b>${yearOut}건</b></div>
+    </div></div>
+    <div class="jgb-v78-maint-section"><h3>정비유형</h3><div class="jgb-v78-maint-types">
+     ${typeNames.map((n,i)=>`<div><span>${n}</span><b>${counts[i]}건</b></div>`).join('')}
+    </div></div>
+   </div></div>
+  </div>`;
+  box.classList.add('show');
+  box.onclick=e=>{if(e.target===box)eamCloseMaintenanceStatus()};
+}
+function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78MaintModal');if(box)box.classList.remove('show')}
+</script>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3823,7 +3878,7 @@ function eamAnalysisTab(name,el){
      const catRows=['점검','보수','부품교체','설비교체','기타'].map(n=>{const q=qYear.filter(h=>{const p=info(h),t=[p.type,p.category,h.action_type,h.event_type,h.description].map(V).join(' ');if(n==='설비교체')return /설비교체|자산교체/.test(t);if(n==='부품교체')return /부품교체|소모품교체/.test(t);if(n==='점검')return /점검/.test(t);if(n==='보수')return /보수|수리/.test(t);return true});return {name:n,count:q.length}});
      const yearRows=years.slice(-5).map(y=>{const q=hist.filter(h=>V(h.event_date).slice(0,4)===String(y));return {y,total:q.length,prevent:q.filter(h=>maintType(h)==='예방점검').length,self:q.filter(h=>method(h)==='자체정비').length,out:q.filter(h=>method(h)==='외주정비').length,failure:q.filter(isFailure).length}});
      return `<div class="eam-xdash">
-      <section class="eam-xhero"><div><div class="eam-xeyebrow">EAM · ASSET CONTROL CENTER</div><h1>EAM 시설·자산 통합 현황</h1><p>자산 등록 → 예방점검 → 자체정비·외주정비 → 고장·이상 → 유지관리 실적을 연도별로 통합 관리합니다.</p></div><div class="eam-xhero-right"><span>● 실시간 DB</span><button onclick="go('eam')">🏢 자산 EAM 관리</button></div></section>
+      <section class="eam-xhero"><div><div class="eam-xeyebrow">EAM · ASSET CONTROL CENTER</div><h1>EAM 시설·자산 통합 현황</h1><p>자산 등록 → 예방점검 → 자체정비·외주정비 → 고장·이상 → 유지관리 실적을 연도별로 통합 관리합니다.</p></div><div class="eam-xhero-right"><span>● 실시간 DB</span><button onclick="go('eam')">🏢 자산 EAM 관리</button><button onclick="eamOpenMaintenanceStatus()">🔧 정비 현황</button></div></section>
       <section class="eam-dx-yearbar"><div><b>조회연도</b><small>선택한 연도의 1~12월 유지관리 실적을 조회합니다.</small></div><select onchange="localStorage.setItem('JGB_EAM_DASH_YEAR',this.value);render()">${[...new Set([...years,currentYear])].sort((a,b)=>b-a).map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}년</option>`).join('')}</select></section>
       <section class="eam-xkpis">
        <div class="eam-xkpi blue"><small>운영 자산</small><b>${assets.length}<i>건</i></b><span>폐기 제외</span></div>
@@ -3843,23 +3898,7 @@ function eamAnalysisTab(name,el){
        <div class="eam-xpanel"><div class="eam-xhead"><div><strong>ASSET HEALTH</strong><small>현재 등록 자산 상태</small></div><em>STATUS</em></div><div class="eam-xstatus-big"><b>${assets.length?Math.round(normal/assets.length*100):0}<small>%</small></b><span>정상 자산 비율</span></div><div class="eam-xstatus-list"><div><span>● 정상</span><b>${normal}건</b><div><i style="width:${assets.length?Math.round(normal/assets.length*100):0}%"></i></div></div><div><span>● 조치 필요</span><b>${attention}건</b><div><i style="width:${assets.length?Math.round(attention/assets.length*100):0}%"></i></div></div></div></div>
       </section>
       <section class="eam-xpanel eam-xmonthly"><div class="eam-xhead"><div><strong>${year}년 월별 유지관리 흐름</strong><small>예방점검 · 자체정비 · 외주정비 · 미처리 정비 · 고장·이상 발생</small></div><em>JAN — DEC</em></div><div class="eam-dx-flow">${months.map(m=>`<div class="eam-dx-flow-month"><b>${m.m}월</b><div class="eam-dx-flow-bars"><i class="prevent" style="height:${Math.max(4,m.prevent/maxFlow*150)}px" title="예방점검 ${m.prevent}건"></i><i class="self" style="height:${Math.max(4,m.self/maxFlow*150)}px" title="자체정비 ${m.self}건"></i><i class="out" style="height:${Math.max(4,m.out/maxFlow*150)}px" title="외주정비 ${m.out}건"></i><i class="pending" style="height:${Math.max(4,m.pending/maxFlow*150)}px" title="미처리 정비 ${m.pending}건"></i><i class="failure" style="height:${Math.max(4,m.failure/maxFlow*150)}px" title="고장·이상 ${m.failure}건"></i></div><small>예방 ${m.prevent} · 자체 ${m.self} · 외주 ${m.out}</small></div>`).join('')}</div><div class="eam-dx-legend"><span><i class="prevent"></i>예방점검</span><span><i class="self"></i>자체정비</span><span><i class="out"></i>외주정비</span><span><i class="pending"></i>미처리</span><span><i class="failure"></i>고장·이상</span></div><div class="eam-dx-annual"><div><small>연간 유지관리</small><b>${qYear.length}<i>건</i></b></div><div><small>예방점검</small><b>${yearPrevent}<i>건</i></b></div><div><small>자체정비</small><b>${yearSelf}<i>건</i></b></div><div><small>외주정비</small><b>${yearOut}<i>건</i></b></div><div><small>고장·이상</small><b>${yearFailure}<i>건</i></b></div></div></section>
-      <section class="eam-xpanel eam-xmaintenance-summary">
-       <div class="eam-xhead"><div><strong>정비 현황</strong><small>${year}년 정비방식 · 정비유형 통합 현황</small></div><em>MAINTENANCE STATUS</em></div>
-       <div class="eam-xmaint-merged">
-        <div class="eam-xmaint-block">
-         <h3>정비방식</h3>
-         <div class="eam-xmethod-row">
-          <div class="eam-xmethod internal"><span>자체정비</span><b>${yearSelf}<small>건</small></b><strong>${qYear.length?Math.round(yearSelf/qYear.length*100):0}%</strong></div>
-          <div class="eam-xmethod external"><span>외주정비</span><b>${yearOut}<small>건</small></b><strong>${qYear.length?Math.round(yearOut/qYear.length*100):0}%</strong></div>
-         </div>
-        </div>
-        <div class="eam-xmaint-divider"></div>
-        <div class="eam-xmaint-block">
-         <h3>정비유형</h3>
-         <div class="eam-xmaint-type-list">${typeRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b></div>`).join('')}</div>
-        </div>
-       </div>
-      </section>
+      
       <section class="eam-xpanel eam-xanalysis-accordion" id="eamAnalysisAccordion">
        <div class="eam-xhead eam-xaccordion-summary" onclick="eamToggleAnalysis()">
         <div><strong>📊 자산 분석</strong><small>핵심 요약 · 상세 분석</small></div>
