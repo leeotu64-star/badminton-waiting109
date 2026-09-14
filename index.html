@@ -3952,14 +3952,15 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     `;document.head.appendChild(st)}
     if(!document.getElementById('JGB_V121_LEAK_PAIR_STYLE')){const st=document.createElement('style');st.id='JGB_V121_LEAK_PAIR_STYLE';st.textContent=`
       .jgb-v104-leak-scroll{max-height:360px;overflow-y:auto;overflow-x:hidden;border:1px solid #d8e2ea;padding:10px;background:#f7fafc;box-sizing:border-box}
-      .jgb-v104-leak-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+      .jgb-v104-leak-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
       .jgb-v104-leak-card{min-width:0;background:#fff;border:1px solid #cbd8e2;box-sizing:border-box}
       .jgb-v104-leak-card table{width:100%;border-collapse:collapse;table-layout:fixed;margin:0}
       .jgb-v104-leak-card th{width:17%;background:#eef4f8;font-weight:900;white-space:nowrap}
       .jgb-v104-leak-card td{width:33%;background:#fff}
-      .jgb-v104-leak-card th,.jgb-v104-leak-card td{border:1px solid #cbd8e2;padding:9px 7px;text-align:center;vertical-align:middle;box-sizing:border-box}
+      .jgb-v104-leak-card th,.jgb-v104-leak-card td{border:1px solid #cbd8e2;padding:9px 10px;vertical-align:middle;box-sizing:border-box}.jgb-v104-leak-card th{text-align:left}.jgb-v104-leak-card td{text-align:left}
       .jgb-v104-leak-manage{border-top:1px solid #cbd8e2;background:#f7fafc;padding:7px;text-align:right}
-      @media(max-width:850px){.jgb-v104-leak-grid{grid-template-columns:1fr}}
+      @media(max-width:1100px){.jgb-v104-leak-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+      @media(max-width:700px){.jgb-v104-leak-grid{grid-template-columns:1fr}}
     `;document.head.appendChild(st)}
     if(!document.getElementById('JGB_V117_PAIR_TABLE_STYLE')){const st=document.createElement('style');st.id='JGB_V117_PAIR_TABLE_STYLE';st.textContent=`.jgb-v104-pair-table table{width:100%;border-collapse:collapse;table-layout:fixed}.jgb-v104-pair-row th{width:11%;padding:10px 12px;background:#eef4f8;border:1px solid #cbd7e0;text-align:center;font-weight:800;white-space:nowrap}.jgb-v104-pair-row td{width:39%;padding:10px 12px;border:1px solid #cbd7e0;background:#fff;text-align:center}.jgb-v104-pair-row td:nth-child(4){width:39%}.jgb-v104-pair-manage td{padding:7px;text-align:right;border:1px solid #cbd7e0;background:#f7fafc}.jgb-v104-pair-manage .btn{margin:0}.jgb-v104-pair-table .jgb-v104-code{font-weight:800}.jgb-v104-pair-table .jgb-v104-wa{font-weight:800}.jgb-v104-pair-table small{margin-left:4px}`;document.head.appendChild(st)}
     function leakagePage(){
@@ -3981,7 +3982,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const safetyScore=Math.max(0,Math.min(100,100-(need*25)-(progress*10)-(observationLeaks*5)+(linked*5)));
       const safetyGrade=safetyScore>=90?'안전':safetyScore>=75?'양호':safetyScore>=60?'주의':safetyScore>=40?'경계':'위험';
       const safetyClass=safetyScore>=90?'safe':safetyScore>=75?'blue':safetyScore>=60?'yellow':safetyScore>=40?'orange':'red';
-      const catCounts=categories.map(c=>({c,total:leaks.filter(x=>catOf(x.location)===c).length,open:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')!=='조치완료').length,done:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치완료').length}));
+      const catCounts=categories.map(c=>({c,total:leaks.filter(x=>catOf(x.location)===c).length,open:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치필요').length,mid:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치진행중').length,done:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치완료').length}));
       const colors={코트:'blue',화장실:'red',샤워실:'cyan',휴게실:'green',기타:'gray'};
       const statRows=catCounts.map(x=>`<button type="button" class="jgb-v104-stat-row ${colors[x.c]}" data-v104-filter="${esc(x.c)}"><span>${esc(x.c)}</span><b>${x.total}</b><small>🔴 필요 ${x.open} &nbsp;·&nbsp; 🟠 진행 ${x.mid||0} &nbsp;·&nbsp; 🟢 완료 ${x.done}</small></button>`).join('');
       const filterButtons=categories.map(c=>`<button type="button" class="jgb-v104-filter ${colors[c]}" data-v104-filter="${esc(c)}">${esc(c)}</button>`).join('');
