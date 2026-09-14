@@ -4673,41 +4673,65 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       if(!m)return '';
       return 'WA-'+String(Number(m[1])).padStart(2,'0')+'-'+String(Math.max(1,Number(seq)||1));
     }
-    function jgbV76NormalizeWpHistoryCodes(cards, hs){
+    /* V85: WA 이력은 고유 id + 부모 방수카드의 cardCode로만 식별/수정/저장 */
+    function jgbV85EnsureWpIdentity(cards, hs){
       const arr=Array.isArray(hs)?hs.map(x=>({...x})):[];
+      const seenIds=new Set();
       const groups={};
-      arr.forEach((h,i)=>{
-        const card=cards[String(h.cardCode||'')]||{};
-        const lk=String(card.leakCode||h.related||'').trim().toUpperCase();
-        if(!/^LK-\d+$/.test(lk))return;
-        const key=lk;
-        (groups[key] ||= []).push({h,i});
-      });
       let changed=false;
-      Object.entries(groups).forEach(([lk,items])=>{
+      arr.forEach((h,i)=>{
+        let id=String(h?.id||'').trim();
+        if(!id || seenIds.has(id)){
+          id='V85-WP-'+Date.now().toString(36)+'-'+i+'-'+Math.random().toString(36).slice(2,8).toUpperCase();
+          arr[i]={...h,id};
+          changed=true;
+        }
+        seenIds.add(id);
+        const cc=String(arr[i]?.cardCode||'').trim();
+        if(cc && cards[cc]){
+          (groups[cc] ||= []).push({h:arr[i],i});
+        }
+      });
+      /* cardCode가 없는 구형 WA만 최초 1회 LK+위치로 부모 카드를 찾아 부여한다. */
+      arr.forEach((h,i)=>{
+        const cc=String(h?.cardCode||'').trim();
+        if(cc && cards[cc]) return;
+        const lk=String(h?.related||'').trim().toUpperCase();
+        const loc=String(h?.location||'').trim();
+        let hit=null;
+        if(lk) hit=Object.entries(cards).find(([k,c])=>String(c?.leakCode||'').trim().toUpperCase()===lk && (!loc || String(c?.location||'').trim()===loc));
+        if(!hit && loc) hit=Object.entries(cards).find(([k,c])=>String(c?.location||'').trim()===loc);
+        if(hit){
+          arr[i]={...arr[i],cardCode:String(hit[0]),related:String(hit[1]?.leakCode||lk).trim().toUpperCase(),location:String(hit[1]?.location||loc).trim()};
+          (groups[hit[0]] ||= []).push({h:arr[i],i});
+          changed=true;
+        }
+      });
+      /* 같은 부모 cardCode 안에서 WA 순번도 중복 없이 고정한다. */
+      Object.entries(groups).forEach(([cc,items])=>{
+        const card=cards[cc]||{};
+        const lk=String(card.leakCode||items[0]?.h?.related||'').trim().toUpperCase();
+        if(!/^LK-\d+$/.test(lk)) return;
         const used=new Set();
-        /* 기존 WA-01 / WA-2 같은 번호는 숫자를 순번으로 최대한 보존 */
-        items.forEach(({h})=>{
-          const m=String(h.waCode||'').trim().toUpperCase().match(/^WA-\d+-(\d+)$/);
-          if(m)used.add(Number(m[1]));
-        });
         let next=1;
         items.forEach(({h,i})=>{
-          const old=String(h.waCode||'').trim().toUpperCase();
-          let seq=null;
-          const canonical=old.match(/^WA-\d+-(\d+)$/);
-          if(canonical)seq=Number(canonical[1]);
-          else {
-            const legacy=old.match(/^WA-(\d+)$/);
-            if(legacy)seq=Number(legacy[1]);
+          const old=String(h?.waCode||'').trim().toUpperCase();
+          const m=old.match(/^WA-\d+-(\d+)$/);
+          let seq=m?Number(m[1]):0;
+          if(!seq || used.has(seq)){
+            while(used.has(next)) next++;
+            seq=next;
           }
-          if(!seq || used.has(seq)&&!canonical){
-            while(used.has(next))next++;
-            seq=next; used.add(seq); next++;
-          }
+          used.add(seq);
+          next=Math.max(next,seq+1);
           const code=jgbV76WaCodeFor(lk,seq);
-          if(code && old!==code){arr[i]={...h,waCode:code,related:lk};changed=true}
-          else if(code && String(h.related||'').trim().toUpperCase()!==lk){arr[i]={...arr[i],related:lk};changed=true}
+          const cur=arr[i];
+          const related=lk;
+          const location=String(card.location||cur.location||'').trim();
+          if(code && (String(cur.waCode||'').toUpperCase()!==code || String(cur.related||'').toUpperCase()!==related || String(cur.location||'')!==location)){
+            arr[i]={...cur,waCode:code,related,location};
+            changed=true;
+          }
         });
       });
       return {arr,changed};
@@ -4715,12 +4739,13 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 
     function waterproofPage(){
   const S=jgbV47Store();
-  try{const cards0=jgbV90NormalizeWpCards();let changed0=false;const migrated0=(Array.isArray(S.wp)?S.wp:[]).map(h=>{if(h.cardCode)return h;const lk=String(h.related||'').trim().toUpperCase();const loc=String(h.location||'').trim();const hit=Object.entries(cards0).find(([k,c])=>String(c?.leakCode||'').trim().toUpperCase()===lk&&String(c?.location||'').trim()===loc);if(hit){changed0=true;return {...h,cardCode:String(hit[0]),related:lk}}return h});if(changed0)S.saveWp(migrated0)}catch(e){}
   let hs=Array.isArray(S.wp)?S.wp:[];
   try{
-    const normalized=jgbV76NormalizeWpHistoryCodes(jgbV90NormalizeWpCards(),hs);
-    if(normalized.changed){hs=normalized.arr;S.saveWp(hs)}
-  }catch(e){}
+    const cards0=jgbV90NormalizeWpCards();
+    const normalized=jgbV85EnsureWpIdentity(cards0,hs);
+    hs=normalized.arr;
+    if(normalized.changed)S.saveWp(hs);
+  }catch(e){console.warn('V85 WA identity normalization failed',e)}
   const CARDKEY='JGB_V72_WP_CARDS';
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   let cards=jgbV90NormalizeWpCards();
@@ -4742,31 +4767,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   cards=jgbV90NormalizeWpCards();
   /* 잘못 저장된 관련 누수값(WA 등)은 부모 카드의 LK 누수코드로 정리 */
   try{let fixed=false;hs=hs.map(h=>{const c=cards[String(h.cardCode||'')]||{};const rel=String(h.related||'').trim().toUpperCase();if(/^WA-\d+$/.test(rel)&&/^LK-\d+$/.test(String(c.leakCode||''))){fixed=true;return {...h,related:String(c.leakCode)}}return h});if(fixed)S.saveWp(hs)}catch(e){}
-  /* 기존 이력은 같은 위치의 기존 카드에만 연결. 이후부터는 반드시 cardCode로 분리 */
-  try{
-    let changed=false, arr=hs.map(h=>{
-      if(h.cardCode)return h;
-      const found=Object.values(cards).find(c=>String(c?.location||'').trim()===String(h?.location||'').trim());
-      if(found?.code){changed=true;return {...h,cardCode:String(found.code)}}
-      return h;
-    });
-    if(changed)S.saveWp(arr);
-  }catch(e){}
-  /* 기존 WA 이력 중 id가 없거나 중복된 데이터도 각각 고유 ID를 갖도록 보정 */
-  try{
-    const seen=new Set(); let fixed=false;
-    hs=hs.map((h,i)=>{
-      let id=String(h?.id||'').trim();
-      if(!id || seen.has(id)){
-        id='V47-WP-'+Date.now().toString(36)+'-'+i+'-'+Math.random().toString(36).slice(2,7);
-        fixed=true;
-        return {...h,id};
-      }
-      seen.add(id);
-      return h;
-    });
-    if(fixed)S.saveWp(hs);
-  }catch(e){}
   const list=Object.entries(cards).map(([code,m])=>({code:String(m?.code||code),meta:m||{}})).filter(x=>x.code);
   const cardFor=(card,idx)=>{
     const code=card.code, meta=card.meta||{}, loc=String(meta.location||'').trim();
@@ -4916,7 +4916,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const title=type==='leak'?(old?'💧 누수 현황 수정':'💧 누수 등록'):(old?'🛡 방수 이력 수정':'📝 방수공사 이력내역 등록');
       const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box"><div class="jgb-v47-modal-head"><h2>${title}</h2><button type="button" data-v47-action="close-modal">×</button></div>${body}<div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" data-v47-action="save-modal" data-type="${type}" data-id="${esc(old?.id||'')}" data-code="${esc(cardCode||old?.cardCode||'')}">저장</button></div></div>`;document.body.appendChild(modal);
     }
-    async function jgbV47SaveModal(type,id,cardCode){const S=jgbV47Store(),val=k=>document.getElementById(k)?.value?.trim()||'',loc=val('v47_location');if(!loc){alert('작업 위치를 확인하세요.');return}const base={id:String(id||'').trim()||('V47-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),location:loc,date:val('v47_date')||new Date().toISOString().slice(0,10)};if(type==='leak'){const old=S.leaks.find(x=>String(x.id)===String(base.id))||{};const leakCode=jgbV90NormalizeCode(val('v47_leakCode'),'LK-');if(!/^LK-\d+$/.test(leakCode)){alert('누수코드는 LK-01 형식으로 입력하세요.');return}const dup=S.leaks.some(x=>String(x.leakCode||'').toUpperCase()===leakCode && String(x.id)!==String(base.id));if(dup){alert('이미 사용 중인 누수코드입니다. 다른 번호를 입력하세요.');return}Object.assign(base,{leakCode,status:val('v47_status')||'조치필요',content:val('v47_content'),note:val('v47_note'),createdAt:old.createdAt||new Date().toISOString()});S.saveLeaks(id?S.leaks.map(x=>String(x.id)===String(base.id)?base:x):[base,...S.leaks])}else{const old=S.wp.find(x=>String(x.id)===String(base.id))||{};if(id && !old.id){alert('선택한 방수 이력(WA)을 찾지 못했습니다. 새로 등록하지 않고 저장을 중단합니다.');return}let cc=String(cardCode||old.cardCode||'').trim();if(!cc){const allCards=jgbV90NormalizeWpCards();const hit=Object.entries(allCards).find(([k,c])=>String(c?.leakCode||'').trim().toUpperCase()===String(old?.related||'').trim().toUpperCase()&&String(c?.location||'').trim()===String(old?.location||'').trim());if(hit)cc=String(hit[0]);}const cardNow=jgbV90NormalizeWpCards()[cc]||{};const linkedLocation=String(cardNow.location||loc||old.location||'').trim();const linkedLK=String(cardNow.leakCode||old.related||'').trim().toUpperCase();if(!cc||!wpV72Cards()[cc]){alert('연결할 이력카드를 찾지 못했습니다. 이력카드에서 이력내역 등록을 눌러주세요.');return}let waCode='';
+    async function jgbV47SaveModal(type,id,cardCode){const S=jgbV47Store(),val=k=>document.getElementById(k)?.value?.trim()||'',loc=val('v47_location');if(!loc){alert('작업 위치를 확인하세요.');return}const base={id:String(id||'').trim()||('V47-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),location:loc,date:val('v47_date')||new Date().toISOString().slice(0,10)};if(type==='leak'){const old=S.leaks.find(x=>String(x.id)===String(base.id))||{};const leakCode=jgbV90NormalizeCode(val('v47_leakCode'),'LK-');if(!/^LK-\d+$/.test(leakCode)){alert('누수코드는 LK-01 형식으로 입력하세요.');return}const dup=S.leaks.some(x=>String(x.leakCode||'').toUpperCase()===leakCode && String(x.id)!==String(base.id));if(dup){alert('이미 사용 중인 누수코드입니다. 다른 번호를 입력하세요.');return}Object.assign(base,{leakCode,status:val('v47_status')||'조치필요',content:val('v47_content'),note:val('v47_note'),createdAt:old.createdAt||new Date().toISOString()});S.saveLeaks(id?S.leaks.map(x=>String(x.id)===String(base.id)?base:x):[base,...S.leaks])}else{const old=S.wp.find(x=>String(x.id)===String(base.id))||{};if(id && !old.id){alert('선택한 방수 이력(WA)을 찾지 못했습니다. 새로 등록하지 않고 저장을 중단합니다.');return}let cc=String(old?.cardCode||cardCode||'').trim();if(old?.cardCode&&cardCode&&String(old.cardCode).trim()!==String(cardCode).trim()){alert('선택한 방수 이력과 이력카드가 일치하지 않습니다. 저장을 중단합니다.');return}const cardNow=jgbV90NormalizeWpCards()[cc]||{};const linkedLocation=String(cardNow.location||loc||old.location||'').trim();const linkedLK=String(cardNow.leakCode||old.related||'').trim().toUpperCase();if(!cc||!wpV72Cards()[cc]){alert('연결할 이력카드를 찾지 못했습니다. 이력카드에서 이력내역 등록을 눌러주세요.');return}let waCode='';
 const existingWa=String(old?.waCode||'').trim().toUpperCase();
 const existingMatch=existingWa.match(/^WA-\d+-(\d+)$/);
 if(existingMatch){
@@ -5025,7 +5025,7 @@ if(waDup){alert('이미 사용 중인 방수이력입니다.');return}Object.ass
       if(a==='delete-leak'){if(!confirm('이 누수 현황을 삭제할까요?'))return;const S=jgbV47Store();S.saveLeaks(S.leaks.filter(x=>String(x.id)!==String(id)));return render()}
       if(a==='delete-wp'){if(!id)return;if(!confirm('이 이력내역만 삭제할까요? 이력카드는 그대로 유지됩니다.'))return;const S=jgbV47Store();const exists=S.wp.some(x=>String(x.id)===String(id));if(!exists)return;S.saveWp(S.wp.filter(x=>String(x.id)!==String(id)));return render()}
       if(a==='delete-wp-card'){if(!code)return;if(!confirm('이 방수공사 이력카드 전체와 그 아래 이력내역을 삭제할까요?'))return;const all=wpV72Cards();if(!all[String(code)])return;delete all[String(code)];wpV72SaveCards(all);const S=jgbV47Store();S.saveWp(S.wp.filter(x=>String(x.cardCode||'')!==String(code)));try{localStorage.removeItem('JGB_V72_WP_COLLAPSED_'+code)}catch(e){}return render()}
-      if(a==='edit-wp'){const S=jgbV47Store();const row=S.wp.find(x=>String(x.id)===String(id));const resolvedCode=String(code||row?.cardCode||'').trim()||String(Object.entries(wpV72Cards()).find(([k,c])=>String(c?.leakCode||'').trim().toUpperCase()===String(row?.related||'').trim().toUpperCase() && String(c?.location||'').trim()===String(row?.location||'').trim())?.[0]||'');return jgbV47OpenModal('wp',id,resolvedCode)}
+      if(a==='edit-wp'){const S=jgbV47Store();const row=S.wp.find(x=>String(x.id)===String(id));const rowCode=String(row?.cardCode||'').trim(),buttonCode=String(code||'').trim();if(!row||!rowCode||!wpV72Cards()[rowCode]){alert('방수 이력의 고유 연결정보(cardCode)를 찾지 못했습니다.');return}if(buttonCode&&buttonCode!==rowCode){alert('선택한 방수 이력과 이력카드가 일치하지 않습니다.');return}return jgbV47OpenModal('wp',id,rowCode)}
       if(a==='edit-wp-card')return code?jgbV48OpenCardEditor(code,false):null;
       if(a==='save-wp-card')return jgbV48SaveCard(code,isNew);
       if(a==='toggle-wp-card'){if(!code)return;const k='JGB_V72_WP_COLLAPSED_'+code;try{const now=localStorage.getItem(k)==='1';localStorage.setItem(k,now?'0':'1')}catch(_){}return render()}
