@@ -3940,43 +3940,7 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
 
       </section>
 
-      <section class="eam-xpanel eam-xanalysis-accordion" id="eamAnalysisAccordion">
-       <div class="eam-xhead eam-xaccordion-summary" onclick="eamToggleAnalysis()">
-        <div><strong>📊 자산 분석</strong><small>핵심 요약 · 상세 분석</small></div>
-        <button type="button" class="btn gray" id="eamAnalysisToggleBtn" onclick="event.stopPropagation();eamToggleAnalysis()">＋ 상세보기</button>
-       </div>
-       <div class="eam-xanalysis-quick">
-        <div><span>⚠️ 고장 발생</span><b>${failureTop.length}건</b></div>
-        <div><span>🔧 정비 집중</span><b>${burdenTop.length}건</b></div>
-        <div><span>📋 정비구분</span><b>${catRows.reduce((n,r)=>n+r.count,0)}건</b></div>
-        <div><span>📅 내용연수</span><b>${lifecycle.length}건</b></div>
-       </div>
-       <div class="eam-xanalysis-body" id="eamAnalysisBody">
-        <div class="eam-xanalysis-tabs">
-         <button type="button" class="eam-xanalysis-tab active" onclick="eamAnalysisTab('failure',this)">⚠️ 고장 발생</button>
-         <button type="button" class="eam-xanalysis-tab" onclick="eamAnalysisTab('burden',this)">🔧 정비 집중</button>
-         <button type="button" class="eam-xanalysis-tab" onclick="eamAnalysisTab('category',this)">📋 정비구분</button>
-         <button type="button" class="eam-xanalysis-tab" onclick="eamAnalysisTab('life',this)">📅 내용연수</button>
-        </div>
-        <div class="eam-xanalysis-pane active" id="eamAnalysisPaneFailure">
-         <div class="eam-xhead"><div><strong>고장 발생 TOP 5</strong><small>${year}년 반복 고장 자산</small></div><em>FAILURE TOP 5</em></div>
-         <div class="eam-dx-ranks">${renderRank(failureTop)}</div>
-        </div>
-        <div class="eam-xanalysis-pane" id="eamAnalysisPaneBurden">
-         <div class="eam-xhead"><div><strong>정비 집중 자산 TOP 5</strong><small>${year}년 유지관리 집중 자산</small></div><em>MAINT TOP 5</em></div>
-         <div class="eam-dx-ranks">${renderRank(burdenTop)}</div>
-        </div>
-        <div class="eam-xanalysis-pane" id="eamAnalysisPaneCategory">
-         <div class="eam-xhead"><div><strong>정비구분</strong><small>점검 · 보수 · 부품교체 · 설비교체</small></div><em>CATEGORY</em></div>
-         <div class="eam-dx-list">${catRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b></div>`).join('')}</div>
-        </div>
-        <div class="eam-xanalysis-pane" id="eamAnalysisPaneLife">
-         <div class="eam-xhead"><div><strong>내용연수 현황</strong><small>설치일·내용연수가 입력된 자산 기준</small></div><em>LIFECYCLE</em></div>
-         <div class="eam-xlife-total"><b>${lifecycle.length}</b><span>분석 가능 자산</span></div>
-         <div class="eam-xlife"><div><span>정상 사용<i></i></span><b>${lifeCounts.normal}건</b></div><div><span>내용연수 임박<i class="near"></i></span><b>${lifeCounts.near}건</b></div><div><span>내용연수 초과<i class="over"></i></span><b>${lifeCounts.over}건</b></div></div>
-        </div>
-       </div>
-      </section>
+      
      </div>`;
     }
     function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
