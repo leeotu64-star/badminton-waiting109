@@ -4847,18 +4847,60 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       if(sel)sel.addEventListener('change',()=>{const o=sel.options[sel.selectedIndex];if(loc)loc.value=o?.dataset?.location||''});
     }
     async function jgbV48SaveCard(code,isNew){
-      const g=id=>document.getElementById(id)?.value?.trim()||'', oldAll=jgbV90NormalizeWpCards(), old=isNew?{}:(oldAll[String(code)]||{}), S=jgbV47Store(), leakCode=jgbV90NormalizeCode(g('v48_leakCode'),'LK-');
-      const leak=Array.isArray(S.leaks)?S.leaks.find(x=>String(x.leakCode||'').toUpperCase()===leakCode.toUpperCase()):null;
-      if(!leak){alert('먼저 누수관리에서 연결할 누수코드(LK)를 등록하세요.');return}
-      const loc=String(leak.location||'').trim(); if(!loc){alert('선택한 누수코드에 발생 위치가 없습니다. 누수관리에서 위치를 먼저 등록하세요.');return}
-      const oldKey=String(code||old.code||''), newCode=String(old.code||oldKey||('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()));
-      const leakDuplicate=Object.entries(oldAll).some(([k,m])=>String(m?.leakCode||'').toUpperCase()===leakCode.toUpperCase() && String(k)!==oldKey);
-      if(leakDuplicate){alert('이미 다른 방수 이력카드에 연결된 누수코드입니다.');return}
-      const data={...old,code:newCode,leakCode:leakCode.toUpperCase(),location:loc,facility:g('v48_facility')||'장군봉체육관',area:g('v48_area'),part:g('v48_part')||loc,kind:g('v48_kind')||'방수 보수·보강',areaSize:g('v48_areaSize'),firstDate:g('v48_firstDate'),status:g('v48_status')||'정상',manager:g('v48_manager'),contact:g('v48_contact'),contractor:g('v48_contractor'),warranty:g('v48_warranty'),purpose:g('v48_purpose')||'시설물 보호 및 누수 예방',method:g('v48_method'),material:g('v48_material'),scope:g('v48_scope'),note:g('v48_note'),photos:old.photos||[]};
-      const f=document.getElementById('v48_card_photo')?.files?.[0];if(f)data.photos=[await jgbV47ReadFile(f)];
-      if(!isNew && oldKey!==newCode){oldAll[newCode]=data;delete oldAll[oldKey];try{S.saveWp(S.wp.map(h=>String(h.cardCode||'')===oldKey?{...h,cardCode:newCode,related:data.leakCode}:h))}catch(e){}}
-      else oldAll[newCode]=data;
-      wpV72SaveCards(oldAll);document.getElementById('jgbV47Modal')?.remove();render();
+      const g=id=>document.getElementById(id)?.value?.trim()||'';
+      const oldAll=jgbV90NormalizeWpCards(), old=isNew?{}:(oldAll[String(code)]||{}), S=jgbV47Store();
+      const rawLK=g('v48_leakCode').toUpperCase();
+      const leakCode=/^LK-\d+$/.test(rawLK)?rawLK:jgbV90NormalizeCode(rawLK,'LK-');
+      const leak=Array.isArray(S.leaks)?S.leaks.find(x=>String(x.leakCode||'').trim().toUpperCase()===leakCode):null;
+      if(!leak){alert('연결할 누수코드(LK)를 선택하세요.');return}
+      const loc=String(leak.location||'').trim();
+      if(!loc){alert('선택한 LK에 발생 위치가 없습니다. 누수관리에서 위치를 먼저 등록하세요.');return}
+
+      const oldKey=String(code||old.code||'').trim();
+      const newCode=String(old.code||oldKey||('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()));
+      const leakDuplicate=Object.entries(oldAll).some(([k,m])=>
+        String(m?.leakCode||'').trim().toUpperCase()===leakCode && String(k)!==oldKey
+      );
+      if(leakDuplicate){alert('이미 다른 방수 이력카드에 연결된 LK입니다. 다른 LK를 선택하세요.');return}
+
+      const data={
+        ...old, code:newCode, leakCode, location:loc,
+        facility:g('v48_facility')||'장군봉체육관', area:g('v48_area'),
+        part:g('v48_part')||loc, kind:g('v48_kind')||'방수 보수·보강',
+        areaSize:g('v48_areaSize'), firstDate:g('v48_firstDate'),
+        status:g('v48_status')||'정상', manager:g('v48_manager'),
+        contact:g('v48_contact'), contractor:g('v48_contractor'),
+        warranty:g('v48_warranty'), purpose:g('v48_purpose')||'시설물 보호 및 누수 예방',
+        method:g('v48_method'), material:g('v48_material'), scope:g('v48_scope'),
+        note:g('v48_note'), photos:old.photos||[]
+      };
+      const f=document.getElementById('v48_card_photo')?.files?.[0];
+      if(f)data.photos=[await jgbV47ReadFile(f)];
+
+      oldAll[newCode]=data;
+      if(oldKey && oldKey!==newCode)delete oldAll[oldKey];
+
+      /* 카드의 LK를 바꾸면 기존 WA 이력도 같은 LK와 위치를 즉시 따라가도록 동기화 */
+      const histories=Array.isArray(S.wp)?S.wp:[];
+      const targetRows=histories.filter(h=>String(h.cardCode||'').trim()===oldKey);
+      const updatedHistories=histories.map(h=>{
+        if(String(h.cardCode||'').trim()!==oldKey)return h;
+        const oldWa=String(h.waCode||'').trim().toUpperCase();
+        const seqMatch=oldWa.match(/^WA-\d+-(\d+)$/);
+        const seq=seqMatch?Number(seqMatch[1]):0;
+        const fallbackSeq=seq||targetRows.indexOf(h)+1;
+        return {
+          ...h,
+          cardCode:newCode,
+          related:leakCode,
+          location:loc,
+          waCode:jgbV76WaCodeFor(leakCode,fallbackSeq)
+        };
+      });
+      try{S.saveWp(updatedHistories)}catch(e){console.warn('WA 연동 저장 실패',e)}
+      wpV72SaveCards(oldAll);
+      document.getElementById('jgbV47Modal')?.remove();
+      render();
     }
     function costFor(arr){return arr.reduce((n,x)=>n+(Number(x.cost)||0),0).toLocaleString()}
     function jgbV47Store(){const lk='JGB_V47_LEAKS',wk='JGB_V47_WP_HISTORY';const parse=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(x)?x:[]}catch(e){return []}};const leaks=parse(lk),wp=parse(wk);return {leaks,wp,saveLeaks:v=>localStorage.setItem(lk,JSON.stringify(v)),saveWp:v=>localStorage.setItem(wk,JSON.stringify(v))}}
