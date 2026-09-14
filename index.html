@@ -1608,6 +1608,9 @@ html,body{max-width:100%;overflow-x:hidden!important}
 .jgb-maker{display:none!important;}
 /* Remove the stray visible text if it is injected dynamically. */
 </style>
+<style id="JGB_V48_DASHBOARD_VIEW_SPLIT">
+.opx-view-switch{display:flex;justify-content:flex-end;margin:0 0 10px}.opx-view-switch button{border:0;border-radius:10px;padding:10px 16px;background:#1769c1;color:#fff;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(23,105,193,.18)}.opx-view-switch button:hover{background:#0f5aa8}.opx-employee-view,.opx-customer-view{width:100%}.opx-customer-switch-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:12px;padding:18px 20px;border-radius:16px;background:linear-gradient(135deg,#08264a,#1266b8);color:#fff;box-shadow:0 10px 25px rgba(8,38,74,.14)}.opx-customer-switch-head h2{margin:3px 0 5px;font-size:28px}.opx-customer-switch-head p{margin:0;color:#dbeafe;font-size:12px}.opx-customer-kicker{font-size:10px;font-weight:900;letter-spacing:1.2px;opacity:.8}.opx-customer-switch-head>span{white-space:nowrap;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);padding:9px 12px;border-radius:10px;font-size:11px;font-weight:900}.opx-view-employee .opx-customer-view{display:none!important}.opx-view-customer .opx-employee-view{display:none!important}.opx-view-customer .opx-customer-view{display:block!important}@media(max-width:650px){.opx-customer-switch-head{align-items:flex-start;flex-direction:column}.opx-customer-switch-head h2{font-size:24px}}
+</style>
 <script>
 // V130: E undefined 오류 방지 — EAM 화면에서 사용하는 HTML escape helper
 function E(value){
@@ -2897,6 +2900,12 @@ html::before,body::before{
     window.jgbTrendScrollInit=jgbTrendScrollInit;
     setTimeout(jgbTrendScrollInit,0);
 
+    function toggleDashboardView(){
+      const next=localStorage.getItem('JGB_OPX_VIEW')==='customer'?'employee':'customer';
+      localStorage.setItem('JGB_OPX_VIEW',next);
+      render();
+    }
+
     function dashboard(s){
       const baseYm=monthKey();
       const savedPeriod=String(localStorage.getItem('JGB_OPX_PERIOD')||'');
@@ -3132,7 +3141,9 @@ html::before,body::before{
       const monthlyRows=monthly.map(x=>`<tr><td>${x.m}월</td><td class="b">${x.basic}</td><td class="g">${x.auto}</td><td class="o">${x.issue}</td><td class="t">${x.total}</td></tr>`).join('');
 
       return `
-      <div class="opx-dash opx-clean-layout">
+      <div class="opx-dash opx-clean-layout ${localStorage.getItem('JGB_OPX_VIEW')==='customer'?'opx-view-customer':'opx-view-employee'}">
+         <div class="opx-view-switch"><button type="button" onclick="toggleDashboardView()">${localStorage.getItem('JGB_OPX_VIEW')==='customer'?'👤 직원 실적 화면으로':'📊 민원 실적 화면으로'}</button></div>
+         <div class="opx-employee-view">
         <section class="opx-hero opx-hero-final">
           <div class="opx-hero-main">
             <div class="opx-eyebrow">JANGGUNBONG SPORTS CENTER · STAFF OPERATION</div>
@@ -3179,7 +3190,10 @@ html::before,body::before{
           </section>
 
           <section class="opx-panel opx-table-panel opx-annual-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><span class="opx-chip">연간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
-          <section class="opx-board opx-board-v7">
+          </div>
+         <div class="opx-customer-view">
+           <section class="opx-customer-switch-head"><div><div class="opx-customer-kicker">CUSTOMER SERVICE · OPERATION INTELLIGENCE</div><h2>민원 실적 운영대시보드</h2><p>직원 실적과 분리하여 고객 QR 접수·처리·반복민원·위험도만 확인합니다.</p></div><span>선택기간 ${year}년 ${month}월</span></section>
+           <section class="opx-board opx-board-v7">
             <div class="opx-board-head">
               <div><span class="opx-board-kicker">QR CUSTOMER OPERATION INTELLIGENCE</span><h3>운영게시판</h3><p>직원실적·레벨은 그대로 두고, 고객 QR 접수 내용만으로 위험도·주의도·반복·빈번시간·요일·처리우선순위를 상세 분석합니다.</p></div>
               <div class="opx-board-clock"><b>${year}.${month}.${String(selectedDate).slice(8,10)}</b><span>고객접수 기반 실시간 분석</span></div>
@@ -3309,8 +3323,9 @@ html::before,body::before{
             </div>
           </section>
         </section>
+           </div>
+         </div>
 
-        
       </div>`;
     }
 
