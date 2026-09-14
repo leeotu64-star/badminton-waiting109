@@ -4662,10 +4662,11 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 
     /* V76: 방수 이력번호는 부모 LK 누수코드 기준으로 WA-LK번호-순번 형식으로 통일 */
     function jgbV76WaCodeFor(leakCode, seq){
-      const lk=jgbV90NormalizeCode(String(leakCode||''),'LK-');
-      const m=lk.match(/^LK-(\\d+)$/);
+      const raw=String(leakCode||'').trim().toUpperCase();
+      const lk=/^LK-\d+$/.test(raw)?raw:jgbV90NormalizeCode(raw,'LK-');
+      const m=lk.match(/^LK-(\d+)$/);
       if(!m)return '';
-      return 'WA-'+m[1]+'-'+String(seq);
+      return 'WA-'+String(Number(m[1])).padStart(2,'0')+'-'+String(Math.max(1,Number(seq)||1));
     }
     function jgbV76NormalizeWpHistoryCodes(cards, hs){
       const arr=Array.isArray(hs)?hs.map(x=>({...x})):[];
@@ -4673,7 +4674,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       arr.forEach((h,i)=>{
         const card=cards[String(h.cardCode||'')]||{};
         const lk=String(card.leakCode||h.related||'').trim().toUpperCase();
-        if(!/^LK-\\d+$/.test(lk))return;
+        if(!/^LK-\d+$/.test(lk))return;
         const key=lk;
         (groups[key] ||= []).push({h,i});
       });
@@ -4682,17 +4683,17 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const used=new Set();
         /* 기존 WA-01 / WA-2 같은 번호는 숫자를 순번으로 최대한 보존 */
         items.forEach(({h})=>{
-          const m=String(h.waCode||'').trim().toUpperCase().match(/^WA-\\d+-(\\d+)$/);
+          const m=String(h.waCode||'').trim().toUpperCase().match(/^WA-\d+-(\d+)$/);
           if(m)used.add(Number(m[1]));
         });
         let next=1;
         items.forEach(({h,i})=>{
           const old=String(h.waCode||'').trim().toUpperCase();
           let seq=null;
-          const canonical=old.match(/^WA-\\d+-(\\d+)$/);
+          const canonical=old.match(/^WA-\d+-(\d+)$/);
           if(canonical)seq=Number(canonical[1]);
           else {
-            const legacy=old.match(/^WA-(\\d+)$/);
+            const legacy=old.match(/^WA-(\d+)$/);
             if(legacy)seq=Number(legacy[1]);
           }
           if(!seq || used.has(seq)&&!canonical){
