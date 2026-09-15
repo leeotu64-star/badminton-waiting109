@@ -12721,3 +12721,101 @@ window.eamDeleteSelectedAsset=async function(){
 
 </body>
 </html>
+
+<!-- JGB EAM V9: 누수 수리 LIVE 화면 오버라이드 -->
+<script>
+(function(){
+  if(document.getElementById('JGB_V9_LIVE_LEAK_STYLE')) return;
+  const st=document.createElement('style');
+  st.id='JGB_V9_LIVE_LEAK_STYLE';
+  st.textContent=`
+  .jgb-v9-live-wrap{width:min(1540px,calc(100vw - 34px));margin:0 auto;padding:10px 0 30px;color:#17334d}
+  .jgb-v9-head{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:14px;padding:16px 18px;background:#fff;border:1px solid #cbd9e6;border-radius:15px;box-shadow:0 4px 14px rgba(20,50,80,.06)}
+  .jgb-v9-title{display:flex;align-items:center;gap:12px}.jgb-v9-title .drop{width:44px;height:44px;border-radius:12px;background:#e9f7ff;display:grid;place-items:center;font-size:25px}.jgb-v9-title h1{margin:0;font-size:25px}.jgb-v9-title p{margin:4px 0 0;color:#71869a;font-size:11px}
+  .jgb-v9-live-pill{display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:999px;background:#fff0ef;color:#d13e37;border:1px solid #ffc6c2;font-size:12px;font-weight:950}.jgb-v9-live-dot{width:8px;height:8px;border-radius:50%;background:#ef4c43;box-shadow:0 0 0 5px rgba(239,76,67,.12);animation:jgbv9pulse 1.2s infinite}@keyframes jgbv9pulse{50%{opacity:.35;transform:scale(.8)}}
+  .jgb-v9-grid{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(360px,.78fr);gap:14px;align-items:stretch}
+  .jgb-v9-card{background:#fff;border:1px solid #cbd9e6;border-radius:15px;box-shadow:0 4px 14px rgba(20,50,80,.06);overflow:hidden}
+  .jgb-v9-map-card{padding:16px}.jgb-v9-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:11px}.jgb-v9-card-head h2{margin:0;font-size:19px}.jgb-v9-card-head p{margin:4px 0 0;color:#71869a;font-size:11px}
+  .jgb-v9-map{position:relative;height:520px;border:2px solid #536f87;background:#fff;border-radius:11px;overflow:hidden;padding:40px 26px 40px;box-sizing:border-box}
+  .jgb-v9-map:before{content:"";position:absolute;left:7%;right:7%;top:15%;bottom:15%;border:1px solid #e1e9f0;pointer-events:none}
+  .jgb-v9-top,.jgb-v9-bottom{position:absolute;left:0;right:0;text-align:center;font-weight:900;font-size:12px;color:#29465d}.jgb-v9-top{top:10px}.jgb-v9-bottom{bottom:10px}.jgb-v9-side{position:absolute;top:50%;writing-mode:vertical-rl;transform:translateY(-50%);font-size:11px;font-weight:900;color:#29465d}.jgb-v9-left{left:7px}.jgb-v9-right{right:7px}
+  .jgb-v9-courts{position:absolute;left:7%;right:7%;top:17%;bottom:17%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:15px}.jgb-v9-court{position:relative;border:2px solid #536f87;background:linear-gradient(180deg,#fff,#fbfdff);display:flex;align-items:center;justify-content:center}.jgb-v9-court:before{content:"";position:absolute;left:-2px;right:-2px;top:50%;border-top:2px solid #536f87}.jgb-v9-court b{font-size:23px;color:#2f4d68;z-index:2}.jgb-v9-entrance{position:absolute;left:79%;bottom:0;width:9%;height:30px;border-left:2px solid #536f87;border-right:2px solid #536f87;background:#fff;display:grid;place-items:center;font-size:9px;font-weight:900;z-index:3}.jgb-v9-entrance:before{content:"";position:absolute;left:50%;bottom:28px;width:34px;height:34px;border-left:2px solid #536f87;border-bottom:2px solid #536f87;border-radius:0 0 0 34px;transform:translateX(-2px)}
+  .jgb-v9-marker{position:absolute;z-index:8;transform:translate(-50%,-50%);border:0;background:transparent;padding:0;cursor:pointer}.jgb-v9-marker .ring{width:54px;height:54px;border-radius:50%;border:3px solid currentColor;display:grid;place-items:center;background:rgba(255,255,255,.95);box-shadow:0 0 0 7px rgba(239,76,67,.08)}.jgb-v9-marker .ring:after{content:"";position:absolute;width:86px;height:86px;border:2px solid currentColor;border-radius:50%;opacity:.22;animation:jgbv9radar 1.8s infinite}.jgb-v9-marker span{display:block;margin-top:5px;padding:4px 8px;border-radius:999px;background:#fff;border:1px solid currentColor;box-shadow:0 3px 9px rgba(20,50,80,.14);font-size:10px;font-weight:950;white-space:nowrap}@keyframes jgbv9radar{0%{transform:scale(.45);opacity:.75}100%{transform:scale(1.2);opacity:0}}
+  .jgb-v9-marker.open{color:#e64c45}.jgb-v9-marker.progress{color:#ed9a20}.jgb-v9-marker.done{color:#2aa56f}.jgb-v9-marker.selected .ring{box-shadow:0 0 0 7px rgba(34,126,218,.14),0 0 20px rgba(34,126,218,.25)}
+  .jgb-v9-legend{display:flex;gap:10px;align-items:center;font-size:10px;color:#667d91;white-space:nowrap}.jgb-v9-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}.jgb-v9-legend .r{background:#e64c45}.jgb-v9-legend .o{background:#ed9a20}.jgb-v9-legend .g{background:#2aa56f}
+  .jgb-v9-live-card{display:flex;flex-direction:column}.jgb-v9-live-head{padding:15px 16px;background:linear-gradient(135deg,#f05a52,#e63f3b);color:#fff;display:flex;justify-content:space-between;align-items:center}.jgb-v9-live-head h2{margin:0;font-size:20px}.jgb-v9-live-head small{font-size:10px;opacity:.9}.jgb-v9-live-body{padding:14px 15px;flex:1}.jgb-v9-current{padding:13px;border:1px solid #ffd2cf;background:#fff6f5;border-radius:12px;margin-bottom:13px}.jgb-v9-current-top{display:flex;justify-content:space-between;gap:10px}.jgb-v9-current b{font-size:19px}.jgb-v9-badge{padding:5px 8px;border-radius:999px;background:#ef514a;color:#fff;font-size:10px;font-weight:950;white-space:nowrap}.jgb-v9-current p{margin:5px 0 0;font-size:12px;color:#566f84}.jgb-v9-timeline{position:relative;margin:8px 0 15px;padding-left:26px}.jgb-v9-timeline:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:#dce6ee}.jgb-v9-event{position:relative;display:grid;grid-template-columns:45px 1fr;gap:7px;margin:0 0 13px}.jgb-v9-event:before{content:"";position:absolute;left:-22px;top:4px;width:9px;height:9px;border-radius:50%;background:#2c82d7;box-shadow:0 0 0 4px #eaf3fb}.jgb-v9-event:last-child:before{background:#ed9a20;box-shadow:0 0 0 4px #fff2dd}.jgb-v9-event time{font-size:10px;color:#8798a8}.jgb-v9-event b{display:block;font-size:11px}.jgb-v9-event span{display:block;font-size:10px;color:#71869a;margin-top:2px}.jgb-v9-info{border-top:1px solid #e1e9f0;padding-top:12px}.jgb-v9-info-row{display:grid;grid-template-columns:75px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #eef2f5;font-size:11px}.jgb-v9-info-row:last-child{border-bottom:0}.jgb-v9-info-row strong{color:#71869a}.jgb-v9-info-row b{color:#203c57}.jgb-v9-feed{border-top:1px solid #e1e9f0;margin-top:12px;padding-top:12px}.jgb-v9-feed-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.jgb-v9-feed-title b{font-size:13px}.jgb-v9-feed-title span{font-size:10px;color:#e64c45;font-weight:900}.jgb-v9-feed-list{display:grid;gap:7px;max-height:170px;overflow:auto}.jgb-v9-feed-item{display:grid;grid-template-columns:45px 1fr auto;gap:7px;align-items:center;padding:8px;border:1px solid #e1e9f0;border-radius:9px;background:#fbfdff;cursor:pointer}.jgb-v9-feed-item:hover{border-color:#8db9df;background:#f5faff}.jgb-v9-feed-item time{font-size:10px;color:#8a9aaa}.jgb-v9-feed-item b{font-size:10px}.jgb-v9-feed-item small{display:block;color:#71869a;font-size:9px;margin-top:2px}.jgb-v9-mini-badge{font-size:9px;font-weight:900;padding:4px 6px;border-radius:999px}.jgb-v9-mini-badge.wait{background:#fff0ee;color:#d23e35}.jgb-v9-mini-badge.run{background:#fff5df;color:#bd7000}.jgb-v9-mini-badge.done{background:#eaf8f0;color:#237d54}
+  @media(max-width:1050px){.jgb-v9-grid{grid-template-columns:1fr}.jgb-v9-map{height:470px}.jgb-v9-live-card{min-height:620px}}@media(max-width:700px){.jgb-v9-live-wrap{width:calc(100vw - 18px)}.jgb-v9-head{align-items:flex-start;flex-direction:column}.jgb-v9-map{height:390px;padding-left:18px;padding-right:18px}.jgb-v9-courts{gap:7px;left:5%;right:5%}.jgb-v9-marker .ring{width:42px;height:42px}.jgb-v9-marker .ring:after{width:66px;height:66px}.jgb-v9-marker span{font-size:8px}.jgb-v9-side{font-size:9px}}
+  `;
+  document.head.appendChild(st);
+
+  const esc=v=>xEsc(v==null?'':String(v));
+  const statusOfIssue=x=>x?.status==='조치중'?'progress':x?.status==='완료'?'done':'open';
+  const statusText=x=>x?.status==='조치중'?'수리 진행 중':x?.status==='완료'?'수리 완료':'접수 대기';
+  const timeSafe=v=>v?new Date(v).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}):'-';
+  const clean=v=>typeof cleanWorkContent==='function'?cleanWorkContent(v):String(v?.content||'').replace(/\[\[[^\]]+\]\]/g,'').trim();
+  const courtNo=loc=>{const m=String(loc||'').match(/(?:코트\s*([1-5])|([1-5])\s*번\s*코트)/i);return m?Number(m[1]||m[2]):0};
+  const courtX={1:85,2:68,3:50,4:32,5:15};
+  const findIssue=(leak,issues)=>{const lk=String(leak?.leakCode||'').toUpperCase();const loc=String(leak?.location||'').trim();return issues.find(i=>String(i?.content||'').toUpperCase().includes(lk))||issues.find(i=>String(i?.place||'').trim()===loc)||issues.find(i=>loc&&String(i?.place||'').includes(loc)||String(i?.place||'')&&loc.includes(String(i.place||'')));};
+
+  window.leakagePage=function(){
+    const S=jgbV47Store();
+    const leaks=Array.isArray(S.leaks)?S.leaks:[];
+    const issues=Array.isArray((typeof db!=='undefined'&&db)?.issues)?db.issues:[];
+    const active=issues.filter(x=>x.status!=='완료').sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+    const recentDone=issues.filter(x=>x.status==='완료').sort((a,b)=>new Date(b.completedAt||b.createdAt||0)-new Date(a.completedAt||a.createdAt||0));
+    const live=[...active,...recentDone].slice(0,8);
+    let selectedId=window.__JGB_LIVE_SELECTED_ID||active[0]?.id||live[0]?.id||'';
+    let selected=issues.find(x=>String(x.id)===String(selectedId))||active[0]||recentDone[0]||null;
+    const selectedLeak=selected?leaks.find(l=>String(selected.content||'').toUpperCase().includes(String(l.leakCode||'').toUpperCase())||String(l.location||'')===String(selected.place||'')):null;
+    const markers=leaks.map((l,i)=>{
+      const n=courtNo(l.location);let x=n?courtX[n]:50;let y=50;if(!n)y=28+(i%4)*16;
+      const issue=findIssue(l,issues);const cls=issue?statusOfIssue(issue):(typeof resultForLeak==='function'?(resultForLeak(l)==='조치'?'done':resultForLeak(l)==='보수 후 관찰'?'progress':'open'):'open');
+      const selectedCls=issue&&selected&&String(issue.id)===String(selected.id)?' selected':'';
+      return `<button type="button" class="jgb-v9-marker ${cls}${selectedCls}" style="left:${Number(l.mapX)||x}%;top:${Number(l.mapY)||y}%" data-live-id="${esc(issue?.id||'')}" title="${esc(l.leakCode||'')} · ${esc(l.location||'')}"><i class="ring">${cls==='done'?'✓':'💧'}</i><span>${esc(l.leakCode||'LK')}</span></button>`;
+    }).join('');
+    const timeline=selected?[
+      [selected.createdAt,'접수되었습니다.',selected.place||''],
+      selected.handlerName?[selected.startedAt||selected.createdAt,'담당자 배정',selected.handlerName]:null,
+      selected.startedAt?[selected.startedAt,'현장 작업 시작',selected.place||'']:null,
+      selected.status==='조치중'?[new Date().toISOString(),'수리 진행 중','현재 작업 처리 중']:null,
+      selected.status==='완료'?[selected.completedAt,'수리 완료','조치가 완료되었습니다.']:null
+    ].filter(Boolean).map(v=>`<div class="jgb-v9-event"><time>${timeSafe(v[0])}</time><div><b>${esc(v[1])}</b><span>${esc(v[2])}</span></div></div>`).join(''):'<div class="jgb-v9-event"><time>--:--</time><div><b>현재 수리 작업 없음</b><span>새 접수가 들어오면 이곳에 즉시 표시됩니다.</span></div></div>';
+    const feed=live.map(x=>`<button type="button" class="jgb-v9-feed-item" data-live-id="${esc(x.id)}"><time>${timeSafe(x.createdAt)}</time><div><b>${esc(x.place||'장소 미기록')}</b><small>${esc(clean(x)||'접수 내용 없음')}</small></div><span class="jgb-v9-mini-badge ${statusOfIssue(x)==='progress'?'run':statusOfIssue(x)==='done'?'done':'wait'}">${esc(statusText(x).replace('수리 ',''))}</span></button>`).join('')||'<div class="jgb-v9-feed-item"><div style="grid-column:1/-1;text-align:center;color:#71869a;padding:14px">현재 수리 이력이 없습니다.</div></div>';
+    const total=issues.filter(x=>x.status!=='완료').length, running=issues.filter(x=>x.status==='조치중').length, waiting=issues.filter(x=>x.status!=='완료'&&!x.handlerId).length, doneToday=issues.filter(x=>x.status==='완료'&&String(x.completedAt||'').slice(0,10)===new Date().toISOString().slice(0,10)).length;
+    return `<div class="jgb-v9-live-wrap">
+      <header class="jgb-v9-head"><div class="jgb-v9-title"><div class="drop">💧</div><div><h1>누수 수리 LIVE</h1><p>장군봉 배드민턴장 · 5개 코트 배치도 기준 실시간 수리 관제</p></div></div><div class="jgb-v9-live-pill"><i class="jgb-v9-live-dot"></i> REAL-TIME LIVE</div></header>
+      <div class="jgb-v9-grid">
+        <section class="jgb-v9-card jgb-v9-map-card"><div class="jgb-v9-card-head"><div><h2>🗺 누수 위치 현황</h2><p>현재 등록된 LK 위치와 수리 상태가 실시간으로 표시됩니다.</p></div><div class="jgb-v9-legend"><span><i class="r"></i>접수</span><span><i class="o"></i>작업중</span><span><i class="g"></i>완료</span></div></div>
+          <div class="jgb-v9-map"><div class="jgb-v9-top">상부 배관</div><div class="jgb-v9-side jgb-v9-left">좌측 외곽</div><div class="jgb-v9-side jgb-v9-right">우측 외곽</div><div class="jgb-v9-bottom">하부 배관</div><div class="jgb-v9-courts">${[5,4,3,2,1].map(n=>`<div class="jgb-v9-court"><b>${n}번<br>코트</b></div>`).join('')}</div><div class="jgb-v9-entrance">출입문</div>${markers||'<div style="position:absolute;inset:0;display:grid;place-items:center;color:#8a9aaa;font-size:12px">등록된 누수 위치가 없습니다.</div>'}</div>
+        </section>
+        <section class="jgb-v9-card jgb-v9-live-card"><div class="jgb-v9-live-head"><h2>📡 수리 LIVE</h2><small>실시간으로 업데이트 됩니다.</small></div><div class="jgb-v9-live-body">
+          ${selected?`<div class="jgb-v9-current"><div class="jgb-v9-current-top"><b>${esc(selectedLeak?.leakCode||selected.assetCode||'시설 수리')} ${selectedLeak?'누수':''}</b><span class="jgb-v9-badge">${esc(statusText(selected))}</span></div><p>${esc(selected.place||'장소 미기록')} · ${esc(clean(selected)||'접수 내용 없음')}</p></div>`:''}
+          <div class="jgb-v9-timeline">${timeline}</div>
+          ${selected?`<div class="jgb-v9-info"><div class="jgb-v9-info-row"><strong>접수시간</strong><b>${esc(timeSafe(selected.createdAt))}</b></div><div class="jgb-v9-info-row"><strong>요청장소</strong><b>${esc(selected.place||'-')}</b></div><div class="jgb-v9-info-row"><strong>담당자</strong><b>${esc(selected.handlerName||'미지정')}</b></div><div class="jgb-v9-info-row"><strong>내용</strong><b>${esc(clean(selected)||'-')}</b></div></div>`:''}
+          <div class="jgb-v9-feed"><div class="jgb-v9-feed-title"><b>최근 수리 LIVE</b><span>● ${active.length}건 진행</span></div><div class="jgb-v9-feed-list">${feed}</div></div>
+        </div></section>
+      </div>
+    </div>`;
+  };
+
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('[data-live-id]');
+    if(!b)return;
+    const id=b.getAttribute('data-live-id');
+    if(!id)return;
+    window.__JGB_LIVE_SELECTED_ID=id;
+    if(typeof render==='function')render();
+  },true);
+
+  setTimeout(function(){if(typeof render==='function')render()},0);
+
+  // 2초마다 현재 누수/수리 상태만 새로 그려 LIVE로 유지
+  if(!window.__JGB_V134_LIVE_TIMER){
+    window.__JGB_V134_LIVE_TIMER=setInterval(function(){
+      try{ if(typeof render==='function' && document.querySelector('.jgb-v9-live-wrap')) render(); }catch(e){}
+    },2000);
+  }
+})();
+
+</script>
+
