@@ -4081,12 +4081,6 @@ function gone(){try{return new Set(JSON.parse(localStorage.getItem(DEL)||'[]').m
 function saveGone(a){try{localStorage.setItem(DEL,JSON.stringify([...a]))}catch(e){}}
 function code(){return V(window.__eamSelCode)}
 function esc(x){return V(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-async function db(){
- try{if(window.SUPA)return window.SUPA}catch(e){}
- try{if(typeof getSupa==='function'){const x=getSupa();return x&&typeof x.then==='function'?await x:x}}catch(e){}
- try{if(window.supabase?.createClient&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined'){window.SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);return window.SUPA}}catch(e){}
- return null;
-}
 // 왼쪽 목록의 실제 데이터 공급원까지 삭제코드를 적용한다.
 if(typeof window.eamCategoryDefs==='function'&&!window.eamCategoryDefs.__v182){const old=window.eamCategoryDefs;const f=function(){const g=gone(),o=old.apply(this,arguments)||{};Object.keys(o).forEach(k=>{if(Array.isArray(o[k]?.items))o[k]={...o[k],items:o[k].items.filter(x=>!g.has(V(x?.code||x?.asset_code)))}});return o};f.__v182=true;window.eamCategoryDefs=f}
 if(typeof window.eamSourceAssets==='function'&&!window.eamSourceAssets.__v182){const old=window.eamSourceAssets;const f=function(){const g=gone();return (old()||[]).filter(x=>!g.has(V(x?.code||x?.asset_code)))};f.__v182=true;window.eamSourceAssets=f}
@@ -4134,7 +4128,7 @@ window.eamDeleteSelectedAsset=async function(){
    alert('삭제되었습니다.');
  }catch(e){console.error('JGB_V182_DELETE',e);alert('삭제하지 못했습니다.\n'+(e?.message||e))}
 };
-})();
+;
 </script>
 
 
