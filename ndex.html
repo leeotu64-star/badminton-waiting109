@@ -3542,51 +3542,55 @@ html::before,body::before{
       .eam228-entry.court{right:12%!important;top:41%!important}
 </style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetCodeDelete()">🗑 자산코드 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
-      /* v241: EAM 자산 아이콘 드래그를 독립 처리 — 클릭과 드래그를 구분하고 위치를 저장 */
-      if(!window.__EAM228_DRAG_V241_BOUND){
-        window.__EAM228_DRAG_V241_BOUND=true;
-        let dragState=null;
-        const finishDrag=(ev)=>{
-          if(!dragState)return;
-          const d=dragState;
-          dragState=null;
-          window.removeEventListener('pointermove',onDragMove,true);
-          window.removeEventListener('pointerup',finishDrag,true);
-          window.removeEventListener('pointercancel',finishDrag,true);
+      /* v242: 배치도에 실제로 보이는 AC 자산 아이콘을 직접 드래그하고 위치를 저장 */
+      if(!window.__EAM228_DRAG_V242_BOUND){
+        window.__EAM228_DRAG_V242_BOUND=true;
+        let ds=null;
+        const move=(e)=>{
+          if(!ds)return;
+          const dx=e.clientX-ds.sx,dy=e.clientY-ds.sy;
+          if(!ds.dragging && Math.hypot(dx,dy)<4)return;
+          ds.dragging=true;
+          ds.el.classList.add('dragging');
+          e.preventDefault();
+          const r=ds.map.getBoundingClientRect();
+          const x=Math.max(1,Math.min(99,((e.clientX-r.left)/r.width)*100));
+          const y=Math.max(1,Math.min(99,((e.clientY-r.top)/r.height)*100));
+          ds.el.style.left=x.toFixed(2)+'%';
+          ds.el.style.top=y.toFixed(2)+'%';
+          ds.x=x;ds.y=y;
+        };
+        const up=(e)=>{
+          if(!ds)return;
+          const d=ds; ds=null;
+          window.removeEventListener('pointermove',move,true);
+          window.removeEventListener('pointerup',up,true);
+          window.removeEventListener('pointercancel',up,true);
           d.el.classList.remove('dragging');
-          if(!d.moved)return;
-          const r=d.map.getBoundingClientRect();
-          const x=Math.max(2,Math.min(98,((ev.clientX-r.left)/r.width)*100));
-          const y=Math.max(2,Math.min(98,((ev.clientY-r.top)/r.height)*100));
-          d.el.style.left=x.toFixed(2)+'%';
-          d.el.style.top=y.toFixed(2)+'%';
-          const pos=readObj(posKey);pos[d.code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];writeObj(posKey,pos);
+          if(!d.dragging)return;
+          const pos=readObj(posKey);
+          pos[d.code]=[Number(d.x.toFixed(2)),Number(d.y.toFixed(2))];
+          writeObj(posKey,pos);
           window.__EAM228_DRAG_SUPPRESS=true;
-          setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,500);
-          ev.preventDefault();ev.stopPropagation();
+          setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,450);
+          e.preventDefault();
+          e.stopPropagation();
           render();
         };
-        const onDragMove=(ev)=>{
-          const d=dragState;if(!d)return;
-          const dx=ev.clientX-d.sx,dy=ev.clientY-d.sy;
-          if(!d.moved){if(Math.hypot(dx,dy)<5)return;d.moved=true;d.el.classList.add('dragging');}
-          ev.preventDefault();ev.stopPropagation();
-          const r=d.map.getBoundingClientRect();
-          const x=Math.max(2,Math.min(98,((ev.clientX-r.left)/r.width)*100));
-          const y=Math.max(2,Math.min(98,((ev.clientY-r.top)/r.height)*100));
-          d.el.style.left=x.toFixed(2)+'%';d.el.style.top=y.toFixed(2)+'%';
-        };
-        document.addEventListener('pointerdown',function(e){
-          const el=e.target.closest?.('.eam228-asset');
-          if(!el||e.button!==0)return;
-          const map=el.closest('#eam228Map');if(!map)return;
+        document.addEventListener('pointerdown',(e)=>{
+          const el=e.target.closest?.('#eam228Map .eam228-asset');
+          if(!el || e.button!==0)return;
+          const map=el.closest('#eam228Map');
+          if(!map)return;
           const r=map.getBoundingClientRect();
-          dragState={el,map,code:V(el.dataset.code||''),sx:e.clientX,sy:e.clientY,startLeft:parseFloat(el.style.left)||0,startTop:parseFloat(el.style.top)||0,moved:false};
-          try{el.setPointerCapture?.(e.pointerId)}catch(_){ }
-          window.addEventListener('pointermove',onDragMove,true);
-          window.addEventListener('pointerup',finishDrag,true);
-          window.addEventListener('pointercancel',finishDrag,true);
-          e.preventDefault();e.stopPropagation();
+          ds={el,map,code:V(el.dataset.code||''),sx:e.clientX,sy:e.clientY,
+              x:parseFloat(el.style.left)||0,y:parseFloat(el.style.top)||0,dragging:false};
+          try{el.setPointerCapture(e.pointerId)}catch(_){ }
+          window.addEventListener('pointermove',move,true);
+          window.addEventListener('pointerup',up,true);
+          window.addEventListener('pointercancel',up,true);
+          e.preventDefault();
+          e.stopPropagation();
         },true);
       }
     }
@@ -4437,7 +4441,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                   <div class="jgb-v188-page-lines"></div><div class="jgb-v188-note">마우스 클릭으로 페이지를 넘겨보세요</div>
                   <div class="jgb-v188-page-content" id="jgbV188BookContent"></div>
                   <div class="jgb-v188-tabs" id="jgbV188BookTabs"></div>
-                  <div class="jgb-v188-bottom"><button class="jgb-v188-nav" type="button" data-v188-book="prev" aria-label="이전 페이지">‹</button><span class="jgb-v188-count" id="jgbV188BookCount">1 / 5</span><button class="jgb-v188-nav" type="button" data-v188-book="next" aria-label="다음 페이지">›</button></div>
+                  <div class="jgb-v188-bottom"><button class="jgb-v188-nav" type="button" data-v188-book="prev" aria-label="이전 페이지">‹</button><button class="jgb-v188-nav" type="button" data-v188-book="next" aria-label="다음 페이지">›</button></div>
                 </div>
               </div>
             </div>
@@ -13275,12 +13279,11 @@ window.eamDeleteSelectedAsset=async function(){
   ];
   let page=0,busy=false;
   function draw(mode){
-    const el=document.getElementById('jgbV188BookPage'), c=document.getElementById('jgbV188BookContent'), t=document.getElementById('jgbV188BookTabs'), n=document.getElementById('jgbV188BookCount');
-    if(!el||!c||!t||!n)return;
+    const el=document.getElementById('jgbV188BookPage'), c=document.getElementById('jgbV188BookContent'), t=document.getElementById('jgbV188BookTabs');
+    if(!el||!c||!t)return;
     if(mode==='out'){busy=true;el.classList.remove('turn-in');el.classList.add('turn-out');setTimeout(()=>draw('in'),330);return;}
-    c.innerHTML='<div class="jgb-v188-page-no">0'+(page+1)+' / 05</div><h3>'+pages[page].title+'</h3>'+pages[page].html;
+    c.innerHTML='<h3>'+pages[page].title+'</h3>'+pages[page].html;
     t.innerHTML=pages.map((x,i)=>'<button type="button" class="jgb-v188-tab '+(i===page?'active':'')+'" data-v188-book-index="'+i+'">'+x.tab+'</button>').join('');
-    n.textContent=(page+1)+' / '+pages.length;
     el.classList.remove('turn-out');el.classList.add('turn-in');setTimeout(()=>{el.classList.remove('turn-in');busy=false},360);
   }
   function go(to){if(busy)return;let next=page;if(typeof to==='number')next=to;else next=page+(to==='next'?1:-1);if(next<0||next>=pages.length)return;page=next;draw('out');}
