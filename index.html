@@ -4073,41 +4073,22 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
 
     function waterproofPage(){
-  const S=jgbV47Store();
-  let hs=Array.isArray(S.wp)?S.wp:[];
-  const CARDKEY='JGB_V72_WP_CARDS';
-  const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  let cards=jgbV90NormalizeWpCards();
-  /* 방수 이력카드는 1개만 유지. 중복 카드와 해당 카드 이력은 정리 */
-  cards=jgbV90NormalizeWpCards();
-  /* V133: 레거시 방수카드는 다시 불러오지 않습니다. */
-  /* 잘못 저장된 관련 누수값(WA 등)은 부모 카드의 LK 누수코드로 정리 */
-  try{let fixed=false;hs=hs.map(h=>{const c=cards[String(h.cardCode||'')]||{};const rel=String(h.related||'').trim().toUpperCase();if(/^WA-\d+$/.test(rel)&&/^LK-\d+$/.test(String(c.leakCode||''))){fixed=true;return {...h,related:String(c.leakCode)}}return h});if(fixed)S.saveWp(hs)}catch(e){}
-  /* 기존 이력은 같은 위치의 기존 카드에만 연결. 이후부터는 반드시 cardCode로 분리 */
-  try{
-    let changed=false, arr=hs.map(h=>{
-      if(h.cardCode)return h;
-      const found=Object.values(cards).find(c=>String(c?.location||'').trim()===String(h?.location||'').trim());
-      if(found?.code){changed=true;return {...h,cardCode:String(found.code)}}
-      return h;
-    });
-    if(changed)S.saveWp(arr);
-  }catch(e){}
-  const list=Object.entries(cards).map(([code,m])=>({code:String(m?.code||code),meta:m||{}})).filter(x=>x.code);
-  const cardFor=(card,idx)=>{
-    const code=card.code, meta=card.meta||{}, loc=String(meta.location||'').trim();
-    const rows=hs.filter(x=>String(x.cardCode||'')===code).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
-    const photo=Array.isArray(meta.photos)&&meta.photos[0]?meta.photos[0]:'';
-    let collapsed=false;try{collapsed=localStorage.getItem('JGB_V72_WP_COLLAPSED_'+code)==='1'}catch(e){}
-    const field=(a,b)=>`<div class="jgb-v66-row"><strong>${esc(a)}</strong><span>${esc(b==null||b===''?'-':b)}</span></div>`;
-    const history=rows.length?rows.map((h,n)=>{
-      const photos=Array.isArray(h.photos)?h.photos:[];
-      return `<article class="jgb-v66-history-item"><div class="jgb-v66-history-title"><b>방수 이력 ${esc(h.waCode||'-')}</b><span>${esc(h.date||'-')}</span><div class="jgb-v66-history-actions"><button type="button" data-v47-action="edit-wp" data-id="${esc(h.id)}" data-code="${esc(code)}">✏ 수정</button><button type="button" data-v47-action="delete-wp" data-id="${esc(h.id)}" data-code="${esc(code)}">🗑 삭제</button></div></div><div class="jgb-v66-history-content"><div>${field('작업일자',h.date)}${field('작업구분',h.method)}${field('외주업체명',h.vendor)}${field('작업비용',Number(h.cost||0).toLocaleString()+'원')}${field('작업내용',h.content)}${field('작업결과',h.result)}${field('방수 이력',h.waCode)}${field('특이사항',h.note)}</div><div class="jgb-v66-work-photos"><div class="jgb-v66-photo-label">📷 작업사진 <em>4 × 4 · 3장</em></div><div class="jgb-v66-work-photo-grid">${[0,1,2].map(k=>photos[k]?`<img src="${esc(photos[k])}" alt="작업사진 ${k+1}">`:`<div class="jgb-v66-work-empty">사진 ${k+1}<small>등록 자리</small></div>`).join('')}</div></div></div></article>`;
-    }).join(''):`<div class="jgb-v66-empty">등록된 방수공사 이력내역이 없습니다.</div>`;
-    return `<section class="jgb-v66-set" data-wp-code="${esc(code)}"><div class="jgb-v66-head"><strong>🛡 방수관리 이력카드</strong><div><button type="button" data-v47-action="edit-wp-card" data-code="${esc(code)}">✏ 수정</button><button type="button" data-v47-action="new-wp" data-code="${esc(code)}">＋ 이력내역</button><button type="button" class="jgb-v66-delete-card" data-v47-action="delete-wp-card" data-code="${esc(code)}">🗑 카드삭제</button><button type="button" class="jgb-v66-fold" data-v47-action="toggle-wp-card" data-code="${esc(code)}" aria-expanded="${collapsed?'false':'true'}">${collapsed?'▼':'▲'}</button></div></div><div class="jgb-v66-body${collapsed?' closed':''}"><div class="jgb-v66-card"><div class="jgb-v66-section">기본정보</div><div class="jgb-v66-card-layout"><div>${field('누수코드',meta.leakCode||rows.find(x=>String(x.related||'').trim())?.related||'-')}${field('시설명',meta.facility||'장군봉체육관')}${field('방수 위치',loc)}${field('건물·구역',meta.area)}${field('주요 방수부위',meta.part||loc)}${field('방수공사 종류',meta.kind||'방수 보수·보강')}${field('방수 면적',meta.areaSize)}${field('최초 방수일',meta.firstDate||rows.at(-1)?.date)}${field('최근 방수일',rows[0]?.date||meta.lastDate)}${field('현재 상태',meta.status||'정상')}${field('담당자',meta.manager)}${field('연락처',meta.contact)}${field('시공업체',meta.contractor)}${field('보증기간',meta.warranty)}${field('공사 목적',meta.purpose||'시설물 보호 및 누수 예방')}${field('주요 공법',meta.method||'우레탄시트 등')}${field('사용 자재',meta.material)}${field('공사 범위',meta.scope)}${field('총 공사비',totalForLocation(rows)+'원')}${field('특이사항',meta.note)}</div><div class="jgb-v66-card-photo"><div class="jgb-v66-photo-label">📷 방수 위치 사진 <em>5 × 5 · 1장</em></div>${photo?`<img src="${esc(photo)}" alt="방수 위치 사진">`:`<div class="jgb-v66-location-empty">사진 등록 자리<br><small>5 × 5 · 1장</small></div>`}</div></div></div><section class="jgb-v66-history"><div class="jgb-v66-history-head"><strong>📋 방수공사 이력내역</strong><button type="button" data-v47-action="new-wp" data-code="${esc(code)}">＋ 이력내역 등록</button></div><div class="jgb-v66-history-list">${history}</div></section></div></section>`;
-  };
-  return `<div class="jgb-v66-wrap"><div class="jgb-v66-top"><h2>🛡 방수관리 이력</h2><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div><div class="jgb-v66-grid">${list.map(cardFor).join('')||'<div class="jgb-v66-none">등록된 방수공사 이력카드가 없습니다.<br><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>'}</div></div>`;
-}
+      /* V140: 방수는 어렵게 묶지 않고 "카드 여러 개 + 각 카드의 이력"으로 단순 표시합니다. */
+      const S=jgbV47Store();
+      const hs=Array.isArray(S.wp)?S.wp:[];
+      const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      const cards=jgbV90NormalizeWpCards();
+      const entries=Object.entries(cards).map(([key,m])=>({code:String(m?.code||key),meta:m||{}})).filter(x=>x.code);
+      const cardFor=(item)=>{
+        const code=item.code, meta=item.meta||{};
+        const rows=hs.filter(x=>String(x.cardCode||'')===code || String(x.related||'').trim().toUpperCase()===String(meta.leakCode||'').trim().toUpperCase())
+          .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+        const field=(a,b)=>`<div class="jgb-v66-row"><strong>${esc(a)}</strong><span>${esc(b==null||b===''?'-':b)}</span></div>`;
+        const history=rows.length?rows.map(h=>`<article class="jgb-v66-history-item"><div class="jgb-v66-history-title"><b>방수 이력 ${esc(h.waCode||'-')}</b><span>${esc(h.date||'-')}</span><div class="jgb-v66-history-actions"><button type="button" data-v47-action="edit-wp" data-id="${esc(h.id)}" data-code="${esc(code)}">✏ 수정</button><button type="button" data-v47-action="delete-wp" data-id="${esc(h.id)}" data-code="${esc(code)}">🗑 삭제</button></div></div><div class="jgb-v66-history-content"><div>${field('작업일자',h.date)}${field('작업구분',h.method)}${field('외주업체명',h.vendor)}${field('작업비용',Number(h.cost||0).toLocaleString()+'원')}${field('작업내용',h.content)}${field('작업결과',h.result)}${field('방수 이력',h.waCode)}${field('특이사항',h.note)}</div><div class="jgb-v66-work-photos"><div class="jgb-v66-photo-label">📷 작업사진</div><div class="jgb-v66-work-photo-grid">${[0,1,2].map(k=>{const p=Array.isArray(h.photos)?h.photos[k]:'';return p?`<img src="${esc(p)}" alt="작업사진 ${k+1}">`:`<div class="jgb-v66-work-empty">사진 ${k+1}<small>등록 자리</small></div>`}).join('')}</div></div></div></article>`).join(''):`<div class="jgb-v66-empty">등록된 방수공사 이력내역이 없습니다.</div>`;
+        return `<section class="jgb-v66-set" data-wp-code="${esc(code)}"><div class="jgb-v66-head"><strong>🛡 방수관리 이력카드</strong><div><button type="button" data-v47-action="edit-wp-card" data-code="${esc(code)}">✏ 수정</button><button type="button" data-v47-action="new-wp" data-code="${esc(code)}">＋ 방수 수리등록</button><button type="button" class="jgb-v66-delete-card" data-v47-action="delete-wp-card" data-code="${esc(code)}">🗑 카드삭제</button></div></div><div class="jgb-v66-body"><div class="jgb-v66-card"><div class="jgb-v66-section">기본정보</div><div class="jgb-v66-card-layout"><div>${field('LK 누수코드',meta.leakCode||'-')}${field('시설명',meta.facility||'장군봉체육관')}${field('방수 위치',meta.location||'-')}${field('건물·구역',meta.area)}${field('주요 방수부위',meta.part||meta.location)}${field('방수공사 종류',meta.kind||'방수 보수·보강')}${field('현재 상태',meta.status||'정상')}${field('담당자',meta.manager)}${field('시공업체',meta.contractor)}${field('주요 공법',meta.method)}${field('사용 자재',meta.material)}${field('공사 범위',meta.scope)}${field('특이사항',meta.note)}</div><div class="jgb-v66-card-photo"><div class="jgb-v66-photo-label">📷 방수 위치 사진</div>${Array.isArray(meta.photos)&&meta.photos[0]?`<img src="${esc(meta.photos[0])}" alt="방수 위치 사진">`:`<div class="jgb-v66-location-empty">사진 등록 자리</div>`}</div></div></div><section class="jgb-v66-history"><div class="jgb-v66-history-head"><strong>📋 방수 수리 이력 (${rows.length}건)</strong><button type="button" data-v47-action="new-wp" data-code="${esc(code)}">＋ 방수 수리등록</button></div><div class="jgb-v66-history-list">${history}</div></section></div></section>`;
+      };
+      return `<div class="jgb-v66-wrap"><div class="jgb-v66-top"><div><h2>🛡 방수관리 이력</h2><p>LK 코드별 방수 이력을 관리합니다. 등록된 카드는 모두 표시됩니다.</p></div><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>${entries.length?`<div class="jgb-v66-grid">${entries.map(cardFor).join('')}</div>`:`<div class="jgb-v66-none">등록된 방수 이력카드가 없습니다.<br><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>`}</div>`;
+    }
     function wpSetCard(location,idx,esc){
       if(!location)return `<section class="jgb-v52-set"><div class="jgb-v48-card panel jgb-v52-card"><div class="jgb-v48-card-head"><div><h2>📋 방수공사 이력카드</h2><p>방수 대상 시설의 기본정보를 관리합니다.</p></div><div class="jgb-v48-card-actions"><button type="button" class="btn gray" disabled>✏️ 이력카드 수정</button></div></div><div class="jgb-v52-empty">방수 위치를 등록하면 이력카드가 표시됩니다.</div></div><section class="jgb-v48-history panel jgb-v52-history"><div class="jgb-v48-card-head"><div><h2>📝 방수공사 이력내역</h2></div></div><div class="jgb-v52-empty">등록된 방수작업 이력이 없습니다.</div></section></section>`;
       const S=jgbV47Store(),hs=S.wp.filter(x=>x.location===location).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))),meta=wpCardMeta(location),photos=Array.isArray(meta.photos)?meta.photos:[],historyCards=hs.slice(0,999).map((x,i)=>wpHistoryCard(x,i,esc)).join('');
