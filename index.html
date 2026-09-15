@@ -3542,65 +3542,56 @@ html::before,body::before{
       .eam228-entry.court{right:12%!important;top:41%!important}
 </style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn" onclick="window.eam228New('AC')">자산등록</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
-      /* v239: EAM 자산 아이콘 이동을 데스크톱 마우스 드래그로 단순화.
-         클릭은 기존 EAM 자산카드 이동, 드래그는 배치 위치 저장으로 분리합니다. */
-      if(!window.__EAM228_DRAG_V239_BOUND){
-        window.__EAM228_DRAG_V239_BOUND=true;
-        window.__EAM228MouseDrag={active:false,code:'',map:null,el:null,startX:0,startY:0,startLeft:0,startTop:0,moved:false};
-        document.addEventListener('mousedown',e=>{
+      /* v240: 누수 LK와 동일한 방식으로 EAM 자산 아이콘을 마우스/터치 드래그 이동 */
+      if(!window.__EAM228_DRAG_V240_BOUND){
+        window.__EAM228_DRAG_V240_BOUND=true;
+        document.addEventListener('pointerdown',function(e){
           const el=e.target.closest?.('.eam228-asset');
           if(!el || e.button!==0)return;
           const map=el.closest('#eam228Map');
           if(!map)return;
-          const d=window.__EAM228MouseDrag;
-          const mr=map.getBoundingClientRect();
-          d.active=true;
-          d.code=V(el.dataset.code);
-          d.map=map;
-          d.el=el;
-          d.startX=e.clientX;
-          d.startY=e.clientY;
-          d.startLeft=parseFloat(el.style.left)||0;
-          d.startTop=parseFloat(el.style.top)||0;
-          d.moved=false;
-          el.classList.add('dragging');
+          const r=map.getBoundingClientRect();
+          const code=V(el.dataset.code||'');
+          const startX=e.clientX,startY=e.clientY;
+          const startLeft=parseFloat(el.style.left)||0,startTop=parseFloat(el.style.top)||0;
+          let dragging=false,moved=false;
+          const move=ev=>{
+            const dx=ev.clientX-startX,dy=ev.clientY-startY;
+            if(!dragging && Math.hypot(dx,dy)<5)return;
+            if(!dragging){dragging=true;el.classList.add('dragging');}
+            moved=true;
+            ev.preventDefault();
+            ev.stopPropagation();
+            const x=Math.max(2,Math.min(98,startLeft+(dx/r.width)*100));
+            const y=Math.max(2,Math.min(98,startTop+(dy/r.height)*100));
+            el.style.left=x.toFixed(2)+'%';
+            el.style.top=y.toFixed(2)+'%';
+          };
+          const finish=ev=>{
+            window.removeEventListener('pointermove',move,true);
+            window.removeEventListener('pointerup',finish,true);
+            window.removeEventListener('pointercancel',finish,true);
+            el.classList.remove('dragging');
+            if(!moved){return;}
+            const rr=map.getBoundingClientRect();
+            const x=Math.max(2,Math.min(98,((ev.clientX-rr.left)/rr.width)*100));
+            const y=Math.max(2,Math.min(98,((ev.clientY-rr.top)/rr.height)*100));
+            const pos=readObj(posKey);
+            pos[code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+            writeObj(posKey,pos);
+            window.__EAM228_DRAG_SUPPRESS=true;
+            setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,500);
+            ev.preventDefault();
+            ev.stopPropagation();
+            render();
+          };
+          window.addEventListener('pointermove',move,true);
+          window.addEventListener('pointerup',finish,true);
+          window.addEventListener('pointercancel',finish,true);
+          try{el.setPointerCapture?.(e.pointerId)}catch(_){}
           e.preventDefault();
           e.stopPropagation();
         },true);
-        document.addEventListener('mousemove',e=>{
-          const d=window.__EAM228MouseDrag;
-          if(!d.active||!d.el||!d.map)return;
-          const r=d.map.getBoundingClientRect();
-          const dx=(e.clientX-d.startX)/r.width*100;
-          const dy=(e.clientY-d.startY)/r.height*100;
-          if(!d.moved && Math.hypot(e.clientX-d.startX,e.clientY-d.startY)<4)return;
-          d.moved=true;
-          const x=Math.max(2,Math.min(98,d.startLeft+dx));
-          const y=Math.max(2,Math.min(98,d.startTop+dy));
-          d.el.style.left=x.toFixed(2)+'%';
-          d.el.style.top=y.toFixed(2)+'%';
-          e.preventDefault();
-        },true);
-        const finish=e=>{
-          const d=window.__EAM228MouseDrag;
-          if(!d.active)return;
-          const el=d.el,code=d.code,map=d.map,moved=d.moved;
-          if(el)el.classList.remove('dragging');
-          d.active=false;d.el=null;d.map=null;
-          if(!moved){d.code='';return;}
-          const r=map.getBoundingClientRect();
-          const x=Math.max(2,Math.min(98,((e.clientX-r.left)/r.width)*100));
-          const y=Math.max(2,Math.min(98,((e.clientY-r.top)/r.height)*100));
-          const pos=readObj(posKey);
-          pos[code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-          writeObj(posKey,pos);
-          window.__EAM228_DRAG_SUPPRESS=true;
-          setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,450);
-          d.code='';
-          render();
-          e.preventDefault();
-        };
-        document.addEventListener('mouseup',finish,true);
       }
     }
 
