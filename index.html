@@ -2502,6 +2502,44 @@ html::before,body::before{
 .jgb-v189-live-notebook:not(.jgb-v26-open) .jgb-v190-cover-image img{cursor:pointer!important;}
 @media(max-width:800px){.jgb-v189-live-notebook.jgb-v26-open{width:96vw!important;height:92vh!important;}}
 </style>
+
+<style id="JGB_V29_NOTEBOOK_CLOSE_ONLY">
+/* v29: 확대 후에는 표지를 눌러 닫지 않고, X 버튼으로만 닫기 */
+.jgb-v189-live-notebook.jgb-v26-open .jgb-v188-cover{cursor:default!important;}
+.jgb-v189-live-notebook.jgb-v26-open .jgb-v190-cover-image:after{display:none!important;}
+.jgb-v28-close{display:flex!important;align-items:center!important;justify-content:center!important;}
+</style>
+<script id="JGB_V29_NOTEBOOK_CLOSE_ONLY_JS">
+(function(){
+ function init(){
+  const book=document.querySelector('.jgb-v189-live-notebook');
+  if(!book || book.dataset.v29Ready==='1') return;
+  book.dataset.v29Ready='1';
+  /* 확대 상태에서는 표지 클릭이 기존 토글 이벤트로 전달되지 않게 차단 */
+  book.addEventListener('click',function(e){
+   if(!book.classList.contains('jgb-v26-open')) return;
+   if(e.target.closest('.jgb-v188-cover')){
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+   }
+  },true);
+  /* X는 항상 확대 상태를 닫는 전용 버튼 */
+  book.addEventListener('click',function(e){
+   const btn=e.target.closest('.jgb-v28-close,.jgb-v26-close,.jgb-v24-close');
+   if(!btn || !book.classList.contains('jgb-v26-open')) return;
+   e.preventDefault();
+   e.stopPropagation();
+   book.classList.remove('jgb-v26-open','jgb-v24-book-open');
+   document.body.classList.remove('jgb-v24-book-lock');
+   document.body.style.overflow='';
+   btn.hidden=true;
+   btn.style.display='none';
+  },true);
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
+</script>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
