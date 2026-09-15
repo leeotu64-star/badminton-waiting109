@@ -1608,9 +1608,6 @@ html,body{max-width:100%;overflow-x:hidden!important}
 .jgb-maker{display:none!important;}
 /* Remove the stray visible text if it is injected dynamically. */
 </style>
-<style id="JGB_V48_DASHBOARD_VIEW_SPLIT">
-.opx-view-switch{display:flex;justify-content:flex-end;margin:0 0 10px}.opx-view-switch button{border:0;border-radius:10px;padding:10px 16px;background:#1769c1;color:#fff;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(23,105,193,.18)}.opx-view-switch button:hover{background:#0f5aa8}.opx-employee-view,.opx-customer-view{width:100%}.opx-customer-switch-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:12px;padding:18px 20px;border-radius:16px;background:linear-gradient(135deg,#08264a,#1266b8);color:#fff;box-shadow:0 10px 25px rgba(8,38,74,.14)}.opx-customer-switch-head h2{margin:3px 0 5px;font-size:28px}.opx-customer-switch-head p{margin:0;color:#dbeafe;font-size:12px}.opx-customer-kicker{font-size:10px;font-weight:900;letter-spacing:1.2px;opacity:.8}.opx-customer-switch-head>span{white-space:nowrap;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);padding:9px 12px;border-radius:10px;font-size:11px;font-weight:900}.opx-view-employee .opx-customer-view{display:none!important}.opx-view-customer .opx-employee-view{display:none!important}.opx-view-customer .opx-customer-view{display:block!important}@media(max-width:650px){.opx-customer-switch-head{align-items:flex-start;flex-direction:column}.opx-customer-switch-head h2{font-size:24px}}
-</style>
 <script>
 // V130: E undefined 오류 방지 — EAM 화면에서 사용하는 HTML escape helper
 function E(value){
@@ -2458,401 +2455,26 @@ html::before,body::before{
 .jgb-v66-work-photos .jgb-v66-photo-label,.jgb-v66-work-photos .jgb-v66-photo-label em{font-size:15px!important;white-space:nowrap!important}
 </style>
 <style id="JGB_V99_CODE_NAMES">.jgb-v66-history-title b{min-width:120px}.jgb-v66-row strong,.jgb-v66-row span{text-align:left}</style>
-<style id="JGB_V57_LEAK_WP_THEME">
-/* V57: 누수·방수 페이지 상단 헤더 제거 후 공통 블루 테마 */
-.jgb-v104-wrap,.jgb-v66-wrap{color:#173b5d!important}
-.jgb-v104-card,.jgb-v66-card,.jgb-v66-history{border-color:#cbdbe8!important}
-.jgb-v104-title,.jgb-v66-section,.jgb-v66-history-head{color:#173b5d!important}
-.jgb-v104-title h2,.jgb-v66-card-head h2,.jgb-v66-history-head strong{
-  color:#173b5d!important;font-weight:950!important;
-}
-.jgb-v104-title p,.jgb-v66-card-head p{color:#60788d!important;font-weight:650!important}
-.jgb-v104-add,.jgb-v66-top button,.jgb-v66-history-head button{
-  background:#176fc7!important;border-color:#176fc7!important;color:#fff!important;
-}
-.jgb-v66-card-head,.jgb-v66-history-head{background:#f1f7fc!important;border-bottom-color:#cbdbe8!important}
-.jgb-v104-kpis{margin-top:4px!important}
-</style>
-
-
-<style id="JGB_V58_LINK_STYLE">
-.jgb-v47-form-grid #v47_linkedLeakCode{background:#eef6ff!important;color:#176fc7!important;font-weight:900!important}
-.jgb-v47-form-grid #v47_linkedLeakCode:read-only{cursor:not-allowed}
-</style>
-<script>
+<script id="JGB_V133_LEAK_WP_RESET">
 (function(){
   try{
-    const key='JGB_V47_WP_HISTORY', ck='JGB_V72_WP_CARDS';
-    const wp=JSON.parse(localStorage.getItem(key)||'[]');
-    const cards=JSON.parse(localStorage.getItem(ck)||'{}');
-    if(Array.isArray(wp)&&wp.length&&cards&&typeof cards==='object'){
-      let changed=false;
-      const out=wp.map(h=>{
-        if(h&&h.cardCode&&!/^LK-\d+$/i.test(String(h.related||''))){
-          const c=cards[String(h.cardCode)]||{};
-          const lk=String(h?.related||c.leakCode||c.related||'').trim().toUpperCase();
-          if(/^LK-\d+$/.test(lk)){changed=true;return {...h,related:lk}}
-        }
-        return h;
-      });
-      if(changed)localStorage.setItem(key,JSON.stringify(out));
+    if(localStorage.getItem('JGB_V133_LEAK_WP_RESET_DONE')!=='1'){
+      [
+        'JGB_V47_LEAKS',
+        'JGB_V47_WP_HISTORY',
+        'JGB_V72_WP_CARDS',
+        'JGB_V48_WP_CARDS',
+        'JGB_V48_WP_SELECTED',
+        'JGB_V47_SELECTED_LOCATION'
+      ].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+      localStorage.setItem('JGB_V133_LEAK_WP_RESET_DONE','1');
     }
   }catch(e){}
 })();
 </script>
 
-
-<style id="JGB_V59_EAM_STYLE">
-/* 누수·방수 페이지 공통 EAM형 헤더 */
-.jgb-v57-page-head{
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:28px;
-  min-height:112px;
-  margin:0 0 18px;
-  padding:24px 28px;
-  border-radius:18px;
-  overflow:hidden;
-  color:#fff;
-  background:linear-gradient(135deg,#0d3f73 0%,#1265a8 55%,#0d8bb0 100%);
-  box-shadow:0 8px 22px rgba(15,61,102,.16);
-}
-.jgb-v57-page-head:after{
-  content:"";
-  position:absolute;
-  width:220px;height:220px;
-  right:-55px;top:-125px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:50%;
-  pointer-events:none;
-}
-.jgb-v57-page-head>div:first-child{position:relative;z-index:1}
-.jgb-v57-eyebrow{
-  margin-bottom:4px;
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:1.6px;
-  color:rgba(255,255,255,.68);
-}
-.jgb-v57-page-head h1{
-  margin:0;
-  font-size:29px;
-  line-height:1.18;
-  font-weight:950;
-  letter-spacing:-.7px;
-  color:#fff!important;
-}
-.jgb-v57-page-head p{
-  margin:7px 0 0;
-  font-size:12px;
-  line-height:1.5;
-  font-weight:650;
-  color:rgba(255,255,255,.88)!important;
-}
-.jgb-v57-page-head p b{font-weight:900;color:#fff}
-.jgb-v57-head-btn{
-  position:relative;
-  z-index:2;
-  flex:0 0 auto;
-  border:1px solid rgba(255,255,255,.18)!important;
-  border-radius:9px!important;
-  padding:11px 16px!important;
-  background:#176fc7!important;
-  color:#fff!important;
-  font-size:12px!important;
-  font-weight:900!important;
-  cursor:pointer;
-  box-shadow:0 3px 10px rgba(0,0,0,.12);
-}
-.jgb-v57-head-btn:hover{filter:brightness(1.08)}
-@media(max-width:760px){
-  .jgb-v57-page-head{align-items:flex-start;flex-direction:column;padding:20px}
-  .jgb-v57-page-head h1{font-size:25px}
-}
-</style>
-
-
-<script>
-(function(){
-  try{
-    const wpKey='JGB_V47_WP_HISTORY', cardKey='JGB_V72_WP_CARDS';
-    const wp=JSON.parse(localStorage.getItem(wpKey)||'[]');
-    const cards=JSON.parse(localStorage.getItem(cardKey)||'{}');
-    if(Array.isArray(wp)&&cards&&typeof cards==='object'){
-      let changed=false;
-      const out=wp.map(h=>{
-        const c=cards[String(h?.cardCode||'')]||{};
-        const lk=String(h?.related||c.leakCode||c.related||'').trim().toUpperCase();
-        const loc=String(h?.location||c.location||'').trim();
-        const next={...h};
-        if(/^LK-\d+$/.test(lk)&&String(next.related||'').toUpperCase()!==lk){next.related=lk;changed=true}
-        if(loc&&String(next.location||'')!==loc){next.location=loc;changed=true}
-        return next;
-      });
-      if(changed)localStorage.setItem(wpKey,JSON.stringify(out));
-    }
-  }catch(e){}
-})();
-</script>
-
-
-<style id="JGB_V63_CARD_GAP">
-/* V63: 하단 운영정보 카드가 서로 붙어 보이지 않도록 간격 확대 */
-.qrx-v8-grid-3{
-  column-gap:26px!important;
-  row-gap:24px!important;
-}
-.qrx-v8-grid-3>.qrx-v8-panel{
-  margin:0!important;
-}
-.qrx-v8-wrap{
-  gap:22px!important;
-}
-@media(max-width:1050px){
-  .qrx-v8-grid-3{column-gap:22px!important;row-gap:22px!important}
-}
-@media(max-width:760px){
-  .qrx-v8-grid-3{column-gap:0!important;row-gap:18px!important}
-}
-</style>
-
-
-<style id="JGB_V64_ROW_GAP">
-/* V64: 상단 '우선 확인/관리자 판단' 영역과
-   하단 '오늘의 변화/반복·집중 장소/시간대별 접수' 영역을 확실히 분리 */
-.qrx-v8-wrap{
-  margin-top:26px!important;
-  padding-top:2px!important;
-}
-.qrx-v8-grid-3{
-  margin-top:4px!important;
-}
-</style>
-
-
-<style id="JGB_V65_SECTION_SEPARATION">
-/* V65: '지금 우선 확인할 고객 접수' 영역과 '오늘의 변화' 영역 사이를 명확하게 분리 */
-.qrx-v8-wrap{
-  margin-top:42px!important;
-  padding-top:0!important;
-}
-</style>
-
-
-<style id="JGB_V67_MIDDLE_HEADER">
-/* V67: 운영대시보드 중간 카드 머리말을 최상단 헤더와 같은 계열로 통일 */
-.qrx-v8-grid-3>.qrx-v8-panel>.qrx-v8-head{
-  background:linear-gradient(135deg,#0d3f73 0%,#1265a8 55%,#0d8bb0 100%)!important;
-  border-bottom:0!important;
-  color:#fff!important;
-  border-radius:14px 14px 0 0!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important;
-}
-.qrx-v8-grid-3>.qrx-v8-panel>.qrx-v8-head b{
-  color:#fff!important;
-  font-weight:950!important;
-}
-.qrx-v8-grid-3>.qrx-v8-panel>.qrx-v8-head span{
-  color:rgba(255,255,255,.82)!important;
-  font-weight:850!important;
-}
-</style>
-
-
-<style id="JGB_V68_CHANGE_TOPLINE">
-/* V68: '오늘의 변화' 줄 바로 위에 상단 영역과 같은 블루 구분선 추가 */
-.qrx-v8-grid-3{
-  border-top:3px solid #1265a8!important;
-  padding-top:14px!important;
-  margin-top:22px!important;
-  border-radius:0!important;
-}
-</style>
-
-
-<style id="JGB_V70_EAM_FLIP">
-/* EAM V71 — 기존 글씨 크기 유지 / 90% 모니터 화면 기준 레이아웃 */
-.eam-innovation{width:100%;max-width:100%;box-sizing:border-box}
-
-/* 누수현황과 비슷한 앞면/뒷면 카드 */
-
-
-.eam-xanalysis-flip.flipped 
-
-
-
-
-
-
-
-
-
-@media(max-width:800px){.eam-xanalysis-summary,}
-</style>
-<script id="JGB_V70_EAM_FLIP_JS">
-function eamFlipAnalysis(){document.getElementById('eamAnalysisFlip')?.classList.toggle('flipped')}
-</script>
-
-
-<style id="JGB_V71_EAM_90FIT">
-/* 90% 모니터 화면에서 좌우 잘림 없이 보이도록 레이아웃만 맞춤 */
-.eam-innovation-layout,
-.eam-xgrid2,
-.eam-xmonthly,
-
-
-</style>
-<style id="JGB_V72_EAM_ACCORDION_TABS">
-/* V72 — 기존 색상/디자인 유지, 카드 뒤집기 대신 아코디언+탭 */
-.eam-xanalysis-accordion{overflow:hidden!important}
-.eam-xaccordion-summary{cursor:pointer!important;min-height:62px!important}
-.eam-xanalysis-quick{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important;padding:14px 16px!important}
-.eam-xanalysis-quick>div{padding:13px 15px!important;border:1px solid #d4e1ed!important;border-radius:9px!important}
-.eam-xanalysis-quick span,.eam-xanalysis-quick b{display:block!important;font-weight:900!important}
-.eam-xanalysis-quick b{font-size:1.15em!important;font-weight:950!important;margin-top:4px!important}
-.eam-xanalysis-body{display:none!important;border-top:1px solid #d4e1ed!important;padding:14px 16px 18px!important}
-.eam-xanalysis-accordion.open .eam-xanalysis-body{display:block!important}
-.eam-xanalysis-tabs{display:flex!important;gap:8px!important;flex-wrap:wrap!important;margin-bottom:12px!important}
-.eam-xanalysis-tab{padding:10px 15px!important;border:1px solid #c9d9e8!important;border-radius:8px!important;background:inherit!important;cursor:pointer!important;font-weight:950!important}
-.eam-xanalysis-pane{display:none!important;border:1px solid #d4e1ed!important;border-radius:10px!important;overflow:hidden!important}
-.eam-xanalysis-pane.active{display:block!important}
-.eam-xanalysis-pane .eam-xhead{margin:0!important}
-.eam-xanalysis-pane strong,.eam-xanalysis-pane span,.eam-xanalysis-pane b,.eam-xanalysis-pane small,.eam-xanalysis-pane em{font-weight:850!important}
-.eam-xanalysis-pane .eam-dx-ranks,.eam-xanalysis-pane .eam-dx-list{font-size:1.05em!important}
-@media(max-width:800px){.eam-xanalysis-quick{grid-template-columns:repeat(2,minmax(0,1fr))!important}.eam-xanalysis-tabs{display:grid!important;grid-template-columns:repeat(2,1fr)!important}}
-</style>
-<script id="JGB_V72_EAM_ACCORDION_TABS_JS">
-function eamToggleAnalysis(){
- const box=document.getElementById('eamAnalysisAccordion'),btn=document.getElementById('eamAnalysisToggleBtn');
- if(!box)return;
- const open=box.classList.toggle('open');
- if(btn)btn.textContent=open?'− 접기':'＋ 상세보기';
-}
-function eamAnalysisTab(name,el){
- document.querySelectorAll('.eam-xanalysis-tab').forEach(b=>b.classList.remove('active'));
- document.querySelectorAll('.eam-xanalysis-pane').forEach(p=>p.classList.remove('active'));
- if(el)el.classList.add('active');
- const pane=document.getElementById('eamAnalysisPane'+name.charAt(0).toUpperCase()+name.slice(1));
- if(pane)pane.classList.add('active');
-}
-</script>
-<style id="JGB_V73_WP_RESULT_NAME">
-/* V73: 방수 작업결과 명칭을 '조치 / 보수 후 관찰 / 재조치 필요'로 통일 */
-.jgb-v47-modal-box select#v47_result{font-weight:800!important}
-</style>
-<style id="JGB_V75_EAM_MAINT_MERGE">
-/* V75: 정비방식 + 정비유형을 하나의 정비 현황 영역으로 통합 */
-.eam-xmaintenance-summary{margin-bottom:18px!important}
-.eam-xmaint-merged{display:grid!important;grid-template-columns:1.15fr 1px .85fr!important;gap:22px!important;align-items:stretch!important;padding:20px 22px!important}
-.eam-xmaint-block h3{margin:0 0 14px!important;font-size:16px!important;font-weight:950!important;color:#183d5a!important}
-.eam-xmethod-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important}
-.eam-xmethod-row .eam-xmethod{min-height:120px!important;box-sizing:border-box!important}
-.eam-xmaint-divider{width:1px!important;background:#d9e4ed!important}
-.eam-xmaint-type-list{display:grid!important;gap:0!important;border-top:1px solid #d9e4ed!important}
-.eam-xmaint-type-list>div{display:flex!important;justify-content:space-between!important;align-items:center!important;padding:11px 4px!important;border-bottom:1px solid #d9e4ed!important}
-.eam-xmaint-type-list span{font-weight:850!important}
-.eam-xmaint-type-list b{font-weight:950!important}
-@media(max-width:800px){.eam-xmaint-merged{grid-template-columns:1fr!important}.eam-xmaint-divider{display:none!important}}
-</style>
-<style id="JGB_V78_EAM_MAINT_BUTTON">
-/* V78: 삭제한 정비 현황은 상단 버튼으로 확인 */
-.eam-xhero-right{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important}
-.eam-xhero-right button{cursor:pointer!important}
-.jgb-v78-maint-modal{position:fixed!important;inset:0!important;z-index:99999!important;background:rgba(15,31,48,.45)!important;display:none!important;align-items:center!important;justify-content:center!important;padding:20px!important}
-.jgb-v78-maint-modal.show{display:flex!important}
-.jgb-v78-maint-box{width:min(760px,96vw)!important;background:#fff!important;border-radius:16px!important;box-shadow:0 20px 60px rgba(0,0,0,.22)!important;overflow:hidden!important}
-.jgb-v78-maint-head{padding:18px 22px!important;border-bottom:1px solid #d4e1ed!important;display:flex!important;justify-content:space-between!important;align-items:center!important}
-.jgb-v78-maint-head strong{font-size:20px!important;font-weight:950!important}
-.jgb-v78-maint-close{border:0!important;background:transparent!important;font-size:24px!important;cursor:pointer!important}
-.jgb-v78-maint-body{padding:20px 22px!important}
-.jgb-v78-maint-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:18px!important}
-.jgb-v78-maint-section{border:1px solid #d4e1ed!important;border-radius:10px!important;padding:16px!important}
-.jgb-v78-maint-section h3{margin:0 0 12px!important;font-size:16px!important;font-weight:950!important}
-.jgb-v78-maint-methods{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
-.jgb-v78-maint-method{padding:14px!important;border-radius:9px!important;border:1px solid #d4e1ed!important}
-.jgb-v78-maint-method.internal{border-left:4px solid #20a86b!important;background:#f5fbf8!important}
-.jgb-v78-maint-method.external{border-left:4px solid #ff861d!important;background:#fff9f1!important}
-.jgb-v78-maint-method span,.jgb-v78-maint-method b{display:block!important;font-weight:900!important}
-.jgb-v78-maint-method b{font-size:22px!important;margin-top:6px!important}
-.jgb-v78-maint-types{border-top:1px solid #d9e4ed!important}
-.jgb-v78-maint-types div{display:flex!important;justify-content:space-between!important;padding:10px 2px!important;border-bottom:1px solid #d9e4ed!important}
-.jgb-v78-maint-types span{font-weight:800!important}.jgb-v78-maint-types b{font-weight:950!important}
-@media(max-width:650px){.jgb-v78-maint-grid{grid-template-columns:1fr!important}.jgb-v78-maint-methods{grid-template-columns:1fr!important}}
-</style>
-<script id="JGB_V78_EAM_MAINT_BUTTON_JS">
-function eamOpenMaintenanceStatus(){
-  const q=typeof qYear!=='undefined'?qYear:[];
-  const yearSelf=typeof window.yearSelf!=='undefined'?window.yearSelf:q.filter(h=>typeof method==='function'&&method(h)==='자체정비').length;
-  const yearOut=typeof window.yearOut!=='undefined'?window.yearOut:q.filter(h=>typeof method==='function'&&method(h)==='외주정비').length;
-  const year=typeof window.year!=='undefined'?window.year:new Date().getFullYear();
-  const typeNames=['예방점검','고장정비','계획정비','기타'];
-  const counts=typeNames.map(n=>q.filter(h=>typeof maintType==='function'&&maintType(h)===n).length);
-  let box=document.getElementById('jgbV78MaintModal');
-  if(!box){
-    box=document.createElement('div');box.id='jgbV78MaintModal';box.className='jgb-v78-maint-modal';
-    document.body.appendChild(box);
-  }
-  box.innerHTML=`<div class="jgb-v78-maint-box" role="dialog" aria-modal="true">
-   <div class="jgb-v78-maint-head"><strong>🔧 정비 현황</strong><button class="jgb-v78-maint-close" onclick="eamCloseMaintenanceStatus()">×</button></div>
-   <div class="jgb-v78-maint-body"><div class="jgb-v78-maint-grid">
-    <div class="jgb-v78-maint-section"><h3>정비방식</h3><div class="jgb-v78-maint-methods">
-     <div class="jgb-v78-maint-method internal"><span>자체정비</span><b>${yearSelf}건</b></div>
-     <div class="jgb-v78-maint-method external"><span>외주정비</span><b>${yearOut}건</b></div>
-    </div></div>
-    <div class="jgb-v78-maint-section"><h3>정비유형</h3><div class="jgb-v78-maint-types">
-     ${typeNames.map((n,i)=>`<div><span>${n}</span><b>${counts[i]}건</b></div>`).join('')}
-    </div></div>
-   </div></div>
-  </div>`;
-  box.classList.add('show');
-  box.onclick=e=>{if(e.target===box)eamCloseMaintenanceStatus()};
-}
-function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78MaintModal');if(box)box.classList.remove('show')}
-</script>
-<style id="JGB_V81_EAM_50_50">
-/* V81: 월별 흐름 50% + 주의 자산/다음 관리 예정 50% */
-.eam-xmonth-half-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:16px!important;align-items:stretch!important}
-.eam-xmonth-half-grid>.eam-xpanel{min-width:0!important;margin:0!important}
-.eam-xmonth-left .eam-dx-flow{min-height:190px!important}
-.eam-xmonth-right{overflow:hidden!important}
-.eam-xmonth-right .eam-dx-ranks{padding:14px 16px!important}
-.eam-xmonth-right .eam-dx-rank{margin-bottom:8px!important}
-.eam-xnext-head{margin-top:4px!important;border-top:1px solid #d9e4ed!important}
-.eam-xnext-list{padding:10px 16px 14px!important}
-.eam-xnext-item{display:grid!important;grid-template-columns:92px 1fr auto!important;gap:8px!important;align-items:center!important;padding:8px 0!important;border-bottom:1px solid #e2eaf0!important;font-size:13px!important}
-.eam-xnext-item>b{font-weight:900!important}
-.eam-xnext-item>span{font-weight:800!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-.eam-xnext-item>small{font-weight:750!important}
-@media(max-width:900px){.eam-xmonth-half-grid{grid-template-columns:1fr!important}}
-</style>
-<style id="JGB_V82_EAM_PANORAMA">
-.eam-xpanorama{overflow:hidden!important;min-width:0!important}.eam-xpanorama-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}.eam-xpanorama-nav{display:flex!important;align-items:center!important;gap:5px!important}.eam-xpanorama-nav button{width:30px!important;height:30px!important;border:1px solid #d4e1ed!important;border-radius:7px!important;background:inherit!important;font-size:21px!important;font-weight:900!important;cursor:pointer!important}.eam-xpanorama-nav span{min-width:52px!important;text-align:center!important;font-size:11px!important;font-weight:900!important}.eam-xpanorama-viewport{overflow:hidden!important;width:100%!important}.eam-xpanorama-track{display:flex!important;width:300%!important;transition:transform .45s ease!important}.eam-xpanorama-slide{width:33.333333%!important;min-width:33.333333%!important;box-sizing:border-box!important;padding:8px 0 4px!important}.eam-xpanorama-slide .eam-dx-ranks,.eam-xpanorama-slide .eam-xnext-list,.eam-xpanorama-slide .eam-xrecent-list{padding:8px 16px 14px!important}.eam-xrecent-item{display:grid!important;grid-template-columns:90px 1fr!important;gap:4px 10px!important;padding:9px 0!important;border-bottom:1px solid #e2eaf0!important}.eam-xrecent-item b{grid-row:span 2!important;font-weight:900!important}.eam-xrecent-item span{font-weight:850!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.eam-xrecent-item small{font-weight:750!important}.eam-xpanorama-labels{display:flex!important;justify-content:center!important;gap:6px!important;padding:7px 8px 10px!important;border-top:1px solid #e2eaf0!important}.eam-xpanorama-labels span{font-size:11px!important;font-weight:800!important;cursor:pointer!important;padding:5px 6px!important}.eam-xpanorama-labels span.active{font-weight:950!important}@media(max-width:900px){.eam-xmonth-half-grid{grid-template-columns:1fr!important}}
-</style>
-<script id="JGB_V82_EAM_PANORAMA_JS">
-(function(){let idx=0,timer=null,paused=false;const titles=[['⚠️ 주의 자산 TOP 5','반복 고장·정비이력이 많은 자산'],['📅 다음 관리 예정','등록된 다음 점검·관리 예정일'],['🛠 최근 정비 이력','최근 처리된 유지관리 이력']];function renderP(){const r=document.getElementById('eamMaintenancePanorama');if(!r)return;const t=r.querySelector('#eamPanoramaTrack');if(t)t.style.transform='translateX(-'+idx*33.333333+'%)';r.querySelector('#eamPanoramaTitle').textContent=titles[idx][0];r.querySelector('#eamPanoramaSub').textContent=titles[idx][1];r.querySelector('#eamPanoramaDots').textContent=[0,1,2].map(i=>i===idx?'●':'○').join(' ');r.querySelectorAll('.eam-xpanorama-labels span').forEach((e,i)=>e.classList.toggle('active',i===idx))}function reset(){clearInterval(timer);timer=setInterval(()=>{if(!paused){idx=(idx+1)%3;renderP()}},7000)}window.eamPanoramaNext=function(){idx=(idx+1)%3;renderP();reset()};window.eamPanoramaPrev=function(){idx=(idx+2)%3;renderP();reset()};window.eamPanoramaGo=function(n){idx=Math.max(0,Math.min(2,n));renderP();reset()};function init(){const r=document.getElementById('eamMaintenancePanorama');if(!r)return;r.addEventListener('mouseenter',()=>paused=true);r.addEventListener('mouseleave',()=>paused=false);renderP();reset()}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init()})();
-</script>
-<style id="JGB_V86_EAM_MONTH_GRAPH">
-/* V86: 월별 그래프는 한 화면에 약 3개월만 크게 표시하고 가로 스크롤 */
-.eam-xmonth-left .eam-dx-flow{
-  grid-template-columns:repeat(12,190px)!important;
-  gap:20px!important;
-  min-height:300px!important;
-  padding:24px 24px 14px!important;
-  align-items:end!important;
-}
-.eam-xmonth-left .eam-dx-flow-month{min-width:190px!important}
-.eam-xmonth-left .eam-dx-flow-month>b{font-size:18px!important;font-weight:950!important}
-.eam-xmonth-left .eam-dx-flow-bars{height:245px!important;gap:7px!important;margin-top:12px!important}
-.eam-xmonth-left .eam-dx-flow-bars i{width:17px!important;min-height:4px!important;border-radius:6px 6px 2px 2px!important}
-.eam-xmonth-left .eam-dx-flow-month>small{font-size:12px!important;margin-top:10px!important;line-height:1.45!important;white-space:normal!important;min-height:34px!important}
-.eam-xmonth-left .eam-dx-legend{gap:20px!important;padding:14px 24px!important}
-.eam-xmonth-left .eam-dx-legend span{font-size:13px!important}
-@media(max-width:900px){
-  .eam-xmonth-left .eam-dx-flow{grid-template-columns:repeat(12,170px)!important;gap:16px!important}
-  .eam-xmonth-left .eam-dx-flow-month{min-width:170px!important}
-}
+<style id="JGB_V133_CLEAN_START_STYLE">
+.jgb-v133-auto-code{display:inline-flex;align-items:center;gap:6px;margin-left:8px;padding:3px 8px;border-radius:999px;background:#eef6ff;color:#1b69a8;font-size:10px;font-weight:900}
 </style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -3297,12 +2919,6 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
     window.jgbTrendScrollInit=jgbTrendScrollInit;
     setTimeout(jgbTrendScrollInit,0);
 
-    function toggleDashboardView(){
-      const next=localStorage.getItem('JGB_OPX_VIEW')==='customer'?'employee':'customer';
-      localStorage.setItem('JGB_OPX_VIEW',next);
-      render();
-    }
-
     function dashboard(s){
       const baseYm=monthKey();
       const savedPeriod=String(localStorage.getItem('JGB_OPX_PERIOD')||'');
@@ -3538,9 +3154,7 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
       const monthlyRows=monthly.map(x=>`<tr><td>${x.m}월</td><td class="b">${x.basic}</td><td class="g">${x.auto}</td><td class="o">${x.issue}</td><td class="t">${x.total}</td></tr>`).join('');
 
       return `
-      <div class="opx-dash opx-clean-layout ${localStorage.getItem('JGB_OPX_VIEW')==='customer'?'opx-view-customer':'opx-view-employee'}">
-         <div class="opx-view-switch"><button type="button" onclick="toggleDashboardView()">${localStorage.getItem('JGB_OPX_VIEW')==='customer'?'👤 직원 실적 화면으로':'📊 민원 실적 화면으로'}</button></div>
-         <div class="opx-employee-view">
+      <div class="opx-dash opx-clean-layout">
         <section class="opx-hero opx-hero-final">
           <div class="opx-hero-main">
             <div class="opx-eyebrow">JANGGUNBONG SPORTS CENTER · STAFF OPERATION</div>
@@ -3587,147 +3201,11 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
           </section>
 
           <section class="opx-panel opx-table-panel opx-annual-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><span class="opx-chip">연간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
-          </div>
-         
-<style id="JGB_V53_90P_FONT">
-/* V53: 90% 모니터/브라우저 확대에서도 읽기 편하도록 글씨 확대 */
-.opx-customer-view{font-size:14px!important}
-
-/* 제목 */
-.opx-customer-switch-head h2{font-size:30px!important}
-.opx-customer-switch-head p{font-size:13px!important}
-.opx-customer-switch-head span{font-size:12px!important}
-
-/* 상단 KPI */
-.qrx-mgmt-label{font-size:15px!important}
-.qrx-mgmt-value{font-size:36px!important}
-.qrx-mgmt-value span{font-size:17px!important}
-.qrx-mgmt-sub{font-size:13px!important}
-.qrx-mgmt-status{font-size:12px!important}
-
-/* 우선확인 표 */
-.opx-board-panel-head{font-size:14px!important}
-.opx-board-panel-head b{font-size:14px!important}
-.opx-board-panel-head span{font-size:11px!important}
-.qr-priority-table-v6{font-size:14px!important}
-.qr-priority-table-v6 th{font-size:13px!important}
-.qr-priority-table-v6 td{font-size:13px!important;line-height:1.45!important}
-.qr-priority-table-v6 small{font-size:11px!important}
-
-/* 관리자 판단 */
-.qrx-judgement-list{font-size:14px!important}
-.qrx-judgement-card{padding:15px 16px!important}
-.qrx-judgement-card .qrx-judgement-main b{font-size:14px!important}
-.qrx-judgement-card .qrx-judgement-main span{font-size:12px!important}
-.qrx-judgement-badge{font-size:12px!important}
-
-/* 하단 3개 카드 */
-.qrx-v8-head{height:56px!important;padding:0 18px!important}
-.qrx-v8-head b{font-size:16px!important}
-.qrx-v8-head span{font-size:12px!important}
-.qrx-v8-body{padding:17px 18px!important}
-
-/* 오늘의 변화 */
-.qrx-change-copy b{font-size:13px!important}
-.qrx-change-copy span{font-size:11px!important}
-.qrx-change-item strong{font-size:12px!important}
-.qrx-change-reco small{font-size:11px!important}
-.qrx-change-reco b{font-size:13px!important}
-.qrx-change-reco span{font-size:11px!important}
-.qrx-change-foot{font-size:10px!important}
-
-/* 반복·집중 장소 */
-.qrx-place{grid-template-columns:34px 1fr 70px!important;padding:12px!important}
-.qrx-rank{width:29px!important;height:29px!important;font-size:13px!important}
-.qrx-place b{font-size:14px!important}
-.qrx-place small{font-size:11px!important;line-height:1.35!important}
-.qrx-score{font-size:15px!important}
-.qrx-score small{font-size:11px!important}
-
-/* 시간대 */
-.qrx-barrow{grid-template-columns:90px 1fr 36px!important;gap:10px!important;font-size:13px!important}
-.qrx-track{height:11px!important}
-.qrx-barrow strong{font-size:13px!important}
-
-/* 하단 설명 */
-.qrx-footer{font-size:12px!important;line-height:1.7!important;padding:14px 17px!important}
-
-/* 스크롤 영역은 글씨가 커져도 너무 빽빽하지 않게 */
-.opx-board-panel .qr-priority-scroll-v6,
-.opx-board-panel .qrx-judgement-list{max-height:220px!important}
-.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body{max-height:245px!important}
-
-/* 90% 화면에서 전체 폭을 효율적으로 사용 */
-.qrx-management-summary-v9{gap:14px!important}
-.qrx-v8-wrap{gap:18px!important}
-.qrx-v8-grid-3{gap:18px!important}
-
-@media(max-width:760px){
-  .opx-customer-switch-head h2{font-size:25px!important}
-  .qrx-mgmt-value{font-size:32px!important}
-}
-</style>
-
-
-<style id="JGB_V54_BOLD_FONT">
-/* V54: 90% 화면에서 글씨를 더 또렷하고 진하게 */
-.opx-customer-view,
-.opx-customer-view p,
-.opx-customer-view span,
-.opx-customer-view small,
-.opx-customer-view td,
-.opx-customer-view th,
-.opx-customer-view li,
-.opx-customer-view b,
-.opx-customer-view strong{
-  font-weight:750!important;
-}
-
-.opx-customer-switch-head h2{font-weight:1000!important}
-.opx-customer-switch-head p{font-weight:700!important}
-.opx-customer-switch-head span{font-weight:800!important}
-
-.qrx-mgmt-label{font-weight:850!important}
-.qrx-mgmt-value{font-weight:1000!important}
-.qrx-mgmt-sub{font-weight:750!important}
-.qrx-mgmt-status{font-weight:900!important}
-
-.qr-priority-table-v6 th{font-weight:900!important}
-.qr-priority-table-v6 td{font-weight:750!important}
-.qr-priority-table-v6 td b{font-weight:950!important}
-
-.opx-board-panel-head b,
-.qrx-v8-head b{font-weight:950!important}
-
-.qrx-judgement-card .qrx-judgement-main b{font-weight:950!important}
-.qrx-judgement-card .qrx-judgement-main span{font-weight:750!important}
-.qrx-judgement-badge{font-weight:950!important}
-
-.qrx-change-copy b{font-weight:900!important}
-.qrx-change-copy span{font-weight:700!important}
-.qrx-change-item strong{font-weight:950!important}
-.qrx-change-reco b{font-weight:950!important}
-.qrx-place b{font-weight:950!important}
-.qrx-place small{font-weight:700!important}
-.qrx-score{font-weight:1000!important}
-.qrx-score small{font-weight:800!important}
-
-.qrx-barrow b,
-.qrx-barrow strong{font-weight:900!important}
-
-.qrx-footer{font-weight:700!important}
-.qrx-footer b{font-weight:950!important}
-
-/* 너무 가늘게 보이는 회색 보조문구도 한 단계 진하게 */
-.opx-customer-view [style*="color:#64748b"],
-.opx-customer-view [style*="color: #64748b"]{
-  font-weight:700!important;
-}
-</style>
-
-<div class="opx-customer-view">
-           <section class="opx-customer-switch-head"><div><div class="opx-customer-kicker">CUSTOMER SERVICE · OPERATION INTELLIGENCE</div><h2>민원 실적 운영대시보드</h2><p>직원 실적과 분리하여 고객 QR 접수·처리·반복민원·위험도만 확인합니다.</p></div><span>선택기간 ${year}년 ${month}월</span></section>
-           <section class="opx-board opx-board-v7">
+          <section class="opx-board opx-board-v7">
+            <div class="opx-board-head">
+              <div><span class="opx-board-kicker">QR CUSTOMER OPERATION INTELLIGENCE</span><h3>운영게시판</h3><p>직원실적·레벨은 그대로 두고, 고객 QR 접수 내용만으로 위험도·주의도·반복·빈번시간·요일·처리우선순위를 상세 분석합니다.</p></div>
+              <div class="opx-board-clock"><b>${year}.${month}.${String(selectedDate).slice(8,10)}</b><span>고객접수 기반 실시간 분석</span></div>
+            </div>
 
             <div class="qrx-management-summary-v9">
               <div class="qrx-mgmt-card blue"><div class="qrx-mgmt-label">접수</div><div class="qrx-mgmt-value">${customerReceived}<span>건</span></div><div class="qrx-mgmt-sub">선택기간 고객 QR 접수</div></div>
@@ -3748,7 +3226,7 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
               </div>
 
               <div class="opx-board-panel">
-                <div class="opx-board-panel-head"><b>🚨 오늘 관리자 판단</b><span>접수내용 기반</span></div>
+                <div class="opx-board-panel-head"><b>📌 관리자 판단</b><span>접수내용 기반</span></div>
                 <div class="qrx-judgement-list">
                   ${qrActionCards.map(a=>{const t=qrJudgementTone(a.level);return `<div class="qrx-judgement-card ${t.key}" style="--qj-bg:${t.bg};--qj-border:${t.border};--qj-accent:${t.accent};--qj-text:${t.text}"><div class="qrx-judgement-badge">${t.label}</div><div class="qrx-judgement-main"><b>${xEsc(a.title)}</b><span>${xEsc(a.text)}</span></div></div>`}).join('')||'<div style="padding:18px;color:#64748b">현재 자동 판단할 접수 데이터가 없습니다.</div>'}
                 </div>
@@ -3792,61 +3270,20 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
               @media(max-width:760px){.qrx-v8-hero,.qrx-v8-grid,.qrx-v8-grid-3{grid-template-columns:1fr}.qrx-judgement-main{font-size:17px}}
             </style>
 
-            
-<style id="JGB_V51_DASHBOARD_SPACING">
-/* V51: 민원 대시보드 간격 정리 + 각 정보영역 개별 스크롤 */
-.qrx-v8-wrap{gap:18px!important}
-.qrx-v8-grid-3{gap:18px!important;align-items:stretch!important}
-.qrx-v8-panel{min-width:0!important;border-radius:16px!important}
-.qrx-v8-head{padding:0 18px!important}
-.qrx-v8-body{padding:16px 18px!important}
-
-/* 내용이 길어져도 카드끼리 눌리지 않도록 개별 스크롤 */
-.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body{
-  max-height:230px!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  scrollbar-gutter:stable!important;
-}
-.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body::-webkit-scrollbar{width:9px}
-.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body::-webkit-scrollbar-track{background:#edf3f8;border-radius:8px}
-.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body::-webkit-scrollbar-thumb{background:#a9bacb;border-radius:8px;border:2px solid #edf3f8}
-.qrx-v8-grid-3>.qrx-v8-panel .qrx-v8-body::-webkit-scrollbar-thumb:hover{background:#8197aa}
-
-/* 상단 '우선 확인' / '관리자 판단'도 카드 안에서 독립 스크롤 */
-.opx-board-panel{min-width:0!important}
-.opx-board-panel .qr-priority-scroll-v6{
-  max-height:210px!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  scrollbar-gutter:stable!important;
-}
-.opx-board-panel .qrx-judgement-list{
-  max-height:210px!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  padding-right:5px!important;
-  scrollbar-gutter:stable!important;
-}
-.opx-board-panel .qr-priority-scroll-v6::-webkit-scrollbar,
-.opx-board-panel .qrx-judgement-list::-webkit-scrollbar{width:9px}
-.opx-board-panel .qr-priority-scroll-v6::-webkit-scrollbar-track,
-.opx-board-panel .qrx-judgement-list::-webkit-scrollbar-track{background:#edf3f8;border-radius:8px}
-.opx-board-panel .qr-priority-scroll-v6::-webkit-scrollbar-thumb,
-.opx-board-panel .qrx-judgement-list::-webkit-scrollbar-thumb{background:#a9bacb;border-radius:8px;border:2px solid #edf3f8}
-
-/* 작은 화면에서도 옆으로 잘리지 않게 */
-@media(max-width:1050px){
-  .qrx-v8-grid-3{grid-template-columns:1fr 1fr!important}
-}
-@media(max-width:760px){
-  .qrx-v8-grid-3{grid-template-columns:1fr!important}
-  .qrx-v8-wrap{gap:16px!important}
-}
-</style>
-
-<div class="qrx-v8-wrap">
-              
+            <div class="qrx-v8-wrap">
+              <div class="qrx-v8-hero">
+                <div class="qrx-v8-panel qrx-judgement"><div class="qrx-v8-body">
+                  <div class="qrx-judgement-title">🚨 오늘 관리자 판단 <span>${qrRiskOverall}</span></div>
+                  <div class="qrx-judgement-main">${qrTopInsight?`${xEsc(qrTopInsight.place)} 우선 확인`:'현재 우선 확인 대상 없음'}</div>
+                  <ul>
+                    <li>${qrTrendChange>0?`최근 7일 접수 ${qrTrendChange}% 증가`:`최근 7일 접수 ${qrNowTrend}건`}</li>
+                    <li>${qrRepeated.length?`반복 접수 장소 ${qrRepeated.length}곳 · 최다 ${qrRepeated[0][0]} ${qrRepeated[0][1]}건`:'반복 접수 장소 없음'}</li>
+                    <li>${customerPending>0?`미조치 ${customerPending}건 · 처리상태 우선 확인`:'미조치 접수 없음'}</li>
+                    <li>${qrTopInsight?xEsc(qrTopInsight.risk.action):'접수 원문을 기준으로 현장 상태를 확인하세요.'}</li>
+                  </ul>
+                </div></div>
+                <div class="qrx-v8-panel"><div class="qrx-alertbox"><div><strong>${qrUrgent}</strong><small>긴급 접수 · 즉시 확인 권장</small></div></div></div>
+              </div>
 
               <div class="qrx-v8-grid-3">
                 ${(()=>{
@@ -3880,13 +3317,22 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
                   ${qrHourBandStats.map(o=>`<div class="qrx-barrow"><b>${o.label}</b><div class="qrx-track"><i class="qrx-fill" style="width:${Math.max(o.n?8:0,Math.round(o.n/qrHourMax*100))}%"></i></div><strong>${o.n}</strong></div>`).join('')}
                 </div><div style="margin-top:12px;padding:9px 11px;border-radius:9px;background:#f5f3ff;color:#4c1d95;font-size:11px;font-weight:800">⚡ 집중 시간대 · ${xEsc(peakHourText)}</div></div></div>
               </div>
-<div class="qrx-footer"><b>💡 분석 기준</b> · 고객 QR 접수의 신고내용·장소·접수시각·처리상태를 기준으로 위험도·반복성·최근성·미조치 상태를 함께 분석합니다. <b>직원실적·레벨 산정값은 이 분석에 사용하지 않습니다.</b></div>
+
+              <div class="qrx-v8-grid">
+                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📅 요일 × 시간 집중 패턴</b><span>접수 빈도 히트맵</span></div><div class="qrx-v8-body">
+                  <div class="qrx-heat">${weekdayMap.map((d,i)=>{const n=weekdayCount[i]||0;const max=Math.max(1,...weekdayCount);const alpha=Math.min(.9,.12+n/max*.78);return `<div class="qrx-heat-cell" style="background:rgba(59,130,246,${alpha})"><b>${d}</b><small>${n}건</small></div>`}).join('')}</div>
+                  <div style="margin-top:12px;padding:9px 11px;border-radius:9px;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:800">🔥 최다 요일 · ${xEsc(peakWeekdayText)} · 최다 시간 · ${xEsc(peakHourText)}</div>
+                </div></div>
+
+                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📈 최근 7일 접수 흐름</b><span>${qrTrendText}</span></div><div class="qrx-v8-body"><div class="qrx-trend">${qrTrend7.map(o=>{const mx=Math.max(1,...qrTrend7.map(v=>v.count));return `<div class="qrx-trend-day"><b>${o.count}</b><div class="qrx-trend-bar" style="height:${Math.max(7,Math.round(o.count/mx*85))}px"></div><small>${xEsc(o.label)}</small></div>`}).join('')}</div><div style="margin-top:8px;text-align:right;font-size:11px;color:#64748b">최근 7일 ${qrNowTrend}건 · 이전 7일 ${qrPrevTrend}건</div></div></div>
+              </div>
+
+              <div class="qrx-footer"><b>💡 분석 기준</b> · 고객 QR 접수의 신고내용·장소·접수시각·처리상태를 기준으로 위험도·반복성·최근성·미조치 상태를 함께 분석합니다. <b>직원실적·레벨 산정값은 이 분석에 사용하지 않습니다.</b></div>
             </div>
           </section>
         </section>
-           </div>
-         </div>
 
+        
       </div>`;
     }
 
@@ -3921,7 +3367,7 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
      const catRows=['점검','보수','부품교체','설비교체','기타'].map(n=>{const q=qYear.filter(h=>{const p=info(h),t=[p.type,p.category,h.action_type,h.event_type,h.description].map(V).join(' ');if(n==='설비교체')return /설비교체|자산교체/.test(t);if(n==='부품교체')return /부품교체|소모품교체/.test(t);if(n==='점검')return /점검/.test(t);if(n==='보수')return /보수|수리/.test(t);return true});return {name:n,count:q.length}});
      const yearRows=years.slice(-5).map(y=>{const q=hist.filter(h=>V(h.event_date).slice(0,4)===String(y));return {y,total:q.length,prevent:q.filter(h=>maintType(h)==='예방점검').length,self:q.filter(h=>method(h)==='자체정비').length,out:q.filter(h=>method(h)==='외주정비').length,failure:q.filter(isFailure).length}});
      return `<div class="eam-xdash">
-      <section class="eam-xhero"><div><div class="eam-xeyebrow">EAM · ASSET CONTROL CENTER</div><h1>EAM 시설·자산 통합 현황</h1><p>자산 등록 → 예방점검 → 자체정비·외주정비 → 고장·이상 → 유지관리 실적을 연도별로 통합 관리합니다.</p></div><div class="eam-xhero-right"><span>● 실시간 DB</span><button onclick="go('eam')">🏢 자산 EAM 관리</button><button onclick="eamOpenMaintenanceStatus()">🔧 정비 현황</button></div></section>
+      <section class="eam-xhero"><div><div class="eam-xeyebrow">EAM · ASSET CONTROL CENTER</div><h1>EAM 시설·자산 통합 현황</h1><p>자산 등록 → 예방점검 → 자체정비·외주정비 → 고장·이상 → 유지관리 실적을 연도별로 통합 관리합니다.</p></div><div class="eam-xhero-right"><span>● 실시간 DB</span><button onclick="go('eam')">🏢 자산 EAM 관리</button></div></section>
       <section class="eam-dx-yearbar"><div><b>조회연도</b><small>선택한 연도의 1~12월 유지관리 실적을 조회합니다.</small></div><select onchange="localStorage.setItem('JGB_EAM_DASH_YEAR',this.value);render()">${[...new Set([...years,currentYear])].sort((a,b)=>b-a).map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}년</option>`).join('')}</select></section>
       <section class="eam-xkpis">
        <div class="eam-xkpi blue"><small>운영 자산</small><b>${assets.length}<i>건</i></b><span>폐기 제외</span></div>
@@ -3940,28 +3386,20 @@ function eamCloseMaintenanceStatus(){const box=document.getElementById('jgbV78Ma
        </div></div>
        <div class="eam-xpanel"><div class="eam-xhead"><div><strong>ASSET HEALTH</strong><small>현재 등록 자산 상태</small></div><em>STATUS</em></div><div class="eam-xstatus-big"><b>${assets.length?Math.round(normal/assets.length*100):0}<small>%</small></b><span>정상 자산 비율</span></div><div class="eam-xstatus-list"><div><span>● 정상</span><b>${normal}건</b><div><i style="width:${assets.length?Math.round(normal/assets.length*100):0}%"></i></div></div><div><span>● 조치 필요</span><b>${attention}건</b><div><i style="width:${assets.length?Math.round(attention/assets.length*100):0}%"></i></div></div></div></div>
       </section>
-      <section class="eam-xmonth-half-grid">
-       <div class="eam-xpanel eam-xmonthly eam-xmonth-left">
-        <div class="eam-xhead"><div><strong>${year}년 월별 유지관리 흐름</strong><small>예방점검 · 자체정비 · 외주정비 · 미처리 · 고장·이상</small></div><em>JAN — DEC</em></div>
-        <div class="eam-dx-flow">${months.map(m=>`<div class="eam-dx-flow-month"><b>${m.m}월</b><div class="eam-dx-flow-bars"><i class="prevent" style="height:${Math.max(4,m.prevent/maxFlow*150)}px" title="예방점검 ${m.prevent}건"></i><i class="self" style="height:${Math.max(4,m.self/maxFlow*150)}px" title="자체정비 ${m.self}건"></i><i class="out" style="height:${Math.max(4,m.out/maxFlow*150)}px" title="외주정비 ${m.out}건"></i><i class="pending" style="height:${Math.max(4,m.pending/maxFlow*150)}px" title="미처리 정비 ${m.pending}건"></i><i class="failure" style="height:${Math.max(4,m.failure/maxFlow*150)}px" title="고장·이상 ${m.failure}건"></i></div><small>예방 ${m.prevent} · 자체 ${m.self} · 외주 ${m.out}</small></div>`).join('')}</div>
-        <div class="eam-dx-legend"><span><i class="prevent"></i>예방점검</span><span><i class="self"></i>자체정비</span><span><i class="out"></i>외주정비</span><span><i class="pending"></i>미처리</span><span><i class="failure"></i>고장·이상</span></div>
-       </div>
-       <div class="eam-xpanel eam-xmonth-right eam-xpanorama" id="eamMaintenancePanorama">
- <div class="eam-xhead eam-xpanorama-head">
-  <div><strong id="eamPanoramaTitle">⚠️ 주의 자산 TOP 5</strong><small id="eamPanoramaSub">반복 고장·정비이력이 많은 자산</small></div>
-  <div class="eam-xpanorama-nav"><button type="button" onclick="eamPanoramaPrev()">‹</button><span id="eamPanoramaDots">● ○ ○</span><button type="button" onclick="eamPanoramaNext()">›</button></div>
- </div>
- <div class="eam-xpanorama-viewport"><div class="eam-xpanorama-track" id="eamPanoramaTrack">
-  <div class="eam-xpanorama-slide"><div class="eam-dx-ranks">${failureTop.length?failureTop.map((x,i)=>`<div class="eam-dx-rank"><b>${String(i+1).padStart(2,'0')}</b><span>${esc(x.asset.name||x.asset.model||x.asset.asset_code||'자산')}</span><strong>${x.count}<small>건</small></strong></div>`).join(''):'<div class="eam-xempty">주의가 필요한 자산이 없습니다.</div>'}</div></div>
-  <div class="eam-xpanorama-slide"><div class="eam-xnext-list">${(()=>{const rows=[];const seen=new Set();(Array.isArray(db?.maint)?db.maint:[]).forEach(d=>{d=d||{};const ds=String(d.nextDate||d.nextInspectionDate||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(ds))return;const a=getAsset(d),name=a?.name||a?.model||a?.asset_code||d.asset_code||d.assetName||'자산',k=ds+'|'+name;if(seen.has(k))return;seen.add(k);rows.push({ds,name,type:d.maintenanceType||d.type||d.result||'정비'})});rows.sort((a,b)=>a.ds.localeCompare(b.ds));return rows.slice(0,6).map(r=>`<div class="eam-xnext-item"><b>${esc(r.ds)}</b><span>${esc(r.name)}</span><small>${esc(r.type)}</small></div>`).join('')||'<div class="eam-xempty">등록된 다음 관리 예정이 없습니다.</div>'})()}</div></div>
-  <div class="eam-xpanorama-slide"><div class="eam-xrecent-list">${(()=>{const rows=(Array.isArray(db?.maint)?db.maint:[]).map(d=>{d=d||{};const a=getAsset(d);return {date:String(d.date||d.workDate||d.created_at||'').slice(0,10),name:a?.name||a?.model||a?.asset_code||d.asset_code||d.assetName||'자산',type:d.maintenanceType||d.type||d.result||'정비'}}).filter(x=>x.date).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);return rows.map(r=>`<div class="eam-xrecent-item"><b>${esc(r.date)}</b><span>${esc(r.name)}</span><small>${esc(r.type)}</small></div>`).join('')||'<div class="eam-xempty">최근 정비 이력이 없습니다.</div>'})()}</div></div>
- </div></div>
- <div class="eam-xpanorama-labels"><span class="active" onclick="eamPanoramaGo(0)">주의 자산</span><span onclick="eamPanoramaGo(1)">다음 관리 예정</span><span onclick="eamPanoramaGo(2)">최근 정비 이력</span></div>
-</div>
-
+      <section class="eam-xpanel eam-xmonthly"><div class="eam-xhead"><div><strong>${year}년 월별 유지관리 흐름</strong><small>예방점검 · 자체정비 · 외주정비 · 미처리 정비 · 고장·이상 발생</small></div><em>JAN — DEC</em></div><div class="eam-dx-flow">${months.map(m=>`<div class="eam-dx-flow-month"><b>${m.m}월</b><div class="eam-dx-flow-bars"><i class="prevent" style="height:${Math.max(4,m.prevent/maxFlow*150)}px" title="예방점검 ${m.prevent}건"></i><i class="self" style="height:${Math.max(4,m.self/maxFlow*150)}px" title="자체정비 ${m.self}건"></i><i class="out" style="height:${Math.max(4,m.out/maxFlow*150)}px" title="외주정비 ${m.out}건"></i><i class="pending" style="height:${Math.max(4,m.pending/maxFlow*150)}px" title="미처리 정비 ${m.pending}건"></i><i class="failure" style="height:${Math.max(4,m.failure/maxFlow*150)}px" title="고장·이상 ${m.failure}건"></i></div><small>예방 ${m.prevent} · 자체 ${m.self} · 외주 ${m.out}</small></div>`).join('')}</div><div class="eam-dx-legend"><span><i class="prevent"></i>예방점검</span><span><i class="self"></i>자체정비</span><span><i class="out"></i>외주정비</span><span><i class="pending"></i>미처리</span><span><i class="failure"></i>고장·이상</span></div><div class="eam-dx-annual"><div><small>연간 유지관리</small><b>${qYear.length}<i>건</i></b></div><div><small>예방점검</small><b>${yearPrevent}<i>건</i></b></div><div><small>자체정비</small><b>${yearSelf}<i>건</i></b></div><div><small>외주정비</small><b>${yearOut}<i>건</i></b></div><div><small>고장·이상</small><b>${yearFailure}<i>건</i></b></div></div></section>
+      <section class="eam-xgrid2">
+       <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비방식</strong><small>${year}년 자체정비와 외주정비</small></div><em>METHOD</em></div><div class="eam-dx-method"><div class="internal"><span>자체정비</span><b>${yearSelf}<small>건</small></b><strong>${qYear.length?Math.round(yearSelf/qYear.length*100):0}%</strong></div><div class="external"><span>외주정비</span><b>${yearOut}<small>건</small></b><strong>${qYear.length?Math.round(yearOut/qYear.length*100):0}%</strong></div></div></div>
+       <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비유형</strong><small>예방점검 · 고장정비 · 계획정비</small></div><em>MAINTENANCE TYPE</em></div><div class="eam-dx-list">${typeRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b></div>`).join('')}</div></div>
       </section>
-
-      
+      <section class="eam-xgrid2">
+       <div class="eam-xpanel"><div class="eam-xhead"><div><strong>고장 발생 TOP 5</strong><small>${year}년 고장·이상 이력이 반복된 자산</small></div><em>FAILURE TOP 5</em></div><div class="eam-dx-ranks">${renderRank(failureTop)}</div></div>
+       <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비 집중 자산 TOP 5</strong><small>${year}년 유지관리 건수가 많은 자산</small></div><em>MAINT TOP 5</em></div><div class="eam-dx-ranks">${renderRank(burdenTop)}</div></div>
+      </section>
+      <section class="eam-xgrid2">
+       <div class="eam-xpanel"><div class="eam-xhead"><div><strong>정비구분</strong><small>점검 · 보수 · 부품교체 · 설비교체</small></div><em>CATEGORY</em></div><div class="eam-dx-list">${catRows.map(r=>`<div><span>${r.name}</span><b>${r.count}건</b></div>`).join('')}</div></div>
+       <div class="eam-xpanel"><div class="eam-xhead"><div><strong>내용연수 현황</strong><small>설치일·내용연수가 입력된 자산 기준</small></div><em>LIFECYCLE</em></div><div class="eam-xlife-total"><b>${lifecycle.length}</b><span>분석 가능 자산</span></div><div class="eam-xlife"><div><span>정상 사용<i></i></span><b>${lifeCounts.normal}건</b></div><div><span>내용연수 임박<i class="near"></i></span><b>${lifeCounts.near}건</b></div><div><span>내용연수 초과<i class="over"></i></span><b>${lifeCounts.over}건</b></div></div></div>
+      </section>
+      <section class="eam-xpanel eam-xyear"><div class="eam-xhead"><div><strong>연도별 EAM 유지관리 비교</strong><small>최근 등록 연도의 유지관리 건수 비교</small></div><em>YEAR OVER YEAR</em></div><div class="eam-xtable"><div class="eam-xthead"><span>연도</span><span>예방점검</span><span>자체정비</span><span>외주정비</span><span>고장·이상</span><span>전체</span></div>${yearRows.map(r=>`<div class="eam-xtrow"><b>${r.y}</b><strong>${r.prevent}건</strong><strong>${r.self}건</strong><strong>${r.out}건</strong><strong>${r.failure}건</strong><strong class="total">${r.total}건</strong></div>`).join('')}</div></section>
      </div>`;
     }
     function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
@@ -4550,41 +3988,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       @media(max-width:700px){.jgb-v104-leak-grid{grid-template-columns:1fr}}
     `;document.head.appendChild(st)}
     if(!document.getElementById('JGB_V129_STRONG_MAP_STYLE')){const st=document.createElement('style');st.id='JGB_V129_STRONG_MAP_STYLE';st.textContent=`.jgb-v104-plan{border:2.5px solid #536f87}.jgb-v104-plan .court{border:2.5px solid #536f87}.jgb-v104-plan .court:before{border-top:3px solid #536f87}.jgb-v104-plan .top-label,.jgb-v104-plan .bottom-label,.jgb-v104-plan .side-label{color:#29465d;font-weight:900}.jgb-v104-plan .entrance{border-left:2px solid #536f87;border-right:2px solid #536f87}.jgb-v104-plan .entrance:before{border-left:2px solid #536f87;border-bottom:2px solid #536f87}.jgb-v104-plan .court span{font-size:27px;font-weight:1000}`;document.head.appendChild(st)}
-    if(!document.getElementById('JGB_V133_STATS_STYLE')){const st=document.createElement('style');st.id='JGB_V133_STATS_STYLE';st.textContent=`
-      .jgb-v104-card.stats{padding:18px;background:linear-gradient(180deg,#ffffff 0%,#f8fbfd 100%)}
-      .jgb-v104-card.stats .jgb-v104-title{margin-bottom:16px}
-      .jgb-v104-card.stats .jgb-v104-title h2{font-size:23px;letter-spacing:-.6px}
-      .jgb-v104-card.stats .jgb-v104-title p{font-size:13px;margin-top:7px}
-      .jgb-v104-stat-list{grid-template-columns:1fr 1fr;gap:12px}
-      .jgb-v104-stat-row{min-height:102px;border:1px solid #d2dee8;border-left:6px solid #8fa2b3;border-radius:12px;background:#fff;padding:15px 17px 13px;box-shadow:0 2px 7px rgba(20,50,80,.05);grid-template-columns:1fr auto;grid-template-rows:auto auto auto;gap:7px}
-      .jgb-v104-stat-row span{font-size:15px;font-weight:900;align-self:center}
-      .jgb-v104-stat-row b{font-size:30px;line-height:1;font-weight:950}
-      .jgb-v104-stat-row small{font-size:11px;color:#657d91;line-height:1.35}
-      .jgb-v104-stat-row:after{right:11px;bottom:8px;font-size:19px;color:#8ca0b0}
-      .jgb-v104-stat-row[data-v104-filter="코트"]{border-left-color:#247ed0}.jgb-v104-stat-row[data-v104-filter="화장실"]{border-left-color:#ed564e}.jgb-v104-stat-row[data-v104-filter="샤워실"]{border-left-color:#1ea9c5}.jgb-v104-stat-row[data-v104-filter="휴게실"]{border-left-color:#2fae76}.jgb-v104-stat-row[data-v104-filter="기타"]{border-left-color:#718394}
-      .jgb-v104-stat-row.on,.jgb-v104-stat-row:focus{outline:3px solid #3186d8;outline-offset:1px}
-      /* v135: map lower wow panel */
-      .jgb-v135-scan-panel{margin-top:12px;border:1px solid #c7d8e5;border-radius:14px;background:linear-gradient(180deg,#f8fbfd,#fff);padding:14px 16px;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(25,55,80,.07)}
-      .jgb-v135-scan-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.jgb-v135-scan-title{display:flex;align-items:center;gap:9px}.jgb-v135-scan-title strong{font-size:16px;color:#173b56}.jgb-v135-scan-title small{display:block;color:#72889a;font-size:11px;margin-top:3px}.jgb-v135-scan-btn{border:1px solid #9db9ce;background:#fff;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:900;color:#176fc2;cursor:pointer}.jgb-v135-scan-btn:hover{background:#edf6fc}.jgb-v135-scan-track{height:10px;margin:14px 0 12px;border-radius:99px;background:#e8eef3;position:relative;overflow:hidden}.jgb-v135-scan-track:before{content:"";position:absolute;left:-18%;top:0;width:18%;height:100%;background:linear-gradient(90deg,transparent,#3aa6e8,transparent);opacity:0}.jgb-v135-scan-panel.scanning .jgb-v135-scan-track:before{opacity:1;animation:jgbV135Scan 1.25s linear infinite}.jgb-v135-scan-courts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.jgb-v135-scan-court{border:1px solid #cfdae3;border-radius:9px;padding:8px 6px;text-align:center;background:#fff}.jgb-v135-scan-court b{display:block;font-size:18px;color:#173b56}.jgb-v135-scan-court span{display:block;font-size:10px;color:#71879a;margin-top:3px}.jgb-v135-scan-court.has-leak{border-color:#ef8c86;background:#fff8f7}.jgb-v135-scan-court.has-leak b{color:#d9463e}.jgb-v135-scan-result{margin-top:10px;font-size:11px;color:#60788b;min-height:17px}.jgb-v135-scan-result b{color:#173b56}@keyframes jgbV135Scan{0%{left:-18%}100%{left:100%}}
-      @media(max-width:700px){.jgb-v135-scan-courts{grid-template-columns:repeat(2,1fr)}}
-      /* v134 3D flip location cards */
-      .jgb-v134-stat-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;perspective:1200px}
-      .jgb-v134-flip{position:relative;min-height:126px;cursor:pointer;outline:none}
-      .jgb-v134-inner{position:relative;width:100%;height:100%;min-height:126px;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.2,.75,.25,1)}
-      .jgb-v134-flip.flipped .jgb-v134-inner{transform:rotateY(180deg)}
-      .jgb-v134-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid #d2dee8;border-radius:12px;background:#fff;box-sizing:border-box;box-shadow:0 3px 10px rgba(20,50,80,.08);padding:15px 16px;overflow:hidden}
-      .jgb-v134-front{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto auto;gap:7px;border-left:6px solid #8fa2b3}
-      .jgb-v134-front .name{font-size:16px;font-weight:900;color:#183b56}.jgb-v134-front .count{font-size:30px;font-weight:950;line-height:1;color:#102f49}.jgb-v134-front .states{grid-column:1/-1;font-size:11px;font-weight:800;color:#60788c;white-space:nowrap}.jgb-v134-front .hint{grid-column:1/-1;font-size:10px;color:#94a4b1}
-      .jgb-v134-back{transform:rotateY(180deg);display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(145deg,#f8fbfd,#fff)}
-      .jgb-v134-back .back-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.jgb-v134-back .back-head strong{font-size:16px;color:#173b56}.jgb-v134-back .back-head b{font-size:24px;color:#17334d}.jgb-v134-back .back-body{font-size:11px;color:#61798c;line-height:1.6;margin:8px 0}.jgb-v134-back .back-body b{color:#24445d}.jgb-v134-back .back-action{align-self:flex-end;border:1px solid #bcd0df;background:#fff;border-radius:7px;padding:6px 10px;font-size:10px;font-weight:900;color:#176fc2;cursor:pointer}
-      .jgb-v134-flip[data-cat="코트"] .jgb-v134-front{border-left-color:#247ed0}.jgb-v134-flip[data-cat="화장실"] .jgb-v134-front{border-left-color:#ed564e}.jgb-v134-flip[data-cat="샤워실"] .jgb-v134-front{border-left-color:#1ea9c5}.jgb-v134-flip[data-cat="휴게실"] .jgb-v134-front{border-left-color:#2fae76}.jgb-v134-flip[data-cat="기타"] .jgb-v134-front{border-left-color:#718394}.jgb-v134-flip:hover .jgb-v134-face{box-shadow:0 7px 18px rgba(20,50,80,.13)}
-      @media(max-width:700px){.jgb-v134-stat-list{grid-template-columns:1fr}}
-      .jgb-v133-summary{margin-top:16px;padding:17px 16px;border:1px solid #d2dee8;border-radius:12px;background:#fff;display:block}
-      .jgb-v133-summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.jgb-v133-summary-head strong{display:block;font-size:15px;color:#1b3d58}.jgb-v133-summary-head small{display:block;margin-top:4px;font-size:11px;color:#73899b}.jgb-v133-summary-head>b{font-size:28px;line-height:1;color:#17334d}.jgb-v133-summary-head>b em{font-style:normal;font-size:12px;margin-left:3px;color:#73899b}
-      .jgb-v133-meter{height:16px;display:flex;overflow:hidden;border-radius:999px;background:#edf2f6;box-shadow:inset 0 1px 2px rgba(30,60,90,.08)}.jgb-v133-meter span{height:100%;min-width:0}.jgb-v133-meter .need{background:#ef5b52}.jgb-v133-meter .progress{background:#f08a3c}.jgb-v133-meter .observe{background:#d6b13a}.jgb-v133-meter .complete{background:#42b27c}
-      .jgb-v133-summary-legend{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;margin-top:13px}.jgb-v133-summary-legend span{font-size:11px;color:#5e7589;white-space:nowrap}.jgb-v133-summary-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}.jgb-v133-summary-legend b{float:right;font-size:12px;color:#17334d}.jgb-v133-summary-legend .observe-dot{background:#d6b13a}
-      @media(max-width:900px){.jgb-v104-stat-list{grid-template-columns:1fr}.jgb-v133-summary-legend{grid-template-columns:1fr}}
-    `;document.head.appendChild(st)}
     if(!document.getElementById('JGB_V117_PAIR_TABLE_STYLE')){const st=document.createElement('style');st.id='JGB_V117_PAIR_TABLE_STYLE';st.textContent=`.jgb-v104-pair-table table{width:100%;border-collapse:collapse;table-layout:fixed}.jgb-v104-pair-row th{width:11%;padding:10px 12px;background:#eef4f8;border:1px solid #cbd7e0;text-align:center;font-weight:800;white-space:nowrap}.jgb-v104-pair-row td{width:39%;padding:10px 12px;border:1px solid #cbd7e0;background:#fff;text-align:center}.jgb-v104-pair-row td:nth-child(4){width:39%}.jgb-v104-pair-manage td{padding:7px;text-align:right;border:1px solid #cbd7e0;background:#f7fafc}.jgb-v104-pair-manage .btn{margin:0}.jgb-v104-pair-table .jgb-v104-code{font-weight:800}.jgb-v104-pair-table .jgb-v104-wa{font-weight:800}.jgb-v104-pair-table small{margin-left:4px}`;document.head.appendChild(st)}
     function leakagePage(){
       const S=jgbV47Store();
@@ -4592,31 +3995,22 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const wp=Array.isArray(S.wp)?S.wp:[];
       const cards=wpV72Cards();
       const esc=v=>xEsc(v==null?'':String(v));
-      const leakCodeOfWp=h=>String(h?.related||cards[String(h?.cardCode||'')]?.leakCode||'').trim().toUpperCase();
-      const waRowsForLeak=leak=>wp.filter(h=>leakCodeOfWp(h)===String(leak.leakCode||'').trim().toUpperCase());
-      const waForLeak=leak=>[...new Set(waRowsForLeak(leak).map(h=>String(h.waCode||'').trim().toUpperCase()).filter(Boolean))];
-      /* 작업결과와 상단 상태 명칭을 동일하게 사용하고, WA 이력의 결과를 LK별로 연동 */
-      const resultForLeak=leak=>{
-        const rs=waRowsForLeak(leak).map(h=>String(h.result||'').trim());
-        if(rs.includes('재조치 필요')) return '재조치 필요';
-        if(rs.includes('보수 후 관찰')) return '보수 후 관찰';
-        if(rs.includes('조치')) return '조치'; if(rs.includes('조치 완료') || rs.includes('완료')) return '조치';
-        return String(leak.status||'조치필요')==='조치필요'?'재조치 필요':String(leak.status||'')==='조치완료'?'조치':String(leak.status||'')==='조치진행중'?'보수 후 관찰':'재조치 필요';
-      };
-      const observationLeaks=leaks.filter(x=>resultForLeak(x)==='보수 후 관찰').length;
-      const progress=0;
-      const done=leaks.filter(x=>resultForLeak(x)==='조치').length;
-      const need=leaks.filter(x=>resultForLeak(x)==='재조치 필요').length;
+      const waForLeak=leak=>[...new Set(wp.filter(h=>String(h.related||'').trim().toUpperCase()===String(leak.leakCode||'').trim().toUpperCase()).map(h=>String(h.waCode||'').trim().toUpperCase()).filter(Boolean))];
+      const waRowsForLeak=leak=>wp.filter(h=>String(h.related||'').trim().toUpperCase()===String(leak.leakCode||'').trim().toUpperCase());
+      const observationLeaks=leaks.filter(x=>waRowsForLeak(x).some(h=>String(h.result||'')==='보수 후 관찰')).length;
+      const progress=leaks.filter(x=>String(x.status||'')==='조치진행중').length;
+      const done=leaks.filter(x=>String(x.status||'')==='조치완료').length;
+      const need=leaks.filter(x=>String(x.status||'조치필요')==='조치필요').length;
       const active=need+progress+observationLeaks;
       const categories=['코트','화장실','샤워실','휴게실','기타'];
       const catOf=loc=>{const v=String(loc||'');if(v.includes('코트'))return '코트';if(v.includes('화장실'))return '화장실';if(v.includes('샤워실'))return '샤워실';if(v.includes('휴게실'))return '휴게실';return '기타'};
-      const linked=wp.filter(h=>{const lk=leakCodeOfWp(h);return /^LK-\d+$/.test(lk)&&leaks.some(l=>String(l.leakCode||'').trim().toUpperCase()===lk)}).length;
+      const linked=leaks.filter(x=>waForLeak(x).length).length;
       const safetyScore=Math.max(0,Math.min(100,100-(need*25)-(progress*10)-(observationLeaks*5)+(linked*5)));
       const safetyGrade=safetyScore>=90?'안전':safetyScore>=75?'양호':safetyScore>=60?'주의':safetyScore>=40?'경계':'위험';
       const safetyClass=safetyScore>=90?'safe':safetyScore>=75?'blue':safetyScore>=60?'yellow':safetyScore>=40?'orange':'red';
-      const catCounts=categories.map(c=>({c,total:leaks.filter(x=>catOf(x.location)===c).length,open:leaks.filter(x=>catOf(x.location)===c&&resultForLeak(x)==='재조치 필요').length,mid:leaks.filter(x=>catOf(x.location)===c&&resultForLeak(x)==='보수 후 관찰').length,done:leaks.filter(x=>catOf(x.location)===c&&resultForLeak(x)==='조치').length}));
+      const catCounts=categories.map(c=>({c,total:leaks.filter(x=>catOf(x.location)===c).length,open:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치필요').length,mid:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치진행중').length,done:leaks.filter(x=>catOf(x.location)===c&&String(x.status||'')==='조치완료').length}));
       const colors={코트:'blue',화장실:'red',샤워실:'cyan',휴게실:'green',기타:'gray'};
-      const statRows=catCounts.map(x=>{const catLeaks=leaks.filter(l=>catOf(l.location)===x.c);const obs=catLeaks.filter(l=>waRowsForLeak(l).some(h=>String(h.result||'')==='보수 후 관찰')).length;const linkedCat=catLeaks.reduce((n,l)=>n+waRowsForLeak(l).length,0);const detail=catLeaks.slice(0,3).map(l=>`${esc(l.leakCode||'-')} · ${esc(l.location||'-')}`).join('<br>')||'등록된 누수 없음';return `<div class="jgb-v134-flip" data-v134-flip="1" data-cat="${esc(x.c)}" tabindex="0" role="button"><div class="jgb-v134-inner"><div class="jgb-v134-face jgb-v134-front"><span class="name">${esc(x.c)}</span><b class="count">${x.total}</b><span class="states">🔴 ${x.open} · 🟠 ${x.mid||0} · 🟡 ${obs} · 🟢 ${x.done}</span><span class="hint">카드를 누르면 상세 현황 ↻</span></div><div class="jgb-v134-face jgb-v134-back"><div class="back-head"><strong>📍 ${esc(x.c)} 상세</strong><b>${x.total}건</b></div><div class="back-body">${detail}<br><b>보수 후 관찰 ${obs}건 · 방수 연계 ${linkedCat}건</b></div><button type="button" class="back-action" data-v104-filter="${esc(x.c)}">해당 위치 보기 →</button></div></div></div>`}).join('');
+      const statRows=catCounts.map(x=>`<button type="button" class="jgb-v104-stat-row ${colors[x.c]}" data-v104-filter="${esc(x.c)}"><span>${esc(x.c)}</span><b>${x.total}</b><small>🔴 필요 ${x.open} &nbsp;·&nbsp; 🟠 진행 ${x.mid||0} &nbsp;·&nbsp; 🟢 완료 ${x.done}</small></button>`).join('');
       const filterButtons=categories.map(c=>`<button type="button" class="jgb-v104-filter ${colors[c]}" data-v104-filter="${esc(c)}">${esc(c)}</button>`).join('');
       const pos={코트:[50,50],화장실:[79,65],샤워실:[79,35],휴게실:[20,55],기타:[50,18]};
       const groupIndex={};
@@ -4632,36 +4026,30 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           const base=pos[c]||[50,50], offsets=[[0,0],[-4,-5],[4,-5],[-5,5],[5,5],[0,9],[-9,0],[9,0]], o=offsets[n%offsets.length];
           px=Math.max(6,Math.min(94,base[0]+o[0])); py=Math.max(7,Math.min(93,base[1]+o[1]));
         }
-        const st=resultForLeak(x), cls=st==='조치'?'done':st==='보수 후 관찰'?'mid':'open';
+        const st=String(x.status||'조치필요'), cls=st==='조치완료'?'done':st==='조치진행중'?'mid':'open';
         const savedX=Number.isFinite(Number(x.mapX))?Number(x.mapX):px, savedY=Number.isFinite(Number(x.mapY))?Number(x.mapY):py; return `<button type="button" class="jgb-v104-marker ${cls}" style="left:${savedX}%;top:${savedY}%" data-v104-place="${esc(c)}" data-v47-action="go-wp-by-leak" data-id="${esc(x.id)}" data-map-x="${savedX}" data-map-y="${savedY}" title="드래그하여 위치 이동 · ${esc(loc)} · ${esc(x.leakCode||'-')}">${esc(x.leakCode||'-')}</button>`;
       }).join('');
       const rows=leaks.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).map((x,i)=>{
-        const was=waForLeak(x), wa=was[0]||'', currentResult=resultForLeak(x);
-        const waHtml=wa?`<button type="button" class="jgb-v104-wa" data-v47-action="show-wp-by-leak" data-leak="${esc(x.leakCode)}">${esc(wa)}</button>${was.length>1?`<small> 외 ${was.length-1}건 (총 ${was.length}건)</small>`:''}`:'-';
+        const was=waForLeak(x), wa=was[0]||'';
+        const waHtml=wa?`<button type="button" class="jgb-v104-wa" data-v47-action="show-wp-by-leak" data-leak="${esc(x.leakCode)}">${esc(wa)}</button>${was.length>1?`<small> 외 ${was.length-1}건</small>`:''}`:'-';
         return `<article class="jgb-v104-leak-card" data-v104-place="${esc(catOf(x.location))}">
           <table><tbody>
             <tr><th>No.</th><td>${i+1}</td><th>누수코드</th><td><button type="button" class="jgb-v104-code" data-v47-action="edit-leak" data-id="${esc(x.id)}">${esc(x.leakCode||'-')}</button></td></tr>
             <tr><th>발생위치</th><td>${esc(x.location||'-')}</td><th>발견일</th><td>${esc(x.date||'-')}</td></tr>
-            <tr><th>상태</th><td><span class="jgb-v104-badge ${currentResult==='조치'?'done':currentResult==='보수 후 관찰'?'mid':'open'}">${esc(currentResult)}</span></td><th>방수 이력</th><td>${waHtml}</td></tr>
+            <tr><th>상태</th><td><span class="jgb-v104-badge ${x.status==='조치완료'?'done':x.status==='조치진행중'?'mid':'open'}">${esc(x.status||'조치필요')}</span></td><th>방수 이력</th><td>${waHtml}</td></tr>
             <tr><th>조치내용</th><td>${esc(x.content||'-')}</td><th>비고</th><td>${esc(x.note||'-')}</td></tr>
           </tbody></table>
           <div class="jgb-v104-leak-manage"><button type="button" class="btn gray" data-v47-action="edit-leak" data-id="${esc(x.id)}">상세보기</button></div>
         </article>`;
       }).join('');
       return `<div class="jgb-v104-wrap">
-        <header class="jgb-v57-page-head">
-          <div>
-            <div class="jgb-v57-eyebrow">LEAK LOCATION MANAGEMENT</div>
-            <h1>💧 누수관리 현황</h1>
-            <p>체육관 내 누수 위치를 관리하고 <b>LK 누수코드</b>와 <b>WA 방수 이력</b>을 연동합니다.</p>
-          </div>
-          <button type="button" class="jgb-v57-head-btn" data-v47-action="new-leak">＋ 누수 등록</button>
-        </header>
-        <div class="jgb-v104-kpis"><div class="blue"><i>💧</i><span>전체 누수</span><b>${leaks.length}</b><small>등록된 LK 전체</small></div><div class="red"><i>!</i><span>재조치 필요</span><b>${need}</b><small>작업결과 기준</small></div><div class="orange"><i>◐</i><span>보수 후 관찰</span><b>${observationLeaks}</b><small>작업결과 기준</small></div><div class="green"><i>✓</i><span>조치</span><b>${done}</b><small>작업결과 기준</small></div><div class="navy"><i>🛡</i><span>방수 연계</span><b>${linked}</b><small>등록된 WA 이력</small></div><div class="${safetyClass} jgb-v104-safety" style="grid-column:1/-1;min-height:68px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:10px 16px"><i>🛡</i><span>누수 안전도<small>상태·방수연계 종합지수</small></span><b>${safetyScore}점 · ${safetyGrade}</b></div></div>
+        <header class="jgb-v104-head"><div><div class="jgb-v104-eyebrow">LEAK LOCATION MANAGEMENT</div><h1>💧 누수관리 현황 <small>LEAK LOCATION MANAGEMENT</small></h1><p>체육관 내 누수 위치를 관리하고 <b>LK 누수코드</b>와 <b>WA 방수 이력</b>을 연결합니다.</p></div><button type="button" class="btn blue jgb-v104-add" data-v47-action="new-leak">＋ 누수 등록</button></header>
+        <div class="jgb-v104-kpis"><div class="blue"><i>💧</i><span>전체 누수</span><b>${leaks.length}</b><small>등록된 LK 전체</small></div><div class="red"><i>!</i><span>조치 필요</span><b>${need}</b><small>즉시 대응 필요</small></div><div class="orange"><i>🔧</i><span>조치 진행</span><b>${progress}</b><small>현재 처리 중</small></div><div class="yellow"><i>◐</i><span>보수 후 관찰</span><b>${observationLeaks}</b><small>재발 여부 관찰</small></div><div class="green"><i>✓</i><span>조치 완료</span><b>${done}</b><small>처리 완료</small></div><div class="navy"><i>🛡</i><span>방수 연계</span><b>${linked}</b><small>WA 이력 연결</small></div><div class="${safetyClass} jgb-v104-safety" style="grid-column:1/-1;min-height:68px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:10px 16px"><i>🛡</i><span>누수 안전도<small>상태·방수연계 종합지수</small></span><b>${safetyScore}점 · ${safetyGrade}</b></div></div>
         <div class="jgb-v104-grid">
-          <section class="jgb-v104-card map"><div class="jgb-v104-title"><div><h2>🗺 누수 위치 현황</h2><p>위치 버튼을 누르면 해당 위치의 <b>LK 누수코드</b>만 표시됩니다.</p></div><div class="jgb-v104-legend"><span><i class="open"></i>조치 필요</span><span><i class="mid"></i>진행</span><span><i class="done"></i>완료</span></div></div><div class="jgb-v104-filters">${filterButtons}</div><div class="jgb-v104-map"><div class="jgb-v104-plan"><div class="top-label">상부</div><div class="side-label left-label">좌측 외곽</div><div class="side-label right-label">우측 외곽</div><div class="bottom-label">하부</div><div class="court-grid"><div class="court"><span>5</span><i class="center-line"></i></div><div class="court"><span>4</span><i class="center-line"></i></div><div class="court"><span>3</span><i class="center-line"></i></div><div class="court"><span>2</span><i class="center-line"></i></div><div class="court"><span>1</span><i class="center-line"></i></div></div><div class="entrance">출입문</div><button type="button" class="jgb-v104-pos-save" id="jgbV104PosSave">📍 위치 저장</button>${markers||'<div class="empty-map">등록된 누수코드가 없습니다.</div>'}</div></div><div class="jgb-v104-note">전체 누수를 표시하고 있습니다. 위치 버튼을 선택하면 해당 위치만 남습니다.</div><div class="jgb-v135-scan-panel" id="jgbV135ScanPanel"><div class="jgb-v135-scan-head"><div class="jgb-v135-scan-title"><span style="font-size:21px">🔎</span><div><strong>누수 위치 스캔</strong><small>등록된 LK 위치를 기준으로 코트별 상태를 빠르게 확인합니다.</small></div></div><button type="button" class="jgb-v135-scan-btn" id="jgbV135ScanBtn">▶ 현황 스캔</button></div><div class="jgb-v135-scan-track"></div><div class="jgb-v135-scan-courts">${[5,4,3,2,1].map(n=>{const cl=leaks.filter(l=>catOf(l.location)==='코트' && /(?:코트\s*|)([1-5])(?:\s*번\s*코트)?/i.test(String(l.location||'')) && Number((String(l.location||'').match(/(?:코트\s*([1-5])|([1-5])\s*번\s*코트)/i)||[])[1]||((String(l.location||'').match(/(?:코트\s*([1-5])|([1-5])\s*번\s*코트)/i)||[])[2]))===n); return `<div class="jgb-v135-scan-court ${cl.length?'has-leak':''}"><b>${n}</b><span>${cl.length?`LK ${cl.length}건`:'누수 없음'}</span></div>`}).join('')}</div><div class="jgb-v135-scan-result" id="jgbV135ScanResult">대기 중 · <b>현황 스캔</b>을 누르면 등록된 위치를 순서대로 확인합니다.</div></div></section>
-          <section class="jgb-v104-card stats"><div class="jgb-v104-title"><div><h2>📊 위치별 누수 통계</h2><p>위치별 건수와 조치 상태를 한눈에 확인합니다.</p></div></div><div class="jgb-v134-stat-list">${statRows}</div><div class="jgb-v104-summary jgb-v133-summary"><div class="jgb-v133-summary-head"><div><strong>전체 위치 상태</strong><small>현재 등록된 LK 누수의 상태를 종합합니다.</small></div><b>${leaks.length}<em>건</em></b></div><div class="jgb-v133-meter"><span class="need" style="width:${leaks.length?Math.round(need/leaks.length*100):0}%"></span><span class="progress" style="width:${leaks.length?Math.round(progress/leaks.length*100):0}%"></span><span class="observe" style="width:${leaks.length?Math.round(observationLeaks/leaks.length*100):0}%"></span><span class="complete" style="width:${leaks.length?Math.max(0,100-Math.round((need+progress+observationLeaks)/leaks.length*100)) :0}%"></span></div><div class="jgb-v133-summary-legend"><span><i class="open"></i>재조치 필요 <b>${need}</b></span><span><i class="observe-dot"></i>보수 후 관찰 <b>${observationLeaks}</b></span><span><i class="done"></i>조치 <b>${done}</b></span><span><i class="link"></i>방수 연계 <b>${linked}</b></span></div></div></section>
+          <section class="jgb-v104-card map"><div class="jgb-v104-title"><div><h2>🗺 누수 위치 현황</h2><p>위치 버튼을 누르면 해당 위치의 <b>LK 누수코드</b>만 표시됩니다.</p></div><div class="jgb-v104-legend"><span><i class="open"></i>조치 필요</span><span><i class="mid"></i>진행</span><span><i class="done"></i>완료</span></div></div><div class="jgb-v104-filters">${filterButtons}</div><div class="jgb-v104-map"><div class="jgb-v104-plan"><div class="top-label">상부</div><div class="side-label left-label">좌측 외곽</div><div class="side-label right-label">우측 외곽</div><div class="bottom-label">하부</div><div class="court-grid"><div class="court"><span>5</span><i class="center-line"></i></div><div class="court"><span>4</span><i class="center-line"></i></div><div class="court"><span>3</span><i class="center-line"></i></div><div class="court"><span>2</span><i class="center-line"></i></div><div class="court"><span>1</span><i class="center-line"></i></div></div><div class="entrance">출입문</div><button type="button" class="jgb-v104-pos-save" id="jgbV104PosSave">📍 위치 저장</button>${markers||'<div class="empty-map">등록된 누수코드가 없습니다.</div>'}</div></div><div class="jgb-v104-note">전체 누수를 표시하고 있습니다. 위치 버튼을 선택하면 해당 위치만 남습니다.</div></section>
+          <section class="jgb-v104-card stats"><div class="jgb-v104-title"><div><h2>📊 위치별 누수 통계</h2><p>위치별 건수와 조치 상태를 한눈에 확인합니다.</p></div></div><div class="jgb-v104-stat-list">${statRows}</div><div class="jgb-v104-summary"><div class="donut"><strong>${leaks.length}</strong><span>전체<br>누수</span></div><div><p><i class="open"></i>조치 필요 <b>${active}</b></p><p><i class="mid"></i>조치 진행 <b>${progress}</b></p><p><i class="done"></i>조치 완료 <b>${done}</b></p><p><i class="link"></i>방수 연계 <b>${linked}</b></p></div></div></section>
         </div>
+        <section class="jgb-v104-card table"><div class="jgb-v104-title"><div><h2>📋 현재 누수 현황</h2><p><b>LK = 누수코드</b> · <b>WA = 방수 이력</b></p></div></div>${rows?`<div class="jgb-v104-leak-scroll"><div class="jgb-v104-leak-grid">${rows}</div></div>`:'<div class="jgb-v104-empty">현재 등록된 누수 현황이 없습니다.<br>상단 <b>누수 등록</b>에서 발생 위치와 LK 누수코드를 등록하세요.</div>'}</section>
       </div>`;
     }
 
@@ -4682,250 +4070,45 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
 
     function jgbV47ShowWpByLeak(leakCode){
-      const S=jgbV47Store(), code=String(leakCode||'').trim(), hs=S.wp.filter(x=>String(x.related||'').trim().toUpperCase()===code.toUpperCase()).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))), parentLeak=S.leaks.find(l=>String(l?.leakCode||'').trim().toUpperCase()===code.toUpperCase())||{}, esc=v=>xEsc(v==null?'':String(v));
-      const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>💧 ${esc(code)} · 관련 방수공사</h2><button type="button" data-v47-action="close-modal">×</button></div>${hs.length?`<div class="jgb-v47-history">${hs.map((x,i)=>{return `<article><div class="jgb-v47-history-head"><b>방수 이력 ${esc(x.waCode||'-')} · ${esc(x.date||'-')}</b><span>${esc(x.date||'-')} · ${esc(x.method||'-')}</span></div><div class="jgb-v47-history-grid"><div><small>방수 위치</small><b>${esc(x.location||parentLeak.location||'-')}</b></div><div><small>업체</small><b>${esc(x.method==='외주'?x.vendor:'자체')}</b></div><div><small>비용</small><b>${Number(x.cost||0).toLocaleString()}원</b></div><div><small>결과</small><b>${esc(x.result==='조치 완료'||x.result==='완료'?'조치':x.result||'-')}</b></div><div class="wide"><small>작업내용</small><b>${esc(x.content||'-')}</b></div></div></article>`}).join('')}</div>`:'<div class="jgb-v47-empty">연결된 방수공사 이력이 없습니다.</div>'}<div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">닫기</button></div></div>`;document.body.appendChild(modal);
-    }
-
-    /* V76: 방수 이력번호는 부모 LK 누수코드 기준으로 WA-LK번호-순번 형식으로 통일 */
-    function jgbV76WaCodeFor(leakCode, seq){
-      const raw=String(leakCode||'').trim().toUpperCase();
-      const lk=/^LK-\d+$/.test(raw)?raw:jgbV90NormalizeCode(raw,'LK-');
-      const m=lk.match(/^LK-(\d+)$/);
-      if(!m)return '';
-      return 'WA-'+String(Number(m[1])).padStart(2,'0')+'-'+String(Math.max(1,Number(seq)||1));
-    }
-    /* V87: WA는 LK를 유일한 부모키로 사용하고, 각 WA는 고유 id로 개별 관리 */
-    function jgbV87EnsureWpIdentity(cards, hs){
-      const arr=Array.isArray(hs)?hs.map(x=>({...x})):[];
-      const leaks=Array.isArray(jgbV47Store().leaks)?jgbV47Store().leaks:[];
-      const seenIds=new Set();
-      const usedByLk={};
-      let changed=false;
-      const cardList=Object.values(cards||{});
-      const leakByCode={};
-      leaks.forEach(l=>{const lk=String(l?.leakCode||'').trim().toUpperCase();if(/^LK-\d+$/.test(lk))leakByCode[lk]=l});
-      const findParent=(h)=>{
-        let lk=String(h?.related||'').trim().toUpperCase();
-        if(!/^LK-\d+$/.test(lk))lk='';
-        if(!lk && h?.cardCode){const c=cards[String(h.cardCode)]||{};const v=String(c?.leakCode||'').trim().toUpperCase();if(/^LK-\d+$/.test(v))lk=v}
-        if(!lk){const loc=String(h?.location||'').trim();if(loc){const c=cardList.find(x=>String(x?.location||'').trim()===loc && /^LK-\d+$/.test(String(x?.leakCode||'').trim().toUpperCase()));if(c)lk=String(c.leakCode).trim().toUpperCase();const l=leaks.find(x=>String(x?.location||'').trim()===loc && /^LK-\d+$/.test(String(x?.leakCode||'').trim().toUpperCase()));if(!lk&&l)lk=String(l.leakCode).trim().toUpperCase()}}
-        return lk;
-      };
-      arr.forEach((h,i)=>{
-        let id=String(h?.id||'').trim();
-        if(!id || seenIds.has(id)){
-          id='V87-WP-'+Date.now().toString(36)+'-'+i+'-'+Math.random().toString(36).slice(2,8).toUpperCase();
-          arr[i]={...arr[i],id}; changed=true;
-        }
-        seenIds.add(id);
-        const lk=findParent(arr[i]);
-        if(!/^LK-\d+$/.test(lk))return;
-        const parentCard=cardList.find(c=>String(c?.leakCode||'').trim().toUpperCase()===lk)||{};
-        const parentLeak=leakByCode[lk]||{};
-        const location=String(parentLeak.location||parentCard.location||arr[i].location||'').trim();
-        const oldWa=String(arr[i]?.waCode||'').trim().toUpperCase();
-        const m=oldWa.match(/^WA-\d+-(\d+)$/);
-        let seq=m?Number(m[1]):0;
-        const used=usedByLk[lk] ||= new Set();
-        if(!seq || used.has(seq)){seq=1;while(used.has(seq))seq++}
-        used.add(seq);
-        const waCode=jgbV76WaCodeFor(lk,seq);
-        const next={...arr[i],related:lk,location};
-        if(waCode)next.waCode=waCode;
-        if(JSON.stringify(next)!==JSON.stringify(arr[i])){arr[i]=next;changed=true}
-      });
-      return {arr,changed};
+      const S=jgbV47Store(), code=String(leakCode||'').trim(), hs=S.wp.filter(x=>String(x.related||'').trim()===code).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))), cards=wpV72Cards(), esc=v=>xEsc(v==null?'':String(v));
+      const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>💧 ${esc(code)} · 관련 방수공사</h2><button type="button" data-v47-action="close-modal">×</button></div>${hs.length?`<div class="jgb-v47-history">${hs.map((x,i)=>{const c=cards[String(x.cardCode||'')]||{};return `<article><div class="jgb-v47-history-head"><b>방수 이력 ${esc(x.waCode||'-')} · ${esc(x.date||'-')}</b><span>${esc(x.date||'-')} · ${esc(x.method||'-')}</span></div><div class="jgb-v47-history-grid"><div><small>방수 위치</small><b>${esc(c.location||x.location||'-')}</b></div><div><small>업체</small><b>${esc(x.method==='외주'?x.vendor:'자체')}</b></div><div><small>비용</small><b>${Number(x.cost||0).toLocaleString()}원</b></div><div><small>결과</small><b>${esc(x.result||'-')}</b></div><div class="wide"><small>작업내용</small><b>${esc(x.content||'-')}</b></div></div></article>`}).join('')}</div>`:'<div class="jgb-v47-empty">연결된 방수공사 이력이 없습니다.</div>'}<div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">닫기</button></div></div>`;document.body.appendChild(modal);
     }
 
     function waterproofPage(){
   const S=jgbV47Store();
   let hs=Array.isArray(S.wp)?S.wp:[];
-  try{
-    const cards0=jgbV90NormalizeWpCards();
-    const normalized=jgbV87EnsureWpIdentity(cards0,hs);
-    hs=normalized.arr;
-    if(normalized.changed)S.saveWp(hs);
-  }catch(e){console.warn('V85 WA identity normalization failed',e)}
   const CARDKEY='JGB_V72_WP_CARDS';
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-
-  /*
-   * V10 FIX
-   * - 기존 V48 카드 저장소를 삭제하지 않음
-   * - 기존 V48 → V72 카드로 안전하게 복구
-   * - 누수관리의 LK가 있으면 방수 이력카드를 자동으로 표시
-   * - 자동 생성한 카드는 V72에 저장하여 다음 접속에서도 유지
-   */
   let cards=jgbV90NormalizeWpCards();
-
+  /* 방수 이력카드는 1개만 유지. 중복 카드와 해당 카드 이력은 정리 */
+  cards=jgbV90NormalizeWpCards();
+  /* V133: 레거시 방수카드는 다시 불러오지 않습니다. */
+  /* 잘못 저장된 관련 누수값(WA 등)은 부모 카드의 LK 누수코드로 정리 */
+  try{let fixed=false;hs=hs.map(h=>{const c=cards[String(h.cardCode||'')]||{};const rel=String(h.related||'').trim().toUpperCase();if(/^WA-\d+$/.test(rel)&&/^LK-\d+$/.test(String(c.leakCode||''))){fixed=true;return {...h,related:String(c.leakCode)}}return h});if(fixed)S.saveWp(hs)}catch(e){}
+  /* 기존 이력은 같은 위치의 기존 카드에만 연결. 이후부터는 반드시 cardCode로 분리 */
   try{
-    const legacyRaw=localStorage.getItem('JGB_V48_WP_CARDS');
-    const legacy=JSON.parse(legacyRaw||'{}');
-    let changed=false;
-
-    if(legacy && typeof legacy==='object' && !Array.isArray(legacy)){
-      Object.entries(legacy).forEach(([loc,m])=>{
-        if(!m || typeof m!=='object') return;
-        const lk=String(m.leakCode||m.related||'').trim().toUpperCase();
-        const leak=Array.isArray(S.leaks)
-          ? S.leaks.find(x=>String(x?.leakCode||'').trim().toUpperCase()===lk)
-          : null;
-        const leakCode=/^LK-\d+$/.test(lk) ? lk :
-          String(leak?.leakCode||'').trim().toUpperCase();
-
-        if(!/^LK-\d+$/.test(leakCode)) return;
-
-        const code=String(m.code||'').trim() ||
-          ('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase());
-
-        if(!cards[code]){
-          cards[code]={
-            ...m,
-            code,
-            leakCode,
-            location:String(leak?.location||m.location||loc||'').trim(),
-            facility:m.facility||'장군봉체육관'
-          };
-          changed=true;
-        }
-      });
-    }
-
-    /* 누수관리 LK를 기준으로 카드가 없으면 자동 복구 */
-    const leakRows=Array.isArray(S.leaks)?S.leaks:[];
-    const existingLK=new Set(
-      Object.values(cards||{})
-        .map(m=>String(m?.leakCode||m?.related||'').trim().toUpperCase())
-        .filter(x=>/^LK-\d+$/.test(x))
-    );
-
-    leakRows.forEach(l=>{
-      const lk=String(l?.leakCode||l?.lkCode||l?.code||'').trim().toUpperCase();
-      if(!/^LK-\d+$/.test(lk) || existingLK.has(lk)) return;
-
-      const code=lk;
-      cards[code]={
-        code,
-        leakCode:lk,
-        location:String(l?.location||'').trim(),
-        facility:'장군봉체육관',
-        area:'',
-        part:String(l?.location||'').trim(),
-        kind:'방수 보수·보강',
-        areaSize:'',
-        firstDate:'',
-        status:'정상',
-        manager:'',
-        contact:'',
-        contractor:'',
-        warranty:'',
-        purpose:'시설물 보호 및 누수 예방',
-        method:'',
-        material:'',
-        scope:'',
-        note:'',
-        photos:[]
-      };
-      existingLK.add(lk);
-      changed=true;
+    let changed=false, arr=hs.map(h=>{
+      if(h.cardCode)return h;
+      const found=Object.values(cards).find(c=>String(c?.location||'').trim()===String(h?.location||'').trim());
+      if(found?.code){changed=true;return {...h,cardCode:String(found.code)}}
+      return h;
     });
-
-    if(changed) wpV72SaveCards(cards);
-  }catch(e){
-    console.warn('V10 방수 이력카드 복구 실패',e);
-  }
-
-  /*
-   * 카드가 없더라도 기존 WA 이력의 related=LK를 기준으로
-   * 최소 이력카드를 복구한다.
-   */
-  try{
-    const hs0=Array.isArray(S.wp)?S.wp:[];
-    const cardLK=new Set(
-      Object.values(cards||{})
-        .map(m=>String(m?.leakCode||m?.related||'').trim().toUpperCase())
-        .filter(x=>/^LK-\d+$/.test(x))
-    );
-
-    hs0.forEach(h=>{
-      const lk=String(h?.related||'').trim().toUpperCase();
-      if(!/^LK-\d+$/.test(lk) || cardLK.has(lk)) return;
-
-      const parent=(Array.isArray(S.leaks)?S.leaks:[]).find(
-        l=>String(l?.leakCode||'').trim().toUpperCase()===lk
-      );
-
-      cards[lk]={
-        code:lk,
-        leakCode:lk,
-        location:String(parent?.location||h?.location||'').trim(),
-        facility:'장군봉체육관',
-        part:String(parent?.location||h?.location||'').trim(),
-        kind:'방수 보수·보강',
-        status:'정상',
-        photos:[]
-      };
-      cardLK.add(lk);
-    });
-
-    wpV72SaveCards(cards);
-  }catch(e){
-    console.warn('V10 WA 기준 카드 복구 실패',e);
-  }
-
-  /* 방수카드 표시 목록 */
-  const leakRows=Array.isArray(S.leaks)?S.leaks:[];
-  const cardByLK=new Map();
-
-  Object.entries(cards||{}).forEach(([code,m])=>{
-    const lk=String(m?.leakCode||m?.related||'').trim().toUpperCase();
-    if(/^LK-\d+$/.test(lk)){
-      cardByLK.set(lk,{
-        code:String(m?.code||code),
-        meta:m||{}
-      });
-    }
-  });
-
-  leakRows.forEach(l=>{
-    const lk=String(l?.leakCode||l?.lkCode||l?.code||'').trim().toUpperCase();
-    if(!/^LK-\d+$/.test(lk) || cardByLK.has(lk)) return;
-
-    cardByLK.set(lk,{
-      code:lk,
-      meta:{
-        code:lk,
-        leakCode:lk,
-        location:String(l?.location||'').trim(),
-        facility:'장군봉체육관'
-      }
-    });
-  });
-
-  const list=Array.from(cardByLK.values()).filter(x=>x.code);
-
+    if(changed)S.saveWp(arr);
+  }catch(e){}
+  const list=Object.entries(cards).map(([code,m])=>({code:String(m?.code||code),meta:m||{}})).filter(x=>x.code);
   const cardFor=(card,idx)=>{
     const code=card.code, meta=card.meta||{}, loc=String(meta.location||'').trim();
-    const rows=hs.filter(x=>String(x.related||'').trim().toUpperCase()===String(meta.leakCode||'').trim().toUpperCase()).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+    const rows=hs.filter(x=>String(x.cardCode||'')===code).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
     const photo=Array.isArray(meta.photos)&&meta.photos[0]?meta.photos[0]:'';
     let collapsed=false;try{collapsed=localStorage.getItem('JGB_V72_WP_COLLAPSED_'+code)==='1'}catch(e){}
     const field=(a,b)=>`<div class="jgb-v66-row"><strong>${esc(a)}</strong><span>${esc(b==null||b===''?'-':b)}</span></div>`;
     const history=rows.length?rows.map((h,n)=>{
       const photos=Array.isArray(h.photos)?h.photos:[];
-      return `<article class="jgb-v66-history-item"><div class="jgb-v66-history-title"><b>방수 이력 ${esc(jgbV90NormalizeCode(h.waCode,'WA-')||'-')}</b><span>${esc(h.date||'-')}</span><div class="jgb-v66-history-actions"><button type="button" data-v47-action="edit-wp" data-id="${esc(h.id)}" data-code="${esc(code)}">✏ 수정</button><button type="button" data-v47-action="delete-wp" data-id="${esc(h.id)}" data-code="${esc(code)}">🗑 삭제</button></div></div><div class="jgb-v66-history-content"><div>${field('방수 위치',meta.location||h.location||'-')}${field('작업일자',h.date)}${field('작업구분',h.method)}${field('외주업체명',h.vendor)}${field('작업비용',Number(h.cost||0).toLocaleString()+'원')}${field('작업내용',h.content)}${field('작업결과',h.result)}${field('방수 이력',h.waCode)}${field('특이사항',h.note)}</div><div class="jgb-v66-work-photos"><div class="jgb-v66-photo-label">📷 작업사진 <em>4 × 4 · 3장</em></div><div class="jgb-v66-work-photo-grid">${[0,1,2].map(k=>photos[k]?`<img src="${esc(photos[k])}" alt="작업사진 ${k+1}">`:`<div class="jgb-v66-work-empty">사진 ${k+1}<small>등록 자리</small></div>`).join('')}</div></div></div></article>`;
+      return `<article class="jgb-v66-history-item"><div class="jgb-v66-history-title"><b>방수 이력 ${esc(h.waCode||'-')}</b><span>${esc(h.date||'-')}</span><div class="jgb-v66-history-actions"><button type="button" data-v47-action="edit-wp" data-id="${esc(h.id)}" data-code="${esc(code)}">✏ 수정</button><button type="button" data-v47-action="delete-wp" data-id="${esc(h.id)}" data-code="${esc(code)}">🗑 삭제</button></div></div><div class="jgb-v66-history-content"><div>${field('작업일자',h.date)}${field('작업구분',h.method)}${field('외주업체명',h.vendor)}${field('작업비용',Number(h.cost||0).toLocaleString()+'원')}${field('작업내용',h.content)}${field('작업결과',h.result)}${field('방수 이력',h.waCode)}${field('특이사항',h.note)}</div><div class="jgb-v66-work-photos"><div class="jgb-v66-photo-label">📷 작업사진 <em>4 × 4 · 3장</em></div><div class="jgb-v66-work-photo-grid">${[0,1,2].map(k=>photos[k]?`<img src="${esc(photos[k])}" alt="작업사진 ${k+1}">`:`<div class="jgb-v66-work-empty">사진 ${k+1}<small>등록 자리</small></div>`).join('')}</div></div></div></article>`;
     }).join(''):`<div class="jgb-v66-empty">등록된 방수공사 이력내역이 없습니다.</div>`;
     return `<section class="jgb-v66-set" data-wp-code="${esc(code)}"><div class="jgb-v66-head"><strong>🛡 방수관리 이력카드</strong><div><button type="button" data-v47-action="edit-wp-card" data-code="${esc(code)}">✏ 수정</button><button type="button" data-v47-action="new-wp" data-code="${esc(code)}">＋ 이력내역</button><button type="button" class="jgb-v66-delete-card" data-v47-action="delete-wp-card" data-code="${esc(code)}">🗑 카드삭제</button><button type="button" class="jgb-v66-fold" data-v47-action="toggle-wp-card" data-code="${esc(code)}" aria-expanded="${collapsed?'false':'true'}">${collapsed?'▼':'▲'}</button></div></div><div class="jgb-v66-body${collapsed?' closed':''}"><div class="jgb-v66-card"><div class="jgb-v66-section">기본정보</div><div class="jgb-v66-card-layout"><div>${field('누수코드',meta.leakCode||rows.find(x=>String(x.related||'').trim())?.related||'-')}${field('시설명',meta.facility||'장군봉체육관')}${field('방수 위치',loc)}${field('건물·구역',meta.area)}${field('주요 방수부위',meta.part||loc)}${field('방수공사 종류',meta.kind||'방수 보수·보강')}${field('방수 면적',meta.areaSize)}${field('최초 방수일',meta.firstDate||rows.at(-1)?.date)}${field('최근 방수일',rows[0]?.date||meta.lastDate)}${field('현재 상태',meta.status||'정상')}${field('담당자',meta.manager)}${field('연락처',meta.contact)}${field('시공업체',meta.contractor)}${field('보증기간',meta.warranty)}${field('공사 목적',meta.purpose||'시설물 보호 및 누수 예방')}${field('주요 공법',meta.method||'우레탄시트 등')}${field('사용 자재',meta.material)}${field('공사 범위',meta.scope)}${field('총 공사비',totalForLocation(rows)+'원')}${field('특이사항',meta.note)}</div><div class="jgb-v66-card-photo"><div class="jgb-v66-photo-label">📷 방수 위치 사진 <em>5 × 5 · 1장</em></div>${photo?`<img src="${esc(photo)}" alt="방수 위치 사진">`:`<div class="jgb-v66-location-empty">사진 등록 자리<br><small>5 × 5 · 1장</small></div>`}</div></div></div><section class="jgb-v66-history"><div class="jgb-v66-history-head"><strong>📋 방수공사 이력내역</strong><button type="button" data-v47-action="new-wp" data-code="${esc(code)}">＋ 이력내역 등록</button></div><div class="jgb-v66-history-list">${history}</div></section></div></section>`;
   };
-  return `<div class="jgb-v66-wrap">
-    <header class="jgb-v57-page-head">
-      <div>
-        <div class="jgb-v57-eyebrow">WATERPROOF MANAGEMENT</div>
-        <h1>🛡 방수관리 이력</h1>
-        <p>누수관리의 <b>LK 누수코드</b>를 기준으로 <b>WA 방수 이력</b>을 연결하여 통합 관리합니다.</p>
-      </div>
-      <button type="button" class="jgb-v57-head-btn" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button>
-    </header>
-    <div class="jgb-v66-grid">${list.map(cardFor).join('')||'<div class="jgb-v66-none">연결된 LK 누수코드가 없습니다.<br><small style="display:block;margin:8px 0;color:#8095a7">누수관리에서 LK 누수코드를 등록하면 이력카드가 자동으로 표시됩니다.</small><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>'}</div></div>`;
+  return `<div class="jgb-v66-wrap"><div class="jgb-v66-top"><h2>🛡 방수관리 이력</h2><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div><div class="jgb-v66-grid">${list.map(cardFor).join('')||'<div class="jgb-v66-none">등록된 방수공사 이력카드가 없습니다.<br><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>'}</div></div>`;
 }
     function wpSetCard(location,idx,esc){
       if(!location)return `<section class="jgb-v52-set"><div class="jgb-v48-card panel jgb-v52-card"><div class="jgb-v48-card-head"><div><h2>📋 방수공사 이력카드</h2><p>방수 대상 시설의 기본정보를 관리합니다.</p></div><div class="jgb-v48-card-actions"><button type="button" class="btn gray" disabled>✏️ 이력카드 수정</button></div></div><div class="jgb-v52-empty">방수 위치를 등록하면 이력카드가 표시됩니다.</div></div><section class="jgb-v48-history panel jgb-v52-history"><div class="jgb-v48-card-head"><div><h2>📝 방수공사 이력내역</h2></div></div><div class="jgb-v52-empty">등록된 방수작업 이력이 없습니다.</div></section></section>`;
@@ -4937,7 +4120,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     function wpCardMeta(location){const k='JGB_V48_WP_CARDS';try{const all=JSON.parse(localStorage.getItem(k)||'{}');return all[location]||{};}catch(e){return {}}}
     function saveWpCardMeta(location,data){const k='JGB_V48_WP_CARDS';let all={};try{all=JSON.parse(localStorage.getItem(k)||'{}')}catch(e){}all[location]=data;localStorage.setItem(k,JSON.stringify(all))}
     function totalForLocation(hs){return hs.reduce((n,x)=>n+(Number(x.cost)||0),0).toLocaleString()}
-    function wpHistoryCard(x,i,esc){const photos=Array.isArray(x.photos)?x.photos:[];return `<article class="jgb-v48-history-card"><div class="jgb-v48-history-head"><div><span class="jgb-v48-history-no">이력 ${i+1}</span><strong>${esc(x.date||'-')}</strong><em class="${x.method==='외주'?'external':''}">${esc(x.method||'자체')}</em></div><div class="jgb-v48-history-actions"><button type="button" class="btn gray" data-v47-action="edit-wp" data-id="${esc(x.id)}" data-code="${esc(x.related||'')}">✏️ 수정</button><button type="button" class="btn danger" data-v47-action="delete-wp" data-id="${esc(x.id)}">삭제</button></div></div><div class="jgb-v48-history-grid"><div class="jgb-v48-history-info"><div><small>작업일자</small><b>${esc(x.date||'-')}</b></div><div><small>작업구분</small><b>${esc(x.method||'자체')}</b></div><div><small>업체명</small><b>${esc(x.method==='외주'?x.vendor||'-':'자체')}</b></div><div><small>작업비용</small><b>${Number(x.cost||0).toLocaleString()}원</b></div><div><small>작업기간</small><b>${esc((x.start||'-')+' ~ '+(x.end||'-'))}</b></div><div><small>작업결과</small><b>${esc(x.result||'-')}</b></div><div class="wide"><small>작업내용</small><b>${esc(x.content||'-')}</b></div><div class="wide"><small>비고</small><b>${esc(x.note||'-')}</b></div></div><div class="jgb-v48-work-photos"><h4>작업사진 <span>최대 3장</span></h4><div>${photos.length?photos.slice(0,3).map((src,j)=>`<figure><img src="${esc(src)}"><figcaption>${['작업 전','작업 중','작업 후'][j]}</figcaption></figure>`).join(''):'<div class="jgb-v48-photo-empty small">작업사진 없음</div>'}</div></div></div></article>`}
+    function wpHistoryCard(x,i,esc){const photos=Array.isArray(x.photos)?x.photos:[];return `<article class="jgb-v48-history-card"><div class="jgb-v48-history-head"><div><span class="jgb-v48-history-no">이력 ${i+1}</span><strong>${esc(x.date||'-')}</strong><em class="${x.method==='외주'?'external':''}">${esc(x.method||'자체')}</em></div><div class="jgb-v48-history-actions"><button type="button" class="btn gray" data-v47-action="edit-wp" data-id="${esc(x.id)}">✏️ 수정</button><button type="button" class="btn danger" data-v47-action="delete-wp" data-id="${esc(x.id)}">삭제</button></div></div><div class="jgb-v48-history-grid"><div class="jgb-v48-history-info"><div><small>작업일자</small><b>${esc(x.date||'-')}</b></div><div><small>작업구분</small><b>${esc(x.method||'자체')}</b></div><div><small>업체명</small><b>${esc(x.method==='외주'?x.vendor||'-':'자체')}</b></div><div><small>작업비용</small><b>${Number(x.cost||0).toLocaleString()}원</b></div><div><small>작업기간</small><b>${esc((x.start||'-')+' ~ '+(x.end||'-'))}</b></div><div><small>작업결과</small><b>${esc(x.result||'-')}</b></div><div class="wide"><small>작업내용</small><b>${esc(x.content||'-')}</b></div><div class="wide"><small>비고</small><b>${esc(x.note||'-')}</b></div></div><div class="jgb-v48-work-photos"><h4>작업사진 <span>최대 3장</span></h4><div>${photos.length?photos.slice(0,3).map((src,j)=>`<figure><img src="${esc(src)}"><figcaption>${['작업 전','작업 중','작업 후'][j]}</figcaption></figure>`).join(''):'<div class="jgb-v48-photo-empty small">작업사진 없음</div>'}</div></div></div></article>`}
     function wpV72Cards(){try{return JSON.parse(localStorage.getItem('JGB_V72_WP_CARDS')||'{}')||{}}catch(e){return {}}}
     function wpV72SaveCards(o){localStorage.setItem('JGB_V72_WP_CARDS',JSON.stringify(o||{}))}
     function jgbV87KeepOnlyOneWpCard(){
@@ -4960,175 +4143,59 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       return x;
     }
     function jgbV90NormalizeWpCards(){
-      const all=wpV72Cards(),out={},S=jgbV47Store(),hist=Array.isArray(S.wp)?S.wp:[];
+      const all=wpV72Cards(),out={};
       Object.entries(all).forEach(([k,m])=>{
         const code=String(m?.code||k).trim();
-        let leakCode=String(m?.leakCode||m?.related||'').trim().toUpperCase();
-        if(!/^LK-\d+$/.test(leakCode)){
-          const linked=hist.find(h=>String(h?.cardCode||'').trim()===code && /^LK-\d+$/i.test(String(h?.related||'')));
-          leakCode=String(linked?.related||'').trim().toUpperCase();
-        }
-        if(code) out[code]={...(m||{}),code,leakCode:/^LK-\d+$/.test(leakCode)?leakCode:''};
+        const leakCode=String(m?.leakCode||'').trim().toUpperCase();
+        if(code) out[code]={...(m||{}),code,leakCode:/^LK-\d+$/.test(leakCode)?leakCode:(m?.related||'')};
       });
       return out;
     }
-    function jgbV90LeakList(){
-      const out=[];
-      const seen=new Set();
-      const add=(rawCode,rawLocation)=>{
-        const lk=String(rawCode||'').trim().toUpperCase();
-        if(!/^LK-\d+$/.test(lk)||seen.has(lk))return;
-        seen.add(lk);
-        out.push({leakCode:lk,location:String(rawLocation||'').trim()});
-      };
-      // 1순위: 누수관리의 실제 저장 데이터
-      const S=jgbV47Store();
-      (Array.isArray(S.leaks)?S.leaks:[]).forEach(l=>add(l?.leakCode||l?.lkCode||l?.code,l?.location));
-      // 2순위: 기존 방수 이력카드에 남아 있는 LK
-      const cards=wpV72Cards();
-      Object.values(cards||{}).forEach(c=>add(c?.leakCode||c?.related,c?.location));
-      // 3순위: 기존 WA 이력의 related(LK)
-      (Array.isArray(S.wp)?S.wp:[]).forEach(h=>{
-        const lk=String(h?.related||'').trim().toUpperCase();
-        const parent=(Array.isArray(S.leaks)?S.leaks:[]).find(l=>String(l?.leakCode||'').trim().toUpperCase()===lk);
-        add(lk,parent?.location||h?.location);
-      });
-      // 4순위: 마지막으로 선택했던 LK가 있으면 목록에 복구
-      try{
-        const saved=String(localStorage.getItem('JGB_V48_WP_SELECTED_LEAK')||'').trim().toUpperCase();
-        if(/^LK-\d+$/.test(saved))add(saved,'');
-      }catch(e){}
-      return out.sort((a,b)=>a.leakCode.localeCompare(b.leakCode,undefined,{numeric:true}));
-    }
     function jgbV48OpenCardEditor(code,isNew){
       const all=jgbV90NormalizeWpCards(), old=isNew?{}:(all[String(code)]||{}), esc=v=>xEsc(v==null?'':String(v));
-      const leaks=jgbV90LeakList(), initial=String(old.code||code||('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()));
-      const leakInitial=String(old.leakCode||'').toUpperCase();
-      const leakOptions=leaks.map(l=>{const lk=String(l.leakCode||'').toUpperCase(),loc=String(l.location||'');return `<option value="${esc(lk)}" data-location="${esc(loc)}" ${lk===leakInitial?'selected':''}>${esc(lk)} · ${esc(loc||'위치 미등록')}</option>`}).join('');
-      const fallback=leakInitial&&!leaks.some(l=>String(l.leakCode||'').toUpperCase()===leakInitial)?`<option value="${esc(leakInitial)}" selected>⚠ ${esc(leakInitial)} · 기존 연결</option>`:'';
-      const selectedLeak=leakInitial||String(leaks[0]?.leakCode||'').toUpperCase();
-      const selectedLocation=String((leaks.find(l=>String(l.leakCode||'').toUpperCase()===selectedLeak)||{}).location||old.location||'');
-      const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>📋 방수공사 이력카드 ${isNew?'등록':'수정'}</h2><button type="button" data-v47-action="close-modal">×</button></div><div class="jgb-v47-form-grid">
-        <label>연결 누수코드(LK)<select id="v48_leakCode">${!leaks.length?'<option value="">등록된 누수 없음</option>':''}${fallback}${leakOptions}</select><small>누수관리에서 등록한 LK를 선택하면 방수 위치가 자동 연결됩니다.</small></label>
-        <label>시설명<input id="v48_facility" value="${esc(old.facility||'장군봉체육관')}"></label>
-        <label>방수 위치<input id="v48_location" value="${esc(selectedLocation)}" readonly><small>LK 누수코드의 발생 위치가 자동 입력됩니다.</small></label>
-        <label>건물·구역<input id="v48_area" value="${esc(old.area||'')}"></label><label>주요 방수부위<input id="v48_part" value="${esc(old.part||'')}"></label><label>방수공사 종류<input id="v48_kind" value="${esc(old.kind||'방수 보수·보강')}"></label><label>방수 면적<input id="v48_areaSize" value="${esc(old.areaSize||'')}"></label><label>최초 방수일<input id="v48_firstDate" type="date" value="${esc(old.firstDate||'')}"></label><label>현재 상태<select id="v48_status"><option ${old.status==='정상'||!old.status?'selected':''}>정상</option><option ${old.status==='점검필요'?'selected':''}>점검필요</option><option ${old.status==='보수필요'?'selected':''}>보수필요</option></select></label><label>담당자<input id="v48_manager" value="${esc(old.manager||'')}"></label><label>연락처<input id="v48_contact" value="${esc(old.contact||'')}"></label><label>시공업체<input id="v48_contractor" value="${esc(old.contractor||'')}"></label><label>보증기간<input id="v48_warranty" value="${esc(old.warranty||'')}"></label><label>공사 목적<input id="v48_purpose" value="${esc(old.purpose||'시설물 보호 및 누수 예방')}"></label><label>주요 공법<input id="v48_method" value="${esc(old.method||'')}"></label><label>사용 자재<input id="v48_material" value="${esc(old.material||'')}"></label><label>공사 범위<input id="v48_scope" value="${esc(old.scope||'')}"></label><label class="wide">특이사항<textarea id="v48_note" rows="3">${esc(old.note||'')}</textarea></label><label class="wide">방수 위치 사진<input id="v48_card_photo" type="file" accept="image/*"><small>대표 사진 1장</small></label></div><div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" data-v47-action="save-wp-card" data-code="${esc(initial)}" data-new="${isNew?'1':'0'}">저장</button></div></div>`;document.body.appendChild(modal);
-      const sel=document.getElementById('v48_leakCode'), loc=document.getElementById('v48_location');
-      if(sel)sel.addEventListener('change',()=>{const o=sel.options[sel.selectedIndex];if(loc)loc.value=o?.dataset?.location||''});
+      const initial=String(old.code||code||('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()));
+      const leakInitial=isNew?jgbV133NextLK():String(old.leakCode||'LK-');
+      const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>📋 방수공사 이력카드 ${isNew?'등록':'수정'}</h2><button type="button" data-v47-action="close-modal">×</button></div><div class="jgb-v47-form-grid"><label>누수코드<input id="v48_leakCode" value="${esc(leakInitial)}" ${isNew?'readonly':''} placeholder="예: LK-01" title="${isNew?'누수코드가 자동 생성됩니다.':'기존 누수코드'}">${isNew?'<small style="display:block;color:#6d8194;margin-top:4px">LK 코드 자동 생성</small>':''}</label><label>시설명<input id="v48_facility" value="${esc(old.facility||'장군봉체육관')}"></label><label>방수 위치<input id="v48_location" value="${esc(old.location||'')}" placeholder="예: 2층 여자화장실"></label><label>건물·구역<input id="v48_area" value="${esc(old.area||'')}"></label><label>주요 방수부위<input id="v48_part" value="${esc(old.part||'')}"></label><label>방수공사 종류<input id="v48_kind" value="${esc(old.kind||'방수 보수·보강')}"></label><label>방수 면적<input id="v48_areaSize" value="${esc(old.areaSize||'')}"></label><label>최초 방수일<input id="v48_firstDate" type="date" value="${esc(old.firstDate||'')}"></label><label>현재 상태<select id="v48_status"><option ${old.status==='정상'||!old.status?'selected':''}>정상</option><option ${old.status==='점검필요'?'selected':''}>점검필요</option><option ${old.status==='보수필요'?'selected':''}>보수필요</option></select></label><label>담당자<input id="v48_manager" value="${esc(old.manager||'')}"></label><label>연락처<input id="v48_contact" value="${esc(old.contact||'')}"></label><label>시공업체<input id="v48_contractor" value="${esc(old.contractor||'')}"></label><label>보증기간<input id="v48_warranty" value="${esc(old.warranty||'')}"></label><label>공사 목적<input id="v48_purpose" value="${esc(old.purpose||'시설물 보호 및 누수 예방')}"></label><label>주요 공법<input id="v48_method" value="${esc(old.method||'')}"></label><label>사용 자재<input id="v48_material" value="${esc(old.material||'')}"></label><label>공사 범위<input id="v48_scope" value="${esc(old.scope||'')}"></label><label class="wide">특이사항<textarea id="v48_note" rows="3">${esc(old.note||'')}</textarea></label><label class="wide">방수 위치 사진<input id="v48_card_photo" type="file" accept="image/*"><small>대표 사진 1장</small></label></div><div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" data-v47-action="save-wp-card" data-code="${esc(initial)}" data-new="${isNew?'1':'0'}">저장</button></div></div>`;document.body.appendChild(modal);
     }
     async function jgbV48SaveCard(code,isNew){
-      const g=id=>document.getElementById(id)?.value?.trim()||'';
-      const oldAll=jgbV90NormalizeWpCards(), old=isNew?{}:(oldAll[String(code)]||{}), S=jgbV47Store();
-      const rawLK=g('v48_leakCode').toUpperCase();
-      const leakCode=/^LK-\d+$/.test(rawLK)?rawLK:jgbV90NormalizeCode(rawLK,'LK-');
-      const leak=Array.isArray(S.leaks)?S.leaks.find(x=>String(x.leakCode||'').trim().toUpperCase()===leakCode):null;
-      if(!leak){alert('연결할 누수코드(LK)를 선택하세요.');return}
-      const loc=String(leak.location||'').trim();
-      if(!loc){alert('선택한 LK에 발생 위치가 없습니다. 누수관리에서 위치를 먼저 등록하세요.');return}
-
-      const oldKey=String(code||old.code||'').trim();
-      const newCode=String(old.code||oldKey||('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()));
-      const leakDuplicate=Object.entries(oldAll).some(([k,m])=>
-        String(m?.leakCode||'').trim().toUpperCase()===leakCode && String(k)!==oldKey
-      );
-      if(leakDuplicate){alert('이미 다른 방수 이력카드에 연결된 LK입니다. 다른 LK를 선택하세요.');return}
-
-      const data={
-        ...old, code:newCode, leakCode, location:loc,
-        facility:g('v48_facility')||'장군봉체육관', area:g('v48_area'),
-        part:g('v48_part')||loc, kind:g('v48_kind')||'방수 보수·보강',
-        areaSize:g('v48_areaSize'), firstDate:g('v48_firstDate'),
-        status:g('v48_status')||'정상', manager:g('v48_manager'),
-        contact:g('v48_contact'), contractor:g('v48_contractor'),
-        warranty:g('v48_warranty'), purpose:g('v48_purpose')||'시설물 보호 및 누수 예방',
-        method:g('v48_method'), material:g('v48_material'), scope:g('v48_scope'),
-        note:g('v48_note'), photos:old.photos||[]
-      };
-      const f=document.getElementById('v48_card_photo')?.files?.[0];
-      if(f)data.photos=[await jgbV47ReadFile(f)];
-
-      oldAll[newCode]=data;
-      if(oldKey && oldKey!==newCode)delete oldAll[oldKey];
-
-      /* 카드의 LK를 바꾸면 기존 WA 이력도 같은 LK와 위치를 즉시 따라가도록 동기화 */
-      const histories=Array.isArray(S.wp)?S.wp:[];
-      const oldLK=String(old.leakCode||'').trim().toUpperCase();
-      const targetRows=histories.filter(h=>String(h.related||'').trim().toUpperCase()===oldLK);
-      const updatedHistories=histories.map(h=>{
-        const rel=String(h.related||'').trim().toUpperCase();
-        if(!(rel===oldLK))return h;
-        const oldWa=String(h.waCode||'').trim().toUpperCase();
-        const seqMatch=oldWa.match(/^WA-\d+-(\d+)$/);
-        const seq=seqMatch?Number(seqMatch[1]):0;
-        const fallbackSeq=seq||targetRows.indexOf(h)+1;
-        return {
-          ...h,
-          related:leakCode,
-          location:loc,
-          waCode:jgbV76WaCodeFor(leakCode,fallbackSeq)
-        };
-      });
-      try{S.saveWp(updatedHistories)}catch(e){console.warn('WA 연동 저장 실패',e)}
-      wpV72SaveCards(oldAll);
-      document.getElementById('jgbV47Modal')?.remove();
-      render();
+      const g=id=>document.getElementById(id)?.value?.trim()||'', oldAll=jgbV90NormalizeWpCards(), old=isNew?{}:(oldAll[String(code)]||{}), leakCode=isNew?jgbV133NextLK():jgbV90NormalizeCode(g('v48_leakCode'),'LK-');
+      const loc=g('v48_location'); if(!loc){alert('방수 위치를 입력하세요.');return}
+      if(!/^LK-\d+$/.test(leakCode)){alert('누수코드는 LK-01 형식으로 입력하세요.');return}
+      const oldKey=String(code||old.code||''), newCode=String(old.code||oldKey||('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()));
+      const leakDuplicate=Object.entries(oldAll).some(([k,m])=>String(m?.leakCode||'').toUpperCase()===leakCode && String(k)!==oldKey);
+      if(leakDuplicate){alert('이미 사용 중인 누수코드입니다. 다른 번호를 입력하세요.');return}
+      const data={...old,code:newCode,leakCode,location:loc,facility:g('v48_facility'),area:g('v48_area'),part:g('v48_part'),kind:g('v48_kind'),areaSize:g('v48_areaSize'),firstDate:g('v48_firstDate'),status:g('v48_status'),manager:g('v48_manager'),contact:g('v48_contact'),contractor:g('v48_contractor'),warranty:g('v48_warranty'),purpose:g('v48_purpose'),method:g('v48_method'),material:g('v48_material'),scope:g('v48_scope'),note:g('v48_note'),photos:old.photos||[]};
+      const f=document.getElementById('v48_card_photo')?.files?.[0];if(f)data.photos=[await jgbV47ReadFile(f)];
+      if(!isNew && oldKey!==newCode){oldAll[newCode]=data;delete oldAll[oldKey];try{const S=jgbV47Store();S.saveWp(S.wp.map(h=>String(h.cardCode||'')===oldKey?{...h,cardCode:newCode}:h))}catch(e){}}
+      else oldAll[newCode]=data;
+      wpV72SaveCards(oldAll);document.getElementById('jgbV47Modal')?.remove();render();
     }
     function costFor(arr){return arr.reduce((n,x)=>n+(Number(x.cost)||0),0).toLocaleString()}
     function jgbV47Store(){const lk='JGB_V47_LEAKS',wk='JGB_V47_WP_HISTORY';const parse=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(x)?x:[]}catch(e){return []}};const leaks=parse(lk),wp=parse(wk);return {leaks,wp,saveLeaks:v=>localStorage.setItem(lk,JSON.stringify(v)),saveWp:v=>localStorage.setItem(wk,JSON.stringify(v))}}
+    function jgbV133NextCode(prefix){
+      const S=jgbV47Store();
+      const nums=[];
+      const take=v=>{
+        const m=String(v||'').trim().toUpperCase().match(new RegExp('^'+prefix+'(\\d+)$'));
+        if(m) nums.push(Number(m[1]));
+      };
+      (S.leaks||[]).forEach(x=>take(x.leakCode));
+      (S.wp||[]).forEach(x=>{take(x.waCode);});
+      Object.values(wpV72Cards()||{}).forEach(x=>take(x.leakCode));
+      const n=(nums.length?Math.max(...nums):0)+1;
+      return prefix+String(n).padStart(2,'0');
+    }
+    function jgbV133NextLK(){return jgbV133NextCode('LK-')}
+    function jgbV133NextWA(){return jgbV133NextCode('WA-')}
     function jgbV47OpenModal(type,id,cardCode){
-      const S=jgbV47Store(), old=type==='leak'?S.leaks.find(x=>String(x.id)===String(id)):S.wp.find(x=>String(x.id)===String(id)), esc=v=>xEsc(v==null?'':String(v)), today=new Date().toISOString().slice(0,10), lkForOld=String(old?.related||'').trim().toUpperCase(), parentLeakForOld=S.leaks.find(x=>String(x?.leakCode||'').trim().toUpperCase()===lkForOld)||{}, cards=wpV72Cards(), card=cardCode?(cards[String(cardCode)]||{}):{}, preset=type==='wp'?(old?.location||parentLeakForOld.location||card.location||''):'';
-      const body=type==='leak'?`<div class="jgb-v47-form-grid"><label>누수코드<input id="v47_leakCode" value="${esc(old?.leakCode||'LK-')}" placeholder="예: LK-01"></label><label>발생 위치<input id="v47_location" value="${esc(old?.location||'')}" placeholder="예: 2층 여자화장실"><div class="jgb-v47-location-buttons"><button type="button" data-v47-place="코트">코트</button><button type="button" data-v47-place="화장실">화장실</button><button type="button" data-v47-place="샤워실">샤워실</button><button type="button" data-v47-place="휴게실">휴게실</button><button type="button" data-v47-place="기타">기타</button></div></label><label>발견일<input id="v47_date" type="date" value="${esc(old?.date||today)}"></label><label>상태<select id="v47_status"><option ${old?.status==='조치필요'||!old?'selected':''}>조치필요</option><option ${old?.status==='조치완료'?'selected':''}>조치완료</option></select></label><label class="wide">누수 내용<textarea id="v47_content" rows="3">${esc(old?.content||'')}</textarea></label><label class="wide">비고<textarea id="v47_note" rows="2">${esc(old?.note||'')}</textarea></label></div>`:`<div class="jgb-v47-form-grid"><label>연결 누수코드<input id="v47_linkedLeakCode" value="${esc(old?.related||card?.leakCode||'')}" readonly><small>누수관리의 LK와 자동 연결됩니다.</small></label><label>방수 작업 위치<input id="v47_location" value="${esc(preset)}" readonly><small>누수관리의 발생위치와 동일하게 자동 연결됩니다.</small></label><label>작업일자<input id="v47_date" type="date" value="${esc(old?.date||today)}"></label><label>작업구분<select id="v47_method"><option ${old?.method!=='외주'?'selected':''}>자체</option><option ${old?.method==='외주'?'selected':''}>외주</option></select></label><label>외주업체명<input id="v47_vendor" value="${esc(old?.vendor||'')}" placeholder="외주인 경우 입력"></label><label>작업비용<input id="v47_cost" type="number" min="0" value="${esc(old?.cost||0)}"></label><label>계약일<input id="v47_contract" type="date" value="${esc(old?.contract||'')}"></label><label>작업시작일<input id="v47_start" type="date" value="${esc(old?.start||'')}"></label><label>작업완료일<input id="v47_end" type="date" value="${esc(old?.end||'')}"></label><label>작업결과<select id="v47_result"><option ${!old||old?.result==='조치'||old?.result==='조치'||old?.result==='완료'?'selected':''}>조치</option><option ${old?.result==='보수 후 관찰'?'selected':''}>보수 후 관찰</option><option ${old?.result==='재조치 필요'?'selected':''}>재조치 필요</option></select></label><label>방수 이력<input id="v47_waCode" value="${esc(old?.waCode||'')}" placeholder="LK에서 자동 생성" readonly><small>연결된 LK 누수코드 기준으로 WA-01-1, WA-01-2처럼 자동 부여됩니다.</small></label><label class="wide">작업내용<textarea id="v47_content" rows="4">${esc(old?.content||'')}</textarea></label><label class="wide">비고<textarea id="v47_note" rows="2">${esc(old?.note||'')}</textarea></label><label class="wide">작업사진<input id="v47_photo" type="file" accept="image/*" multiple></label></div>`;
+      const S=jgbV47Store(), old=type==='leak'?S.leaks.find(x=>String(x.id)===String(id)):S.wp.find(x=>String(x.id)===String(id)), esc=v=>xEsc(v==null?'':String(v)), today=new Date().toISOString().slice(0,10), cards=wpV72Cards(), card=cardCode?(cards[String(cardCode)]||{}):{}, preset=type==='wp'?(old?.location||card.location||''):'';
+      const body=type==='leak'?`<div class="jgb-v47-form-grid"><label>누수코드<input id="v47_leakCode" value="${esc(old?.leakCode||jgbV133NextLK())}" readonly title="누수 등록 시 LK 코드가 자동 생성됩니다."><small style="display:block;color:#6d8194;margin-top:4px">LK 코드 자동 생성</small></label><label>발생 위치<input id="v47_location" value="${esc(old?.location||'')}" placeholder="예: 2층 여자화장실"><div class="jgb-v47-location-buttons"><button type="button" data-v47-place="코트">코트</button><button type="button" data-v47-place="화장실">화장실</button><button type="button" data-v47-place="샤워실">샤워실</button><button type="button" data-v47-place="휴게실">휴게실</button><button type="button" data-v47-place="기타">기타</button></div></label><label>발견일<input id="v47_date" type="date" value="${esc(old?.date||today)}"></label><label>상태<select id="v47_status"><option ${old?.status==='조치필요'||!old?'selected':''}>조치필요</option><option ${old?.status==='조치완료'?'selected':''}>조치완료</option></select></label><label class="wide">누수 내용<textarea id="v47_content" rows="3">${esc(old?.content||'')}</textarea></label><label class="wide">비고<textarea id="v47_note" rows="2">${esc(old?.note||'')}</textarea></label></div>`:`<div class="jgb-v47-form-grid"><label>방수 작업 위치<input id="v47_location" value="${esc(preset)}" readonly></label><label>작업일자<input id="v47_date" type="date" value="${esc(old?.date||today)}"></label><label>작업구분<select id="v47_method"><option ${old?.method!=='외주'?'selected':''}>자체</option><option ${old?.method==='외주'?'selected':''}>외주</option></select></label><label>외주업체명<input id="v47_vendor" value="${esc(old?.vendor||'')}" placeholder="외주인 경우 입력"></label><label>작업비용<input id="v47_cost" type="number" min="0" value="${esc(old?.cost||0)}"></label><label>계약일<input id="v47_contract" type="date" value="${esc(old?.contract||'')}"></label><label>작업시작일<input id="v47_start" type="date" value="${esc(old?.start||'')}"></label><label>작업완료일<input id="v47_end" type="date" value="${esc(old?.end||'')}"></label><label>작업결과<select id="v47_result"><option ${!old||old?.result==='완료'?'selected':''}>완료</option><option ${old?.result==='보수 후 관찰'?'selected':''}>보수 후 관찰</option><option ${old?.result==='재조치 필요'?'selected':''}>재조치 필요</option></select></label><label>방수 이력<input id="v47_waCode" value="${esc(old?.waCode||jgbV133NextWA())}" readonly title="방수 이력 등록 시 WA 코드가 자동 생성됩니다."><small style="display:block;color:#6d8194;margin-top:4px">WA 코드 자동 생성</small></label><label class="wide">작업내용<textarea id="v47_content" rows="4">${esc(old?.content||'')}</textarea></label><label class="wide">비고<textarea id="v47_note" rows="2">${esc(old?.note||'')}</textarea></label><label class="wide">작업사진<input id="v47_photo" type="file" accept="image/*" multiple></label></div>`;
       const title=type==='leak'?(old?'💧 누수 현황 수정':'💧 누수 등록'):(old?'🛡 방수 이력 수정':'📝 방수공사 이력내역 등록');
       const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box"><div class="jgb-v47-modal-head"><h2>${title}</h2><button type="button" data-v47-action="close-modal">×</button></div>${body}<div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" data-v47-action="save-modal" data-type="${type}" data-id="${esc(old?.id||'')}" data-code="${esc(cardCode||old?.cardCode||'')}">저장</button></div></div>`;document.body.appendChild(modal);
     }
-    async function jgbV47SaveModal(type,id,cardCode){
-      const S=jgbV47Store(),val=k=>document.getElementById(k)?.value?.trim()||'',loc=val('v47_location');
-      if(!loc){alert('작업 위치를 확인하세요.');return}
-      const base={id:String(id||'').trim()||('V47-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),location:loc,date:val('v47_date')||new Date().toISOString().slice(0,10)};
-      if(type==='leak'){
-        const old=S.leaks.find(x=>String(x.id)===String(base.id))||{};
-        const leakCode=jgbV90NormalizeCode(val('v47_leakCode'),'LK-');
-        if(!/^LK-\d+$/.test(leakCode)){alert('누수코드는 LK-01 형식으로 입력하세요.');return}
-        const dup=S.leaks.some(x=>String(x.leakCode||'').toUpperCase()===leakCode && String(x.id)!==String(base.id));
-        if(dup){alert('이미 사용 중인 누수코드입니다. 다른 번호를 입력하세요.');return}
-        Object.assign(base,{leakCode,status:val('v47_status')||'조치필요',content:val('v47_content'),note:val('v47_note'),createdAt:old.createdAt||new Date().toISOString()});
-        S.saveLeaks(id?S.leaks.map(x=>String(x.id)===String(base.id)?base:x):[base,...S.leaks]);
-      }else{
-        const old=S.wp.find(x=>String(x.id)===String(base.id))||{};
-        if(id && !old.id){alert('선택한 방수 이력(WA)을 찾지 못했습니다. 새로 등록하지 않고 저장을 중단합니다.');return}
-        const cards=jgbV90NormalizeWpCards();
-        const cardNow=cards[String(cardCode||'')]||{};
-        /* V89 핵심: 기존 WA 수정은 카드가 아니라 WA 자체의 related(LK)를 최우선으로 사용 */
-        const linkedLK=String(old.related||cardNow.leakCode||'').trim().toUpperCase();
-        if(!/^LK-\d+$/.test(linkedLK)){alert('연결된 LK 누수코드를 확인하세요.');return}
-        const parentLeak=S.leaks.find(x=>String(x.leakCode||'').trim().toUpperCase()===linkedLK)||{};
-        const linkedLocation=String(parentLeak.location||cardNow.location||loc||old.location||'').trim();
-        if(!linkedLocation){alert('연결된 LK의 발생 위치를 확인하세요.');return}
-        let waCode='';
-        const existingWa=String(old?.waCode||'').trim().toUpperCase();
-        const existingMatch=existingWa.match(/^WA-\d+-(\d+)$/);
-        if(existingMatch){
-          waCode=jgbV76WaCodeFor(linkedLK,Number(existingMatch[1]));
-        }else{
-          const nums=S.wp.filter(x=>String(x.related||'').trim().toUpperCase()===linkedLK).map(x=>String(x.waCode||'').match(/^WA-\d+-(\d+)$/)).filter(Boolean).map(m=>Number(m[1]));
-          const nextSeq=(nums.length?Math.max(...nums):0)+1;
-          waCode=jgbV76WaCodeFor(linkedLK,nextSeq);
-        }
-        if(!waCode){alert('WA 이력번호를 만들 수 없습니다. LK 누수코드를 확인하세요.');return}
-        const waDup=S.wp.some(x=>String(x.waCode||'').toUpperCase()===waCode && String(x.id)!==String(base.id));
-        if(waDup){alert('이미 사용 중인 방수이력입니다.');return}
-        Object.assign(base,{waCode,method:val('v47_method')||'자체',vendor:val('v47_vendor'),cost:Number(val('v47_cost'))||0,contract:val('v47_contract'),start:val('v47_start'),end:val('v47_end'),result:val('v47_result')||'조치',related:linkedLK,location:linkedLocation,content:val('v47_content'),note:val('v47_note'),photos:old.photos||[],createdAt:old.createdAt||new Date().toISOString()});
-        // V89: WA 이력에는 cardCode를 저장하지 않는다. LK(related)가 유일한 부모키다.
-        delete base.cardCode;
-        const f=document.getElementById('v47_photo')?.files||[];
-        if(f.length){base.photos=[];for(const file of [...f].slice(0,3))base.photos.push(await jgbV47ReadFile(file))}
-        S.saveWp(id?S.wp.map(x=>String(x.id)===String(base.id)?base:x):[base,...S.wp]);
-      }
-      document.getElementById('jgbV47Modal')?.remove();render();
-    }
-
+    async function jgbV47SaveModal(type,id,cardCode){const S=jgbV47Store(),val=k=>document.getElementById(k)?.value?.trim()||'',loc=val('v47_location');if(!loc){alert('작업 위치를 확인하세요.');return}const base={id:id||('V47-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),location:loc,date:val('v47_date')||new Date().toISOString().slice(0,10)};if(type==='leak'){const old=S.leaks.find(x=>String(x.id)===String(base.id))||{};const leakCode=id?jgbV90NormalizeCode(val('v47_leakCode'),'LK-'):jgbV133NextLK();if(!/^LK-\d+$/.test(leakCode)){alert('누수코드는 LK-01 형식으로 입력하세요.');return}const dup=S.leaks.some(x=>String(x.leakCode||'').toUpperCase()===leakCode && String(x.id)!==String(base.id));if(dup){alert('이미 사용 중인 누수코드입니다. 다른 번호를 입력하세요.');return}Object.assign(base,{leakCode,status:val('v47_status')||'조치필요',content:val('v47_content'),note:val('v47_note'),createdAt:old.createdAt||new Date().toISOString()});S.saveLeaks(id?S.leaks.map(x=>String(x.id)===String(base.id)?base:x):[base,...S.leaks])}else{const old=S.wp.find(x=>String(x.id)===String(base.id))||{};const cc=String(cardCode||old.cardCode||'').trim();if(!cc||!wpV72Cards()[cc]){alert('연결할 이력카드를 찾지 못했습니다. 이력카드에서 이력내역 등록을 눌러주세요.');return}const waCode=id?jgbV90NormalizeCode(val('v47_waCode'),'WA-'):jgbV133NextWA();if(!/^WA-\d+$/.test(waCode)){alert('방수이력은 WA-01 형식으로 입력하세요.');return}const waDup=S.wp.some(x=>String(x.waCode||'').toUpperCase()===waCode && String(x.id)!==String(base.id));if(waDup){alert('이미 사용 중인 방수이력입니다. 다른 번호를 입력하세요.');return}Object.assign(base,{cardCode:cc,waCode,method:val('v47_method')||'자체',vendor:val('v47_vendor'),cost:Number(val('v47_cost'))||0,contract:val('v47_contract'),start:val('v47_start'),end:val('v47_end'),result:val('v47_result')||'완료',related:String((wpV72Cards()[cc]?.leakCode)||old.related||'').trim(),content:val('v47_content'),note:val('v47_note'),photos:old.photos||[],createdAt:old.createdAt||new Date().toISOString()});const f=document.getElementById('v47_photo')?.files||[];if(f.length){base.photos=[];for(const file of [...f].slice(0,3))base.photos.push(await jgbV47ReadFile(file))}S.saveWp(id?S.wp.map(x=>String(x.id)===String(base.id)?base:x):[base,...S.wp])}document.getElementById('jgbV47Modal')?.remove();render()}
     function jgbV47ReadFile(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=reject;r.readAsDataURL(file)})}
-    function jgbV47ShowWp(location){const S=jgbV47Store(),hs=S.wp.filter(x=>x.location===location).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))),esc=v=>xEsc(v==null?'':String(v));const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>📍 ${esc(location)} · 방수관리 이력</h2><button type="button" data-v47-action="close-modal">×</button></div><div class="jgb-v47-history">${hs.length?hs.map((x,i)=>`<article><div class="jgb-v47-history-head"><b>이력 ${i+1}</b><span>${esc(x.date)} · ${esc(x.method)}</span></div><div class="jgb-v47-history-grid"><div><small>업체</small><b>${esc(x.method==='외주'?x.vendor:'자체')}</b></div><div><small>비용</small><b>${Number(x.cost||0).toLocaleString()}원</b></div><div><small>결과</small><b>${esc(x.result==='완료'?'조치':x.result)}</b></div><div><small>관련 누수</small><b>${esc(x.related||'-')}</b></div><div class="wide"><small>작업내용</small><b>${esc(x.content||'-')}</b></div></div></article>`).join(''):'<div class="jgb-v47-empty">등록된 이력이 없습니다.</div>'}</div><div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">닫기</button></div></div>`;document.body.appendChild(modal)}
+    function jgbV47ShowWp(location){const S=jgbV47Store(),hs=S.wp.filter(x=>x.location===location).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))),esc=v=>xEsc(v==null?'':String(v));const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>📍 ${esc(location)} · 방수관리 이력</h2><button type="button" data-v47-action="close-modal">×</button></div><div class="jgb-v47-history">${hs.length?hs.map((x,i)=>`<article><div class="jgb-v47-history-head"><b>이력 ${i+1}</b><span>${esc(x.date)} · ${esc(x.method)}</span></div><div class="jgb-v47-history-grid"><div><small>업체</small><b>${esc(x.method==='외주'?x.vendor:'자체')}</b></div><div><small>비용</small><b>${Number(x.cost||0).toLocaleString()}원</b></div><div><small>결과</small><b>${esc(x.result)}</b></div><div><small>관련 누수</small><b>${esc(x.related||'-')}</b></div><div class="wide"><small>작업내용</small><b>${esc(x.content||'-')}</b></div></div></article>`).join(''):'<div class="jgb-v47-empty">등록된 이력이 없습니다.</div>'}</div><div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">닫기</button></div></div>`;document.body.appendChild(modal)}
     function costFor(arr){return arr.reduce((n,x)=>n+(Number(x.cost)||0),0).toLocaleString()}
     function jgbV47Store(){const lk='JGB_V47_LEAKS',wk='JGB_V47_WP_HISTORY';const parse=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(x)?x:[]}catch(e){return []}};const leaks=parse(lk),wp=parse(wk);return {leaks,wp,saveLeaks:v=>localStorage.setItem(lk,JSON.stringify(v)),saveWp:v=>localStorage.setItem(wk,JSON.stringify(v))}}
     if(!document.getElementById('JGB_V72_DELETE_STYLE')){const st=document.createElement('style');st.id='JGB_V72_DELETE_STYLE';st.textContent='.jgb-v66-delete-card{border:0;background:#c0392b;color:#fff;padding:6px 9px;border-radius:5px;font-weight:800;cursor:pointer}.jgb-v66-history-actions{display:flex;gap:6px;margin-left:auto}.jgb-v66-delete-card:hover{filter:brightness(.92)}.jgb-v66-history-actions button[data-v47-action=\"edit-wp\"]{cursor:pointer}';document.head.appendChild(st)}
@@ -5213,7 +4280,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
     setTimeout(jgbV104BindMarkerDrag,0);
     
-    if(!window.__JGB_V47_EVENTS){window.__JGB_V47_EVENTS=true;document.addEventListener('click',function(e){const place=e.target.closest('[data-v47-place]');if(place){e.preventDefault();e.stopPropagation();const input=document.getElementById('v47_location');if(input){input.value=place.getAttribute('data-v47-place')||'';input.focus()}return}const flip=e.target.closest('[data-v134-flip]');if(flip&&!e.target.closest('[data-v104-filter]')){e.preventDefault();e.stopPropagation();flip.classList.toggle('flipped');return}const scan=e.target.closest('#jgbV135ScanBtn');if(scan){e.preventDefault();e.stopPropagation();const panel=document.getElementById('jgbV135ScanPanel'),out=document.getElementById('jgbV135ScanResult');if(panel&&!panel.classList.contains('scanning')){panel.classList.add('scanning');scan.disabled=true;scan.textContent='⟳ 스캔 중...';let n=0;const steps=['상부 → 코트 5 확인','코트 4 확인','코트 3 확인','코트 2 확인','코트 1 확인','하부 → 출입문 주변 확인'];const timer=setInterval(()=>{if(out)out.innerHTML=`스캔 중 · <b>${steps[n]}</b>`;n++;if(n>=steps.length){clearInterval(timer);panel.classList.remove('scanning');scan.disabled=false;scan.textContent='↻ 다시 스캔';if(out)out.innerHTML=`스캔 완료 · 등록된 LK <b>${(Array.isArray(jgbV47Store().leaks)?jgbV47Store().leaks.length:0)}건</b>의 위치를 확인했습니다.`}},420)}return}const b=e.target.closest('[data-v47-action]');if(!b)return;const a=b.getAttribute('data-v47-action'),id=b.getAttribute('data-id'),type=b.getAttribute('data-type'),loc=b.getAttribute('data-location'),code=b.getAttribute('data-code'),isNew=b.getAttribute('data-new')==='1';e.preventDefault();e.stopPropagation();if(window.__JGB_LK_DRAG_SUPPRESS&&(a==='edit-leak'||a==='go-wp-by-leak'))return;
+    if(!window.__JGB_V47_EVENTS){window.__JGB_V47_EVENTS=true;document.addEventListener('click',function(e){const place=e.target.closest('[data-v47-place]');if(place){e.preventDefault();e.stopPropagation();const input=document.getElementById('v47_location');if(input){input.value=place.getAttribute('data-v47-place')||'';input.focus()}return}const b=e.target.closest('[data-v47-action]');if(!b)return;const a=b.getAttribute('data-v47-action'),id=b.getAttribute('data-id'),type=b.getAttribute('data-type'),loc=b.getAttribute('data-location'),code=b.getAttribute('data-code'),isNew=b.getAttribute('data-new')==='1';e.preventDefault();e.stopPropagation();if(window.__JGB_LK_DRAG_SUPPRESS&&(a==='edit-leak'||a==='go-wp-by-leak'))return;
       if(a==='new-leak')return jgbV47OpenModal('leak');
       if(a==='new-wp-card')return jgbV48OpenCardEditor('',true);
       if(a==='new-wp')return code?jgbV47OpenModal('wp',null,code):null;
@@ -5222,8 +4289,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     if(a==='show-wp-by-leak')return jgbV47ShowWpByLeak(b.getAttribute('data-leak')||'');
       if(a==='delete-leak'){if(!confirm('이 누수 현황을 삭제할까요?'))return;const S=jgbV47Store();S.saveLeaks(S.leaks.filter(x=>String(x.id)!==String(id)));return render()}
       if(a==='delete-wp'){if(!id)return;if(!confirm('이 이력내역만 삭제할까요? 이력카드는 그대로 유지됩니다.'))return;const S=jgbV47Store();const exists=S.wp.some(x=>String(x.id)===String(id));if(!exists)return;S.saveWp(S.wp.filter(x=>String(x.id)!==String(id)));return render()}
-      if(a==='delete-wp-card'){if(!code)return;if(!confirm('이 방수공사 이력카드 전체와 그 아래 이력내역을 삭제할까요?'))return;const all=wpV72Cards();const target=all[String(code)];if(!target)return;const lk=String(target?.leakCode||'').trim().toUpperCase();delete all[String(code)];wpV72SaveCards(all);const S=jgbV47Store();if(lk)S.saveWp(S.wp.filter(x=>String(x.related||'').trim().toUpperCase()!==lk));try{localStorage.removeItem('JGB_V72_WP_COLLAPSED_'+code)}catch(e){}return render()}
-      if(a==='edit-wp'){const S=jgbV47Store();const row=S.wp.find(x=>String(x.id)===String(id));if(!row){alert('선택한 방수 이력(WA)을 찾지 못했습니다.');return}const parent=Object.entries(wpV72Cards()).find(([k,c])=>String(c?.leakCode||'').trim().toUpperCase()===String(row.related||'').trim().toUpperCase());return jgbV47OpenModal('wp',id,parent?.[0]||code||'')}
+      if(a==='delete-wp-card'){if(!code)return;if(!confirm('이 방수공사 이력카드 전체와 그 아래 이력내역을 삭제할까요?'))return;const all=wpV72Cards();if(!all[String(code)])return;delete all[String(code)];wpV72SaveCards(all);const S=jgbV47Store();S.saveWp(S.wp.filter(x=>String(x.cardCode||'')!==String(code)));try{localStorage.removeItem('JGB_V72_WP_COLLAPSED_'+code)}catch(e){}return render()}
+      if(a==='edit-wp')return jgbV47OpenModal('wp',id,code);
       if(a==='edit-wp-card')return code?jgbV48OpenCardEditor(code,false):null;
       if(a==='save-wp-card')return jgbV48SaveCard(code,isNew);
       if(a==='toggle-wp-card'){if(!code)return;const k='JGB_V72_WP_COLLAPSED_'+code;try{const now=localStorage.getItem(k)==='1';localStorage.setItem(k,now?'0':'1')}catch(_){}return render()}
@@ -13654,161 +12721,3 @@ window.eamDeleteSelectedAsset=async function(){
 
 </body>
 </html>
-<script id="JGB_V93_WP_CARD_CREATE_FIX">
-(function(){
-  if(window.__JGB_V93_WP_CREATE_FIX)return;
-  window.__JGB_V93_WP_CREATE_FIX=true;
-  function esc(v){return typeof xEsc==='function'?xEsc(v==null?'':String(v)):String(v==null?'':v).replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]))}
-  function getLeaks(){
-    try{
-      const raw=JSON.parse(localStorage.getItem('JGB_V47_LEAKS')||'[]');
-      const arr=Array.isArray(raw)?raw:[]; const seen=new Set();
-      return arr.map(x=>({lk:String(x?.leakCode||x?.lkCode||x?.code||'').trim().toUpperCase(),location:String(x?.location||'').trim()}))
-        .filter(x=>/^LK-\d+$/.test(x.lk)&&!seen.has(x.lk)&&seen.add(x.lk))
-        .sort((a,b)=>a.lk.localeCompare(b.lk,undefined,{numeric:true}));
-    }catch(e){return []}
-  }
-  function openCreate(){
-    const leaks=getLeaks();
-    const oldCards=(()=>{try{return JSON.parse(localStorage.getItem('JGB_V72_WP_CARDS')||'{}')||{}}catch(e){return {}}})();
-    const existing=new Set(Object.values(oldCards).map(x=>String(x?.leakCode||'').trim().toUpperCase()));
-    const options=leaks.map(x=>`<option value="${esc(x.lk)}" data-location="${esc(x.location)}">${esc(x.lk)} · ${esc(x.location||'위치 미등록')}</option>`).join('');
-    const modal=document.createElement('div');
-    modal.id='jgbV47Modal'; modal.className='jgb-v47-modal';
-    modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>📋 방수공사 이력카드 등록</h2><button type="button" data-v47-action="close-modal">×</button></div>
-      <div class="jgb-v47-form-grid">
-        <label>연결 누수코드(LK)<select id="v93_lk">${options||'<option value="">등록된 누수코드가 없습니다</option>'}</select><small>누수관리에서 등록된 LK-01 등의 누수코드를 선택합니다.</small></label>
-        <label>시설명<input id="v93_facility" value="장군봉체육관"></label>
-        <label>방수 위치<input id="v93_location" readonly value="${esc(leaks[0]?.location||'')}"></label>
-        <label>건물·구역<input id="v93_area"></label>
-        <label>주요 방수부위<input id="v93_part"></label>
-        <label>방수공사 종류<input id="v93_kind" value="방수 보수·보강"></label>
-        <label>방수 면적<input id="v93_areaSize"></label>
-        <label>최초 방수일<input id="v93_firstDate" type="date"></label>
-        <label>현재 상태<select id="v93_status"><option>정상</option><option>점검필요</option><option>보수필요</option></select></label>
-        <label>담당자<input id="v93_manager"></label>
-        <label>연락처<input id="v93_contact"></label>
-        <label>시공업체<input id="v93_contractor"></label>
-        <label>보증기간<input id="v93_warranty"></label>
-        <label>공사 목적<input id="v93_purpose" value="시설물 보호 및 누수 예방"></label>
-        <label>주요 공법<input id="v93_method"></label>
-        <label>사용 자재<input id="v93_material"></label>
-        <label>공사 범위<input id="v93_scope"></label>
-        <label class="wide">특이사항<textarea id="v93_note" rows="3"></textarea></label>
-      </div>
-      <div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" id="v93_save_card">저장</button></div></div>`;
-    document.body.appendChild(modal);
-    const sel=modal.querySelector('#v93_lk'), loc=modal.querySelector('#v93_location');
-    if(sel)sel.addEventListener('change',()=>{const o=sel.options[sel.selectedIndex];if(loc)loc.value=o?.dataset?.location||''});
-    const save=modal.querySelector('#v93_save_card');
-    save?.addEventListener('click',()=>{
-      const lk=String(sel?.value||'').trim().toUpperCase();
-      if(!/^LK-\d+$/.test(lk)){alert('연결 누수코드(LK)를 선택하세요.');return}
-      const leak=leaks.find(x=>x.lk===lk)||{}; const location=String(leak.location||loc?.value||'').trim();
-      if(!location){alert('선택한 LK에 발생 위치가 없습니다. 누수관리에서 위치를 먼저 등록하세요.');return}
-      if(existing.has(lk)){alert('이 LK에는 이미 방수 이력카드가 있습니다. 기존 카드를 사용하세요.');return}
-      const code='CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
-      const val=id=>modal.querySelector('#'+id)?.value?.trim()||'';
-      const card={code,leakCode:lk,location,facility:val('v93_facility')||'장군봉체육관',area:val('v93_area'),part:val('v93_part')||location,kind:val('v93_kind')||'방수 보수·보강',areaSize:val('v93_areaSize'),firstDate:val('v93_firstDate'),status:val('v93_status')||'정상',manager:val('v93_manager'),contact:val('v93_contact'),contractor:val('v93_contractor'),warranty:val('v93_warranty'),purpose:val('v93_purpose')||'시설물 보호 및 누수 예방',method:val('v93_method'),material:val('v93_material'),scope:val('v93_scope'),note:val('v93_note'),photos:[]};
-      const all={...oldCards,[code]:card}; localStorage.setItem('JGB_V72_WP_CARDS',JSON.stringify(all));
-      modal.remove(); if(typeof render==='function')render();
-    });
-  }
-  document.addEventListener('click',function(e){
-    const b=e.target.closest('[data-v47-action="new-wp-card"]');
-    if(!b)return;
-    e.preventDefault(); e.stopImmediatePropagation(); openCreate();
-  },true);
-})();
-</script>
-
-
-<!-- JGB EAM V9: 누수 수리 LIVE 화면 오버라이드 -->
-<script>
-(function(){
-  if(document.getElementById('JGB_V9_LIVE_LEAK_STYLE')) return;
-  const st=document.createElement('style');
-  st.id='JGB_V9_LIVE_LEAK_STYLE';
-  st.textContent=`
-  .jgb-v9-live-wrap{width:min(1540px,calc(100vw - 34px));margin:0 auto;padding:10px 0 30px;color:#17334d}
-  .jgb-v9-head{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:14px;padding:16px 18px;background:#fff;border:1px solid #cbd9e6;border-radius:15px;box-shadow:0 4px 14px rgba(20,50,80,.06)}
-  .jgb-v9-title{display:flex;align-items:center;gap:12px}.jgb-v9-title .drop{width:44px;height:44px;border-radius:12px;background:#e9f7ff;display:grid;place-items:center;font-size:25px}.jgb-v9-title h1{margin:0;font-size:25px}.jgb-v9-title p{margin:4px 0 0;color:#71869a;font-size:11px}
-  .jgb-v9-live-pill{display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:999px;background:#fff0ef;color:#d13e37;border:1px solid #ffc6c2;font-size:12px;font-weight:950}.jgb-v9-live-dot{width:8px;height:8px;border-radius:50%;background:#ef4c43;box-shadow:0 0 0 5px rgba(239,76,67,.12);animation:jgbv9pulse 1.2s infinite}@keyframes jgbv9pulse{50%{opacity:.35;transform:scale(.8)}}
-  .jgb-v9-grid{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(360px,.78fr);gap:14px;align-items:stretch}
-  .jgb-v9-card{background:#fff;border:1px solid #cbd9e6;border-radius:15px;box-shadow:0 4px 14px rgba(20,50,80,.06);overflow:hidden}
-  .jgb-v9-map-card{padding:16px}.jgb-v9-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:11px}.jgb-v9-card-head h2{margin:0;font-size:19px}.jgb-v9-card-head p{margin:4px 0 0;color:#71869a;font-size:11px}
-  .jgb-v9-map{position:relative;height:520px;border:2px solid #536f87;background:#fff;border-radius:11px;overflow:hidden;padding:40px 26px 40px;box-sizing:border-box}
-  .jgb-v9-map:before{content:"";position:absolute;left:7%;right:7%;top:15%;bottom:15%;border:1px solid #e1e9f0;pointer-events:none}
-  .jgb-v9-top,.jgb-v9-bottom{position:absolute;left:0;right:0;text-align:center;font-weight:900;font-size:12px;color:#29465d}.jgb-v9-top{top:10px}.jgb-v9-bottom{bottom:10px}.jgb-v9-side{position:absolute;top:50%;writing-mode:vertical-rl;transform:translateY(-50%);font-size:11px;font-weight:900;color:#29465d}.jgb-v9-left{left:7px}.jgb-v9-right{right:7px}
-  .jgb-v9-courts{position:absolute;left:7%;right:7%;top:17%;bottom:17%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:15px}.jgb-v9-court{position:relative;border:2px solid #536f87;background:linear-gradient(180deg,#fff,#fbfdff);display:flex;align-items:center;justify-content:center}.jgb-v9-court:before{content:"";position:absolute;left:-2px;right:-2px;top:50%;border-top:2px solid #536f87}.jgb-v9-court b{font-size:23px;color:#2f4d68;z-index:2}.jgb-v9-entrance{position:absolute;left:79%;bottom:0;width:9%;height:30px;border-left:2px solid #536f87;border-right:2px solid #536f87;background:#fff;display:grid;place-items:center;font-size:9px;font-weight:900;z-index:3}.jgb-v9-entrance:before{content:"";position:absolute;left:50%;bottom:28px;width:34px;height:34px;border-left:2px solid #536f87;border-bottom:2px solid #536f87;border-radius:0 0 0 34px;transform:translateX(-2px)}
-  .jgb-v9-marker{position:absolute;z-index:8;transform:translate(-50%,-50%);border:0;background:transparent;padding:0;cursor:pointer}.jgb-v9-marker .ring{width:54px;height:54px;border-radius:50%;border:3px solid currentColor;display:grid;place-items:center;background:rgba(255,255,255,.95);box-shadow:0 0 0 7px rgba(239,76,67,.08)}.jgb-v9-marker .ring:after{content:"";position:absolute;width:86px;height:86px;border:2px solid currentColor;border-radius:50%;opacity:.22;animation:jgbv9radar 1.8s infinite}.jgb-v9-marker span{display:block;margin-top:5px;padding:4px 8px;border-radius:999px;background:#fff;border:1px solid currentColor;box-shadow:0 3px 9px rgba(20,50,80,.14);font-size:10px;font-weight:950;white-space:nowrap}@keyframes jgbv9radar{0%{transform:scale(.45);opacity:.75}100%{transform:scale(1.2);opacity:0}}
-  .jgb-v9-marker.open{color:#e64c45}.jgb-v9-marker.progress{color:#ed9a20}.jgb-v9-marker.done{color:#2aa56f}.jgb-v9-marker.selected .ring{box-shadow:0 0 0 7px rgba(34,126,218,.14),0 0 20px rgba(34,126,218,.25)}
-  .jgb-v9-legend{display:flex;gap:10px;align-items:center;font-size:10px;color:#667d91;white-space:nowrap}.jgb-v9-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}.jgb-v9-legend .r{background:#e64c45}.jgb-v9-legend .o{background:#ed9a20}.jgb-v9-legend .g{background:#2aa56f}
-  .jgb-v9-live-card{display:flex;flex-direction:column}.jgb-v9-live-head{padding:15px 16px;background:linear-gradient(135deg,#f05a52,#e63f3b);color:#fff;display:flex;justify-content:space-between;align-items:center}.jgb-v9-live-head h2{margin:0;font-size:20px}.jgb-v9-live-head small{font-size:10px;opacity:.9}.jgb-v9-live-body{padding:14px 15px;flex:1}.jgb-v9-current{padding:13px;border:1px solid #ffd2cf;background:#fff6f5;border-radius:12px;margin-bottom:13px}.jgb-v9-current-top{display:flex;justify-content:space-between;gap:10px}.jgb-v9-current b{font-size:19px}.jgb-v9-badge{padding:5px 8px;border-radius:999px;background:#ef514a;color:#fff;font-size:10px;font-weight:950;white-space:nowrap}.jgb-v9-current p{margin:5px 0 0;font-size:12px;color:#566f84}.jgb-v9-timeline{position:relative;margin:8px 0 15px;padding-left:26px}.jgb-v9-timeline:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:#dce6ee}.jgb-v9-event{position:relative;display:grid;grid-template-columns:45px 1fr;gap:7px;margin:0 0 13px}.jgb-v9-event:before{content:"";position:absolute;left:-22px;top:4px;width:9px;height:9px;border-radius:50%;background:#2c82d7;box-shadow:0 0 0 4px #eaf3fb}.jgb-v9-event:last-child:before{background:#ed9a20;box-shadow:0 0 0 4px #fff2dd}.jgb-v9-event time{font-size:10px;color:#8798a8}.jgb-v9-event b{display:block;font-size:11px}.jgb-v9-event span{display:block;font-size:10px;color:#71869a;margin-top:2px}.jgb-v9-info{border-top:1px solid #e1e9f0;padding-top:12px}.jgb-v9-info-row{display:grid;grid-template-columns:75px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #eef2f5;font-size:11px}.jgb-v9-info-row:last-child{border-bottom:0}.jgb-v9-info-row strong{color:#71869a}.jgb-v9-info-row b{color:#203c57}.jgb-v9-feed{border-top:1px solid #e1e9f0;margin-top:12px;padding-top:12px}.jgb-v9-feed-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.jgb-v9-feed-title b{font-size:13px}.jgb-v9-feed-title span{font-size:10px;color:#e64c45;font-weight:900}.jgb-v9-feed-list{display:grid;gap:7px;max-height:170px;overflow:auto}.jgb-v9-feed-item{display:grid;grid-template-columns:45px 1fr auto;gap:7px;align-items:center;padding:8px;border:1px solid #e1e9f0;border-radius:9px;background:#fbfdff;cursor:pointer}.jgb-v9-feed-item:hover{border-color:#8db9df;background:#f5faff}.jgb-v9-feed-item time{font-size:10px;color:#8a9aaa}.jgb-v9-feed-item b{font-size:10px}.jgb-v9-feed-item small{display:block;color:#71869a;font-size:9px;margin-top:2px}.jgb-v9-mini-badge{font-size:9px;font-weight:900;padding:4px 6px;border-radius:999px}.jgb-v9-mini-badge.wait{background:#fff0ee;color:#d23e35}.jgb-v9-mini-badge.run{background:#fff5df;color:#bd7000}.jgb-v9-mini-badge.done{background:#eaf8f0;color:#237d54}
-  @media(max-width:1050px){.jgb-v9-grid{grid-template-columns:1fr}.jgb-v9-map{height:470px}.jgb-v9-live-card{min-height:620px}}@media(max-width:700px){.jgb-v9-live-wrap{width:calc(100vw - 18px)}.jgb-v9-head{align-items:flex-start;flex-direction:column}.jgb-v9-map{height:390px;padding-left:18px;padding-right:18px}.jgb-v9-courts{gap:7px;left:5%;right:5%}.jgb-v9-marker .ring{width:42px;height:42px}.jgb-v9-marker .ring:after{width:66px;height:66px}.jgb-v9-marker span{font-size:8px}.jgb-v9-side{font-size:9px}}
-  `;
-  document.head.appendChild(st);
-
-  const esc=v=>xEsc(v==null?'':String(v));
-  const statusOfIssue=x=>x?.status==='조치중'?'progress':x?.status==='완료'?'done':'open';
-  const statusText=x=>x?.status==='조치중'?'수리 진행 중':x?.status==='완료'?'수리 완료':'접수 대기';
-  const timeSafe=v=>v?new Date(v).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}):'-';
-  const clean=v=>typeof cleanWorkContent==='function'?cleanWorkContent(v):String(v?.content||'').replace(/\[\[[^\]]+\]\]/g,'').trim();
-  const courtNo=loc=>{const m=String(loc||'').match(/(?:코트\s*([1-5])|([1-5])\s*번\s*코트)/i);return m?Number(m[1]||m[2]):0};
-  const courtX={1:85,2:68,3:50,4:32,5:15};
-  const findIssue=(leak,issues)=>{const lk=String(leak?.leakCode||'').toUpperCase();const loc=String(leak?.location||'').trim();return issues.find(i=>String(i?.content||'').toUpperCase().includes(lk))||issues.find(i=>String(i?.place||'').trim()===loc)||issues.find(i=>loc&&String(i?.place||'').includes(loc)||String(i?.place||'')&&loc.includes(String(i.place||'')));};
-
-  window.leakagePage=function(){
-    const S=jgbV47Store();
-    const leaks=Array.isArray(S.leaks)?S.leaks:[];
-    const issues=Array.isArray(db?.issues)?db.issues:[];
-    const active=issues.filter(x=>x.status!=='완료').sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
-    const recentDone=issues.filter(x=>x.status==='완료').sort((a,b)=>new Date(b.completedAt||b.createdAt||0)-new Date(a.completedAt||a.createdAt||0));
-    const live=[...active,...recentDone].slice(0,8);
-    let selectedId=window.__JGB_LIVE_SELECTED_ID||active[0]?.id||live[0]?.id||'';
-    let selected=issues.find(x=>String(x.id)===String(selectedId))||active[0]||recentDone[0]||null;
-    const selectedLeak=selected?leaks.find(l=>String(selected.content||'').toUpperCase().includes(String(l.leakCode||'').toUpperCase())||String(l.location||'')===String(selected.place||'')):null;
-    const markers=leaks.map((l,i)=>{
-      const n=courtNo(l.location);let x=n?courtX[n]:50;let y=50;if(!n)y=28+(i%4)*16;
-      const issue=findIssue(l,issues);const cls=issue?statusOfIssue(issue):(typeof resultForLeak==='function'?(resultForLeak(l)==='조치'?'done':resultForLeak(l)==='보수 후 관찰'?'progress':'open'):'open');
-      const selectedCls=issue&&selected&&String(issue.id)===String(selected.id)?' selected':'';
-      return `<button type="button" class="jgb-v9-marker ${cls}${selectedCls}" style="left:${Number(l.mapX)||x}%;top:${Number(l.mapY)||y}%" data-live-id="${esc(issue?.id||'')}" title="${esc(l.leakCode||'')} · ${esc(l.location||'')}"><i class="ring">${cls==='done'?'✓':'💧'}</i><span>${esc(l.leakCode||'LK')}</span></button>`;
-    }).join('');
-    const timeline=selected?[
-      [selected.createdAt,'접수되었습니다.',selected.place||''],
-      selected.handlerName?[selected.startedAt||selected.createdAt,'담당자 배정',selected.handlerName]:null,
-      selected.startedAt?[selected.startedAt,'현장 작업 시작',selected.place||'']:null,
-      selected.status==='조치중'?[new Date().toISOString(),'수리 진행 중','현재 작업 처리 중']:null,
-      selected.status==='완료'?[selected.completedAt,'수리 완료','조치가 완료되었습니다.']:null
-    ].filter(Boolean).map(v=>`<div class="jgb-v9-event"><time>${timeSafe(v[0])}</time><div><b>${esc(v[1])}</b><span>${esc(v[2])}</span></div></div>`).join(''):'<div class="jgb-v9-event"><time>--:--</time><div><b>현재 수리 작업 없음</b><span>새 접수가 들어오면 이곳에 즉시 표시됩니다.</span></div></div>';
-    const feed=live.map(x=>`<button type="button" class="jgb-v9-feed-item" data-live-id="${esc(x.id)}"><time>${timeSafe(x.createdAt)}</time><div><b>${esc(x.place||'장소 미기록')}</b><small>${esc(clean(x)||'접수 내용 없음')}</small></div><span class="jgb-v9-mini-badge ${statusOfIssue(x)==='progress'?'run':statusOfIssue(x)==='done'?'done':'wait'}">${esc(statusText(x).replace('수리 ',''))}</span></button>`).join('')||'<div class="jgb-v9-feed-item"><div style="grid-column:1/-1;text-align:center;color:#71869a;padding:14px">현재 수리 이력이 없습니다.</div></div>';
-    const total=issues.filter(x=>x.status!=='완료').length, running=issues.filter(x=>x.status==='조치중').length, waiting=issues.filter(x=>x.status!=='완료'&&!x.handlerId).length, doneToday=issues.filter(x=>x.status==='완료'&&String(x.completedAt||'').slice(0,10)===new Date().toISOString().slice(0,10)).length;
-    return `<div class="jgb-v9-live-wrap">
-      <header class="jgb-v9-head"><div class="jgb-v9-title"><div class="drop">💧</div><div><h1>누수 수리 LIVE</h1><p>장군봉 배드민턴장 · 5개 코트 배치도 기준 실시간 수리 관제</p></div></div><div class="jgb-v9-live-pill"><i class="jgb-v9-live-dot"></i> REAL-TIME LIVE</div></header>
-      <div class="jgb-v9-grid">
-        <section class="jgb-v9-card jgb-v9-map-card"><div class="jgb-v9-card-head"><div><h2>🗺 누수 위치 현황</h2><p>현재 등록된 LK 위치와 수리 상태가 실시간으로 표시됩니다.</p></div><div class="jgb-v9-legend"><span><i class="r"></i>접수</span><span><i class="o"></i>작업중</span><span><i class="g"></i>완료</span></div></div>
-          <div class="jgb-v9-map"><div class="jgb-v9-top">상부 배관</div><div class="jgb-v9-side jgb-v9-left">좌측 외곽</div><div class="jgb-v9-side jgb-v9-right">우측 외곽</div><div class="jgb-v9-bottom">하부 배관</div><div class="jgb-v9-courts">${[5,4,3,2,1].map(n=>`<div class="jgb-v9-court"><b>${n}번<br>코트</b></div>`).join('')}</div><div class="jgb-v9-entrance">출입문</div>${markers||'<div style="position:absolute;inset:0;display:grid;place-items:center;color:#8a9aaa;font-size:12px">등록된 누수 위치가 없습니다.</div>'}</div>
-        </section>
-        <section class="jgb-v9-card jgb-v9-live-card"><div class="jgb-v9-live-head"><h2>📡 수리 LIVE</h2><small>실시간으로 업데이트 됩니다.</small></div><div class="jgb-v9-live-body">
-          ${selected?`<div class="jgb-v9-current"><div class="jgb-v9-current-top"><b>${esc(selectedLeak?.leakCode||selected.assetCode||'시설 수리')} ${selectedLeak?'누수':''}</b><span class="jgb-v9-badge">${esc(statusText(selected))}</span></div><p>${esc(selected.place||'장소 미기록')} · ${esc(clean(selected)||'접수 내용 없음')}</p></div>`:''}
-          <div class="jgb-v9-timeline">${timeline}</div>
-          ${selected?`<div class="jgb-v9-info"><div class="jgb-v9-info-row"><strong>접수시간</strong><b>${esc(timeSafe(selected.createdAt))}</b></div><div class="jgb-v9-info-row"><strong>요청장소</strong><b>${esc(selected.place||'-')}</b></div><div class="jgb-v9-info-row"><strong>담당자</strong><b>${esc(selected.handlerName||'미지정')}</b></div><div class="jgb-v9-info-row"><strong>내용</strong><b>${esc(clean(selected)||'-')}</b></div></div>`:''}
-          <div class="jgb-v9-feed"><div class="jgb-v9-feed-title"><b>최근 수리 LIVE</b><span>● ${active.length}건 진행</span></div><div class="jgb-v9-feed-list">${feed}</div></div>
-        </div></section>
-      </div>
-    </div>`;
-  };
-
-  document.addEventListener('click',function(e){
-    const b=e.target.closest('[data-live-id]');
-    if(!b)return;
-    const id=b.getAttribute('data-live-id');
-    if(!id)return;
-    window.__JGB_LIVE_SELECTED_ID=id;
-    if(typeof render==='function')render();
-  },true);
-
-  setTimeout(function(){if(typeof render==='function')render()},0);
-})();
-
-</script>
