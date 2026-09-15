@@ -2509,35 +2509,31 @@ html::before,body::before{
 .jgb-v189-live-notebook.jgb-v26-open .jgb-v190-cover-image:after{display:none!important;}
 .jgb-v28-close{display:flex!important;align-items:center!important;justify-content:center!important;}
 </style>
-<script id="JGB_V29_NOTEBOOK_CLOSE_ONLY_JS">
+
+<style id="JGB_V32_NOTEBOOK_CLOSE_FINAL">
+/* v32: F5/새로고침 감지·강제 초기화 기능 제거. X 닫기 시 표지 상태로만 복귀 */
+.jgb-v189-live-notebook.jgb-v26-open .jgb-v28-close,
+.jgb-v189-live-notebook.jgb-v26-open .jgb-v24-close{display:flex!important;align-items:center!important;justify-content:center!important;}
+</style>
+<script id="JGB_V32_NOTEBOOK_CLOSE_FINAL_JS">
 (function(){
- function init(){
-  const book=document.querySelector('.jgb-v189-live-notebook');
-  if(!book || book.dataset.v29Ready==='1') return;
-  book.dataset.v29Ready='1';
-  /* 확대 상태에서는 표지 클릭이 기존 토글 이벤트로 전달되지 않게 차단 */
-  book.addEventListener('click',function(e){
-   if(!book.classList.contains('jgb-v26-open')) return;
-   if(e.target.closest('.jgb-v188-cover')){
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-   }
-  },true);
-  /* X는 항상 확대 상태를 닫는 전용 버튼 */
-  book.addEventListener('click',function(e){
-   const btn=e.target.closest('.jgb-v28-close,.jgb-v26-close,.jgb-v24-close');
-   if(!btn || !book.classList.contains('jgb-v26-open')) return;
-   e.preventDefault();
-   e.stopPropagation();
-   book.classList.remove('jgb-v26-open','jgb-v24-book-open');
-   document.body.classList.remove('jgb-v24-book-lock');
-   document.body.style.overflow='';
-   btn.hidden=true;
-   btn.style.display='none';
-  },true);
- }
- if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+  function init(){
+    const book=document.querySelector('.jgb-v189-live-notebook');
+    if(!book || book.dataset.v32Ready==='1') return;
+    book.dataset.v32Ready='1';
+    const close=book.querySelector('.jgb-v28-close,.jgb-v26-close,.jgb-v24-close');
+    if(!close) return;
+    close.addEventListener('click',function(e){
+      e.preventDefault(); e.stopPropagation();
+      book.classList.remove('jgb-v26-open','jgb-v24-book-open');
+      document.body.classList.remove('jgb-v24-book-lock');
+      document.body.style.overflow='';
+      close.style.display='none';
+      close.hidden=true;
+    },true);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
 })();
 </script>
 </head><body><div id="app"></div>
@@ -13553,7 +13549,15 @@ body.jgb-v24-book-lock{overflow:hidden!important;}
 .jgb-nb30-open .jgb-nb30-head{padding:0 4px 12px}.jgb-nb30-open .jgb-nb30-head b{font-size:16px}.jgb-nb30-open .jgb-nb30-head span{font-size:11px}
 .jgb-nb30-open .jgb-nb30-cover-wrap{height:calc(100% - 38px);grid-template-columns:310px minmax(0,1fr)}
 .jgb-nb30-open .jgb-nb30-cover{border-radius:14px 4px 4px 14px}.jgb-nb30-open .jgb-nb30-hint{font-size:12px;bottom:16px}.jgb-nb30-open .jgb-nb30-page{padding:64px 76px 70px}.jgb-nb30-open .jgb-nb30-page h3{font-size:30px;margin-bottom:18px}.jgb-nb30-open .jgb-nb30-page p{font-size:14px;line-height:1.9}.jgb-nb30-open .jgb-nb30-tip{font-size:12px;padding:11px 13px}.jgb-nb30-open .jgb-nb30-tab{font-size:10px;padding:7px 10px}.jgb-nb30-close{display:none;border:0;border-radius:50%;width:38px;height:38px;background:#fff;color:#173b55;font-size:24px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.12)}
-.jgb-nb30-open .jgb-nb30-close{display:block;position:absolute;right:16px;top:14px;z-index:20}
+.jgb-nb30-open .jgb-nb30-close{display:block;position:absolute;right:14px;top:10px;z-index:100;width:40px;height:40px}
+.jgb-nb30-open .jgb-nb30-tabs{top:62px!important;right:0!important;z-index:30!important}
+.jgb-nb30-extra{position:relative;z-index:8;margin-top:16px;padding:10px 12px;border:1px dashed #c7d5df;border-radius:9px;background:rgba(255,255,255,.72);color:#526f83;font-size:11px;line-height:1.4}
+.jgb-nb30-extra b{display:block;margin-bottom:6px;color:#1d587e;font-size:12px}
+.jgb-nb30-extra textarea{display:block;width:100%;min-height:68px;box-sizing:border-box;resize:vertical;border:1px solid #cbdde9;border-radius:7px;background:#fffdf8;padding:8px 9px;color:#314f63;font:inherit;outline:none}
+.jgb-nb30-extra textarea:focus{border-color:#2b82c8;box-shadow:0 0 0 2px rgba(43,130,200,.10)}
+.jgb-nb30-open .jgb-nb30-extra{margin-top:22px;padding:13px 15px;font-size:13px}
+.jgb-nb30-open .jgb-nb30-extra b{font-size:14px}
+.jgb-nb30-open .jgb-nb30-extra textarea{min-height:105px;font-size:13px}
 @media(max-width:700px){.jgb-nb30-cover-wrap{grid-template-columns:105px minmax(0,1fr);height:230px}.jgb-nb30-open{width:94vw!important;height:86vh!important}.jgb-nb30-open .jgb-nb30-cover-wrap{grid-template-columns:125px minmax(0,1fr)}.jgb-nb30-open .jgb-nb30-page{padding:48px 28px 60px}.jgb-nb30-open .jgb-nb30-page h3{font-size:21px}.jgb-nb30-open .jgb-nb30-page p{font-size:11px}}
 </style>
 
@@ -13579,30 +13583,36 @@ body.jgb-v24-book-lock{overflow:hidden!important;}
           <div class="jgb-nb30-lines"></div>
           <div class="jgb-nb30-tabs"></div>
           <h3></h3><p></p><div class="jgb-nb30-tip"></div>
+          <div class="jgb-nb30-extra"><b>📝 추가 기록</b><textarea class="jgb-nb30-extra-input" placeholder="이 페이지와 관련해 추가로 기록할 내용을 입력하세요."></textarea></div>
           <button class="jgb-nb30-pageclick" type="button" aria-label="다음 페이지"></button>
           <div class="jgb-nb30-bottom"><button class="jgb-nb30-arrow prev" type="button" aria-label="이전 페이지">‹</button><button class="jgb-nb30-arrow next" type="button" aria-label="다음 페이지">›</button></div>
         </div>
         <button class="jgb-nb30-close" type="button" aria-label="수첩 닫기">×</button>
       </div>`;
     const cover=host.querySelector('.jgb-nb30-cover'), wrap=host.querySelector('.jgb-nb30-cover-wrap'), page=host.querySelector('.jgb-nb30-page');
-    const title=host.querySelector('h3'), text=host.querySelector('p'), tip=host.querySelector('.jgb-nb30-tip'), tabs=host.querySelector('.jgb-nb30-tabs');
+    const title=host.querySelector('h3'), text=host.querySelector('p'), tip=host.querySelector('.jgb-nb30-tip'), tabs=host.querySelector('.jgb-nb30-tabs'), extra=host.querySelector('.jgb-nb30-extra-input');
+    const noteKey='jgb_nb30_extra_notes';
+    function getNotes(){try{return JSON.parse(localStorage.getItem(noteKey)||'{}')}catch(e){return {}}}
+    function saveNote(){const notes=getNotes();notes[index]=extra.value;try{localStorage.setItem(noteKey,JSON.stringify(notes))}catch(e){}}
     const prev=host.querySelector('.prev'), next=host.querySelector('.next'), close=host.querySelector('.jgb-nb30-close'), pageClick=host.querySelector('.jgb-nb30-pageclick');
     let index=0;
     function render(){
       title.textContent=pages[index][0]; text.textContent=pages[index][1]; tip.textContent=pages[index][2];
+      const notes=getNotes(); extra.value=notes[index]||'';
       tabs.innerHTML=pages.map((p,i)=>`<button class="jgb-nb30-tab ${i===index?'active':''}" type="button" data-i="${i}">${esc(p[0])}</button>`).join('');
-      tabs.querySelectorAll('.jgb-nb30-tab').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();index=Number(b.dataset.i);render();}));
+      tabs.querySelectorAll('.jgb-nb30-tab').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();saveNote();index=Number(b.dataset.i);render();}));
+      extra.oninput=saveNote; extra.onclick=e=>e.stopPropagation(); extra.onkeydown=e=>e.stopPropagation();
       prev.disabled=index===0; next.disabled=index===pages.length-1;
       prev.style.opacity=prev.disabled?.45:1; next.style.opacity=next.disabled?.45:1;
     }
     function open(){host.classList.add('jgb-nb30-open'); index=0; render(); document.body.style.overflow='hidden'; close.focus();}
-    function shut(){host.classList.remove('jgb-nb30-open'); document.body.style.overflow=''; cover.focus();}
+    function shut(){saveNote();host.classList.remove('jgb-nb30-open'); document.body.style.overflow=''; cover.focus();}
     function goNext(){if(index<pages.length-1){index++;render();}}
     function goPrev(){if(index>0){index--;render();}}
     cover.addEventListener('click',open);
     close.addEventListener('click',shut);
-    next.addEventListener('click',e=>{e.stopPropagation();goNext();}); prev.addEventListener('click',e=>{e.stopPropagation();goPrev();});
-    pageClick.addEventListener('click',e=>{e.stopPropagation();goNext();});
+    next.addEventListener('click',e=>{e.stopPropagation();saveNote();goNext();}); prev.addEventListener('click',e=>{e.stopPropagation();saveNote();goPrev();});
+    pageClick.addEventListener('click',e=>{e.stopPropagation();saveNote();goNext();});
     page.addEventListener('click',e=>{if(e.target===page)goNext();});
     host.addEventListener('keydown',e=>{if(!host.classList.contains('jgb-nb30-open'))return;if(e.key==='Escape'){e.preventDefault();shut();}else if(e.key==='ArrowRight'){e.preventDefault();goNext();}else if(e.key==='ArrowLeft'){e.preventDefault();goPrev();}});
     render();
@@ -13620,7 +13630,23 @@ body.jgb-v24-book-lock{overflow:hidden!important;}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
-</script></body>
+</script><style id="JGB_NOTEBOOK_V31_FIX">
+/* v31: X 버튼과 인덱스 탭을 완전히 분리 + 추가 기록 */
+.jgb-nb30-open .jgb-nb30-close{right:14px!important;top:10px!important;z-index:100!important;width:40px!important;height:40px!important}
+.jgb-nb30-open .jgb-nb30-tabs{top:62px!important;right:0!important;z-index:30!important}
+.jgb-nb30-extra{position:relative;z-index:8;margin-top:16px;padding:10px 12px;border:1px dashed #c7d5df;border-radius:9px;background:rgba(255,255,255,.72);color:#526f83;font-size:11px;line-height:1.4}
+.jgb-nb30-extra b{display:block;margin-bottom:6px;color:#1d587e;font-size:12px}
+.jgb-nb30-extra textarea{display:block;width:100%;min-height:68px;box-sizing:border-box;resize:vertical;border:1px solid #cbdde9;border-radius:7px;background:#fffdf8;padding:8px 9px;color:#314f63;font:inherit;outline:none}
+.jgb-nb30-extra textarea:focus{border-color:#2b82c8;box-shadow:0 0 0 2px rgba(43,130,200,.10)}
+.jgb-nb30-open .jgb-nb30-extra{margin-top:22px;padding:13px 15px;font-size:13px}
+.jgb-nb30-open .jgb-nb30-extra b{font-size:14px}
+.jgb-nb30-open .jgb-nb30-extra textarea{min-height:105px;font-size:13px}
+</style>
+<script id="JGB_NOTEBOOK_V31_INIT">
+/* v31: 새로고침 시 확대 상태가 남지 않도록 강제 초기화 */
+(function(){function reset(){document.querySelectorAll('.jgb-nb30-host').forEach(b=>{b.classList.remove('jgb-nb30-open');});document.body.style.overflow='';} if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',reset,{once:true});else reset();window.addEventListener('pageshow',reset);})();
+</script>
+</body>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
 .jgb-v176-live-card .jgb-v178-live-table{
@@ -13845,19 +13871,4 @@ body.jgb-v24-book-lock{overflow:hidden!important;}
  .jgb-v189-live-notebook.jgb-v26-open .jgb-v188-tabs{display:flex!important;}
 }
 </style>
-<script id="JGB_V27_NOTEBOOK_RESET">
-(function(){
-  /* F5/새로고침 후에는 수첩이 반드시 닫힌 상태로 시작 */
-  function resetNotebook(){
-    const book=document.querySelector('.jgb-v189-live-notebook');
-    if(!book)return;
-    book.classList.remove('jgb-v24-book-open','jgb-v26-open');
-    document.body.classList.remove('jgb-v24-book-lock');
-    document.body.style.overflow='';
-    const close=book.querySelector('.jgb-v26-close,.jgb-v24-close');
-    if(close){close.hidden=true;close.style.display='none';}
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',resetNotebook);else resetNotebook();
-  window.addEventListener('pageshow',resetNotebook);
-})();
-</script>
+
