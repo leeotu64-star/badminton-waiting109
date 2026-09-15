@@ -4438,9 +4438,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
               <div class="jgb-v188-rings" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
               <div class="jgb-v188-page-wrap">
                 <div class="jgb-v188-page" id="jgbV188BookPage">
-                  <div class="jgb-v188-page-lines"></div><div class="jgb-v188-note">마우스 클릭으로 페이지를 넘겨보세요</div>
+                  <div class="jgb-v188-page-lines"></div>
                   <div class="jgb-v188-page-content" id="jgbV188BookContent"></div>
-                  <div class="jgb-v188-tabs" id="jgbV188BookTabs"></div>
                   <div class="jgb-v188-bottom"><button class="jgb-v188-nav" type="button" data-v188-book="prev" aria-label="이전 페이지">‹</button><button class="jgb-v188-nav" type="button" data-v188-book="next" aria-label="다음 페이지">›</button></div>
                 </div>
               </div>
@@ -13271,25 +13270,30 @@ window.eamDeleteSelectedAsset=async function(){
 <script>
 (function(){
   const pages=[
-    {tab:'수리현황',title:'현재 진행 중인 수리내역이 없습니다.',html:'<div class="jgb-v189-empty-page"><div class="jgb-v189-worker"><span>👷</span><i>✓</i></div><p>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</p><div class="jgb-v189-green">🌱 작은 불편도 놓치지 않고,<br>쾌적한 시설을 위해 항상 노력하겠습니다.</div></div>'},
-    {tab:'LK란?',title:'LK란?',html:'<p><strong>LK</strong>는 누수 위치를 관리하기 위한 고유 코드입니다.</p><span class="formula">LK = Leak(누수) + Korea</span><div class="jgb-v188-tip">예) <strong>LK-01, LK-02, LK-03</strong><br>각 누수 위치별로 번호를 부여하여 지도와 방수공사 이력을 연결합니다.</div>'},
-    {tab:'위치조정',title:'LK 위치 조정 방법',html:'<p>코트 위치와 번호는 고정됩니다.<br><strong>LK 아이콘만 드래그</strong>하여 실제 누수 위치에 맞게 이동할 수 있습니다.</p><div class="jgb-v188-tip">📍 위치를 잘못 옮겼다면 LK 아이콘을 다시 드래그해 원하는 위치에 놓아주세요.</div>'},
-    {tab:'삭제방법',title:'LK 삭제 · 초기화',html:'<p>사용하지 않는 LK는 상단 <strong>「LK 삭제·초기화」</strong>에서 선택합니다.</p><div class="jgb-v188-tip">🗑 LK 아이콘을 클릭하면 해당 LK의 방수공사 이력으로 이동합니다.<br>삭제·초기화는 누수현황 상단 메뉴에서 처리합니다.</div>'},
-    {tab:'마지막',title:'함께 만드는 <em>쾌적한 시설</em>',html:'<p class="jgb-v188-last">“안전한 시설, 쾌적한 환경,<br>고객의 만족이 우리의 보람입니다.”</p><div class="jgb-v188-tip">🌱 작은 누수도 놓치지 않고 꼼꼼하게 관리하겠습니다.</div>'}
+    {title:'현재 진행 중인 수리내역이 없습니다.',html:'<div class="jgb-v189-empty-page"><div class="jgb-v189-worker"><span>👷</span><i>✓</i></div><p>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</p><div class="jgb-v189-green">🌱 작은 불편도 놓치지 않고,<br>쾌적한 시설을 위해 항상 노력하겠습니다.</div></div>'},
+    {title:'LK란?',html:'<p><strong>LK</strong>는 누수 위치를 관리하기 위한 고유 코드입니다.</p><span class="formula">LK = Leak(누수) + Korea</span><div class="jgb-v188-tip">예) <strong>LK-01, LK-02, LK-03</strong><br>각 누수 위치별로 번호를 부여하여 지도와 방수공사 이력을 연결합니다.</div>'},
+    {title:'LK 위치 조정 방법',html:'<p>코트 위치와 번호는 고정됩니다.<br><strong>LK 아이콘만 드래그</strong>하여 실제 누수 위치에 맞게 이동할 수 있습니다.</p><div class="jgb-v188-tip">📍 위치를 잘못 옮겼다면 LK 아이콘을 다시 드래그해 원하는 위치에 놓아주세요.</div>'},
+    {title:'LK 삭제 · 초기화',html:'<p>사용하지 않는 LK는 상단 <strong>「LK 삭제·초기화」</strong>에서 선택합니다.</p><div class="jgb-v188-tip">🗑 LK 아이콘을 클릭하면 해당 LK의 방수공사 이력으로 이동합니다.<br>삭제·초기화는 누수현황 상단 메뉴에서 처리합니다.</div>'},
+    {title:'함께 만드는 <em>쾌적한 시설</em>',html:'<p class="jgb-v188-last">“안전한 시설, 쾌적한 환경,<br>고객의 만족이 우리의 보람입니다.”</p><div class="jgb-v188-tip">🌱 작은 누수도 놓치지 않고 꼼꼼하게 관리하겠습니다.</div>'}
   ];
   let page=0,busy=false;
   function draw(mode){
-    const el=document.getElementById('jgbV188BookPage'), c=document.getElementById('jgbV188BookContent'), t=document.getElementById('jgbV188BookTabs');
-    if(!el||!c||!t)return;
+    const el=document.getElementById('jgbV188BookPage'), c=document.getElementById('jgbV188BookContent');
+    if(!el||!c)return;
     if(mode==='out'){busy=true;el.classList.remove('turn-in');el.classList.add('turn-out');setTimeout(()=>draw('in'),330);return;}
     c.innerHTML='<h3>'+pages[page].title+'</h3>'+pages[page].html;
-    t.innerHTML=pages.map((x,i)=>'<button type="button" class="jgb-v188-tab '+(i===page?'active':'')+'" data-v188-book-index="'+i+'">'+x.tab+'</button>').join('');
-    el.classList.remove('turn-out');el.classList.add('turn-in');setTimeout(()=>{el.classList.remove('turn-in');busy=false},360);
+    el.classList.remove('turn-out');el.classList.add('turn-in');
+    setTimeout(()=>{el.classList.remove('turn-in');busy=false},360);
   }
-  function go(to){if(busy)return;let next=page;if(typeof to==='number')next=to;else next=page+(to==='next'?1:-1);if(next<0||next>=pages.length)return;page=next;draw('out');}
+  function go(to){
+    if(busy)return;
+    let next=page+(to==='next'?1:-1);
+    if(next<0||next>=pages.length)return;
+    page=next;draw('out');
+  }
   document.addEventListener('click',function(e){
-    const b=e.target.closest('[data-v188-book]'); if(b){e.preventDefault();go(b.getAttribute('data-v188-book'));return;}
-    const tab=e.target.closest('[data-v188-book-index]'); if(tab){e.preventDefault();go(Number(tab.getAttribute('data-v188-book-index')));return;}
+    const b=e.target.closest('[data-v188-book]');
+    if(b){e.preventDefault();go(b.getAttribute('data-v188-book'));return;}
   });
   function init(){draw('in')}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
@@ -13472,4 +13476,11 @@ window.eamDeleteSelectedAsset=async function(){
   position:relative!important;
   z-index:999!important;
 }
+</style>
+
+<style id="JGB_V198_NOTEBOOK_DIARY_ONLY">
+/* v198: 수첩은 숫자/탭 없이 다이어리식 이전·다음 넘김만 사용 */
+.jgb-v189-book .jgb-v188-tabs,.jgb-v189-book .jgb-v188-count,.jgb-v189-book .jgb-v188-note{display:none!important;}
+.jgb-v189-book .jgb-v188-bottom{pointer-events:none!important;}
+.jgb-v189-book .jgb-v188-nav{pointer-events:auto!important;}
 </style>
