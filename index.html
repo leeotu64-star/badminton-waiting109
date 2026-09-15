@@ -3388,9 +3388,19 @@ html::before,body::before{
         if(!a){alert('연결된 EAM 자산을 찾을 수 없습니다.');return}
         const cat=normCat(a);
         const catPage={AC:'cooling',BO:'water',FI:'fire',EL:'electrical',DO:'doors',SA:'sanitary',OT:'other'}[cat]||'other';
+        // 배치도 아이콘 클릭은 현황판 오른쪽 카드가 아니라 EAM 실제 자산 이력카드로 바로 이동
         window.__eamSelCode=c;
         window.__eamCat=catPage;
         go('eam');
+        setTimeout(()=>{
+          try{
+            const card=document.querySelector('.jgb-history-card');
+            if(card){
+              card.open=true;
+              card.scrollIntoView({behavior:'smooth',block:'start'});
+            }
+          }catch(_){}
+        },120);
       };
       window.eam228Status=async code=>{
         const a=assets.find(x=>codeOf(x)===V(code));if(!a||!SUPA)return;
