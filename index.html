@@ -13872,3 +13872,50 @@ body.jgb-v24-book-lock{overflow:hidden!important;}
 }
 </style>
 
+
+<style id="JGB_V33_LEAK_5050_SLIDER">
+/* v33: 누수관리 메인 좌/우 영역 50:50 고정 + 가로 스크롤 */
+.jgb-v47-wrap{overflow-x:auto!important;overflow-y:visible!important;scrollbar-width:auto!important;}
+.jgb-v47-grid{grid-template-columns:minmax(620px,1fr) minmax(620px,1fr)!important;min-width:1240px!important;gap:12px!important;}
+.jgb-v47-map,.jgb-v47-table{min-width:0!important;box-sizing:border-box!important;}
+/* 작은 화면에서도 50:50 비율을 유지하고 아래 가로 스크롤 사용 */
+@media(max-width:1250px){.jgb-v47-wrap{padding-bottom:8px!important}.jgb-v47-grid{grid-template-columns:620px 620px!important;width:1252px!important;}}
+/* 수첩 확대 기능 제거: 표지는 일반 표시만 하고 화면 확대/오버레이를 사용하지 않음 */
+.jgb-nb30-open{position:relative!important;left:auto!important;top:auto!important;transform:none!important;width:auto!important;height:auto!important;z-index:auto!important;margin:0 8px!important;padding:10px!important;border:1px solid #d4e2ec!important;border-radius:12px!important;background:linear-gradient(180deg,#f4f9fc,#edf5f9)!important;box-shadow:5px 14px 14px rgba(25,60,85,.06)!important;overflow:hidden!important;}
+.jgb-nb30-open:before{display:none!important;}
+.jgb-nb30-open .jgb-nb30-cover-wrap{height:285px!important;grid-template-columns:145px minmax(0,1fr)!important;}
+.jgb-nb30-open .jgb-nb30-cover{cursor:default!important;}
+.jgb-nb30-open .jgb-nb30-hint{font-size:10px!important;bottom:10px!important;}
+.jgb-nb30-open .jgb-nb30-page{padding:35px 42px 48px!important;}
+.jgb-nb30-open .jgb-nb30-page h3{font-size:19px!important;margin:8px 0 10px!important;}
+.jgb-nb30-open .jgb-nb30-page p{font-size:11px!important;line-height:1.75!important;}
+.jgb-nb30-open .jgb-nb30-close{display:none!important;}
+.jgb-nb30-open .jgb-nb30-tabs{display:flex!important;}
+</style>
+
+<script id="JGB_V33_NO_NOTEBOOK_EXPAND">
+(function(){
+  'use strict';
+  function disableNotebookExpand(){
+    document.querySelectorAll('.jgb-nb30-cover').forEach(function(cover){
+      if(cover.dataset.v33NoExpand==='1') return;
+      cover.dataset.v33NoExpand='1';
+      cover.setAttribute('aria-label','누수관리 수첩');
+      cover.querySelector('.jgb-nb30-hint')?.replaceChildren(document.createTextNode('누수관리 수첩'));
+      cover.addEventListener('click',function(e){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const host=cover.closest('.jgb-nb30-host');
+        host?.classList.remove('jgb-nb30-open');
+        const close=host?.querySelector('.jgb-nb30-close');
+        if(close) close.style.display='none';
+      },true);
+    });
+    document.querySelectorAll('.jgb-nb30-host').forEach(function(host){host.classList.remove('jgb-nb30-open');});
+    document.body.style.overflow='';
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',disableNotebookExpand,{once:true}); else disableNotebookExpand();
+  setTimeout(disableNotebookExpand,300);
+  setTimeout(disableNotebookExpand,1000);
+})();
+</script>
