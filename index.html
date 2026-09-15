@@ -3978,18 +3978,18 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const waForLk=lk=>wp.filter(h=>norm(h.related)===norm(lk)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
       const liveFor=lk=>{
         const rows=waForLk(lk);
-        return rows.filter(h=>{
-          const result=String(h.result||'').trim();
-          const start=String(h.start||'').trim();
-          const end=String(h.end||'').trim();
-          const planned=String(h.contract||'').trim();
-          return result==='재조치 필요' || (!start && !!planned) || (!!start && !end);
-        });
+        const card=cardForLk(lk);
+        const lkStatus=String(card.status||'').trim();
+        const rework=rows.filter(h=>String(h.result||'').trim()==='재조치 필요');
+        if(lkStatus==='조치필요'||lkStatus==='보수필요'){
+          return rows.length ? [rows[0]] : [{waCode:'',content:'수리 작업 등록 대기',result:'조치필요',date:'',method:'',vendor:''}];
+        }
+        return rework.length ? [rework[0]] : [];
       };
       const statusOf=lk=>String(cardForLk(lk).status||'').trim();
       const markerClass=lk=>{
         const st=statusOf(lk);
-        return st==='보수필요'?'lk-red':st==='점검필요'?'lk-yellow':st==='정상'?'lk-blue':'lk-gray';
+        return (st==='조치필요'||st==='보수필요')?'lk-red':(st==='점검요청'||st==='점검필요')?'lk-yellow':st==='정상'?'lk-blue':'lk-gray';
       };
       const pos={1:[85,50],2:[68,50],3:[50,50],4:[32,50],5:[15,50]};
       const group={};
@@ -4034,7 +4034,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       <div class="jgb-v170-wrap">
         <header class="jgb-v170-head"><div><div style="font-size:11px;font-weight:900;letter-spacing:.12em;color:#1475ca">LEAK LOCATION MANAGEMENT</div><h1>💧 누수현황</h1><p>LK는 방수공사 이력에 연결되고, WA는 수리 LIVE에 자동 연계됩니다.</p><div class="jgb-v170-lk-count">등록 LK ${leaks.length}개</div></div><div class="jgb-v170-head-actions"><button type="button" class="jgb-v170-add" data-v47-action="new-lk">＋ LK 생성</button><button type="button" class="jgb-v171-delete-btn" data-v47-action="open-lk-delete">LK 삭제·초기화</button></div></header>
         <div class="jgb-v170-grid">
-          <section class="jgb-v170-card jgb-v170-mapcard"><div class="jgb-v170-title"><div><h2>🗺 코트 배치도 <span style="font-size:11px;color:#7a91a4;font-weight:800">· LK 위치 관리</span></h2><p>코트 위치와 번호는 고정됩니다. LK 아이콘만 드래그하여 위치를 조정할 수 있습니다.</p></div><div class="jgb-v170-legend"><span><i style="background:#ef5b52"></i>보수필요</span><span><i style="background:#e0b62f"></i>점검필요</span><span><i style="background:#3d8fe4"></i>정상</span></div></div><div class="jgb-v170-map"><div class="jgb-v170-plan"><div class="top-label">상부</div><div class="side-label left-label">좌측 외곽</div><div class="side-label right-label">우측 외곽</div><div class="bottom-label">하부</div><div class="court-grid"><div class="court"><span class="court-no">5</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">4</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">3</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">2</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">1</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div></div><div class="entrance">출입문</div>${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}</div></div><div class="jgb-v170-note">LK 아이콘 클릭 → 해당 LK의 방수공사 이력으로 이동 · 삭제·초기화는 상단 「LK 삭제·초기화」에서 선택</div></section>
+          <section class="jgb-v170-card jgb-v170-mapcard"><div class="jgb-v170-title"><div><h2>🗺 코트 배치도 <span style="font-size:11px;color:#7a91a4;font-weight:800">· LK 위치 관리</span></h2><p>코트 위치와 번호는 고정됩니다. LK 아이콘만 드래그하여 위치를 조정할 수 있습니다.</p></div><div class="jgb-v170-legend"><span><i style="background:#ef5b52"></i>조치필요</span><span><i style="background:#e0b62f"></i>점검요청</span><span><i style="background:#3d8fe4"></i>정상</span></div></div><div class="jgb-v170-map"><div class="jgb-v170-plan"><div class="top-label">상부</div><div class="side-label left-label">좌측 외곽</div><div class="side-label right-label">우측 외곽</div><div class="bottom-label">하부</div><div class="court-grid"><div class="court"><span class="court-no">5</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">4</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">3</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">2</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">1</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div></div><div class="entrance">출입문</div>${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}</div></div><div class="jgb-v170-note">LK 아이콘 클릭 → 해당 LK의 방수공사 이력으로 이동 · 삭제·초기화는 상단 「LK 삭제·초기화」에서 선택</div></section>
           <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>WA 방수공사 이력의 진행 상태를 자동으로 반영합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>AUTO</b><span>WA 연동</span></div></div><div class="jgb-v176-summary"><div class="planned"><small>수리예정</small><b>${liveCounts.planned}</b><span>PLANNED</span></div><div class="working"><small>수리중</small><b>${liveCounts.working}</b><span>WORKING</span></div><div class="rework"><small>재조치 필요</small><b>${liveCounts.rework}</b><span>REWORK</span></div></div><div class="jgb-v176-live-label"><b>현재 수리 작업</b><span>${live.length}건</span></div><div class="jgb-v170-live-list jgb-v176-live-list">${liveHtml}</div><div class="jgb-v176-live-footer"><span>● 자동 연동</span><span>수리예정 · 수리중 · 재조치 필요</span></div></section>
         </div>
       </div>`;
@@ -4307,43 +4307,38 @@ function jgbV47GoWpByLeak(leakCode){
       document.getElementById('jgbV171LkDeleteModal')?.remove();
       return render();
     }
-    // v175: 기존 중복 드래그 핸들러 제거. 아래 단일 핸들러만 사용합니다.
-    if(!window.__JGB_V175_DRAG){
-      window.__JGB_V175_DRAG=true;
+    // v177: wrapper 자체를 이동시켜 LK 아이콘 위치를 정확하게 저장합니다.
+    if(!window.__JGB_V177_DRAG){
+      window.__JGB_V177_DRAG=true;
       document.addEventListener('pointerdown',function(e){
-        const marker=e.target.closest?.('.jgb-v170-marker'); if(!marker)return;
-        if(e.button!==0)return;
-        const plan=marker.closest('.jgb-v170-plan'); if(!plan)return;
-        const id=marker.getAttribute('data-id');
-        const r=plan.getBoundingClientRect();
-        const sx=e.clientX, sy=e.clientY;
-        const startX=parseFloat(marker.dataset.mapX||marker.style.left)||0;
-        const startY=parseFloat(marker.dataset.mapY||marker.style.top)||0;
-        let dragging=false, moved=false;
+        const marker=e.target.closest?.('.jgb-v170-marker'); if(!marker||e.button!==0)return;
+        const wrap=marker.closest('.jgb-v170-marker-wrap'), plan=marker.closest('.jgb-v170-plan');
+        if(!wrap||!plan)return;
+        const id=marker.getAttribute('data-id'), r=plan.getBoundingClientRect();
+        const sx=e.clientX,sy=e.clientY;
+        const startX=parseFloat(marker.dataset.mapX||wrap.style.left)||0;
+        const startY=parseFloat(marker.dataset.mapY||wrap.style.top)||0;
+        let dragging=false,moved=false;
         const move=ev=>{
-          const dx=ev.clientX-sx, dy=ev.clientY-sy;
-          if(!dragging && Math.hypot(dx,dy)<5)return;
-          if(!dragging){dragging=true; marker.classList.add('dragging'); try{marker.setPointerCapture?.(e.pointerId)}catch(_){}}
+          const dx=ev.clientX-sx,dy=ev.clientY-sy;
+          if(!dragging&&Math.hypot(dx,dy)<6)return;
+          if(!dragging){dragging=true;marker.classList.add('dragging');try{marker.setPointerCapture?.(e.pointerId)}catch(_){} }
           ev.preventDefault();
           const x=Math.max(2,Math.min(98,((ev.clientX-r.left)/r.width)*100));
           const y=Math.max(3,Math.min(97,((ev.clientY-r.top)/r.height)*100));
-          moved=true;
-          marker.style.left=x.toFixed(2)+'%'; marker.style.top=y.toFixed(2)+'%';
-          marker.dataset.mapX=x.toFixed(2); marker.dataset.mapY=y.toFixed(2);
+          moved=true;wrap.style.left=x.toFixed(2)+'%';wrap.style.top=y.toFixed(2)+'%';
+          marker.dataset.mapX=x.toFixed(2);marker.dataset.mapY=y.toFixed(2);
         };
-        const up=()=>{
+        const finish=()=>{
           marker.classList.remove('dragging');
-          window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up); window.removeEventListener('pointercancel',up);
+          window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',finish);
           if(moved){
-            const x=parseFloat(marker.dataset.mapX), y=parseFloat(marker.dataset.mapY);
-            const S=jgbV47Store();
+            const x=parseFloat(marker.dataset.mapX),y=parseFloat(marker.dataset.mapY),S=jgbV47Store();
             S.saveLeaks(S.leaks.map(v=>String(v.id)===String(id)?{...v,mapX:x,mapY:y}:v));
-            window.__JGB_LK_DRAG_SUPPRESS=true; setTimeout(()=>window.__JGB_LK_DRAG_SUPPRESS=false,450);
-          } else {
-            marker.style.left=startX.toFixed(2)+'%'; marker.style.top=startY.toFixed(2)+'%';
-          }
+            window.__JGB_LK_DRAG_SUPPRESS=true;setTimeout(()=>window.__JGB_LK_DRAG_SUPPRESS=false,500);
+          }else{wrap.style.left=startX.toFixed(2)+'%';wrap.style.top=startY.toFixed(2)+'%';}
         };
-        window.addEventListener('pointermove',move); window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
+        window.addEventListener('pointermove',move);window.addEventListener('pointerup',finish);window.addEventListener('pointercancel',finish);
       },true);
     }
 
