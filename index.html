@@ -4467,11 +4467,15 @@ function jgbV47GoWpByLeak(leakCode){
           const cards=wpV72Cards();
           const hit=Object.entries(cards).find(([k,v])=>String(v?.leakCode||'').trim().toUpperCase()===code.toUpperCase());
           if(hit){
+            // 누수 지도에서 LK 아이콘을 누르면 방수관리 왼쪽의 같은 LK 번호를 자동 선택
+            try{localStorage.setItem('JGB_V72_SELECTED_WP',String(hit[0]))}catch(e){}
+            const side=[...document.querySelectorAll('[data-v47-action="select-wp-card"]')].find(x=>String(x.getAttribute('data-code'))===String(hit[0]));
+            if(side){side.click();return}
             const el=[...document.querySelectorAll('[data-wp-code]')].find(x=>String(x.getAttribute('data-wp-code'))===String(hit[0]));
-            if(el){el.scrollIntoView({behavior:'smooth',block:'start'});el.style.outline='3px solid #d23e35';setTimeout(()=>el.style.outline='',2200)}
+            if(el){el.scrollIntoView({behavior:'smooth',block:'start'})}
           }
         }catch(e){}
-      },80);
+      },120);
     }
 
     function jgbV47ShowWpByLeak(leakCode){
