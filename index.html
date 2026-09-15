@@ -3994,67 +3994,40 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const leaks=Array.isArray(S.leaks)?S.leaks:[];
       const issues=Array.isArray((typeof db!=='undefined'&&db)?.issues)?db.issues:[];
       const esc=v=>xEsc(v==null?'':String(v));
-      const courtNo=loc=>{const m=String(loc||'').match(/(?:코트\s*([1-5])|([1-5])\s*번\s*코트|([1-5])코트)/i);return m?Number(m[1]||m[2]||m[3]):0};
-      const courtX={1:85,2:68,3:50,4:32,5:15};
       const statusOfIssue=x=>x?.status==='조치중'?'progress':x?.status==='완료'?'done':'open';
       const statusText=x=>x?.status==='조치중'?'수리 진행 중':x?.status==='완료'?'수리 완료':'접수 대기';
-      const leakStatus=l=>{
-        const linked=issues.find(i=>String(i?.content||'').toUpperCase().includes(String(l?.leakCode||'').toUpperCase())) || issues.find(i=>String(i?.place||'').trim()===String(l?.location||'').trim()) || issues.find(i=>{const p=String(i?.place||'').trim(),q=String(l?.location||'').trim();return p&&q&&(p.includes(q)||q.includes(p))});
-        if(linked)return {kind:statusOfIssue(linked),text:statusText(linked),issue:linked};
-        const st=String(l?.status||'');
-        if(st==='조치완료'||st==='완료')return {kind:'done',text:'수리 완료',issue:null};
-        if(st==='조치중'||st==='수리중')return {kind:'progress',text:'수리 진행 중',issue:null};
-        return {kind:'open',text:'접수 대기',issue:null};
-      };
-      const wpAll=Array.isArray(S.wp)?S.wp:[];
-      const wpForLeak=lk=>wpAll.filter(w=>String(w?.related||'').trim().toUpperCase()===String(lk||'').trim().toUpperCase() || String(w?.leakCode||'').trim().toUpperCase()===String(lk||'').trim().toUpperCase());
-      const selectedCourt=Number(window.__JGB_LIVE_SELECTED_COURT||1);
-      const courtLeaks=n=>leaks.filter(l=>courtNo(l.location)===n);
-      const allCourtData=[1,2,3,4,5].map(n=>({n,items:courtLeaks(n)}));
-      const selectedItems=courtLeaks(selectedCourt);
-      const escText=v=>esc(v||'-');
       const timeSafe=v=>v?new Date(v).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}):'-';
       const clean=v=>typeof cleanWorkContent==='function'?cleanWorkContent(v):String(v?.content||'').replace(/\[\[[^\]]+\]\]/g,'').trim();
-      const statusRank={open:1,progress:2,done:3};
-      const courtClass=n=>{const items=courtLeaks(n);if(!items.length)return 'normal';const best=items.map(leakStatus).sort((a,b)=>(statusRank[a.kind]||1)-(statusRank[b.kind]||1))[0];return best.kind};
-      const markers=leaks.map((l,i)=>{const n=courtNo(l.location);if(!n)return '';const st=leakStatus(l);const selected=window.__JGB_LIVE_SELECTED_COURT&&Number(window.__JGB_LIVE_SELECTED_COURT)===n?' selected':'';return `<button type="button" class="jgb-v9-marker ${st.kind}${selected}" style="left:${Number(l.mapX)||courtX[n]}%;top:${Number(l.mapY)||(38+(i%2)*20)}%" data-live-court="${n}" title="${esc(l.leakCode||'')} · ${esc(l.location||'')}"><i class="ring">${st.kind==='done'?'✓':'💧'}</i><span>${esc(l.leakCode||'LK')}</span></button>`}).join('');
-      const selectedDetails=selectedItems.length?selectedItems.map(l=>{const st=leakStatus(l),linked=st.issue,wps=wpForLeak(l.leakCode);return `<article class="jgb-v137-detail-item"><div class="jgb-v137-detail-head"><b>${esc(l.leakCode||'LK')}</b><span class="jgb-v137-state ${st.kind}">${esc(st.text)}</span></div><div class="jgb-v137-detail-grid"><div><small>누수 위치</small><b>${esc(l.location||'-')}</b></div><div><small>발견일</small><b>${esc(l.date||'-')}</b></div><div class="wide"><small>누수 내용</small><b>${esc(l.content||'-')}</b></div>${linked?`<div><small>수리 접수</small><b>${esc(timeSafe(linked.createdAt))}</b></div><div><small>담당자</small><b>${esc(linked.handlerName||'미지정')}</b></div><div class="wide"><small>수리 내용</small><b>${esc(clean(linked)||'기록 없음')}</b></div>`:'<div class="wide"><small>수리 이력</small><b>연결된 수리 기록이 없습니다.</b></div>'}${wps.length?`<div class="wide jgb-v137-wp"><small>방수 이력 · ${wps.length}건</small>${wps.map(w=>`<div class="jgb-v137-wp-row"><b>${esc(w.waCode||'WA')}</b><span>${esc(w.date||w.end||'-')}</span><span>${esc(w.result||'')}</span><span>${esc(w.content||w.method||'')}</span></div>`).join('')}</div>`:'<div class="wide jgb-v137-wp"><small>방수 이력</small><b>연결된 방수 이력이 없습니다.</b></div>'}</div></article>`}).join(''):`<div class="jgb-v137-empty"><b>${selectedCourt}번 코트</b><span>등록된 누수 이력이 없습니다.</span></div>`;
+      const courtNo=loc=>{const m=String(loc||'').match(/(?:코트\s*([1-5])|([1-5])\s*번\s*코트)/i);return m?Number(m[1]||m[2]):0};
+      const courtX={1:85,2:68,3:50,4:32,5:15};
+      const findIssue=(leak)=>{const lk=String(leak?.leakCode||'').toUpperCase();const loc=String(leak?.location||'').trim();return issues.find(i=>String(i?.content||'').toUpperCase().includes(lk))||issues.find(i=>String(i?.place||'').trim()===loc)||issues.find(i=>loc&&String(i?.place||'').includes(loc)||String(i?.place||'')&&loc.includes(String(i.place||'')));};
+      const statusForLeak=l=>{const issue=findIssue(l);if(issue)return statusOfIssue(issue);const r=typeof resultForLeak==='function'?resultForLeak(l):'';return r==='조치'?'done':r==='보수 후 관찰'?'progress':'open'};
       const active=issues.filter(x=>x.status!=='완료').sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
       const recentDone=issues.filter(x=>x.status==='완료').sort((a,b)=>new Date(b.completedAt||b.createdAt||0)-new Date(a.completedAt||a.createdAt||0));
-      const liveIssues=[...active,...recentDone].slice(0,8);
-      const total=leaks.length;
-      const need=leaks.filter(l=>leakStatus(l).kind==='open').length;
-      const running=leaks.filter(l=>leakStatus(l).kind==='progress').length;
-      const done=leaks.filter(l=>leakStatus(l).kind==='done').length;
-      const linkedWp=wpAll.filter(w=>String(w.related||w.leakCode||'').trim()).length;
-      if(!window.__JGB_V137_LIVE_EVENTS){
-        window.__JGB_V137_LIVE_EVENTS=true;
-        document.addEventListener('click',function(e){
-          const c=e.target.closest('[data-live-court]');
-          if(c){e.preventDefault();e.stopPropagation();window.__JGB_LIVE_SELECTED_COURT=Number(c.getAttribute('data-live-court')||1);if(typeof render==='function')render();return;}
-        },true);
+      const live=[...active,...recentDone].slice(0,8);
+      let selectedId=window.__JGB_LIVE_SELECTED_ID||active[0]?.id||live[0]?.id||'';
+      let selected=issues.find(x=>String(x.id)===String(selectedId))||active[0]||recentDone[0]||null;
+      const selectedLeak=selected?leaks.find(l=>String(selected.content||'').toUpperCase().includes(String(l.leakCode||'').toUpperCase())||String(l.location||'')===String(selected.place||'')):null;
+      const markers=leaks.map((l,i)=>{const n=courtNo(l.location);let x=n?courtX[n]:50;let y=50;if(!n)y=28+(i%4)*16;const issue=findIssue(l);const cls=statusForLeak(l);const selectedCls=issue&&selected&&String(issue.id)===String(selected.id)?' selected':'';return `<button type="button" class="jgb-v9-marker ${cls}${selectedCls}" style="left:${Number(l.mapX)||x}%;top:${Number(l.mapY)||y}%" data-live-id="${esc(issue?.id||'')}" title="${esc(l.leakCode||'')} · ${esc(l.location||'')}"><i class="ring">${cls==='done'?'✓':'💧'}</i><span>${esc(l.leakCode||'LK')}</span></button>`}).join('');
+      const timeline=selected?[[selected.createdAt,'접수되었습니다.',selected.place||''],selected.handlerName?[selected.startedAt||selected.createdAt,'담당자 배정',selected.handlerName]:null,selected.startedAt?[selected.startedAt,'현장 작업 시작',selected.place||'']:null,selected.status==='조치중'?[new Date().toISOString(),'수리 진행 중','현재 작업 처리 중']:null,selected.status==='완료'?[selected.completedAt,'수리 완료','조치가 완료되었습니다.']:null].filter(Boolean).map(v=>`<div class="jgb-v9-event"><time>${timeSafe(v[0])}</time><div><b>${esc(v[1])}</b><span>${esc(v[2])}</span></div></div>`).join(''):'<div class="jgb-v9-event"><time>--:--</time><div><b>현재 수리 작업 없음</b><span>새 접수가 들어오면 이곳에 즉시 표시됩니다.</span></div></div>';
+      const feed=live.map(x=>`<button type="button" class="jgb-v9-feed-item" data-live-id="${esc(x.id)}"><time>${timeSafe(x.createdAt)}</time><div><b>${esc(x.place||'장소 미기록')}</b><small>${esc(clean(x)||'접수 내용 없음')}</small></div><span class="jgb-v9-mini-badge ${statusOfIssue(x)==='progress'?'run':statusOfIssue(x)==='done'?'done':'wait'}">${esc(statusText(x).replace('수리 ','') )}</span></button>`).join('')||'<div class="jgb-v9-feed-item"><div style="grid-column:1/-1;text-align:center;color:#71869a;padding:14px">현재 수리 이력이 없습니다.</div></div>';
+      const total=issues.filter(x=>x.status!=='완료').length,running=issues.filter(x=>x.status==='조치중').length,waiting=issues.filter(x=>x.status!=='완료'&&!x.handlerId).length,doneToday=issues.filter(x=>x.status==='완료'&&String(x.completedAt||'').slice(0,10)===new Date().toISOString().slice(0,10)).length;
+      if(!window.__JGB_V135_LIVE_EVENTS){
+        window.__JGB_V135_LIVE_EVENTS=true;
+        document.addEventListener('click',function(e){const b=e.target.closest('[data-live-id]');if(!b)return;const id=b.getAttribute('data-live-id');if(!id)return;window.__JGB_LIVE_SELECTED_ID=id;if(typeof render==='function')render()},true);
       }
-      return `<div class="jgb-v9-live-wrap jgb-v137-wrap">
-        <style>
-          .jgb-v137-wrap .jgb-v9-map-card{min-width:0}.jgb-v137-wrap .jgb-v9-live-card{min-width:0}
-          .jgb-v137-courts{position:absolute;inset:15% 7% 16%;display:grid;grid-template-columns:repeat(5,1fr);gap:16px;pointer-events:none}
-          .jgb-v137-court-btn{pointer-events:auto;border:2px solid #526f87;background:rgba(255,255,255,.72);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:1000;color:#29465d;cursor:pointer;position:relative}
-          .jgb-v137-court-btn.selected{box-shadow:0 0 0 4px rgba(35,126,230,.18);background:#eef7ff}
-          .jgb-v137-court-btn.normal:after{content:'정상';position:absolute;right:6px;top:6px;font-size:10px;color:#2d9b67}
-          .jgb-v137-court-btn.open:after{content:'누수';position:absolute;right:6px;top:6px;font-size:10px;color:#d93c4b}
-          .jgb-v137-court-btn.progress:after{content:'수리중';position:absolute;right:6px;top:6px;font-size:10px;color:#e88927}
-          .jgb-v137-court-btn.done:after{content:'완료';position:absolute;right:6px;top:6px;font-size:10px;color:#2d9b67}
-          .jgb-v137-statbar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.jgb-v137-stat{background:#fff;border:1px solid #d3dfe8;border-radius:10px;padding:10px 12px}.jgb-v137-stat small{display:block;color:#70879a;font-size:11px}.jgb-v137-stat b{display:block;font-size:23px;margin-top:2px}
-          .jgb-v137-detail-item{background:#fff;border:1px solid #d5e0e8;border-radius:10px;padding:12px;margin-bottom:10px}.jgb-v137-detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.jgb-v137-state{font-size:11px;padding:4px 8px;border-radius:999px;font-weight:800}.jgb-v137-state.open{background:#fff0f1;color:#d33b4a}.jgb-v137-state.progress{background:#fff5e8;color:#d98218}.jgb-v137-state.done{background:#eaf8f0;color:#278957}.jgb-v137-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.jgb-v137-detail-grid>div{background:#f7fafc;border-radius:6px;padding:8px}.jgb-v137-detail-grid .wide{grid-column:1/-1}.jgb-v137-detail-grid small{display:block;color:#7890a3;font-size:10px;margin-bottom:3px}.jgb-v137-detail-grid b{font-size:12px;line-height:1.45}.jgb-v137-wp{border-left:3px solid #2d9b67!important}.jgb-v137-wp-row{display:grid;grid-template-columns:65px 90px 70px 1fr;gap:6px;margin-top:6px;padding-top:6px;border-top:1px dashed #d6e0e7;font-size:11px}.jgb-v137-empty{height:100%;min-height:240px;display:grid;place-content:center;text-align:center;color:#8195a5;gap:8px}.jgb-v137-empty b{font-size:22px;color:#29465d}.jgb-v137-feed{margin-top:10px}.jgb-v137-feed-list{max-height:240px;overflow:auto}.jgb-v137-courts-wrap{position:absolute;inset:0;pointer-events:none}
-          @media(max-width:900px){.jgb-v137-statbar{grid-template-columns:repeat(2,1fr)}.jgb-v137-courts{gap:7px}.jgb-v137-court-btn{font-size:17px}.jgb-v137-wp-row{grid-template-columns:55px 80px 60px 1fr}}
-        </style>
-        <header class="jgb-v9-head"><div class="jgb-v9-title"><div class="drop">💧</div><div><h1>누수 수리 LIVE</h1><p>누수현황 원본 데이터를 자동으로 읽어 코트별 누수·수리·방수 이력을 표시합니다.</p></div></div><div class="jgb-v9-live-pill"><i class="jgb-v9-live-dot"></i> REAL-TIME LIVE</div></header>
-        <div class="jgb-v137-statbar"><div class="jgb-v137-stat"><small>등록 누수</small><b>${total}</b></div><div class="jgb-v137-stat"><small>조치 필요</small><b>${need}</b></div><div class="jgb-v137-stat"><small>수리 진행</small><b>${running}</b></div><div class="jgb-v137-stat"><small>방수 연결</small><b>${linkedWp}</b></div></div>
+      return `<div class="jgb-v9-live-wrap">
+        <header class="jgb-v9-head"><div class="jgb-v9-title"><div class="drop">💧</div><div><h1>누수 수리 LIVE</h1><p>장군봉 배드민턴장 · 5개 코트 배치도 기준 실시간 수리 관제</p></div></div><div class="jgb-v9-live-pill"><i class="jgb-v9-live-dot"></i> REAL-TIME LIVE</div></header>
         <div class="jgb-v9-grid">
-          <section class="jgb-v9-card jgb-v9-map-card"><div class="jgb-v9-card-head"><div><h2>🗺 코트 LIVE 배치도</h2><p>코트를 누르면 해당 코트의 누수·수리·방수 이력이 오른쪽에 표시됩니다.</p></div><div class="jgb-v9-legend"><span><i class="r"></i>누수</span><span><i class="o"></i>수리중</span><span><i class="g"></i>완료</span></div></div>
-            <div class="jgb-v9-map"><div class="jgb-v9-top">상부 배관</div><div class="jgb-v9-side jgb-v9-left">좌측 외곽</div><div class="jgb-v9-side jgb-v9-right">우측 외곽</div><div class="jgb-v9-bottom">하부 배관</div><div class="jgb-v137-courts">${[5,4,3,2,1].map(n=>`<button type="button" class="jgb-v137-court-btn ${courtClass(n)}${selectedCourt===n?' selected':''}" data-live-court="${n}">${n}번<br>코트</button>`).join('')}</div><div class="jgb-v9-entrance">출입문</div>${markers||'<div style="position:absolute;inset:0;display:grid;place-items:center;color:#8a9aaa;font-size:12px;pointer-events:none">등록된 누수 위치가 없습니다.</div>'}</div>
+          <section class="jgb-v9-card jgb-v9-map-card"><div class="jgb-v9-card-head"><div><h2>🗺 누수 위치 현황</h2><p>현재 등록된 LK 위치와 수리 상태가 실시간으로 표시됩니다.</p></div><div class="jgb-v9-legend"><span><i class="r"></i>접수</span><span><i class="o"></i>작업중</span><span><i class="g"></i>완료</span></div></div>
+            <div class="jgb-v9-map"><div class="jgb-v9-top">상부 배관</div><div class="jgb-v9-side jgb-v9-left">좌측 외곽</div><div class="jgb-v9-side jgb-v9-right">우측 외곽</div><div class="jgb-v9-bottom">하부 배관</div><div class="jgb-v9-courts">${[5,4,3,2,1].map(n=>`<div class="jgb-v9-court"><b>${n}번<br>코트</b></div>`).join('')}</div><div class="jgb-v9-entrance">출입문</div>${markers||'<div style="position:absolute;inset:0;display:grid;place-items:center;color:#8a9aaa;font-size:12px">등록된 누수 위치가 없습니다.</div>'}</div>
           </section>
-          <section class="jgb-v9-card jgb-v9-live-card"><div class="jgb-v9-live-head"><h2>📡 ${selectedCourt}번 코트 상세</h2><small>누수현황·방수 이력 자동 연동</small></div><div class="jgb-v9-live-body">${selectedDetails}<div class="jgb-v137-feed"><div class="jgb-v137-detail-head"><b>최근 수리 LIVE</b><span>${active.length}건 진행 중 · ${done}건 완료</span></div><div class="jgb-v137-detail-item">${liveIssues.length?liveIssues.map(x=>`<div class="jgb-v137-wp-row" style="grid-template-columns:80px 1fr 85px"><b>${esc(x.place||'장소 미기록')}</b><span>${esc(clean(x)||'접수 내용 없음')}</span><span>${esc(statusText(x))}</span></div>`).join(''):'<div class="jgb-v137-empty" style="min-height:100px"><span>연결된 수리 LIVE 기록이 없습니다.</span></div>'}</div></div></div></section>
+          <section class="jgb-v9-card jgb-v9-live-card"><div class="jgb-v9-live-head"><h2>📡 수리 LIVE</h2><small>실시간으로 업데이트 됩니다.</small></div><div class="jgb-v9-live-body">
+            ${selected?`<div class="jgb-v9-current"><div class="jgb-v9-current-top"><b>${esc(selectedLeak?.leakCode||selected.assetCode||'시설 수리')} ${selectedLeak?'누수':''}</b><span class="jgb-v9-badge">${esc(statusText(selected))}</span></div><p>${esc(selected.place||'장소 미기록')} · ${esc(clean(selected)||'접수 내용 없음')}</p></div>`:''}
+            <div class="jgb-v9-timeline">${timeline}</div>
+            ${selected?`<div class="jgb-v9-info"><div class="jgb-v9-info-row"><strong>접수시간</strong><b>${esc(timeSafe(selected.createdAt))}</b></div><div class="jgb-v9-info-row"><strong>요청장소</strong><b>${esc(selected.place||'-')}</b></div><div class="jgb-v9-info-row"><strong>담당자</strong><b>${esc(selected.handlerName||'미지정')}</b></div><div class="jgb-v9-info-row"><strong>내용</strong><b>${esc(clean(selected)||'-')}</b></div></div>`:''}
+            <div class="jgb-v9-feed"><div class="jgb-v9-feed-title"><b>최근 수리 LIVE</b><span>● ${active.length}건 진행</span></div><div class="jgb-v9-feed-list">${feed}</div></div>
+          </div></section>
         </div>
       </div>`;
     }
@@ -4193,87 +4166,12 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     function jgbV133NextLK(){return jgbV133NextCode('LK-')}
     function jgbV133NextWA(){return jgbV133NextCode('WA-')}
     function jgbV47OpenModal(type,id,cardCode){
-      const S=jgbV47Store(), old=type==='leak'?S.leaks.find(x=>String(x.id)===String(id)):S.wp.find(x=>String(x.id)===String(id));
-      const esc=v=>xEsc(v==null?'':String(v)), today=new Date().toISOString().slice(0,10);
-      let body='';
-      if(type==='leak'){
-        body=`<div class="jgb-v47-form-grid">
-          <label>누수코드<input id="v47_leakCode" value="${esc(old?.leakCode||jgbV133NextLK())}" readonly><small style="display:block;color:#6d8194;margin-top:4px">LK 코드 자동 생성</small></label>
-          <label>발생 위치<input id="v47_location" value="${esc(old?.location||'')}" placeholder="예: 1번 코트 천장"><div class="jgb-v47-location-buttons"><button type="button" data-v47-place="1번 코트">1번 코트</button><button type="button" data-v47-place="2번 코트">2번 코트</button><button type="button" data-v47-place="3번 코트">3번 코트</button><button type="button" data-v47-place="4번 코트">4번 코트</button><button type="button" data-v47-place="5번 코트">5번 코트</button><button type="button" data-v47-place="화장실">화장실</button><button type="button" data-v47-place="샤워실">샤워실</button><button type="button" data-v47-place="휴게실">휴게실</button><button type="button" data-v47-place="기타">기타</button></div></label>
-          <label>발견일<input id="v47_date" type="date" value="${esc(old?.date||today)}"></label>
-          <label>상태<select id="v47_status"><option ${old?.status==='조치필요'||!old?'selected':''}>조치필요</option><option ${old?.status==='조치중'||old?.status==='수리중'?'selected':''}>조치중</option><option ${old?.status==='조치완료'||old?.status==='완료'?'selected':''}>조치완료</option></select></label>
-          <label class="wide">누수 내용<textarea id="v47_content" rows="3">${esc(old?.content||'')}</textarea></label>
-          <label class="wide">수리 내용<textarea id="v47_repairContent" rows="3">${esc(old?.repairContent||old?.repair||'')}</textarea></label>
-          <label class="wide">비고<textarea id="v47_note" rows="2">${esc(old?.note||'')}</textarea></label>
-        </div>`;
-      }else{
-        const leaks=S.leaks.filter(x=>x?.leakCode).sort((a,b)=>String(a.leakCode).localeCompare(String(b.leakCode),undefined,{numeric:true}));
-        const currentLK=String(old?.related||'').trim().toUpperCase();
-        const selectedLK=currentLK||String((cardCode&&wpV72Cards()[String(cardCode)]?.leakCode)||'').trim().toUpperCase();
-        const selLeak=leaks.find(x=>String(x.leakCode||'').trim().toUpperCase()===selectedLK);
-        const opts=leaks.map(l=>`<option value="${esc(l.leakCode)}" ${String(l.leakCode||'').toUpperCase()===selectedLK?'selected':''}>${esc(l.leakCode)} · ${esc(l.location||'위치 미기록')}</option>`).join('');
-        body=`<div class="jgb-v47-form-grid">
-          <label class="wide">연결 LK 코드<select id="v47_related_lk"><option value="">누수현황에서 LK를 선택하세요</option>${opts}</select><small style="display:block;color:#1769c1;margin-top:4px">LK를 선택하면 코트·위치·누수내용이 자동으로 연결됩니다.</small></label>
-          <label>코트/위치<input id="v47_location" value="${esc(selLeak?.location||old?.location||'')}" readonly></label>
-          <label>누수 내용<input id="v47_linked_content" value="${esc(selLeak?.content||'')}" readonly></label>
-          <label>방수 이력<input id="v47_waCode" value="${esc(old?.waCode||jgbV133NextWA())}" readonly><small style="display:block;color:#6d8194;margin-top:4px">WA 코드 자동 생성</small></label>
-          <label>작업일자<input id="v47_date" type="date" value="${esc(old?.date||today)}"></label>
-          <label>작업구분<select id="v47_method"><option ${old?.method!=='외주'?'selected':''}>자체</option><option ${old?.method==='외주'?'selected':''}>외주</option></select></label>
-          <label>외주업체명<input id="v47_vendor" value="${esc(old?.vendor||'')}" placeholder="외주인 경우 입력"></label>
-          <label>작업비용<input id="v47_cost" type="number" min="0" value="${esc(old?.cost||0)}"></label>
-          <label>계약일<input id="v47_contract" type="date" value="${esc(old?.contract||'')}"></label>
-          <label>작업시작일<input id="v47_start" type="date" value="${esc(old?.start||'')}"></label>
-          <label>작업완료일<input id="v47_end" type="date" value="${esc(old?.end||'')}"></label>
-          <label>작업결과<select id="v47_result"><option ${!old||old?.result==='완료'?'selected':''}>완료</option><option ${old?.result==='보수 후 관찰'?'selected':''}>보수 후 관찰</option><option ${old?.result==='재조치 필요'?'selected':''}>재조치 필요</option></select></label>
-          <label class="wide">방수 작업내용<textarea id="v47_content" rows="4">${esc(old?.content||'')}</textarea></label>
-          <label class="wide">비고<textarea id="v47_note" rows="2">${esc(old?.note||'')}</textarea></label>
-          <label class="wide">작업사진<input id="v47_photo" type="file" accept="image/*" multiple></label>
-        </div>`;
-      }
-      const title=type==='leak'?(old?'💧 누수 현황 수정':'💧 누수 등록'):(old?'🛡 방수 이력 수정':'🛡 LK 연계 방수 수리 등록');
-      const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';
-      modal.innerHTML=`<div class="jgb-v47-modal-box"><div class="jgb-v47-modal-head"><h2>${title}</h2><button type="button" data-v47-action="close-modal">×</button></div>${body}<div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" data-v47-action="save-modal" data-type="${type}" data-id="${esc(old?.id||'')}" data-code="${esc(cardCode||old?.cardCode||'')}">저장</button></div></div>`;
-      document.body.appendChild(modal);
-      if(type==='wp'){
-        const sel=document.getElementById('v47_related_lk'), loc=document.getElementById('v47_location'), content=document.getElementById('v47_linked_content');
-        sel?.addEventListener('change',()=>{const l=S.leaks.find(x=>String(x.leakCode||'').toUpperCase()===String(sel.value||'').toUpperCase());if(loc)loc.value=l?.location||'';if(content)content.value=l?.content||'';});
-      }
+      const S=jgbV47Store(), old=type==='leak'?S.leaks.find(x=>String(x.id)===String(id)):S.wp.find(x=>String(x.id)===String(id)), esc=v=>xEsc(v==null?'':String(v)), today=new Date().toISOString().slice(0,10), cards=wpV72Cards(), card=cardCode?(cards[String(cardCode)]||{}):{}, preset=type==='wp'?(old?.location||card.location||''):'';
+      const body=type==='leak'?`<div class="jgb-v47-form-grid"><label>누수코드<input id="v47_leakCode" value="${esc(old?.leakCode||jgbV133NextLK())}" readonly title="누수 등록 시 LK 코드가 자동 생성됩니다."><small style="display:block;color:#6d8194;margin-top:4px">LK 코드 자동 생성</small></label><label>발생 위치<input id="v47_location" value="${esc(old?.location||'')}" placeholder="예: 2층 여자화장실"><div class="jgb-v47-location-buttons"><button type="button" data-v47-place="코트">코트</button><button type="button" data-v47-place="화장실">화장실</button><button type="button" data-v47-place="샤워실">샤워실</button><button type="button" data-v47-place="휴게실">휴게실</button><button type="button" data-v47-place="기타">기타</button></div></label><label>발견일<input id="v47_date" type="date" value="${esc(old?.date||today)}"></label><label>상태<select id="v47_status"><option ${old?.status==='조치필요'||!old?'selected':''}>조치필요</option><option ${old?.status==='조치완료'?'selected':''}>조치완료</option></select></label><label class="wide">누수 내용<textarea id="v47_content" rows="3">${esc(old?.content||'')}</textarea></label><label class="wide">비고<textarea id="v47_note" rows="2">${esc(old?.note||'')}</textarea></label></div>`:`<div class="jgb-v47-form-grid"><label>방수 작업 위치<input id="v47_location" value="${esc(preset)}" readonly></label><label>작업일자<input id="v47_date" type="date" value="${esc(old?.date||today)}"></label><label>작업구분<select id="v47_method"><option ${old?.method!=='외주'?'selected':''}>자체</option><option ${old?.method==='외주'?'selected':''}>외주</option></select></label><label>외주업체명<input id="v47_vendor" value="${esc(old?.vendor||'')}" placeholder="외주인 경우 입력"></label><label>작업비용<input id="v47_cost" type="number" min="0" value="${esc(old?.cost||0)}"></label><label>계약일<input id="v47_contract" type="date" value="${esc(old?.contract||'')}"></label><label>작업시작일<input id="v47_start" type="date" value="${esc(old?.start||'')}"></label><label>작업완료일<input id="v47_end" type="date" value="${esc(old?.end||'')}"></label><label>작업결과<select id="v47_result"><option ${!old||old?.result==='완료'?'selected':''}>완료</option><option ${old?.result==='보수 후 관찰'?'selected':''}>보수 후 관찰</option><option ${old?.result==='재조치 필요'?'selected':''}>재조치 필요</option></select></label><label>방수 이력<input id="v47_waCode" value="${esc(old?.waCode||jgbV133NextWA())}" readonly title="방수 이력 등록 시 WA 코드가 자동 생성됩니다."><small style="display:block;color:#6d8194;margin-top:4px">WA 코드 자동 생성</small></label><label class="wide">작업내용<textarea id="v47_content" rows="4">${esc(old?.content||'')}</textarea></label><label class="wide">비고<textarea id="v47_note" rows="2">${esc(old?.note||'')}</textarea></label><label class="wide">작업사진<input id="v47_photo" type="file" accept="image/*" multiple></label></div>`;
+      const title=type==='leak'?(old?'💧 누수 현황 수정':'💧 누수 등록'):(old?'🛡 방수 이력 수정':'📝 방수공사 이력내역 등록');
+      const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box"><div class="jgb-v47-modal-head"><h2>${title}</h2><button type="button" data-v47-action="close-modal">×</button></div>${body}<div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">취소</button><button type="button" class="btn blue" data-v47-action="save-modal" data-type="${type}" data-id="${esc(old?.id||'')}" data-code="${esc(cardCode||old?.cardCode||'')}">저장</button></div></div>`;document.body.appendChild(modal);
     }
-    function jgbV138EnsureWpCardForLeak(leakCode){
-      const lk=String(leakCode||'').trim().toUpperCase(); if(!lk)return '';
-      const S=jgbV47Store(), leak=S.leaks.find(x=>String(x.leakCode||'').trim().toUpperCase()===lk); if(!leak)return '';
-      let cards=wpV72Cards();
-      const hit=Object.entries(cards).find(([k,v])=>String(v?.leakCode||'').trim().toUpperCase()===lk);
-      if(hit)return String(hit[0]);
-      const code='WP-'+Date.now().toString(36).toUpperCase();
-      cards[code]={code,leakCode:lk,location:leak.location||'',facility:'장군봉체육관',area:'',part:leak.location||'',kind:'방수 보수·보강',status:'정상',manager:'',contractor:'',purpose:'시설물 보호 및 누수 예방',method:'',material:'',photos:[]};
-      wpV72SaveCards(cards); return code;
-    }
-    async function jgbV47SaveModal(type,id,cardCode){
-      const S=jgbV47Store(),val=k=>document.getElementById(k)?.value?.trim()||'',loc=val('v47_location');
-      if(type==='leak'){
-        if(!loc){alert('작업 위치를 확인하세요.');return}
-        const base={id:id||('V47-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),location:loc,date:val('v47_date')||new Date().toISOString().slice(0,10)};
-        const old=S.leaks.find(x=>String(x.id)===String(base.id))||{}; const leakCode=id?jgbV90NormalizeCode(val('v47_leakCode'),'LK-'):jgbV133NextLK();
-        if(!/^LK-\d+$/.test(leakCode))return alert('누수코드는 LK-01 형식으로 입력하세요.');
-        const dup=S.leaks.some(x=>String(x.leakCode||'').toUpperCase()===leakCode&&String(x.id)!==String(base.id));if(dup)return alert('이미 사용 중인 누수코드입니다.');
-        Object.assign(base,{leakCode,status:val('v47_status')||'조치필요',content:val('v47_content'),repairContent:val('v47_repairContent'),note:val('v47_note'),createdAt:old.createdAt||new Date().toISOString()});
-        S.saveLeaks(id?S.leaks.map(x=>String(x.id)===String(base.id)?base:x):[base,...S.leaks]);
-      }else{
-        const lk=String(val('v47_related_lk')||'').trim().toUpperCase();
-        const leak=S.leaks.find(x=>String(x.leakCode||'').trim().toUpperCase()===lk);
-        if(!leak){alert('연결할 LK 코드를 선택하세요.');return}
-        const cc=jgbV138EnsureWpCardForLeak(lk); if(!cc){alert('방수 이력카드를 만들지 못했습니다.');return}
-        const old=S.wp.find(x=>String(x.id)===String(id))||{};
-        const waCode=id?jgbV90NormalizeCode(val('v47_waCode'),'WA-'):jgbV133NextWA();
-        if(!/^WA-\d+$/.test(waCode))return alert('방수이력은 WA-01 형식으로 입력하세요.');
-        const dup=S.wp.some(x=>String(x.waCode||'').toUpperCase()===waCode&&String(x.id)!==String(id));if(dup)return alert('이미 사용 중인 방수이력입니다.');
-        const base={id:id||('V47-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),cardCode:cc,related:lk,leakCode:lk,location:leak.location||loc,date:val('v47_date')||new Date().toISOString().slice(0,10),waCode,method:val('v47_method')||'자체',vendor:val('v47_vendor'),cost:Number(val('v47_cost'))||0,contract:val('v47_contract'),start:val('v47_start'),end:val('v47_end'),result:val('v47_result')||'완료',content:val('v47_content'),note:val('v47_note'),photos:old.photos||[],createdAt:old.createdAt||new Date().toISOString()};
-        const f=document.getElementById('v47_photo')?.files||[];if(f.length){base.photos=[];for(const file of [...f].slice(0,3))base.photos.push(await jgbV47ReadFile(file))}
-        S.saveWp(id?S.wp.map(x=>String(x.id)===String(id)?base:x):[base,...S.wp]);
-      }
-      document.getElementById('jgbV47Modal')?.remove();render();
-    }
+    async function jgbV47SaveModal(type,id,cardCode){const S=jgbV47Store(),val=k=>document.getElementById(k)?.value?.trim()||'',loc=val('v47_location');if(!loc){alert('작업 위치를 확인하세요.');return}const base={id:id||('V47-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),location:loc,date:val('v47_date')||new Date().toISOString().slice(0,10)};if(type==='leak'){const old=S.leaks.find(x=>String(x.id)===String(base.id))||{};const leakCode=id?jgbV90NormalizeCode(val('v47_leakCode'),'LK-'):jgbV133NextLK();if(!/^LK-\d+$/.test(leakCode)){alert('누수코드는 LK-01 형식으로 입력하세요.');return}const dup=S.leaks.some(x=>String(x.leakCode||'').toUpperCase()===leakCode && String(x.id)!==String(base.id));if(dup){alert('이미 사용 중인 누수코드입니다. 다른 번호를 입력하세요.');return}Object.assign(base,{leakCode,status:val('v47_status')||'조치필요',content:val('v47_content'),note:val('v47_note'),createdAt:old.createdAt||new Date().toISOString()});S.saveLeaks(id?S.leaks.map(x=>String(x.id)===String(base.id)?base:x):[base,...S.leaks])}else{const old=S.wp.find(x=>String(x.id)===String(base.id))||{};const cc=String(cardCode||old.cardCode||'').trim();if(!cc||!wpV72Cards()[cc]){alert('연결할 이력카드를 찾지 못했습니다. 이력카드에서 이력내역 등록을 눌러주세요.');return}const waCode=id?jgbV90NormalizeCode(val('v47_waCode'),'WA-'):jgbV133NextWA();if(!/^WA-\d+$/.test(waCode)){alert('방수이력은 WA-01 형식으로 입력하세요.');return}const waDup=S.wp.some(x=>String(x.waCode||'').toUpperCase()===waCode && String(x.id)!==String(base.id));if(waDup){alert('이미 사용 중인 방수이력입니다. 다른 번호를 입력하세요.');return}Object.assign(base,{cardCode:cc,waCode,method:val('v47_method')||'자체',vendor:val('v47_vendor'),cost:Number(val('v47_cost'))||0,contract:val('v47_contract'),start:val('v47_start'),end:val('v47_end'),result:val('v47_result')||'완료',related:String((wpV72Cards()[cc]?.leakCode)||old.related||'').trim(),content:val('v47_content'),note:val('v47_note'),photos:old.photos||[],createdAt:old.createdAt||new Date().toISOString()});const f=document.getElementById('v47_photo')?.files||[];if(f.length){base.photos=[];for(const file of [...f].slice(0,3))base.photos.push(await jgbV47ReadFile(file))}S.saveWp(id?S.wp.map(x=>String(x.id)===String(base.id)?base:x):[base,...S.wp])}document.getElementById('jgbV47Modal')?.remove();render()}
     function jgbV47ReadFile(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=reject;r.readAsDataURL(file)})}
     function jgbV47ShowWp(location){const S=jgbV47Store(),hs=S.wp.filter(x=>x.location===location).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))),esc=v=>xEsc(v==null?'':String(v));const modal=document.createElement('div');modal.id='jgbV47Modal';modal.className='jgb-v47-modal';modal.innerHTML=`<div class="jgb-v47-modal-box wide"><div class="jgb-v47-modal-head"><h2>📍 ${esc(location)} · 방수관리 이력</h2><button type="button" data-v47-action="close-modal">×</button></div><div class="jgb-v47-history">${hs.length?hs.map((x,i)=>`<article><div class="jgb-v47-history-head"><b>이력 ${i+1}</b><span>${esc(x.date)} · ${esc(x.method)}</span></div><div class="jgb-v47-history-grid"><div><small>업체</small><b>${esc(x.method==='외주'?x.vendor:'자체')}</b></div><div><small>비용</small><b>${Number(x.cost||0).toLocaleString()}원</b></div><div><small>결과</small><b>${esc(x.result)}</b></div><div><small>관련 누수</small><b>${esc(x.related||'-')}</b></div><div class="wide"><small>작업내용</small><b>${esc(x.content||'-')}</b></div></div></article>`).join(''):'<div class="jgb-v47-empty">등록된 이력이 없습니다.</div>'}</div><div class="jgb-v47-modal-foot"><button type="button" class="btn gray" data-v47-action="close-modal">닫기</button></div></div>`;document.body.appendChild(modal)}
     function costFor(arr){return arr.reduce((n,x)=>n+(Number(x.cost)||0),0).toLocaleString()}
@@ -12799,17 +12697,35 @@ window.eamDeleteSelectedAsset=async function(){
 @media(max-width:900px){.jgb-v95-kpis{grid-template-columns:repeat(2,minmax(0,1fr));}.jgb-v95-main-grid{grid-template-columns:1fr;}.jgb-v95-plan{height:320px;}}
 </style>
 
-
-<script id="JGB_V138_NAV_STABLE">
-(function(){
-  if(window.__JGB_V138_NAV_STABLE)return; window.__JGB_V138_NAV_STABLE=true;
-  document.addEventListener('click',function(e){
-    const a=e.target.closest('a.jgb-link[data-page]'); if(!a)return;
-    e.preventDefault(); e.stopPropagation();
-    const p=a.getAttribute('data-page'); if(typeof go==='function')go(p); else location.href=a.href;
-  },true);
-})();
-</script>
 </body>
 </html>
-</html>
+
+<!-- JGB EAM V9: 누수 수리 LIVE 화면 오버라이드 -->
+<script>
+(function(){
+  if(document.getElementById('JGB_V9_LIVE_LEAK_STYLE')) return;
+  const st=document.createElement('style');
+  st.id='JGB_V9_LIVE_LEAK_STYLE';
+  st.textContent=`
+  .jgb-v9-live-wrap{width:min(1540px,calc(100vw - 34px));margin:0 auto;padding:10px 0 30px;color:#17334d}
+  .jgb-v9-head{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:14px;padding:16px 18px;background:#fff;border:1px solid #cbd9e6;border-radius:15px;box-shadow:0 4px 14px rgba(20,50,80,.06)}
+  .jgb-v9-title{display:flex;align-items:center;gap:12px}.jgb-v9-title .drop{width:44px;height:44px;border-radius:12px;background:#e9f7ff;display:grid;place-items:center;font-size:25px}.jgb-v9-title h1{margin:0;font-size:25px}.jgb-v9-title p{margin:4px 0 0;color:#71869a;font-size:11px}
+  .jgb-v9-live-pill{display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:999px;background:#fff0ef;color:#d13e37;border:1px solid #ffc6c2;font-size:12px;font-weight:950}.jgb-v9-live-dot{width:8px;height:8px;border-radius:50%;background:#ef4c43;box-shadow:0 0 0 5px rgba(239,76,67,.12);animation:jgbv9pulse 1.2s infinite}@keyframes jgbv9pulse{50%{opacity:.35;transform:scale(.8)}}
+  .jgb-v9-grid{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(360px,.78fr);gap:14px;align-items:stretch}
+  .jgb-v9-card{background:#fff;border:1px solid #cbd9e6;border-radius:15px;box-shadow:0 4px 14px rgba(20,50,80,.06);overflow:hidden}
+  .jgb-v9-map-card{padding:16px}.jgb-v9-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:11px}.jgb-v9-card-head h2{margin:0;font-size:19px}.jgb-v9-card-head p{margin:4px 0 0;color:#71869a;font-size:11px}
+  .jgb-v9-map{position:relative;height:520px;border:2px solid #536f87;background:#fff;border-radius:11px;overflow:hidden;padding:40px 26px 40px;box-sizing:border-box}
+  .jgb-v9-map:before{content:"";position:absolute;left:7%;right:7%;top:15%;bottom:15%;border:1px solid #e1e9f0;pointer-events:none}
+  .jgb-v9-top,.jgb-v9-bottom{position:absolute;left:0;right:0;text-align:center;font-weight:900;font-size:12px;color:#29465d}.jgb-v9-top{top:10px}.jgb-v9-bottom{bottom:10px}.jgb-v9-side{position:absolute;top:50%;writing-mode:vertical-rl;transform:translateY(-50%);font-size:11px;font-weight:900;color:#29465d}.jgb-v9-left{left:7px}.jgb-v9-right{right:7px}
+  .jgb-v9-courts{position:absolute;left:7%;right:7%;top:17%;bottom:17%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:15px}.jgb-v9-court{position:relative;border:2px solid #536f87;background:linear-gradient(180deg,#fff,#fbfdff);display:flex;align-items:center;justify-content:center}.jgb-v9-court:before{content:"";position:absolute;left:-2px;right:-2px;top:50%;border-top:2px solid #536f87}.jgb-v9-court b{font-size:23px;color:#2f4d68;z-index:2}.jgb-v9-entrance{position:absolute;left:79%;bottom:0;width:9%;height:30px;border-left:2px solid #536f87;border-right:2px solid #536f87;background:#fff;display:grid;place-items:center;font-size:9px;font-weight:900;z-index:3}.jgb-v9-entrance:before{content:"";position:absolute;left:50%;bottom:28px;width:34px;height:34px;border-left:2px solid #536f87;border-bottom:2px solid #536f87;border-radius:0 0 0 34px;transform:translateX(-2px)}
+  .jgb-v9-marker{position:absolute;z-index:8;transform:translate(-50%,-50%);border:0;background:transparent;padding:0;cursor:pointer}.jgb-v9-marker .ring{width:54px;height:54px;border-radius:50%;border:3px solid currentColor;display:grid;place-items:center;background:rgba(255,255,255,.95);box-shadow:0 0 0 7px rgba(239,76,67,.08)}.jgb-v9-marker .ring:after{content:"";position:absolute;width:86px;height:86px;border:2px solid currentColor;border-radius:50%;opacity:.22;animation:jgbv9radar 1.8s infinite}.jgb-v9-marker span{display:block;margin-top:5px;padding:4px 8px;border-radius:999px;background:#fff;border:1px solid currentColor;box-shadow:0 3px 9px rgba(20,50,80,.14);font-size:10px;font-weight:950;white-space:nowrap}@keyframes jgbv9radar{0%{transform:scale(.45);opacity:.75}100%{transform:scale(1.2);opacity:0}}
+  .jgb-v9-marker.open{color:#e64c45}.jgb-v9-marker.progress{color:#ed9a20}.jgb-v9-marker.done{color:#2aa56f}.jgb-v9-marker.selected .ring{box-shadow:0 0 0 7px rgba(34,126,218,.14),0 0 20px rgba(34,126,218,.25)}
+  .jgb-v9-legend{display:flex;gap:10px;align-items:center;font-size:10px;color:#667d91;white-space:nowrap}.jgb-v9-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}.jgb-v9-legend .r{background:#e64c45}.jgb-v9-legend .o{background:#ed9a20}.jgb-v9-legend .g{background:#2aa56f}
+  .jgb-v9-live-card{display:flex;flex-direction:column}.jgb-v9-live-head{padding:15px 16px;background:linear-gradient(135deg,#f05a52,#e63f3b);color:#fff;display:flex;justify-content:space-between;align-items:center}.jgb-v9-live-head h2{margin:0;font-size:20px}.jgb-v9-live-head small{font-size:10px;opacity:.9}.jgb-v9-live-body{padding:14px 15px;flex:1}.jgb-v9-current{padding:13px;border:1px solid #ffd2cf;background:#fff6f5;border-radius:12px;margin-bottom:13px}.jgb-v9-current-top{display:flex;justify-content:space-between;gap:10px}.jgb-v9-current b{font-size:19px}.jgb-v9-badge{padding:5px 8px;border-radius:999px;background:#ef514a;color:#fff;font-size:10px;font-weight:950;white-space:nowrap}.jgb-v9-current p{margin:5px 0 0;font-size:12px;color:#566f84}.jgb-v9-timeline{position:relative;margin:8px 0 15px;padding-left:26px}.jgb-v9-timeline:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:#dce6ee}.jgb-v9-event{position:relative;display:grid;grid-template-columns:45px 1fr;gap:7px;margin:0 0 13px}.jgb-v9-event:before{content:"";position:absolute;left:-22px;top:4px;width:9px;height:9px;border-radius:50%;background:#2c82d7;box-shadow:0 0 0 4px #eaf3fb}.jgb-v9-event:last-child:before{background:#ed9a20;box-shadow:0 0 0 4px #fff2dd}.jgb-v9-event time{font-size:10px;color:#8798a8}.jgb-v9-event b{display:block;font-size:11px}.jgb-v9-event span{display:block;font-size:10px;color:#71869a;margin-top:2px}.jgb-v9-info{border-top:1px solid #e1e9f0;padding-top:12px}.jgb-v9-info-row{display:grid;grid-template-columns:75px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #eef2f5;font-size:11px}.jgb-v9-info-row:last-child{border-bottom:0}.jgb-v9-info-row strong{color:#71869a}.jgb-v9-info-row b{color:#203c57}.jgb-v9-feed{border-top:1px solid #e1e9f0;margin-top:12px;padding-top:12px}.jgb-v9-feed-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.jgb-v9-feed-title b{font-size:13px}.jgb-v9-feed-title span{font-size:10px;color:#e64c45;font-weight:900}.jgb-v9-feed-list{display:grid;gap:7px;max-height:170px;overflow:auto}.jgb-v9-feed-item{display:grid;grid-template-columns:45px 1fr auto;gap:7px;align-items:center;padding:8px;border:1px solid #e1e9f0;border-radius:9px;background:#fbfdff;cursor:pointer}.jgb-v9-feed-item:hover{border-color:#8db9df;background:#f5faff}.jgb-v9-feed-item time{font-size:10px;color:#8a9aaa}.jgb-v9-feed-item b{font-size:10px}.jgb-v9-feed-item small{display:block;color:#71869a;font-size:9px;margin-top:2px}.jgb-v9-mini-badge{font-size:9px;font-weight:900;padding:4px 6px;border-radius:999px}.jgb-v9-mini-badge.wait{background:#fff0ee;color:#d23e35}.jgb-v9-mini-badge.run{background:#fff5df;color:#bd7000}.jgb-v9-mini-badge.done{background:#eaf8f0;color:#237d54}
+  @media(max-width:1050px){.jgb-v9-grid{grid-template-columns:1fr}.jgb-v9-map{height:470px}.jgb-v9-live-card{min-height:620px}}@media(max-width:700px){.jgb-v9-live-wrap{width:calc(100vw - 18px)}.jgb-v9-head{align-items:flex-start;flex-direction:column}.jgb-v9-map{height:390px;padding-left:18px;padding-right:18px}.jgb-v9-courts{gap:7px;left:5%;right:5%}.jgb-v9-marker .ring{width:42px;height:42px}.jgb-v9-marker .ring:after{width:66px;height:66px}.jgb-v9-marker span{font-size:8px}.jgb-v9-side{font-size:9px}}
+  `;
+  document.head.appendChild(st);
+
+})();
+</script>
+
