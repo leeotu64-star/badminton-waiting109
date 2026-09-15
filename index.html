@@ -3366,6 +3366,10 @@ html::before,body::before{
       const readObj=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
       const writeObj=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x))}catch(_){} };
       const positions=readObj(posKey);
+      // v237: 기존 배치 아이콘 위치값만 1회 초기화하고 자산 데이터는 보존
+      const resetKey='JGB_EAM_DASH_MAP_RESET_V237';
+      if(!localStorage.getItem(resetKey)){try{localStorage.removeItem(posKey);localStorage.setItem(resetKey,'1')}catch(_){}}
+      const freshPositions=readObj(posKey);
       const readLive=()=>{try{const x=JSON.parse(localStorage.getItem(liveKey)||'[]');return Array.isArray(x)?x:[]}catch(_){return []}};
       const writeLive=x=>{try{localStorage.setItem(liveKey,JSON.stringify(x))}catch(_){} };
       const normCat=a=>{const q=(codeOf(a)+' '+V(a?.category||a?.asset_type||'')).toUpperCase();if(/^AC[-_]/.test(q)||q.includes('에어컨'))return 'AC';if(/^BO[-_]/.test(q)||q.includes('보일러'))return 'BO';if(/^FI[-_]/.test(q)||q.includes('소방'))return 'FI';if(/^EL[-_]/.test(q)||q.includes('전기'))return 'EL';if(/^DO[-_]/.test(q)||q.includes('문·창호')||q.includes('문창호'))return 'DO';if(/^SA[-_]/.test(q)||q.includes('위생'))return 'SA';return 'OT'};
@@ -3375,7 +3379,7 @@ html::before,body::before{
       const check=assets.filter(a=>statusOf(a)==='check').length;
       const repair=assets.filter(a=>statusOf(a)==='repair').length;
       const defaultAC={'AC-01':[86,8],'AC-02':[68,8],'AC-03':[50,8],'AC-04':[32,8],'AC-05':[14,8],'AC-06':[7,30]};
-      const getPos=a=>{const c=codeOf(a);if(positions[c]&&Number.isFinite(Number(positions[c][0]))&&Number.isFinite(Number(positions[c][1])))return positions[c];return defaultAC[c]||null};
+      const getPos=a=>{const c=codeOf(a);if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];return defaultAC[c]||null};
       const placeName=a=>V(a?.place||a?.location||a?.zone||a?.area||'미지정');
       const attr=s=>esc(V(s)).replace(/\n/g,' ');
       const liveRows=readLive();
@@ -3394,23 +3398,23 @@ html::before,body::before{
         window.__eamCat=catPage;
         go('eam');
 
-        // EAM 현황에서 클릭한 자산을 EAM 이력 화면의 왼쪽 자산목록에서 실제로 자동 클릭
         let tries=0;
         const selectExisting=()=>{
-          const btn=[...document.querySelectorAll('#eamproGrid .eam-asset-row[data-code]')]
+          const btn=[...document.querySelectorAll('.eam-asset-row[data-code]')]
             .find(x=>V(x.getAttribute('data-code'))===c);
 
           if(btn){
-            btn.scrollIntoView({behavior:'smooth',block:'nearest'});
             btn.click();
             btn.classList.add('on');
+            btn.scrollIntoView({behavior:'smooth',block:'nearest'});
             return;
           }
 
-          // EAM 화면 렌더링이 늦어도 최대 2초 동안 왼쪽 자산 버튼을 찾는다.
-          if(++tries<20) setTimeout(selectExisting,100);
+          if(++tries<20){
+            setTimeout(selectExisting,100);
+          }
         };
-        requestAnimationFrame(selectExisting);
+        setTimeout(selectExisting,100);
       };
       window.eam228Status=async code=>{
         const a=assets.find(x=>codeOf(x)===V(code));if(!a||!SUPA)return;
@@ -3490,7 +3494,7 @@ html::before,body::before{
       window.eam228Location=label=>{const rows=locData[label]||[];const box=document.getElementById('eam228Card');if(!box)return;box.innerHTML=`<div class="eam228-card-head"><div><small>LOCATION</small><b>${esc(label)}</b></div><span>${rows.length}건</span></div><div class="eam228-location-list">${rows.length?rows.map(a=>`<button onclick="window.eam228Pick('${attr(codeOf(a))}')"><strong>${esc(codeOf(a))}</strong><span>${esc(a.name||'자산')}</span><em class="${statusClass(statusOf(a))}">${statusText(statusOf(a))}</em></button>`).join(''):'<div class="eam228-empty">등록된 자산이 없습니다.</div>'}</div>`};
 
       const markerAssets=assets.filter(a=>getPos(a));
-      const markers=markerAssets.map(a=>{const p=getPos(a),st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}"><span>${catIcon(cat)}</span><b>${esc(code)}</b></button>`}).join('');
+      const markers=markerAssets.map(a=>{const p=getPos(a),st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}" onclick="if(!window.__EAM228_DRAG_SUPPRESS)window.eam228Pick('${attr(code)}')"><span>${catIcon(cat)}</span><b>${esc(code)}</b></button>`}).join('');
       const court=n=>`<button type="button" class="eam228-court" onclick="window.eam228Location('코트 ${n}')"><span>${n}</span></button>`;
       const zone=(label,sub,cls='')=>`<button type="button" class="eam228-zone ${cls}" onclick="window.eam228Location('${attr(label)}')"><b>${esc(label)}</b><small>${esc(sub)}</small></button>`;
       const map=`<div id="eam228Map" class="eam228-map"><div class="eam228-courts"><strong>코트 구역 · 에어컨 자산 6개</strong>${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div><div class="eam228-facility"><div class="eam228-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>창고</b></button><span>▲ 계단</span></div><div class="eam228-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button><div class="eam228-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div></div>`;
@@ -3534,91 +3538,63 @@ html::before,body::before{
       .eam228-entry.court{right:12%!important;top:41%!important}
 </style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn" onclick="window.eam228New('AC')">자산등록</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
-      if(!window.__EAM228_DRAG_DELEGATED){
-        window.__EAM228_DRAG_DELEGATED=true;
-        let drag=null;
-
-        document.addEventListener('pointerdown',ev=>{
-          const el=ev.target.closest?.('.eam228-asset');
-          if(!el || ev.button!==0)return;
-          const map=el.closest('#eam228Map');
+      if(!window.__EAM228_DRAG_V237_BOUND){
+        window.__EAM228_DRAG_V237_BOUND=true;
+        const bindDrag=()=>{
+          const map=document.getElementById('eam228Map');
           if(!map)return;
-          ev.preventDefault();
-          ev.stopPropagation();
-
-          const rect=map.getBoundingClientRect();
-          drag={el,map,code:el.dataset.code,pointerId:ev.pointerId,
-                startX:ev.clientX,startY:ev.clientY,rect,active:false};
-          try{el.setPointerCapture?.(ev.pointerId)}catch(_){}
-        },true);
-
-        document.addEventListener('pointermove',ev=>{
-          if(!drag || ev.pointerId!==drag.pointerId)return;
-          const dx=ev.clientX-drag.startX,dy=ev.clientY-drag.startY;
-          if(!drag.active && Math.hypot(dx,dy)<4)return;
-          drag.active=true;
-          drag.el.classList.add('dragging');
-
-          const x=Math.max(2,Math.min(98,((ev.clientX-drag.rect.left)/drag.rect.width)*100));
-          const y=Math.max(2,Math.min(98,((ev.clientY-drag.rect.top)/drag.rect.height)*100));
-          drag.el.style.left=x.toFixed(2)+'%';
-          drag.el.style.top=y.toFixed(2)+'%';
-        },true);
-
-        const finish=e=>{
-          if(!drag || e.pointerId!==drag.pointerId)return;
-          const d=drag;
-          drag=null;
-          d.el.classList.remove('dragging');
-
-          if(!d.active){
-            window.eam228Pick?.(d.code);
-            return;
-          }
-
-          const x=Math.max(2,Math.min(98,((e.clientX-d.rect.left)/d.rect.width)*100));
-          const y=Math.max(2,Math.min(98,((e.clientY-d.rect.top)/d.rect.height)*100));
-          const pos=readObj(posKey);
-          pos[d.code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-          writeObj(posKey,pos);
-          window.__EAM228_DRAG_SUPPRESS=true;
-          setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,250);
-          render();
+          map.querySelectorAll('.eam228-asset').forEach(el=>{
+            if(el.__eamDragBound)return;
+            el.__eamDragBound=true;
+            el.setAttribute('draggable','false');
+            el.addEventListener('dragstart',e=>e.preventDefault());
+            el.addEventListener('pointerdown',e=>{
+              if(e.button!==0)return;
+              e.stopPropagation();
+              const rect=map.getBoundingClientRect();
+              const code=el.dataset.code;
+              const sx=e.clientX,sy=e.clientY;
+              let moved=false;
+              try{el.setPointerCapture(e.pointerId)}catch(_){}
+              const move=ev=>{
+                if(ev.pointerId!==e.pointerId)return;
+                const dx=ev.clientX-sx,dy=ev.clientY-sy;
+                if(!moved && Math.hypot(dx,dy)<4)return;
+                if(!moved)ev.preventDefault();
+                moved=true;
+                el.classList.add('dragging');
+                const x=Math.max(2,Math.min(98,((ev.clientX-rect.left)/rect.width)*100));
+                const y=Math.max(2,Math.min(98,((ev.clientY-rect.top)/rect.height)*100));
+                el.style.left=x.toFixed(2)+'%';
+                el.style.top=y.toFixed(2)+'%';
+              };
+              const end=ev=>{
+                if(ev.pointerId!==e.pointerId)return;
+                el.removeEventListener('pointermove',move);
+                el.removeEventListener('pointerup',end);
+                el.removeEventListener('pointercancel',end);
+                el.classList.remove('dragging');
+                try{el.releasePointerCapture(e.pointerId)}catch(_){}
+                if(!moved)return;
+                const x=Math.max(2,Math.min(98,((ev.clientX-rect.left)/rect.width)*100));
+                const y=Math.max(2,Math.min(98,((ev.clientY-rect.top)/rect.height)*100));
+                const pos=readObj(posKey);
+                pos[code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+                writeObj(posKey,pos);
+                window.__EAM228_DRAG_SUPPRESS=true;
+                setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,250);
+                render();
+              };
+              el.addEventListener('pointermove',move);
+              el.addEventListener('pointerup',end);
+              el.addEventListener('pointercancel',end);
+            });
+          });
         };
-
-        document.addEventListener('pointerup',finish,true);
-        document.addEventListener('pointercancel',finish,true);
-
-        // EAM 배치 아이콘: 일반 마우스 환경에서도 확실하게 드래그되도록 보조 mouse 이벤트 추가
-        let mouseDrag=null;
-        document.addEventListener('mousedown',ev=>{
-          const el=ev.target.closest?.('.eam228-asset');
-          if(!el || ev.button!==0 || !el.closest('#eam228Map') || drag) return;
-          ev.preventDefault();
-          const map=el.closest('#eam228Map'),rect=map.getBoundingClientRect();
-          mouseDrag={el,map,code:el.dataset.code,rect,startX:ev.clientX,startY:ev.clientY,active:false};
-        },true);
-        document.addEventListener('mousemove',ev=>{
-          if(!mouseDrag)return;
-          const d=mouseDrag,dx=ev.clientX-d.startX,dy=ev.clientY-d.startY;
-          if(!d.active && Math.hypot(dx,dy)<3)return;
-          d.active=true;d.el.classList.add('dragging');
-          const x=Math.max(2,Math.min(98,((ev.clientX-d.rect.left)/d.rect.width)*100));
-          const y=Math.max(2,Math.min(98,((ev.clientY-d.rect.top)/d.rect.height)*100));
-          d.el.style.left=x.toFixed(2)+'%';d.el.style.top=y.toFixed(2)+'%';
-        },true);
-        const finishMouse=ev=>{
-          if(!mouseDrag)return;
-          const d=mouseDrag;mouseDrag=null;d.el.classList.remove('dragging');
-          if(!d.active){window.eam228Pick?.(d.code);return;}
-          const x=Math.max(2,Math.min(98,((ev.clientX-d.rect.left)/d.rect.width)*100));
-          const y=Math.max(2,Math.min(98,((ev.clientY-d.rect.top)/d.rect.height)*100));
-          const pos=readObj(posKey);pos[d.code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];writeObj(posKey,pos);
-          window.__EAM228_DRAG_SUPPRESS=true;setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,250);
-          render();
-        };
-        document.addEventListener('mouseup',finishMouse,true);
+        setTimeout(bindDrag,0);
+        window.__eam228BindDrag=bindDrag;
       }
+      setTimeout(()=>window.__eam228BindDrag?.(),0);
     }
 
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
@@ -3948,7 +3924,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     function eamRegisterNewAsset(){document.getElementById('eamRegisterModal')?.remove();document.body.insertAdjacentHTML('beforeend',`<div id="eamRegisterModal" class="eam-modal"><div class="eam-modal-card"><div class="eam-modal-head"><div><span>EAM ASSET MASTER</span><h3>새 자산 등록</h3><small>등록 후 작업·점검·교체·폐기 이력이 이 자산에 연결됩니다.</small></div><button type="button" onclick="closeEamRegisterModal()">×</button></div><div class="eam-modal-grid"><label>시설·설비명 *<input id="eamRegName" placeholder="예: 주펌프"></label><label>분류 *<select id="eamRegCat"><option>냉난방</option><option>소방설비</option><option>보일러·온수</option><option>전기설비</option><option>코트조명</option><option>위생설비</option><option>문·창호설비</option><option>기타설비</option></select></label><label>위치코드 *<select id="eamRegLocCode" onchange="eamRegLocationChange(this.value)">${eamLocationCodeOptions('A')}</select></label><label>세부 위치 *<select id="eamRegDetailPlace" onchange="eamShowCustomPlace('eamRegDetailPlace','eamRegCustomPlace')">${eamLocationDetails('A')}</select><input id="eamRegCustomPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label><label>설치일<input id="eamRegDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label></div><div class="eam-modal-note">자산번호는 자동 발급합니다. 등록 후 EAM 자산번호 기준으로 작업·점검·교체·폐기 이력이 연결됩니다.</div><div class="eam-modal-actions"><button class="btn gray" type="button" onclick="closeEamRegisterModal()">취소</button><button class="btn blue" id="eamRegSubmit" type="button" onclick="submitEamRegister()">EAM 자산 생성</button></div></div></div>`);}
     function eamRegPlaceMode(v){const input=document.getElementById('eamRegPlace');if(!input)return;if(v==='__new__'){input.style.display='block';input.value='';input.focus()}else{input.style.display='none';input.value=v||''}}
     function closeEamRegisterModal(){document.getElementById('eamRegisterModal')?.remove()}
-    async function submitEamRegister(){if(!SUPA){alert('Supabase 연결이 필요합니다.');return}const name=document.getElementById('eamRegName')?.value.trim(),category=document.getElementById('eamRegCat')?.value||'기타설비',locCode=document.getElementById('eamRegLocCode')?.value||'A',detail=document.getElementById('eamRegDetailPlace')?.value||'',custom=document.getElementById('eamRegCustomPlace')?.value.trim()||'',place=detail==='__custom__'?custom:detail,date=document.getElementById('eamRegDate')?.value||new Date().toISOString().slice(0,10);if(!name||!place){alert('시설·설비명과 세부 위치는 필수입니다.');return}const btn=document.getElementById('eamRegSubmit');if(btn)btn.disabled=true;const code='AST-'+new Date().toISOString().replace(/\D/g,'').slice(0,14)+'-'+Math.random().toString(36).slice(2,5).toUpperCase();try{const r=await SUPA.from('assets').insert({asset_code:code,name,category,place,status:'정상',product_name:category});if(r.error)throw r.error;await eamLoad();const created=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));if(created){const h=await SUPA.from('asset_history').insert({asset_id:created.id,event_type:'자산등록',description:`EAM 신규 자산 등록 · ${name} · 위치코드 ${locCode}`,worker_name:'관리자',cost:0,event_date:date});if(h.error)console.warn('자산등록 이력 저장 실패',h.error)}window.__eamSelCode=code;window.__eamCat=({'냉난방':'cooling','소방설비':'fire','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','위생설비':'sanitary','문·창호설비':'doors','기타설비':'other'})[category]||'other';closeEamRegisterModal();await eamLoad();go('eam')}catch(e){console.error(e);alert('EAM 자산 등록에 실패했습니다.\n'+(e?.message||'assets 테이블의 등록 권한을 확인하세요.'))}finally{if(btn)btn.disabled=false}}
+    async function submitEamRegister(){if(!SUPA){alert('Supabase 연결이 필요합니다.');return}const name=document.getElementById('eamRegName')?.value.trim(),category=document.getElementById('eamRegCat')?.value||'기타설비',locCode=document.getElementById('eamRegLocCode')?.value||'A',detail=document.getElementById('eamRegDetailPlace')?.value||'',custom=document.getElementById('eamRegCustomPlace')?.value.trim()||'',place=detail==='__custom__'?custom:detail,date=document.getElementById('eamRegDate')?.value||new Date().toISOString().slice(0,10);if(!name||!place){alert('시설·설비명과 세부 위치는 필수입니다.');return}const btn=document.getElementById('eamRegSubmit');if(btn)btn.disabled=true;const code='AST-'+new Date().toISOString().replace(/\D/g,'').slice(0,14)+'-'+Math.random().toString(36).slice(2,5).toUpperCase();try{const r=await SUPA.from('assets').insert({asset_code:code,name,category,place:null,status:'정상',product_name:category});if(r.error)throw r.error;await eamLoad();const created=(window.__eamA||[]).find(v=>String(v.asset_code)===String(code));if(created){const h=await SUPA.from('asset_history').insert({asset_id:created.id,event_type:'자산등록',description:`EAM 신규 자산 등록 · ${name} · 위치코드 ${locCode}`,worker_name:'관리자',cost:0,event_date:date});if(h.error)console.warn('자산등록 이력 저장 실패',h.error)}window.__eamSelCode=code;window.__eamCat=({'냉난방':'cooling','소방설비':'fire','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','위생설비':'sanitary','문·창호설비':'doors','기타설비':'other'})[category]||'other';closeEamRegisterModal();await eamLoad();go('eam')}catch(e){console.error(e);alert('EAM 자산 등록에 실패했습니다.\n'+(e?.message||'assets 테이블의 등록 권한을 확인하세요.'))}finally{if(btn)btn.disabled=false}}
 
     /* =========================
        EAM FINAL UI / REAL ASSET ONLY
@@ -4111,11 +4087,9 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <div class="eam-modal-grid">
             <label>시설·설비명 *<input id="eamRegName" placeholder="구매한 실제 제품명"></label>
             <label>분류 *<select id="eamRegCat"><option>냉난방</option><option>소방설비</option><option>보일러·온수</option><option>전기설비</option><option>코트조명</option><option>위생설비</option><option>문·창호설비</option><option>기타설비</option><option>누수관리</option></select></label>
-            <label>위치코드 *<select id="eamRegLocCode" onchange="eamRegLocationChange(this.value)">${eamLocationCodeOptions('A')}</select></label>
-            <label>세부 위치 *<select id="eamRegDetailPlace">${eamLocationDetails('A')}</select></label>
             <label>설치일<input id="eamRegDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label>
           </div>
-          <div class="eam-modal-note">기존 자산은 자동으로 추가하지 않습니다. 신규 구매·설치 자산 또는 신규 누수 항목만 직접 등록합니다.</div>
+          <div class="eam-modal-note">등록 후 배치도에서 자산 아이콘을 직접 배치합니다.</div>
           <div class="eam-modal-actions"><button class="btn gray" type="button" onclick="closeEamRegisterModal()">취소</button><button class="btn blue" id="eamRegSubmit" type="button" onclick="submitEamRegister()">EAM 자산 생성</button></div>
         </div></div>`);
       const cat=document.getElementById('eamRegCat');
@@ -4126,16 +4100,14 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
       const name=document.getElementById('eamRegName')?.value.trim();
       const category=document.getElementById('eamRegCat')?.value||'기타설비';
-      const locCode=document.getElementById('eamRegLocCode')?.value||'A';
-      const place=document.getElementById('eamRegDetailPlace')?.value.trim();
       const date=document.getElementById('eamRegDate')?.value||new Date().toISOString().slice(0,10);
-      if(!name||!place){alert('시설·설비명과 세부 위치는 필수입니다.');return}
+      if(!name){alert('시설·설비명을 입력하세요.');return}
       const btn=document.getElementById('eamRegSubmit'); if(btn)btn.disabled=true;
       const code='AST-'+new Date().toISOString().replace(/\D/g,'').slice(0,14)+'-'+Math.random().toString(36).slice(2,5).toUpperCase();
       try{
         const r=await SUPA.from('assets').insert({asset_code:code,name,category,place,status:'정상',product_name:category}).select('id,asset_code,name,category,place,status').single();
         if(r.error)throw r.error;
-        await SUPA.from('asset_history').insert({asset_id:r.data.id,event_type:'자산등록',description:`신규 자산 등록 · ${name} · 위치코드 ${locCode} · ${place}`,worker_name:'관리자',cost:0,event_date:date});
+        await SUPA.from('asset_history').insert({asset_id:r.data.id,event_type:'자산등록',description:`신규 자산 등록 · ${name}`,worker_name:'관리자',cost:0,event_date:date});
         window.__eamSelCode=code;
         const map={'냉난방':'cooling','소방설비':'fire','보일러·온수':'water','전기설비':'electrical','코트조명':'lighting','방수':'waterproof','위생설비':'sanitary','문·창호설비':'doors','기타설비':'other'};
         window.__eamCat=map[category]||'other';
