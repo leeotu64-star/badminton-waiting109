@@ -4748,36 +4748,162 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   }catch(e){console.warn('V85 WA identity normalization failed',e)}
   const CARDKEY='JGB_V72_WP_CARDS';
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+  /*
+   * V10 FIX
+   * - 기존 V48 카드 저장소를 삭제하지 않음
+   * - 기존 V48 → V72 카드로 안전하게 복구
+   * - 누수관리의 LK가 있으면 방수 이력카드를 자동으로 표시
+   * - 자동 생성한 카드는 V72에 저장하여 다음 접속에서도 유지
+   */
   let cards=jgbV90NormalizeWpCards();
-  /* 방수 이력카드는 1개만 유지. 중복 카드와 해당 카드 이력은 정리 */
-  cards=jgbV90NormalizeWpCards();
-  /* 기존 v48 위치키 카드를 v72 고유 관리번호 카드로 1회 이관 */
+
   try{
-    const legacy=JSON.parse(localStorage.getItem('JGB_V48_WP_CARDS')||'{}')||{};
-    let changed=false, used=new Set(Object.keys(cards));
-    Object.keys(legacy).forEach(loc=>{
-      const m=legacy[loc]||{}; if(!m||typeof m!=='object')return;
-      const code=String(m.code||'').trim()||('WP-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,5).toUpperCase());
-      if(!cards[code]){cards[code]={...m,code,location:loc};changed=true}
+    const legacyRaw=localStorage.getItem('JGB_V48_WP_CARDS');
+    const legacy=JSON.parse(legacyRaw||'{}');
+    let changed=false;
+
+    if(legacy && typeof legacy==='object' && !Array.isArray(legacy)){
+      Object.entries(legacy).forEach(([loc,m])=>{
+        if(!m || typeof m!=='object') return;
+        const lk=String(m.leakCode||m.related||'').trim().toUpperCase();
+        const leak=Array.isArray(S.leaks)
+          ? S.leaks.find(x=>String(x?.leakCode||'').trim().toUpperCase()===lk)
+          : null;
+        const leakCode=/^LK-\d+$/.test(lk) ? lk :
+          String(leak?.leakCode||'').trim().toUpperCase();
+
+        if(!/^LK-\d+$/.test(leakCode)) return;
+
+        const code=String(m.code||'').trim() ||
+          ('CARD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase());
+
+        if(!cards[code]){
+          cards[code]={
+            ...m,
+            code,
+            leakCode,
+            location:String(leak?.location||m.location||loc||'').trim(),
+            facility:m.facility||'장군봉체육관'
+          };
+          changed=true;
+        }
+      });
+    }
+
+    /* 누수관리 LK를 기준으로 카드가 없으면 자동 복구 */
+    const leakRows=Array.isArray(S.leaks)?S.leaks:[];
+    const existingLK=new Set(
+      Object.values(cards||{})
+        .map(m=>String(m?.leakCode||m?.related||'').trim().toUpperCase())
+        .filter(x=>/^LK-\d+$/.test(x))
+    );
+
+    leakRows.forEach(l=>{
+      const lk=String(l?.leakCode||l?.lkCode||l?.code||'').trim().toUpperCase();
+      if(!/^LK-\d+$/.test(lk) || existingLK.has(lk)) return;
+
+      const code=lk;
+      cards[code]={
+        code,
+        leakCode:lk,
+        location:String(l?.location||'').trim(),
+        facility:'장군봉체육관',
+        area:'',
+        part:String(l?.location||'').trim(),
+        kind:'방수 보수·보강',
+        areaSize:'',
+        firstDate:'',
+        status:'정상',
+        manager:'',
+        contact:'',
+        contractor:'',
+        warranty:'',
+        purpose:'시설물 보호 및 누수 예방',
+        method:'',
+        material:'',
+        scope:'',
+        note:'',
+        photos:[]
+      };
+      existingLK.add(lk);
+      changed=true;
     });
-    if(changed)localStorage.setItem(CARDKEY,JSON.stringify(cards));
-  }catch(e){}
-  /* 레거시 카드가 다시 중복 생성되지 않도록 정리 */
-  try{localStorage.removeItem('JGB_V48_WP_CARDS')}catch(e){}
-  cards=jgbV90NormalizeWpCards();
-  /* 방수카드가 아직 생성되지 않았어도 누수관리의 LK를 기준으로 화면에 먼저 표시 */
+
+    if(changed) wpV72SaveCards(cards);
+  }catch(e){
+    console.warn('V10 방수 이력카드 복구 실패',e);
+  }
+
+  /*
+   * 카드가 없더라도 기존 WA 이력의 related=LK를 기준으로
+   * 최소 이력카드를 복구한다.
+   */
+  try{
+    const hs0=Array.isArray(S.wp)?S.wp:[];
+    const cardLK=new Set(
+      Object.values(cards||{})
+        .map(m=>String(m?.leakCode||m?.related||'').trim().toUpperCase())
+        .filter(x=>/^LK-\d+$/.test(x))
+    );
+
+    hs0.forEach(h=>{
+      const lk=String(h?.related||'').trim().toUpperCase();
+      if(!/^LK-\d+$/.test(lk) || cardLK.has(lk)) return;
+
+      const parent=(Array.isArray(S.leaks)?S.leaks:[]).find(
+        l=>String(l?.leakCode||'').trim().toUpperCase()===lk
+      );
+
+      cards[lk]={
+        code:lk,
+        leakCode:lk,
+        location:String(parent?.location||h?.location||'').trim(),
+        facility:'장군봉체육관',
+        part:String(parent?.location||h?.location||'').trim(),
+        kind:'방수 보수·보강',
+        status:'정상',
+        photos:[]
+      };
+      cardLK.add(lk);
+    });
+
+    wpV72SaveCards(cards);
+  }catch(e){
+    console.warn('V10 WA 기준 카드 복구 실패',e);
+  }
+
+  /* 방수카드 표시 목록 */
   const leakRows=Array.isArray(S.leaks)?S.leaks:[];
   const cardByLK=new Map();
-  Object.entries(cards).forEach(([code,m])=>{
-    const lk=String(m?.leakCode||'').trim().toUpperCase();
-    if(/^LK-\d+$/.test(lk)) cardByLK.set(lk,{code:String(m?.code||code),meta:m||{}});
+
+  Object.entries(cards||{}).forEach(([code,m])=>{
+    const lk=String(m?.leakCode||m?.related||'').trim().toUpperCase();
+    if(/^LK-\d+$/.test(lk)){
+      cardByLK.set(lk,{
+        code:String(m?.code||code),
+        meta:m||{}
+      });
+    }
   });
+
   leakRows.forEach(l=>{
     const lk=String(l?.leakCode||l?.lkCode||l?.code||'').trim().toUpperCase();
-    if(!/^LK-\d+$/.test(lk)||cardByLK.has(lk))return;
-    cardByLK.set(lk,{code:lk,meta:{code:lk,leakCode:lk,location:String(l?.location||'').trim(),facility:'장군봉체육관'}});
+    if(!/^LK-\d+$/.test(lk) || cardByLK.has(lk)) return;
+
+    cardByLK.set(lk,{
+      code:lk,
+      meta:{
+        code:lk,
+        leakCode:lk,
+        location:String(l?.location||'').trim(),
+        facility:'장군봉체육관'
+      }
+    });
   });
+
   const list=Array.from(cardByLK.values()).filter(x=>x.code);
+
   const cardFor=(card,idx)=>{
     const code=card.code, meta=card.meta||{}, loc=String(meta.location||'').trim();
     const rows=hs.filter(x=>String(x.related||'').trim().toUpperCase()===String(meta.leakCode||'').trim().toUpperCase()).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
@@ -4799,7 +4925,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       </div>
       <button type="button" class="jgb-v57-head-btn" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button>
     </header>
-    <div class="jgb-v66-grid">${list.map(cardFor).join('')||'<div class="jgb-v66-none">등록된 방수공사 이력카드가 없습니다.<br><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>'}</div></div>`;
+    <div class="jgb-v66-grid">${list.map(cardFor).join('')||'<div class="jgb-v66-none">연결된 LK 누수코드가 없습니다.<br><small style="display:block;margin:8px 0;color:#8095a7">누수관리에서 LK 누수코드를 등록하면 이력카드가 자동으로 표시됩니다.</small><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>'}</div></div>`;
 }
     function wpSetCard(location,idx,esc){
       if(!location)return `<section class="jgb-v52-set"><div class="jgb-v48-card panel jgb-v52-card"><div class="jgb-v48-card-head"><div><h2>📋 방수공사 이력카드</h2><p>방수 대상 시설의 기본정보를 관리합니다.</p></div><div class="jgb-v48-card-actions"><button type="button" class="btn gray" disabled>✏️ 이력카드 수정</button></div></div><div class="jgb-v52-empty">방수 위치를 등록하면 이력카드가 표시됩니다.</div></div><section class="jgb-v48-history panel jgb-v52-history"><div class="jgb-v48-card-head"><div><h2>📝 방수공사 이력내역</h2></div></div><div class="jgb-v52-empty">등록된 방수작업 이력이 없습니다.</div></section></section>`;
