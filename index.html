@@ -3339,129 +3339,100 @@ html::before,body::before{
     }
 
     function dashboard2(){
-      const A=Array.isArray(window.__eamA)?window.__eamA:[],
+      const A=Array.isArray(window.__eamA)?window.__eamA:[], H=Array.isArray(window.__eamH)?window.__eamH:[],
             assets=A.filter(a=>String(a.status||'정상')!=='폐기'),
             V=s=>String(s??'').trim(),
             esc=s=>typeof xEsc==='function'?xEsc(s):String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])),
-            currentYear=new Date().getFullYear();
+            normal=assets.filter(a=>V(a.status||'정상')==='정상').length,
+            currentYear=new Date().getFullYear(),
+            year=Number(localStorage.getItem('JGB_EAM_DASH_YEAR'))||currentYear;
 
       const TYPES=[
-        {key:'AC',name:'냉난방설비',sub:'에어컨, 냉난방기 등',cls:'ac'},
-        {key:'BO',name:'보일러설비',sub:'보일러, 온수설비 등',cls:'bo'},
-        {key:'FI',name:'소방설비',sub:'소화전, 감지기, 스프링클러 등',cls:'fi'},
-        {key:'EL',name:'전기설비',sub:'분전반, 전기, 배선 등',cls:'el'},
-        {key:'LT',name:'조명설비',sub:'실내·외 조명 등',cls:'lt'},
+        {key:'AC',name:'냉난방설비',sub:'에어컨·냉난방기',cls:'ac'},
+        {key:'BO',name:'보일러설비',sub:'보일러·온수설비',cls:'bo'},
+        {key:'FI',name:'소방설비',sub:'소화전·감지기 등',cls:'fi'},
+        {key:'EL',name:'전기설비',sub:'분전반·전기·배선',cls:'el'},
+        {key:'LT',name:'조명설비',sub:'실내·외 조명',cls:'lt'},
         {key:'OT',name:'기타설비',sub:'기타 시설물',cls:'ot'}
       ];
-      const reservedKey='JGB_EAM_RESERVED_CODES';
-      const getReserved=()=>{try{const x=JSON.parse(localStorage.getItem(reservedKey)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}};
-      const setReserved=x=>localStorage.setItem(reservedKey,JSON.stringify(x));
-      const usedCodes=()=>assets.map(a=>V(a.asset_code||a.code||a.id)).concat(getReserved()).filter(Boolean);
-      const nextCode=(prefix,qty=1)=>{
-        const used=new Set(usedCodes().map(x=>x.toUpperCase()));
-        let n=1, out=[];
-        while(out.length<qty){
-          const code=prefix+'-'+String(n).padStart(2,'0');
-          if(!used.has(code)){out.push(code);used.add(code)}
-          n++;
-          if(n>9999)break;
-        }
-        return out;
-      };
-      const countType=t=>assets.filter(a=>V(a.asset_code||'').toUpperCase().startsWith(t.key+'-')).length;
-      const statusCount=st=>assets.filter(a=>V(a.status||'정상')===st).length;
-
-      window.eamDashGenerate=function(prefix){
-        const type=TYPES.find(t=>t.key===prefix)||TYPES[0];
-        const name=V(document.getElementById('eamCodeAssetName')?.value)||'';
-        const codes=nextCode(type.key,1);
-        const out=document.getElementById('eamGeneratedCode');
-        if(out)out.innerHTML='<strong>'+esc(codes[0])+'</strong><small>'+esc(type.name)+(name?' · '+esc(name):'')+'</small>';
-      };
+      const codeOf=a=>V(a.asset_code||a.code||'');
+      const typeOf=a=>{const c=codeOf(a).toUpperCase();const x=TYPES.find(t=>c.indexOf(t.key+'-')===0);return x?x.key:''};
+      const typeRows=key=>assets.filter(a=>typeOf(a)===key);
+      const statusClass=a=>{const st=V(a.status||'정상');return st==='정상'?'ok':/점검|확인/.test(st)?'warn':'bad'};
+      const getReserved=()=>{try{const x=JSON.parse(localStorage.getItem('JGB_EAM_RESERVED_CODES')||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}};
+      const usedCodes=()=>assets.map(codeOf).concat(getReserved()).filter(Boolean).map(x=>x.toUpperCase());
+      const nextCodes=(prefix,qty)=>{const used=new Set(usedCodes());let n=1,out=[];while(out.length<qty&&n<10000){const c=prefix+'-'+String(n).padStart(2,'0');if(!used.has(c)){out.push(c);used.add(c)}n++;}return out};
+      window.eamDashCodePreview=function(prefix,id){const el=document.getElementById(id);if(el)el.textContent=nextCodes(prefix,1)[0]||prefix+'-??'};
       window.eamDashReserve=function(){
-        const sel=document.getElementById('eamPreType');
-        const qty=Math.max(1,Math.min(99,Number(document.getElementById('eamPreQty')?.value)||1));
-        const prefix=sel?.value||'AC';
-        const codes=nextCode(prefix,qty);
-        const old=getReserved();
-        setReserved(old.concat(codes));
-        const out=document.getElementById('eamPreResult');
-        if(out)out.innerHTML='<b>'+esc(codes[0])+(codes.length>1?' ~ '+esc(codes[codes.length-1]):'')+'</b><span>'+codes.length+'개 생성 · 미사용 코드로 예약됨</span>';
-        const list=document.getElementById('eamReservedList');
-        if(list)list.innerHTML=renderReserved();
-        renderDashboardCards();
+        const sel=document.getElementById('eamCodeGenType'); const qty=Math.max(1,Math.min(100,Number(document.getElementById('eamCodeGenQty')?.value)||1));
+        const prefix=sel?.value||'AC'; const codes=nextCodes(prefix,qty); const old=getReserved();
+        localStorage.setItem('JGB_EAM_RESERVED_CODES',JSON.stringify(old.concat(codes)));
+        const out=document.getElementById('eamCodeGenResult'); if(out)out.innerHTML='<b>'+esc(codes.join(', '))+'</b><small>'+codes.length+'개 코드가 미리 생성되었습니다. 자산 등록 시 사용할 수 있습니다.</small>';
       };
-      window.eamDashClearReserved=function(){
-        setReserved([]);
-        const list=document.getElementById('eamReservedList'); if(list)list.innerHTML=renderReserved();
-        renderDashboardCards();
-      };
-      window.eamDashShowType=function(prefix){
-        const t=TYPES.find(x=>x.key===prefix)||TYPES[0];
-        const rows=assets.filter(a=>V(a.asset_code||'').toUpperCase().startsWith(prefix+'-'));
-        const box=document.getElementById('eamTypeDrawer'); if(!box)return;
-        box.innerHTML='<div class="eam-drawer-head"><div><b>'+esc(t.key)+'</b><strong>'+esc(t.name)+'</strong><small>'+esc(t.sub)+'</small></div><button type="button" onclick="document.getElementById(\'eamTypeDrawer\').classList.remove(\'on\')">닫기 ×</button></div>'+
-          '<div class="eam-drawer-body">'+(rows.length?rows.map(a=>'<button type="button" class="eam-asset-row" onclick="window.eamDashAsset(\''+esc(a.asset_code||a.id||'')+'\')"><b>'+esc(a.asset_code||a.id||'')+'</b><span>'+esc(a.name||a.model||'미등록')+'</span><em class="'+(V(a.status||'정상')==='정상'?'ok':'bad')+'">'+esc(a.status||'정상')+'</em></button>').join(''):'<div class="eam-empty">등록된 '+esc(t.name)+' 자산이 없습니다.</div>')+'</div>';
-        box.classList.add('on');
+      window.eamDashType=function(key){
+        const box=document.getElementById('eamTypeDrawer');if(!box)return;
+        const rows=typeRows(key), t=TYPES.find(x=>x.key===key);
+        box.classList.add('open');
+        box.innerHTML='<div class="eam-drawer-head"><div><b>'+esc(t.key)+' · '+esc(t.name)+'</b><small>'+rows.length+'건</small></div><button type="button" onclick="document.getElementById(\'eamTypeDrawer\').classList.remove(\'open\')">닫기 ×</button></div>'+
+          '<div class="eam-code-list">'+(rows.length?rows.map(a=>'<button type="button" onclick="window.eamDashAsset(\''+esc(codeOf(a))+'\')"><strong>'+esc(codeOf(a)||'미등록')+'</strong><span>'+esc(a.name||a.model||'자산')+'</span><em class="'+statusClass(a)+'">'+esc(a.status||'정상')+'</em></button>').join(''):'<div class="eam-code-empty">등록된 자산이 없습니다.</div>')+'</div>';
+        box.scrollIntoView({behavior:'smooth',block:'nearest'});
       };
       window.eamDashAsset=function(code){
-        const a=assets.find(x=>V(x.asset_code||x.id)===V(code)); if(!a)return;
-        const box=document.getElementById('eamTypeDrawer'); if(!box)return;
-        box.innerHTML='<div class="eam-drawer-head"><div><b>'+esc(a.asset_code||a.id||'')+'</b><strong>'+esc(a.name||a.model||'미등록')+'</strong><small>'+esc(a.place||a.location||'위치 미지정')+'</small></div><button type="button" onclick="document.getElementById(\'eamTypeDrawer\').classList.remove(\'on\')">닫기 ×</button></div>'+
-          '<div class="eam-asset-detail"><div class="eam-detail-status '+(V(a.status||'정상')==='정상'?'ok':'bad')+'">'+esc(a.status||'정상')+'</div><dl><dt>자산코드</dt><dd>'+esc(a.asset_code||a.id||'')+'</dd><dt>자산명</dt><dd>'+esc(a.name||a.model||'미등록')+'</dd><dt>설치 위치</dt><dd>'+esc(a.place||a.location||'미지정')+'</dd><dt>제조사</dt><dd>'+esc(a.manufacturer||a.maker||'미등록')+'</dd><dt>모델명</dt><dd>'+esc(a.product_name||a.model||'미등록')+'</dd></dl></div>';
-        box.classList.add('on');
-      };
-      const renderReserved=()=>{
-        const r=getReserved();
-        return r.length?r.slice(-20).reverse().map(c=>'<span>'+esc(c)+'</span>').join(''):'<i>아직 생성된 예약 코드가 없습니다.</i>';
-      };
-      window.eamDashQuickGenerate=function(){
-        const p=document.getElementById('eamQuickType')?.value||'AC';
-        const code=nextCode(p,1)[0];
-        const out=document.getElementById('eamQuickCode'); if(out)out.textContent=code;
-      };
-      const renderDashboardCards=()=>{
-        const root=document.getElementById('eamAssetCards'); if(!root)return;
-        root.innerHTML=TYPES.map(t=>'<button type="button" class="eam-type-card '+t.cls+'" onclick="window.eamDashShowType(\''+t.key+'\')"><div class="eam-code-box">'+t.key+'</div><div class="eam-type-info"><strong>'+t.name+'</strong><small>'+t.sub+'</small><b>'+countType(t)+'<em>건</em></b></div><span class="eam-card-arrow">'+t.key+' 자산 보기&nbsp; ›</span></button>').join('');
+        const a=assets.find(x=>codeOf(x)===V(code)); if(!a)return;
+        const box=document.getElementById('eamDtInspector'); if(!box)return;
+        const st=V(a.status||'정상'), x=Number(a.map_x), y=Number(a.map_y);
+        box.innerHTML='<div class="dt-ins-head"><div><small>선택 자산</small><h3>'+esc(codeOf(a))+'</h3></div><span class="dt-status '+(st==='정상'?'ok':'bad')+'">'+(st==='정상'?'🟢 정상':'🔴 '+esc(st))+'</span></div>'+
+          '<div class="dt-selected-asset"><b>'+esc(a.name||a.model||'미등록 자산')+'</b></div>'+
+          '<div class="dt-detail-grid"><div><small>자산종류</small><b>'+esc(TYPES.find(t=>t.key===typeOf(a))?.name||'기타')+'</b></div><div><small>배치도</small><b>'+((Number.isFinite(x)&&Number.isFinite(y))?'📍 위치 지정됨':'미지정')+'</b></div></div>'+
+          '<div class="dt-ins-title">관리 상태</div><div class="dt-empty" style="text-align:left">상태: <b>'+esc(st)+'</b><br>배치도 위치는 자산별로 직접 지정할 수 있습니다.</div>'+
+          '<div class="dt-ins-foot"><button type="button" onclick="go(\'eam\')">자산 이력카드 열기 →</button></div>';
       };
 
-      setTimeout(renderDashboardCards,0);
-      const total=assets.length, normal=statusCount('정상'), bad=total-normal;
-      return `<style id="EAM_DASH_V208_ONLY_CSS">
-        .eam208{height:calc(100vh - 34px);min-height:720px;overflow:auto;padding:10px 10px 20px;box-sizing:border-box;background:#f4f8fa}
-        .eam208-head{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#0c426c,#087ea4);color:#fff;border-radius:14px;padding:15px 20px;margin-bottom:12px;box-shadow:0 7px 20px rgba(18,65,92,.14)}
-        .eam208-title{display:flex;align-items:center;gap:12px}.eam208-title .cube{font-size:28px}.eam208-title h1{margin:0;font-size:23px;letter-spacing:-.8px}.eam208-title p{margin:3px 0 0;font-size:11px;opacity:.84}.eam208-head-right{font-size:12px;font-weight:900;opacity:.9}
-        .eam208-cards{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:10px;margin-bottom:13px}.eam-type-card{min-height:175px;border:1px solid #d7e3ea;border-radius:14px;background:#fff;padding:13px;cursor:pointer;text-align:left;position:relative;box-shadow:0 5px 14px rgba(19,53,73,.07);transition:.16s;overflow:hidden}.eam-type-card:hover{transform:translateY(-2px);box-shadow:0 9px 20px rgba(19,53,73,.13)}
-        .eam-code-box{width:57px;height:57px;border-radius:10px;display:grid;place-items:center;color:#fff;font-size:25px;font-weight:950;letter-spacing:-1px;box-shadow:0 4px 9px rgba(20,40,60,.13)}.eam-type-info{padding:10px 1px 38px}.eam-type-info strong{display:block;font-size:16px;color:#183b57}.eam-type-info small{display:block;color:#708595;font-size:9px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.eam-type-info>b{display:block;font-size:31px;line-height:1;margin-top:12px;color:#173c5b}.eam-type-info b em{font-size:13px;font-style:normal;margin-left:2px}.eam-card-arrow{position:absolute;left:10px;right:10px;bottom:10px;height:31px;border-radius:7px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:950}.ac .eam-code-box,.ac .eam-card-arrow{background:#176bc9}.bo .eam-code-box,.bo .eam-card-arrow{background:#e72e2e}.fi .eam-code-box,.fi .eam-card-arrow{background:#11a84d}.el .eam-code-box,.el .eam-card-arrow{background:#e3a900}.lt .eam-code-box,.lt .eam-card-arrow{background:#7434d7}.ot .eam-code-box,.ot .eam-card-arrow{background:#607485}
-        .eam208-gen{background:#fff;border:1px solid #d2e0e8;border-radius:14px;overflow:hidden;box-shadow:0 5px 16px rgba(15,44,65,.07)}.eam208-gen-head{height:52px;background:linear-gradient(90deg,#0c426c,#0d6d94);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-sizing:border-box}.eam208-gen-head h2{margin:0;font-size:18px}.eam208-gen-head span{font-size:10px;opacity:.84}.eam208-gen-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}.eam208-method{padding:18px 20px 20px;min-height:235px;box-sizing:border-box}.eam208-method+ .eam208-method{border-left:1px solid #e1e8ee;background:#f8fcfa}.method-title{display:flex;align-items:center;gap:10px}.method-no{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:16px;font-weight:950;background:#176bc9}.method2 .method-no{background:#11a878}.method-title strong{font-size:16px;color:#183b57}.method-title small{display:block;font-size:10px;color:#748896;margin-top:2px}.eam-form{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}.eam-field label{display:block;font-size:10px;font-weight:900;color:#557083;margin-bottom:5px}.eam-field select,.eam-field input{width:100%;height:39px;border:1px solid #cfdee7;border-radius:7px;background:#fff;padding:0 10px;box-sizing:border-box;font-size:12px;color:#24475f}.eam-preview{height:39px;border-radius:7px;background:#e9f2ff;display:flex;flex-direction:column;justify-content:center;padding:0 12px;box-sizing:border-box;color:#176bc9}.eam-preview strong{font-size:19px;line-height:1}.eam-preview small{font-size:8px;color:#658098;margin-top:2px}.method2 .eam-preview{background:#e8faf3;color:#0b9b73}.eam-action{display:flex;justify-content:center;margin-top:16px}.eam-action button{border:0;border-radius:8px;height:42px;padding:0 28px;color:#fff;font-size:12px;font-weight:950;cursor:pointer;background:#176bc9}.method2 .eam-action button{background:#0ca77b}.eam-note{font-size:9px;color:#6d8190;margin-left:9px}.eam-reserved{margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;min-height:23px}.eam-reserved span{font-size:10px;font-weight:900;background:#fff;border:1px solid #cde6dc;color:#09815f;border-radius:999px;padding:4px 7px}.eam-reserved i{font-size:9px;color:#82939e}.eam-clear{margin-left:auto;border:0;background:transparent;color:#718695;font-size:9px;cursor:pointer;text-decoration:underline}
-        .eam208-foot{display:flex;gap:10px;margin-top:12px}.eam208-stat{flex:1;background:#fff;border:1px solid #d7e3ea;border-radius:11px;padding:10px 14px}.eam208-stat small{display:block;font-size:9px;color:#718695}.eam208-stat b{font-size:20px;color:#183e5b}.eam208-stat b em{font-size:10px;font-style:normal;margin-left:2px}.eam208-stat.bad b{color:#d94343}
-        .eam-type-drawer{position:fixed;z-index:9999;right:18px;top:78px;width:390px;max-height:calc(100vh - 110px);background:#fff;border:1px solid #cadbe5;border-radius:14px;box-shadow:0 18px 45px rgba(10,40,62,.24);display:none;overflow:hidden}.eam-type-drawer.on{display:block}.eam-drawer-head{display:flex;justify-content:space-between;gap:10px;padding:15px;background:linear-gradient(135deg,#0c426c,#0d7d9f);color:#fff}.eam-drawer-head b{display:block;font-size:22px}.eam-drawer-head strong{display:block;font-size:14px;margin-top:1px}.eam-drawer-head small{display:block;font-size:9px;opacity:.82;margin-top:3px}.eam-drawer-head button{height:29px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);color:#fff;border-radius:6px;cursor:pointer}.eam-drawer-body{padding:10px;overflow:auto;max-height:calc(100vh - 210px)}.eam-asset-row{width:100%;display:grid;grid-template-columns:72px 1fr 70px;gap:7px;align-items:center;border:1px solid #e1e9ee;background:#fff;border-radius:8px;padding:10px;margin-bottom:6px;text-align:left;cursor:pointer}.eam-asset-row>b{color:#176bc9}.eam-asset-row>span{font-size:11px;color:#36566b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.eam-asset-row>em{font-style:normal;font-size:9px;font-weight:900;text-align:center;border-radius:999px;padding:4px}.eam-asset-row>em.ok{background:#eaf8ef;color:#19854c}.eam-asset-row>em.bad{background:#fff0f0;color:#d44141}.eam-empty{text-align:center;padding:40px 10px;color:#81929e;font-size:11px}.eam-asset-detail{padding:18px}.eam-detail-status{display:inline-block;padding:6px 10px;border-radius:999px;font-size:10px;font-weight:950}.eam-detail-status.ok{background:#eaf8ef;color:#19854c}.eam-detail-status.bad{background:#fff0f0;color:#d44141}.eam-asset-detail dl{margin:15px 0 0;border-top:1px solid #e4ebef}.eam-asset-detail dl div{}.eam-asset-detail dt{float:left;width:90px;padding:10px 0;border-bottom:1px solid #e4ebef;color:#718695;font-size:10px}.eam-asset-detail dd{margin-left:90px;padding:10px 0;border-bottom:1px solid #e4ebef;color:#23475e;font-size:11px;font-weight:800}
-        @media(max-width:1100px){.eam208-cards{grid-template-columns:repeat(3,1fr)}.eam208-gen-grid{grid-template-columns:1fr}.eam208-method+.eam208-method{border-left:0;border-top:1px solid #e1e8ee}.eam-type-drawer{width:min(390px,calc(100vw - 30px))}} 
+      const locationDefs=[
+        ['코트 5',['5번 코트','코트5','5코트']],['코트 4',['4번 코트','코트4','4코트']],['코트 3',['3번 코트','코트3','3코트']],['코트 2',['2번 코트','코트2','2코트']],['코트 1',['1번 코트','코트1','1코트']],
+        ['지붕',['지붕']],['옥상',['옥상']],['창고',['창고','2층 창고']],
+        ['샤워실(남)',['남자 샤워실','샤워실(남)','남성 샤워실']],['화장실(남)',['남자 화장실','화장실(남)']],['탈의실(남)',['남자 탈의실','탈의실(남)']],
+        ['샤워실(여)',['여자 샤워실','샤워실(여)','여성 샤워실']],['탈의실(여)',['여자 탈의실','탈의실(여)']],['화장실(여)',['여자 화장실','화장실(여)']],
+        ['휴게실',['휴게실']],['통합 유수장치실',['유수장치실','통합 유수장치실']],['사무실',['사무실']],['복도',['복도']]
+      ];
+      const locData={}, normalizeLoc=v=>V(v).replace(/\s+/g,'');
+      locationDefs.forEach(([label,keys])=>{const rows=assets.filter(a=>{const loc=normalizeLoc(a.location||a.place||a.zone||a.area||'');return keys.some(k=>loc.includes(normalizeLoc(k)))});locData[label]={rows,bad:rows.filter(a=>V(a.status||'정상')!=='정상').length}});
+      window.eamDtSelect=function(label){
+        const d=locData[label]||{rows:[],bad:0}, box=document.getElementById('eamDtInspector');if(!box)return;const rows=d.rows||[];
+        box.innerHTML='<div class="dt-ins-head"><div><small>선택 시설</small><h3>'+esc(label)+'</h3></div><span class="dt-status '+(d.bad?'bad':'ok')+'">'+(d.bad?'🔴 확인 필요':'🟢 정상')+'</span></div><div class="dt-ins-kpis"><div><b>'+rows.length+'</b><span>등록 자산</span></div><div><b>'+rows.filter(a=>V(a.status||'정상')==='정상').length+'</b><span>정상</span></div><div><b>'+d.bad+'</b><span>확인 필요</span></div></div><div class="dt-ins-title">자산코드</div><div class="dt-assets">'+(rows.length?rows.map(a=>'<button type="button" onclick="window.eamDashAsset(\''+esc(codeOf(a))+'\')"><span>'+esc(codeOf(a)||'미등록')+'</span><b>'+esc(a.name||a.model||'미등록')+'</b><em class="'+statusClass(a)+'">'+esc(a.status||'정상')+'</em></button>').join(''):'<div class="dt-empty">이 위치에 등록된 자산이 없습니다.</div>')+'</div>';
+      };
+      const zone=(label,sub,cls='')=>'<button type="button" class="dt-zone '+cls+'" onclick="window.eamDtSelect(\''+esc(label)+'\')"><b>'+esc(label)+'</b><small>'+esc(sub)+'</small><em>'+((locData[label]||{}).rows||[]).length+'건</em></button>';
+      const court=n=>'<button type="button" class="dt-court '+((locData['코트 '+n]||{}).bad?'warn':'')+'" onclick="window.eamDtSelect(\'코트 '+n+'\')"><span>'+n+'</span><small>'+((locData['코트 '+n]||{}).rows||[]).length+' 자산</small></button>';
+      const markers=assets.filter(a=>Number.isFinite(Number(a.map_x))&&Number.isFinite(Number(a.map_y))).map(a=>'<button type="button" class="eam-map-asset '+statusClass(a)+'" style="left:'+Number(a.map_x)+'%;top:'+Number(a.map_y)+'%" title="'+esc(codeOf(a))+'" onclick="window.eamDashAsset(\''+esc(codeOf(a))+'\')">'+esc(codeOf(a))+'</button>').join('');
+      const map='<div class="dt-map"><div class="dt-map-top"><div class="dt-top-title">코트 구역</div>'+court(5)+court(4)+court(3)+court(2)+court(1)+'</div><div class="dt-facility"><div class="dt-roof"><button type="button" onclick="window.eamDtSelect(\'지붕\')"><b>지붕</b><small>'+((locData['지붕']||{}).rows||[]).length+'건</small></button><button type="button" onclick="window.eamDtSelect(\'옥상\')"><b>옥상</b><small>'+((locData['옥상']||{}).rows||[]).length+'건</small></button><button type="button" onclick="window.eamDtSelect(\'창고\')"><b>창고</b><small>'+((locData['창고']||{}).rows||[]).length+'건</small></button><span>▲ 계단</span></div><div class="dt-row1">'+zone('샤워실(남)','남자 샤워실')+zone('화장실(남)','남자 화장실')+zone('탈의실(남)','남자 탈의실')+zone('샤워실(여)','여자 샤워실','pink')+zone('탈의실(여)','여자 탈의실','pink')+zone('화장실(여)','여자 화장실','pink')+'</div><button type="button" class="dt-corridor" onclick="window.eamDtSelect(\'복도\')">복도 · '+((locData['복도']||{}).rows||[]).length+'건</button><div class="dt-row3">'+zone('휴게실','휴게공간')+zone('통합 유수장치실','소방·유수 설비','water')+zone('사무실','관리·운영')+'</div><span class="dt-entrance court-entry">코트 출입구</span><span class="dt-entrance main-entry">주출입문</span>'+markers+'</div></div>';
+      const typeCards=TYPES.map(t=>{const rows=typeRows(t.key);return '<button type="button" class="eam-type-card '+t.cls+'" onclick="window.eamDashType(\''+t.key+'\')"><div class="eam-type-code">'+t.key+'</div><div class="eam-type-copy"><b>'+t.name+'</b><small>'+t.sub+'</small></div><strong>'+rows.length+'<em>건</em></strong><span>자산 보기 →</span></button>'}).join('');
+      const first=nextCodes('AC',1)[0]||'AC-??';
+      const rate=assets.length?Math.round(normal/assets.length*100):0;
+      return `<style id="EAM_DASH_V209_CSS">
+        .eam209-page{height:calc(100vh - 34px);min-height:900px;display:flex;flex-direction:column;gap:10px;overflow:auto;padding:4px 2px 14px}
+        .eam209-types{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.eam-type-card{border:1px solid #d6e2eb;background:#fff;border-radius:13px;padding:11px;display:grid;grid-template-columns:62px 1fr;grid-template-rows:auto auto auto;gap:3px 9px;text-align:left;cursor:pointer;box-shadow:0 4px 14px rgba(15,42,62,.06);min-height:132px}.eam-type-card:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(15,42,62,.11)}.eam-type-code{grid-row:1 / span 3;width:58px;height:58px;border-radius:11px;display:grid;place-items:center;color:#fff;font-size:25px;font-weight:950}.eam-type-copy b{font-size:14px;color:#173b5a;display:block}.eam-type-copy small{font-size:9px;color:#718696}.eam-type-card strong{font-size:25px;color:#173b5a;line-height:1}.eam-type-card strong em{font-style:normal;font-size:10px;margin-left:3px;color:#708594}.eam-type-card>span{grid-column:1 / span 2;border-radius:7px;padding:7px;text-align:center;color:#fff;font-size:11px;font-weight:950;margin-top:4px}.eam-type-card.ac .eam-type-code,.eam-type-card.ac>span{background:#1976d2}.eam-type-card.bo .eam-type-code,.eam-type-card.bo>span{background:#e53935}.eam-type-card.fi .eam-type-code,.eam-type-card.fi>span{background:#16a34a}.eam-type-card.el .eam-type-code,.eam-type-card.el>span{background:#e5a900}.eam-type-card.lt .eam-type-code,.eam-type-card.lt>span{background:#7c3aed}.eam-type-card.ot .eam-type-code,.eam-type-card.ot>span{background:#607789}
+        .eam-type-drawer{display:none;background:#fff;border:1px solid #cfdde7;border-radius:12px;box-shadow:0 8px 24px rgba(15,42,62,.10);overflow:hidden}.eam-type-drawer.open{display:block}.eam-drawer-head{padding:10px 14px;background:#f4f8fb;border-bottom:1px solid #e1e8ed;display:flex;justify-content:space-between;align-items:center}.eam-drawer-head b{font-size:15px;color:#173b5a}.eam-drawer-head small{margin-left:8px;color:#718696}.eam-drawer-head button{border:0;background:#e7eef3;border-radius:7px;padding:6px 10px;cursor:pointer;font-weight:800}.eam-code-list{display:grid;grid-template-columns:repeat(4,1fr);max-height:150px;overflow:auto}.eam-code-list button{border:0;border-right:1px solid #edf1f4;border-bottom:1px solid #edf1f4;background:#fff;padding:9px;display:grid;grid-template-columns:62px 1fr 55px;gap:5px;align-items:center;text-align:left;cursor:pointer}.eam-code-list button:hover{background:#f5f9fc}.eam-code-list strong{color:#28628c;font-size:11px}.eam-code-list span{font-size:10px;color:#415a6a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.eam-code-list em{font-style:normal;font-size:9px;font-weight:900;text-align:right}.eam-code-list em.ok{color:#168348}.eam-code-list em.warn{color:#c48a00}.eam-code-list em.bad{color:#d63d3d}.eam-code-empty{padding:20px;color:#80919d;font-size:11px}
+        .eam209-maprow{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,.72fr);gap:10px;min-height:610px;flex:1}.eam209-panel{background:#fff;border:1px solid #d1dfe8;border-radius:13px;box-shadow:0 5px 18px rgba(15,42,62,.07);overflow:hidden;min-height:0}.eam209-panel-head{padding:10px 14px;border-bottom:1px solid #e1e8ee;display:flex;justify-content:space-between;align-items:center}.eam209-panel-head h2{margin:0;font-size:16px;color:#173b5a}.eam209-panel-head small{display:block;color:#718696;font-size:9px;margin-top:2px}.dt-map-wrap{padding:10px;height:calc(100% - 58px);box-sizing:border-box;background:#f2f6f8}.dt-map{height:100%;min-height:540px;border:3px solid #304b61;background:linear-gradient(145deg,#edf3f6,#dce6eb 52%,#f8fafb);box-shadow:inset 0 0 0 7px rgba(255,255,255,.72),inset 0 0 34px rgba(28,55,74,.13);position:relative;overflow:hidden;padding:12px;box-sizing:border-box}.dt-map-top{height:52%;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:20px 6%;box-sizing:border-box;position:relative}.dt-top-title{position:absolute;top:2px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:950;color:#294c64}.dt-court{border:2px solid #fff;border-radius:7px;background:linear-gradient(110deg,#dbe7ed,#f7fbfd 35%,#d4e3e9 70%,#f7fbfc);box-shadow:inset 0 0 0 2px #557083,0 6px 12px rgba(25,55,75,.16);position:relative;cursor:pointer;color:#173b55}.dt-court:after{content:"";position:absolute;left:11%;right:11%;top:11%;bottom:11%;border:1px solid #547083}.dt-court span{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:19px;font-weight:950;box-shadow:0 3px 8px rgba(20,45,60,.24)}.dt-court small{position:absolute;bottom:6px;left:0;right:0;font-size:9px;font-weight:900;z-index:4}.dt-court.warn{box-shadow:inset 0 0 0 3px #e45757,0 6px 14px rgba(180,55,55,.18)}
+        .dt-facility{position:absolute;left:4%;right:4%;bottom:4%;height:42%;border:2px solid #526a7b;background:#fff;display:grid;grid-template-columns:1.15fr 1fr 1.15fr;grid-template-rows:35% 27% 38%;overflow:visible}.dt-roof{grid-column:1;grid-row:1 / span 3;display:grid;grid-template-rows:repeat(3,1fr);border-right:1px solid #8798a3;background:#f4f7f9;position:relative}.dt-roof button{border:0;border-bottom:1px solid #8798a3;background:linear-gradient(135deg,#f8fafb,#e8eef2);cursor:pointer;color:#173b5a}.dt-roof button b{display:block;font-size:12px}.dt-roof button small{font-size:8px;color:#657b8b;font-weight:800}.dt-roof span{position:absolute;bottom:5px;right:5px;background:#fff;border:1px solid #9db0bd;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:950;color:#35546b}.dt-row1{grid-column:2 / span 2;grid-row:1;display:grid;grid-template-columns:repeat(6,1fr)}.dt-zone{border:0;border-right:1px solid #8798a3;border-bottom:1px solid #8798a3;background:linear-gradient(135deg,#edf5fa,#f8fbfd);cursor:pointer;color:#173b5a;padding:8px 3px 4px;position:relative;text-align:center}.dt-zone.pink{background:linear-gradient(135deg,#fff1f4,#fde6eb)}.dt-zone.water{background:linear-gradient(135deg,#fff9e9,#f5e9c7)}.dt-zone b{display:block;font-size:11px;font-weight:950}.dt-zone small{display:block;font-size:8px;color:#627989;margin-top:3px}.dt-zone em{display:block;font-size:8px;font-style:normal;font-weight:900;color:#35627e;margin-top:4px}.dt-corridor{grid-column:2 / span 2;grid-row:2;border:0;border-bottom:1px solid #8798a3;background:linear-gradient(180deg,#f8f5ed,#eee9dd,#f8f5ed);font-size:11px;font-weight:950;color:#65736f;letter-spacing:.22em;cursor:pointer}.dt-row3{grid-column:2 / span 2;grid-row:3;display:grid;grid-template-columns:repeat(3,1fr)}.dt-row3 .dt-zone{border-bottom:0}.dt-entrance{position:absolute;background:#fff;border:1px solid #526a7b;padding:7px 10px;font-size:9px;font-weight:950;color:#29465d;z-index:8}.court-entry{right:10%;top:39%}.main-entry{right:-2px;top:68%;padding:9px 12px}.eam-map-asset{position:absolute;transform:translate(-50%,-50%);z-index:20;border:2px solid #fff;border-radius:999px;padding:6px 8px;font-size:9px;font-weight:950;box-shadow:0 3px 10px rgba(10,35,55,.25);cursor:pointer;white-space:nowrap}.eam-map-asset.ok{background:#16a34a;color:#fff}.eam-map-asset.warn{background:#eab308;color:#fff}.eam-map-asset.bad{background:#dc2626;color:#fff}
+        .eam209-inspector{display:flex;flex-direction:column}.dt-ins{padding:14px;overflow:auto}.dt-ins-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.dt-ins-head small{font-size:10px;color:#718696}.dt-ins-head h3{margin:2px 0 0;font-size:22px;color:#173b5a}.dt-status{padding:6px 9px;border-radius:999px;font-size:10px;font-weight:950}.dt-status.ok{background:#e9f7ef;color:#18844a}.dt-status.bad{background:#fff0f0;color:#d64242}.dt-ins-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}.dt-ins-kpis div{background:#f5f8fa;border:1px solid #e1e8ed;border-radius:9px;padding:9px;text-align:center}.dt-ins-kpis b{display:block;font-size:21px;color:#173b5a}.dt-ins-kpis span{font-size:9px;color:#718696}.dt-ins-title{font-size:12px;font-weight:950;color:#173b5a;border-bottom:1px solid #e1e8ed;padding-bottom:8px;margin-top:10px}.dt-assets{overflow:auto}.dt-assets button{width:100%;border:0;border-bottom:1px solid #edf1f4;background:#fff;padding:9px 3px;display:grid;grid-template-columns:65px 1fr 55px;gap:6px;text-align:left;align-items:center;cursor:pointer}.dt-assets span{font-size:10px;font-weight:950;color:#28628c}.dt-assets b{font-size:10px;color:#344f62;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dt-assets em{font-style:normal;font-size:9px;font-weight:950;text-align:right}.dt-assets em.ok{color:#168348}.dt-assets em.warn{color:#c48a00}.dt-assets em.bad{color:#d63d3d}.dt-empty{padding:20px 3px;text-align:center;color:#8193a0;font-size:10px;line-height:1.7}.dt-selected-asset{margin-top:8px;padding:9px;background:#eef6fb;border-radius:7px;font-size:10px;color:#31576f}.dt-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.dt-detail-grid div{background:#f5f8fa;border:1px solid #e1e8ed;border-radius:8px;padding:8px}.dt-detail-grid small{display:block;color:#718696;font-size:9px}.dt-detail-grid b{display:block;color:#173b5a;font-size:10px;margin-top:3px}.dt-ins-foot{border-top:1px solid #e1e8ed;margin-top:10px;padding-top:10px}.dt-ins-foot button{width:100%;border:0;background:#123f63;color:#fff;border-radius:8px;padding:10px;font-weight:950;cursor:pointer}
+        .eam209-codegen{background:#fff;border:1px solid #d1dfe8;border-radius:13px;overflow:hidden}.eam209-code-head{background:linear-gradient(135deg,#0d4d78,#117da3);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}.eam209-code-head b{font-size:16px}.eam209-code-head small{font-size:9px;opacity:.85}.eam209-code-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}.eam209-code-box{padding:12px 16px}.eam209-code-box+ .eam209-code-box{border-left:1px solid #e1e8ed}.eam209-code-box h3{margin:0 0 3px;font-size:13px;color:#173b5a}.eam209-code-box p{margin:0 0 9px;font-size:9px;color:#718696}.eam209-code-form{display:grid;grid-template-columns:1.1fr 1fr 120px;gap:8px;align-items:end}.eam209-code-form label{font-size:9px;font-weight:900;color:#536d7d}.eam209-code-form select,.eam209-code-form input{width:100%;box-sizing:border-box;border:1px solid #d3e0e8;border-radius:7px;padding:8px;background:#fff}.eam209-code-preview{background:#edf6ff;border-radius:7px;padding:7px 10px;text-align:center;color:#1764a0;font-size:20px;font-weight:950}.eam209-code-btn{border:0;border-radius:7px;padding:9px;background:#1474c4;color:#fff;font-weight:950;cursor:pointer}.eam209-code-btn.green{background:#10a37f}.eam209-result{margin-top:8px;background:#f2faf7;border:1px solid #d5eee5;border-radius:7px;padding:7px;font-size:10px;color:#28665a;min-height:18px}.eam209-result small{display:block;color:#668b82;margin-top:2px}.eam209-note{font-size:9px;color:#718696;margin-top:6px}
+        @media(max-width:1150px){.eam209-types{grid-template-columns:repeat(3,1fr)}.eam209-maprow{grid-template-columns:1fr}.eam209-code-grid{grid-template-columns:1fr}.eam209-code-box+.eam209-code-box{border-left:0;border-top:1px solid #e1e8ed}.eam209-page{height:auto;overflow:visible}.eam209-maprow{min-height:850px}}
       </style>
-      <div class="eam208">
-        <header class="eam208-head"><div class="eam208-title"><span class="cube">◈</span><div><h1>EAM | 자산 현황</h1><p>장군봉체육관 · 주요설비 자산관리</p></div></div><div class="eam208-head-right">${currentYear} EAM ASSET MANAGEMENT</div></header>
-        <section id="eamAssetCards" class="eam208-cards"></section>
-        <section class="eam208-gen">
-          <div class="eam208-gen-head"><h2>⚙ 자산코드 생성 방법 (2가지)</h2><span>선택한 방법으로 자산코드를 자동 생성합니다.</span></div>
-          <div class="eam208-gen-grid">
-            <div class="eam208-method method1">
-              <div class="method-title"><span class="method-no">1</span><div><strong>자산 등록 시 자동 생성</strong><small>자산종류를 선택하면 해당 종류의 다음 번호를 자동으로 찾습니다.</small></div></div>
-              <div class="eam-form"><div class="eam-field"><label>자산종류 선택</label><select id="eamQuickType" onchange="window.eamDashGenerate(this.value)">${TYPES.map(t=>'<option value="'+t.key+'">'+t.name+' ('+t.key+')</option>').join('')}</select></div><div class="eam-field"><label>자산명</label><input id="eamCodeAssetName" placeholder="자산명을 입력하세요" oninput="window.eamDashGenerate(document.getElementById(\'eamQuickType\').value)"></div><div class="eam-field"><label>생성될 자산코드 (예시)</label><div class="eam-preview" id="eamGeneratedCode"><strong>${esc(nextCode('AC',1)[0])}</strong><small>에어컨</small></div></div></div>
-              <div class="eam-action"><button type="button" onclick="window.eamDashGenerate(document.getElementById('eamQuickType').value)">＋ 다음 자산코드 생성</button><span class="eam-note">실제 자산 등록 시 사용하기 위한 다음 번호를 미리 확인합니다.</span></div>
-            </div>
-            <div class="eam208-method method2">
-              <div class="method-title"><span class="method-no">2</span><div><strong>자산코드만 미리 생성</strong><small>자산 등록 전에 필요한 코드를 여러 개 만들어 예약할 수 있습니다.</small></div></div>
-              <div class="eam-form"><div class="eam-field"><label>자산종류 선택</label><select id="eamPreType">${TYPES.map(t=>'<option value="'+t.key+'">'+t.name+' ('+t.key+')</option>').join('')}</select></div><div class="eam-field"><label>생성할 개수</label><input id="eamPreQty" type="number" min="1" max="99" value="1"></div><div class="eam-field"><label>생성될 자산코드 (예시)</label><div class="eam-preview" id="eamPreResult"><b>${esc(nextCode('AC',1)[0])}</b><span>1개 생성</span></div></div></div>
-              <div class="eam-action"><button type="button" onclick="window.eamDashReserve()">🔗 자산코드만 생성</button><span class="eam-note">생성된 코드는 예약되어 다음 자동생성 번호에 반영됩니다.</span></div>
-              <div id="eamReservedList" class="eam-reserved">${renderReserved()}<button class="eam-clear" type="button" onclick="window.eamDashClearReserved()">예약코드 비우기</button></div>
-            </div>
-          </div>
-        </section>
-        <section class="eam208-foot"><div class="eam208-stat"><small>전체 운영 자산</small><b>${total}<em>건</em></b></div><div class="eam208-stat"><small>정상 자산</small><b>${normal}<em>건</em></b></div><div class="eam208-stat bad"><small>조치·점검 필요</small><b>${bad}<em>건</em></b></div></section>
+      <div class="eam209-page">
+        <section class="eam209-types">${typeCards}</section>
         <div id="eamTypeDrawer" class="eam-type-drawer"></div>
+        <section class="eam209-maprow">
+          <div class="eam209-panel"><div class="eam209-panel-head"><div><h2>🗺 시설 배치도 · 자산코드 현황</h2><small>배치도에 위치를 지정한 자산만 자산코드가 표시됩니다. 코드를 누르면 상세정보가 열립니다.</small></div><small>🟢 정상 · 🟡 점검요청 · 🔴 조치필요</small></div><div class="dt-map-wrap">${map}</div></div>
+          <div class="eam209-panel eam209-inspector"><div class="eam209-panel-head"><div><h2>📋 자산 상세</h2><small>배치도 또는 자산코드를 선택하세요.</small></div></div><div id="eamDtInspector" class="dt-ins"><div class="dt-ins-head"><div><small>전체 자산</small><h3>${assets.length}건</h3></div><span class="dt-status ok">🟢 운영</span></div><div class="dt-ins-kpis"><div><b>${assets.length}</b><span>전체</span></div><div><b>${normal}</b><span>정상</span></div><div><b>${assets.length-normal}</b><span>확인 필요</span></div></div><div class="dt-ins-title">사용 방법</div><div class="dt-empty">위쪽 자산종류를 누르면 해당 자산코드가 펼쳐집니다.<br>배치도에서 자산코드를 누르면 해당 자산의 상태를 확인할 수 있습니다.</div></div></div>
+        </section>
+        <section class="eam209-codegen"><div class="eam209-code-head"><b>⚙ 자산코드 생성 방법 (2가지)</b><small>위치코드는 사용하지 않고 자산코드만 관리합니다.</small></div><div class="eam209-code-grid">
+          <div class="eam209-code-box"><h3>① 자산 등록 시 자동 생성</h3><p>자산종류를 선택하면 기존 번호를 확인하여 다음 자산코드를 자동으로 만듭니다.</p><div class="eam209-code-form"><label>자산종류<select id="eamCodeGenType" onchange="eamDashCodePreview(this.value,'eamCodePreview')"><option value="AC">에어컨 (AC)</option><option value="BO">보일러 (BO)</option><option value="FI">소방설비 (FI)</option><option value="EL">전기설비 (EL)</option><option value="LT">조명설비 (LT)</option><option value="OT">기타설비 (OT)</option></select></label><div><label>생성 코드</label><div id="eamCodePreview" class="eam209-code-preview">${first}</div></div><button type="button" class="eam209-code-btn" onclick="go('eam')">자산 등록으로 가기</button></div><div class="eam209-note">예: AC-01~AC-11이 사용 중이면 다음은 AC-12. 삭제된 번호는 재사용하지 않습니다.</div></div>
+          <div class="eam209-code-box"><h3>② 자산코드만 미리 생성</h3><p>등록 전에 필요한 수량만큼 코드를 미리 확보할 수 있습니다.</p><div class="eam209-code-form"><label>자산종류<select onchange="eamDashCodePreview(this.value,'eamCodePreview2')"><option value="AC">에어컨 (AC)</option><option value="BO">보일러 (BO)</option><option value="FI">소방설비 (FI)</option><option value="EL">전기설비 (EL)</option><option value="LT">조명설비 (LT)</option><option value="OT">기타설비 (OT)</option></select></label><label>생성 개수<input id="eamCodeGenQty" type="number" min="1" max="100" value="1"></label><div id="eamCodePreview2" class="eam209-code-preview">${first}</div></div><button type="button" class="eam209-code-btn green" style="margin-top:8px;width:100%" onclick="window.eamDashReserve()">🔗 자산코드만 생성</button><div id="eamCodeGenResult" class="eam209-result">아직 생성된 코드가 없습니다.</div></div>
+        </div></section>
       </div>`;
     }
-    function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
+    
+function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
     function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
     function workerRow(w){const d=tasksFor(w.id), mine=(db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey()), md=mine.filter(x=>x.status!=="완료").length, bs=basicWorkerStats(w.id,monthKey());return `<tr><td><b>${w.name}</b></td><td>${w.shift}<br>${w.start?`${w.start}~${w.end}`:"-"}</td><td><span class="badge ${w.working?"":"off"}">${w.working?"근무":"휴무"}</span></td><td>${w.working?`${bs.complete}/${bs.target}일`:"-"}</td><td>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</td><td class="${md?"red":"green"}"><b>${w.working?md:"-"}</b></td><td><b>${mine.length}건</b></td></tr>`}
     const ACTION_TYPES=['자체조치','외부용역'];
