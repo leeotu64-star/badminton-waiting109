@@ -4258,10 +4258,11 @@ function jgbV47GoWpByLeak(leakCode){
     
     function jgbV47CreateLk(){
       const S=jgbV47Store();
-      let code=(prompt('등록할 LK 번호를 입력하세요.\n예: LK-01 또는 01','')||'').trim().toUpperCase();
-      if(!code)return;
-      if(/^\d+$/.test(code))code='LK-'+code.padStart(2,'0');
-      if(!/^LK-\d+$/.test(code)){alert('LK-01 형식으로 입력하세요.');return}
+      let num=(prompt('LK- 뒤에 들어갈 번호만 입력하세요.\n예: 01','')||'').trim();
+      if(!num)return;
+      if(!/^\d+$/.test(num)){alert('숫자만 입력하세요. 예: 01');return}
+      num=num.padStart(2,'0');
+      const code='LK-'+num;
       if(S.leaks.some(x=>String(x.leakCode||'').trim().toUpperCase()===code)){alert('이미 등록된 LK 번호입니다. 다른 번호를 입력하세요.');return}
       const id='LK-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
       const n=S.leaks.length, px=18+(n%5)*17, py=50+((Math.floor(n/5)%2)?18:-18);
@@ -4332,7 +4333,7 @@ function jgbV47GoWpByLeak(leakCode){
       if(a==='select-wp-location'){try{localStorage.setItem('JGB_V48_WP_SELECTED',loc||'')}catch(_){}return render()}
       if(a==='view-wp')return jgbV47ShowWp(loc);
       if(a==='show-leak'){try{localStorage.setItem('JGB_V47_SELECTED_LOCATION',loc||'')}catch(_){}return go('leakage')}
-      if(a==='close-modal')return document.getElementById('jgbV47Modal')?.remove();
+      if(a==='close-modal'){document.getElementById('jgbV47Modal')?.remove();document.getElementById('jgbV171LkDeleteModal')?.remove();return}
       if(b.hasAttribute('data-v104-filter')){document.querySelectorAll('[data-v104-filter]').forEach(x=>x.classList.remove('on'));b.classList.add('on');const q=String(b.getAttribute('data-v104-filter')||'').trim();document.querySelectorAll('.jgb-v104-card.table tbody tr').forEach(tr=>{tr.style.display=(!q||String(tr.getAttribute('data-v104-place')||'')===q)?'':'none'});document.querySelectorAll('.jgb-v104-marker').forEach(m=>{m.style.display=(!q||String(m.getAttribute('data-v104-place')||'')===q)?'':'none'});document.querySelectorAll('.jgb-v104-stat-row').forEach(r=>{r.style.outline=(String(r.getAttribute('data-v104-filter')||'')===q)?'2px solid #2b82d9':''});const note=document.querySelector('.jgb-v104-note');if(note)note.textContent=q?`${q} 위치의 누수만 표시하고 있습니다.`:'전체 누수를 표시하고 있습니다. 위치 버튼을 선택하면 해당 위치만 남습니다.';return}
     if(a==='save-modal')return jgbV47SaveModal(type,id,code);
     },true)}
