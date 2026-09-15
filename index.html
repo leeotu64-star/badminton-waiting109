@@ -3461,7 +3461,7 @@ html::before,body::before{
         document.getElementById('eam228Modal')?.remove();
         const used=new Set(assets.map(a=>codeOf(a).toUpperCase()));
         const m=document.createElement('div');m.id='eam228Modal';m.className='eam228-modal';
-        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>누수관리 LK 생성처럼 번호를 직접 입력할 수 있습니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><span>${x[2]}</span><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><input id="e223No" maxlength="2" inputmode="numeric" placeholder="01"><strong id="e223Preview">${defaultCat||'AC'}-01</strong></div><div class="eam228-form"><label>자산명 *<input id="e223NewName" placeholder="예: 천장형 에어컨"></label><label>제조사<input id="e223NewMaker"></label><label>모델명<input id="e223NewModel"></label><label>설치일<input id="e223NewDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label><label class="wide">설치위치<input id="e223NewPlace" placeholder="예: 1번 코트 / 통합 유수장치실"></label></div><div class="eam228-modal-note">생성 후 배치도에서 아이콘을 직접 드래그하여 위치를 정합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
+        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>누수관리 LK 생성처럼 번호를 직접 입력할 수 있습니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><span>${x[2]}</span><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><input id="e223No" maxlength="2" inputmode="numeric" placeholder="01"><strong id="e223Preview">${defaultCat||'AC'}-01</strong></div><div class="eam228-form"><label>자산명 *<input id="e223NewName" placeholder="예: 천장형 에어컨"></label><label>제조사<input id="e223NewMaker"></label><label>모델명<input id="e223NewModel"></label><label>설치일<input id="e223NewDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label></div><div class="eam228-modal-note">생성 후 배치도에서 아이콘을 직접 드래그하여 위치를 정합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
         document.body.appendChild(m);window.__eam228Used=used;window.eam228Prefix(defaultCat||'AC');document.getElementById('e223No')?.addEventListener('input',window.eam228Preview);
       };
       window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Prefix').textContent=p;document.querySelectorAll('.eam228-code-types button').forEach(b=>b.classList.toggle('on',b.dataset.cat===p));window.eam228Preview()};
@@ -3470,7 +3470,7 @@ html::before,body::before{
         if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
         const p=window.__eam228Prefix||'AC',raw=V(document.getElementById('e223No')?.value),n=Number(raw||0),code=`${p}-${String(n||1).padStart(2,'0')}`,name=V(document.getElementById('e223NewName')?.value);
         if(!/^\d{1,2}$/.test(raw)||n<1||n>99){alert('번호는 1~99 사이 숫자로 입력하세요.');return}if(assets.some(a=>codeOf(a).toUpperCase()===code)){alert('이미 사용 중인 자산코드입니다.');return}if(!name){alert('자산명을 입력하세요.');return}
-        const g=id=>V(document.getElementById(id)?.value);const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],manufacturer:g('e223NewMaker')||null,model:g('e223NewModel')||null,install_date:g('e223NewDate')||null,place:g('e223NewPlace')||null,status:'정상'};
+        const g=id=>V(document.getElementById(id)?.value);const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],manufacturer:g('e223NewMaker')||null,model:g('e223NewModel')||null,install_date:g('e223NewDate')||null,place:null,status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
       };
@@ -3538,63 +3538,66 @@ html::before,body::before{
       .eam228-entry.court{right:12%!important;top:41%!important}
 </style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn" onclick="window.eam228New('AC')">자산등록</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
-      if(!window.__EAM228_DRAG_V237_BOUND){
-        window.__EAM228_DRAG_V237_BOUND=true;
-        const bindDrag=()=>{
-          const map=document.getElementById('eam228Map');
+      /* v239: EAM 자산 아이콘 이동을 데스크톱 마우스 드래그로 단순화.
+         클릭은 기존 EAM 자산카드 이동, 드래그는 배치 위치 저장으로 분리합니다. */
+      if(!window.__EAM228_DRAG_V239_BOUND){
+        window.__EAM228_DRAG_V239_BOUND=true;
+        window.__EAM228MouseDrag={active:false,code:'',map:null,el:null,startX:0,startY:0,startLeft:0,startTop:0,moved:false};
+        document.addEventListener('mousedown',e=>{
+          const el=e.target.closest?.('.eam228-asset');
+          if(!el || e.button!==0)return;
+          const map=el.closest('#eam228Map');
           if(!map)return;
-          map.querySelectorAll('.eam228-asset').forEach(el=>{
-            if(el.__eamDragBound)return;
-            el.__eamDragBound=true;
-            el.setAttribute('draggable','false');
-            el.addEventListener('dragstart',e=>e.preventDefault());
-            el.addEventListener('pointerdown',e=>{
-              if(e.button!==0)return;
-              e.stopPropagation();
-              const rect=map.getBoundingClientRect();
-              const code=el.dataset.code;
-              const sx=e.clientX,sy=e.clientY;
-              let moved=false;
-              try{el.setPointerCapture(e.pointerId)}catch(_){}
-              const move=ev=>{
-                if(ev.pointerId!==e.pointerId)return;
-                const dx=ev.clientX-sx,dy=ev.clientY-sy;
-                if(!moved && Math.hypot(dx,dy)<4)return;
-                if(!moved)ev.preventDefault();
-                moved=true;
-                el.classList.add('dragging');
-                const x=Math.max(2,Math.min(98,((ev.clientX-rect.left)/rect.width)*100));
-                const y=Math.max(2,Math.min(98,((ev.clientY-rect.top)/rect.height)*100));
-                el.style.left=x.toFixed(2)+'%';
-                el.style.top=y.toFixed(2)+'%';
-              };
-              const end=ev=>{
-                if(ev.pointerId!==e.pointerId)return;
-                el.removeEventListener('pointermove',move);
-                el.removeEventListener('pointerup',end);
-                el.removeEventListener('pointercancel',end);
-                el.classList.remove('dragging');
-                try{el.releasePointerCapture(e.pointerId)}catch(_){}
-                if(!moved)return;
-                const x=Math.max(2,Math.min(98,((ev.clientX-rect.left)/rect.width)*100));
-                const y=Math.max(2,Math.min(98,((ev.clientY-rect.top)/rect.height)*100));
-                const pos=readObj(posKey);
-                pos[code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-                writeObj(posKey,pos);
-                window.__EAM228_DRAG_SUPPRESS=true;
-                setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,250);
-                render();
-              };
-              el.addEventListener('pointermove',move);
-              el.addEventListener('pointerup',end);
-              el.addEventListener('pointercancel',end);
-            });
-          });
+          const d=window.__EAM228MouseDrag;
+          const mr=map.getBoundingClientRect();
+          d.active=true;
+          d.code=V(el.dataset.code);
+          d.map=map;
+          d.el=el;
+          d.startX=e.clientX;
+          d.startY=e.clientY;
+          d.startLeft=parseFloat(el.style.left)||0;
+          d.startTop=parseFloat(el.style.top)||0;
+          d.moved=false;
+          el.classList.add('dragging');
+          e.preventDefault();
+          e.stopPropagation();
+        },true);
+        document.addEventListener('mousemove',e=>{
+          const d=window.__EAM228MouseDrag;
+          if(!d.active||!d.el||!d.map)return;
+          const r=d.map.getBoundingClientRect();
+          const dx=(e.clientX-d.startX)/r.width*100;
+          const dy=(e.clientY-d.startY)/r.height*100;
+          if(!d.moved && Math.hypot(e.clientX-d.startX,e.clientY-d.startY)<4)return;
+          d.moved=true;
+          const x=Math.max(2,Math.min(98,d.startLeft+dx));
+          const y=Math.max(2,Math.min(98,d.startTop+dy));
+          d.el.style.left=x.toFixed(2)+'%';
+          d.el.style.top=y.toFixed(2)+'%';
+          e.preventDefault();
+        },true);
+        const finish=e=>{
+          const d=window.__EAM228MouseDrag;
+          if(!d.active)return;
+          const el=d.el,code=d.code,map=d.map,moved=d.moved;
+          if(el)el.classList.remove('dragging');
+          d.active=false;d.el=null;d.map=null;
+          if(!moved){d.code='';return;}
+          const r=map.getBoundingClientRect();
+          const x=Math.max(2,Math.min(98,((e.clientX-r.left)/r.width)*100));
+          const y=Math.max(2,Math.min(98,((e.clientY-r.top)/r.height)*100));
+          const pos=readObj(posKey);
+          pos[code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+          writeObj(posKey,pos);
+          window.__EAM228_DRAG_SUPPRESS=true;
+          setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,450);
+          d.code='';
+          render();
+          e.preventDefault();
         };
-        setTimeout(bindDrag,0);
-        window.__eam228BindDrag=bindDrag;
+        document.addEventListener('mouseup',finish,true);
       }
-      setTimeout(()=>window.__eam228BindDrag?.(),0);
     }
 
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
