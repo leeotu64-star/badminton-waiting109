@@ -4522,7 +4522,32 @@ function jgbV47GoWpByLeak(leakCode){
     }).join(''):`<div class="jgb-v66-empty">등록된 방수공사 이력내역이 없습니다.</div>`;
     return `<section class="jgb-v66-set" data-wp-code="${esc(code)}"><div class="jgb-v66-head"><strong>🛡 방수관리 이력카드</strong><div><button type="button" data-v47-action="edit-wp-card" data-code="${esc(code)}">✏ 수정</button><button type="button" data-v47-action="new-wp" data-code="${esc(code)}">＋ 이력내역</button><button type="button" class="jgb-v66-delete-card" data-v47-action="delete-wp-card" data-code="${esc(code)}">🗑 카드삭제</button><button type="button" class="jgb-v66-fold" data-v47-action="toggle-wp-card" data-code="${esc(code)}" aria-expanded="${collapsed?'false':'true'}">${collapsed?'▼':'▲'}</button></div></div><div class="jgb-v66-body${collapsed?' closed':''}"><div class="jgb-v66-card"><div class="jgb-v66-section">기본정보</div><div class="jgb-v66-card-layout"><div>${(()=>{const lc=String(meta.leakCode||rows.find(x=>String(x.related||'').trim())?.related||'').trim().toUpperCase(); return lc&&/^LK-\d+$/.test(lc)?`<div class=\"jgb-v66-field\"><small>누수코드</small><button type=\"button\" data-v47-action=\"go-leak-by-code\" data-leak=\"${esc(lc)}\" style=\"border:0;background:none;padding:0;color:#1769c1;font-weight:900;font-size:inherit;cursor:pointer;text-align:left\">${esc(lc)} ↗</button></div>`:field('누수코드','-')})()}${field('시설명',meta.facility||'장군봉체육관')}${field('방수 위치',loc)}${field('건물·구역',meta.area)}${field('주요 방수부위',meta.part||loc)}${field('방수공사 종류',meta.kind||'방수 보수·보강')}${field('방수 면적',meta.areaSize)}${field('최초 방수일',meta.firstDate||rows.at(-1)?.date)}${field('최근 방수일',rows[0]?.date||meta.lastDate)}${field('현재 상태',meta.status||'정상')}${field('담당자',meta.manager)}${field('연락처',meta.contact)}${field('시공업체',meta.contractor)}${field('보증기간',meta.warranty)}${field('공사 목적',meta.purpose||'시설물 보호 및 누수 예방')}${field('주요 공법',meta.method||'우레탄시트 등')}${field('사용 자재',meta.material)}${field('공사 범위',meta.scope)}${field('총 공사비',totalForLocation(rows)+'원')}${field('특이사항',meta.note)}</div><div class="jgb-v66-card-photo"><div class="jgb-v66-photo-label">📷 방수 위치 사진 <em>5 × 5 · 1장</em></div>${photo?`<img src="${esc(photo)}" alt="방수 위치 사진">`:`<div class="jgb-v66-location-empty">사진 등록 자리<br><small>5 × 5 · 1장</small></div>`}</div></div></div><section class="jgb-v66-history"><div class="jgb-v66-history-head"><strong>📋 방수공사 이력내역</strong><button type="button" data-v47-action="new-wp" data-code="${esc(code)}">＋ 이력내역 등록</button></div><div class="jgb-v66-history-list">${history}</div></section></div></section>`;
   };
-  return `<div class="jgb-v66-wrap"><div class="jgb-v66-top"><h2>🛡 방수관리 이력</h2><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div><div class="jgb-v66-grid">${list.map(cardFor).join('')||'<div class="jgb-v66-none">등록된 방수공사 이력카드가 없습니다.<br><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>'}</div></div>`;
+  let selectedCode='';
+  try{selectedCode=String(localStorage.getItem('JGB_V72_SELECTED_WP')||'').trim()}catch(e){}
+  const selected=list.find(x=>x.code===selectedCode)||list[0];
+  if(selected && selected.code!==selectedCode){try{localStorage.setItem('JGB_V72_SELECTED_WP',selected.code)}catch(e){}}
+  const wpSide=list.map((x,i)=>{
+    const m=x.meta||{};
+    const active=selected&&x.code===selected.code;
+    const rows=hs.filter(h=>String(h.cardCode||'')===x.code);
+    const status=String(m.status||'정상');
+    return `<button type="button" class="jgb-v66-wp-side-item${active?' active':''}" data-v47-action="select-wp-card" data-code="${esc(x.code)}"><span class="jgb-v66-wp-side-code">${esc(x.code)}</span><span class="jgb-v66-wp-side-info">${esc(m.location||'방수 위치 미등록')} · ${rows.length}건</span><em>${esc(status)}</em></button>`;
+  }).join('');
+  return `<div class="jgb-v66-wrap"><style>
+    .jgb-v66-wp-select-grid{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px;align-items:start}
+    .jgb-v66-wp-side{border:1px solid #ccdbe8;border-radius:12px;background:#fff;overflow:hidden}
+    .jgb-v66-wp-side-title{padding:12px 13px;border-bottom:1px solid #dbe5ed;font-weight:900;color:#17334d;background:#f5f9fc}
+    .jgb-v66-wp-side-list{padding:7px}
+    .jgb-v66-wp-side-item{position:relative;width:100%;display:block;text-align:left;border:1px solid #d7e3ed;border-left:5px solid #d7e3ed;border-radius:10px;background:#fff;padding:10px 9px;margin:0 0 7px;cursor:pointer}
+    .jgb-v66-wp-side-item:last-child{margin-bottom:0}
+    .jgb-v66-wp-side-item.active{border-color:#1976d2;border-left-color:#1976d2;background:#f1f7ff;box-shadow:0 1px 4px rgba(23,105,193,.12)}
+    .jgb-v66-wp-side-code{display:block;font-size:15px;font-weight:900;color:#1769c1;margin-bottom:4px}
+    .jgb-v66-wp-side-info{display:block;font-size:11px;color:#667d91;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:38px}
+    .jgb-v66-wp-side-item em{position:absolute;right:8px;top:10px;font-style:normal;font-size:10px;font-weight:900;color:#14845a;background:#e8f7ef;border-radius:999px;padding:4px 6px}
+    .jgb-v66-wp-side-item.active em{color:#d45b4d;background:#fff0ed}
+    .jgb-v66-wp-main .jgb-v66-grid{display:block}
+    @media(max-width:900px){.jgb-v66-wp-select-grid{grid-template-columns:1fr}.jgb-v66-wp-side-list{display:flex;gap:7px;overflow:auto}.jgb-v66-wp-side-item{min-width:190px;margin:0}}
+  </style><div class="jgb-v66-top"><h2>🛡 방수관리 이력</h2><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div><div class="jgb-v66-wp-select-grid"><aside class="jgb-v66-wp-side"><div class="jgb-v66-wp-side-title">방수 이력 ${list.length}개</div><div class="jgb-v66-wp-side-list">${wpSide||'<div class="jgb-v66-none">등록된 방수 이력카드가 없습니다.</div>'}</div></aside><main class="jgb-v66-wp-main"><div class="jgb-v66-grid">${selected?cardFor(selected,0):'<div class="jgb-v66-none">등록된 방수공사 이력카드가 없습니다.<br><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>'}</div></main></div></div>`;
 }
     function wpSetCard(location,idx,esc){
       if(!location)return `<section class="jgb-v52-set"><div class="jgb-v48-card panel jgb-v52-card"><div class="jgb-v48-card-head"><div><h2>📋 방수공사 이력카드</h2><p>방수 대상 시설의 기본정보를 관리합니다.</p></div><div class="jgb-v48-card-actions"><button type="button" class="btn gray" disabled>✏️ 이력카드 수정</button></div></div><div class="jgb-v52-empty">방수 위치를 등록하면 이력카드가 표시됩니다.</div></div><section class="jgb-v48-history panel jgb-v52-history"><div class="jgb-v48-card-head"><div><h2>📝 방수공사 이력내역</h2></div></div><div class="jgb-v52-empty">등록된 방수작업 이력이 없습니다.</div></section></section>`;
@@ -4774,6 +4799,7 @@ function jgbV47GoWpByLeak(leakCode){
       }
       if(a==='open-lk-delete')return jgbV171OpenLkDelete();
       if(a==='new-leak')return jgbV47OpenModal('leak');
+      if(a==='select-wp-card'){try{localStorage.setItem('JGB_V72_SELECTED_WP',String(code||''))}catch(e){} return render();}
       if(a==='new-wp-card')return jgbV48OpenCardEditor('',true);
       if(a==='new-wp')return code?jgbV47OpenModal('wp',null,code):null;
       if(a==='edit-leak')return jgbV47OpenModal('leak',id);
