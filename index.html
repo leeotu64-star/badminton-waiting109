@@ -3969,6 +3969,21 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     if(!document.getElementById('JGB_V117_PAIR_TABLE_STYLE')){const st=document.createElement('style');st.id='JGB_V117_PAIR_TABLE_STYLE';st.textContent=`.jgb-v104-pair-table table{width:100%;border-collapse:collapse;table-layout:fixed}.jgb-v104-pair-row th{width:11%;padding:10px 12px;background:#eef4f8;border:1px solid #cbd7e0;text-align:center;font-weight:800;white-space:nowrap}.jgb-v104-pair-row td{width:39%;padding:10px 12px;border:1px solid #cbd7e0;background:#fff;text-align:center}.jgb-v104-pair-row td:nth-child(4){width:39%}.jgb-v104-pair-manage td{padding:7px;text-align:right;border:1px solid #cbd7e0;background:#f7fafc}.jgb-v104-pair-manage .btn{margin:0}.jgb-v104-pair-table .jgb-v104-code{font-weight:800}.jgb-v104-pair-table .jgb-v104-wa{font-weight:800}.jgb-v104-pair-table small{margin-left:4px}`;document.head.appendChild(st)}
     function jgbV178LiveStore(){try{return JSON.parse(localStorage.getItem('JGB_V178_LIVE_MANUAL')||'[]')||[]}catch(e){return []}}
     function jgbV178SaveLive(v){try{localStorage.setItem('JGB_V178_LIVE_MANUAL',JSON.stringify(v||[]))}catch(e){}}
+    function jgbV180DoneStore(){try{return JSON.parse(localStorage.getItem('JGB_V180_LIVE_DONE')||'[]')||[]}catch(e){return []}}
+    function jgbV180SaveDone(v){try{localStorage.setItem('JGB_V180_LIVE_DONE',JSON.stringify(v||[]))}catch(e){}}
+    function jgbV180SyncLiveFromLks(){
+      const S=jgbV47Store(), leaks=(S.leaks||[]).filter(x=>!x.iconHidden), current=jgbV178LiveStore(), done=new Set(jgbV180DoneStore());
+      const byId=new Map(current.filter(x=>x&&x.sourceId).map(x=>[String(x.sourceId),x]));
+      leaks.forEach(l=>{
+        const id=String(l.id||''), lk=String(l.leakCode||'').trim().toUpperCase();
+        if(!id||!lk||done.has(id))return;
+        if(!byId.has(id) && !current.some(x=>String(x.lk||'').trim().toUpperCase()===lk)){
+          current.push({sourceId:id,lk,content:'',status:'수리예정',scheduled:'',manager:''});
+        }
+      });
+      jgbV178SaveLive(current);
+      return current;
+    }
     function jgbV178OpenLiveRegister(){
       const S=jgbV47Store(), leaks=(S.leaks||[]).filter(x=>!x.iconHidden), live=jgbV178LiveStore();
       const available=leaks.filter(l=>!live.some(x=>String(x.lk||'').toUpperCase()===String(l.leakCode||'').toUpperCase()));
@@ -4061,7 +4076,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const py=Number.isFinite(Number(x.mapY))?Number(x.mapY):Math.max(8,Math.min(92,base[1]+o[1]));
         return `<div class="jgb-v170-marker-wrap" style="left:${px}%;top:${py}%" data-id="${esc(x.id)}"><button type="button" class="jgb-v170-marker ${markerClass(lk)}" data-v47-action="go-wp-by-leak" data-id="${esc(x.id)}" data-map-x="${px}" data-map-y="${py}" title="${esc(lk)} · 클릭하면 방수 이력"><span class="lk-pin-dot"></span><span class="lk-pin-code">${esc(lk||'-')}</span></button></div>`;
       }).join('');
-      const live=jgbV178LiveStore();
+      const live=jgbV180SyncLiveFromLks();
       return `<style>
         .jgb-v170-grid{display:grid;grid-template-columns:minmax(0,2.05fr) minmax(310px,.95fr);gap:14px;align-items:stretch}
         .jgb-v170-card{background:#fff;border:1px solid #d2dfea;border-radius:13px;box-shadow:0 2px 9px rgba(20,50,80,.05);overflow:hidden}
@@ -4077,7 +4092,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         <header class="jgb-v170-head"><div><div style="font-size:11px;font-weight:900;letter-spacing:.12em;color:#1475ca">LEAK LOCATION MANAGEMENT</div><h1>💧 누수현황</h1><p>LK를 선택하여 필요한 수리 건만 실시간 수리에 직접 등록합니다.</p><div class="jgb-v170-lk-count">등록 LK ${leaks.length}개</div></div><div class="jgb-v170-head-actions"><button type="button" class="jgb-v170-add" data-v47-action="new-lk">＋ LK 생성</button><button type="button" class="jgb-v171-delete-btn" data-v47-action="open-lk-delete">LK 삭제·초기화</button></div></header>
         <div class="jgb-v170-grid">
           <section class="jgb-v170-card jgb-v170-mapcard"><div class="jgb-v170-title"><div><h2>🗺 코트 배치도 <span style="font-size:11px;color:#7a91a4;font-weight:800">· LK 위치 관리</span></h2><p>코트 위치와 번호는 고정됩니다. LK 아이콘만 드래그하여 위치를 조정할 수 있습니다.</p></div><div class="jgb-v170-legend"><span><i style="background:#ef5b52"></i>조치필요</span><span><i style="background:#e0b62f"></i>점검요청</span><span><i style="background:#3d8fe4"></i>정상</span></div></div><div class="jgb-v170-map"><div class="jgb-v170-plan"><div class="top-label">상부</div><div class="side-label left-label">좌측 외곽</div><div class="side-label right-label">우측 외곽</div><div class="bottom-label">하부</div><div class="court-grid"><div class="court"><span class="court-no">5</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">4</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">3</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">2</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div><div class="court"><span class="court-no">1</span><i class="court-net"></i><i class="court-service court-service-a"></i><i class="court-service court-service-b"></i><i class="court-side court-side-l"></i><i class="court-side court-side-r"></i></div></div><div class="entrance">출입문</div>${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}</div></div><div class="jgb-v170-note">LK 아이콘 클릭 → 해당 LK의 방수공사 이력으로 이동 · 삭제·초기화는 상단 「LK 삭제·초기화」에서 선택</div></section>
-          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>AUTO LK</b><span>LK 등록 연동</span></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>LK</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.lk||'')}</b></td><td>${esc(x.content||'')}</td><td>${esc(x.status||'수리예정')}</td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.lk||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v176-empty"><b>등록된 실시간 수리가 없습니다.</b><span>LK를 등록하면 자동으로 LIVE에 등록됩니다.</span></div>`}</div><div class="jgb-v176-live-footer"><span>● 직접 등록</span><span>수리예정 · 수리중 · 재조치 필요</span></div></section>
+          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>AUTO LK</b><span>LK 등록 연동</span></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>LK</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.lk||'')}</b></td><td>${esc(x.content||'')}</td><td>${esc(x.status||'수리예정')}</td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.lk||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v176-empty"><b>등록된 실시간 수리가 없습니다.</b><span>LK를 등록하면 자동으로 LIVE에 등록됩니다.</span></div>`}</div><div class="jgb-v176-live-footer"><span>● LK 자동 등록</span><span>완료 전까지 LIVE 유지</span></div></section>
         </div>
       </div>`;
     }
@@ -4318,6 +4333,7 @@ function jgbV47GoWpByLeak(leakCode){
       const id='LK-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
       const n=S.leaks.length, px=18+(n%5)*17, py=50+((Math.floor(n/5)%2)?18:-18);
       S.saveLeaks([{id,leakCode:code,status:'정상',location:'',content:'',note:'',createdAt:new Date().toISOString(),mapX:px,mapY:py},...S.leaks]);
+      const lv=jgbV178LiveStore(); lv.push({sourceId:id,lk:code,content:'',status:'수리예정',scheduled:'',manager:''}); jgbV178SaveLive(lv);
       return render();
     }
     function jgbV171OpenLkDelete(){
@@ -4391,7 +4407,11 @@ function jgbV47GoWpByLeak(leakCode){
         const lk=String(b.getAttribute('data-live-lk')||'').trim().toUpperCase();
         if(!lk)return;
         if(!confirm(lk+'의 실시간 수리를 완료 처리할까요?\n\nLIVE에서만 사라지고 LK와 WA는 그대로 유지됩니다.'))return;
-        jgbV178SaveLive(jgbV178LiveStore().filter(x=>String(x.lk||'').trim().toUpperCase()!==lk));
+        const rows=jgbV178LiveStore();
+        const target=rows.find(x=>String(x.lk||'').trim().toUpperCase()===lk);
+        const sourceId=String(target?.sourceId||'');
+        jgbV178SaveLive(rows.filter(x=>String(x.lk||'').trim().toUpperCase()!==lk));
+        if(sourceId){const d=jgbV180DoneStore();if(!d.includes(sourceId)){d.push(sourceId);jgbV180SaveDone(d)}}
         return render();
       }
       if(a==='open-lk-delete')return jgbV171OpenLkDelete();
