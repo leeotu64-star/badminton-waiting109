@@ -4077,6 +4077,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   <div class="jgbx-bottom"><section class="jgbx-panel"><div class="jgbx-panel-head"><div><h2>🔧 최근 수리 LIVE</h2><p>누수현황 원본에서 자동 표시</p></div></div><div class="jgbx-feed">${issues.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,8).map(i=>{const lk=String(i.content||'').match(/LK-\d+/i)?.[0]||'';return `<div class="jgbx-feed-row"><small>${i.createdAt?new Date(i.createdAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}):'-'}</small><b>${esc(lk||i.place||'수리')}</b><span>${esc(clean(i)||'수리 내용 없음')}</span><em>${esc(i.status||'접수')}</em></div>`}).join('')||'<div class="jgbx-empty">등록된 수리 LIVE 기록이 없습니다.</div>'}</div></section><section class="jgbx-panel"><div class="jgbx-panel-head"><div><h2>📌 운영 원칙</h2><p>한 번 입력하고 여러 곳에서 확인</p></div></div><div class="jgbx-feed"><div class="jgbx-feed-row"><b>누수현황</b><span>원본 데이터 입력</span><em>입력</em></div><div class="jgbx-feed-row"><b>LK 아이콘</b><span>관리자가 실제 위치 지정</span><em>클릭</em></div><div class="jgbx-feed-row"><b>수리 LIVE</b><span>LK 관련 수리 자동 표시</span><em>자동</em></div><div class="jgbx-feed-row"><b>방수 이력</b><span>LK에 연결된 WA 자동 표시</span><em>연동</em></div></div></section></div>
   </div>`;
 }
+// v144: global helper for legacy management hooks; prevents dashboard pages from failing with 'V is not defined'.
+function V(s){return String(s==null?'':s).trim()}
 function gone(){try{return new Set(JSON.parse(localStorage.getItem(DEL)||'[]').map(V).filter(Boolean))}catch(e){return new Set()}}
 function saveGone(a){try{localStorage.setItem(DEL,JSON.stringify([...a]))}catch(e){}}
 function code(){return V(window.__eamSelCode)}
