@@ -3394,23 +3394,23 @@ html::before,body::before{
         window.__eamCat=catPage;
         go('eam');
 
+        // EAM 현황에서 클릭한 자산을 EAM 이력 화면의 왼쪽 자산목록에서 실제로 자동 클릭
         let tries=0;
         const selectExisting=()=>{
-          const btn=[...document.querySelectorAll('.eam-asset-row[data-code]')]
+          const btn=[...document.querySelectorAll('#eamproGrid .eam-asset-row[data-code]')]
             .find(x=>V(x.getAttribute('data-code'))===c);
 
           if(btn){
+            btn.scrollIntoView({behavior:'smooth',block:'nearest'});
             btn.click();
             btn.classList.add('on');
-            btn.scrollIntoView({behavior:'smooth',block:'nearest'});
             return;
           }
 
-          // 목록 렌더링이 늦는 경우 기존 선택 함수로 한 번 더 시도
-          if(typeof window.eamPick==='function') window.eamPick(catPage,c);
-          if(++tries<20)setTimeout(selectExisting,100);
+          // EAM 화면 렌더링이 늦어도 최대 2초 동안 왼쪽 자산 버튼을 찾는다.
+          if(++tries<20) setTimeout(selectExisting,100);
         };
-        setTimeout(selectExisting,100);
+        requestAnimationFrame(selectExisting);
       };
       window.eam228Status=async code=>{
         const a=assets.find(x=>codeOf(x)===V(code));if(!a||!SUPA)return;
@@ -3588,6 +3588,36 @@ html::before,body::before{
 
         document.addEventListener('pointerup',finish,true);
         document.addEventListener('pointercancel',finish,true);
+
+        // EAM 배치 아이콘: 일반 마우스 환경에서도 확실하게 드래그되도록 보조 mouse 이벤트 추가
+        let mouseDrag=null;
+        document.addEventListener('mousedown',ev=>{
+          const el=ev.target.closest?.('.eam228-asset');
+          if(!el || ev.button!==0 || !el.closest('#eam228Map') || drag) return;
+          ev.preventDefault();
+          const map=el.closest('#eam228Map'),rect=map.getBoundingClientRect();
+          mouseDrag={el,map,code:el.dataset.code,rect,startX:ev.clientX,startY:ev.clientY,active:false};
+        },true);
+        document.addEventListener('mousemove',ev=>{
+          if(!mouseDrag)return;
+          const d=mouseDrag,dx=ev.clientX-d.startX,dy=ev.clientY-d.startY;
+          if(!d.active && Math.hypot(dx,dy)<3)return;
+          d.active=true;d.el.classList.add('dragging');
+          const x=Math.max(2,Math.min(98,((ev.clientX-d.rect.left)/d.rect.width)*100));
+          const y=Math.max(2,Math.min(98,((ev.clientY-d.rect.top)/d.rect.height)*100));
+          d.el.style.left=x.toFixed(2)+'%';d.el.style.top=y.toFixed(2)+'%';
+        },true);
+        const finishMouse=ev=>{
+          if(!mouseDrag)return;
+          const d=mouseDrag;mouseDrag=null;d.el.classList.remove('dragging');
+          if(!d.active){window.eam228Pick?.(d.code);return;}
+          const x=Math.max(2,Math.min(98,((ev.clientX-d.rect.left)/d.rect.width)*100));
+          const y=Math.max(2,Math.min(98,((ev.clientY-d.rect.top)/d.rect.height)*100));
+          const pos=readObj(posKey);pos[d.code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];writeObj(posKey,pos);
+          window.__EAM228_DRAG_SUPPRESS=true;setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,250);
+          render();
+        };
+        document.addEventListener('mouseup',finishMouse,true);
       }
     }
 
