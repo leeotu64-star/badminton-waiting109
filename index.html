@@ -2480,9 +2480,12 @@ html::before,body::before{
 
 /* v228: asset badge placement + roof grid refinement */
 .eam228-roof button{font-size:15px!important;}
-.eam228-asset{font-size:18px!important;padding:6px 11px!important;gap:5px!important;border-width:2px!important;min-width:72px!important;justify-content:flex-start!important;transform:none!important;}
-.eam228-asset b{font-size:18px!important;}
-.eam228-asset span{font-size:16px!important;}
+.eam228-asset{font-size:11px!important;padding:3px 6px!important;gap:3px!important;border-width:2px!important;min-width:0!important;justify-content:center!important;transform:none!important;line-height:1!important;}
+.eam228-asset b{font-size:11px!important;}
+.eam228-asset span{font-size:10px!important;line-height:1!important;}
+.eam228-asset.ok{border-color:#16aa72!important;background:#f3fff9!important;}
+.eam228-asset.warn{border-color:#e3a91c!important;background:#fff8dc!important;}
+.eam228-asset.bad{border-color:#e34b4b!important;background:#fff0f0!important;}
 .eam228-zone b,.eam228-corridor{font-size:15px!important;}
 </style>
 </head><body><div id="app"></div>
@@ -3379,7 +3382,16 @@ html::before,body::before{
       const selected={code:''};
 
       window.eam228Refresh=()=>{render()};
-      window.eam228Pick=code=>{selected.code=V(code);render()};
+      window.eam228Pick=code=>{
+        const c=V(code);
+        const a=assets.find(x=>codeOf(x)===c);
+        if(!a){alert('연결된 EAM 자산을 찾을 수 없습니다.');return}
+        const cat=normCat(a);
+        const catPage={AC:'cooling',BO:'water',FI:'fire',EL:'electrical',DO:'doors',SA:'sanitary',OT:'other'}[cat]||'other';
+        window.__eamSelCode=c;
+        window.__eamCat=catPage;
+        go('eam');
+      };
       window.eam228Status=async code=>{
         const a=assets.find(x=>codeOf(x)===V(code));if(!a||!SUPA)return;
         const cur=statusOf(a),next=cur==='normal'?'check':cur==='check'?'repair':'normal';
