@@ -3973,10 +3973,54 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const S=jgbV47Store(), leaks=(S.leaks||[]).filter(x=>!x.iconHidden), live=jgbV178LiveStore();
       const available=leaks.filter(l=>!live.some(x=>String(x.lk||'').toUpperCase()===String(l.leakCode||'').toUpperCase()));
       const esc=v=>xEsc(v==null?'':String(v));
-      const list=available.length?available.map(l=>`<button type="button" data-v178-lk="${esc(l.leakCode)}" style="width:100%;text-align:left;padding:12px;border:1px solid #d8e3eb;border-radius:9px;background:#fff;margin:5px 0;cursor:pointer"><b>${esc(l.leakCode)}</b><small style="display:block;color:#8195a6;margin-top:3px">이 LK를 실시간 수리에 등록</small></button>`).join(''):'<div style="padding:22px;text-align:center;color:#8296a7">등록할 LK가 없습니다.</div>';
-      const m=document.createElement('div');m.id='jgbV178LiveModal';m.style.cssText='position:fixed;inset:0;background:rgba(15,35,50,.4);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px';
-      m.innerHTML=`<div style="width:min(390px,94vw);background:#fff;border-radius:14px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.22)"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:16px">실시간 수리 등록</b><button type="button" data-v178-close style="border:0;background:transparent;font-size:22px;cursor:pointer">×</button></div><p style="font-size:11px;color:#71869a;margin:6px 0 12px">등록할 LK만 선택하세요.</p>${list}</div>`;
-      document.body.appendChild(m);m.addEventListener('click',e=>{const b=e.target.closest('[data-v178-lk]');if(b){const code=b.getAttribute('data-v178-lk'),a=jgbV178LiveStore();a.push({lk:code,content:'',status:'수리예정',scheduled:'',manager:''});jgbV178SaveLive(a);m.remove();render();}if(e.target.closest('[data-v178-close]')||e.target===m)m.remove()});
+      const options=available.map(l=>`<option value="${esc(l.leakCode)}">${esc(l.leakCode)}</option>`).join('');
+      const m=document.createElement('div');
+      m.id='jgbV178LiveModal';
+      m.style.cssText='position:fixed;inset:0;background:rgba(15,35,50,.4);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px';
+      m.innerHTML=`<div style="width:min(440px,94vw);background:#fff;border-radius:14px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.22)">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e1e8ee;padding-bottom:10px">
+          <b style="font-size:17px;color:#17334d">실시간 수리 등록</b>
+          <button type="button" data-v178-close style="border:0;background:transparent;font-size:22px;cursor:pointer">×</button>
+        </div>
+        <p style="font-size:11px;color:#71869a;margin:8px 0 14px">실시간 수리에 표시할 내용을 직접 입력하세요.</p>
+        ${available.length?`<div style="display:grid;gap:10px">
+          <label style="font-size:12px;font-weight:900;color:#405c72">LK
+            <select data-v178-field="lk" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:9px;border:1px solid #cbd9e4;border-radius:8px;background:#fff">${options}</select>
+          </label>
+          <label style="font-size:12px;font-weight:900;color:#405c72">작업내용
+            <input data-v178-field="content" type="text" placeholder="예: 천장 누수 보수" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:9px;border:1px solid #cbd9e4;border-radius:8px">
+          </label>
+          <label style="font-size:12px;font-weight:900;color:#405c72">수리상태
+            <select data-v178-field="status" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:9px;border:1px solid #cbd9e4;border-radius:8px;background:#fff">
+              <option value="수리예정">수리예정</option><option value="수리중">수리중</option><option value="완료">완료</option><option value="재조치 필요">재조치 필요</option>
+            </select>
+          </label>
+          <label style="font-size:12px;font-weight:900;color:#405c72">예정일
+            <input data-v178-field="scheduled" type="date" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:9px;border:1px solid #cbd9e4;border-radius:8px">
+          </label>
+          <label style="font-size:12px;font-weight:900;color:#405c72">담당
+            <input data-v178-field="manager" type="text" placeholder="담당자 입력" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:9px;border:1px solid #cbd9e4;border-radius:8px">
+          </label>
+          <button type="button" data-v178-save style="margin-top:3px;padding:11px;border:0;border-radius:8px;background:#1769bd;color:#fff;font-weight:900;cursor:pointer">LIVE 등록</button>
+        </div>`:`<div style="padding:22px;text-align:center;color:#8296a7">등록할 LK가 없습니다.</div>`}
+      </div>`;
+      document.body.appendChild(m);
+      m.addEventListener('click',e=>{
+        if(e.target.closest('[data-v178-save]')){
+          const lk=m.querySelector('[data-v178-field="lk"]')?.value||'';
+          const content=m.querySelector('[data-v178-field="content"]')?.value.trim()||'';
+          const status=m.querySelector('[data-v178-field="status"]')?.value||'수리예정';
+          const scheduled=m.querySelector('[data-v178-field="scheduled"]')?.value||'';
+          const manager=m.querySelector('[data-v178-field="manager"]')?.value.trim()||'';
+          if(!lk){alert('LK를 선택하세요.');return}
+          if(!content){alert('작업내용을 입력하세요.');return}
+          const a=jgbV178LiveStore();
+          if(a.some(x=>String(x.lk||'').toUpperCase()===String(lk).toUpperCase())){alert('이미 LIVE에 등록된 LK입니다.');return}
+          a.push({lk,content,status,scheduled,manager});
+          jgbV178SaveLive(a);m.remove();render();return;
+        }
+        if(e.target.closest('[data-v178-close]')||e.target===m)m.remove();
+      });
     }
     function leakagePage(){
       const S=jgbV47Store();
