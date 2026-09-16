@@ -12878,6 +12878,104 @@ window.eamDeleteSelectedAsset=async function(){
   };
 })();
 </script>
+
+<style id="JGB_EAM_CODE_ONLY_V10_STYLE">
+.jgb-code-only-modal{position:fixed;inset:0;background:rgba(8,31,48,.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px}
+.jgb-code-only-card{width:min(560px,96vw);max-height:82vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.jgb-code-only-head{background:#12587d;color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center}
+.jgb-code-only-head small{display:block;font-size:10px;letter-spacing:.08em;opacity:.8}
+.jgb-code-only-head h3{margin:3px 0 0;font-size:22px}
+.jgb-code-only-close{border:0;background:rgba(255,255,255,.16);color:#fff;border-radius:8px;font-size:24px;width:36px;height:36px;cursor:pointer}
+.jgb-code-only-list{padding:14px}
+.jgb-code-only-row{display:flex;align-items:center;justify-content:space-between;border:1px solid #d5e1e9;border-radius:11px;padding:13px 14px;margin-bottom:9px;background:#fff}
+.jgb-code-only-row .code{font-weight:900;font-size:18px;color:#0867b5}
+.jgb-code-only-row .num{font-size:12px;color:#7890a0}
+.jgb-code-only-add{border:0;border-radius:8px;background:#1674c8;color:#fff;padding:8px 12px;font-weight:700;cursor:pointer}
+.jgb-category-codes{cursor:pointer}
+</style>
+
+<script id="JGB_EAM_CODE_ONLY_V10">
+(function(){
+  const PREFIX={
+    '냉난방':'AC','소방·방재':'FI','소방설비':'FI',
+    '온수·난방':'BO','보일러·온수':'BO',
+    '전기설비':'EL','코트조명':'LT','방수':'WP','위생설비':'SA',
+    '문·창호설비':'DR','기타설비':'OT'
+  };
+
+  function esc(v){
+    return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  async function openCodes(category){
+    const prefix=PREFIX[category]||'OT';
+    let rows=[];
+    if(window.SUPA){
+      try{
+        const r=await SUPA.from('assets').select('asset_code').like('asset_code',prefix+'-%').order('asset_code',{ascending:true});
+        if(!r.error) rows=(r.data||[]).map(x=>x.asset_code).filter(Boolean);
+      }catch(e){}
+    }
+
+    const nums=rows.map(c=>parseInt(String(c).split('-')[1],10)).filter(Number.isFinite);
+    const next=(nums.length?Math.max(...nums):0)+1;
+
+    const m=document.createElement('div');
+    m.className='jgb-code-only-modal';
+    m.innerHTML=`
+      <div class="jgb-code-only-card">
+        <div class="jgb-code-only-head">
+          <div><small>EAM ASSET CODE</small><h3>${esc(category)} 코드</h3></div>
+          <button class="jgb-code-only-close" onclick="this.closest('.jgb-code-only-modal').remove()">×</button>
+        </div>
+        <div class="jgb-code-only-list">
+          ${rows.length ? rows.map(c=>`
+            <div class="jgb-code-only-row">
+              <div><span class="code">${esc(c)}</span></div>
+            </div>`).join('') :
+            `<div style="padding:28px;text-align:center;color:#7890a0">등록된 코드가 없습니다.</div>`}
+          <div class="jgb-code-only-row" style="background:#f4f8fb">
+            <div><span class="code">${prefix}-${String(next).padStart(2,'0')}</span><div class="num">다음 자동 생성 코드</div></div>
+            <button class="jgb-code-only-add" onclick="window.jgbCreateCodeOnly('${esc(category)}')">+ 코드 등록</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(m);
+  }
+
+  window.jgbCreateCodeOnly=function(category){
+    document.querySelector('.jgb-code-only-modal')?.remove();
+    if(typeof window.eamRegisterNewAsset==='function') window.eamRegisterNewAsset(category);
+  };
+
+  window.jgbOpenCategoryCodes=openCodes;
+
+  // Existing category cards: attach click behavior without changing their visual design.
+  function wire(){
+    const prefixMap=PREFIX;
+    document.querySelectorAll('button,div').forEach(el=>{
+      if(el.dataset.jgbCodeWired) return;
+      const txt=(el.innerText||'').trim();
+      const category=Object.keys(prefixMap).find(k=>txt===k || txt.startsWith(k+'\n'));
+      if(!category) return;
+      // Only wire likely category-card elements, not tiny labels inside them.
+      if(el.children.length<1) return;
+      const rect=el.getBoundingClientRect();
+      if(rect.width<120 || rect.height<60) return;
+      el.dataset.jgbCodeWired='1';
+      el.classList.add('jgb-category-codes');
+      el.addEventListener('click',function(ev){
+        if(ev.target.closest('button,input,select,a')) return;
+        ev.preventDefault(); ev.stopPropagation();
+        openCodes(category);
+      },true);
+    });
+  }
+  setTimeout(wire,300);
+  setTimeout(wire,1000);
+  setTimeout(wire,2000);
+})();
+</script>
 </body>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
