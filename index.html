@@ -2492,6 +2492,32 @@ html::before,body::before{
 <style id="v92-lk-code-only">
 .jgb-v66-lk-code{display:inline-flex;align-items:center;margin-left:8px;padding:4px 9px;border:1px solid #b8d2ee;border-radius:7px;background:#eef6ff;color:#1267b1;font-size:12px;font-weight:800;vertical-align:middle;line-height:1;}
 </style>
+
+<style id="v13-court-size-balance">
+/* v13: 코트 영역 확대 / 하부 시설 영역 축소 */
+.eam228-courts{
+  top:1.5%!important;
+  height:31%!important;
+  left:5%!important;
+  right:5%!important;
+  gap:8px!important;
+}
+.eam228-court{
+  margin-top:15px!important;
+}
+.eam228-court span{
+  font-size:17px!important;
+}
+.eam228-facility{
+  top:35%!important;
+  bottom:2%!important;
+}
+.eam228-roof span{font-size:9px!important}
+.eam228-zone b{font-size:12px!important}
+.eam228-zone small{font-size:8px!important}
+.eam228-corridor{font-size:12px!important}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -13363,17 +13389,16 @@ function mapPoint(ev,map,offsetX,offsetY,el){
   const w=map.clientWidth||r.width;
   const h=map.clientHeight||r.height;
 
+  /* 배치 가능 영역 = 화면에 보이는 전체 배치도.
+     코트/시설 영역을 별도 제한하지 않는다. */
   let px=ev.clientX-r.left-offsetX;
   let py=ev.clientY-r.top-offsetY;
 
-  /* 아이콘 전체가 배치도 안에 있도록 좌표를 보정 */
+  /* 아이콘 중심이 지도 안에 있도록 최소한의 경계만 적용 */
   const ew=el?.offsetWidth||0;
   const eh=el?.offsetHeight||0;
-  const minX=0, maxX=Math.max(0,w-ew);
-  const minY=0, maxY=Math.max(0,h-eh);
-
-  px=Math.max(minX,Math.min(maxX,px));
-  py=Math.max(minY,Math.min(maxY,py));
+  px=Math.max(-ew*0.25,Math.min(w-ew*0.75,px));
+  py=Math.max(-eh*0.25,Math.min(h-eh*0.75,py));
 
   return [(px/w)*100,(py/h)*100];
 }
@@ -13416,6 +13441,8 @@ document.addEventListener('pointermove',function(ev){
     if(Math.hypot(dx,dy)<4)return;
     drag.moved=true;
     drag.el.classList.add('dragging');
+    drag.el.style.pointerEvents='none';
+    drag.el.style.zIndex='9999';
     document.body.style.userSelect='none';
   }
 
@@ -13434,6 +13461,8 @@ function finish(ev){
   drag=null;
 
   d.el.classList.remove('dragging');
+  d.el.style.pointerEvents='auto';
+  d.el.style.zIndex='';
   document.body.style.userSelect='';
 
   /* 이동하지 않은 경우에는 AC-01 자동 클릭 등 기존 기능 그대로 */
