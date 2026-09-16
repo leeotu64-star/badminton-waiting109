@@ -12739,6 +12739,145 @@ window.eamDeleteSelectedAsset=async function(){
 .jgb-v189-empty-page{height:135px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.jgb-v189-worker{position:relative;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#eef7ff,#fff);border:1px solid #d8e7f1;margin-bottom:7px}.jgb-v189-worker span{font-size:27px}.jgb-v189-worker i{position:absolute;right:-3px;bottom:0;width:15px;height:15px;border-radius:50%;background:#e6f8ee;color:#15945e;border:2px solid #fff;font-size:8px;font-style:normal;font-weight:950;display:flex;align-items:center;justify-content:center}.jgb-v189-empty-page p{font-size:9px!important;color:#8093a2!important;margin:0!important;line-height:1.5!important}.jgb-v189-green{margin-top:9px;padding:6px 8px;border-radius:8px;background:#eaf8f2;color:#247653;font-size:7px;font-weight:900;line-height:1.45}
 @media(max-width:900px){.jgb-v189-book-head small{display:none}.jgb-v189-book{grid-template-columns:68px minmax(0,1fr)!important}.jgb-v189-book .jgb-v188-rings{left:60px!important}.jgb-v189-book .jgb-v188-page{padding-left:22px!important;padding-right:20px!important}.jgb-v189-book .jgb-v188-tabs{display:none}}
 </style>
+
+<script id="JGB_EAM_CODE_REGISTER_FINAL_V9">
+(function(){
+  /*
+    EAM V9:
+    "신규 자산 등록" 화면을 제거하고 "자산코드 등록" 전용 화면으로 통일.
+    - 시설·설비명 / 제조사 / 모델명 / 설치일 입력 없음
+    - 분류 선택
+    - 분류별 다음 코드 자동 생성
+    - 코드 생성 시에만 assets 테이블에 코드 레코드 생성
+  */
+  window.eamRegisterNewAsset=function(defaultCategory){
+    document.getElementById('eamRegisterModal')?.remove();
+    document.getElementById('eamAssetMasterModal')?.remove();
+
+    const cats=[
+      ['냉난방','❄️ 냉난방'],
+      ['소방설비','🚒 소방·방재'],
+      ['보일러·온수','♨️ 온수·난방'],
+      ['전기설비','⚡ 전기설비'],
+      ['코트조명','💡 코트조명'],
+      ['방수','🏗️ 방수'],
+      ['위생설비','🚻 위생설비'],
+      ['문·창호설비','🚪 문·창호설비'],
+      ['기타설비','🔧 기타설비']
+    ];
+
+    const m=document.createElement('div');
+    m.id='eamRegisterModal';
+    m.className='eam-modal';
+    m.innerHTML=`<div class="eam-modal-card" style="max-width:520px">
+      <div class="eam-modal-head">
+        <div>
+          <span>EAM ASSET CODE</span>
+          <h3>자산코드 등록</h3>
+          <small>분류를 선택하면 다음 자산코드가 자동으로 생성됩니다.</small>
+        </div>
+        <button type="button" onclick="closeEamRegisterModal()">×</button>
+      </div>
+
+      <div class="eam-modal-grid" style="grid-template-columns:1fr 1fr">
+        <label>자산 분류 *
+          <select id="eamRegCat" onchange="eamUpdateGeneratedCode()">
+            ${cats.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}
+          </select>
+        </label>
+        <label>자동 생성 코드
+          <input id="eamRegCode" readonly style="font-weight:900;font-size:20px;background:#f1f6fa;text-align:center">
+        </label>
+      </div>
+
+      <div class="eam-modal-note">
+        <b>코드만 등록합니다.</b><br>
+        제조사·모델명·설치일·시설명 입력은 이 화면에서 하지 않습니다.
+      </div>
+
+      <div class="eam-modal-actions">
+        <button class="btn gray" type="button" onclick="closeEamRegisterModal()">취소</button>
+        <button class="btn blue" id="eamRegSubmit" type="button" onclick="submitEamRegister()">코드 등록</button>
+      </div>
+    </div>`;
+
+    document.body.appendChild(m);
+    const cat=document.getElementById('eamRegCat');
+    if(cat && defaultCategory) cat.value=defaultCategory;
+    window.eamUpdateGeneratedCode();
+  };
+
+  window.eamUpdateGeneratedCode=function(){
+    const cat=document.getElementById('eamRegCat')?.value||'기타설비';
+    const code=typeof nextAutoCode==='function'?nextAutoCode(cat):'';
+    const el=document.getElementById('eamRegCode');
+    if(el)el.value=code;
+  };
+
+  window.closeEamRegisterModal=function(){
+    document.getElementById('eamRegisterModal')?.remove();
+  };
+
+  window.submitEamRegister=async function(){
+    if(!window.SUPA){alert('Supabase 연결이 필요합니다.');return}
+
+    const category=document.getElementById('eamRegCat')?.value||'기타설비';
+    const code=document.getElementById('eamRegCode')?.value||
+      (typeof nextAutoCode==='function'?nextAutoCode(category):'');
+
+    if(!code){alert('자산코드 생성에 실패했습니다.');return}
+
+    const btn=document.getElementById('eamRegSubmit');
+    if(btn){btn.disabled=true;btn.textContent='등록 중…'}
+
+    try{
+      const exists=await SUPA.from('assets').select('id,asset_code').eq('asset_code',code).maybeSingle();
+      if(exists.data){
+        alert(`${code}는 이미 등록되어 있습니다.`);
+        window.eamUpdateGeneratedCode();
+        return;
+      }
+
+      const r=await SUPA.from('assets').insert({
+        asset_code:code,
+        name:`${category} 자산`,
+        category,
+        place:null,
+        status:'정상',
+        product_name:category
+      }).select('id,asset_code,name,category,place,status').single();
+
+      if(r.error)throw r.error;
+
+      await SUPA.from('asset_history').insert({
+        asset_id:r.data.id,
+        event_type:'자산코드등록',
+        description:`자산코드 등록 · ${code}`,
+        worker_name:'관리자',
+        cost:0,
+        event_date:new Date().toISOString().slice(0,10)
+      });
+
+      window.__eamSelCode=code;
+      const map={
+        '냉난방':'cooling','소방설비':'fire','보일러·온수':'water',
+        '전기설비':'electrical','코트조명':'lighting','방수':'waterproof',
+        '위생설비':'sanitary','문·창호설비':'doors','기타설비':'other'
+      };
+      window.__eamCat=map[category]||'other';
+
+      window.closeEamRegisterModal();
+      await window.eamLoad();
+      if(typeof window.render==='function')window.render();
+    }catch(e){
+      console.error(e);
+      alert('자산코드 등록 실패\n'+(e?.message||e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent='코드 등록'}
+    }
+  };
+})();
+</script>
 </body>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
