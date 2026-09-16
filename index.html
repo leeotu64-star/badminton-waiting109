@@ -3624,7 +3624,6 @@ window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Pre
           window.__EAM228_DRAG_SUPPRESS=true;
           setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,500);
           ev.preventDefault();ev.stopPropagation();
-          render();
         };
         const onDragMove=(ev)=>{
           const d=dragState;if(!d)return;
@@ -13287,8 +13286,9 @@ window.eamDeleteMapIconByCode=function(c){
  });
  writeObj('JGB_EAM_DASH_MAP_POS_V228',pos);
 
- iconHidden[c]=true;
- writeObj('JGB_EAM_MAP_ICON_HIDDEN_V1',iconHidden);
+ const hidden=readObj('JGB_EAM_MAP_ICON_HIDDEN_V1');
+ hidden[c]=true;
+ writeObj('JGB_EAM_MAP_ICON_HIDDEN_V1',hidden);
 
  document.getElementById('eamAssetIconDeleteModal')?.remove();
 };
