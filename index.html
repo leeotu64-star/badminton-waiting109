@@ -3553,53 +3553,6 @@ html::before,body::before{
       .eam228-entry.court{right:12%!important;top:41%!important}
 </style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
-      /* v241: EAM 자산 아이콘 드래그를 독립 처리 — 클릭과 드래그를 구분하고 위치를 저장 */
-      if(!window.__EAM228_DRAG_V241_BOUND){
-        window.__EAM228_DRAG_V241_BOUND=true;
-        let dragState=null;
-        const finishDrag=(ev)=>{
-          if(!dragState)return;
-          const d=dragState;
-          dragState=null;
-          window.removeEventListener('pointermove',onDragMove,true);
-          window.removeEventListener('pointerup',finishDrag,true);
-          window.removeEventListener('pointercancel',finishDrag,true);
-          d.el.classList.remove('dragging');
-          if(!d.moved)return;
-          const r=d.map.getBoundingClientRect();
-          const x=Math.max(2,Math.min(98,((ev.clientX-r.left)/r.width)*100));
-          const y=Math.max(2,Math.min(98,((ev.clientY-r.top)/r.height)*100));
-          d.el.style.left=x.toFixed(2)+'%';
-          d.el.style.top=y.toFixed(2)+'%';
-          const pos=readObj(posKey);pos[d.code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];writeObj(posKey,pos);
-          window.__EAM228_DRAG_SUPPRESS=true;
-          setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,500);
-          ev.preventDefault();ev.stopPropagation();
-          render();
-        };
-        const onDragMove=(ev)=>{
-          const d=dragState;if(!d)return;
-          const dx=ev.clientX-d.sx,dy=ev.clientY-d.sy;
-          if(!d.moved){if(Math.hypot(dx,dy)<5)return;d.moved=true;d.el.classList.add('dragging');}
-          ev.preventDefault();ev.stopPropagation();
-          const r=d.map.getBoundingClientRect();
-          const x=Math.max(2,Math.min(98,((ev.clientX-r.left)/r.width)*100));
-          const y=Math.max(2,Math.min(98,((ev.clientY-r.top)/r.height)*100));
-          d.el.style.left=x.toFixed(2)+'%';d.el.style.top=y.toFixed(2)+'%';
-        };
-        document.addEventListener('pointerdown',function(e){
-          const el=e.target.closest?.('.eam228-asset');
-          if(!el||e.button!==0)return;
-          const map=el.closest('#eam228Map');if(!map)return;
-          const r=map.getBoundingClientRect();
-          dragState={el,map,code:V(el.dataset.code||''),sx:e.clientX,sy:e.clientY,startLeft:parseFloat(el.style.left)||0,startTop:parseFloat(el.style.top)||0,moved:false};
-          try{el.setPointerCapture?.(e.pointerId)}catch(_){ }
-          window.addEventListener('pointermove',onDragMove,true);
-          window.addEventListener('pointerup',finishDrag,true);
-          window.addEventListener('pointercancel',finishDrag,true);
-          e.preventDefault();e.stopPropagation();
-        },true);
-      }
     }
 
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
@@ -13356,54 +13309,161 @@ window.eamDeleteSelectedAsset=async function(){
 @media(max-width:900px){.jgb-v189-book-head small{display:none}.jgb-v189-book{grid-template-columns:68px minmax(0,1fr)!important}.jgb-v189-book .jgb-v188-rings{left:60px!important}.jgb-v189-book .jgb-v188-page{padding-left:22px!important;padding-right:20px!important}.jgb-v189-book .jgb-v188-tabs{display:none}}
 </style>
 
-<script id="JGB_EAM_ICON_MOVE_DELETE_V242">
+
+
+
+<script id="JGB_EAM_ICON_MOVE_DELETE_V243">
 (function(){
 'use strict';
-if(window.__JGB_EAM_ICON_V242)return;
-window.__JGB_EAM_ICON_V242=true;
-const POS='JGB_EAM_DASH_MAP_POS_V228',DEL='JGB_EAM_DASH_MAP_DELETED_V241';
+if(window.__JGB_EAM_ICON_V243)return;
+window.__JGB_EAM_ICON_V243=true;
+
+const POS='JGB_EAM_DASH_MAP_POS_V228';
+const DEL='JGB_EAM_DASH_MAP_DELETED_V241';
 const V=x=>String(x??'').trim();
-const read=(k,d)=>{try{const x=JSON.parse(localStorage.getItem(k)||'');return x==null?d:x}catch(_){return d}};
-const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}};
-const deleted=()=>{const a=read(DEL,[]);return new Set((Array.isArray(a)?a:[]).map(V).filter(Boolean))};
+
+function read(k,d){
+  try{
+    const raw=localStorage.getItem(k);
+    if(!raw)return d;
+    const x=JSON.parse(raw);
+    return x==null?d:x;
+  }catch(_){return d}
+}
+function write(k,v){
+  try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}
+}
+function deletedSet(){
+  const a=read(DEL,[]);
+  return new Set((Array.isArray(a)?a:[]).map(V).filter(Boolean));
+}
+
+/* 커서가 아이콘의 어느 지점을 잡았는지 기억해 아이콘 중심이 코트까지 정확히 따라가도록 한다. */
 let drag=null;
-function xy(ev,map){
- const r=map.getBoundingClientRect();
- return [Math.max(1,Math.min(99,((ev.clientX-r.left)/r.width)*100)),Math.max(1,Math.min(99,((ev.clientY-r.top)/r.height)*100))];
+
+function mapPoint(ev,map,offsetX,offsetY,el){
+  const r=map.getBoundingClientRect();
+  const w=map.clientWidth||r.width;
+  const h=map.clientHeight||r.height;
+
+  let px=ev.clientX-r.left-offsetX;
+  let py=ev.clientY-r.top-offsetY;
+
+  /* 아이콘 전체가 배치도 안에 있도록 좌표를 보정 */
+  const ew=el?.offsetWidth||0;
+  const eh=el?.offsetHeight||0;
+  const minX=0, maxX=Math.max(0,w-ew);
+  const minY=0, maxY=Math.max(0,h-eh);
+
+  px=Math.max(minX,Math.min(maxX,px));
+  py=Math.max(minY,Math.min(maxY,py));
+
+  return [(px/w)*100,(py/h)*100];
 }
+
 document.addEventListener('pointerdown',function(ev){
- if(ev.button!==0)return;
- const el=ev.target.closest?.('#eam228Map .eam228-asset');if(!el)return;
- const map=el.closest('#eam228Map');if(!map)return;
- drag={el,map,id:ev.pointerId,code:V(el.dataset.code||''),sx:ev.clientX,sy:ev.clientY,moved:false};
- try{el.setPointerCapture(ev.pointerId)}catch(_){}
+  if(ev.button!==0)return;
+
+  const el=ev.target.closest?.('#eam228Map .eam228-asset');
+  if(!el)return;
+
+  const map=el.closest('#eam228Map');
+  if(!map)return;
+
+  const er=el.getBoundingClientRect();
+
+  drag={
+    el:el,
+    map:map,
+    id:ev.pointerId,
+    code:V(el.dataset.code||''),
+    sx:ev.clientX,
+    sy:ev.clientY,
+    grabX:ev.clientX-er.left,
+    grabY:ev.clientY-er.top,
+    moved:false
+  };
+
+  try{el.setPointerCapture(ev.pointerId)}catch(_){}
+
+  /* 클릭인지 드래그인지 판단할 때까지는 기존 onclick을 방해하지 않는다. */
 },true);
+
 document.addEventListener('pointermove',function(ev){
- if(!drag||ev.pointerId!==drag.id)return;
- const dx=ev.clientX-drag.sx,dy=ev.clientY-drag.sy;
- if(!drag.moved){if(Math.hypot(dx,dy)<5)return;drag.moved=true;drag.el.classList.add('dragging');document.body.style.userSelect='none';}
- ev.preventDefault();ev.stopPropagation();
- const [x,y]=xy(ev,drag.map);drag.el.style.left=x.toFixed(2)+'%';drag.el.style.top=y.toFixed(2)+'%';
+  if(!drag||ev.pointerId!==drag.id)return;
+
+  const dx=ev.clientX-drag.sx;
+  const dy=ev.clientY-drag.sy;
+
+  if(!drag.moved){
+    if(Math.hypot(dx,dy)<4)return;
+    drag.moved=true;
+    drag.el.classList.add('dragging');
+    document.body.style.userSelect='none';
+  }
+
+  ev.preventDefault();
+  ev.stopPropagation();
+
+  const [x,y]=mapPoint(ev,drag.map,drag.grabX,drag.grabY,drag.el);
+  drag.el.style.left=x.toFixed(2)+'%';
+  drag.el.style.top=y.toFixed(2)+'%';
 },true);
+
 function finish(ev){
- if(!drag||ev.pointerId!==drag.id)return;
- const d=drag;drag=null;d.el.classList.remove('dragging');document.body.style.userSelect='';
- if(!d.moved)return;
- const [x,y]=xy(ev,d.map);
- d.el.style.left=x.toFixed(2)+'%';d.el.style.top=y.toFixed(2)+'%';
- const pos=read(POS,{});pos[d.code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];write(POS,pos);
- const ds=deleted();ds.delete(d.code);write(DEL,[...ds]);
- ev.preventDefault();ev.stopPropagation();
+  if(!drag||ev.pointerId!==drag.id)return;
+
+  const d=drag;
+  drag=null;
+
+  d.el.classList.remove('dragging');
+  document.body.style.userSelect='';
+
+  /* 이동하지 않은 경우에는 AC-01 자동 클릭 등 기존 기능 그대로 */
+  if(!d.moved)return;
+
+  const [x,y]=mapPoint(ev,d.map,d.grabX,d.grabY,d.el);
+
+  d.el.style.left=x.toFixed(2)+'%';
+  d.el.style.top=y.toFixed(2)+'%';
+
+  const pos=read(POS,{});
+  pos[d.code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+
+  if(!write(POS,pos)){
+    alert('아이콘 위치 저장에 실패했습니다.');
+  }
+
+  /* 이동한 자산은 삭제 상태가 아니므로 다시 표시 가능 */
+  const ds=deletedSet();
+  ds.delete(d.code);
+  write(DEL,[...ds]);
+
+  /* 중요: pointerup에서 전체 render()를 하지 않는다.
+     render()가 지도 DOM을 통째로 교체하면 코트 위 배치가 끊길 수 있다. */
+  ev.preventDefault();
+  ev.stopPropagation();
 }
+
 document.addEventListener('pointerup',finish,true);
 document.addEventListener('pointercancel',finish,true);
+
+/* 아이콘 제거: 자산 자체는 건드리지 않음 */
 window.eam228RemoveIcon=function(code){
- const c=V(code);if(!c)return;
- if(!confirm(`${c} 배치 아이콘만 제거할까요?\n자산 자체는 삭제되지 않습니다.`))return;
- const pos=read(POS,{});delete pos[c];write(POS,pos);
- const ds=deleted();ds.add(c);write(DEL,[...ds]);
- document.querySelector(`#eam228Map .eam228-asset[data-code="${CSS.escape(c)}"]`)?.remove();
- if(typeof window.eam228Refresh==='function')window.eam228Refresh();
+  const c=V(code);
+  if(!c)return;
+
+  if(!confirm(`${c} 배치 아이콘만 제거할까요?\n자산 자체는 삭제되지 않습니다.`))return;
+
+  const pos=read(POS,{});
+  delete pos[c];
+  write(POS,pos);
+
+  const ds=deletedSet();
+  ds.add(c);
+  write(DEL,[...ds]);
+
+  document.querySelector(`#eam228Map .eam228-asset[data-code="${CSS.escape(c)}"]`)?.remove();
 };
 })();
 </script>
