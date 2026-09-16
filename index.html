@@ -3383,7 +3383,7 @@ html::before,body::before{
       const check=assets.filter(a=>statusOf(a)==='check').length;
       const repair=assets.filter(a=>statusOf(a)==='repair').length;
       const defaultAC={'AC-01':[86,8],'AC-02':[68,8],'AC-03':[50,8],'AC-04':[32,8],'AC-05':[14,8],'AC-06':[7,30]};
-      const getPos=a=>{const c=codeOf(a);if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];return defaultAC[c]||null};
+      const iconHidden=readObj('JGB_EAM_MAP_ICON_HIDDEN_V1'); const getPos=a=>{const c=codeOf(a);if(iconHidden[c])return null;if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];return defaultAC[c]||null};
       const placeName=a=>V(a?.place||a?.location||a?.zone||a?.area||'미지정');
       const attr=s=>esc(V(s)).replace(/\n/g,' ');
       const liveRows=readLive();
@@ -13274,14 +13274,21 @@ window.eamOpenAssetIconDelete=function(){
 
 window.eamDeleteMapIconByCode=function(c){
  c=V(c);if(!c)return;
- if(!confirm(`'${c}' 배치도 아이콘만 삭제할까요?\n자산 자체와 자산등록 정보는 삭제되지 않습니다.`))return;
+ if(!confirm(`'${c}' 배치도 아이콘만 삭제할까요?
+자산 자체와 자산등록 정보는 삭제되지 않습니다.`))return;
+
+ document.querySelectorAll('#eam228Map .eam228-asset').forEach(icon=>{
+   if(V(icon.dataset.code||'').toUpperCase()===c.toUpperCase()) icon.remove();
+ });
+
  const pos=readObj('JGB_EAM_DASH_MAP_POS_V228');
- if(!Object.prototype.hasOwnProperty.call(pos,c)){alert('배치 위치 정보가 없습니다.');return}
- delete pos[c];
+ Object.keys(pos).forEach(k=>{
+   if(String(k).toUpperCase()===c.toUpperCase()) delete pos[k];
+ });
  writeObj('JGB_EAM_DASH_MAP_POS_V228',pos);
 
- const icon=document.querySelector(`#eam228Map .eam228-asset[data-code="${CSS.escape(c)}"]`);
- icon?.remove();
+ iconHidden[c]=true;
+ writeObj('JGB_EAM_MAP_ICON_HIDDEN_V1',iconHidden);
 
  document.getElementById('eamAssetIconDeleteModal')?.remove();
 };
