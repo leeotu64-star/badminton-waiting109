@@ -3461,83 +3461,32 @@ html::before,body::before{
         const r=await SUPA.from('assets').update(payload).eq('id',a.id);if(r.error){alert('저장 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();await eamLoad();render();
       };
-      window.eam228New=defaultCat=>{
+      window.eam228New=async(defaultCat='AC')=>{
   document.getElementById('eam228Modal')?.remove();
-
-  const raw=window.prompt('AC- 뒤에 들어갈 번호만 입력하세요.\n예: 07');
+  const p=String(defaultCat||'AC').toUpperCase();
+  const labels={AC:'냉난방',BO:'온수·난방',FI:'소방·방재',EL:'전기설비',DO:'문·창호설비',SA:'위생설비',OT:'기타설비'};
+  const prefix=/^[A-Z]{2}$/.test(p)?p:'AC';
+  const existing=(Array.isArray(window.__eamA)?window.__eamA:[]).map(a=>String(a.asset_code||a.code||'').toUpperCase());
+  const raw=window.prompt(prefix+'- 뒤에 들어갈 번호만 입력하세요.\n예: 07');
   if(raw===null)return;
-  const n=Number(String(raw).trim());
-  if(!/^\d{1,2}$/.test(String(raw).trim())||n<1||n>99){
-    alert('번호는 1~99 사이 숫자로 입력하세요.\n예: 07');
-    return;
-  }
-
-  const code=`AC-${String(n).padStart(2,'0')}`;
-  const used=new Set(assets.map(a=>codeOf(a).toUpperCase()));
-  if(used.has(code)){
-    alert(`${code}는 이미 등록되어 있습니다.`);
-    return;
-  }
-
-  const m=document.createElement('div');
-  m.id='eam228Modal';
-  m.className='eam228-modal';
-  m.innerHTML=`<div class="eam228-modal-box">
-    <div class="eam228-modal-head">
-      <div>
-        <small>EAM ASSET</small>
-        <h3>자산 등록</h3>
-        <p>자산코드는 입력한 번호로 자동 부여됩니다.</p>
-      </div>
-      <button type="button" onclick="this.closest('.eam228-modal').remove()">×</button>
-    </div>
-
-    <div class="eam228-form" style="padding:16px">
-      <label>자산코드
-        <input id="e223No" value="${esc(code)}" readonly style="font-weight:800;background:#f3f7fa">
-      </label>
-      <label>자산명 *
-        <input id="e223NewName" placeholder="예: 천장형 에어컨">
-      </label>
-      <label>제조사
-        <input id="e223NewMaker">
-      </label>
-      <label>모델명
-        <input id="e223NewModel">
-      </label>
-      <label>설치일
-        <input id="e223NewDate" type="date" value="${new Date().toISOString().slice(0,10)}">
-      </label>
-    </div>
-
-    <div class="eam228-modal-note">
-      등록하면 ${esc(code)}가 자산목록과 배치도 아이콘으로 표시됩니다.
-    </div>
-
-    <div class="eam228-modal-actions">
-      <button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button>
-      <button class="blue" onclick="window.eam228Create()">등록</button>
-    </div>
-  </div>`;
-
-  document.body.appendChild(m);
-  window.__eam228Used=used;
-  window.__eam228Prefix='AC';
-
-  const no=document.getElementById('e223No');
-  if(no)no.dataset.code=code;
+  const t=String(raw).trim();
+  if(!/^\d{1,2}$/.test(t)||Number(t)<1||Number(t)>99){alert('번호는 1~99 사이 숫자로 입력하세요.\n예: 07');return}
+  const code=prefix+'-'+String(Number(t)).padStart(2,'0');
+  if(existing.includes(code)){alert(code+'는 이미 등록되어 있습니다.');return}
+  if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+  try{
+    const payload={asset_code:code,name:code,category:labels[prefix]||prefix,product_name:null,manufacturer:null,model:null,install_date:null,place:null,status:'정상'};
+    const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();
+    if(r.error)throw r.error;
+    await eamLoad();
+    render();
+    alert(code+' 등록 완료');
+  }catch(e){console.error(e);alert('코드 등록 실패\n'+(e?.message||e));}
 };
 
-window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Prefix').textContent=p;document.querySelectorAll('.eam228-code-types button').forEach(b=>b.classList.toggle('on',b.dataset.cat===p));window.eam228Preview()};
-      window.eam228Preview=()=>{const p=window.__eam228Prefix||'AC',used=window.__eam228Used||new Set(),raw=V(document.getElementById('e223No')?.value);let n=raw?Number(raw):1;if(!raw)while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<99)n++;n=Math.max(1,Math.min(99,n||1));const el=document.getElementById('e223Preview');if(el)el.textContent=`${p}-${String(n).padStart(2,'0')}`};
-      window.eam228Create=async()=>{
-        if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
-        const p='AC',display=V(document.getElementById('e223No')?.value),mCode=display.match(/^AC-(\d{1,2})$/i),n=mCode?Number(mCode[1]):0,code=`AC-${String(n||1).padStart(2,'0')}`,name=V(document.getElementById('e223NewName')?.value);
-        if(!/^\d{1,2}$/.test(raw)||n<1||n>99){alert('번호는 1~99 사이 숫자로 입력하세요.');return}if(assets.some(a=>codeOf(a).toUpperCase()===code)){alert('이미 사용 중인 자산코드입니다.');return}if(!name){alert('자산명을 입력하세요.');return}
-        const g=id=>V(document.getElementById(id)?.value);const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],manufacturer:g('e223NewMaker')||null,model:g('e223NewModel')||null,install_date:g('e223NewDate')||null,place:null,status:'정상'};
-        const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
-        document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
-      };
+window.eam228Prefix=p=>{};
+window.eam228Preview=()=>{};
+window.eam228Create=()=>{};
       window.eam228LiveInput=code=>{
         const a=assets.find(x=>codeOf(x)===V(code));
         document.getElementById('eam228Modal')?.remove();
