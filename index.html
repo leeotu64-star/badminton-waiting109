@@ -4192,17 +4192,10 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     function jgbV180DoneStore(){try{return JSON.parse(localStorage.getItem('JGB_V180_LIVE_DONE')||'[]')||[]}catch(e){return []}}
     function jgbV180SaveDone(v){try{localStorage.setItem('JGB_V180_LIVE_DONE',JSON.stringify(v||[]))}catch(e){}}
     function jgbV180SyncLiveFromLks(){
-      const S=jgbV47Store(), leaks=(S.leaks||[]).filter(x=>!x.iconHidden), current=jgbV178LiveStore(), done=new Set(jgbV180DoneStore());
-      const byId=new Map(current.filter(x=>x&&x.sourceId).map(x=>[String(x.sourceId),x]));
-      leaks.forEach(l=>{
-        const id=String(l.id||''), lk=String(l.leakCode||'').trim().toUpperCase();
-        if(!id||!lk||done.has(id))return;
-        if(!byId.has(id) && !current.some(x=>String(x.lk||'').trim().toUpperCase()===lk)){
-          current.push({sourceId:id,lk,content:'',status:'수리예정',method:'자체정비',scheduled:'',manager:''});
-        }
-      });
-      jgbV178SaveLive(current);
-      return current;
+      /* LK 생성과 수리 LIVE를 완전히 분리한다.
+         이 함수는 더 이상 LK를 읽어서 LIVE를 자동 생성하지 않는다.
+         LIVE 데이터는 「+ 직접입력」에서 등록한 것만 사용한다. */
+      return jgbV178LiveStore();
     }
     function jgbV178OpenLiveRegister(){
       const S=jgbV47Store(), leaks=(S.leaks||[]).filter(x=>!x.iconHidden), live=jgbV178LiveStore();
@@ -4437,7 +4430,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 <div class="jgb-v190-corridor">복도</div>
 <div class="jgb-v190-female"><div class="jgb-v190-zone"><div><b>샤워실(여)</b><small>여자 샤워실</small></div></div><div class="jgb-v190-zone"><div><b>탈의실(여)</b><small>여자 탈의실</small></div></div><div class="jgb-v190-zone"><div><b>화장실(여)</b><small>여자 화장실</small></div></div></div>
 <div class="jgb-v190-office"><div class="jgb-v190-zone jgb-v200-lounge"><div><b>휴게실</b><small>휴게공간</small></div></div><div class="jgb-v190-zone jgb-v200-water"><div><b>통합 유수장치실</b><small>소방·유수 설비</small></div></div><div class="jgb-v190-zone jgb-v200-office"><div><b>사무실</b><small>관리·운영</small></div></div></div></div><div class="entrance">코트 출입구</div><div class="main-entrance">주출입문</div>${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}</div></div><div class="jgb-v170-note">LK 아이콘 클릭 → 해당 LK의 방수공사 이력으로 이동 · 삭제·초기화는 상단 「LK 삭제·초기화」에서 선택</div></section>
-          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>AUTO LK</b><span>LK 등록 연동</span></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>LK</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.lk||'')}</b></td><td>${esc(x.content||'')}</td><td>${esc(x.status||'수리예정')}</td><td class="jgb-v187-date">${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v182-live-edit" data-v47-action="edit-live" data-live-lk="${esc(x.lk||'')}">입력</button></td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.lk||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v187-empty"><div class="jgb-v187-empty-visual"><span>👷</span><i>✓</i></div><b>현재 진행 중인 수리내역이 없습니다.</b><span>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</span><em>🌱 작은 불편도 놓치지 않고, 쾌적한 시설을 위해 항상 노력하겠습니다.</em></div>`}</div>
+          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>MANUAL LIVE</b><span>직접입력 등록</span></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>LK</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.lk||'')}</b></td><td>${esc(x.content||'')}</td><td>${esc(x.status||'수리예정')}</td><td class="jgb-v187-date">${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v182-live-edit" data-v47-action="edit-live" data-live-lk="${esc(x.lk||'')}">입력</button></td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.lk||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v187-empty"><div class="jgb-v187-empty-visual"><span>👷</span><i>✓</i></div><b>현재 진행 중인 수리내역이 없습니다.</b><span>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</span><em>🌱 작은 불편도 놓치지 않고, 쾌적한 시설을 위해 항상 노력하겠습니다.</em></div>`}</div>
           <section class="jgb-v189-live-notebook" aria-label="실시간 수리 안내 수첩">
             <div class="jgb-v189-book-head"><span>📒 수리관리 안내 수첩</span><small>실시간 수리 화면에서 필요한 내용을 확인하세요.</small></div>
             <div class="jgb-v188-book jgb-v189-book">
