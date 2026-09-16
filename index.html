@@ -13565,6 +13565,42 @@ window.eamDeleteSelectedAsset=async function(){
   });
 })();
 </script>
+
+<style id="JGB_EAM_CODE_ONLY_V12">
+/* 코드 등록 전용: 기존 자산등록 UI를 사용하지 않음 */
+</style>
+<script id="JGB_EAM_CODE_ONLY_V12_SCRIPT">
+(function(){
+  const C={cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DR',other:'OT'};
+  function codeExists(code){
+    try{return (Array.isArray(window.__eamA)?window.__eamA:[]).some(a=>String(a.asset_code||a.code||'').toUpperCase()===code.toUpperCase());}catch(e){return false;}
+  }
+  async function onlyCodeRegister(cat){
+    const prefix=C[cat]||'AC';
+    const raw=window.prompt(prefix+'- 뒤에 들어갈 번호만 입력하세요.\n예: 01');
+    if(raw===null)return;
+    const t=String(raw).trim();
+    if(!/^\\d{1,2}$/.test(t)){alert('번호는 1~99 사이 숫자만 입력하세요.\n예: 01');return;}
+    const code=prefix+'-'+String(Number(t)).padStart(2,'0');
+    if(codeExists(code)){alert(code+'는 이미 등록되어 있습니다.');return;}
+    if(typeof SUPA==='undefined'||!SUPA){alert('데이터베이스 연결이 없습니다.');return;}
+    try{
+      const r=await SUPA.from('assets').insert({asset_code:code,name:code,category:cat||'cooling',status:'정상'}).select('*').single();
+      if(r.error)throw r.error;
+      if(typeof window.eamLoad==='function')await window.eamLoad();
+      if(typeof window.render==='function')window.render();
+      alert(code+' 등록 완료');
+    }catch(e){console.error(e);alert('코드 등록 실패\n'+(e&&e.message?e.message:e));}
+  }
+  window.eam228New=function(defaultCat){ onlyCodeRegister(defaultCat||window.__eamCat||'cooling'); };
+  document.addEventListener('DOMContentLoaded',function(){
+    document.querySelectorAll('button').forEach(function(b){
+      const t=(b.textContent||'').trim();
+      if(t==='자산 등록'||t.indexOf('EAM 자산 생성')>=0||t.indexOf('자산코드 생성')>=0)b.textContent='＋ 코드 등록';
+    });
+  });
+})();
+</script>
 </body>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
