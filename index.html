@@ -3484,7 +3484,24 @@ html::before,body::before{
       window.eam228Create=async()=>{
         if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
         const p=window.__eam228Prefix||'AC',raw=V(document.getElementById('e223No')?.value),n=Number(raw||0),code=`${p}-${String(n||1).padStart(2,'0')}`,name=catMap[p]||code;
-        if(!/^\d{1,2}$/.test(raw)||n<1||n>99){alert('번호는 1~99 사이 숫자로 입력하세요.');return}if(assets.some(a=>codeOf(a).toUpperCase()===code)){alert('이미 등록된 자산코드입니다.\n아이콘만 삭제한 경우 자산코드는 계속 사용 중입니다.\n코드를 다시 사용하려면 기존 자산을 먼저 삭제하세요.');return}
+        if(!/^\d{1,2}$/.test(raw)||n<1||n>99){alert('번호는 1~99 사이 숫자로 입력하세요.');return}
+        const existing=assets.find(a=>codeOf(a).toUpperCase()===code);
+        if(existing){
+          let deletedCodes=new Set();
+          try{const z=JSON.parse(localStorage.getItem('JGB_EAM_DASH_MAP_DELETED_V241')||'[]');deletedCodes=new Set(Array.isArray(z)?z.map(V):[])}catch(_){}
+          if(deletedCodes.has(code)){
+            deletedCodes.delete(code);
+            localStorage.setItem('JGB_EAM_DASH_MAP_DELETED_V241',JSON.stringify([...deletedCodes]));
+            selected.code=code;
+            document.getElementById('eam228Modal')?.remove();
+            await eamLoad();
+            render();
+            setTimeout(()=>window.eam228Place(code),120);
+            return;
+          }
+          alert('이미 등록된 자산코드입니다.\n기존 EAM 자산을 그대로 사용하려면 기존 자산을 선택하세요.');
+          return;
+        }
         const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],manufacturer:null,model:null,install_date:null,place:null,status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
