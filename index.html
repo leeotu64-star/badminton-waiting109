@@ -2492,13 +2492,6 @@ html::before,body::before{
 <style id="v92-lk-code-only">
 .jgb-v66-lk-code{display:inline-flex;align-items:center;margin-left:8px;padding:4px 9px;border:1px solid #b8d2ee;border-radius:7px;background:#eef6ff;color:#1267b1;font-size:12px;font-weight:800;vertical-align:middle;line-height:1;}
 </style>
-
-<!-- JGB EAM v20: 좌측 자산목록 화면 제거. v19 코드관리 기준 유지 -->
-<style id="JGB_EAM_V20_REMOVE_ASSET_LIST">
-/* 좌측 AC-01~ 목록을 화면에서 완전히 숨김. 코드관리/배치도와 분리 */
-.eam-innovation-layout{grid-template-columns:minmax(0,1fr)!important;}
-.eam-assets-panel{display:none!important;}
-</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -13766,60 +13759,6 @@ window.eamDeleteSelectedAsset=async function(){
       if(t.includes('자산등록')||t.includes('자산코드생성'))b.textContent='＋ 코드 생성';
     });
   });
-})();
-</script>
-
-<style id="JGB_CODE_ONLY_V19">
-.jgb-code-category-grid{display:grid!important;grid-template-columns:repeat(8,minmax(100px,1fr));gap:10px;margin:12px 0}
-.jgb-code-category{cursor:pointer;border:1px solid #cbdbe6;border-radius:12px;padding:12px;text-align:center;background:#fff}
-.jgb-code-category.active{outline:2px solid #1674c8}
-.jgb-code-category .n{font-weight:800;font-size:13px}.jgb-code-category .p{font-size:11px;color:#6d8494;margin-top:3px}
-#jgbStandaloneV19{position:fixed;inset:0;z-index:999999;background:rgba(7,25,40,.55);display:flex;align-items:center;justify-content:center}
-#jgbStandaloneV19 .box{width:min(520px,94vw);background:#fff;border-radius:15px;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,.3)}
-#jgbStandaloneV19 .head{background:#155f84;color:#fff;padding:17px 20px;display:flex;justify-content:space-between}
-#jgbStandaloneV19 .head button{border:0;background:rgba(255,255,255,.15);color:#fff;font-size:22px;border-radius:7px}
-#jgbStandaloneV19 .body{padding:14px}.v19row{display:flex;justify-content:space-between;align-items:center;border:1px solid #d6e2ea;border-radius:9px;padding:10px 12px;margin-bottom:8px}.v19del{border:0;background:#fff0f0;color:#d33;padding:7px 12px;border-radius:7px;font-weight:800}.v19add{display:flex;gap:7px;align-items:center;margin-top:12px}.v19add input{width:100px;padding:9px;border:1px solid #bfcfda;border-radius:8px}.v19add button{border:0;background:#1674c8;color:#fff;padding:9px 13px;border-radius:8px;font-weight:800}
-</style>
-<script id="JGB_CODE_ONLY_V19">
-(function(){
- const P={cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DR',other:'OT'};
- const N={cooling:'냉난방',fire:'소방·방재',water:'온수·난방',electrical:'전기설비',lighting:'코트조명',waterproof:'방수',sanitary:'위생설비',doors:'문·창호설비',other:'기타설비'};
- const KEY='JGB_EAM_CODES_V19';
- function get(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
- function put(x){localStorage.setItem(KEY,JSON.stringify(x))}
- function code(cat,n){return P[cat]+'-'+String(n).padStart(2,'0')}
- function render(cat){
-   let d=get(), a=Array.isArray(d[cat])?d[cat].map(Number).sort((x,y)=>x-y):[];
-   let m=document.getElementById('jgbStandaloneV19');
-   if(!m){m=document.createElement('div');m.id='jgbStandaloneV19';document.body.appendChild(m)}
-   m.innerHTML='<div class="box"><div class="head"><div><div style="font-size:10px;letter-spacing:.08em">EAM CODE ONLY</div><div style="font-size:22px;font-weight:900">'+N[cat]+' · 코드 관리</div></div><button type="button" id="v19x">×</button></div><div class="body"><div id="v19list">'+(a.length?a.map(n=>'<div class="v19row"><b>'+code(cat,n)+'</b><button type="button" class="v19del" data-n="'+n+'">삭제</button></div>').join(''):'<div style="padding:25px;text-align:center;color:#7890a0">등록된 코드가 없습니다.</div>')+'</div><div class="v19add"><b>'+P[cat]+'-</b><input id="v19num" inputmode="numeric" maxlength="2" placeholder="예: 07"><button type="button" id="v19addbtn">＋ 코드 생성</button></div></div></div>';
-   m.querySelector('#v19x').onclick=()=>m.remove();
-   m.querySelector('#v19addbtn').onclick=()=>{
-      let t=m.querySelector('#v19num').value.trim();
-      if(!/^\d{1,2}$/.test(t)){alert('01~99 숫자만 입력하세요.');return}
-      let n=Number(t); d=get(); let arr=Array.isArray(d[cat])?d[cat].map(Number):[];
-      if(arr.includes(n)){alert(code(cat,n)+'는 이미 있습니다.');return}
-      arr.push(n); d[cat]=arr; put(d); render(cat);
-   };
-   m.querySelectorAll('.v19del').forEach(btn=>btn.onclick=()=>{
-      let n=Number(btn.dataset.n), d=get(), arr=Array.isArray(d[cat])?d[cat]:[];
-      if(!confirm(code(cat,n)+' 코드만 삭제할까요?'))return;
-      d[cat]=arr.filter(x=>Number(x)!==n); put(d); render(cat);
-   });
- }
- window.jgbOpenCodeManagerV19=render;
- window.jgbCodePrefixesV19=P;
- window.jgbCodeNamesV19=N;
- // Intercept legacy "자산 등록/코드 등록" buttons so they no longer open prompt/asset forms.
- document.addEventListener('click',function(e){
-   const b=e.target.closest('button');
-   if(!b)return;
-   const t=(b.textContent||'').replace(/\s+/g,'').trim();
-   if(/자산등록|자산코드생성|코드등록|EAM자산생성/.test(t)){
-      e.preventDefault();e.stopImmediatePropagation();
-      render(window.__eamCat||'cooling');
-   }
- },true);
 })();
 </script>
 </body>
