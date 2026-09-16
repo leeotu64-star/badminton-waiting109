@@ -13601,6 +13601,68 @@ window.eamDeleteSelectedAsset=async function(){
   });
 })();
 </script>
+
+<style id="JGB_EAM_CODE_MASTER_CLEAN_V14">
+/* EAM은 자산마스터 입력 화면이 아니라 '코드 목록 + 코드 등록'으로 사용 */
+.eam-asset-row .row-copy{display:none!important}
+.eam-asset-row{grid-template-columns:minmax(70px,1fr) auto!important;align-items:center!important}
+</style>
+<script id="JGB_EAM_CODE_MASTER_CLEAN_V14_SCRIPT">
+(function(){
+  const P={cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DR',other:'OT'};
+  function norm(v){return String(v||'').trim().toUpperCase()}
+  function nextCode(cat){
+    const p=P[cat]||'OT';
+    const a=Array.isArray(window.__eamA)?window.__eamA:[];
+    const nums=a.map(x=>norm(x.asset_code||x.code)).filter(x=>x.indexOf(p+'-')===0).map(x=>parseInt(x.slice(p.length+1),10)).filter(Number.isFinite);
+    let n=1; while(nums.includes(n)) n++;
+    return p+'-'+String(n).padStart(2,'0');
+  }
+  function codeList(cat){
+    const p=P[cat]||'OT';
+    const a=Array.isArray(window.__eamA)?window.__eamA:[];
+    const codes=[...new Set(a.map(x=>norm(x.asset_code||x.code)).filter(x=>x.indexOf(p+'-')===0))].sort((a,b)=>(parseInt(a.split('-')[1])||0)-(parseInt(b.split('-')[1])||0));
+    return {p,codes};
+  }
+  function open(cat){
+    const d=codeList(cat), m=document.createElement('div');
+    m.className='jgb-code-modal'; m.id='jgbCodeMasterV14';
+    m.innerHTML='<div class="jgb-code-box"><div class="jgb-code-head"><div><small>EAM ASSET CODE</small><h3>자산코드 관리</h3><div style="margin-top:3px;font-size:12px;opacity:.9">'+d.p+' 코드는 자동으로 붙습니다. 뒤 숫자만 입력하세요.</div></div><button class="jgb-code-x" type="button">×</button></div><div class="jgb-code-list">'+
+      (d.codes.length?d.codes.map(c=>'<div class="jgb-code-row"><span class="jgb-code-value">'+c+'</span></div>').join(''):'<div style="padding:25px;text-align:center;color:#7890a0">등록된 코드가 없습니다.</div>')+
+      '<div class="jgb-code-row jgb-code-new"><div><b style="color:#1768ad;font-size:17px">'+d.p+'-</b><small style="display:block;color:#7890a0;margin-top:3px">예: 07 입력 → '+d.p+'-07</small></div><button class="jgb-code-add" type="button">＋ 코드 등록</button></div></div></div>';
+    document.body.appendChild(m); m.querySelector('.jgb-code-x').onclick=()=>m.remove(); m.onclick=e=>{if(e.target===m)m.remove()};
+    m.querySelector('.jgb-code-add').onclick=()=>add(cat);
+  }
+  async function add(cat){
+    const p=P[cat]||'OT', raw=prompt(p+'- 뒤에 들어갈 번호만 입력하세요.\n예: 07'); if(raw===null)return;
+    const t=String(raw).trim(); if(!/^\d{1,2}$/.test(t)){alert('숫자만 입력하세요. 예: 07');return}
+    const code=p+'-'+String(Number(t)).padStart(2,'0');
+    const exists=(Array.isArray(window.__eamA)?window.__eamA:[]).some(x=>norm(x.asset_code||x.code)===code);
+    if(exists){alert(code+'는 이미 있습니다.');return}
+    if(!window.SUPA){alert('Supabase 연결이 없습니다.');return}
+    try{
+      const r=await SUPA.from('assets').insert({asset_code:code,name:code,category:cat,status:'정상',product_name:code}).select('id,asset_code,name,category,status').single();
+      if(r.error)throw r.error;
+      if(typeof window.eamLoad==='function')await window.eamLoad();
+      document.getElementById('jgbCodeMasterV14')?.remove(); open(cat);
+    }catch(e){console.error(e);alert('코드 등록 실패\n'+(e?.message||e))}
+  }
+  // 카테고리 클릭: 자산상세로 가지 않고 코드목록만 표시.
+  const oldPick=window.eamPick;
+  window.eamPick=function(cat,code){
+    if(code===undefined||code===null||code===''){open(cat);return;}
+    // 코드 클릭은 기존 EAM 자산상세를 강제로 다시 그리지 않음.
+    window.__eamCat=cat||window.__eamCat; window.__eamSelCode=String(code); return;
+  };
+  window.jgbEamCodeMasterOpen=open;
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.querySelectorAll('button').forEach(b=>{
+      const t=(b.textContent||'').trim();
+      if(t==='자산 등록'||t.indexOf('자산코드 생성')>=0||t.indexOf('EAM 자산 생성')>=0)b.textContent='＋ 코드 등록';
+    });
+  });
+})();
+</script>
 </body>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
