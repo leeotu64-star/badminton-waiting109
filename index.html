@@ -3555,7 +3555,7 @@ html::before,body::before{
       const markers=markerAssets.map(a=>{const p=getPos(a);if(!p)return '';const st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}" onclick="if(!window.__EAM228_DRAG_SUPPRESS)window.eam228Pick('${attr(code)}')"><span>${catIcon(cat)}</span><b>${esc(code)}</b></button>`}).join('');
       const court=n=>`<button type="button" class="eam228-court" onclick="window.eam228Location('코트 ${n}')"><span>${n}</span></button>`;
       const zone=(label,sub,cls='')=>`<button type="button" class="eam228-zone ${cls}" onclick="window.eam228Location('${attr(label)}')"><b>${esc(label)}</b><small>${esc(sub)}</small></button>`;
-      const map=`<div id="eam228Map" class="eam228-map"><div class="eam228-courts"><strong>코트 구역 · 에어컨 자산 6개</strong>${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div><div class="eam228-facility"><div class="eam228-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>창고</b></button><span>▲ 계단</span></div><div class="eam228-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button><div class="eam228-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div></div>`;
+      const map=`<div id="eam228Map" class="eam228-map"><div class="eam228-courts"><strong>코트 구역 · 에어컨 자산 6개</strong>${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div><div class="eam228-facility"><div class="eam228-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>창고</b></button><span>▲ 계단</span></div><div class="eam228-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button><div class="eam228-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span></div>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div>`;
 
       const live=readLive().filter(x=>assets.some(a=>codeOf(a)===V(x.asset_code)));
       const liveHtml=live.length?`<table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><button class="eam228-link" onclick="window.eam228Pick('${attr(x.asset_code)}')">${esc(x.asset_code)}</button></td><td>${esc(x.content||'-')}</td><td><span class="live-state">${esc(x.status||'수리예정')}</span></td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="done" onclick="window.eam228Complete('${attr(x.asset_code)}')">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="eam228-empty"><b>현재 수리예정 자산이 없습니다.</b><span>수리가 필요하면 「＋ 직접입력」으로 등록하세요.</span></div>`;
@@ -13573,6 +13573,21 @@ window.eam228RemoveIcon=function(code){
 }
 .eam228-courts strong{
   font-size:10px!important;
+}
+</style>
+
+
+<style id="v16-asset-map-layer">
+/* v16: 자산 아이콘은 시설영역이 아니라 전체 배치도 좌표를 기준으로 배치 */
+#eam228Map > .eam228-asset{
+  position:absolute!important;
+  z-index:100!important;
+}
+#eam228Map > .eam228-empty-map{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
 }
 </style>
 
