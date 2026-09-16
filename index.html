@@ -3463,38 +3463,18 @@ html::before,body::before{
       };
       window.eam228New=defaultCat=>{
   document.getElementById('eam228Modal')?.remove();
-
-  const raw=window.prompt('AC- 뒤에 들어갈 번호만 입력하세요.\n예: 07');
-  if(raw===null)return;
-  const n=Number(String(raw).trim());
-  if(!/^\d{1,2}$/.test(String(raw).trim())||n<1||n>99){
-    alert('번호는 1~99 사이 숫자로 입력하세요.\n예: 07');
-    return;
-  }
-
-  const code=`AC-${String(n).padStart(2,'0')}`;
-  const used=new Set(assets.map(a=>codeOf(a).toUpperCase()));
-  if(used.has(code)){
-    alert(`${code}는 이미 등록되어 있습니다.`);
-    return;
-  }
-
   const m=document.createElement('div');
   m.id='eam228Modal';
   m.className='eam228-modal';
   m.innerHTML=`<div class="eam228-modal-box">
     <div class="eam228-modal-head">
-      <div>
-        <small>EAM ASSET</small>
-        <h3>자산 등록</h3>
-        <p>자산코드는 입력한 번호로 자동 부여됩니다.</p>
-      </div>
+      <div><small>EAM ASSET</small><h3>자산 등록</h3>
+      <p>자산코드는 아래 입력란에서 직접 입력합니다.</p></div>
       <button type="button" onclick="this.closest('.eam228-modal').remove()">×</button>
     </div>
-
     <div class="eam228-form" style="padding:16px">
-      <label>자산코드
-        <input id="e223No" value="${esc(code)}" readonly style="font-weight:800;background:#f3f7fa">
+      <label>자산코드 *
+        <input id="e223No" placeholder="예: AC-07" autocomplete="off">
       </label>
       <label>자산명 *
         <input id="e223NewName" placeholder="예: 천장형 에어컨">
@@ -3509,36 +3489,58 @@ html::before,body::before{
         <input id="e223NewDate" type="date" value="${new Date().toISOString().slice(0,10)}">
       </label>
     </div>
-
-    <div class="eam228-modal-note">
-      등록하면 ${esc(code)}가 자산목록과 배치도 아이콘으로 표시됩니다.
-    </div>
-
+    <div class="eam228-modal-note">코드는 <b>AC-01, AC-02</b>처럼 직접 입력하세요.</div>
     <div class="eam228-modal-actions">
       <button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button>
       <button class="blue" onclick="window.eam228Create()">등록</button>
     </div>
   </div>`;
-
   document.body.appendChild(m);
-  window.__eam228Used=used;
   window.__eam228Prefix='AC';
-
-  const no=document.getElementById('e223No');
-  if(no)no.dataset.code=code;
 };
 
 window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Prefix').textContent=p;document.querySelectorAll('.eam228-code-types button').forEach(b=>b.classList.toggle('on',b.dataset.cat===p));window.eam228Preview()};
       window.eam228Preview=()=>{const p=window.__eam228Prefix||'AC',used=window.__eam228Used||new Set(),raw=V(document.getElementById('e223No')?.value);let n=raw?Number(raw):1;if(!raw)while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<99)n++;n=Math.max(1,Math.min(99,n||1));const el=document.getElementById('e223Preview');if(el)el.textContent=`${p}-${String(n).padStart(2,'0')}`};
       window.eam228Create=async()=>{
-        if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
-        const p='AC',display=V(document.getElementById('e223No')?.value),mCode=display.match(/^AC-(\d{1,2})$/i),n=mCode?Number(mCode[1]):0,code=`AC-${String(n||1).padStart(2,'0')}`,name=V(document.getElementById('e223NewName')?.value);
-        if(!/^\d{1,2}$/.test(raw)||n<1||n>99){alert('번호는 1~99 사이 숫자로 입력하세요.');return}if(assets.some(a=>codeOf(a).toUpperCase()===code)){alert('이미 사용 중인 자산코드입니다.');return}if(!name){alert('자산명을 입력하세요.');return}
-        const g=id=>V(document.getElementById(id)?.value);const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],manufacturer:g('e223NewMaker')||null,model:g('e223NewModel')||null,install_date:g('e223NewDate')||null,place:null,status:'정상'};
-        const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
-        document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
-      };
-      window.eam228LiveInput=code=>{
+  if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
+  const g=id=>V(document.getElementById(id)?.value);
+  const code=g('e223No').toUpperCase();
+  const name=g('e223NewName');
+
+  if(!/^AC-\d{2}$/.test(code)){
+    alert('자산코드는 AC-01 ~ AC-99 형식으로 입력하세요.');
+    return;
+  }
+  if(assets.some(a=>codeOf(a).toUpperCase()===code)){
+    alert('이미 사용 중인 자산코드입니다.');
+    return;
+  }
+  if(!name){
+    alert('자산명을 입력하세요.');
+    return;
+  }
+
+  const payload={
+    asset_code:code,name,
+    category:catMap['AC'],
+    product_name:catMap['AC'],
+    manufacturer:g('e223NewMaker')||null,
+    model:g('e223NewModel')||null,
+    install_date:g('e223NewDate')||null,
+    place:null,status:'정상'
+  };
+
+  const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();
+  if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
+
+  document.getElementById('eam228Modal')?.remove();
+  selected.code=code;
+  await eamLoad();
+  render();
+  setTimeout(()=>window.eam228Place(code),120);
+};
+
+window.eam228LiveInput=code=>{
         const a=assets.find(x=>codeOf(x)===V(code));
         document.getElementById('eam228Modal')?.remove();
         const m=document.createElement('div');m.id='eam228Modal';m.className='eam228-modal';
