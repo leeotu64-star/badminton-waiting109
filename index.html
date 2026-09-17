@@ -2518,6 +2518,17 @@ html::before,body::before{
 .eam228-corridor{font-size:12px!important}
 </style>
 
+
+<style id="v15-eam-court-center">
+/* v15: 코트 영역을 위쪽에 붙지 않도록 중앙 쪽으로 이동. 다른 기능/배치는 변경하지 않음. */
+.eam228-courts{
+  top:6%!important;
+  height:24%!important;
+}
+.eam228-court{
+  margin-top:15px!important;
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3528,7 +3539,7 @@ html::before,body::before{
           alert('이미 등록된 자산코드입니다.\n기존 EAM 자산을 그대로 사용하려면 기존 자산을 선택하세요.');
           return;
         }
-        const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],manufacturer:null,model:null,place:null,status:'정상'};
+        const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],model:null,place:null,status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
       };
