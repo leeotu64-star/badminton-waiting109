@@ -13912,76 +13912,79 @@ body {
 </style>
 
 
-<style id="EAM_DASH_V27_COURT_RATIO_ONLY">
-/* v27: EAM 현황판 배치도 비율만 조정. 수리 LIVE 및 기존 기능은 변경하지 않음. */
-/* 코트 전체 영역: 기존 22% → 약 35% */
-.eam228-courts{
-  top:2%!important;
-  height:35%!important;
-}
-/* 코트가 차지한 만큼 시설부를 아래로 이동 */
-.eam228-facility{
-  top:39%!important;
-  bottom:1.5%!important;
-}
-/* 샤워실·화장실 행은 기존 시설부의 비율을 크게 흔들지 않도록 유지 */
-.eam228-facility{
-  grid-template-rows:10% 34% 10% 46%!important;
-}
-/* 하부에서 줄일 공간은 통합 유수장치실이 포함된 하부 영역 쪽으로 제한 */
-.eam228-bottom{
-  grid-template-columns:18% 64% 18%!important;
-}
-/* 코트 5개는 동일 폭으로 전체 코트 영역 중앙 정렬 유지 */
-.eam228-courts{
-  left:4%!important;
-  right:4%!important;
-  grid-template-columns:repeat(5,minmax(0,1fr))!important;
-  gap:8px!important;
-}
-</style>
-</body>
-
-<style id="v29-eam-bottom-alignment">
-/* v29: 배치도와 수리 LIVE는 내부 크기 조정은 독립적으로 유지하되,
-   두 외곽 패널의 하단선만 동일하게 맞춘다. */
+<style id="v30-eam-final-independent-equal-height">
+/* v30: v26 기준 — EAM 현황판만 수정
+   좌측 배치도와 우측 수리 LIVE는 50:50 가로폭을 유지하고
+   두 카드의 바깥 위/아래 끝선을 동일하게 맞춘다.
+   내부 배치도 비율 조정은 LIVE 크기에 영향을 주지 않는다. */
 .eam228-main{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  grid-template-rows:auto!important;
   align-items:stretch!important;
-  height:560px!important;
-  min-height:560px!important;
-}
-.eam228-map-card{
-  height:560px!important;
-  min-height:560px!important;
-  max-height:560px!important;
+  column-gap:10px!important;
+  row-gap:0!important;
+  width:100%!important;
+  max-width:none!important;
+  height:auto!important;
+  min-height:0!important;
   box-sizing:border-box!important;
 }
+.eam228-map-card,
+.eam228-right-card{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  align-self:stretch!important;
+}
 .eam228-right{
-  height:560px!important;
-  min-height:560px!important;
-  max-height:560px!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:auto!important;
+  display:flex!important;
+  flex-direction:column!important;
   align-self:stretch!important;
 }
 .eam228-right-card{
-  height:100%!important;
-  min-height:0!important;
-  max-height:none!important;
-  box-sizing:border-box!important;
+  flex:1 1 auto!important;
+}
+.eam228-map-card{
+  display:flex!important;
+  flex-direction:column!important;
 }
 .eam228-map-wrap{
-  height:calc(100% - 43px)!important;
+  width:100%!important;
+  flex:1 1 auto!important;
   min-height:0!important;
-  max-height:none!important;
+  height:auto!important;
   box-sizing:border-box!important;
 }
-.eam228-map{height:100%!important;min-height:0!important;max-height:none!important;}
-@media(max-width:1000px){
-  .eam228-main{height:auto!important;min-height:0!important;}
-  .eam228-map-card,.eam228-right{height:auto!important;min-height:0!important;max-height:none!important;}
-  .eam228-map-wrap{height:520px!important;min-height:520px!important;max-height:520px!important;}
-  .eam228-right-card{height:520px!important;min-height:520px!important;max-height:520px!important;}
+.eam228-map{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+.eam228-right-card{
+  display:flex!important;
+  flex-direction:column!important;
+}
+.eam228-live-body{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow:auto!important;
+}
+/* 배치도 내부 비율: 코트 영역을 확대하고 하부 유수장치실 쪽 세로 공간을 축소.
+   기존 위치/아이콘/드래그 기능은 변경하지 않는다. */
+.eam228-courts{
+  top:1.5%!important;
+  height:35%!important;
 }
 </style>
+</body>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
 .jgb-v176-live-card .jgb-v178-live-table{
@@ -14121,56 +14124,11 @@ body {
   min-height:0!important;
 }
 </style>
-<style id="v28-eam-independent-map-live">
-/* v28: EAM 현황판에서 배치도와 수리 LIVE의 세로 크기를 서로 독립시킴.
-   v26/v27 기능은 건드리지 않고 레이아웃 스트레칭만 차단한다. */
+
+<style id="v31-eam-68-32-layout">
+/* v31: v26 기준. EAM 현황판 좌/우 가로 비율만 68:32로 변경.
+   배치도 내부 기능/아이콘/드래그/생성/삭제/저장 및 수리 LIVE 기능은 변경하지 않는다. */
 .eam228-main{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-  column-gap:10px!important;
-  align-items:start!important;
-  height:auto!important;
-  min-height:0!important;
-}
-.eam228-map-card{
-  align-self:start!important;
-  height:auto!important;
-  min-height:0!important;
-}
-.eam228-map-wrap{
-  flex:0 0 auto!important;
-  height:520px!important;
-  min-height:520px!important;
-  max-height:520px!important;
-  box-sizing:border-box!important;
-}
-.eam228-map{
-  width:100%!important;
-  height:100%!important;
-  min-height:0!important;
-  max-height:none!important;
-  box-sizing:border-box!important;
-}
-.eam228-right{
-  align-self:start!important;
-  height:auto!important;
-  min-height:0!important;
-}
-.eam228-right-card{
-  align-self:start!important;
-  height:520px!important;
-  min-height:520px!important;
-  max-height:520px!important;
-  box-sizing:border-box!important;
-}
-.eam228-live-body{
-  min-height:0!important;
-  overflow:auto!important;
-}
-@media(max-width:1000px){
-  .eam228-main{grid-template-columns:1fr!important;align-items:start!important}
-  .eam228-map-wrap{height:520px!important;min-height:520px!important;max-height:520px!important}
-  .eam228-right-card{height:520px!important;min-height:520px!important;max-height:520px!important}
+  grid-template-columns:minmax(0,68fr) minmax(0,32fr)!important;
 }
 </style>
-
