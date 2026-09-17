@@ -3594,6 +3594,60 @@ html::before,body::before{
       .eam228-bottom{grid-template-columns:2fr 3fr 1fr!important}
       .eam228-entry.main{right:0!important;top:46%!important}
       .eam228-entry.court{right:12%!important;top:41%!important}
+
+      /* v23: EAM 현황판 배치도만 조정 — 수리 LIVE 기능/데이터/이벤트는 변경하지 않음 */
+      .eam228-main{
+        display:grid!important;
+        grid-template-columns:minmax(0,2.05fr) minmax(360px,0.95fr)!important;
+        gap:10px!important;
+        height:calc(100vh - 150px)!important;
+        min-height:620px!important;
+        flex:none!important;
+      }
+      .eam228-map-card,.eam228-right{height:100%!important;min-height:0!important;align-self:stretch!important;}
+      .eam228-map-wrap{height:calc(100% - 43px)!important;min-height:0!important;}
+      .eam228-map{height:100%!important;min-height:0!important;}
+      /* 코트 5개 전체 영역을 약 35%로 확대 */
+      .eam228-courts{
+        top:2%!important;
+        height:35%!important;
+        left:7.5%!important;
+        right:7.5%!important;
+        gap:7px!important;
+      }
+      /* 코트가 커진 만큼 시설 시작 위치를 아래로 이동 */
+      .eam228-facility{
+        top:38%!important;
+        bottom:1.5%!important;
+        grid-template-rows:10% 42% 8% 40%!important;
+      }
+      /* 화장실·샤워실 행은 유지/확대, 하부 유수장치실 영역은 축소 */
+      .eam228-row1{grid-template-columns:repeat(6,1fr)!important;}
+      .eam228-bottom{grid-template-columns:2fr 3fr 1fr!important;}
+      .eam228-roof{grid-template-columns:1fr 2fr 2fr 1fr!important;}
+      .eam228-corridor{width:100%!important;}
+      /* LIVE는 배치도와 독립된 오른쪽 패널. 내부 스크롤 허용 */
+      .eam228-right{
+        overflow:hidden!important;
+        display:flex!important;
+        flex-direction:column!important;
+      }
+      .eam228-right-card{
+        height:100%!important;
+        min-height:0!important;
+        overflow:hidden!important;
+      }
+      .eam228-live-body{
+        height:calc(100% - 48px)!important;
+        max-height:none!important;
+        overflow:auto!important;
+      }
+      @media(max-width:1000px){
+        .eam228-main{grid-template-columns:1fr!important;height:auto!important;min-height:0!important;}
+        .eam228-map-card{height:650px!important;}
+        .eam228-right{height:650px!important;min-height:650px!important;}
+      }
+
 </style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
     }
@@ -13810,16 +13864,6 @@ window.eam228RemoveIcon=function(code){
 }
 </style>
 
-
-<style id="eam-v25-court-balance">
-/* EAM 현황판만: 코트 전체를 약 35% 영역으로, 5개 코트 중앙 정렬 */
-.eam228-page .eam228-main{height:calc(100vh - 170px)!important;min-height:0!important;display:flex!important;align-items:stretch!important;}
-.eam228-page .eam228-map{height:100%!important;min-height:0!important;}
-.eam228-page .eam228-courts{top:3%!important;height:35%!important;display:flex!important;align-items:center!important;}
-.eam228-page .eam228-court{height:82%!important;top:9%!important;}
-.eam228-page .eam228-facility{top:39%!important;bottom:1.5%!important;}
-.eam228-page .eam228-live{height:100%!important;min-height:0!important;}
-</style>
 </body>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
