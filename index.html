@@ -2569,6 +2569,239 @@ html::before,body::before{
 .eam228-court{margin-top:0!important;height:100%!important;min-height:0!important;}
 @media(max-width:1200px){.eam228-head-function span{font-size:44px!important;width:48px!important;height:48px!important;line-height:48px!important}.eam228-head-function b{font-size:20px!important}.eam228-head-function small{font-size:12px!important}}
 </style>
+
+<style id="EAM_HYUNHWANG_FINAL_V9">
+/* v9: EAM 현황 구조 기준 최종 보정. 기능 로직은 유지하고 표시 구조/크기만 맞춤. */
+.eam228-header{height:160px!important;min-height:160px!important;max-height:160px!important;flex:0 0 160px!important;box-sizing:border-box!important;align-items:center!important;overflow:hidden!important;}
+.eam228-head-functions{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;height:100%!important;flex:0 0 auto!important;}
+.eam228-head-function{appearance:none!important;-webkit-appearance:none!important;border:1px solid rgba(255,255,255,.22)!important;color:inherit!important;font:inherit!important;cursor:pointer!important;height:92px!important;min-height:92px!important;min-width:86px!important;padding:7px 8px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;border-radius:12px!important;background:rgba(255,255,255,.10)!important;}
+.eam228-head-function span{font-size:44px!important;line-height:48px!important;width:48px!important;height:48px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 48px!important;}
+.eam228-head-function b{font-size:20px!important;line-height:1.1!important;white-space:nowrap!important;}
+.eam228-head-function small{font-size:12px!important;line-height:1.1!important;white-space:nowrap!important;opacity:.92!important;}
+.eam228-main{height:650px!important;min-height:650px!important;max-height:650px!important;flex:0 0 650px!important;align-items:stretch!important;}
+.eam228-main>.eam228-map-card,.eam228-main>.eam228-right{height:650px!important;min-height:650px!important;max-height:650px!important;align-self:stretch!important;box-sizing:border-box!important;}
+.eam228-main>.eam228-right>.eam228-right-card{height:650px!important;min-height:650px!important;max-height:650px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;}
+.eam228-map-card{display:flex!important;flex-direction:column!important;}
+.eam228-map-wrap{height:606px!important;min-height:606px!important;max-height:606px!important;flex:0 0 606px!important;box-sizing:border-box!important;}
+.eam228-map{height:100%!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;box-sizing:border-box!important;}
+/* 코트 5개: 도면 내부 세로 30%, 5개 상단/하단 동일선 */
+.eam228-courts{top:2%!important;height:30%!important;left:7.5%!important;right:7.5%!important;width:auto!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:7px!important;align-items:stretch!important;box-sizing:border-box!important;}
+.eam228-court{width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;margin:0!important;align-self:stretch!important;box-sizing:border-box!important;}
+.eam228-court span{top:50%!important;}
+.eam228-facility{top:32%!important;bottom:1.5%!important;min-height:0!important;}
+.eam228-live-body{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow:auto!important;}
+@media(max-width:1200px){.eam228-head-functions{gap:6px!important}.eam228-head-function{min-width:78px!important;padding:6px!important}.eam228-head-function span{font-size:44px!important;width:48px!important;height:48px!important;line-height:48px!important}.eam228-head-function b{font-size:18px!important}.eam228-head-function small{font-size:11px!important}}
+@media(max-width:1000px){.eam228-main{grid-template-columns:1fr!important;height:auto!important;min-height:0!important;max-height:none!important;flex:0 0 auto!important}.eam228-main>.eam228-map-card,.eam228-main>.eam228-right,.eam228-main>.eam228-right>.eam228-right-card{height:auto!important;min-height:0!important;max-height:none!important}.eam228-head-functions{display:flex!important;gap:4px!important}.eam228-head-function{min-width:70px!important}.eam228-head-function b{font-size:16px!important}.eam228-head-function small{font-size:10px!important}}
+</style>
+
+<style id="EAM_V10_HEADER_MAP_FINAL">
+/* v10 FINAL: EAM 현황 화면의 표시 구조만 정리. 기존 JS/onclick/기능은 변경하지 않음. */
+@media(min-width:1001px){
+  .eam228-page{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:8px!important;
+    height:calc(100vh - 24px)!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+
+  /* 최상단 헤더: 160px 고정, 기존 제목과 기능 메뉴가 겹치지 않도록 실제 5영역으로 정렬 */
+  .eam228-header{
+    height:160px!important;
+    min-height:160px!important;
+    max-height:160px!important;
+    flex:0 0 160px!important;
+    width:100%!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    padding:14px 16px!important;
+    overflow:hidden!important;
+  }
+  .eam228-brand{
+    flex:1 1 330px!important;
+    min-width:300px!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:10px!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  .eam228-brand .ico{
+    width:48px!important;
+    height:48px!important;
+    flex:0 0 48px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    font-size:42px!important;
+    line-height:1!important;
+  }
+  .eam228-brand b{
+    display:block!important;
+    font-size:20px!important;
+    line-height:1.2!important;
+    letter-spacing:-.5px!important;
+    white-space:nowrap!important;
+  }
+  .eam228-brand small{
+    display:block!important;
+    font-size:12px!important;
+    line-height:1.3!important;
+    margin-top:6px!important;
+    white-space:nowrap!important;
+  }
+
+  /* 자산관리 / EAM 현황 / 누수관리 / 방수관리: 모두 동일한 아이콘 크기 */
+  .eam228-head-functions{
+    flex:0 0 auto!important;
+    height:100%!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    margin:0!important;
+  }
+  .eam228-head-function{
+    width:82px!important;
+    min-width:82px!important;
+    max-width:82px!important;
+    height:100px!important;
+    min-height:100px!important;
+    max-height:100px!important;
+    padding:7px 4px!important;
+    margin:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  .eam228-head-function span{
+    width:48px!important;
+    height:48px!important;
+    flex:0 0 48px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    font-size:44px!important;
+    line-height:48px!important;
+  }
+  .eam228-head-function b{
+    font-size:16px!important;
+    line-height:1.15!important;
+    white-space:nowrap!important;
+  }
+  .eam228-head-function small{
+    font-size:10px!important;
+    line-height:1.1!important;
+    white-space:nowrap!important;
+  }
+
+  .eam228-head-stats{
+    flex:0 0 auto!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,64px)!important;
+    gap:5px!important;
+    margin:0!important;
+    align-self:center!important;
+  }
+  .eam228-stat{
+    width:64px!important;
+    height:58px!important;
+    min-height:58px!important;
+  }
+  .eam228-stat b{font-size:19px!important}
+  .eam228-stat small{font-size:8px!important}
+  .eam228-head-btn{
+    flex:0 0 auto!important;
+    height:58px!important;
+    min-height:58px!important;
+    padding:0 11px!important;
+    margin:0!important;
+    align-self:center!important;
+    white-space:nowrap!important;
+  }
+
+  /* 도면 + LIVE: 동일한 외곽 세로 650px */
+  .eam228-main{
+    display:grid!important;
+    grid-template-columns:minmax(0,68.3fr) minmax(0,31.7fr)!important;
+    gap:10px!important;
+    width:100%!important;
+    height:650px!important;
+    min-height:650px!important;
+    max-height:650px!important;
+    flex:0 0 650px!important;
+    align-items:stretch!important;
+  }
+  .eam228-main > .eam228-map-card,
+  .eam228-main > .eam228-right{
+    height:650px!important;
+    min-height:650px!important;
+    max-height:650px!important;
+    align-self:stretch!important;
+    margin:0!important;
+  }
+  .eam228-map-card{
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .eam228-map-wrap{
+    height:606px!important;
+    min-height:606px!important;
+    max-height:606px!important;
+    flex:0 0 606px!important;
+    box-sizing:border-box!important;
+  }
+  .eam228-map{
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+  }
+  .eam228-main > .eam228-right > .eam228-right-card{
+    width:100%!important;
+    height:650px!important;
+    min-height:650px!important;
+    max-height:650px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    margin:0!important;
+  }
+  .eam228-live-body{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:auto!important;
+  }
+
+  /* 코트 5개: 도면 내부 세로 30%, 같은 상단/하단선 */
+  .eam228-courts{
+    top:2%!important;
+    height:30%!important;
+    left:7.5%!important;
+    right:7.5%!important;
+    width:auto!important;
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:7px!important;
+    align-items:stretch!important;
+  }
+  .eam228-court{
+    width:100%!important;
+    height:calc(100% - 13px)!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin-top:13px!important;
+    align-self:stretch!important;
+  }
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3645,7 +3878,7 @@ html::before,body::before{
       .eam228-bottom{grid-template-columns:2fr 3fr 1fr!important}
       .eam228-entry.main{right:0!important;top:46%!important}
       .eam228-entry.court{right:12%!important;top:41%!important}
-</style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-functions" aria-label="EAM 기능 아이콘"><div class="eam228-head-function"><span>🏢</span><b>자산관리</b><small>EAM 자산</small></div><div class="eam228-head-function"><span>📊</span><b>EAM 현황</b><small>현황판</small></div><div class="eam228-head-function"><span>💧</span><b>누수관리</b><small>누수 현황</small></div><div class="eam228-head-function"><span>🛡️</span><b>방수관리</b><small>방수 이력</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
+</style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-functions" aria-label="EAM 기능 아이콘"><button type="button" class="eam228-head-function" onclick="go('eam')"><span>🏢</span><b>자산관리</b><small>EAM 자산</small></button><button type="button" class="eam228-head-function" onclick="go('dashboard2')"><span>📊</span><b>EAM 현황</b><small>현황판</small></button><button type="button" class="eam228-head-function" onclick="go('leakage')"><span>💧</span><b>누수관리</b><small>누수 현황</small></button><button type="button" class="eam228-head-function" onclick="go('waterproof')"><span>🛡️</span><b>방수관리</b><small>방수 이력</small></button></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
     }
 
