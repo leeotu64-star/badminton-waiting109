@@ -368,7 +368,7 @@
 /* v201: 제거된 안내문/누수등록 카운트 영역만큼 상단 공간을 실제 도면에 활용 */
 .jgb-v170-head{padding-bottom:12px!important;min-height:70px!important}
 .jgb-v170-head h1{margin-bottom:0!important}
-.eam228-head-btn.live{background:#1674b9!important;color:#fff!important;border:1px solid #1674b9!important;}</style></style>
+</style></style>
     <style id="EMPLOYEE_OVERVIEW_STYLE">
     .eov-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
     .eov-card{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:14px;box-shadow:0 2px 8px #00000008}
@@ -2492,16 +2492,32 @@ html::before,body::before{
 <style id="v92-lk-code-only">
 .jgb-v66-lk-code{display:inline-flex;align-items:center;margin-left:8px;padding:4px 9px;border:1px solid #b8d2ee;border-radius:7px;background:#eef6ff;color:#1267b1;font-size:12px;font-weight:800;vertical-align:middle;line-height:1;}
 </style>
-<style id="JGB_EAM_V4_SAFE_LAYOUT">
-/* V4 안전 레이아웃: 기존 dashboard2/등록/삭제/입력/아이콘/저장 JS는 수정하지 않음 */
-.eam228-page{box-sizing:border-box!important;width:100%!important;max-width:none!important;}
-.eam228-main{width:100%!important;min-width:0!important;align-items:stretch!important;}
-.eam228-map-card,.eam228-right{min-width:0!important;}
-.eam228-right{min-height:0!important;}
-.eam228-right-card{min-width:0!important;overflow:hidden!important;}
-.eam228-live-body{min-width:0!important;}
-.eam228-map{width:100%!important;box-sizing:border-box!important;}
+
+<style id="v13-court-size-balance">
+/* v13: 코트 영역 확대 / 하부 시설 영역 축소 */
+.eam228-courts{
+  top:1.5%!important;
+  height:31%!important;
+  left:5%!important;
+  right:5%!important;
+  gap:8px!important;
+}
+.eam228-court{
+  margin-top:15px!important;
+}
+.eam228-court span{
+  font-size:17px!important;
+}
+.eam228-facility{
+  top:35%!important;
+  bottom:2%!important;
+}
+.eam228-roof span{font-size:9px!important}
+.eam228-zone b{font-size:12px!important}
+.eam228-zone small{font-size:8px!important}
+.eam228-corridor{font-size:12px!important}
 </style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -2525,53 +2541,6 @@ html::before,body::before{
     @media(max-width:700px){.eam-tabs{grid-template-columns:1fr!important}.eam-asset-card{min-height:70px!important}.eam-detail-hero h2{font-size:24px!important}}
     </style>
     <script>
-window.renderEamHistory = function(hs,ins){
-  const parseMaint=(h)=>{let d={};const raw=String(h?.description??'');if(raw.startsWith('MAINT::')){try{d=JSON.parse(raw.slice(7))||{}}catch(e){d={}}}return d};
-  const __esc=(v)=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); const val=(v)=>__esc(v==null||v===''?'-':String(v));
-  const date=(v)=>{const s=String(v||'');const m=s.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:(s?s.slice(0,10):'-')};
-  if(!hs.length)return '<div class="eamx-empty">등록된 작업·교체 이력이 없습니다.</div>';
-  return `<div class="jgb-eam-history-rebuild">${hs.slice(0,10).map((h,i)=>{
-    const d=parseMaint(h),method=d.maintenanceMethod||d.method||h.event_type||'외주정비',type=d.type||'수리',mtype=d.maintenanceType||d.type||'예방정비';
-    const issue=d.issue||'-',action=d.action||'-',cause=d.cause||'-',part=d.part||'-';
-    const start=d.startDate||d.workStartDate||h.event_date||'',end=d.endDate||d.workEndDate||'',next=d.nextDate||d.nextInspectionDate||'-';
-    const result=d.result||'조치완료',note=d.note||'-',vendor=h.worker_name||d.vendor||'-';
-    const cost=Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-',hid=String(h.id||('hist-'+i));
-    const photo=(label)=>`<div class="jgb-eam-history-photo" onclick="window.jgbPickWorkPhoto&&jgbPickWorkPhoto('${val(hid)}','${label}')"><span>📷</span><b>${label}</b><small>사진 등록 · 클릭</small></div>`;
-    return `<article class="jgb-eam-history-card" data-maint-history-id="${val(hid)}">
-      <div class="jgb-eam-history-head">
-        <div class="jgb-eam-history-head-title"><strong>이력 ${i+1}</strong><span>${val(date(h.event_date))} · ${val(type)} · ${val(mtype)}</span></div>
-        <div class="jgb-eam-history-actions">
-          <button type="button" class="jgb-real-toggle" onclick="event.preventDefault();event.stopPropagation();jgbRealToggleHistory(this)">접기</button>
-          
-          <button type="button" class="jgb-real-delete" onclick="event.preventDefault();event.stopPropagation();window.eamDeleteMaintenanceHistory&&eamDeleteMaintenanceHistory('${val(hid)}')">삭제</button>
-        </div>
-      </div>
-      <div class="jgb-eam-history-body">
-        <div class="jgb-eam-history-info">
-          <div><small>작업일자</small><b>${val(date(h.event_date))}</b></div><div><small>정비구분</small><b>${val(type)}</b></div>
-          <div><small>정비유형</small><b>${val(mtype)}</b></div><div><small>정비방식</small><b>${val(method)}</b></div>
-          <div><small>정비업체</small><b>${val(vendor)}</b></div><div><small>정비비용</small><b>${val(cost)}</b></div>
-          <div><small>고장·이상내용</small><b>${val(issue)}</b></div><div><small>고장원인</small><b>${val(cause)}</b></div>
-          <div><small>조치내용</small><b>${val(action)}</b></div><div><small>교체부품</small><b>${val(part)}</b></div>
-          <div><small>작업시작일</small><b>${val(date(start))}</b></div><div><small>작업완료일</small><b>${val(date(end))}</b></div>
-          <div><small>차기 점검일</small><b>${val(date(next))}</b></div><div><small>조치상태</small><b>${val(result)}</b></div>
-          <div class="wide"><small>비고</small><b>${val(note)}</b></div>
-        </div>
-        <div class="jgb-eam-history-right"><h4>📷 작업사진 <em>최대 3장</em></h4><div class="jgb-eam-history-photos">${photo('작업 전')}${photo('작업 중')}${photo('작업 후')}${photo('완료')}</div><div class="jgb-eam-history-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></div>
-      </div>
-    </article>`;
-  }).join('')}</div>`;
-}
-    window.jgbRealToggleHistory=function(btn){
-      const card=btn?.closest('.jgb-eam-history-card');if(!card)return;
-      const body=card.querySelector('.jgb-eam-history-body');if(!body)return;
-      const collapsed=card.classList.toggle('is-collapsed');
-      body.style.display=collapsed?'none':'';
-      btn.textContent=collapsed?'펼치기':'접기';
-    };
-</script>
-
-<script>
     const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
     let SUPA=(window.supabase&&typeof window.supabase.createClient==="function")?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
@@ -3413,7 +3382,7 @@ window.renderEamHistory = function(hs,ins){
 
     function dashboard2(){
       const A=Array.isArray(window.__eamA)?window.__eamA:[];
-      const assets=A.filter(a=>String(a.status||'정상')!=='폐기').map(a=>{let m={};try{m=JSON.parse(localStorage.getItem('JGB_EAM_ASSET_META')||'{}')?.[a.asset_code||a.code]||{}}catch(e){}return {...a,manufacturer:a.manufacturer||m.manufacturer||'',model:a.model||m.model||''};});
+      const assets=A.filter(a=>String(a.status||'정상')!=='폐기');
       const V=s=>String(s??'').trim();
       const esc=s=>typeof xEsc==='function'?xEsc(s):String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
       const codeOf=a=>V(a?.asset_code||a?.code||'');
@@ -3423,6 +3392,7 @@ window.renderEamHistory = function(hs,ins){
       const catDefs=[['AC','에어컨','❄️'],['BO','보일러','♨️'],['FI','소방설비','🚒'],['EL','전기설비','⚡'],['DO','문·창호','🚪'],['SA','위생설비','🚻'],['OT','기타설비','🔧']];
       const catMap={AC:'에어컨',BO:'보일러',FI:'소방설비',EL:'전기설비',DO:'문·창호설비',SA:'위생설비',OT:'기타설비'};
       const posKey='JGB_EAM_DASH_MAP_POS_V228';
+      const deletedMapKey='JGB_EAM_DASH_MAP_DELETED_V241';
       const liveKey='JGB_EAM_REPAIR_LIVE_V228';
       const readObj=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
       const writeObj=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x))}catch(_){} };
@@ -3431,6 +3401,8 @@ window.renderEamHistory = function(hs,ins){
       const resetKey='JGB_EAM_DASH_MAP_RESET_V237';
       if(!localStorage.getItem(resetKey)){try{localStorage.removeItem(posKey);localStorage.setItem(resetKey,'1')}catch(_){}}
       const freshPositions=readObj(posKey);
+      const readDeletedMap=()=>{try{const x=JSON.parse(localStorage.getItem(deletedMapKey)||'[]');return new Set(Array.isArray(x)?x.map(V).filter(Boolean):[])}catch(_){return new Set()}};
+      const writeDeletedMap=s=>{try{localStorage.setItem(deletedMapKey,JSON.stringify([...s]))}catch(_){}};
       const readLive=()=>{try{const x=JSON.parse(localStorage.getItem(liveKey)||'[]');return Array.isArray(x)?x:[]}catch(_){return []}};
       const writeLive=x=>{try{localStorage.setItem(liveKey,JSON.stringify(x))}catch(_){} };
       const normCat=a=>{const q=(codeOf(a)+' '+V(a?.category||a?.asset_type||'')).toUpperCase();if(/^AC[-_]/.test(q)||q.includes('에어컨'))return 'AC';if(/^BO[-_]/.test(q)||q.includes('보일러'))return 'BO';if(/^FI[-_]/.test(q)||q.includes('소방'))return 'FI';if(/^EL[-_]/.test(q)||q.includes('전기'))return 'EL';if(/^DO[-_]/.test(q)||q.includes('문·창호')||q.includes('문창호'))return 'DO';if(/^SA[-_]/.test(q)||q.includes('위생'))return 'SA';return 'OT'};
@@ -3440,7 +3412,7 @@ window.renderEamHistory = function(hs,ins){
       const check=assets.filter(a=>statusOf(a)==='check').length;
       const repair=assets.filter(a=>statusOf(a)==='repair').length;
       const defaultAC={'AC-01':[86,8],'AC-02':[68,8],'AC-03':[50,8],'AC-04':[32,8],'AC-05':[14,8],'AC-06':[7,30]};
-      const getPos=a=>{const c=codeOf(a);if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];return defaultAC[c]||null};
+      const getPos=a=>{const c=codeOf(a);if(readDeletedMap().has(c))return null;if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];return defaultAC[c]||null};
       const placeName=a=>V(a?.place||a?.location||a?.zone||a?.area||'미지정');
       const attr=s=>esc(V(s)).replace(/\n/g,' ');
       const liveRows=readLive();
@@ -3485,16 +3457,16 @@ window.renderEamHistory = function(hs,ins){
         if(r.error){alert('상태 변경에 실패했습니다.');return}await eamLoad();render();
       };
       window.eam228Place=code=>{
-        selected.code=V(code);const hint=document.getElementById('eam228Hint');if(hint){hint.textContent=`${code} 선택 · 배치도에서 원하는 위치로 드래그하세요.`;hint.classList.add('on')}
+        const c=V(code);selected.code=c;
+        const s=readDeletedMap();s.delete(c);writeDeletedMap(s);
+        const hint=document.getElementById('eam228Hint');if(hint){hint.textContent=`${code} 선택 · 배치도에서 원하는 위치로 드래그하세요.`;hint.classList.add('on')}
       };
-      window.eam228RemoveIcon=code=>{if(!confirm(`${code} 배치 아이콘만 제거할까요?\n자산 자체는 삭제되지 않습니다.`))return;const p=readObj(posKey);delete p[V(code)];writeObj(posKey,p);render()};
-      window.eam228RemoveSelectedIcon=()=>{
-        const code=V(selected.code||'');
-        if(!code){alert('먼저 배치도에서 삭제할 아이콘을 클릭하세요.');return;}
-        const p=readObj(posKey);
-        if(!Object.prototype.hasOwnProperty.call(p,code)){alert(`${code} 아이콘이 배치되어 있지 않습니다.`);return;}
-        if(!confirm(`${code} 아이콘만 삭제할까요?\n자산 정보는 삭제되지 않습니다.`))return;
-        delete p[code]; writeObj(posKey,p); selected.code=code; render();
+      window.eam228RemoveIcon=code=>{
+        const c=V(code);if(!c)return;
+        if(!confirm(`${c} 배치 아이콘만 제거할까요?\n자산 자체는 삭제되지 않습니다.`))return;
+        const p=readObj(posKey);delete p[c];writeObj(posKey,p);
+        const s=readDeletedMap();s.add(c);writeDeletedMap(s);
+        document.querySelector(`#eam228Map .eam228-asset[data-code="${CSS.escape(c)}"]`)?.remove();
       };
       window.eam228Delete=async code=>{
         const a=assets.find(x=>codeOf(x)===V(code));if(!a||!SUPA)return;
@@ -3521,28 +3493,43 @@ window.renderEamHistory = function(hs,ins){
       window.eam228Save=async code=>{
         const a=assets.find(x=>codeOf(x)===V(code));if(!a||!SUPA)return;
         const g=id=>V(document.getElementById(id)?.value);
-        const payload={name:g('e223Name'),category:catMap[g('e223Cat')]||'기타설비',install_date:g('e223Date')||null,place:g('e223Place')||null,status:g('e223Status')||'정상',product_name:catMap[g('e223Cat')]||'기타설비'};
+        const payload={name:g('e223Name'),category:catMap[g('e223Cat')]||'기타설비',manufacturer:g('e223Maker')||null,model:g('e223Model')||null,install_date:g('e223Date')||null,place:g('e223Place')||null,status:g('e223Status')||'정상',product_name:catMap[g('e223Cat')]||'기타설비'};
         if(!payload.name){alert('자산명을 입력하세요.');return}
         const r=await SUPA.from('assets').update(payload).eq('id',a.id);if(r.error){alert('저장 실패\n'+(r.error.message||''));return}
-        try{const meta=JSON.parse(localStorage.getItem('JGB_EAM_ASSET_META')||'{}')||{};meta[code]={...(meta[code]||{}),manufacturer:g('e223Maker'),model:g('e223Model')};localStorage.setItem('JGB_EAM_ASSET_META',JSON.stringify(meta))}catch(e){}
         document.getElementById('eam228Modal')?.remove();await eamLoad();render();
       };
       window.eam228New=defaultCat=>{
         document.getElementById('eam228Modal')?.remove();
         const used=new Set(assets.map(a=>codeOf(a).toUpperCase()));
         const m=document.createElement('div');m.id='eam228Modal';m.className='eam228-modal';
-        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>누수관리 LK 생성처럼 번호를 직접 입력할 수 있습니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><span>${x[2]}</span><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><input id="e223No" maxlength="2" inputmode="numeric" placeholder="01"><strong id="e223Preview">${defaultCat||'AC'}-01</strong></div><div class="eam228-form"><label>자산명 *<input id="e223NewName" placeholder="예: 천장형 에어컨"></label><label>제조사<input id="e223NewMaker"></label><label>모델명<input id="e223NewModel"></label><label>설치일<input id="e223NewDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label></div><div class="eam228-modal-note">생성 후 배치도에서 아이콘을 직접 드래그하여 위치를 정합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
+        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>누수관리 LK 생성처럼 번호를 직접 입력할 수 있습니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><span>${x[2]}</span><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><input id="e223No" maxlength="2" inputmode="numeric" placeholder="01"><strong id="e223Preview">${defaultCat||'AC'}-01</strong></div><div class="eam228-modal-note">코드 생성 후 배치도에서 아이콘을 직접 드래그하여 위치를 정합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
         document.body.appendChild(m);window.__eam228Used=used;window.eam228Prefix(defaultCat||'AC');document.getElementById('e223No')?.addEventListener('input',window.eam228Preview);
       };
       window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Prefix').textContent=p;document.querySelectorAll('.eam228-code-types button').forEach(b=>b.classList.toggle('on',b.dataset.cat===p));window.eam228Preview()};
       window.eam228Preview=()=>{const p=window.__eam228Prefix||'AC',used=window.__eam228Used||new Set(),raw=V(document.getElementById('e223No')?.value);let n=raw?Number(raw):1;if(!raw)while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<99)n++;n=Math.max(1,Math.min(99,n||1));const el=document.getElementById('e223Preview');if(el)el.textContent=`${p}-${String(n).padStart(2,'0')}`};
       window.eam228Create=async()=>{
         if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
-        const p=window.__eam228Prefix||'AC',raw=V(document.getElementById('e223No')?.value),n=Number(raw||0),code=`${p}-${String(n||1).padStart(2,'0')}`,name=V(document.getElementById('e223NewName')?.value);
-        if(!/^\d{1,2}$/.test(raw)||n<1||n>99){alert('번호는 1~99 사이 숫자로 입력하세요.');return}if(assets.some(a=>codeOf(a).toUpperCase()===code)){alert('이미 사용 중인 자산코드입니다.');return}if(!name){alert('자산명을 입력하세요.');return}
-        const g=id=>V(document.getElementById(id)?.value);const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],install_date:g('e223NewDate')||null,place:null,status:'정상'};
+        const p=window.__eam228Prefix||'AC',raw=V(document.getElementById('e223No')?.value),n=Number(raw||0),code=`${p}-${String(n||1).padStart(2,'0')}`,name=catMap[p]||code;
+        if(!/^\d{1,2}$/.test(raw)||n<1||n>99){alert('번호는 1~99 사이 숫자로 입력하세요.');return}
+        const existing=assets.find(a=>codeOf(a).toUpperCase()===code);
+        if(existing){
+          let deletedCodes=new Set();
+          try{const z=JSON.parse(localStorage.getItem('JGB_EAM_DASH_MAP_DELETED_V241')||'[]');deletedCodes=new Set(Array.isArray(z)?z.map(V):[])}catch(_){}
+          if(deletedCodes.has(code)){
+            deletedCodes.delete(code);
+            localStorage.setItem('JGB_EAM_DASH_MAP_DELETED_V241',JSON.stringify([...deletedCodes]));
+            selected.code=code;
+            document.getElementById('eam228Modal')?.remove();
+            await eamLoad();
+            render();
+            setTimeout(()=>window.eam228Place(code),120);
+            return;
+          }
+          alert('이미 등록된 자산코드입니다.\n기존 EAM 자산을 그대로 사용하려면 기존 자산을 선택하세요.');
+          return;
+        }
+        const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],manufacturer:null,model:null,place:null,status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
-        try{const meta=JSON.parse(localStorage.getItem('JGB_EAM_ASSET_META')||'{}')||{};meta[code]={...(meta[code]||{}),manufacturer:g('e223NewMaker'),model:g('e223NewModel')};localStorage.setItem('JGB_EAM_ASSET_META',JSON.stringify(meta))}catch(e){}
         document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
       };
       window.eam228LiveInput=code=>{
@@ -3565,46 +3552,22 @@ window.renderEamHistory = function(hs,ins){
       window.eam228Location=label=>{const rows=locData[label]||[];const box=document.getElementById('eam228Card');if(!box)return;box.innerHTML=`<div class="eam228-card-head"><div><small>LOCATION</small><b>${esc(label)}</b></div><span>${rows.length}건</span></div><div class="eam228-location-list">${rows.length?rows.map(a=>`<button onclick="window.eam228Pick('${attr(codeOf(a))}')"><strong>${esc(codeOf(a))}</strong><span>${esc(a.name||'자산')}</span><em class="${statusClass(statusOf(a))}">${statusText(statusOf(a))}</em></button>`).join(''):'<div class="eam228-empty">등록된 자산이 없습니다.</div>'}</div>`};
 
       const markerAssets=assets.filter(a=>getPos(a));
-      const markers=markerAssets.map(a=>{const p=getPos(a),st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}" onclick="if(!window.__EAM228_DRAG_SUPPRESS)window.eam228Pick('${attr(code)}')"><span>${catIcon(cat)}</span><b>${esc(code)}</b></button>`}).join('');
-      const court=n=>`<button type="button" class="eam228-court jgb3-court" onclick="window.eam228Location('코트 ${n}')"><div class="jgb3-court-inner"><i class="jgb3-net"></i><i class="jgb3-center"></i><i class="jgb3-service s1"></i><i class="jgb3-service s2"></i><span>${n}</span></div></button>`;
-      const zone=(label,sub,cls='')=>`<button type="button" class="eam228-zone ${cls} jgb3-room" onclick="window.eam228Location('${attr(label)}')"><b>${esc(label)}</b><small>${esc(sub)}</small></button>`;
-      const map=`<div id="eam228Map" class="eam228-map jgb3-map"><div class="jgb3-court-area"><strong>배드민턴 코트 구역</strong><div class="eam228-courts jgb3-courts">${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div></div><div class="jgb3-facility-area"><div class="eam228-roof jgb3-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>옥상 창고</b></button><span>▲ 계단</span></div><div class="eam228-row1 jgb3-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor jgb3-corridor" onclick="window.eam228Location('복도')">복 도</button><div class="eam228-bottom jgb3-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div></div>`;
+      const markers=markerAssets.map(a=>{const p=getPos(a);if(!p)return '';const st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}" onclick="if(!window.__EAM228_DRAG_SUPPRESS)window.eam228Pick('${attr(code)}')"><span>${catIcon(cat)}</span><b>${esc(code)}</b></button>`}).join('');
+      const court=n=>`<button type="button" class="eam228-court" onclick="window.eam228Location('코트 ${n}')"><span>${n}</span></button>`;
+      const zone=(label,sub,cls='')=>`<button type="button" class="eam228-zone ${cls}" onclick="window.eam228Location('${attr(label)}')"><b>${esc(label)}</b><small>${esc(sub)}</small></button>`;
+      const map=`<div id="eam228Map" class="eam228-map"><div class="eam228-courts"><strong>코트 구역 · 에어컨 자산 6개</strong>${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div><div class="eam228-facility"><div class="eam228-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>창고</b></button><span>▲ 계단</span></div><div class="eam228-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button><div class="eam228-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span></div>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div>`;
 
       const live=readLive().filter(x=>assets.some(a=>codeOf(a)===V(x.asset_code)));
-      // v40: 관리자 게시판 수리 내역을 사람이 읽는 표로 정리하고 MAINT 내부 JSON은 화면에 노출하지 않음
-      const parseRepairHistory=h=>{
-        const raw=V(h?.description); let d={};
-        if(raw.startsWith('MAINT::')){try{d=JSON.parse(raw.slice(7))||{}}catch(e){d={}}}
-        else if(raw.startsWith('MAINT:')){try{d=JSON.parse(raw.slice(6))||{}}catch(e){d={}}}
-        const content=V(d.action||d.issue||d.description||h?.action||h?.description||h?.event_type||'수리 작업');
-        const status=V(d.result||h?.status||h?.action_type||h?.event_type||'처리완료');
-        return {date:(String(h?.event_date||'').match(/^\d{4}-\d{2}-\d{2}/)||[])[0]||V(h?.event_date).slice(0,10)||'-',asset:assets.find(a=>V(a.id)===V(h?.asset_id)),content,status,manager:V(h?.worker_name)||'-'};
-      };
-      const history=Array.isArray(window.__eamH)?window.__eamH.filter(h=>{const et=V(h?.event_type),raw=V(h?.description);return h?.asset_id && !['자산정보수정','자산등록'].includes(et) && !raw.includes('자산 등록')}).sort((a,b)=>V(b.event_date).localeCompare(V(a.event_date))).slice(0,30):[];
-      const historyHtml=history.length?`<table class="eam228-history-table"><thead><tr><th>일자</th><th>자산코드</th><th>수리내용</th><th>담당</th><th>상태</th></tr></thead><tbody>${history.map(h=>{const r=parseRepairHistory(h);const code=r.asset?codeOf(r.asset):V(h.asset_code)||'-';const st=r.status;const cls=/완료|정상|조치완료/.test(st)?'done':/필요|예정|요청|진행/.test(st)?'warn':'';return `<tr><td>${esc(r.date)}</td><td><b>${esc(code)}</b></td><td>${esc(r.content)}</td><td>${esc(r.manager)}</td><td><span class="eam228-history-status ${cls}">${esc(st)}</span></td></tr>`}).join('')}</tbody></table>`:`<div class="eam228-empty"><b>등록된 수리 내역이 없습니다.</b><span>수리 완료 또는 이력 등록 시 여기에 표시됩니다.</span></div>`;
       const liveHtml=live.length?`<table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><button class="eam228-link" onclick="window.eam228Pick('${attr(x.asset_code)}')">${esc(x.asset_code)}</button></td><td>${esc(x.content||'-')}</td><td><span class="live-state">${esc(x.status||'수리예정')}</span></td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="done" onclick="window.eam228Complete('${attr(x.asset_code)}')">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="eam228-empty"><b>현재 수리예정 자산이 없습니다.</b><span>수리가 필요하면 「＋ 직접입력」으로 등록하세요.</span></div>`;
       const cur=assets.find(a=>codeOf(a)===selected.code)||assets.find(a=>codeOf(a)==='AC-01')||assets[0];
       if(cur)selected.code=codeOf(cur);
       const p=cur?getPos(cur):null,lk=cur?V(cur.related_lk||cur.leak_code||cur.lk_code||''):'';
       const card=cur?`<div class="eam228-card-head"><div><small>ASSET MASTER</small><b>${esc(codeOf(cur))}</b></div><span class="${statusClass(statusOf(cur))}">${statusText(statusOf(cur))}</span></div><h3>${esc(cur.name||catLabel(normCat(cur)))}</h3><div class="eam228-card-grid"><span>자산종류</span><b>${esc(catLabel(normCat(cur)))}</b><span>제조사</span><b>${esc(cur.manufacturer||cur.company||'-')}</b><span>모델명</span><b>${esc(cur.model||cur.model_name||'-')}</b><span>설치일</span><b>${esc(cur.install_date||cur.acquisition_date||'-')}</b><span>설치위치</span><b>${esc(placeName(cur))}</b><span>현재상태</span><b class="${statusClass(statusOf(cur))}">${statusText(statusOf(cur))}</b><span>배치도</span><b>${p?'배치 완료':'미배치'}</b><span>관련 LK</span><b>${lk?esc(lk):'-'}</b></div><div class="eam228-card-actions"><button onclick="window.eam228Edit('${attr(codeOf(cur))}')">수정</button><button onclick="window.eam228Status('${attr(codeOf(cur))}')">상태변경</button><button onclick="window.eam228Place('${attr(codeOf(cur))}')">📍 배치</button></div><div class="eam228-card-actions"><button onclick="go('leakage')">💧 누수관리</button><button class="danger" onclick="window.eam228RemoveIcon('${attr(codeOf(cur))}')">아이콘 제거</button><button class="danger" onclick="window.eam228Delete('${attr(codeOf(cur))}')">자산 삭제</button></div>`:`<div class="eam228-empty">등록된 자산이 없습니다.</div>`;
 
-      return `<style id="EAM_DASH_V235_CSS">
+      return `<style id="EAM_DASH_V223_CSS">
       .eam228-asset{cursor:grab!important;touch-action:none!important;user-select:none!important;pointer-events:auto!important;-webkit-user-drag:none!important}.eam228-asset.dragging{cursor:grabbing!important;z-index:999!important;transform:scale(1.06)!important;box-shadow:0 8px 20px rgba(20,55,70,.32),0 0 0 3px rgba(20,123,193,.18)!important;}
-      .eam228-icon-delete{border:1px solid #e24d4d!important;background:#fff5f5!important;color:#c52f2f!important;border-radius:7px!important;padding:6px 9px!important;font-size:10px!important;font-weight:950!important;cursor:pointer!important;white-space:nowrap!important}.eam228-icon-delete:hover{background:#ffe8e8!important}.eam228-icon-delete:active{transform:translateY(1px)}
 
-
-      /* v40: 수리 내역 관리대장형 표 */
-      .eam228-history-table{table-layout:fixed!important;font-size:10px!important}
-      .eam228-history-table th,.eam228-history-table td{white-space:normal!important;word-break:break-word!important;vertical-align:middle!important;padding:8px 5px!important}
-      .eam228-history-table th:nth-child(1),.eam228-history-table td:nth-child(1){width:82px}
-      .eam228-history-table th:nth-child(2),.eam228-history-table td:nth-child(2){width:68px}
-      .eam228-history-table th:nth-child(4),.eam228-history-table td:nth-child(4){width:58px}
-      .eam228-history-table th:nth-child(5),.eam228-history-table td:nth-child(5){width:68px}
-      .eam228-history-table td:nth-child(3){text-align:left!important}
-      .eam228-history-status{display:inline-block;padding:3px 6px;border-radius:999px;background:#eef3f7;color:#53687a;font-weight:900;font-size:9px;white-space:nowrap}
-      .eam228-history-status.done{background:#e8f8ef;color:#16844c}
-      .eam228-history-status.warn{background:#fff2df;color:#b66a00}
-      .eam228-page{height:calc(100vh - 24px);min-height:700px;display:flex;flex-direction:column;gap:8px;padding:0;box-sizing:border-box;overflow:hidden;background:linear-gradient(180deg,#eef6fa,#e5eef4);color:#17344d}.eam228-header{height:88px;flex:0 0 88px;border-radius:14px;background:linear-gradient(135deg,#0c4166,#176a98 55%,#082f4e);color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px;box-sizing:border-box;box-shadow:0 10px 22px rgba(17,54,82,.22),inset 0 1px 0 rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.22)}.eam228-brand{display:flex;align-items:center;gap:10px;min-width:235px}.eam228-brand .ico{font-size:31px;filter:drop-shadow(0 4px 5px rgba(0,0,0,.28))}.eam228-brand b{font-size:25px;font-weight:950;letter-spacing:-1px;text-shadow:0 2px 3px rgba(0,0,0,.25)}.eam228-brand small{display:block;color:#d9edf9;font-size:10px;margin-top:3px;font-weight:800}.eam228-head-stats{display:grid;grid-template-columns:repeat(3,70px);gap:5px;margin-left:auto}.eam228-stat{height:55px;border:1px solid rgba(255,255,255,.3);border-radius:9px;background:rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}.eam228-stat b{font-size:20px;line-height:1}.eam228-stat small{font-size:8px;margin-top:4px}.eam228-stat.ok b{color:#58e19b}.eam228-stat.warn b{color:#ffd15a}.eam228-stat.bad b{color:#ff6b6b}.eam228-head-btn{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.13);color:#fff;border-radius:9px;padding:11px 12px;font-weight:950;cursor:pointer}.eam228-head-btn.primary{background:#fff;color:#075b91}.eam228-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.75fr) minmax(390px,1fr);gap:12px}.eam228-map-card,.eam228-right-card{background:#fff;border:1px solid #cad9e4;border-radius:12px;overflow:hidden;box-shadow:0 3px 12px rgba(22,54,78,.08)}.eam228-map-card{display:flex;flex-direction:column;min-width:0}.eam228-map-head{height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid #d8e3eb}.eam228-map-head h2{font-size:17px;margin:0;font-weight:950}.eam228-map-head span{font-size:10px;color:#72899b;font-weight:800}.eam228-map-wrap{flex:1;min-height:0;padding:7px;background:#eef5f8}.eam228-map{position:relative;height:100%;min-height:0;border:2px solid #314d63;background:linear-gradient(145deg,#eef4f7,#dfe9ee 48%,#f8fafb);box-shadow:inset 0 0 0 5px rgba(255,255,255,.7);overflow:hidden}.eam228-courts{position:absolute;left:4%;right:4%;top:2%;height:22%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.eam228-courts strong{position:absolute;top:-1px;left:0;right:0;text-align:center;font-size:9px;color:#36546b;z-index:2}.eam228-court{margin-top:13px;border:1px solid #607e92;border-radius:5px;background:linear-gradient(110deg,#e0ebf0,#f8fbfc 40%,#d4e2e8);box-shadow:0 4px 8px rgba(25,55,75,.16);position:relative;cursor:pointer}.eam228-court:before{content:"";position:absolute;left:12%;right:12%;top:50%;border-top:1px solid #587489}.eam228-court:after{content:"";position:absolute;left:14%;right:14%;top:15%;bottom:15%;border:1px solid #668296}.eam228-court span{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff,#dce7ed);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:950;color:#173d58;box-shadow:0 4px 8px rgba(20,50,70,.2)}.eam228-facility{position:absolute;left:1.5%;right:1.5%;top:25%;bottom:1.5%;display:grid;grid-template-rows:10% 34% 10% 46%;grid-template-columns:1fr}.eam228-roof{display:grid;grid-template-columns:1fr 2fr 2fr 1fr;border:1px solid #91a7b5;background:#f4f7f9}.eam228-roof button{border:0;border-right:1px solid #9cafbb;background:transparent;font-weight:950;color:#173d58;cursor:pointer}.eam228-roof span{display:flex;align-items:center;justify-content:center;font-size:8px;color:#526d80}.eam228-row1{display:grid;grid-template-columns:repeat(6,1fr);border-left:1px solid #9cafbb}.eam228-zone{border:0;border-right:1px solid #9cafbb;border-bottom:1px solid #9cafbb;background:#f3f8fa;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#173d58}.eam228-zone.pink{background:#fff0f4}.eam228-zone b{font-size:11px;font-weight:950}.eam228-zone small{font-size:7px;color:#758a99;margin-top:3px}.eam228-corridor{border:1px solid #9cafbb;background:#f6efdf;font-size:11px;font-weight:950;color:#425d70;cursor:pointer}.eam228-bottom{display:grid;grid-template-columns:18% 64% 18%;border-left:1px solid #9cafbb}.eam228-bottom .small{background:#f3f8fa}.eam228-bottom .water{background:#fff4d1}.eam228-entry{position:absolute;z-index:5;font-size:7px;border:1px solid #637b8d;background:#fff;padding:3px 5px;color:#36536a;font-weight:900}.eam228-entry.court{right:12%;top:41%}.eam228-entry.main{right:0;top:52%;}.eam228-asset{position:absolute;z-index:20;transform:translate(0,0);border:1px solid #19a974;border-radius:999px;background:linear-gradient(180deg,#fff,#eef8f3);padding:4px 8px;display:flex;align-items:center;gap:4px;box-shadow:0 5px 12px rgba(20,55,70,.2),0 0 0 2px rgba(255,255,255,.9);font-size:8px;font-weight:950;cursor:grab;touch-action:none}.eam228-asset span{font-size:9px}.eam228-asset.ok{border-color:#16aa72}.eam228-asset.warn{border-color:#e3a91c;background:#fff9e8}.eam228-asset.bad{border-color:#e34b4b;background:#fff0f0}.eam228-asset.selected{box-shadow:0 0 0 3px #147bc1,0 7px 16px rgba(20,55,70,.3)}.eam228-right{min-width:0;display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:9px;min-height:0;overflow:hidden}.eam228-history-table{width:100%;border-collapse:collapse;font-size:9px}.eam228-history-table th{position:sticky;top:0;background:#edf4f8;padding:7px 5px;border-bottom:1px solid #cddce6}.eam228-history-table td{padding:7px 5px;border-bottom:1px solid #e2ebf0;text-align:center}.eam228-history-table td:nth-child(3){text-align:left}.eam228-right-card{display:flex;flex-direction:column;min-height:0}.eam228-section-head{height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:space-between;padding:0 11px;border-bottom:1px solid #d7e3eb}.eam228-section-head h2{margin:0;font-size:16px;font-weight:950}.eam228-section-head small{color:#d84c4c;font-size:9px;font-weight:900}.eam228-direct{border:1px solid #176db0;background:#176db0;color:#fff;border-radius:7px;padding:7px 10px;font-size:10px;font-weight:950;cursor:pointer}.eam228-live-body{flex:1;min-height:0;overflow:auto}.eam228-live-body table{width:100%;border-collapse:collapse;font-size:9px}.eam228-live-body th{position:sticky;top:0;background:#edf4f8;padding:7px 5px;border-bottom:1px solid #cddce6}.eam228-live-body td{padding:7px 5px;border-bottom:1px solid #e2ebf0;text-align:center}.eam228-live-body td:nth-child(2){text-align:left}.eam228-link{border:0;background:none;color:#126db0;font-weight:950;cursor:pointer}.live-state{color:#e13f3f;font-weight:950}.done{border:1px solid #cbd7df;background:#fff;border-radius:5px;padding:4px 7px;font-size:8px;font-weight:950;cursor:pointer}.eam228-empty{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;color:#9aaab6;font-size:10px;text-align:center}.eam228-empty span{font-size:9px}.eam228-card-body{flex:1;min-height:0;overflow:auto;padding:10px}.eam228-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.eam228-card-head small{display:block;font-size:8px;letter-spacing:.08em;color:#7890a1;font-weight:900}.eam228-card-head b{font-size:17px;color:#123c5a}.eam228-card-head>span{padding:4px 9px;border-radius:999px;font-size:9px;font-weight:950}.eam228-card-head>span.ok,.eam228-card-head>span.good{background:#e5f7ed;color:#13915e}.eam228-card-head>span.warn{background:#fff4d3;color:#b67c00}.eam228-card-head>span.bad{background:#ffe8e8;color:#d73e3e}.eam228-card-body h3{margin:3px 0 8px;font-size:15px}.eam228-card-grid{display:grid;grid-template-columns:72px 1fr;gap:1px;border:1px solid #d6e1e8;font-size:9px}.eam228-card-grid span,.eam228-card-grid b{padding:6px 7px;background:#f7fafb}.eam228-card-grid span{font-weight:900;color:#61788a;border-right:1px solid #d6e1e8}.eam228-card-grid b{font-weight:900;color:#243f54;word-break:break-word}.eam228-card-grid b.ok{color:#13915e}.eam228-card-grid b.warn{color:#b67c00}.eam228-card-grid b.bad{color:#d73e3e}.eam228-card-actions{display:flex;gap:5px;margin-top:7px}.eam228-card-actions button{flex:1;border:1px solid #cddbe4;background:#fff;border-radius:6px;padding:7px 4px;font-size:9px;font-weight:950;cursor:pointer;color:#294c64}.eam228-card-actions .danger{color:#d64747;border-color:#efc8c8}.eam228-location-list{display:flex;flex-direction:column;gap:4px}.eam228-location-list button{display:grid;grid-template-columns:70px 1fr auto;align-items:center;border:1px solid #dce6ed;background:#fff;border-radius:6px;padding:7px;cursor:pointer;text-align:left}.eam228-location-list span{font-size:9px}.eam228-location-list em{font-style:normal;font-size:8px;font-weight:950}.eam228-location-list em.ok{color:#13915e}.eam228-location-list em.warn{color:#b67c00}.eam228-location-list em.bad{color:#d73e3e}.eam228-hint{position:absolute;left:10px;bottom:10px;z-index:50;display:none;padding:6px 9px;border-radius:7px;background:#123f61;color:#fff;font-size:9px;font-weight:900}.eam228-hint.on{display:block}.eam228-modal{position:fixed;inset:0;z-index:99999;background:rgba(8,31,48,.55);display:flex;align-items:center;justify-content:center;padding:18px}.eam228-modal-box{width:min(650px,96vw);max-height:92vh;overflow:auto;background:#fff;border-radius:14px;box-shadow:0 25px 60px rgba(0,0,0,.3);border:1px solid #cad9e4}.eam228-modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px;background:linear-gradient(135deg,#103f61,#16658f);color:#fff}.eam228-modal-head small{font-size:8px;letter-spacing:.1em}.eam228-modal-head h3{margin:4px 0 0;font-size:19px}.eam228-modal-head p{margin:4px 0 0;font-size:9px;color:#d9ebf6}.eam228-modal-head button{border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:6px;font-size:20px;width:30px;height:30px;cursor:pointer}.eam228-code-types{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:12px}.eam228-code-types button{border:1px solid #d4e0e7;background:#f7fafb;border-radius:7px;padding:7px 3px;cursor:pointer}.eam228-code-types button.on{border-color:#176db0;background:#eaf5fc;box-shadow:inset 0 -2px 0 #176db0}.eam228-code-types span{display:block;font-size:13px}.eam228-code-types b{font-size:11px}.eam228-code-types small{display:block;font-size:7px;color:#708696}.eam228-code-line{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;background:#f3f8fb;border-top:1px solid #dbe6ed;border-bottom:1px solid #dbe6ed}.eam228-code-line b{font-size:18px;color:#166da2}.eam228-code-line input{width:65px;text-align:center;border:1px solid #b9cbd8;border-radius:6px;padding:7px;font-weight:950}.eam228-code-line strong{font-size:18px;color:#183e58}.eam228-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:14px}.eam228-form label{font-size:9px;font-weight:950;color:#506b7d}.eam228-form input,.eam228-form select{display:block;width:100%;margin-top:4px;border:1px solid #cbd9e2;border-radius:6px;padding:8px;font-size:11px;box-sizing:border-box;background:#fff}.eam228-form .wide{grid-column:1/-1}.eam228-modal-note{padding:0 14px 12px;color:#718797;font-size:9px}.eam228-modal-actions{display:flex;justify-content:flex-end;gap:7px;padding:12px 14px;border-top:1px solid #dbe5eb}.eam228-modal-actions button{border:0;border-radius:7px;padding:9px 16px;font-weight:950;cursor:pointer}.eam228-modal-actions .gray{background:#eef2f4;color:#516978}.eam228-modal-actions .blue{background:#176db0;color:#fff}.eam228-empty-map{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8ca0ad;font-size:10px;pointer-events:none}.eam228-bottom .water b{font-size:12px}.eam228-bottom .water small{font-size:8px}.eam228-bottom .small b{font-size:10px}.eam228-bottom .small small{font-size:7px}@media(max-width:1000px){.eam228-main{grid-template-columns:1fr}.eam228-right{min-height:650px}.eam228-page{overflow:auto}.eam228-map-card{min-height:650px}}@media(max-width:700px){.eam228-head-stats{display:none}.eam228-brand b{font-size:19px}.eam228-form{grid-template-columns:1fr}.eam228-form .wide{grid-column:auto}.eam228-code-types{grid-template-columns:repeat(4,1fr)}}
+      .eam228-page{height:calc(100vh - 24px);min-height:700px;display:flex;flex-direction:column;gap:8px;padding:0;box-sizing:border-box;overflow:hidden;background:linear-gradient(180deg,#eef6fa,#e5eef4);color:#17344d}.eam228-header{height:88px;flex:0 0 88px;border-radius:14px;background:linear-gradient(135deg,#0c4166,#176a98 55%,#082f4e);color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px;box-sizing:border-box;box-shadow:0 10px 22px rgba(17,54,82,.22),inset 0 1px 0 rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.22)}.eam228-brand{display:flex;align-items:center;gap:10px;min-width:235px}.eam228-brand .ico{font-size:31px;filter:drop-shadow(0 4px 5px rgba(0,0,0,.28))}.eam228-brand b{font-size:25px;font-weight:950;letter-spacing:-1px;text-shadow:0 2px 3px rgba(0,0,0,.25)}.eam228-brand small{display:block;color:#d9edf9;font-size:10px;margin-top:3px;font-weight:800}.eam228-head-stats{display:grid;grid-template-columns:repeat(3,70px);gap:5px;margin-left:auto}.eam228-stat{height:55px;border:1px solid rgba(255,255,255,.3);border-radius:9px;background:rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}.eam228-stat b{font-size:20px;line-height:1}.eam228-stat small{font-size:8px;margin-top:4px}.eam228-stat.ok b{color:#58e19b}.eam228-stat.warn b{color:#ffd15a}.eam228-stat.bad b{color:#ff6b6b}.eam228-head-btn{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.13);color:#fff;border-radius:9px;padding:11px 12px;font-weight:950;cursor:pointer}.eam228-head-btn.primary{background:#fff;color:#075b91}.eam228-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,2.08fr) minmax(390px,.92fr);gap:9px}.eam228-map-card,.eam228-right-card{background:#fff;border:1px solid #cad9e4;border-radius:12px;overflow:hidden;box-shadow:0 3px 12px rgba(22,54,78,.08)}.eam228-map-card{display:flex;flex-direction:column;min-width:0}.eam228-map-head{height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid #d8e3eb}.eam228-map-head h2{font-size:17px;margin:0;font-weight:950}.eam228-map-head span{font-size:10px;color:#72899b;font-weight:800}.eam228-map-wrap{flex:1;min-height:0;padding:7px;background:#eef5f8}.eam228-map{position:relative;height:100%;min-height:0;border:2px solid #314d63;background:linear-gradient(145deg,#eef4f7,#dfe9ee 48%,#f8fafb);box-shadow:inset 0 0 0 5px rgba(255,255,255,.7);overflow:hidden}.eam228-courts{position:absolute;left:4%;right:4%;top:2%;height:22%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.eam228-courts strong{position:absolute;top:-1px;left:0;right:0;text-align:center;font-size:9px;color:#36546b;z-index:2}.eam228-court{margin-top:13px;border:1px solid #607e92;border-radius:5px;background:linear-gradient(110deg,#e0ebf0,#f8fbfc 40%,#d4e2e8);box-shadow:0 4px 8px rgba(25,55,75,.16);position:relative;cursor:pointer}.eam228-court:before{content:"";position:absolute;left:12%;right:12%;top:50%;border-top:1px solid #587489}.eam228-court:after{content:"";position:absolute;left:14%;right:14%;top:15%;bottom:15%;border:1px solid #668296}.eam228-court span{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff,#dce7ed);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:950;color:#173d58;box-shadow:0 4px 8px rgba(20,50,70,.2)}.eam228-facility{position:absolute;left:1.5%;right:1.5%;top:25%;bottom:1.5%;display:grid;grid-template-rows:10% 34% 10% 46%;grid-template-columns:1fr}.eam228-roof{display:grid;grid-template-columns:1fr 2fr 2fr 1fr;border:1px solid #91a7b5;background:#f4f7f9}.eam228-roof button{border:0;border-right:1px solid #9cafbb;background:transparent;font-weight:950;color:#173d58;cursor:pointer}.eam228-roof span{display:flex;align-items:center;justify-content:center;font-size:8px;color:#526d80}.eam228-row1{display:grid;grid-template-columns:repeat(6,1fr);border-left:1px solid #9cafbb}.eam228-zone{border:0;border-right:1px solid #9cafbb;border-bottom:1px solid #9cafbb;background:#f3f8fa;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#173d58}.eam228-zone.pink{background:#fff0f4}.eam228-zone b{font-size:11px;font-weight:950}.eam228-zone small{font-size:7px;color:#758a99;margin-top:3px}.eam228-corridor{border:1px solid #9cafbb;background:#f6efdf;font-size:11px;font-weight:950;color:#425d70;cursor:pointer}.eam228-bottom{display:grid;grid-template-columns:18% 64% 18%;border-left:1px solid #9cafbb}.eam228-bottom .small{background:#f3f8fa}.eam228-bottom .water{background:#fff4d1}.eam228-entry{position:absolute;z-index:5;font-size:7px;border:1px solid #637b8d;background:#fff;padding:3px 5px;color:#36536a;font-weight:900}.eam228-entry.court{right:12%;top:41%}.eam228-entry.main{right:0;top:52%;}.eam228-asset{position:absolute;z-index:20;transform:translate(0,0);border:1px solid #19a974;border-radius:999px;background:linear-gradient(180deg,#fff,#eef8f3);padding:4px 8px;display:flex;align-items:center;gap:4px;box-shadow:0 5px 12px rgba(20,55,70,.2),0 0 0 2px rgba(255,255,255,.9);font-size:8px;font-weight:950;cursor:grab;touch-action:none}.eam228-asset span{font-size:9px}.eam228-asset.ok{border-color:#16aa72}.eam228-asset.warn{border-color:#e3a91c;background:#fff9e8}.eam228-asset.bad{border-color:#e34b4b;background:#fff0f0}.eam228-asset.selected{box-shadow:0 0 0 3px #147bc1,0 7px 16px rgba(20,55,70,.3)}.eam228-right{min-width:0;display:grid;grid-template-rows:1fr;gap:9px;min-height:0}.eam228-right-card{display:flex;flex-direction:column;min-height:0}.eam228-section-head{height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:space-between;padding:0 11px;border-bottom:1px solid #d7e3eb}.eam228-section-head h2{margin:0;font-size:16px;font-weight:950}.eam228-section-head small{color:#d84c4c;font-size:9px;font-weight:900}.eam228-direct{border:1px solid #176db0;background:#176db0;color:#fff;border-radius:7px;padding:7px 10px;font-size:10px;font-weight:950;cursor:pointer}.eam228-live-body{flex:1;min-height:0;overflow:auto}.eam228-live-body table{width:100%;border-collapse:collapse;font-size:9px}.eam228-live-body th{position:sticky;top:0;background:#edf4f8;padding:7px 5px;border-bottom:1px solid #cddce6}.eam228-live-body td{padding:7px 5px;border-bottom:1px solid #e2ebf0;text-align:center}.eam228-live-body td:nth-child(2){text-align:left}.eam228-link{border:0;background:none;color:#126db0;font-weight:950;cursor:pointer}.live-state{color:#e13f3f;font-weight:950}.done{border:1px solid #cbd7df;background:#fff;border-radius:5px;padding:4px 7px;font-size:8px;font-weight:950;cursor:pointer}.eam228-empty{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;color:#9aaab6;font-size:10px;text-align:center}.eam228-empty span{font-size:9px}.eam228-card-body{flex:1;min-height:0;overflow:auto;padding:10px}.eam228-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.eam228-card-head small{display:block;font-size:8px;letter-spacing:.08em;color:#7890a1;font-weight:900}.eam228-card-head b{font-size:17px;color:#123c5a}.eam228-card-head>span{padding:4px 9px;border-radius:999px;font-size:9px;font-weight:950}.eam228-card-head>span.ok,.eam228-card-head>span.good{background:#e5f7ed;color:#13915e}.eam228-card-head>span.warn{background:#fff4d3;color:#b67c00}.eam228-card-head>span.bad{background:#ffe8e8;color:#d73e3e}.eam228-card-body h3{margin:3px 0 8px;font-size:15px}.eam228-card-grid{display:grid;grid-template-columns:72px 1fr;gap:1px;border:1px solid #d6e1e8;font-size:9px}.eam228-card-grid span,.eam228-card-grid b{padding:6px 7px;background:#f7fafb}.eam228-card-grid span{font-weight:900;color:#61788a;border-right:1px solid #d6e1e8}.eam228-card-grid b{font-weight:900;color:#243f54;word-break:break-word}.eam228-card-grid b.ok{color:#13915e}.eam228-card-grid b.warn{color:#b67c00}.eam228-card-grid b.bad{color:#d73e3e}.eam228-card-actions{display:flex;gap:5px;margin-top:7px}.eam228-card-actions button{flex:1;border:1px solid #cddbe4;background:#fff;border-radius:6px;padding:7px 4px;font-size:9px;font-weight:950;cursor:pointer;color:#294c64}.eam228-card-actions .danger{color:#d64747;border-color:#efc8c8}.eam228-location-list{display:flex;flex-direction:column;gap:4px}.eam228-location-list button{display:grid;grid-template-columns:70px 1fr auto;align-items:center;border:1px solid #dce6ed;background:#fff;border-radius:6px;padding:7px;cursor:pointer;text-align:left}.eam228-location-list span{font-size:9px}.eam228-location-list em{font-style:normal;font-size:8px;font-weight:950}.eam228-location-list em.ok{color:#13915e}.eam228-location-list em.warn{color:#b67c00}.eam228-location-list em.bad{color:#d73e3e}.eam228-hint{position:absolute;left:10px;bottom:10px;z-index:50;display:none;padding:6px 9px;border-radius:7px;background:#123f61;color:#fff;font-size:9px;font-weight:900}.eam228-hint.on{display:block}.eam228-modal{position:fixed;inset:0;z-index:99999;background:rgba(8,31,48,.55);display:flex;align-items:center;justify-content:center;padding:18px}.eam228-modal-box{width:min(650px,96vw);max-height:92vh;overflow:auto;background:#fff;border-radius:14px;box-shadow:0 25px 60px rgba(0,0,0,.3);border:1px solid #cad9e4}.eam228-modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px;background:linear-gradient(135deg,#103f61,#16658f);color:#fff}.eam228-modal-head small{font-size:8px;letter-spacing:.1em}.eam228-modal-head h3{margin:4px 0 0;font-size:19px}.eam228-modal-head p{margin:4px 0 0;font-size:9px;color:#d9ebf6}.eam228-modal-head button{border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:6px;font-size:20px;width:30px;height:30px;cursor:pointer}.eam228-code-types{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:12px}.eam228-code-types button{border:1px solid #d4e0e7;background:#f7fafb;border-radius:7px;padding:7px 3px;cursor:pointer}.eam228-code-types button.on{border-color:#176db0;background:#eaf5fc;box-shadow:inset 0 -2px 0 #176db0}.eam228-code-types span{display:block;font-size:13px}.eam228-code-types b{font-size:11px}.eam228-code-types small{display:block;font-size:7px;color:#708696}.eam228-code-line{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;background:#f3f8fb;border-top:1px solid #dbe6ed;border-bottom:1px solid #dbe6ed}.eam228-code-line b{font-size:18px;color:#166da2}.eam228-code-line input{width:65px;text-align:center;border:1px solid #b9cbd8;border-radius:6px;padding:7px;font-weight:950}.eam228-code-line strong{font-size:18px;color:#183e58}.eam228-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:14px}.eam228-form label{font-size:9px;font-weight:950;color:#506b7d}.eam228-form input,.eam228-form select{display:block;width:100%;margin-top:4px;border:1px solid #cbd9e2;border-radius:6px;padding:8px;font-size:11px;box-sizing:border-box;background:#fff}.eam228-form .wide{grid-column:1/-1}.eam228-modal-note{padding:0 14px 12px;color:#718797;font-size:9px}.eam228-modal-actions{display:flex;justify-content:flex-end;gap:7px;padding:12px 14px;border-top:1px solid #dbe5eb}.eam228-modal-actions button{border:0;border-radius:7px;padding:9px 16px;font-weight:950;cursor:pointer}.eam228-modal-actions .gray{background:#eef2f4;color:#516978}.eam228-modal-actions .blue{background:#176db0;color:#fff}.eam228-empty-map{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8ca0ad;font-size:10px;pointer-events:none}.eam228-bottom .water b{font-size:12px}.eam228-bottom .water small{font-size:8px}.eam228-bottom .small b{font-size:10px}.eam228-bottom .small small{font-size:7px}@media(max-width:1000px){.eam228-main{grid-template-columns:1fr}.eam228-right{min-height:650px}.eam228-page{overflow:auto}.eam228-map-card{min-height:650px}}@media(max-width:700px){.eam228-head-stats{display:none}.eam228-brand b{font-size:19px}.eam228-form{grid-template-columns:1fr}.eam228-form .wide{grid-column:auto}.eam228-code-types{grid-template-columns:repeat(4,1fr)}}
       
       /* v225: 배치도 95% 확대 + 좌우 패널 높이 동일 */
       .eam228-main{height:95%;flex:0 0 95%;min-height:0}
@@ -3631,52 +3594,9 @@ window.renderEamHistory = function(hs,ins){
       .eam228-bottom{grid-template-columns:2fr 3fr 1fr!important}
       .eam228-entry.main{right:0!important;top:46%!important}
       .eam228-entry.court{right:12%!important;top:41%!important}
-</style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn live" onclick="window.eam228LiveInput('')">＋ 직접입력</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetCodeDelete()">🗑 자산코드 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><div style="display:flex;align-items:center;gap:8px"><span>아이콘을 드래그하여 원하는 위치에 배치</span><button type="button" class="eam228-icon-delete" onclick="window.eam228RemoveSelectedIcon()">🗑 아이콘 삭제</button></div></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>📋 수리 내역</h2><small>전체 수리 이력</small></div><div class="eam228-live-body">${historyHtml}</div></section><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
+</style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
-      /* v243: 배치도 아이콘 드래그 안정화. 아이콘만 이동하고 위치를 localStorage에 저장 */
-      if(!window.__EAM228_DRAG_V243_BOUND){
-        window.__EAM228_DRAG_V243_BOUND=true;
-        let ds=null;
-        const move=(e)=>{
-          if(!ds || e.pointerId!==ds.pointerId)return;
-          const dx=e.clientX-ds.sx, dy=e.clientY-ds.sy;
-          if(!ds.dragging && Math.hypot(dx,dy)<4)return;
-          ds.dragging=true;
-          ds.el.classList.add('dragging');
-          const r=ds.map.getBoundingClientRect();
-          const x=Math.max(1,Math.min(99,(e.clientX-r.left)/r.width*100));
-          const y=Math.max(1,Math.min(99,(e.clientY-r.top)/r.height*100));
-          ds.x=x; ds.y=y; ds.el.style.left=x.toFixed(2)+'%'; ds.el.style.top=y.toFixed(2)+'%';
-          e.preventDefault();
-        };
-        const finish=(e)=>{
-          if(!ds || e.pointerId!==ds.pointerId)return;
-          const d=ds; ds=null;
-          window.removeEventListener('pointermove',move,true);
-          window.removeEventListener('pointerup',finish,true);
-          window.removeEventListener('pointercancel',finish,true);
-          d.el.classList.remove('dragging');
-          if(!d.dragging)return;
-          const pos=readObj(posKey); pos[d.code]=[Number(d.x.toFixed(2)),Number(d.y.toFixed(2))]; writeObj(posKey,pos);
-          window.__EAM228_DRAG_SUPPRESS=true; setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,300);
-          e.preventDefault(); e.stopPropagation();
-          render();
-        };
-        document.addEventListener('pointerdown',(e)=>{
-          const el=e.target.closest?.('#eam228Map .eam228-asset');
-          if(!el || e.button!==0 || ds)return;
-          const map=el.closest('#eam228Map'); if(!map)return;
-          selected.code=V(el.dataset.code||'');
-          ds={el,map,code:selected.code,sx:e.clientX,sy:e.clientY,pointerId:e.pointerId,
-              x:parseFloat(el.style.left)||1,y:parseFloat(el.style.top)||1,dragging:false};
-          try{el.setPointerCapture?.(e.pointerId)}catch(_){}
-          window.addEventListener('pointermove',move,true);
-          window.addEventListener('pointerup',finish,true);
-          window.addEventListener('pointercancel',finish,true);
-          e.preventDefault(); e.stopPropagation();
-        },true);
-      }
-
+    }
 
 function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
     function yearRows(s){return `<div class="compareline">2025년 접수 <b>0건</b></div><div class="compareline">2026년 접수 <b>${s.is.length}건</b></div><div class="compareline">2025년 조치완료 <b>0건</b></div><div class="compareline">2026년 조치완료 <b>${s.done.length}건</b></div><div class="compareline">2026년 미조치 <b>${s.pending.length}건</b></div>`}
@@ -4223,7 +4143,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
               <div><small>관리코드</small><b>${xEsc(eamUnifiedCode(src||current))}</b></div><div><small>기존 자산코드</small><b>${xEsc(code)}</b></div><div><small>설비 종류</small><b>${xEsc(current.category||current.type||C.label||'-')}</b></div><div><small>소분류(자산명)</small><b>${xEsc(eamDisplayName(current))}</b></div><div><small>위치</small><b>${xEsc(displayPlace(current))}</b></div><div><small>모델·규격</small><b>${xEsc(current.model||'-')}</b></div><div><small>수량</small><b>${xEsc(current.qty??current.quantity??'-')}</b></div><div><small>제작·구매</small><b>${xEsc(current.vendor||current.maker||'-')}</b></div><div><small>A/S 연락처</small><b>${xEsc(current.asContact||'-')}</b></div><div><small>설치일</small><b>${xEsc(current.installDate||current.date||'-')}</b></div><div><small>보증</small><b>${xEsc(current.warranty||'-')}</b></div><div><small>A/S 기록</small><b>${xEsc(current.asHistory||'-')}</b></div><div class="wide"><small>비고</small><b>${xEsc(current.note||'-')}</b></div>
             </div></section>
             ${src?`<details class="eam-source-card"><summary>📄 원본 이력카드 핵심정보 <span>클릭해서 보기</span></summary><div class="source-grid"><div><small>용량</small><b>${xEsc(src.capacity||src.model||'-')}</b></div><div><small>내용연수</small><b>${xEsc(src.life||'-')}</b></div><div><small>제작회사</small><b>${xEsc(src.vendor||src.maker||'-')}</b></div><div><small>제조년월일</small><b>${xEsc(src.installDate||src.date||'-')}</b></div><div><small>설치비용</small><b>${xEsc(src.cost||'-')}</b></div><div><small>평가등급</small><b>${xEsc(src.grade||'-')}</b></div></div><div class="source-plan"><b>시설개선계획</b><span>2023 특이사항 없음</span><span>2024 특이사항 없음</span><span>2025 특이사항 없음</span></div></details>`:''}
-            <section class="eam-detail-section eam-history"><div class="section-title"><h3>유지보수 이력</h3><span>${hs.length}건 · 점검 ${ins.length}건</span></div>${window.renderEamHistory(hs,ins)}</section>
+            <section class="eam-detail-section eam-history"><div class="section-title"><h3>유지보수 이력</h3><span>${hs.length}건 · 점검 ${ins.length}건</span></div>${renderEamHistory(hs,ins)}</section>
           `:'<div class="eam-empty">설비 종류에서 자산을 선택하세요.</div>'}</main>
         </div></div>`;
     }
@@ -4448,7 +4368,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         .jgb-v176-live-card{padding:0!important;background:linear-gradient(180deg,#fff 0%,#fbfdff 100%);border-color:#d4e1eb;box-shadow:0 8px 24px rgba(22,55,80,.09)}
         .jgb-v176-live-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:17px;background:linear-gradient(135deg,#f8fbfe,#eef6fb);border-bottom:1px solid #dbe6ee}.jgb-v176-kicker{font-size:9px;font-weight:950;letter-spacing:.14em;color:#197a56;margin-bottom:4px}.jgb-v176-live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#18a36a;box-shadow:0 0 0 4px rgba(24,163,106,.12);margin-right:5px}.jgb-v176-live-head h2{margin:0!important;font-size:22px!important;color:#17334d}.jgb-v176-live-head p{margin:4px 0 0;font-size:10px;color:#71869a}.jgb-v176-live-badge{display:flex;align-items:center;gap:5px;padding:7px 9px;border:1px solid #cfe4d9;border-radius:9px;background:#f4fbf7;white-space:nowrap}.jgb-v176-live-badge i{width:7px;height:7px;border-radius:50%;background:#19a16a}.jgb-v176-live-badge b{font-size:9px;color:#17784f}.jgb-v176-live-badge span{font-size:9px;color:#648271}
         .jgb-v176-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:11px 12px 8px}.jgb-v176-summary>div{position:relative;min-height:66px;border:1px solid #dce6ee;border-radius:10px;padding:9px 10px;background:#fff;box-sizing:border-box}.jgb-v176-summary>div:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}.jgb-v176-summary .planned:before{background:#3e91dd}.jgb-v176-summary .working:before{background:#ee9b3a}.jgb-v176-summary .rework:before{background:#ef5b52}.jgb-v176-summary small{display:block;font-size:10px;font-weight:900;color:#60788c}.jgb-v176-summary b{display:block;font-size:24px;line-height:1.05;color:#17334d;margin-top:3px}.jgb-v176-summary span{font-size:7px;font-weight:950;letter-spacing:.1em;color:#9aabb8}.jgb-v176-live-label{display:flex;justify-content:space-between;padding:4px 14px 7px;color:#49657a}.jgb-v176-live-label b{font-size:11px}.jgb-v176-live-label span{font-size:10px;font-weight:900;color:#8a9dac}.jgb-v176-live-list{padding:0 12px 10px;gap:8px!important;max-height:370px!important}
-        .jgb-v176-live-item{display:flex;align-items:stretch;min-height:86px;border:1px solid #dbe5ed;border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 3px 9px rgba(30,60,80,.055)}.jgb-v176-live-stripe{width:5px;flex:none}.jgb-v176-live-item.blue .jgb-v176-live-stripe{background:#3e91dd}.jgb-v176-live-item.orange .jgb-v176-live-stripe{background:#ee9b3a}.jgb-v176-live-item.red .jgb-v176-live-stripe{background:#ef5b52}.jgb-v176-live-main{padding:10px 9px 9px 11px;min-width:0;flex:1}.jgb-v176-live-top{display:flex;justify-content:space-between;align-items:center;gap:7px}.jgb-v176-codes{display:flex;align-items:center;gap:5px;font-size:11px}.jgb-v176-codes b{color:#17334d}.jgb-v176-codes span{color:#9aabb8}.jgb-v176-codes strong{color:#1769bd}.jgb-v176-live-top em{font-style:normal;font-size:9px;font-weight:950;padding:4px 7px;border-radius:999px}.jgb-v176-live-item.blue em{background:#eaf3ff;color:#1769bd}.jgb-v176-live-item.orange em{background:#fff3df;color:#a66800}.jgb-v176-live-item.red em{background:#fff0ee;color:#c13e35}.jgb-v176-live-main h3{margin:7px 0 5px;font-size:12px;color:#314f65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.jgb-v176-live-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:9px;color:#8295a5}.jgb-v176-live-pulse{width:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:#f8fbfd;border-left:1px solid #e5edf2}.jgb-v176-live-pulse i{width:9px;height:9px;border-radius:50%;background:#18a36a;box-shadow:0 0 0 5px rgba(24,163,106,.10);animation:jgbV176Pulse 1.7s infinite}.jgb-v176-live-pulse small{font-size:7px;font-weight:950;letter-spacing:.08em;color:#5f7a8e}.jgb-v176-live-footer{display:flex;justify-content:space-between;padding:9px 14px;border-top:1px solid #e3ebf1;background:#f7fafc;font-size:8px;color:#8093a3}.jgb-v176-live-footer span:first-child{font-weight:950;color:#198058}@keyframes jgbV176Pulse{0%,100%{opacity:1;box-shadow:0 0 0 5px rgba(24,163,106,.10)}50%{opacity:.55;box-shadow:0 0 0 8px rgba(24,163,106,.04)}}.jgb-v176-empty{margin:0 0 2px!important;padding:36px 12px!important;display:flex;flex-direction:column;gap:5px}.jgb-v176-empty b{font-size:12px;color:#536d80}.jgb-v176-empty span{font-size:9px;color:#93a3af}.jgb-v178-live-register{padding:0 12px 10px}.jgb-v178-live-register button,.jgb-v178-live-reg-btn{border:1px solid #bcd4e4;background:#fff;color:#1769bd;border-radius:8px;padding:9px 12px;font-size:11px;font-weight:900;cursor:pointer}.jgb-v178-live-register button{width:100%}.jgb-v178-live-reg-btn{display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:center!important;white-space:nowrap;cursor:pointer;background:#1769bd!important;color:#fff!important;border:1px solid #1769bd!important;border-color:#1769bd!important;padding:7px 10px!important;min-height:32px!important;position:relative!important;z-index:5!important}.jgb-v178-live-reg-btn:hover{background:#0f5ea9!important}.jgb-v178-live-table{padding:0 12px 12px;overflow:auto}.jgb-v178-live-table table{width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed}.jgb-v178-live-table th,.jgb-v178-live-table td{border:1px solid #dbe5ed;padding:7px 5px;text-align:center}.jgb-v178-live-table th{background:#eef5f9;font-weight:900;color:#526d80}.jgb-v178-live-table th:nth-child(1){width:14%}.jgb-v178-live-table th:nth-child(2){width:25%}.jgb-v178-live-table th:nth-child(3){width:15%}.jgb-v178-live-table th:nth-child(4){width:15%}.jgb-v178-live-table th:nth-child(5){width:12%}.jgb-v178-live-table th:nth-child(6){width:10%}.jgb-v178-live-table th:nth-child(7){width:9%}.jgb-v178-live-table th:nth-child(8){width:10%}.jgb-v180-live-done{border:1px solid #e0a4a0;background:#fff4f2;color:#c53f37;border-radius:7px;padding:5px 8px;font-size:10px;font-weight:900;cursor:pointer}.jgb-v180-live-done:hover{background:#ffe8e5} .jgb-v182-live-edit{border:1px solid #b9d2e4;background:#f4f9fc;color:#1769bd;border-radius:7px;padding:5px 8px;font-size:10px;font-weight:900;cursor:pointer}.jgb-v182-live-edit:hover{background:#e8f2f9}
+        .jgb-v176-live-item{display:flex;align-items:stretch;min-height:86px;border:1px solid #dbe5ed;border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 3px 9px rgba(30,60,80,.055)}.jgb-v176-live-stripe{width:5px;flex:none}.jgb-v176-live-item.blue .jgb-v176-live-stripe{background:#3e91dd}.jgb-v176-live-item.orange .jgb-v176-live-stripe{background:#ee9b3a}.jgb-v176-live-item.red .jgb-v176-live-stripe{background:#ef5b52}.jgb-v176-live-main{padding:10px 9px 9px 11px;min-width:0;flex:1}.jgb-v176-live-top{display:flex;justify-content:space-between;align-items:center;gap:7px}.jgb-v176-codes{display:flex;align-items:center;gap:5px;font-size:11px}.jgb-v176-codes b{color:#17334d}.jgb-v176-codes span{color:#9aabb8}.jgb-v176-codes strong{color:#1769bd}.jgb-v176-live-top em{font-style:normal;font-size:9px;font-weight:950;padding:4px 7px;border-radius:999px}.jgb-v176-live-item.blue em{background:#eaf3ff;color:#1769bd}.jgb-v176-live-item.orange em{background:#fff3df;color:#a66800}.jgb-v176-live-item.red em{background:#fff0ee;color:#c13e35}.jgb-v176-live-main h3{margin:7px 0 5px;font-size:12px;color:#314f65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.jgb-v176-live-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:9px;color:#8295a5}.jgb-v176-live-pulse{width:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:#f8fbfd;border-left:1px solid #e5edf2}.jgb-v176-live-pulse i{width:9px;height:9px;border-radius:50%;background:#18a36a;box-shadow:0 0 0 5px rgba(24,163,106,.10);animation:jgbV176Pulse 1.7s infinite}.jgb-v176-live-pulse small{font-size:7px;font-weight:950;letter-spacing:.08em;color:#5f7a8e}.jgb-v176-live-footer{display:flex;justify-content:space-between;padding:9px 14px;border-top:1px solid #e3ebf1;background:#f7fafc;font-size:8px;color:#8093a3}.jgb-v176-live-footer span:first-child{font-weight:950;color:#198058}@keyframes jgbV176Pulse{0%,100%{opacity:1;box-shadow:0 0 0 5px rgba(24,163,106,.10)}50%{opacity:.55;box-shadow:0 0 0 8px rgba(24,163,106,.04)}}.jgb-v176-empty{margin:0 0 2px!important;padding:36px 12px!important;display:flex;flex-direction:column;gap:5px}.jgb-v176-empty b{font-size:12px;color:#536d80}.jgb-v176-empty span{font-size:9px;color:#93a3af}.jgb-v178-live-register{padding:0 12px 10px}.jgb-v178-live-register button,.jgb-v178-live-reg-btn{border:1px solid #bcd4e4;background:#fff;color:#1769bd;border-radius:8px;padding:9px 12px;font-size:11px;font-weight:900;cursor:pointer}.jgb-v178-live-register button{width:100%}.jgb-v178-live-table{padding:0 12px 12px;overflow:auto}.jgb-v178-live-table table{width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed}.jgb-v178-live-table th,.jgb-v178-live-table td{border:1px solid #dbe5ed;padding:7px 5px;text-align:center}.jgb-v178-live-table th{background:#eef5f9;font-weight:900;color:#526d80}.jgb-v178-live-table th:nth-child(1){width:14%}.jgb-v178-live-table th:nth-child(2){width:25%}.jgb-v178-live-table th:nth-child(3){width:15%}.jgb-v178-live-table th:nth-child(4){width:15%}.jgb-v178-live-table th:nth-child(5){width:12%}.jgb-v178-live-table th:nth-child(6){width:10%}.jgb-v178-live-table th:nth-child(7){width:9%}.jgb-v178-live-table th:nth-child(8){width:10%}.jgb-v180-live-done{border:1px solid #e0a4a0;background:#fff4f2;color:#c53f37;border-radius:7px;padding:5px 8px;font-size:10px;font-weight:900;cursor:pointer}.jgb-v180-live-done:hover{background:#ffe8e5} .jgb-v182-live-edit{border:1px solid #b9d2e4;background:#f4f9fc;color:#1769bd;border-radius:7px;padding:5px 8px;font-size:10px;font-weight:900;cursor:pointer}.jgb-v182-live-edit:hover{background:#e8f2f9}
 
         /* v200: 실제 평면도 기준 위치관리 배치 — 기존 코트 디자인은 유지 */
         .jgb-v200-plan{height:690px!important;background:linear-gradient(180deg,#edf3f6 0%,#e7eef2 50%,#f8fafb 50%,#f8fafb 100%)!important}
@@ -4513,8 +4433,22 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 <div class="jgb-v190-corridor">복도</div>
 <div class="jgb-v190-female"><div class="jgb-v190-zone"><div><b>샤워실(여)</b><small>여자 샤워실</small></div></div><div class="jgb-v190-zone"><div><b>탈의실(여)</b><small>여자 탈의실</small></div></div><div class="jgb-v190-zone"><div><b>화장실(여)</b><small>여자 화장실</small></div></div></div>
 <div class="jgb-v190-office"><div class="jgb-v190-zone jgb-v200-lounge"><div><b>휴게실</b><small>휴게공간</small></div></div><div class="jgb-v190-zone jgb-v200-water"><div><b>통합 유수장치실</b><small>소방·유수 설비</small></div></div><div class="jgb-v190-zone jgb-v200-office"><div><b>사무실</b><small>관리·운영</small></div></div></div></div><div class="entrance">코트 출입구</div><div class="main-entrance">주출입문</div>${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}</div></div><div class="jgb-v170-note">LK 아이콘 클릭 → 해당 LK의 방수공사 이력으로 이동 · 삭제·초기화는 상단 「LK 삭제·초기화」에서 선택</div></section>
-          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div style="display:flex!important;align-items:center!important;gap:7px!important;flex-shrink:0!important"><button type="button" class="jgb-v178-live-reg-btn" data-v47-action="register-live">＋ 직접입력</button><div class="jgb-v176-live-badge"><i></i><b>AUTO LK</b><span>LK 등록 연동</span></div></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>LK</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.lk||'')}</b></td><td>${esc(x.content||'')}</td><td>${esc(x.status||'수리예정')}</td><td class="jgb-v187-date">${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v182-live-edit" data-v47-action="edit-live" data-live-lk="${esc(x.lk||'')}">입력</button></td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.lk||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v187-empty"><div class="jgb-v187-empty-visual"><span>👷</span><i>✓</i></div><b>현재 진행 중인 수리내역이 없습니다.</b><span>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</span><em>🌱 작은 불편도 놓치지 않고, 쾌적한 시설을 위해 항상 노력하겠습니다.</em></div>`}</div>
-          
+          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>AUTO LK</b><span>LK 등록 연동</span></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>LK</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.lk||'')}</b></td><td>${esc(x.content||'')}</td><td>${esc(x.status||'수리예정')}</td><td class="jgb-v187-date">${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v182-live-edit" data-v47-action="edit-live" data-live-lk="${esc(x.lk||'')}">입력</button></td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.lk||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v187-empty"><div class="jgb-v187-empty-visual"><span>👷</span><i>✓</i></div><b>현재 진행 중인 수리내역이 없습니다.</b><span>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</span><em>🌱 작은 불편도 놓치지 않고, 쾌적한 시설을 위해 항상 노력하겠습니다.</em></div>`}</div>
+          <section class="jgb-v189-live-notebook" aria-label="실시간 수리 안내 수첩">
+            <div class="jgb-v189-book-head"><span>📒 수리관리 안내 수첩</span><small>실시간 수리 화면에서 필요한 내용을 확인하세요.</small></div>
+            <div class="jgb-v188-book jgb-v189-book">
+              <div class="jgb-v188-cover"><div class="book-drop">💧</div><b>장군봉체육관<br>누수관리 수첩</b><span>작은 누수도 소중히<br>꼼꼼하게 관리합니다.</span></div>
+              <div class="jgb-v188-rings" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="jgb-v188-page-wrap">
+                <div class="jgb-v188-page" id="jgbV188BookPage">
+                  <div class="jgb-v188-page-lines"></div><div class="jgb-v188-note">마우스 클릭으로 페이지를 넘겨보세요</div>
+                  <div class="jgb-v188-page-content" id="jgbV188BookContent"></div>
+                  <div class="jgb-v188-tabs" id="jgbV188BookTabs"></div>
+                  <div class="jgb-v188-bottom"><button class="jgb-v188-nav" type="button" data-v188-book="prev" aria-label="이전 페이지">‹</button><span class="jgb-v188-count" id="jgbV188BookCount">1 / 5</span><button class="jgb-v188-nav" type="button" data-v188-book="next" aria-label="다음 페이지">›</button></div>
+                </div>
+              </div>
+            </div>
+          </section>
           <div class="jgb-v176-live-footer"><span>● LK 자동 등록</span><span>완료 전까지 LIVE 유지</span></div></section>
         </div>
       </div>`;
@@ -4954,7 +4888,7 @@ function jgbV47GoWpByLeak(leakCode){
       body.style.display=collapsed?'none':'';
       btn.textContent=collapsed?'펼치기':'접기';
     };
-    function eamHistoryTab(mode){const box=document.getElementById('eamHistoryView');if(!box)return;const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];const code=window.__eamSelCode||'';const a=A.find(x=>x.asset_code===code);const hs=a?H.filter(v=>v.asset_id===a.id||v.asset_code===code):[];const ins=a?I.filter(v=>v.asset_id===a.id||v.asset_code===code):[];if(mode==='inspection')box.innerHTML=ins.length?ins.map(v=>`<div class="eamx-hrow"><b>${xEsc(v.result||'-')}</b><span>${xEsc(v.inspector_name||'-')}</span><time>${time(v.inspection_date)}</time></div>`).join(''):'<div class="eamx-empty">등록된 점검 이력이 없습니다.</div>';else box.innerHTML=window.renderEamHistory(hs,[])}
+    function eamHistoryTab(mode){const box=document.getElementById('eamHistoryView');if(!box)return;const A=window.__eamA||[],H=window.__eamH||[],I=window.__eamI||[];const code=window.__eamSelCode||'';const a=A.find(x=>x.asset_code===code);const hs=a?H.filter(v=>v.asset_id===a.id||v.asset_code===code):[];const ins=a?I.filter(v=>v.asset_id===a.id||v.asset_code===code):[];if(mode==='inspection')box.innerHTML=ins.length?ins.map(v=>`<div class="eamx-hrow"><b>${xEsc(v.result||'-')}</b><span>${xEsc(v.inspector_name||'-')}</span><time>${time(v.inspection_date)}</time></div>`).join(''):'<div class="eamx-empty">등록된 점검 이력이 없습니다.</div>';else box.innerHTML=renderEamHistory(hs,[])}
     function eamToggleForm(){return}
     function eamShowHistory(){const e=document.querySelector('.eamx-history');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})}
     function eamSelectedSource(){
@@ -5110,7 +5044,6 @@ function jgbV47GoWpByLeak(leakCode){
     render();
     eamLoad().then(function(){if(typeof externalLoad==="function")externalLoad();render()});
     if(SUPA){syncFromSupabase();startRealtime();setInterval(syncFromSupabase,5000);}
-    }
     </script>
 
     
@@ -5380,7 +5313,7 @@ function jgbV47GoWpByLeak(leakCode){
                 <div class="wide"><small>비고</small><b>${xEsc(current.note||'-')}</b></div>
               </div></section>
               ${sourceHistory?`<details class="eam-source-card"><summary>📄 원본 이력카드 핵심정보 <span>필요할 때만 열기</span></summary><div class="source-grid"><div><small>용량</small><b>${xEsc(src.capacity||'-')}</b></div><div><small>내용연수</small><b>${xEsc(src.life||'-')}</b></div><div><small>평가등급</small><b>${xEsc(src.grade||'-')}</b></div><div><small>제조년월일</small><b>${xEsc(src.date||src.installDate||'-')}</b></div></div><div class="source-plan"><b>시설개선계획</b><span>2023 특이사항 없음</span><span>2024 특이사항 없음</span><span>2025 특이사항 없음</span></div></details>`:''}
-              <section class="eam-detail-section eam-history"><div class="section-title"><h3>유지보수 이력</h3><span>${hs.length}건 · 점검 ${ins.length}건</span></div>${window.renderEamHistory(hs,ins)}</section>
+              <section class="eam-detail-section eam-history"><div class="section-title"><h3>유지보수 이력</h3><span>${hs.length}건 · 점검 ${ins.length}건</span></div>${renderEamHistory(hs,ins)}</section>
             `:'<div class="eam-empty">설비 종류에서 자산을 선택하세요.</div>'}</main>
           </div></div>`;
       };
@@ -5788,7 +5721,7 @@ function jgbV47GoWpByLeak(leakCode){
           <main class="eam-detail-panel">${src?`<div class="eam-detail-hero"><div><div class="hero-code">${esc(dc)}</div><h2>${esc(window.eamDisplayName(cur))}</h2><div class="hero-meta"><span>${esc(C.label)}</span><b>${esc(placeLabel(cur.place))}</b></div></div><span class="hero-status ${String(cur.status||'원본')==='정상'?'good':'source'}">${esc(cur.status||'원본')}</span></div>
           <section class="eam-detail-section eam-master"><div class="section-title"><h3>자산 기본정보</h3><span>주요설비 이력카드와 동일 자산정보</span></div><div class="master-grid"><div><small>자산코드</small><b>${esc(dc)}</b></div><div><small>설비 종류</small><b>${esc(C.label)}</b></div><div><small>소분류(자산명)</small><b>${esc(window.eamDisplayName(cur))}</b></div><div><small>위치</small><b>${esc(placeLabel(cur.place))}</b></div><div><small>모델·규격</small><b>${esc(cur.model||'-')}</b></div><div><small>용량</small><b>${esc(cur.capacity||'-')}</b></div><div><small>수량</small><b>${esc(cur.qty??cur.quantity??'-')}</b></div><div><small>제조사</small><b>${esc(cur.maker||cur.vendor||'-')}</b></div><div><small>A/S 연락처</small><b>${esc(cur.asContact||'-')}</b></div><div><small>제조일</small><b>${esc(cur.date||cur.manufactureDate||'-')}</b></div><div><small>설치일</small><b>${esc(cur.installDate||'-')}</b></div><div><small>내용연수</small><b>${esc(cur.life||'-')}</b></div><div><small>평가등급</small><b>${esc(cur.grade||'-')}</b></div><div><small>보증</small><b>${esc(cur.warranty||'-')}</b></div><div><small>A/S 기록</small><b>${esc(cur.asHistory||'-')}</b></div><div><small>자산상태</small><b>${esc(cur.status||'정상')}</b></div><div><small>취득구분</small><b>${esc(cur.acquisitionType||'기존 자산')}</b></div><div class="wide"><small>시설개선계획</small><b>${esc(cur.improvementPlan||'-')}</b></div><div class="wide"><small>특이사항</small><b>${esc(cur.note||'-')}</b></div></div></section>
           ${window.JGB_EAM_CARD_V22_HTML(cur,reg,H,I)}
-          <section class="eam-detail-section eam-history"><div class="section-title"><h3>유지관리 이력</h3><span>외부정비 ${d.ext.length}건 · 전체 ${hs.length}건 · 점검 ${d.inspections.length}건</span><button type="button" class="jgb-maint-register-top" onclick="event.preventDefault();event.stopImmediatePropagation();if(typeof window.eamOpenMaintenanceRegister==='function'){window.eamOpenMaintenanceRegister();return false}else{alert('유지관리 등록 기능을 불러오지 못했습니다.');return false}">＋ 유지관리 등록</button></div>${window.renderEamHistory(hs,d.inspections)}</section>`:'<div class="eam-empty">설비 종류에서 자산을 선택하세요.</div>'}</main></div></div>`;
+          <section class="eam-detail-section eam-history"><div class="section-title"><h3>유지관리 이력</h3><span>외부정비 ${d.ext.length}건 · 전체 ${hs.length}건 · 점검 ${d.inspections.length}건</span><button type="button" class="jgb-maint-register-top" onclick="event.preventDefault();event.stopImmediatePropagation();if(typeof window.eamOpenMaintenanceRegister==='function'){window.eamOpenMaintenanceRegister();return false}else{alert('유지관리 등록 기능을 불러오지 못했습니다.');return false}">＋ 유지관리 등록</button></div>${renderEamHistory(hs,d.inspections)}</section>`:'<div class="eam-empty">설비 종류에서 자산을 선택하세요.</div>'}</main></div></div>`;
       };
       window.eamPick=function(cat,code){const b=document.getElementById('eamproGrid'),typeRow=document.querySelector('.eam-type-row'),old=b?b.scrollTop:0,oldX=typeRow?typeRow.scrollLeft:0,oldCat=window.__eamCat||'';window.__eamCat=cat||'cooling';window.__eamSelCode=code!==undefined&&code!==null?String(code):'';render();requestAnimationFrame(()=>{const n=document.getElementById('eamproGrid'),r=document.querySelector('.eam-type-row');if(n&&oldCat===window.__eamCat)n.scrollTop=old;if(r){r.scrollLeft=Math.max(0,oldX);requestAnimationFrame(()=>{r.scrollLeft=Math.max(0,oldX)})}})};
       window.eamEditSelectedAsset=async function(){
@@ -7996,7 +7929,7 @@ function jgbV47GoWpByLeak(leakCode){
 </style>
 
 <style id="JGB_V135_REAL_MAINT_BUTTONS">
-/* V135: 실제 window.renderEamHistory() 구조에 버튼을 직접 적용 */
+/* V135: 실제 renderEamHistory() 구조에 버튼을 직접 적용 */
 .jgb-eam-history-card .jgb-eam-history-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;min-height:54px!important;padding:9px 12px!important;box-sizing:border-box!important;background:#e7f2fa!important;border-bottom:2px solid #7f95a6!important;}
 .jgb-eam-history-card .jgb-eam-history-head-title{display:flex!important;align-items:center!important;gap:12px!important;min-width:0!important;flex:1 1 auto!important;}
 .jgb-eam-history-card .jgb-eam-history-head-title strong{font-size:17px!important;font-weight:900!important;color:#173f59!important;white-space:nowrap!important;}
@@ -13258,14 +13191,51 @@ window.eamOpenManageMenu=function(){
 // 주요설비 이력카드의 수정 버튼은 기존 단일 편집기로 연결.
 window.eamEditSelectedAsset=function(c){c=V(c||window.__eamSelCode);if(!c){alert('먼저 수정할 자산을 선택하세요.');return false}window.__eamSelCode=c;return typeof window.JGB_EAM_CARD_V22_OPEN==='function'?window.JGB_EAM_CARD_V22_OPEN(c):false};window.eamHistoryCardEdit=window.eamEditSelectedAsset;
 // 삭제는 asset_code로 DB를 직접 찾는다. 기존 __eamA 의존 때문에 AC-01 삭제가 실패하던 문제를 제거.
-window.eamOpenAssetCodeDelete=function(){
- document.getElementById('eamAssetCodeDeleteModal')?.remove();
- const A=Array.isArray(window.__eamA)?window.__eamA:[];
- const rows=A.filter(a=>V(a?.asset_code||a?.code)).map(a=>({code:V(a.asset_code||a.code),name:V(a.name||'자산')}));
- const modal=document.createElement('div');modal.id='eamAssetCodeDeleteModal';modal.className='eam228-modal';
- modal.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 삭제</h3><p>삭제할 자산코드를 선택하세요.</p></div><button type="button" onclick="this.closest('.eam228-modal').remove()">×</button></div><div style="padding:14px;display:grid;gap:7px;max-height:60vh;overflow:auto">${rows.length?rows.map(x=>`<button type="button" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;border:1px solid #d5e1e8;border-radius:8px;background:#fff;cursor:pointer;text-align:left" onclick="window.eamDeleteSelectedAssetByCode('${esc(x.code)}')"><span><b style="color:#176db0">${esc(x.code)}</b><small style="display:block;color:#718797;margin-top:3px">${esc(x.name)}</small></span><strong style="color:#d64747">삭제</strong></button>`).join(''):'<div style="padding:25px;text-align:center;color:#8296a7">등록된 자산이 없습니다.</div>'}</div></div>`;
- document.body.appendChild(modal);
+window.eamOpenAssetIconDelete=function(){
+  document.getElementById('eamAssetIconDeleteModal')?.remove();
+  const icons=[...document.querySelectorAll('#eam228Map .eam228-asset')];
+  const rows=icons.map(el=>({
+    code:V(el.dataset.code||''),
+    name:V(el.getAttribute('title')||'').replace(/^[^·]+·\s*/,'')||'자산'
+  })).filter(x=>x.code);
+  const modal=document.createElement('div');
+  modal.id='eamAssetIconDeleteModal';
+  modal.className='eam228-modal';
+  modal.innerHTML=`<div class="eam228-modal-box">
+    <div class="eam228-modal-head">
+      <div><small>EAM MAP ICON</small><h3>아이콘 삭제</h3>
+      <p>배치도 아이콘만 삭제합니다. EAM 자산등록 정보는 유지됩니다.</p></div>
+      <button type="button" onclick="this.closest('.eam228-modal').remove()">×</button>
+    </div>
+    <div style="padding:14px;display:grid;gap:7px;max-height:60vh;overflow:auto">
+    ${rows.length?rows.map(x=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;border:1px solid #d5e1e8;border-radius:8px;background:#fff">
+      <span><b style="color:#176db0">${esc(x.code)}</b><small style="display:block;color:#718797;margin-top:3px">${esc(x.name)}</small></span>
+      <button type="button" style="border:0;background:none;color:#d64747;font-weight:800;cursor:pointer;padding:6px 2px"
+        onclick="event.preventDefault();event.stopPropagation();window.eamDeleteMapIconByCode('${esc(x.code)}')">삭제</button>
+    </div>`).join(''):'<div style="padding:25px;text-align:center;color:#8296a7">현재 배치도에 표시된 아이콘이 없습니다.</div>'}
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
 };
+
+window.eamDeleteMapIconByCode=function(c){
+  c=V(c);if(!c)return;
+  if(!confirm(`'${c}' 배치도 아이콘만 삭제할까요?\n자산 자체와 자산등록 정보는 삭제되지 않습니다.`))return;
+  try{
+    const pos=JSON.parse(localStorage.getItem('JGB_EAM_DASH_MAP_POS_V228')||'{}');
+    delete pos[c];
+    localStorage.setItem('JGB_EAM_DASH_MAP_POS_V228',JSON.stringify(pos));
+    const raw=JSON.parse(localStorage.getItem('JGB_EAM_DASH_MAP_DELETED_V241')||'[]');
+    const set=new Set(Array.isArray(raw)?raw.map(V):[]);
+    set.add(c);
+    localStorage.setItem('JGB_EAM_DASH_MAP_DELETED_V241',JSON.stringify([...set]));
+  }catch(err){
+    console.error(err);alert('아이콘 삭제 저장에 실패했습니다.');return;
+  }
+  document.querySelector(`#eam228Map .eam228-asset[data-code="${CSS.escape(c)}"]`)?.remove();
+  document.getElementById('eamAssetIconDeleteModal')?.remove();
+};
+
 window.eamDeleteSelectedAssetByCode=async function(c){window.__eamSelCode=V(c);return window.eamDeleteSelectedAsset()};
 window.eamDeleteSelectedAsset=async function(){
  const c=code();if(!c){alert('먼저 왼쪽 자산목록에서 자산을 선택하세요.');return}
@@ -13341,83 +13311,650 @@ window.eamDeleteSelectedAsset=async function(){
 <script>
 (function(){
   const pages=[
-    {title:'수리 LIVE',html:'<div class="jgb-v189-empty-page"><div class="jgb-v189-worker"><span>👷</span><i>✓</i></div><p><strong>새로운 수리작업이 등록되면 이 화면에 실시간으로 표시됩니다.</strong><br>수리 등록부터 완료까지 현재 진행 상황을 한눈에 확인할 수 있습니다.</p><div class="jgb-v189-green">🌱 작은 불편도 놓치지 않고 쾌적한 시설을 위해 신속하게 관리합니다.</div></div>'},
-    {title:'LK란?',html:'<p><strong>LK</strong>는 누수 위치를 관리하기 위한 고유 코드입니다.</p><span class="formula">LK = Leak 관리번호</span><div class="jgb-v188-tip">예: <strong>LK-01 · LK-02 · LK-03</strong><br>누수현황에서 한 번 생성된 LK는 해당 누수의 <strong>수리·방수 이력과 연결</strong>하여 관리합니다.</div><div class="jgb-v188-tip">📌 LK 번호를 기준으로 같은 누수 건을 찾기 때문에 중복 입력을 줄이고 이력을 쉽게 확인할 수 있습니다.</div>'},
-    {title:'LK 위치조정',html:'<p>배치도의 코트 위치와 번호는 고정되어 있습니다.<br><strong>LK 아이콘만 드래그</strong>하여 실제 누수 발생 위치에 맞춰 이동합니다.</p><div class="jgb-v188-tip">📍 이동 방법<br>① LK 아이콘을 마우스로 누릅니다.<br>② 원하는 위치까지 끌고 갑니다.<br>③ 마우스를 놓으면 새 위치가 저장됩니다.</div><div class="jgb-v188-tip">💡 위치를 다시 바꾸려면 같은 LK 아이콘을 다시 드래그하면 됩니다.</div>'},
-    {title:'삭제·초기화',html:'<p>사용하지 않는 LK는 <strong>누수현황의 LK 삭제·초기화 메뉴</strong>에서 관리합니다.</p><div class="jgb-v188-tip">🗑 삭제 전에는 해당 LK의 누수·수리·방수 이력을 확인하세요.<br>필요한 기록은 삭제 전에 별도로 보관하는 것을 권장합니다.</div><div class="jgb-v188-tip">🔗 LK 아이콘을 클릭하면 연결된 방수관리 화면에서 같은 LK 번호의 이력을 확인할 수 있습니다.</div>'},
-    {title:'시설관리 원칙',html:'<p class="jgb-v188-last"><strong>안전한 시설 · 쾌적한 환경 · 체계적인 이력관리</strong></p><div class="jgb-v188-tip">✓ 누수 발생 → LK 등록<br>✓ 수리내용 → 수리 LIVE 관리<br>✓ 방수공사 → 같은 LK로 이력 연결<br>✓ 배치도 → 실제 위치를 한눈에 확인</div><div class="jgb-v189-green">🌱 작은 누수도 놓치지 않고 꼼꼼하게 관리하여 더 안전한 장군봉체육관을 만들겠습니다.</div>'}
+    {tab:'수리현황',title:'현재 진행 중인 수리내역이 없습니다.',html:'<div class="jgb-v189-empty-page"><div class="jgb-v189-worker"><span>👷</span><i>✓</i></div><p>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</p><div class="jgb-v189-green">🌱 작은 불편도 놓치지 않고,<br>쾌적한 시설을 위해 항상 노력하겠습니다.</div></div>'},
+    {tab:'LK란?',title:'LK란?',html:'<p><strong>LK</strong>는 누수 위치를 관리하기 위한 고유 코드입니다.</p><span class="formula">LK = Leak(누수) + Korea</span><div class="jgb-v188-tip">예) <strong>LK-01, LK-02, LK-03</strong><br>각 누수 위치별로 번호를 부여하여 지도와 방수공사 이력을 연결합니다.</div>'},
+    {tab:'위치조정',title:'LK 위치 조정 방법',html:'<p>코트 위치와 번호는 고정됩니다.<br><strong>LK 아이콘만 드래그</strong>하여 실제 누수 위치에 맞게 이동할 수 있습니다.</p><div class="jgb-v188-tip">📍 위치를 잘못 옮겼다면 LK 아이콘을 다시 드래그해 원하는 위치에 놓아주세요.</div>'},
+    {tab:'삭제방법',title:'LK 삭제 · 초기화',html:'<p>사용하지 않는 LK는 상단 <strong>「LK 삭제·초기화」</strong>에서 선택합니다.</p><div class="jgb-v188-tip">🗑 LK 아이콘을 클릭하면 해당 LK의 방수공사 이력으로 이동합니다.<br>삭제·초기화는 누수현황 상단 메뉴에서 처리합니다.</div>'},
+    {tab:'마지막',title:'함께 만드는 <em>쾌적한 시설</em>',html:'<p class="jgb-v188-last">“안전한 시설, 쾌적한 환경,<br>고객의 만족이 우리의 보람입니다.”</p><div class="jgb-v188-tip">🌱 작은 누수도 놓치지 않고 꼼꼼하게 관리하겠습니다.</div>'}
   ];
   let page=0,busy=false;
   function draw(mode){
-    const el=document.getElementById('jgbV188BookPage'), c=document.getElementById('jgbV188BookContent'), t=document.getElementById('jgbV188BookTabs');
-    if(!el||!c)return;
+    const el=document.getElementById('jgbV188BookPage'), c=document.getElementById('jgbV188BookContent'), t=document.getElementById('jgbV188BookTabs'), n=document.getElementById('jgbV188BookCount');
+    if(!el||!c||!t||!n)return;
     if(mode==='out'){busy=true;el.classList.remove('turn-in');el.classList.add('turn-out');setTimeout(()=>draw('in'),330);return;}
-    c.innerHTML='<h3>'+pages[page].title+'</h3>'+pages[page].html;
-    if(t)t.innerHTML='';
+    c.innerHTML='<div class="jgb-v188-page-no">0'+(page+1)+' / 05</div><h3>'+pages[page].title+'</h3>'+pages[page].html;
+    t.innerHTML=pages.map((x,i)=>'<button type="button" class="jgb-v188-tab '+(i===page?'active':'')+'" data-v188-book-index="'+i+'">'+x.tab+'</button>').join('');
+    n.textContent=(page+1)+' / '+pages.length;
     el.classList.remove('turn-out');el.classList.add('turn-in');setTimeout(()=>{el.classList.remove('turn-in');busy=false},360);
   }
-  function go(to){if(busy)return;let next=page+(to==='next'?1:-1);if(next<0||next>=pages.length)return;page=next;draw('out');}
+  function go(to){if(busy)return;let next=page;if(typeof to==='number')next=to;else next=page+(to==='next'?1:-1);if(next<0||next>=pages.length)return;page=next;draw('out');}
   document.addEventListener('click',function(e){
-    const b=e.target.closest('[data-v188-book]');
-    if(b){e.preventDefault();go(b.getAttribute('data-v188-book'));return;}
+    const b=e.target.closest('[data-v188-book]'); if(b){e.preventDefault();go(b.getAttribute('data-v188-book'));return;}
+    const tab=e.target.closest('[data-v188-book-index]'); if(tab){e.preventDefault();go(Number(tab.getAttribute('data-v188-book-index')));return;}
   });
   function init(){draw('in')}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 
-<style id="JGB_V21_LIVE_REGISTER_FINAL">
-/* v21: 실시간 수리 현황 등록 버튼 최종 고정 표시 — 다른 기능은 변경하지 않음 */
-.jgb-v176-live-head{position:relative!important;}
-.jgb-v176-live-head > div:last-child{display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;gap:8px!important;flex-shrink:0!important;position:relative!important;z-index:1000!important;}
-.jgb-v176-live-head .jgb-v178-live-reg-btn{display:inline-flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:1001!important;min-width:104px!important;width:auto!important;height:38px!important;padding:0 13px!important;box-sizing:border-box!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important;border:1px solid #1769bd!important;border-radius:8px!important;background:#1769bd!important;color:#fff!important;font-size:12px!important;font-weight:900!important;cursor:pointer!important;}
-@media(max-width:760px){.jgb-v176-live-head{flex-wrap:wrap!important}.jgb-v176-live-head > div:last-child{width:100%!important;justify-content:flex-end!important}.jgb-v176-live-head .jgb-v178-live-reg-btn{min-width:110px!important}}
+<style id="JGB_V189_LIVE_NOTEBOOK">
+/* v189: 수첩을 LIVE 수리영역 내부로 이동. 기존 LIVE/누수 지도 기능은 유지 */
+.jgb-v189-live-notebook{margin:10px 8px 0;border:1px solid #d4e2ec;border-radius:12px;background:linear-gradient(180deg,#f4f9fc,#edf5f9);padding:8px;box-shadow:0 5px 14px rgba(25,60,85,.06);}
+.jgb-v189-book-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 4px 7px;color:#1d587e;}
+.jgb-v189-book-head span{font-size:10px;font-weight:950}.jgb-v189-book-head small{font-size:8px;color:#8296a5;}
+.jgb-v189-book{min-height:225px!important;grid-template-columns:72px minmax(0,1fr)!important;}
+.jgb-v189-book .jgb-v188-cover{padding:20px 8px 12px!important;border-radius:9px 3px 3px 9px!important;}
+.jgb-v189-book .jgb-v188-cover .book-drop{font-size:22px!important;margin-bottom:7px!important}.jgb-v189-book .jgb-v188-cover b{font-size:10px!important}.jgb-v189-book .jgb-v188-cover span{font-size:7px!important;margin-top:6px!important;}
+.jgb-v189-book .jgb-v188-rings{left:64px!important;top:9px!important;bottom:9px!important;width:14px!important}.jgb-v189-book .jgb-v188-rings i{width:11px;height:6px;border-width:2px;}
+.jgb-v189-book .jgb-v188-page{min-height:225px!important;padding:18px 25px 12px 28px!important;}
+.jgb-v189-book .jgb-v188-page h3{font-size:13px!important;margin:5px 0 7px!important;line-height:1.3}.jgb-v189-book .jgb-v188-page p{font-size:8px!important;line-height:1.55!important}.jgb-v189-book .jgb-v188-page .formula{font-size:9px!important;margin-top:9px!important;padding:6px 8px!important}.jgb-v189-book .jgb-v188-tip{font-size:8px!important;margin-top:9px!important;padding:7px 8px!important}.jgb-v189-book .jgb-v188-note{font-size:6px!important;right:25px!important;top:6px!important}.jgb-v189-book .jgb-v188-tabs{top:22px!important}.jgb-v189-book .jgb-v188-tab{font-size:6px!important;padding:4px 5px!important}.jgb-v189-book .jgb-v188-bottom{height:32px!important;gap:7px!important}.jgb-v189-book .jgb-v188-nav{width:24px;height:24px;font-size:13px}.jgb-v189-book .jgb-v188-count{font-size:8px;min-width:28px}
+.jgb-v189-empty-page{height:135px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.jgb-v189-worker{position:relative;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#eef7ff,#fff);border:1px solid #d8e7f1;margin-bottom:7px}.jgb-v189-worker span{font-size:27px}.jgb-v189-worker i{position:absolute;right:-3px;bottom:0;width:15px;height:15px;border-radius:50%;background:#e6f8ee;color:#15945e;border:2px solid #fff;font-size:8px;font-style:normal;font-weight:950;display:flex;align-items:center;justify-content:center}.jgb-v189-empty-page p{font-size:9px!important;color:#8093a2!important;margin:0!important;line-height:1.5!important}.jgb-v189-green{margin-top:9px;padding:6px 8px;border-radius:8px;background:#eaf8f2;color:#247653;font-size:7px;font-weight:900;line-height:1.45}
+@media(max-width:900px){.jgb-v189-book-head small{display:none}.jgb-v189-book{grid-template-columns:68px minmax(0,1fr)!important}.jgb-v189-book .jgb-v188-rings{left:60px!important}.jgb-v189-book .jgb-v188-page{padding-left:22px!important;padding-right:20px!important}.jgb-v189-book .jgb-v188-tabs{display:none}}
 </style>
 
-<style id="JGB_EAM_3D_LAYOUT_FINAL">
-.eam228-page{height:calc(100vh - 18px)!important;min-height:760px!important;overflow:hidden!important}
-.eam228-main{grid-template-columns:minmax(0,7fr) minmax(360px,3fr)!important;gap:10px!important;min-height:0!important}
-.eam228-map-card,.eam228-right-card{min-height:0!important;height:100%!important}
-.eam228-map-wrap{padding:8px!important;min-height:0!important;height:100%!important;box-sizing:border-box!important}
-.eam228-map.jgb3-map{position:relative!important;height:100%!important;min-height:0!important;overflow:hidden!important;border-radius:10px!important;background:linear-gradient(145deg,#eaf3f7,#d5e4ea)!important;border:2px solid #718f9f!important;box-shadow:inset 0 0 30px rgba(30,70,90,.12),0 7px 15px rgba(30,70,90,.15)!important}
-.jgb3-court-area{position:absolute!important;left:1.5%!important;right:1.5%!important;top:1.5%!important;height:35%!important;padding:22px 10px 10px!important;box-sizing:border-box!important;border:1px solid #7898a8!important;border-radius:10px!important;background:linear-gradient(145deg,#f8fcfd,#dceaf0)!important;box-shadow:inset 0 1px 0 #fff,0 5px 12px rgba(40,70,85,.12)!important}
-.jgb3-court-area>strong{position:absolute!important;top:5px!important;left:50%!important;transform:translateX(-50%)!important;font-size:11px!important;color:#486d80!important;white-space:nowrap!important}
-.eam228-courts.jgb3-courts{position:static!important;width:100%!important;height:100%!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important}
-.eam228-court.jgb3-court{position:relative!important;display:block!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:1px solid #55788b!important;border-radius:8px!important;background:linear-gradient(145deg,#f8fdff,#c9dce4)!important;box-shadow:0 6px 10px rgba(28,62,78,.2),inset 0 1px 0 #fff!important;overflow:hidden!important;cursor:pointer!important}
-.jgb3-court-inner{position:absolute!important;left:15%!important;right:15%!important;top:8%!important;bottom:8%!important;border:1px solid #5c8193!important;background:linear-gradient(90deg,#e5f0f4,#f8fcfd,#d7e7ed)!important}
-.jgb3-court-inner:before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;transform:translateY(-50%);background:linear-gradient(#334f5e,#9db0b9,#334f5e)!important;box-shadow:0 2px 4px rgba(0,0,0,.28)!important;z-index:3}
-.jgb3-court-inner:after{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:#638696!important}
-.jgb3-net{display:block!important;position:absolute!important;left:-5px!important;right:-5px!important;top:50%!important;height:4px!important;z-index:4!important;background:transparent!important}
-.jgb3-center{display:none!important}
-.jgb3-service{position:absolute!important;left:0!important;right:0!important;height:1px!important;background:#7192a0!important;z-index:2!important}.jgb3-service.s1{top:30%!important}.jgb3-service.s2{bottom:30%!important}
-.jgb3-court-inner>span{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:30px!important;height:30px!important;border-radius:50%!important;display:grid!important;place-items:center!important;background:radial-gradient(circle at 35% 30%,#fff,#dce9ee)!important;border:1px solid #819ba7!important;box-shadow:0 4px 8px rgba(20,50,65,.24)!important;color:#1b4257!important;font-size:13px!important;font-weight:950!important;z-index:5!important}
-.jgb3-facility-area{position:absolute!important;left:1.5%!important;right:1.5%!important;top:38%!important;bottom:1.5%!important;display:grid!important;grid-template-rows:27% 31% 7% 35%!important;gap:0!important;overflow:hidden!important;border:1px solid #7795a4!important;background:#eef5f7!important}
-.jgb3-roof{display:grid!important;grid-template-columns:4fr 1.2fr .6fr!important;gap:6px!important;padding:7px!important;box-sizing:border-box!important;background:linear-gradient(#eaf4f7,#d9e8ed)!important}
-.jgb3-roof button{border:1px solid #7f9daa!important;border-radius:7px!important;background:linear-gradient(145deg,#f9fcfd,#d8e7ed)!important;color:#355c70!important;box-shadow:inset 0 1px #fff,0 3px 7px rgba(40,70,85,.12)!important;font-weight:900!important;cursor:pointer!important}
-.jgb3-roof span{display:flex!important;align-items:center!important;justify-content:center!important;color:#687f8b!important;font-size:9px!important}
-.jgb3-row1{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:4px!important;padding:5px!important;background:#e9f1f4!important;border-top:1px solid #8ca5b1!important;border-bottom:1px solid #8ca5b1!important}
-.jgb3-room{min-width:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;border:1px solid #91a9b5!important;border-radius:5px!important;background:linear-gradient(145deg,#f8fcfd,#d8e6eb)!important;color:#31576a!important;cursor:pointer!important;box-shadow:inset 0 1px #fff!important}
-.jgb3-room.pink{background:linear-gradient(145deg,#fffafd,#f0dfe5)!important}
-.jgb3-room b{font-size:11px!important}.jgb3-room small{font-size:7px!important;margin-top:3px!important;color:#748995!important}
-.jgb3-corridor{width:100%!important;border:0!important;border-top:1px solid #a69268!important;border-bottom:1px solid #a69268!important;background:linear-gradient(#f5ecd9,#e7dcc4)!important;color:#76633e!important;font-size:11px!important;font-weight:900!important;cursor:pointer!important}
-.jgb3-bottom{display:grid!important;grid-template-columns:1fr 2.8fr 1fr!important;gap:5px!important;padding:6px!important;box-sizing:border-box!important;background:#e5eef2!important}
-.jgb3-bottom .water{background:linear-gradient(145deg,#fffbea,#e7db9c)!important;border:2px solid #aa9854!important;box-shadow:0 5px 10px rgba(100,85,30,.15)!important}.jgb3-bottom .water b{font-size:15px!important;color:#5d5427!important}.jgb3-bottom .water small{font-size:8px!important}
-.eam228-entry{z-index:30!important}.eam228-entry.main{right:0!important;top:54%!important}.eam228-entry.court{right:11%!important;top:40%!important}
-.eam228-asset{z-index:50!important}
-@media(max-width:1000px){.eam228-main{grid-template-columns:1fr!important;overflow:auto!important}.eam228-page{overflow:auto!important}.eam228-map-card{min-height:650px!important}.eam228-right{min-height:500px!important}}
-</style>
-<script id="JGB_EAM_V5_RENDER_WATCHDOG">
+
+
+
+<script id="JGB_EAM_ICON_MOVE_DELETE_V243">
 (function(){
-  function retry(){
-    try{
-      var app=document.getElementById('app');
-      if(app && !app.innerHTML.trim() && typeof window.render==='function') window.render();
-    }catch(e){ console.error('EAM render retry failed',e); }
+'use strict';
+if(window.__JGB_EAM_ICON_V243)return;
+window.__JGB_EAM_ICON_V243=true;
+
+const POS='JGB_EAM_DASH_MAP_POS_V228';
+const DEL='JGB_EAM_DASH_MAP_DELETED_V241';
+const V=x=>String(x??'').trim();
+
+function read(k,d){
+  try{
+    const raw=localStorage.getItem(k);
+    if(!raw)return d;
+    const x=JSON.parse(raw);
+    return x==null?d:x;
+  }catch(_){return d}
+}
+function write(k,v){
+  try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}
+}
+function deletedSet(){
+  const a=read(DEL,[]);
+  return new Set((Array.isArray(a)?a:[]).map(V).filter(Boolean));
+}
+
+/* 커서가 아이콘의 어느 지점을 잡았는지 기억해 아이콘 중심이 코트까지 정확히 따라가도록 한다. */
+let drag=null;
+
+function mapPoint(ev,map,offsetX,offsetY,el){
+  const r=map.getBoundingClientRect();
+  const w=map.clientWidth||r.width;
+  const h=map.clientHeight||r.height;
+
+  /* 배치 가능 영역 = 화면에 보이는 전체 배치도.
+     코트/시설 영역을 별도 제한하지 않는다. */
+  let px=ev.clientX-r.left-offsetX;
+  let py=ev.clientY-r.top-offsetY;
+
+  /* 아이콘 중심이 지도 안에 있도록 최소한의 경계만 적용 */
+  const ew=el?.offsetWidth||0;
+  const eh=el?.offsetHeight||0;
+  px=Math.max(-ew*0.25,Math.min(w-ew*0.75,px));
+  py=Math.max(-eh*0.25,Math.min(h-eh*0.75,py));
+
+  return [(px/w)*100,(py/h)*100];
+}
+
+document.addEventListener('pointerdown',function(ev){
+  if(ev.button!==0)return;
+
+  const el=ev.target.closest?.('#eam228Map .eam228-asset');
+  if(!el)return;
+
+  const map=el.closest('#eam228Map');
+  if(!map)return;
+
+  const er=el.getBoundingClientRect();
+
+  drag={
+    el:el,
+    map:map,
+    id:ev.pointerId,
+    code:V(el.dataset.code||''),
+    sx:ev.clientX,
+    sy:ev.clientY,
+    grabX:ev.clientX-er.left,
+    grabY:ev.clientY-er.top,
+    moved:false
+  };
+
+  try{el.setPointerCapture(ev.pointerId)}catch(_){}
+
+  /* 클릭인지 드래그인지 판단할 때까지는 기존 onclick을 방해하지 않는다. */
+},true);
+
+document.addEventListener('pointermove',function(ev){
+  if(!drag||ev.pointerId!==drag.id)return;
+
+  const dx=ev.clientX-drag.sx;
+  const dy=ev.clientY-drag.sy;
+
+  if(!drag.moved){
+    if(Math.hypot(dx,dy)<4)return;
+    drag.moved=true;
+    drag.el.classList.add('dragging');
+    drag.el.style.pointerEvents='none';
+    drag.el.style.zIndex='9999';
+    document.body.style.userSelect='none';
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){setTimeout(retry,250);}, {once:true});
-  else setTimeout(retry,250);
+
+  ev.preventDefault();
+  ev.stopPropagation();
+
+  const [x,y]=mapPoint(ev,drag.map,drag.grabX,drag.grabY,drag.el);
+  drag.el.style.left=x.toFixed(2)+'%';
+  drag.el.style.top=y.toFixed(2)+'%';
+},true);
+
+function finish(ev){
+  if(!drag||ev.pointerId!==drag.id)return;
+
+  const d=drag;
+  drag=null;
+
+  d.el.classList.remove('dragging');
+  d.el.style.pointerEvents='auto';
+  d.el.style.zIndex='';
+  document.body.style.userSelect='';
+
+  /* 이동하지 않은 경우에는 AC-01 자동 클릭 등 기존 기능 그대로 */
+  if(!d.moved)return;
+
+  const [x,y]=mapPoint(ev,d.map,d.grabX,d.grabY,d.el);
+
+  d.el.style.left=x.toFixed(2)+'%';
+  d.el.style.top=y.toFixed(2)+'%';
+
+  const pos=read(POS,{});
+  pos[d.code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+
+  if(!write(POS,pos)){
+    alert('아이콘 위치 저장에 실패했습니다.');
+  }
+
+  /* 이동한 자산은 삭제 상태가 아니므로 다시 표시 가능 */
+  const ds=deletedSet();
+  ds.delete(d.code);
+  write(DEL,[...ds]);
+
+  /* 중요: pointerup에서 전체 render()를 하지 않는다.
+     render()가 지도 DOM을 통째로 교체하면 코트 위 배치가 끊길 수 있다. */
+  ev.preventDefault();
+  ev.stopPropagation();
+}
+
+document.addEventListener('pointerup',finish,true);
+document.addEventListener('pointercancel',finish,true);
+
+/* 아이콘 제거: 자산 자체는 건드리지 않음 */
+window.eam228RemoveIcon=function(code){
+  const c=V(code);
+  if(!c)return;
+
+  if(!confirm(`${c} 배치 아이콘만 제거할까요?\n자산 자체는 삭제되지 않습니다.`))return;
+
+  const pos=read(POS,{});
+  delete pos[c];
+  write(POS,pos);
+
+  const ds=deletedSet();
+  ds.add(c);
+  write(DEL,[...ds]);
+
+  document.querySelector(`#eam228Map .eam228-asset[data-code="${CSS.escape(c)}"]`)?.remove();
+};
 })();
 </script>
+
+
+<style id="v14-court-final">
+/* 코트 배치도: 코트를 위로 올리고 크게, 하부 시설 영역은 압축 */
+.eam228-map{
+  position:relative!important;
+}
+.eam228-courts{
+  position:absolute!important;
+  left:4%!important;
+  right:4%!important;
+  top:0%!important;
+  height:36%!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+.eam228-courts strong{
+  top:0!important;
+  font-size:10px!important;
+}
+.eam228-court{
+  margin-top:14px!important;
+  min-height:0!important;
+}
+.eam228-court span{
+  width:34px!important;
+  height:34px!important;
+  font-size:16px!important;
+}
+.eam228-facility{
+  position:absolute!important;
+  left:1.5%!important;
+  right:1.5%!important;
+  top:39%!important;
+  bottom:1.5%!important;
+  grid-template-rows:10% 34% 10% 46%!important;
+}
+</style>
+
+
+<style id="v15-court-only-shrink">
+/* v15: 코트만 약 1/3 크기로 축소. 배치도 전체 영역/자산 아이콘 영역은 유지 */
+.eam228-courts{
+  top:0%!important;
+  height:13%!important;
+  left:4%!important;
+  right:4%!important;
+  gap:8px!important;
+}
+.eam228-court{
+  margin-top:8px!important;
+}
+.eam228-court span{
+  width:30px!important;
+  height:30px!important;
+  font-size:15px!important;
+}
+.eam228-courts strong{
+  font-size:10px!important;
+}
+</style>
+
+
+<style id="v16-asset-map-layer">
+/* v16: 자산 아이콘은 시설영역이 아니라 전체 배치도 좌표를 기준으로 배치 */
+#eam228Map > .eam228-asset{
+  position:absolute!important;
+  z-index:100!important;
+}
+#eam228Map > .eam228-empty-map{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+}
+</style>
+
+
+<style id="v17-court-assignment-width">
+/* v17: 코트 배정 화면의 좌우 폭에 맞춰 코트 카드 폭만 조정 */
+.eam228-courts{
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,138px)!important;
+  justify-content:center!important;
+  gap:18px!important;
+}
+.eam228-court{
+  width:138px!important;
+  box-sizing:border-box!important;
+}
+</style>
+
+
+<style id="v18-court-full-width">
+/* v18: 가운데 고정 폭이 아니라 배치도 좌우 폭을 거의 전부 사용 */
+.eam228-courts{
+  left:0.5%!important;
+  right:0.5%!important;
+  width:99%!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  justify-content:stretch!important;
+  gap:8px!important;
+  box-sizing:border-box!important;
+}
+.eam228-court{
+  width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+</style>
+
+
+<style id="v19-court-gap-tight">
+/* v19: 코트 아래 빈 공간을 크게 줄이고 하부 시설을 위로 당김 */
+.eam228-facility{
+  top:18%!important;
+  bottom:1.5%!important;
+}
+</style>
+
+
+<style id="v20-leak-map-size">
+/* v20: 누수관리 현황 배치도와 같은 전체 비율(약 923:307 = 3:1)로 강제 */
+.eam228-map-wrap{
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:7px!important;
+  box-sizing:border-box!important;
+  overflow:auto!important;
+}
+.eam228-map{
+  width:100%!important;
+  max-width:923px!important;
+  height:auto!important;
+  aspect-ratio:3 / 1!important;
+  min-height:307px!important;
+  max-height:307px!important;
+  margin:0 auto!important;
+  box-sizing:border-box!important;
+}
+/* 코트/시설은 새 전체 좌표 영역 안에서 자동으로 재배치 */
+.eam228-courts{
+  top:1%!important;
+  height:22%!important;
+  left:.5%!important;
+  right:.5%!important;
+  width:99%!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+.eam228-facility{
+  top:25%!important;
+  bottom:1.5%!important;
+}
+</style>
+
+
+<style id="v21-leak-layout-force">
+/* v21: 누수관리 현황의 컴팩트한 배치도 크기를 좌/우 모두 동일하게 적용 */
+.eam228-main{
+  height:307px!important;
+  min-height:307px!important;
+  max-height:307px!important;
+  flex:0 0 307px!important;
+  align-items:stretch!important;
+}
+.eam228-map-card,
+.eam228-right-card{
+  height:307px!important;
+  min-height:307px!important;
+  max-height:307px!important;
+}
+.eam228-map-wrap{
+  height:256px!important;
+  min-height:256px!important;
+  max-height:256px!important;
+  flex:0 0 256px!important;
+  box-sizing:border-box!important;
+}
+.eam228-map{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+}
+.eam228-right{
+  height:307px!important;
+  min-height:307px!important;
+  max-height:307px!important;
+}
+.eam228-right-card{
+  overflow:hidden!important;
+}
+.eam228-live-body{
+  min-height:0!important;
+  max-height:255px!important;
+  overflow:auto!important;
+}
+</style>
+
+
+<style id="v22-vertical-badminton-court">
+/* v22
+   전체 배치도 크기/좌표계/자산 아이콘 기능은 유지.
+   코트 모델만 세로형 배드민턴 코트로 변경.
+*/
+.eam228-courts{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:8px!important;
+  align-items:start!important;
+}
+
+.eam228-court{
+  position:relative!important;
+  width:100%!important;
+  height:100px!important;
+  min-height:100px!important;
+  max-height:100px!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+  border:1px solid #7894a8!important;
+  border-radius:6px!important;
+  background:linear-gradient(90deg,#eef5f8,#dce9ee 50%,#eef5f8)!important;
+  box-shadow:0 2px 5px rgba(0,0,0,.10)!important;
+}
+
+/* 실제 코트 라인 */
+.eam228-court::before{
+  content:""!important;
+  position:absolute!important;
+  left:17%!important;
+  right:17%!important;
+  top:14%!important;
+  bottom:14%!important;
+  border:1px solid #7894a8!important;
+  background:
+    linear-gradient(to right,
+      transparent 49.5%,
+      #7894a8 49.5%,
+      #7894a8 50.5%,
+      transparent 50.5%)!important;
+  box-sizing:border-box!important;
+}
+
+/* 가운데 네트 */
+.eam228-court::after{
+  content:""!important;
+  position:absolute!important;
+  left:4%!important;
+  right:4%!important;
+  top:49%!important;
+  height:2px!important;
+  background:#526f80!important;
+  box-shadow:0 0 2px rgba(0,0,0,.25)!important;
+  z-index:2!important;
+}
+
+/* 코트 번호 */
+.eam228-court span{
+  position:absolute!important;
+  left:50%!important;
+  top:49%!important;
+  transform:translate(-50%,-50%)!important;
+  z-index:5!important;
+  width:32px!important;
+  height:32px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:50%!important;
+  background:#f7fbfd!important;
+  border:1px solid #7894a8!important;
+  box-shadow:0 2px 7px rgba(0,0,0,.16)!important;
+  font-size:15px!important;
+  font-weight:700!important;
+}
+
+/* 코트 제목은 기존 기능/텍스트를 유지하되 상단 중앙 */
+.eam228-courts > .eam228-court > strong{
+  position:absolute!important;
+  top:-9px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  z-index:6!important;
+  white-space:nowrap!important;
+  font-size:10px!important;
+}
+</style>
+
+
+<style id="v23-half-half-layout">
+/* v23: 누수관리 현황처럼 좌측 배치도 / 우측 수리 LIVE를 정확히 50:50 */
+.eam228-main{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:10px!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.eam228-main > *{
+  width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+.eam228-map-card,
+.eam228-right-card{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+</style>
+
+
+<style id="v24-true-half-layout">
+.eam228-main{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  column-gap:10px!important;
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+.eam228-main > .eam228-map-card,
+.eam228-main > .eam228-right-card{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+.eam228-map-wrap,
+.eam228-map{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+</style>
+
+
+<style id="v25-full-width-layout">
+/* v25: 좌우 50%가 아니라 배치도 전체를 가로 100% 사용 */
+.eam228-main{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+.eam228-map-card{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+.eam228-map-wrap,
+.eam228-map{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+.eam228-right-card{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+  margin-top:10px!important;
+}
+</style>
+
+
+<style id="v26-remove-bottom-space">
+/* v26: 화면 전체 높이 강제 제거 — 콘텐츠가 끝나는 곳에서 배치도/수리 LIVE 영역 종료 */
+html, body {
+  min-height: auto !important;
+  height: auto !important;
+}
+body {
+  overflow-y: auto !important;
+}
+.eam228-main {
+  min-height: 0 !important;
+  height: auto !important;
+  align-items: start !important;
+}
+.eam228-map-card,
+.eam228-right-card,
+.eam228-map-wrap,
+.eam228-map {
+  min-height: 0 !important;
+  height: auto !important;
+}
+</style>
+
+
+<style id="EAM_V33_FINAL_LAYOUT">
+/* v33: 누수현황과 동일한 전체 세로 사용 + EAM 68:32 */
+.eam228-page{
+  height:100vh!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+.eam228-main{
+  height:auto!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,68fr) minmax(0,32fr)!important;
+  gap:9px!important;
+  align-items:stretch!important;
+}
+.eam228-map-card,
+.eam228-right,
+.eam228-right-card{
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+}
+.eam228-map-card,
+.eam228-right-card{
+  align-self:stretch!important;
+}
+.eam228-map-wrap,
+.eam228-live-body{
+  min-height:0!important;
+}
+.eam228-map{
+  height:100%!important;
+  min-height:0!important;
+}
+@media(max-width:1000px){
+  .eam228-main{
+    grid-template-columns:1fr!important;
+  }
+}
+</style>
+
 </body>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
@@ -13496,6 +14033,40 @@ window.eamDeleteSelectedAsset=async function(){
 @media(max-width:700px){.jgb-v188-book{grid-template-columns:88px minmax(0,1fr)}.jgb-v188-rings{left:77px}.jgb-v188-cover{padding:20px 8px}.jgb-v188-cover b{font-size:12px}.jgb-v188-page{padding:22px 25px 50px 28px}.jgb-v188-page h3{font-size:16px}.jgb-v188-page p{font-size:10px}.jgb-v188-tabs{display:none}.jgb-v188-note{display:none}}
 </style>
 
+<style id="JGB_V192_NOTEBOOK_TEXT">
+/* v192: LIVE 안내 수첩 글씨 확대 - 내용이 한눈에 보이도록 */
+.jgb-v189-live-notebook{padding:10px!important;margin-top:10px!important;}
+.jgb-v189-book-head{padding:3px 6px 9px!important;}
+.jgb-v189-book-head span{font-size:13px!important;font-weight:950!important;}
+.jgb-v189-book-head small{font-size:10px!important;}
+.jgb-v189-book{min-height:275px!important;}
+.jgb-v189-book .jgb-v188-cover{padding:22px 9px 14px!important;}
+.jgb-v189-book .jgb-v188-cover .book-drop{font-size:27px!important;margin-bottom:9px!important;}
+.jgb-v189-book .jgb-v188-cover b{font-size:12px!important;line-height:1.45!important;}
+.jgb-v189-book .jgb-v188-cover span{font-size:9px!important;line-height:1.55!important;margin-top:8px!important;}
+.jgb-v189-book .jgb-v188-page{min-height:275px!important;padding:22px 30px 44px 32px!important;}
+.jgb-v189-book .jgb-v188-page-no{font-size:11px!important;}
+.jgb-v189-book .jgb-v188-page h3{font-size:18px!important;margin:7px 0 10px!important;line-height:1.4!important;color:#183d5d!important;}
+.jgb-v189-book .jgb-v188-page p{font-size:11px!important;line-height:1.7!important;color:#526f83!important;max-width:none!important;}
+.jgb-v189-book .jgb-v188-page .formula{font-size:12px!important;margin-top:12px!important;padding:8px 10px!important;}
+.jgb-v189-book .jgb-v188-tip{font-size:10px!important;line-height:1.65!important;margin-top:12px!important;padding:9px 10px!important;}
+.jgb-v189-book .jgb-v188-last{font-size:14px!important;line-height:1.7!important;}
+.jgb-v189-book .jgb-v188-bottom{height:36px!important;gap:8px!important;}
+.jgb-v189-book .jgb-v188-nav{width:28px!important;height:28px!important;font-size:16px!important;}
+.jgb-v189-book .jgb-v188-count{font-size:10px!important;min-width:34px!important;}
+.jgb-v189-book .jgb-v188-tabs{top:25px!important;}
+.jgb-v189-book .jgb-v188-tab{font-size:8px!important;padding:5px 6px!important;}
+@media(max-width:900px){
+  .jgb-v189-book{min-height:270px!important;grid-template-columns:68px minmax(0,1fr)!important;}
+  .jgb-v189-book .jgb-v188-page{min-height:270px!important;padding:20px 18px 42px 22px!important;}
+  .jgb-v189-book .jgb-v188-page h3{font-size:16px!important;}
+  .jgb-v189-book .jgb-v188-page p{font-size:10px!important;}
+  .jgb-v189-book .jgb-v188-page .formula{font-size:11px!important;}
+  .jgb-v189-book .jgb-v188-tip{font-size:9px!important;}
+  .jgb-v189-book .jgb-v188-cover b{font-size:10px!important;}
+  .jgb-v189-book .jgb-v188-cover span{font-size:8px!important;}
+}
+</style>
 <style>
 /* v218: 시설 배치 비율 조정 — 복도 축소, 상부/화장실 행 비율 교정 */
 .jgb-v190-facilities{grid-template-rows:28% 18% 54%!important}
@@ -13524,92 +14095,283 @@ window.eamDeleteSelectedAsset=async function(){
   min-height:0!important;
 }
 </style>
-<style id="JGB_V17_LIVE_REGISTER_VISIBLE">
-/* v17: 실시간 수리 현황 직접입력 버튼 강제 노출 */
-.jgb-v176-live-head > div:last-child{display:flex!important;align-items:center!important;gap:8px!important;visibility:visible!important;opacity:1!important;}
-.jgb-v176-live-head .jgb-v178-live-reg-btn{
-  display:inline-flex!important;
-  visibility:visible!important;
-  opacity:1!important;
-  align-items:center!important;
-  justify-content:center!important;
-  min-width:92px!important;
-  height:36px!important;
+
+<style id="v32-eam-layout-benchmark">
+/* v32: EAM 현황판 전체 크기만 누수현황 레이아웃처럼 맞춤.
+   배치도 68% / 수리 LIVE 32%. 두 영역의 상단·하단을 동일하게 유지.
+   기존 v26 기능/좌표/아이콘/LIVE 동작은 변경하지 않음. */
+.eam228-main{
+  display:grid!important;
+  grid-template-columns:minmax(0,68fr) minmax(0,32fr)!important;
+  column-gap:10px!important;
+  width:100%!important;
+  max-width:none!important;
+  flex:1 1 0!important;
+  height:auto!important;
+  min-height:0!important;
+  align-items:stretch!important;
   box-sizing:border-box!important;
-  border:1px solid #1769bd!important;
-  border-radius:8px!important;
-  background:#1769bd!important;
-  color:#fff!important;
-  font-size:12px!important;
-  font-weight:900!important;
-  cursor:pointer!important;
-  position:relative!important;
-  z-index:999!important;
+}
+.eam228-main > .eam228-map-card,
+.eam228-main > .eam228-right-card{
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0!important;
+  align-self:stretch!important;
+  box-sizing:border-box!important;
+}
+.eam228-map-card{
+  display:flex!important;
+  flex-direction:column!important;
+}
+.eam228-right{
+  height:100%!important;
+  min-height:0!important;
+}
+.eam228-map-wrap{
+  flex:1 1 auto!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  box-sizing:border-box!important;
+}
+.eam228-map{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  box-sizing:border-box!important;
+}
+.eam228-right-card{
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+.eam228-live-body{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:auto!important;
+}
+@media(max-width:1000px){
+  .eam228-main{
+    grid-template-columns:1fr!important;
+    flex:0 0 auto!important;
+    height:auto!important;
+  }
+  .eam228-main > .eam228-map-card,
+  .eam228-main > .eam228-right-card{
+    height:auto!important;
+  }
 }
 </style>
 
-<style id="JGB_V33_LEAK_5050_SLIDER">
-/* v33: 누수관리 메인 좌/우 영역 50:50 고정 + 가로 스크롤 */
-.jgb-v47-wrap{overflow-x:auto!important;overflow-y:visible!important;scrollbar-width:auto!important;}
-.jgb-v47-grid{grid-template-columns:minmax(620px,1fr) minmax(620px,1fr)!important;min-width:1240px!important;gap:12px!important;}
-.jgb-v47-map,.jgb-v47-table{min-width:0!important;box-sizing:border-box!important;}
-/* 작은 화면에서도 50:50 비율을 유지하고 아래 가로 스크롤 사용 */
-@media(max-width:1250px){.jgb-v47-wrap{padding-bottom:8px!important}.jgb-v47-grid{grid-template-columns:620px 620px!important;width:1252px!important;}}
-/* 수첩 확대 기능 제거: 표지는 일반 표시만 하고 화면 확대/오버레이를 사용하지 않음 */
-.jgb-nb30-open{position:relative!important;left:auto!important;top:auto!important;transform:none!important;width:auto!important;height:auto!important;z-index:auto!important;margin:0 8px!important;padding:10px!important;border:1px solid #d4e2ec!important;border-radius:12px!important;background:linear-gradient(180deg,#f4f9fc,#edf5f9)!important;box-shadow:5px 14px 14px rgba(25,60,85,.06)!important;overflow:hidden!important;}
-.jgb-nb30-open:before{display:none!important;}
-.jgb-nb30-open .jgb-nb30-cover-wrap{height:285px!important;grid-template-columns:145px minmax(0,1fr)!important;}
-.jgb-nb30-open .jgb-nb30-cover{cursor:default!important;}
-.jgb-nb30-open .jgb-nb30-hint{font-size:10px!important;bottom:10px!important;}
-.jgb-nb30-open .jgb-nb30-page{padding:35px 42px 48px!important;}
-.jgb-nb30-open .jgb-nb30-page h3{font-size:19px!important;margin:8px 0 10px!important;}
-.jgb-nb30-open .jgb-nb30-page p{font-size:11px!important;line-height:1.75!important;}
-.jgb-nb30-open .jgb-nb30-close{display:none!important;}
-.jgb-nb30-open .jgb-nb30-tabs{display:flex!important;}
+<style id="EAM_HYUNHWANG_COURT_VERTICAL_V1">
+/* EAM 현황 전용: 크기/세로 배분만 조정. 기능/기존 디자인/전체 가로 비율은 변경하지 않음. */
+.eam228-main{
+  /* 기존 EAM 현황 좌우 통합 비율은 유지 */
+  align-items:stretch!important;
+}
+.eam228-map-card,.eam228-right,.eam228-right-card{
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  align-self:stretch!important;
+}
+.eam228-map-wrap{
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  box-sizing:border-box!important;
+}
+.eam228-map{
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+  box-sizing:border-box!important;
+}
+/* 코트 5개 영역: 도면 세로의 30% */
+.eam228-courts{
+  top:2%!important;
+  height:30%!important;
+  left:7.5%!important;
+  right:7.5%!important;
+  width:auto!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:7px!important;
+  align-items:stretch!important;
+  box-sizing:border-box!important;
+}
+/* 5개 코트의 상단/하단을 정확히 동일선으로 정렬 */
+.eam228-court{
+  width:100%!important;
+  height:calc(100% - 13px)!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin-top:13px!important;
+  box-sizing:border-box!important;
+  align-self:stretch!important;
+}
+/* 코트 번호도 각 코트의 동일한 중앙에 유지 */
+.eam228-court span{
+  top:50%!important;
+}
+/* 코트 확대에 맞춰 하부 시설 영역을 30% 이후부터 시작하여 유수장치실 등 세로 공간을 압축 */
+.eam228-facility{
+  top:32%!important;
+  bottom:1.5%!important;
+  grid-template-rows:10% 34% 8% 48%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+}
+/* 오른쪽 LIVE는 도면 카드와 같은 외곽 높이로 함께 이동 */
+.eam228-right-card{
+  height:100%!important;
+  min-height:0!important;
+}
+.eam228-live-body{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:none!important;
+}
+@media(max-width:1000px){
+  .eam228-main{grid-template-columns:1fr!important;}
+}
 </style>
 
-<style id="JGB_V36_REPAIR_ORDER">
-/* v36: EAM 오른쪽 영역만 순서 교정 — 위 수리 LIVE / 아래 수리 내역, 50:50 고정 */
-.jgb-v36-repair-split{display:grid!important;grid-template-rows:minmax(0,1fr) minmax(0,1fr)!important;height:100%!important;min-height:0!important;gap:8px!important;}
-.jgb-v36-repair-split>*{min-height:0!important;max-height:none!important;overflow:auto!important;box-sizing:border-box!important;}
-.jgb-v36-repair-split .jgb-v176-live-card{order:1!important;height:auto!important;min-height:0!important;}
-.jgb-v36-repair-split .jgb-v36-history-card{order:2!important;height:auto!important;min-height:0!important;}
-</style>
-<script id="JGB_V36_REPAIR_ORDER_JS">
-(function(){
-  function txt(el){return (el?.textContent||'').replace(/\\s+/g,' ').trim();}
-  function findCardByHeading(words){
-    const all=document.querySelectorAll('section,aside,div');
-    for(const el of all){
-      const t=txt(el);
-      if(!t || t.length>120) continue;
-      if(words.some(w=>t.includes(w))){
-        const h=el.querySelector('h1,h2,h3,h4');
-        if(h && words.some(w=>txt(h).includes(w))) return el;
-      }
-    }
-    return null;
-  }
-  function apply(){
-    const live=document.querySelector('.jgb-v176-live-card') || findCardByHeading(['수리 LIVE']);
-    if(!live) return;
-    let parent=live.parentElement;
-    if(!parent) return;
-    let history=findCardByHeading(['수리 내역','수리이력','수리 이력']);
-    if(!history || history===live) return;
-    if(history.parentElement!==parent){
-      const common=live.parentElement;
-      if(history.parentElement?.parentElement===common) parent=common;
-      else return;
-    }
-    parent.classList.add('jgb-v36-repair-split');
-    live.classList.add('jgb-v36-live-card');
-    history.classList.add('jgb-v36-history-card');
-    live.style.order='1';
-    history.style.order='2';
-  }
-  function boot(){apply(); let n=0; const timer=setInterval(()=>{apply(); if(++n>20)clearInterval(timer)},300); const ob=new MutationObserver(()=>apply()); ob.observe(document.body,{childList:true,subtree:true});}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
-})();
-</script>
 
+
+<style id="EAM_HYUNHWANG_COURT_VERTICAL_V2">
+/* EAM 현황 v2: 전체 세로 크기만 554px로 고정. 기능/기존 디자인/가로 비율 변경 없음. */
+@media(min-width:1001px){
+  .eam228-page{
+    height:auto!important;
+    min-height:0!important;
+    overflow:visible!important;
+  }
+  .eam228-main{
+    height:554px!important;
+    min-height:554px!important;
+    max-height:554px!important;
+    flex:0 0 554px!important;
+    align-items:stretch!important;
+  }
+  .eam228-main > .eam228-map-card,
+  .eam228-main > .eam228-right{
+    height:554px!important;
+    min-height:554px!important;
+    max-height:554px!important;
+    align-self:stretch!important;
+  }
+  .eam228-main > .eam228-right > .eam228-right-card{
+    height:554px!important;
+    min-height:554px!important;
+    max-height:554px!important;
+  }
+  .eam228-map-wrap{
+    height:510px!important;
+    min-height:510px!important;
+    max-height:510px!important;
+    flex:0 0 510px!important;
+  }
+  .eam228-map{
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+  /* 코트 5개는 도면 내부 세로 30%, 상·하단 동일선 유지 */
+  .eam228-courts{
+    top:2%!important;
+    height:30%!important;
+    align-items:stretch!important;
+  }
+  .eam228-court{
+    height:calc(100% - 13px)!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin-top:13px!important;
+    align-self:stretch!important;
+  }
+  /* 도면과 LIVE는 같은 외곽 세로 크기로 함께 이동 */
+  .eam228-right-card{
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+  }
+  .eam228-live-body{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:auto!important;
+  }
+}
+</style>
+
+
+<style id="EAM_HYUNHWANG_V5_750_SYNC">
+/* v5: EAM 현황 도면/LIVE 세로 750px 동기화. 가로/기능/디자인 변경 없음. */
+@media(min-width:1001px){
+  .eam228-page{
+    height:auto!important;
+    min-height:0!important;
+    overflow:visible!important;
+  }
+  .eam228-main{
+    height:750px!important;
+    min-height:750px!important;
+    max-height:750px!important;
+    flex:0 0 750px!important;
+    align-items:stretch!important;
+  }
+  .eam228-main > .eam228-map-card,
+  .eam228-main > .eam228-right{
+    height:750px!important;
+    min-height:750px!important;
+    max-height:750px!important;
+    align-self:stretch!important;
+    box-sizing:border-box!important;
+  }
+  .eam228-main > .eam228-right > .eam228-right-card{
+    height:750px!important;
+    min-height:750px!important;
+    max-height:750px!important;
+    box-sizing:border-box!important;
+  }
+  .eam228-map-card{
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .eam228-map-wrap{
+    height:704px!important;
+    min-height:704px!important;
+    max-height:704px!important;
+    flex:0 0 704px!important;
+    box-sizing:border-box!important;
+  }
+  .eam228-map{
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    box-sizing:border-box!important;
+  }
+  .eam228-right-card{
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+  }
+  .eam228-live-body{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:auto!important;
+  }
+}
+</style>
