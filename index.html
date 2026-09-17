@@ -3517,37 +3517,7 @@ window.eam228Create=()=>{};
       const markers=markerAssets.map(a=>{const p=getPos(a),st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}" onclick="if(!window.__EAM228_DRAG_SUPPRESS)window.eam228Pick('${attr(code)}')"><span>${catIcon(cat)}</span><b>${esc(code)}</b></button>`}).join('');
       const court=n=>`<button type="button" class="eam228-court" onclick="window.eam228Location('코트 ${n}')"><span>${n}</span></button>`;
       const zone=(label,sub,cls='')=>`<button type="button" class="eam228-zone ${cls}" onclick="window.eam228Location('${attr(label)}')"><b>${esc(label)}</b><small>${esc(sub)}</small></button>`;
-      const map=`<div id="eam228Map" class="eam228-map">
-        <div class="eam228-courts">
-          <strong>코트 구역 · 에어컨 자산</strong>
-          ${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}
-        </div>
-        <div class="eam228-facility">
-          <div class="eam228-roof">
-            <button onclick="window.eam228Location('지붕')"><b>지붕</b><small>2층 상부</small></button>
-            <button onclick="window.eam228Location('옥상')"><b>옥상</b><small>2층 옥상</small></button>
-            <button onclick="window.eam228Location('창고')"><b>옥상 창고</b><small>시설창고</small></button>
-            <span>▲ 계단</span>
-          </div>
-          <div class="eam228-row1">
-            ${zone('샤워실(남)','남자 샤워실')}
-            ${zone('화장실(남)','남자 화장실')}
-            ${zone('탈의실(남)','남자 탈의실')}
-            ${zone('샤워실(여)','여자 샤워실','pink')}
-            ${zone('탈의실(여)','여자 탈의실','pink')}
-            ${zone('화장실(여)','여자 화장실','pink')}
-          </div>
-          <button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button>
-          <div class="eam228-bottom">
-            ${zone('휴게실','휴게공간','small')}
-            ${zone('통합 유수장치실','소방 · 유수 설비','water')}
-            ${zone('사무실','관리 · 운영','small')}
-          </div>
-          <span class="eam228-entry court">코트 출입구</span>
-          <span class="eam228-entry main">주출입문</span>
-          ${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}
-        </div>
-      </div>`;
+      const map=`<div id="eam228Map" class="eam228-map"><div class="eam228-courts"><strong>코트 구역 · 에어컨 자산 6개</strong>${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div><div class="eam228-facility"><div class="eam228-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>창고</b></button><span>▲ 계단</span></div><div class="eam228-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button><div class="eam228-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div></div>`;
 
       const live=readLive().filter(x=>assets.some(a=>codeOf(a)===V(x.asset_code)));
       const liveHtml=live.length?`<table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><button class="eam228-link" onclick="window.eam228Pick('${attr(x.asset_code)}')">${esc(x.asset_code)}</button></td><td>${esc(x.content||'-')}</td><td><span class="live-state">${esc(x.status||'수리예정')}</span></td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="done" onclick="window.eam228Complete('${attr(x.asset_code)}')">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="eam228-empty"><b>현재 수리예정 자산이 없습니다.</b><span>수리가 필요하면 「＋ 직접입력」으로 등록하세요.</span></div>`;
@@ -3586,91 +3556,49 @@ window.eam228Create=()=>{};
       .eam228-bottom{grid-template-columns:2fr 3fr 1fr!important}
       .eam228-entry.main{right:0!important;top:46%!important}
       .eam228-entry.court{right:12%!important;top:41%!important}
-      /* v21: 배치도 레이아웃만 재구성 — 기존 EAM 등록/삭제/입력/아이콘/저장 로직 유지 */
-      .eam228-page{height:calc(100vh - 24px)!important;min-height:680px!important}
-      .eam228-main{grid-template-columns:minmax(0,2.12fr) minmax(390px,.88fr)!important;gap:10px!important;height:auto!important;flex:1 1 auto!important}
+
+      /* V22 LAYOUT ONLY: 기존 등록/삭제/입력/아이콘/드래그/저장 JS는 V20 그대로 유지 */
+      .eam228-main{grid-template-columns:minmax(0,2.12fr) minmax(390px,.88fr)!important;align-items:stretch!important}
       .eam228-map-card,.eam228-right-card{height:100%!important}
       .eam228-map-wrap{padding:8px!important}
-      .eam228-map{
-        min-height:0!important;height:100%!important;
-        background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(219,232,239,.92)),linear-gradient(180deg,#edf5f9,#d9e6ed)!important;
-        box-shadow:inset 0 0 0 6px rgba(255,255,255,.72),inset 0 -16px 30px rgba(48,83,104,.10),0 8px 18px rgba(30,55,75,.12)!important;
-        perspective:900px!important;
-      }
-      /* 코트 약 35% / 나머지 시설 약 65% */
-      .eam228-courts{
-        left:2.2%!important;right:2.2%!important;top:2%!important;height:33%!important;
-        grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:9px!important;
-        transform:perspective(900px) rotateX(1.5deg)!important;transform-origin:center bottom!important;
-      }
-      .eam228-courts strong{font-size:10px!important;top:0!important}
-      .eam228-court{
-        margin-top:16px!important;border:1px solid #587487!important;border-radius:7px!important;
-        background:linear-gradient(145deg,#d5e4eb 0%,#f8fbfc 35%,#c5d8e1 100%)!important;
-        box-shadow:0 7px 14px rgba(25,55,75,.22),inset 0 1px 0 rgba(255,255,255,.85)!important;
-      }
-      .eam228-court:before{left:8%!important;right:8%!important;top:50%!important;border-top:2px solid #4d6879!important;box-shadow:0 2px 0 rgba(255,255,255,.55)}
-      .eam228-court:after{left:10%!important;right:10%!important;top:12%!important;bottom:12%!important;border:1px solid #66889b!important}
-      .eam228-court span{
-        width:34px!important;height:34px!important;font-size:16px!important;
-        background:radial-gradient(circle at 32% 24%,#fff 0,#edf5f8 48%,#cbdce4 100%)!important;
-        box-shadow:0 5px 10px rgba(20,50,70,.28),inset 0 1px 0 #fff!important;
-      }
-      .eam228-facility{
-        left:1.5%!important;right:1.5%!important;top:36%!important;bottom:1.5%!important;
-        grid-template-rows:16% 39% 9% 36%!important;
-      }
-      /* 2층 옥상 공간 확대 / 옥상 창고는 축소 */
-      .eam228-roof{
-        grid-template-columns:20% 55% 17% 8%!important;
-        background:linear-gradient(180deg,#f8fbfc,#e4edf2)!important;
-        box-shadow:inset 0 1px 0 #fff,0 3px 8px rgba(25,55,75,.08)!important;
-      }
-      .eam228-roof button{
-        position:relative!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
-        background:linear-gradient(145deg,#f8fbfc,#dce8ee)!important;
-      }
+      .eam228-map{height:100%!important;min-height:0!important;perspective:1000px!important}
+      /* 코트 35% / 시설 65% */
+      .eam228-courts{top:2%!important;height:31%!important;left:3%!important;right:3%!important;gap:9px!important}
+      .eam228-court{margin-top:14px!important;border-radius:8px!important;background:linear-gradient(145deg,#c9dbe4 0%,#f8fbfd 38%,#b8ced9 100%)!important;box-shadow:0 7px 14px rgba(25,55,75,.22),inset 0 1px 0 rgba(255,255,255,.9)!important;transform:translateZ(8px)!important}
+      .eam228-court:before{border-top:2px solid #4d6879!important}
+      .eam228-court:after{border:1px solid #66889b!important}
+      .eam228-court span{width:34px!important;height:34px!important;font-size:16px!important;box-shadow:0 5px 10px rgba(20,50,70,.28),inset 0 1px 0 #fff!important}
+      /* 시설 영역: 원래 위치/순서는 유지하고 높이만 조정 */
+      .eam228-facility{top:35%!important;bottom:1.5%!important;grid-template-rows:17% 36% 9% 38%!important}
+      /* 2층 상부: 옥상 크게, 창고 작게 */
+      .eam228-roof{grid-template-columns:20% 57% 15% 8%!important;background:linear-gradient(180deg,#f8fbfc,#e1ebf0)!important;box-shadow:inset 0 1px 0 #fff,0 3px 8px rgba(25,55,75,.08)!important}
+      .eam228-roof button{background:linear-gradient(145deg,#f8fbfc,#dce8ee)!important}
       .eam228-roof button b{font-size:13px!important}
-      .eam228-roof button small{font-size:8px!important;color:#718797!important;margin-top:3px}
-      .eam228-roof span{font-size:9px!important}
-      /* 샤워실·화장실·탈의실 영역을 크게 */
+      /* 샤워실/화장실/탈의실은 세로 공간 확대 */
       .eam228-row1{grid-template-columns:repeat(6,minmax(0,1fr))!important}
-      .eam228-zone{
-        background:linear-gradient(145deg,#f8fbfd,#e3edf2)!important;
-        box-shadow:inset 0 1px 0 rgba(255,255,255,.8)!important;
-      }
-      .eam228-zone.pink{background:linear-gradient(145deg,#fff7f9,#f8dfe7)!important}
-      .eam228-zone b{font-size:12px!important;text-shadow:0 1px 0 #fff}
-      .eam228-zone small{font-size:8px!important;margin-top:4px}
-      .eam228-corridor{
-        background:linear-gradient(180deg,#fbf6e9,#eee1c5)!important;
-        box-shadow:inset 0 1px 0 rgba(255,255,255,.85)!important;font-size:12px!important;
-      }
-      /* 하단 세로는 압축하고 통합 유수장치실을 크게 */
+      .eam228-zone b{font-size:12px!important}
+      .eam228-zone small{font-size:8px!important;margin-top:4px!important}
+      .eam228-zone{background:linear-gradient(145deg,#f8fbfd,#e2edf2)!important}
+      .eam228-zone.pink{background:linear-gradient(145deg,#fff8fa,#f7dfe7)!important}
+      /* 복도는 기존 위치 유지 */
+      .eam228-corridor{font-size:12px!important}
+      /* 하부: 유수장치실 확대 */
       .eam228-bottom{grid-template-columns:22% 56% 22%!important}
-      .eam228-bottom .small{background:linear-gradient(145deg,#f5fafc,#dfeaf0)!important}
-      .eam228-bottom .water{
-        background:linear-gradient(145deg,#fff8dd,#f4dda0 55%,#ffeec0)!important;
-        box-shadow:inset 0 1px 0 rgba(255,255,255,.85),inset 0 0 18px rgba(214,160,50,.08)!important;
-      }
+      .eam228-bottom .water{background:linear-gradient(145deg,#fff8dc,#f3dda0 55%,#ffedbe)!important}
       .eam228-bottom .water b{font-size:14px!important}
       .eam228-bottom .water small{font-size:9px!important}
-      .eam228-bottom .small b{font-size:11px!important}
-      .eam228-entry.court{right:12%!important;top:35%!important}
-      .eam228-entry.main{right:0!important;top:53%!important}
-      /* 오른쪽 수리 LIVE는 배치도와 같은 높이·끝선 */
+      /* 출입구 위치는 기존 기준 유지 */
+      .eam228-entry.court{right:12%!important;top:41%!important}
+      .eam228-entry.main{right:0!important;top:52%!important}
+      /* 오른쪽 LIVE 높이를 배치도와 정확히 맞춤 */
       .eam228-right{min-height:0!important;height:100%!important}
       .eam228-right-card{min-height:0!important}
-      .eam228-section-head{height:52px!important;flex-basis:52px!important}
-      .eam228-section-head h2{font-size:17px!important}
-      .eam228-live-body table{font-size:10px!important}
-      .eam228-live-body th,.eam228-live-body td{padding:9px 6px!important}
-      @media(max-width:1000px){
-        .eam228-page{height:auto!important;min-height:100vh!important;overflow:auto!important}
-        .eam228-main{grid-template-columns:1fr!important;height:auto!important}
-        .eam228-map-card{min-height:720px!important;height:720px!important}
-        .eam228-right{height:650px!important}
-      }
+      .eam228-section-head{height:52px!important;flex:0 0 52px!important}
+      .eam228-live-body{min-height:0!important;overflow:auto!important}
+      /* 아이콘은 드래그/클릭이 절대 막히지 않도록 유지 */
+      .eam228-asset{pointer-events:auto!important;z-index:100!important;cursor:grab!important;touch-action:none!important}
+      .eam228-head-btn,.eam228-direct,.eam228-court,.eam228-zone,.eam228-roof button,.eam228-corridor,.eam228-link,.done{pointer-events:auto!important}
+      @media(max-width:1000px){.eam228-main{grid-template-columns:1fr!important}.eam228-map-card{height:720px!important;min-height:720px!important}.eam228-right{height:650px!important}}
 </style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산 등록</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
       /* v241: EAM 자산 아이콘 드래그를 독립 처리 — 클릭과 드래그를 구분하고 위치를 저장 */
