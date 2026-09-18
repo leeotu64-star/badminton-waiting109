@@ -3453,19 +3453,55 @@ a[data-page="digitalTwin"],
 }
 </style>
 
-<style id="v23-map-icon-color-only">
-/* v23: 배치도 아이콘 색상만 변경 — 아이콘 글씨 색상은 기존 상태별 색상 유지 */
-.jgb-v104-marker{
-  background:linear-gradient(145deg,#ffffff 0%,#e7f3fb 48%,#c7dfed 100%) !important;
-  border-color:#28779f !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -2px 3px rgba(25,76,105,.14),0 4px 9px rgba(24,62,84,.24) !important;
+<style id="JGB_EAM_V25_FORCE_6040">
+/* ===== V25 : 배치도 6 : 수리 LIVE 4 강제 고정 ===== */
+.eh-main{
+  display:grid!important;
+  grid-template-columns:minmax(0,6fr) minmax(0,4fr)!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  gap:10px!important;
+  flex:1 1 auto!important;
 }
-.jgb-v104-marker.open,.jgb-v104-marker.mid,.jgb-v104-marker.done{
-  /* 글씨 색상은 기존 CSS를 그대로 따름 */
-  color:inherit;
+
+/* 좌우 영역이 grid 비율을 다시 깨지 않도록 */
+.eh-main > .eh-map-card{
+  grid-column:1!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
 }
-.jgb-v104-marker.dragging{
-  background:linear-gradient(145deg,#ffffff 0%,#d9edf8 48%,#b5d5e6 100%) !important;
+
+.eh-main > .eh-right{
+  grid-column:2!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+
+/* 수리 LIVE 자체는 우측 40%를 전부 사용 */
+.eh-main > .eh-right .eh-live-card{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+
+/* 수리 LIVE 내부에만 가로/세로 스크롤 */
+.eh-main > .eh-right .eh-live-scroll{
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  overflow-x:auto!important;
+  overflow-y:auto!important;
+}
+
+/* 기존 모바일 미디어쿼리가 1열로 바꾸지 못하게 고정 */
+@media(max-width:1000px){
+  .eh-main{
+    grid-template-columns:minmax(0,6fr) minmax(0,4fr)!important;
+  }
 }
 </style>
 </head><body><div id="app"></div>
@@ -17132,29 +17168,6 @@ document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map
     0 8px 14px rgba(15,45,65,.30),
     inset 0 2px 2px rgba(255,255,255,.98)!important;
   text-shadow:0 1px 0 #fff!important;
-}
-</style>
-<style id="EAM_V24_RATIO_7_2_FORCE">
-/* V24: EAM 현황 배치도 : 수리 LIVE = 7 : 2 강제 고정 */
-.eh-main{
-  grid-template-columns:minmax(0,7fr) minmax(0,2fr)!important;
-  gap:10px!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-}
-.eh-map-card{
-  min-width:0!important;
-  width:100%!important;
-}
-.eh-right{
-  min-width:0!important;
-  width:100%!important;
-}
-.eh-live-card{
-  width:100%!important;
-}
-@media(max-width:1000px){
-  .eh-main{grid-template-columns:minmax(0,7fr) minmax(0,2fr)!important;}
 }
 </style>
 
