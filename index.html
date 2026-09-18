@@ -2646,8 +2646,9 @@ html::before,body::before{
   min-height:40px!important;
   padding:10px 12px!important;
   margin:0!important;
-  color:#7890a5!important;
+  color:#06243e!important;
   background:#06243e!important;
+  font-size:0!important;
   border:1px solid #123b5c!important;
   border-radius:7px!important;
   opacity:.92!important;
@@ -2657,7 +2658,8 @@ html::before,body::before{
   font-weight:700!important;
 }
 .jgb-link.jgb-dt-locked::after{
-  content:"잠금";
+  display:none!important;
+  content:"";
   margin-left:auto;
   padding:3px 7px;
   border-radius:5px;
@@ -2866,6 +2868,7 @@ html::before,body::before{
     function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
     function go(p){if(!p)return;page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
     window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";render()})
+    window.render=render;
     function body(){
       if(page==="lighting")return (typeof window.jgbLightReelPageMarkup==="function"?window.jgbLightReelPageMarkup():"<div></div>");
       if(page==="digitalTwin")return digitalTwinPage();
@@ -14239,7 +14242,22 @@ body {
     const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
   window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog"><h3>유지관리 이력 등록</h3><textarea id="jgbLRText" placeholder="점검·정비 내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;modal.classList.add('open');document.getElementById('jgbLRText').value='';}
-  window.jgbLRSave=function(){const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim();if(!text)return;const row=[new Date().toISOString().slice(0,10),'유지관리',text,'담당자'];if(type==='light')assets[n-1].lightHistory.unshift(row);else assets[n-1].reelHistory.unshift(row);m.classList.remove('open');window.jgbLRSelect(n,type);}
+  window.jgbLRSave=function(){
+    const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim();
+    if(!text)return;
+    /* 등록일자는 브라우저의 현지 날짜를 사용합니다. 연도가 바뀌면 새 연도가 자동 적용됩니다. */
+    const now=new Date();
+    const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+    const row=[today,'유지관리',text,'담당자'];
+    if(type==='light')assets[n-1].lightHistory.unshift(row);else assets[n-1].reelHistory.unshift(row);
+    m.classList.remove('open');window.jgbLRSelect(n,type);
+  };
+  /* 최초 렌더 시 이 스크립트가 뒤늦게 정의되는 경우에도 조명·릴선 화면을 즉시 다시 그립니다. */
+  setTimeout(function(){
+    try{
+      if(new URLSearchParams(location.search).get('page')==='lighting' && typeof window.render==='function') window.render();
+    }catch(e){console.warn('조명·릴선 화면 재렌더링 오류',e);}
+  },0);
 })();
 </script>
 
@@ -14361,6 +14379,12 @@ body {
   new MutationObserver(fix).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
+
+<style id="JGB_DIGITAL_TWIN_LOCKED_TEXT_V59">
+/* 디지털트윈 메뉴는 기능/영역을 유지하되 화면에서는 글씨를 완전히 덮습니다. */
+a[data-page="digitalTwin"]{color:transparent!important;text-shadow:none!important;position:relative;}
+a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!important;}
+</style>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
 .jgb-v176-live-card .jgb-v178-live-table{
