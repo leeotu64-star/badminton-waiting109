@@ -15728,3 +15728,126 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 .jgb-lr-maint-dialog .jgb-lr-date-label{display:flex!important;flex-direction:column!important;gap:5px!important;margin:0 0 10px!important;font-size:13px!important;font-weight:900!important;color:#17384e!important}
 .jgb-lr-maint-dialog #jgbLRDate{box-sizing:border-box!important;width:100%!important;padding:9px 10px!important;border:1px solid #b8cbd8!important;border-radius:5px!important;background:#fff!important;font:inherit!important;font-weight:800!important;color:#17384e!important}
 </style>
+
+
+<style id="JGB_EAM_V71_ONLY_REQUEST">
+/* V71 — 요청한 부분만 수정: 오른쪽 수리 LIVE 60:40 + 가로/세로 스크롤 + 표 칸 정렬 */
+.eam228-right-split{
+  display:grid!important;
+  grid-template-rows:minmax(0,6fr) minmax(0,4fr)!important;
+  gap:9px!important;
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+}
+.eam228-live-card,
+.eam228-future-card{
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+}
+.eam228-live-body,
+.eam228-live-scroll{
+  min-width:0!important;
+  min-height:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  overflow:auto!important;
+  box-sizing:border-box!important;
+  scrollbar-gutter:stable both-edges!important;
+}
+.eam228-live-scroll table{
+  table-layout:auto!important;
+  width:max-content!important;
+  min-width:100%!important;
+  max-width:none!important;
+  border-collapse:collapse!important;
+}
+.eam228-live-scroll th,
+.eam228-live-scroll td{
+  box-sizing:border-box!important;
+  border-right:1px solid #c8d7e2!important;
+  border-bottom:1px solid #c8d7e2!important;
+  padding:8px 10px!important;
+  vertical-align:middle!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+.eam228-live-scroll th{
+  position:sticky!important;
+  top:0!important;
+  z-index:3!important;
+  background:#e8f1f6!important;
+  white-space:nowrap!important;
+  min-width:92px!important;
+}
+.eam228-live-scroll td{
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+}
+/* 작업내용은 내용 길이에 따라 칸 자체가 늘어나도록 */
+.eam228-live-scroll th:nth-child(2),
+.eam228-live-scroll td:nth-child(2){
+  min-width:240px!important;
+  width:max-content!important;
+  max-width:none!important;
+  white-space:nowrap!important;
+}
+.eam228-live-scroll th:nth-child(1),
+.eam228-live-scroll td:nth-child(1){min-width:100px!important}
+.eam228-live-scroll th:nth-child(3),
+.eam228-live-scroll td:nth-child(3){min-width:105px!important}
+.eam228-live-scroll th:nth-child(4),
+.eam228-live-scroll td:nth-child(4){min-width:105px!important}
+.eam228-live-scroll th:nth-child(5),
+.eam228-live-scroll td:nth-child(5){min-width:90px!important}
+.eam228-live-scroll th:nth-child(6),
+.eam228-live-scroll td:nth-child(6){min-width:72px!important;text-align:center!important}
+.eam228-live-scroll::-webkit-scrollbar{width:12px!important;height:12px!important}
+.eam228-live-scroll::-webkit-scrollbar-track{background:#eef4f7!important;border:1px solid #d5e1e8!important}
+.eam228-live-scroll::-webkit-scrollbar-thumb{background:#8ea7b8!important;border:2px solid #eef4f7!important;border-radius:8px!important}
+.eam228-live-scroll::-webkit-scrollbar-thumb:hover{background:#657f92!important}
+.eam228-live-scroll{scrollbar-width:auto!important;scrollbar-color:#8ea7b8 #eef4f7!important}
+.eam228-future-body{min-height:0!important;overflow:auto!important}
+
+/* V71 — 배치도 아이콘 이동 오작동 방지: 12px 이상 움직여야 드래그 */
+.eam228-asset{touch-action:none!important;-webkit-user-drag:none!important}
+</style>
+
+<script id="JGB_EAM_V71_ICON_DRAG_GUARD">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_V71_DRAG_GUARD)return;
+  window.__JGB_EAM_V71_DRAG_GUARD=true;
+  document.addEventListener('pointerdown',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el || e.button!==0)return;
+    el.__jgbV71Moved=false;
+    el.__jgbV71StartX=e.clientX;
+    el.__jgbV71StartY=e.clientY;
+  },true);
+  document.addEventListener('pointermove',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el || el.__jgbV71StartX==null)return;
+    const d=Math.hypot(e.clientX-el.__jgbV71StartX,e.clientY-el.__jgbV71StartY);
+    if(d<12){ e.stopImmediatePropagation(); return; }
+    el.__jgbV71Moved=true;
+  },true);
+  document.addEventListener('pointerup',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el)return;
+    if(el.__jgbV71Moved){
+      window.__EAM228_DRAG_SUPPRESS=true;
+      setTimeout(()=>window.__EAM228_DRAG_SUPPRESS=false,180);
+    }
+    el.__jgbV71StartX=null;el.__jgbV71StartY=null;
+    el.__jgbV71Moved=false;
+  },true);
+  document.addEventListener('pointercancel',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el)return;
+    el.__jgbV71StartX=null;el.__jgbV71StartY=null;el.__jgbV71Moved=false;
+  },true);
+})();
+</script>
