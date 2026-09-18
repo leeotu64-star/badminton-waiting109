@@ -15221,20 +15221,6 @@ body {
     };
     requestAnimationFrame(()=>{if(!pick())setTimeout(pick,80);});
   }
-
-  /* 한 번 클릭: 아무 화면 이동 없음. 더블클릭: AC 자산코드로 EAM 이력카드 이동 */
-  document.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el || el.classList.contains('map-only'))return;
-    const code=V(el.getAttribute('data-code'));
-    if(!code)return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    openEam(code);
-  },true);
-})();
-</script>
-
 <style id="JGB_V25_ICON_DELETE_FINAL_FIX">
 /* V25: 배치도 아이콘 삭제창의 목록 영역만 안정화 */
 #eamHyunIconDeleteModal .eh-modal-box{width:min(620px,95vw);max-height:88vh;overflow:auto}
@@ -15258,117 +15244,107 @@ body {
 
 
 
-<style id="JGB_EAM_ICON_DRAG_CLEAN_V10">
-/* V10: 기존 EAM 아이콘 이동 엔진을 제거하고 단일 이동 방식으로 다시 구성.
-   이동 후 render()를 호출하지 않으며, 자동 재배치/중앙복귀/겹침보정은 하지 않는다. */
+<style id="JGB_EAM_MAP_INTERACTION_V14">
 .eh-map .eh-marker{
+  touch-action:none!important;
   user-select:none!important;
   -webkit-user-select:none!important;
   -webkit-user-drag:none!important;
-  touch-action:none!important;
   cursor:grab!important;
+  transform:translate(-50%,-50%)!important;
 }
-.eh-map .eh-marker.eam-fixed-dragging{
+.eh-map .eh-marker.eam-v14-dragging{
   cursor:grabbing!important;
+  z-index:99999!important;
   transition:none!important;
-  animation:none!important;
-  z-index:10000!important;
+  transform:translate(-50%,-50%)!important;
 }
 </style>
-<script id="JGB_EAM_ICON_DRAG_CLEAN_V12">
+<script id="JGB_EAM_MAP_INTERACTION_V14">
 (function(){
   'use strict';
-  if(window.__JGB_EAM_ICON_DRAG_CLEAN_V12)return;
-  window.__JGB_EAM_ICON_DRAG_CLEAN_V12=true;
+  if(window.__JGB_EAM_MAP_INTERACTION_V14)return;
+  window.__JGB_EAM_MAP_INTERACTION_V14=true;
 
   const POS_KEY='JGB_EAM_HYUNHWANG_MAP_V1';
   const DASH_KEY='JGB_EAM_DASH_MAP_POS_V228';
-  const S=x=>String(x??'').trim();
-  function read(key){try{const v=JSON.parse(localStorage.getItem(key)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}}
-  function write(key,obj){try{localStorage.setItem(key,JSON.stringify(obj));return true}catch(_){return false}}
-  function save(code,x,y){const c=S(code);if(!c)return;const value=[Number(x.toFixed(3)),Number(y.toFixed(3))];const a=read(POS_KEY);a[c]=value;write(POS_KEY,a);const b=read(DASH_KEY);b[c]=value;write(DASH_KEY,b)}
-
-  let drag=null;
-  function marker(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
+  const S=v=>String(v??'').trim();
+  const read=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
+  const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}};
+  function save(code,x,y){
+    code=S(code); if(!code)return;
+    const p=[+Number(x).toFixed(3),+Number(y).toFixed(3)];
+    const a=read(POS_KEY);a[code]=p;write(POS_KEY,a);
+    const b=read(DASH_KEY);b[code]=p;write(DASH_KEY,b);
+  }
+  function getMarker(e){
+    const el=e.target?.closest?.('.eh-map .eh-marker');
     if(!el)return null;
     const map=el.closest('.eh-map');
     return map?{el,map}:null;
   }
-  function stopOnly(e){e.preventDefault();e.stopPropagation();}
+  let drag=null;
+  let suppressClickUntil=0;
 
-  function begin(e){
-    if(e.button!==0)return;
-    const t=marker(e); if(!t)return;
-    const rect=t.map.getBoundingClientRect();
+  function down(e){
+    if(e.pointerType==='mouse' && e.button!==0)return;
+    const t=getMarker(e); if(!t)return;
     const mr=t.el.getBoundingClientRect();
+    const rect=t.map.getBoundingClientRect();
     drag={el:t.el,map:t.map,rect,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,
       grabX:e.clientX-(mr.left+mr.width/2),grabY:e.clientY-(mr.top+mr.height/2),moved:false};
-    t.el.classList.add('eam-fixed-dragging');
+    t.el.classList.add('eam-v14-dragging');
     try{t.el.setPointerCapture?.(e.pointerId)}catch(_){ }
-    // 중요: pointerdown에서는 클릭을 막지 않는다. 클릭/더블클릭이 정상적으로 발생해야 한다.
   }
-
   function move(e){
-    if(!drag || e.pointerId!==drag.pointerId)return;
-    const d=drag,dx=e.clientX-d.startX,dy=e.clientY-d.startY;
-    if(!d.moved && Math.hypot(dx,dy)<5)return;
+    const d=drag;if(!d||e.pointerId!==d.pointerId)return;
+    const dx=e.clientX-d.startX,dy=e.clientY-d.startY;
+    if(!d.moved && Math.hypot(dx,dy)<6)return;
     d.moved=true;
-    const x=Math.max(0.5,Math.min(99.5,((e.clientX-d.grabX-d.rect.left)/d.rect.width)*100));
-    const y=Math.max(0.5,Math.min(99.5,((e.clientY-d.grabY-d.rect.top)/d.rect.height)*100));
-    d.el.style.left=x+'%'; d.el.style.top=y+'%';
-    stopOnly(e);
+    const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.grabX-d.rect.left)/d.rect.width*100));
+    const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.grabY-d.rect.top)/d.rect.height*100));
+    d.el.style.left=x+'%';d.el.style.top=y+'%';
+    e.preventDefault();e.stopPropagation();
   }
-
-  function finish(e){
-    if(!drag || (e.pointerId!=null && e.pointerId!==drag.pointerId))return;
-    const d=drag; drag=null;
+  function up(e){
+    const d=drag;if(!d|| (e.pointerId!=null&&e.pointerId!==d.pointerId))return;
+    drag=null;
     if(d.moved){
-      const x=Math.max(0.5,Math.min(99.5,((e.clientX-d.grabX-d.rect.left)/d.rect.width)*100));
-      const y=Math.max(0.5,Math.min(99.5,((e.clientY-d.grabY-d.rect.top)/d.rect.height)*100));
-      d.el.style.left=x+'%'; d.el.style.top=y+'%';
+      const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.grabX-d.rect.left)/d.rect.width*100));
+      const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.grabY-d.rect.top)/d.rect.height*100));
+      d.el.style.left=x+'%';d.el.style.top=y+'%';
       save(d.el.getAttribute('data-code'),x,y);
-      window.__JGB_EAM_DRAG_SUPPRESS_UNTIL=Date.now()+450;
-      stopOnly(e);
+      suppressClickUntil=Date.now()+500;
+      e.preventDefault();e.stopPropagation();
     }
-    d.el.classList.remove('eam-fixed-dragging');
+    d.el.classList.remove('eam-v14-dragging');
     try{d.el.releasePointerCapture?.(d.pointerId)}catch(_){ }
   }
 
-  window.addEventListener('pointerdown',begin,true);
+  window.addEventListener('pointerdown',down,true);
   window.addEventListener('pointermove',move,true);
-  window.addEventListener('pointerup',finish,true);
-  window.addEventListener('pointercancel',finish,true);
+  window.addEventListener('pointerup',up,true);
+  window.addEventListener('pointercancel',up,true);
 
-  // 드래그로 놓은 직후 발생하는 click만 차단한다. 일반 클릭은 통과시킨다.
+  // 클릭은 드래그가 아닐 때만 실행한다.
   window.addEventListener('click',function(e){
-    if(Date.now()<(window.__JGB_EAM_DRAG_SUPPRESS_UNTIL||0) && e.target.closest?.('.eh-map .eh-marker')){
-      stopOnly(e);
-      return;
-    }
-    const el=e.target.closest?.('.eh-map .eh-marker');
+    const el=e.target?.closest?.('.eh-map .eh-marker');
     if(!el || el.classList.contains('map-only'))return;
-    const code=S(el.getAttribute('data-code'));
-    if(!code)return;
-    e.preventDefault();
-    e.stopPropagation();
-    if(typeof window.__JGB_EAM_OPEN_EAM==='function') window.__JGB_EAM_OPEN_EAM(code);
-  },true);
-
-  // 기존 더블클릭 이동 기능과도 호환
-  window.__JGB_EAM_OPEN_EAM=window.__JGB_EAM_OPEN_EAM||function(code){
-    const c=S(code), pre=c.split('-')[0];
-    const cat={AC:'cooling',BO:'heating',FI:'fire',SA:'sanitary',EL:'electrical',DO:'door',OT:'other'}[pre]||'cooling';
-    window.__eamSelCode=c; window.__eamCat=cat;
+    if(Date.now()<suppressClickUntil){e.preventDefault();e.stopImmediatePropagation();return;}
+    const code=S(el.getAttribute('data-code'));if(!code)return;
+    e.preventDefault();e.stopImmediatePropagation();
+    const pre=code.split('-')[0];
+    const cat={AC:'cooling',BO:'heating',FI:'fire',SA:'sanitary',EL:'electrical',DO:'door',OT:'other'}[pre]||'other';
+    window.__eamSelCode=code;window.__eamCat=cat;
     if(typeof window.go==='function')window.go('eam');
     const pick=()=>{
-      const row=document.querySelector('.eam-asset-row[data-code="'+CSS.escape(c)+'"]');
+      const row=document.querySelector('.eam-asset-row[data-code="'+CSS.escape(code)+'"]');
       if(row){row.click();return true;}
-      if(typeof window.eamPick==='function'){try{window.eamPick(cat,c);return true}catch(_){}}
+      if(typeof window.eamPick==='function'){try{window.eamPick(cat,code);return true}catch(_){} }
       return false;
     };
     requestAnimationFrame(()=>{if(!pick())setTimeout(pick,120);});
-  };
+  },true);
 })();
 </script>
 
@@ -17038,12 +17014,6 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 };
 })();
 </script>
-
-<style id="JGB_EAM_HYUN_V11_ICON_NO_OVERLAP">
-/* v11: 배치도 아이콘끼리 겹치지 않도록 표시 영역만 정리 */
-.eh-map .eh-marker{z-index:20!important}
-.eh-map .eh-marker.dragging{z-index:100!important}
-</style>
 
 
 
