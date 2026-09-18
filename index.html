@@ -15494,6 +15494,67 @@ body {
   new MutationObserver(function(){addButton();syncMap();}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+
+<style id="JGB_EAM_MAP_MOVE_HEADER_V8">
+/* V8: 실제 EAM 현황의 '시설 자산 배치도' 헤더에만 위치 이동 버튼 표시 */
+.jgb-eam-map-tools-v8{display:flex!important;align-items:center!important;gap:6px!important;margin-left:auto!important;}
+.jgb-eam-map-move-v8{border:1px solid #176fc1!important;background:#fff!important;color:#075b91!important;border-radius:6px!important;padding:6px 10px!important;font-size:11px!important;font-weight:900!important;cursor:pointer!important;white-space:nowrap!important;}
+.jgb-eam-map-move-v8.on{background:#176fc1!important;color:#fff!important;}
+</style>
+<script id="JGB_EAM_MAP_MOVE_HEADER_V8">
+(function(){
+'use strict';
+if(window.__JGB_EAM_MAP_MOVE_HEADER_V8)return;
+window.__JGB_EAM_MAP_MOVE_HEADER_V8=true;
+function map(){return document.getElementById('eam228Map');}
+function findHeader(){
+  const m=map(); if(!m)return null;
+  let p=m.parentElement;
+  for(let level=0;p&&level<8;level++,p=p.parentElement){
+    const candidates=p.querySelectorAll?.('*')||[];
+    for(const el of candidates){
+      const t=(el.textContent||'').replace(/\s+/g,' ').trim();
+      if(t.includes('시설 자산 배치도') && el.children.length<=3){
+        return el.closest('.eh-card-head, .eam228-card-head, .card-head, header, .section-head') || el.parentElement;
+      }
+    }
+  }
+  return null;
+}
+function sync(btn){
+  const on=!!window.__EAM228_MOVE_MODE;
+  btn.classList.toggle('on',on);
+  btn.textContent=on?'📍 위치 이동 종료':'📍 위치 이동';
+}
+function install(){
+  const m=map(); if(!m)return;
+  const h=findHeader(); if(!h)return;
+  let btn=document.querySelector('.jgb-eam-map-move-v8');
+  if(!btn){
+    const tools=document.createElement('div');
+    tools.className='jgb-eam-map-tools-v8';
+    btn=document.createElement('button');
+    btn.type='button';
+    btn.className='jgb-eam-map-move-v8';
+    btn.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      window.__EAM228_MOVE_MODE=!window.__EAM228_MOVE_MODE;
+      m.classList.toggle('eam-move-on',!!window.__EAM228_MOVE_MODE);
+      sync(btn);
+    });
+    tools.appendChild(btn);
+    h.style.display='flex';
+    h.style.alignItems='center';
+    h.style.gap='8px';
+    h.appendChild(tools);
+  }
+  sync(btn);
+}
+function boot(){install();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+new MutationObserver(install).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
