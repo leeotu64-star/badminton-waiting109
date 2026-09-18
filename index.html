@@ -6628,7 +6628,7 @@ function jgbV47GoWpByLeak(leakCode){
         document.body.insertAdjacentHTML('beforeend',`<div id="jgbV22CardEditor" class="jgb-v155-editor" style="position:fixed!important;inset:0!important;z-index:2147483647!important;background:rgba(7,24,44,.58)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important;box-sizing:border-box!important;overflow:auto!important;" onclick="if(event.target===this)this.remove()"><div class="jgb-ah-card" style="width:min(980px,96vw)!important;max-height:94vh!important;overflow:auto!important;background:#fff!important;border-radius:16px!important;box-shadow:0 25px 80px rgba(0,0,0,.32)!important;box-sizing:border-box!important;">
           <div class="jgb-ah-head" style="display:flex!important;justify-content:space-between!important;align-items:center!important;padding:16px 20px!important;background:#edf6ff!important;border-bottom:1px solid #cfdeeb!important;"><div><h3 style="margin:0!important;color:#173b5d!important;font-size:20px!important;">📋 주요설비 이력카드 수정</h3><small style="font-size:12px!important;">이력카드 정보만 수정합니다.</small></div><button type="button" style="border:0!important;background:transparent!important;font-size:26px!important;cursor:pointer!important;" onclick="document.getElementById('jgbV22CardEditor')?.remove()">×</button></div>
           <div class="jgb-ah-grid" style="display:grid!important;grid-template-columns:1fr!important;gap:10px!important;padding:16px!important;background:#f6f9fc!important;box-sizing:border-box!important;">
-            ${jgbV22Field('자산코드','jgb22_code',s.code,'readonly')}${jgbV22Field('자산명','jgb22_name',x.name||'')}
+            ${jgbV22Field('자산코드','jgb22_code',s.code)}${jgbV22Field('자산명','jgb22_name',x.name||'')}
             <label>설비 종류<select id="jgb22_category">${catOpts}</select></label><label>위치코드<select id="jgb22_loc">${locOpts}</select></label>
             <label>세부 위치<select id="jgb22_place">${detOpts}</select><input id="jgb22_customPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
             ${jgbV22Field('모델·규격','jgb22_model',x.model||x.product_name||'')}${jgbV22Field('용량','jgb22_capacity',x.capacity||'')}${jgbV22Field('수량','jgb22_qty',x.qty??x.quantity??'')}${jgbV22Field('제조사','jgb22_maker',x.maker||x.vendor||'')}${jgbV22Field('A/S 연락처','jgb22_as',x.asContact||'')}${jgbV22Field('제조일','jgb22_date',x.date||x.manufactureDate||'')}${jgbV22Field('설치일','jgb22_install',x.installDate||'')}${jgbV22Field('내용연수','jgb22_life',x.life||'')}${jgbV22Field('평가등급','jgb22_grade',x.grade||'')}${jgbV22Field('보증','jgb22_warranty',x.warranty||'')}${jgbV22Field('A/S 기록','jgb22_asHistory',x.asHistory||'')}
@@ -6650,6 +6650,8 @@ function jgbV47GoWpByLeak(leakCode){
       };
       window.JGB_EAM_CARD_V22_SAVE=async function(code){
         const c=String(code||'').trim(), btn=document.getElementById('jgbV22Save'); if(!c)return false;
+        const newCode=jgbV22Val('jgb22_code').toUpperCase();
+        if(!/^[A-Z]{1,4}-\d{1,4}$/.test(newCode)){alert('자산코드는 예: AC-01 형식으로 입력하세요.');document.getElementById('jgb22_code')?.focus();return false}
         const name=jgbV22Val('jgb22_name'), category=jgbV22Val('jgb22_category')||'기타설비'; let place=jgbV22Val('jgb22_place'); if(place==='직접 입력')place=jgbV22Val('jgb22_customPlace'); if(category==='소방·방재')place='유수장치실';
         if(!name||!place){alert('자산명과 위치는 필수입니다.');return false}
         if(btn){btn.disabled=true;btn.textContent='저장 중…'}
@@ -6658,15 +6660,15 @@ function jgbV47GoWpByLeak(leakCode){
           if(!dbx)try{dbx=window.SUPA||null}catch(e){}
           if(!dbx && window.supabase&&typeof window.supabase.createClient==='function'&&typeof SUPABASE_URL!=='undefined'&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined')dbx=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
           if(!dbx)throw new Error('Supabase 연결에 실패했습니다.');
-          const A=Array.isArray(window.__eamA)?window.__eamA:[]; let a=A.find(z=>String(z.asset_code||'').trim()===c)||null;
+          const A=Array.isArray(window.__eamA)?window.__eamA:[]; if(newCode!==c.toUpperCase()&&A.some(z=>String(z.asset_code||'').trim().toUpperCase()===newCode)){alert('이미 사용 중인 자산코드입니다.');document.getElementById('jgb22_code')?.focus();return false} let a=A.find(z=>String(z.asset_code||'').trim()===c)||null;
           if(!a){const q=await dbx.from('assets').select('*').eq('asset_code',c).maybeSingle();if(q.error)throw q.error;a=q.data||null}
           const model=jgbV22Val('jgb22_model');
           const payload={name,category,place,status:jgbV22Val('jgb22_status')||'정상',product_name:model||category};
-          if(a){const r=await dbx.from('assets').update(payload).eq('id',a.id);if(r.error)throw r.error}
-          else{const r=await dbx.from('assets').insert({asset_code:c,...payload}).select('*').single();if(r.error)throw r.error}
-          const all=jgbV22Meta();all[c]={asset_code:c,name,category,locationCode:category==='소방·방재'?'E':jgbV22Val('jgb22_loc').charAt(0)||'A',place,model,capacity:jgbV22Val('jgb22_capacity'),qty:jgbV22Val('jgb22_qty'),quantity:jgbV22Val('jgb22_qty'),maker:jgbV22Val('jgb22_maker'),vendor:jgbV22Val('jgb22_maker'),asContact:jgbV22Val('jgb22_as'),date:jgbV22Val('jgb22_date'),manufactureDate:jgbV22Val('jgb22_date'),installDate:jgbV22Val('jgb22_install'),life:jgbV22Val('jgb22_life'),grade:jgbV22Val('jgb22_grade'),warranty:jgbV22Val('jgb22_warranty'),asHistory:jgbV22Val('jgb22_asHistory'),status:jgbV22Val('jgb22_status')||'정상',acquisitionType:jgbV22Val('jgb22_acq')||'기존 자산',recentExternalMaintenanceDate:jgbV22Val('jgb22_extDate'),externalMaintenanceDate:jgbV22Val('jgb22_extDate'),recentExternalMaintenanceAction:jgbV22Val('jgb22_extAction'),externalMaintenanceAction:jgbV22Val('jgb22_extAction'),nextInspectionDate:jgbV22Val('jgb22_next'),nextDate:jgbV22Val('jgb22_next'),disposalPlan:jgbV22Val('jgb22_disposal'),retirementPlan:jgbV22Val('jgb22_disposal'),improvementPlan:jgbV22Val('jgb22_plan'),note:jgbV22Val('jgb22_note')};
-          jgbV22SaveMeta(all);window.__eamMetaByCode=all;window.__eamSelCode=c;document.getElementById('jgbV22CardEditor')?.remove();
-          if(typeof window.eamLoad==='function')await window.eamLoad();window.__eamSelCode=c;if(typeof render==='function')render();return true;
+          if(a){const r=await dbx.from('assets').update({asset_code:newCode,...payload}).eq('id',a.id);if(r.error)throw r.error}
+          else{const r=await dbx.from('assets').insert({asset_code:newCode,...payload}).select('*').single();if(r.error)throw r.error}
+          const all=jgbV22Meta();if(newCode!==c){delete all[c];}all[newCode]={asset_code:newCode,name,category,locationCode:category==='소방·방재'?'E':jgbV22Val('jgb22_loc').charAt(0)||'A',place,model,capacity:jgbV22Val('jgb22_capacity'),qty:jgbV22Val('jgb22_qty'),quantity:jgbV22Val('jgb22_qty'),maker:jgbV22Val('jgb22_maker'),vendor:jgbV22Val('jgb22_maker'),asContact:jgbV22Val('jgb22_as'),date:jgbV22Val('jgb22_date'),manufactureDate:jgbV22Val('jgb22_date'),installDate:jgbV22Val('jgb22_install'),life:jgbV22Val('jgb22_life'),grade:jgbV22Val('jgb22_grade'),warranty:jgbV22Val('jgb22_warranty'),asHistory:jgbV22Val('jgb22_asHistory'),status:jgbV22Val('jgb22_status')||'정상',acquisitionType:jgbV22Val('jgb22_acq')||'기존 자산',recentExternalMaintenanceDate:jgbV22Val('jgb22_extDate'),externalMaintenanceDate:jgbV22Val('jgb22_extDate'),recentExternalMaintenanceAction:jgbV22Val('jgb22_extAction'),externalMaintenanceAction:jgbV22Val('jgb22_extAction'),nextInspectionDate:jgbV22Val('jgb22_next'),nextDate:jgbV22Val('jgb22_next'),disposalPlan:jgbV22Val('jgb22_disposal'),retirementPlan:jgbV22Val('jgb22_disposal'),improvementPlan:jgbV22Val('jgb22_plan'),note:jgbV22Val('jgb22_note')};
+          jgbV22SaveMeta(all);window.__eamMetaByCode=all;window.__eamSelCode=newCode;document.getElementById('jgbV22CardEditor')?.remove();
+          if(typeof window.eamLoad==='function')await window.eamLoad();window.__eamSelCode=newCode;if(typeof render==='function')render();return true;
         }catch(e){console.error('JGB_V22_CARD_SAVE',e);alert('이력카드 저장에 실패했습니다.\n'+(e?.message||e));return false}
         finally{if(btn){btn.disabled=false;btn.textContent='저장'}}
       };
@@ -15367,6 +15369,18 @@ body {
 .jgb-v170-mapcard{min-height:0!important;}
 .jgb-v170-mapcard .jgb-v170-map{height:100%!important;min-height:620px!important;}
 </style>
+
+<style id="JGB_EAM_V10_DRAG_LOCK">
+.eh-map .eh-marker{
+  -webkit-user-drag:none!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  touch-action:none!important;
+  cursor:grab!important;
+}
+.eh-map .eh-marker.dragging{cursor:grabbing!important;z-index:999!important;}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -17139,72 +17153,15 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 </script>
 
 <style id="JGB_EAM_HYUN_V11_ICON_NO_OVERLAP">
-/* v11: 배치도 아이콘끼리 겹치지 않도록 표시 영역만 정리 */
+/* V10: 자동 중앙/빈자리 재배치 금지. 사용자가 놓은 위치를 유지한다. */
 .eh-map .eh-marker{z-index:20!important}
 .eh-map .eh-marker.dragging{z-index:100!important}
 </style>
 <script id="JGB_EAM_HYUN_V11_ICON_NO_OVERLAP_JS">
 (function(){
-'use strict';
-if(window.__JGB_EAM_HYUN_V11_ICON_NO_OVERLAP)return;
-window.__JGB_EAM_HYUN_V11_ICON_NO_OVERLAP=true;
-const MAPKEY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
-const POSKEY='JGB_EAM_HYUNHWANG_MAP_V1';
-const V=x=>String(x??'').trim();
-const read=(k,f)=>{try{const x=JSON.parse(localStorage.getItem(k)||'');return x&&typeof x==='object'?x:f}catch(_){return f}};
-const write=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x));return true}catch(_){return false}};
-function center(el,map){const a=el.getBoundingClientRect(),b=map.getBoundingClientRect();return {x:a.left+a.width/2,y:a.top+a.height/2,w:a.width,h:a.height};}
-function overlap(a,b,pad){return Math.abs(a.x-b.x)<(a.w+b.w)/2+pad && Math.abs(a.y-b.y)<(a.h+b.h)/2+pad;}
-function savePos(el,x,y){
- const c=V(el.dataset.code||el.textContent||''); if(!c)return;
- if(el.classList.contains('map-only')){
-   const d=read(MAPKEY,{}); if(d[c]){d[c].x=+x.toFixed(2);d[c].y=+y.toFixed(2);write(MAPKEY,d);}
- }else{
-   const p=read(POSKEY,{});p[c]=[+x.toFixed(2),+y.toFixed(2)];write(POSKEY,p);
- }
-}
-function findFree(el,map,startX,startY){
- const all=[...map.querySelectorAll('.eh-marker')].filter(x=>x!==el);
- const mr=map.getBoundingClientRect();
- const step=3.2;
- const candidates=[];
- for(let ring=1;ring<=12;ring++){
-   const d=step*ring;
-   candidates.push([startX+d,startY],[startX-d,startY],[startX,startY+d],[startX,startY-d],[startX+d,startY+d],[startX-d,startY-d],[startX+d,startY-d],[startX-d,startY+d]);
- }
- candidates.push([8,8],[20,12],[32,18],[44,12],[56,18],[68,12],[80,18],[92,12],[12,82],[28,86],[44,82],[60,86],[76,82],[90,78]);
- for(const [x,y] of candidates){
-   const nx=Math.max(3,Math.min(97,x)), ny=Math.max(3,Math.min(97,y));
-   el.style.left=nx+'%';el.style.top=ny+'%';
-   const r=center(el,map);
-   if(!all.some(o=>overlap(r,center(o,map),4)))return [nx,ny];
- }
- el.style.left=startX+'%';el.style.top=startY+'%';
- return [startX,startY];
-}
-function resolveMap(map){
- if(!map)return;
- const icons=[...map.querySelectorAll('.eh-marker')];
- if(icons.length<2)return;
- let changed=false;
- for(let i=0;i<icons.length;i++){
-   const el=icons[i]; if(!el.isConnected)continue;
-   const r=center(el,map);
-   let hit=false;
-   for(let j=0;j<i;j++) if(overlap(r,center(icons[j],map),4)){hit=true;break;}
-   if(hit){
-     const x=parseFloat(el.style.left)||50,y=parseFloat(el.style.top)||50;
-     const [nx,ny]=findFree(el,map,x,y);
-     savePos(el,nx,ny); changed=true;
-   }
- }
- if(changed) window.dispatchEvent(new Event('resize'));
-}
-function schedule(){clearTimeout(window.__JGB_EAM_V11_TIMER);window.__JGB_EAM_V11_TIMER=setTimeout(()=>document.querySelectorAll('.eh-map').forEach(resolveMap),180)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
-new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
-/* 드래그가 끝난 직후에도 겹침을 정리 */
-document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map .eh-marker'))setTimeout(schedule,40)},true);
+  'use strict';
+  /* 자동 겹침 보정/중앙 이동 로직을 의도적으로 비활성화한다. */
+  window.__JGB_EAM_HYUN_V11_ICON_NO_OVERLAP=true;
 })();
 </script>
 
