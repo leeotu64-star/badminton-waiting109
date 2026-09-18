@@ -15061,16 +15061,21 @@ body {
     const file=input.files&&input.files[0]; if(!file)return;
     const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
-  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="점검·정비 내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';}
+  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog jgb-lr-maint-expanded"><h3>유지관리 이력 등록</h3><div class="jgb-lr-maint-grid"><label>관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>관리구분<input id="jgbLRCategory" type="text" placeholder="예: 예방정비, 고장수리"></label><label>작업자<input id="jgbLRWorker" type="text" placeholder="작업자명을 입력하세요."></label><label>정비비용(원)<input id="jgbLRCost" type="number" min="0" placeholder="0"></label><label class="full">점검·정비 내용<textarea id="jgbLRText" placeholder="점검·정비 내용을 입력하세요."></textarea></label><label class="full">조치내용<textarea id="jgbLRAction" placeholder="조치내용 및 결과를 입력하세요."></textarea></label><label class="full">비고<textarea id="jgbLRNote" placeholder="추가사항을 입력하세요."></textarea></label></div><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');['jgbLRText','jgbLRAction','jgbLRNote','jgbLRCategory','jgbLRWorker','jgbLRCost'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});}
   window.jgbLRSave=function(){
-    const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim();
-    if(!text)return;
-    /* 등록일자는 브라우저의 현지 날짜를 사용합니다. 연도가 바뀌면 새 연도가 자동 적용됩니다. */
+    const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type;
+    const text=document.getElementById('jgbLRText')?.value.trim()||'';
+    const action=document.getElementById('jgbLRAction')?.value.trim()||'';
+    const note=document.getElementById('jgbLRNote')?.value.trim()||'';
+    const category=document.getElementById('jgbLRCategory')?.value.trim()||'유지관리';
+    const worker=document.getElementById('jgbLRWorker')?.value.trim()||'담당자';
+    if(!text && !action){alert('점검·정비 내용 또는 조치내용을 입력하세요.');return;}
     const now=new Date();
     const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     const picked=document.getElementById('jgbLRDate')?.value||today;
     const y=Number(String(picked).slice(0,4));
-    const row=[(y>=2026&&y<=2035)?picked:today,'유지관리',text,'담당자'];
+    const desc=[text&&('점검·정비: '+text),action&&('조치내용: '+action),note&&('비고: '+note)].filter(Boolean).join(' | ');
+    const row=[(y>=2026&&y<=2035)?picked:today,category,desc,worker];
     if(type==='light')assets[n-1].lightHistory.unshift(row);else assets[n-1].reelHistory.unshift(row);
     m.classList.remove('open');window.jgbLRSelect(n,type);
   };
@@ -15555,6 +15560,115 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 new MutationObserver(install).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+
+<style id="JGB_LR_MAINT_DIRECT_INPUT">
+.jgb-lr-maint-expanded{width:min(720px,92vw)!important;}
+.jgb-lr-maint-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 14px;}
+.jgb-lr-maint-grid label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:800;color:#173b55;}
+.jgb-lr-maint-grid label.full{grid-column:1/-1;}
+.jgb-lr-maint-grid input,.jgb-lr-maint-grid textarea{box-sizing:border-box;width:100%;border:1px solid #9bb5c9;border-radius:5px;background:#fff;padding:9px 10px;font:inherit;color:#173b55;}
+.jgb-lr-maint-grid textarea{min-height:72px;resize:vertical;}
+@media(max-width:600px){.jgb-lr-maint-grid{grid-template-columns:1fr}.jgb-lr-maint-grid label.full{grid-column:auto;}}
+</style>
+
+<style id="JGB_EAM_MOVE_FINAL_V10">
+/* V10 최종: EAM 시설 자산 배치도에서만 위치 이동 모드 사용 */
+.jgb-eam-move-toggle-v10{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  height:34px!important;padding:0 13px!important;border:2px solid #176fc1!important;
+  border-radius:6px!important;background:#fff!important;color:#075b91!important;
+  font-size:12px!important;font-weight:900!important;cursor:pointer!important;white-space:nowrap!important;
+}
+.jgb-eam-move-toggle-v10.on{background:#176fc1!important;color:#fff!important;}
+#eam228Map:not(.eam-move-on) .eam228-asset{cursor:pointer!important;}
+#eam228Map.eam-move-on .eam228-asset{cursor:grab!important;touch-action:none!important;}
+#eam228Map.eam-move-on .eam228-asset.dragging{cursor:grabbing!important;}
+</style>
+<script id="JGB_EAM_MOVE_FINAL_V10_SCRIPT">
+(function(){
+'use strict';
+if(window.__JGB_EAM_MOVE_FINAL_V10)return;
+window.__JGB_EAM_MOVE_FINAL_V10=true;
+window.__EAM228_MOVE_MODE=!!window.__EAM228_MOVE_MODE;
+
+function map(){return document.getElementById('eam228Map');}
+function code(el){return String(el?.getAttribute('data-code')||el?.dataset?.code||'').trim();}
+function openAsset(c){
+  if(!c)return;
+  window.__eamSelCode=c;
+  if(typeof window.jgbOpenEamAssetByCode==='function') return window.jgbOpenEamAssetByCode(c);
+  if(typeof window.go==='function') return window.go('eam');
+}
+function header(){
+  const m=map(); if(!m)return null;
+  const card=m.closest('.eam228-map-card');
+  if(!card)return null;
+  return card.querySelector(':scope > .eh-card-head') || card.querySelector('.eh-card-head');
+}
+function install(){
+  const m=map(), h=header(); if(!m||!h)return;
+  /* 이전에 잘못 추가된 이동 버튼은 숨기고 V10 버튼 하나만 사용 */
+  document.querySelectorAll('.jgb-eam-map-move-v8,.jgb-eam-move-toggle').forEach(b=>b.style.display='none');
+  let b=h.querySelector('.jgb-eam-move-toggle-v10');
+  if(!b){
+    b=document.createElement('button');
+    b.type='button';
+    b.className='jgb-eam-move-toggle-v10';
+    b.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      window.__EAM228_MOVE_MODE=!window.__EAM228_MOVE_MODE;
+      sync();
+    });
+    h.style.display='flex';h.style.alignItems='center';h.style.justifyContent='space-between';h.style.gap='8px';
+    h.appendChild(b);
+  }
+  sync();
+}
+function sync(){
+  const m=map(), b=document.querySelector('#eam228Map')?.closest('.eam228-map-card')?.querySelector('.jgb-eam-move-toggle-v10');
+  if(!m)return;
+  m.classList.toggle('eam-move-on',!!window.__EAM228_MOVE_MODE);
+  if(b){b.classList.toggle('on',!!window.__EAM228_MOVE_MODE);b.textContent=window.__EAM228_MOVE_MODE?'📍 위치 이동 종료':'📍 위치 이동';}
+}
+
+/* 평상시 클릭은 EAM으로 이동. 이동 모드에서는 클릭으로 이동하지 않는다. */
+document.addEventListener('click',function(e){
+  const el=e.target.closest?.('#eam228Map .eam228-asset');
+  if(!el)return;
+  if(window.__EAM228_MOVE_MODE){
+    e.preventDefault();e.stopImmediatePropagation();
+    return;
+  }
+  if(el.classList.contains('dragging')){
+    e.preventDefault();e.stopImmediatePropagation();
+    return;
+  }
+  const c=code(el); if(!c)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  openAsset(c);
+},true);
+
+/* 이동 모드에서는 기존 더블클릭 이동도 차단한다. */
+document.addEventListener('dblclick',function(e){
+  const el=e.target.closest?.('#eam228Map .eam228-asset');
+  if(!el||!window.__EAM228_MOVE_MODE)return;
+  e.preventDefault();e.stopImmediatePropagation();
+},true);
+
+/* 이동 모드가 아닐 때 기존 드래그 핸들러가 움직이지 못하게 차단 */
+document.addEventListener('pointerdown',function(e){
+  const el=e.target.closest?.('#eam228Map .eam228-asset');
+  if(!el)return;
+  if(!window.__EAM228_MOVE_MODE){
+    e.stopImmediatePropagation();
+  }
+},true);
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+new MutationObserver(function(){install();sync();}).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
