@@ -2707,7 +2707,7 @@ html::before,body::before{
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v47</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v49</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      }catch(err){
        console.error("화면 렌더링 오류",err);
        app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
@@ -2717,6 +2717,54 @@ html::before,body::before{
     function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
     function go(p){if(!p)return;page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
     window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";render()})
+
+<script id="EAM_V49_MANUAL_JS">
+(function(){
+  const pages=[
+    {t:"01 · 시작하기", rows:[
+      ["자산 선택","좌측 자산 목록에서 관리할 자산을 선택합니다."],
+      ["배치도","시설 배치도에서 자산 위치를 확인하고 아이콘을 배치합니다."],
+      ["상태","이력카드의 자산상태를 기준으로 관리합니다."]
+    ]},
+    {t:"02 · 자산 이력카드", rows:[
+      ["기본정보","자산코드·자산명·설비종류·위치·모델·수량 등을 확인합니다."],
+      ["수정","이력카드의 수정 기능으로 자산 정보를 변경합니다."],
+      ["상태관리","정상·점검·조치필요·수리중·부품대기·폐기 기준으로 관리합니다."]
+    ]},
+    {t:"03 · 수리 LIVE", rows:[
+      ["직접입력","실시간 수리 현황은 우측의 직접입력으로 등록합니다."],
+      ["확인","수리 상태·예정일·담당자를 확인합니다."],
+      ["처리","완료 버튼으로 수리 LIVE를 처리합니다."]
+    ]},
+    {t:"04 · 조명·릴선", rows:[
+      ["위치","코트 도면의 36개 위치를 기준으로 관리합니다."],
+      ["조명","각 위치의 코트조명을 별도 품목으로 관리합니다."],
+      ["릴선","CSI-7 릴선을 별도 품목으로 관리하고 올림·내림 상태를 확인합니다."]
+    ]},
+    {t:"05 · 이력관리", rows:[
+      ["점검이력","정기점검과 점검 결과를 기록합니다."],
+      ["수리이력","고장·조치내용·작업자·일자를 누적 관리합니다."],
+      ["교체이력","부품 또는 설비 교체 내용을 남깁니다."]
+    ]}
+  ];
+  window.eamV49Manual=function(n){
+    n=Math.max(0,Math.min(pages.length,n));
+    const b=document.getElementById("eamV49Book"); if(!b)return;
+    if(n===0){
+      b.innerHTML='<div class="eam-v49-cover" onclick="window.eamV49Manual(1)"><div class="bookmark">🏢</div><strong>장군봉체육관<br>EAM 시설 자산관리</strong><small>자산 등록부터 배치·상태·수리이력까지<br>한눈에 관리하는 사용 설명서</small><small style="margin-top:14px;opacity:.65">표지를 클릭하면 사용 설명서가 열립니다.</small></div>';
+      return;
+    }
+    const p=pages[n-1];
+    b.innerHTML='<div class="eam-v49-manual"><h4>📖 '+p.t+'</h4>'+p.rows.map(r=>'<div class="mrow"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>').join('')+
+      '<div class="eam-v49-manual-nav">'+
+      '<button onclick="window.eamV49Manual(0)">표지</button>'+
+      (n>1?'<button onclick="window.eamV49Manual('+(n-1)+')">‹ 이전</button>':'')+
+      (n<pages.length?'<button onclick="window.eamV49Manual('+(n+1)+')">다음 ›</button>':'')+
+      '</div></div>';
+  };
+})();
+</script>
+
     function lightingPage(){
       const esc=x=>typeof window.xEsc==='function'?window.xEsc(x==null?'':String(x)):String(x==null?'':x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
       const STORE='JGB_LIGHT_REEL_V1';
@@ -3645,7 +3693,26 @@ html::before,body::before{
       .eam228-bottom{grid-template-columns:2fr 3fr 1fr!important}
       .eam228-entry.main{right:0!important;top:46%!important}
       .eam228-entry.court{right:12%!important;top:41%!important}
-</style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
+</style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리예정</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right">
+<section class="eam228-right-card">
+  <div class="eam228-section-head">
+    <h2>🔧 실시간 수리 현황</h2>
+    <div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div>
+  </div>
+  <div class="eam228-live-body">${liveHtml}</div>
+</section>
+<section class="eam-v49-notebook" aria-label="EAM 사용 설명서 수첩">
+  <div class="eam-v49-book-head"><b>📒 EAM 사용 설명서</b><span>시설 자산관리 안내 수첩</span></div>
+  <div class="eam-v49-book-body" id="eamV49Book">
+    <div class="eam-v49-cover" onclick="window.eamV49Manual(1)">
+      <div class="bookmark">🏢</div>
+      <strong>장군봉체육관<br>EAM 시설 자산관리</strong>
+      <small>자산 등록부터 배치·상태·수리이력까지<br>한눈에 관리하는 사용 설명서</small>
+      <small style="margin-top:14px;opacity:.65">표지를 클릭하면 사용 설명서가 열립니다.</small>
+    </div>
+  </div>
+</section>
+</aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
     }
 
@@ -3729,7 +3796,7 @@ function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length
 const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK_V53';_dtStyle.textContent='.dt-link-asset{width:100%;text-align:left;border:1px solid #dbe5ee;background:#f8fbff;border-radius:9px;padding:8px 10px;color:#1b5e9e;cursor:pointer}.dt-link-asset span{float:right}.dt-hot.room{white-space:nowrap;transform:translate(-50%,-50%)}';document.head.appendChild(_dtStyle);
 
 (function(){
-  const DT={floor:'',toilet:'',lighting:''};
+
   window.__dtView=window.__dtView||'floor';
   window.__dtSel=window.__dtSel||{type:'room',name:'1층 전체',place:'장군봉체육관 1층',status:'정상',code:'',category:'공간'};
   window.__dtZoom=window.__dtZoom||1;
@@ -3800,7 +3867,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       ].map(r=>`<button class="dt-hot asset" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.icon)}</span><b>${esc(r.code)}</b></button>`).join('')+'</div>';
     const lightingMini=`<div class="dt-mini-card"><div class="dt-mini-title"><b>조명·전등릴 교체 이력</b><span>코트장 조명 관리</span></div><div class="dt-image-removed">조명 도면 이미지는 제외됨</div><button onclick="dtView('lighting')">전체 이력 보기 →</button></div>`;
     return `<div class="dt-v43 dt-v43-new">
-      <div class="dt-v43-head"><div><div class="dt-v43-kicker">DIGITAL TWIN · JANGGUNBONG</div><div class="dt-v43-title">장군봉체육관 디지털트윈</div><div class="dt-v43-sub">실제 평면도에 공간 · 코트 · EAM 자산을 연결하고, 조명은 별도 도면에서 관리합니다.</div></div><div class="dt-v43-actions"><button class="dt-v43-btn" onclick="go('eam')">EAM 자산관리</button><button class="dt-v43-btn primary" onclick="go('process')">QR 접수관리</button></div></div>
+      <div class="dt-v43-head"><div><div class="dt-v43-kicker">DIGITAL TWIN · JANGGUNBONG</div><div class="dt-v43-title">장군봉체육관 공간 안내</div><div class="dt-v43-sub">실제 평면도에 공간 · 코트 · EAM 자산을 연결하고, 조명은 별도 도면에서 관리합니다.</div></div><div class="dt-v43-actions"><button class="dt-v43-btn" onclick="go('eam')">EAM 자산관리</button><button class="dt-v43-btn primary" onclick="go('process')">QR 접수관리</button></div></div>
       <div class="dt-v43-tabs"><button class="dt-v43-tab ${v==='floor'?'on':''}" onclick="dtView('floor')">전체 평면도</button><button class="dt-v43-tab ${v==='toilet'?'on':''}" onclick="dtView('toilet')">화장실 상세도</button><button class="dt-v43-tab ${v==='lighting'?'on':''}" onclick="dtView('lighting')">조명·전등릴 이력</button></div>
       <div class="dt-twin-strip">
         <div class="dt-floor-main"><div class="dt-v43-maphead"><div><strong>${title}</strong><small>${sub}</small></div><div class="dt-v43-legend"><span><i class="dt-dot g"></i>정상</span><span><i class="dt-dot y"></i>주의</span><span><i class="dt-dot r"></i>점검필요</span></div></div><div class="dt-v43-map"><div class="dt-image-removed">도면 이미지는 용량 절감을 위해 제외했습니다.<br><small>자산 정보와 위치 데이터는 유지됩니다.</small></div>${v==='floor'?floorHotspots:v==='toilet'?toiletHotspots:''}<div class="dt-v43-zoom"><button onclick="dtZoom(.1)">＋</button><button onclick="dtZoom(-.1)">−</button><button onclick="window.__dtZoom=1;render()">1:1</button></div></div></div>
@@ -3809,7 +3876,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           ${v==='lighting'?lightingMini:''}
         </div>
       </div>
-      ${v==='floor'?`<div class="dt-v43-detailgrid"><div class="dt-v43-detail"><h4>공간 기반 디지털트윈</h4><p>도면에서 코트·공간·EAM 자산을 선택하면 현재 상태와 연결 이력을 바로 확인할 수 있습니다.</p></div><div class="dt-v43-detail"><h4>관리 흐름</h4><p>위치 선택 → 자산 확인 → EAM 이력 → 작업/접수로 이어지는 공간 기반 관리 구조입니다.</p></div></div>`:''}
+      ${v==='floor'?`<div class="dt-v43-detailgrid"><div class="dt-v43-detail"><h4>공간 기반 시설안내</h4><p>도면에서 코트·공간·EAM 자산을 선택하면 현재 상태와 연결 이력을 바로 확인할 수 있습니다.</p></div><div class="dt-v43-detail"><h4>관리 흐름</h4><p>위치 선택 → 자산 확인 → EAM 이력 → 작업/접수로 이어지는 공간 기반 관리 구조입니다.</p></div></div>`:''}
       ${v==='toilet'?`<div class="dt-v43-detailgrid"><div class="dt-v43-detail"><h4>화장실 상세도 연결</h4><p>제공된 실제 화장실 도면을 그대로 사용합니다. 위생설비 자산을 선택하면 EAM 자산번호와 작업·정비이력으로 연결할 수 있습니다.</p></div><div class="dt-v43-detail"><h4>현재 등록된 위생설비</h4><p>SA-01 등 위생설비는 EAM 분류와 연동됩니다. 도면 위 좌표는 실제 위치에 맞춰 추가 조정할 수 있습니다.</p></div></div>`:''}
       ${v==='lighting'?`<div class="dt-v43-detailgrid"><div class="dt-v43-detail"><h4>코트장 조명 연결</h4><p>조명은 체육관 코트 상부 설비로 표시합니다. L-01~L-05처럼 위치를 나누어 선택하고 교체 이력과 연결하는 구조입니다.</p></div><div class="dt-v43-detail"><h4>교체 이력 자료</h4><p>현재 제공된 조명등·전등릴 교체 이력 자료를 원본 기준으로 연결해 사용합니다.</p></div></div>`:''}
     </div>`;
@@ -14431,3 +14498,83 @@ body {
 <style id="JGB_LIGHT_REEL_V1_STYLE">
 .jgb-lr-page{padding:10px 2px 30px;color:#17334d}.jgb-lr-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:12px}.jgb-lr-head small{font-size:10px;font-weight:900;color:#6e8495}.jgb-lr-head h2{margin:3px 0;font-size:22px}.jgb-lr-head p{margin:0;color:#708396;font-size:12px}.jgb-lr-head-actions button{border:0;border-radius:8px;background:#1769bd;color:#fff;font-weight:900;padding:10px 14px;cursor:pointer}.jgb-lr-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(330px,.9fr);gap:12px;align-items:start}.jgb-lr-page .card{background:#fff;border:1px solid #cbd9e4;border-radius:10px;overflow:hidden}.jgb-lr-cardhead{height:44px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d6e0e8;background:#f4f8fb}.jgb-lr-cardhead span{font-size:10px;color:#718496}.jgb-lr-legend{display:flex;gap:14px;padding:9px 12px;font-size:11px;border-bottom:1px solid #e0e7ed}.jgb-lr-courts{margin:12px;background:#edf3f6;border:3px solid #304b61;border-radius:8px;padding:14px;position:relative}.jgb-lr-courtlabels{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:8px}.jgb-lr-courtlabels b{text-align:center;font-size:12px;padding:6px;background:#1b4563;color:#fff;border-radius:4px}.jgb-lr-grid{display:grid;grid-template-columns:repeat(9,minmax(36px,1fr));grid-template-rows:repeat(4,62px);gap:5px;background:#d7ebd0;padding:9px;border:1px solid #78936f}.jgb-lr-dot{position:relative;border:1px solid #a7c4aa;border-radius:5px;background:#f8fcf7;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;box-shadow:0 1px 2px rgba(0,0,0,.08)}.jgb-lr-dot:before{content:"";position:absolute;top:5px;left:50%;width:2px;height:18px;background:#8798a4;opacity:.65}.jgb-lr-dot.sel{outline:3px solid #1769bd;z-index:2}.jgb-lr-icon{font-size:17px}.jgb-lr-dot b{font-size:13px;color:#16364d}.jgb-lr-entry{width:120px;margin:10px auto -27px;text-align:center;background:#d0d0d0;border:2px solid #555;padding:6px;font-weight:900}.jgb-lr-statuses{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 12px}.jgb-lr-statuses span{border:1px solid #d8e1e8;background:#fff;border-radius:6px;padding:6px 8px;font-size:10px;font-weight:900}.jgb-lr-statuses i,.jgb-lr-statusbtn i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.jgb-lr-side{display:flex;flex-direction:column;gap:12px}.jgb-lr-tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #d5e0e8}.jgb-lr-tabs button{padding:11px;border:0;background:#eef4f8;font-weight:900;color:#4d6679;cursor:pointer}.jgb-lr-tabs button.on{background:#fff;color:#1769bd;box-shadow:inset 0 -3px #1769bd}.jgb-lr-selected{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #e0e7ed}.jgb-lr-selected small{display:block;color:#74889a;font-size:10px}.jgb-lr-selected strong{font-size:22px;margin-right:7px}.jgb-lr-selected span{font-size:11px;color:#6d8191}.jgb-lr-selected em{font-style:normal;font-weight:900;font-size:12px}.jgb-lr-assets table,.jgb-lr-history table{width:100%;border-collapse:collapse;font-size:11px}.jgb-lr-assets th,.jgb-lr-assets td,.jgb-lr-history th,.jgb-lr-history td{border-bottom:1px solid #dbe4ea;padding:8px;text-align:left}.jgb-lr-assets th{width:82px;background:#edf3f7;color:#456075}.jgb-lr-statusbtn{border:1px solid #c9d8e2;background:#fff;border-radius:5px;padding:5px 8px;font-weight:900;cursor:pointer}.jgb-lr-reelbtns{display:flex;gap:5px;margin-top:7px}.jgb-lr-reelbtns button{border:1px solid #c5d5e0;background:#f5f9fc;border-radius:5px;padding:5px 7px;font-size:10px;font-weight:900;cursor:pointer}.jgb-lr-history-scroll{max-height:240px;overflow:auto}.jgb-lr-history th{background:#edf3f7;position:sticky;top:0}.jgb-lr-empty{padding:30px 10px;text-align:center;color:#8293a0;font-size:11px}.jgb-lr-empty button{margin-top:9px;border:1px solid #1769bd;background:#fff;color:#1769bd;border-radius:6px;padding:6px 9px;font-weight:900;cursor:pointer}@media(max-width:1100px){.jgb-lr-layout{grid-template-columns:1fr}.jgb-lr-grid{grid-template-columns:repeat(9,minmax(30px,1fr));overflow:auto}.jgb-lr-courts{overflow:auto}}
 </style>
+<style id="EAM_V49_RIGHT_LIVE_NOTEBOOK">
+/* v49: EAM 우측을 30% 영역으로 구성.
+   전체 EAM에는 스크롤을 강제하지 않고, 실시간 수리 현황만 가로·세로 스크롤 허용. */
+.eam228-main{
+  grid-template-columns:minmax(0,7fr) minmax(300px,3fr)!important;
+  gap:9px!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.eam228-right{
+  display:grid!important;
+  grid-template-rows:minmax(250px,1fr) minmax(220px,.82fr)!important;
+  gap:9px!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.eam228-right-card{
+  min-width:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.eam228-live-body{
+  min-width:0!important;
+  min-height:0!important;
+  overflow:auto!important;
+  overscroll-behavior:contain;
+}
+.eam228-live-body table{
+  min-width:620px!important;
+  width:max-content!important;
+  max-width:none!important;
+}
+.eam228-live-body::-webkit-scrollbar{width:10px;height:10px}
+.eam228-live-body::-webkit-scrollbar-thumb{background:#93a7b5;border-radius:8px}
+.eam228-live-body::-webkit-scrollbar-track{background:#eef3f7}
+.eam228-live-body{scrollbar-width:auto;scrollbar-color:#93a7b5 #eef3f7}
+
+/* EAM 사용 설명서 수첩 */
+.eam-v49-notebook{
+  min-height:0!important;
+  background:#fff!important;
+  border:1px solid #cbd9e4!important;
+  border-radius:12px!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.eam-v49-book-head{
+  height:42px;flex:0 0 42px;padding:0 11px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid #d7e2ea;background:#f4f8fb;
+}
+.eam-v49-book-head b{font-size:14px;color:#173d58}
+.eam-v49-book-head span{font-size:9px;color:#7a8c9b}
+.eam-v49-book-body{flex:1;min-height:0;padding:9px;background:#eef3f6}
+.eam-v49-cover{
+  height:100%;min-height:175px;border-radius:9px;
+  background:linear-gradient(145deg,#17608b,#0d4163 58%,#082f4c);
+  color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),0 8px 18px rgba(20,54,76,.18);
+  cursor:pointer;
+}
+.eam-v49-cover .bookmark{font-size:27px;margin-bottom:7px}
+.eam-v49-cover strong{font-size:18px;letter-spacing:-.03em}
+.eam-v49-cover small{font-size:9px;opacity:.82;margin-top:7px;line-height:1.5}
+.eam-v49-manual{height:100%;min-height:175px;background:#fff;border:1px solid #d7e0e7;border-radius:8px;padding:10px;box-sizing:border-box;overflow:auto}
+.eam-v49-manual h4{margin:0 0 7px;font-size:13px;color:#17476a}
+.eam-v49-manual p{margin:4px 0;font-size:9px;line-height:1.55;color:#536b7d}
+.eam-v49-manual .mrow{display:grid;grid-template-columns:62px 1fr;gap:6px;padding:5px 0;border-bottom:1px solid #edf1f4;font-size:9px}
+.eam-v49-manual .mrow b{color:#45657b}.eam-v49-manual .mrow span{color:#173d58}
+.eam-v49-manual-nav{display:flex;gap:5px;margin-top:7px}
+.eam-v49-manual-nav button{border:1px solid #cbd9e4;background:#fff;border-radius:6px;padding:5px 8px;font-size:9px;font-weight:900;color:#27526e;cursor:pointer}
+@media(max-width:1000px){
+  .eam228-main{grid-template-columns:1fr!important;overflow:visible!important;height:auto!important}
+  .eam228-right{grid-template-rows:minmax(380px,1fr) 300px!important;overflow:visible!important}
+  .eam228-page{overflow:auto!important}
+}
+</style>
+
