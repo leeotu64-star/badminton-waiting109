@@ -3259,6 +3259,97 @@ a[data-page="digitalTwin"],
   }
 }
 </style>
+
+<style id="JGB_EAM_HYUN_V2_ALIGN_SCROLL">
+/* V2: 배치도와 우측 영역의 상·하단을 정확히 맞추고, 수리 LIVE에 가로/세로 스크롤을 고정 표시 */
+.eh-main{
+  min-height:0!important;
+  height:100%!important;
+  align-items:stretch!important;
+  box-sizing:border-box!important;
+}
+.eh-map-card,
+.eh-right{
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  align-self:stretch!important;
+  box-sizing:border-box!important;
+}
+/* 우측은 배치도 전체 높이에 정확히 맞추고 6:4로 분할 */
+.eh-right{
+  display:grid!important;
+  grid-template-rows:minmax(0,6fr) minmax(0,4fr)!important;
+  gap:10px!important;
+  overflow:hidden!important;
+}
+.eh-live-card,
+.eh-detail-card{
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+/* 수리 LIVE 내부만 스크롤: 세로바는 항상 표시, 내용이 넓으면 가로바 표시 */
+.eh-live-card{
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+.eh-live-card .eh-card-body{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  width:100%!important;
+  height:100%!important;
+  overflow-y:scroll!important;
+  overflow-x:auto!important;
+  scrollbar-gutter:stable both-edges!important;
+  box-sizing:border-box!important;
+}
+.eh-live-card table{
+  width:max-content!important;
+  min-width:760px!important;
+  max-width:none!important;
+  table-layout:fixed!important;
+  border-collapse:collapse!important;
+}
+.eh-live-card th,
+.eh-live-card td{
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.eh-live-card .eh-card-head{
+  flex:0 0 44px!important;
+}
+.eh-live-card .eh-card-body::-webkit-scrollbar{
+  width:11px!important;
+  height:11px!important;
+}
+.eh-live-card .eh-card-body::-webkit-scrollbar-thumb{
+  background:#8299a9!important;
+  border-radius:7px!important;
+  border:2px solid #edf3f6!important;
+}
+.eh-live-card .eh-card-body::-webkit-scrollbar-track{
+  background:#edf3f6!important;
+}
+/* 하단 40% 영역도 배치도 하단선과 정확히 일치 */
+.eh-detail-card{
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+.eh-detail-body{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow:auto!important;
+  box-sizing:border-box!important;
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
