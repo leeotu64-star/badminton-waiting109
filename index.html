@@ -3522,7 +3522,7 @@ html::before,body::before{
       window.eam228Save=async code=>{
         const a=assets.find(x=>codeOf(x)===V(code));if(!a||!SUPA)return;
         const g=id=>V(document.getElementById(id)?.value);
-        const payload={name:g('e223Name'),category:catMap[g('e223Cat')]||'기타설비',model:g('e223Model')||null,install_date:g('e223Date')||null,place:g('e223Place')||null,status:g('e223Status')||'정상',product_name:catMap[g('e223Cat')]||'기타설비'};
+        const payload={name:g('e223Name'),category:catMap[g('e223Cat')]||'기타설비',install_date:g('e223Date')||null,place:g('e223Place')||null,status:g('e223Status')||'정상',product_name:catMap[g('e223Cat')]||'기타설비'};
         if(!payload.name){alert('자산명을 입력하세요.');return}
         const r=await SUPA.from('assets').update(payload).eq('id',a.id);if(r.error){alert('저장 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();await eamLoad();render();
@@ -3557,7 +3557,7 @@ html::before,body::before{
           alert('이미 등록된 자산코드입니다.\n기존 EAM 자산을 그대로 사용하려면 기존 자산을 선택하세요.');
           return;
         }
-        const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],model:null,place:null,status:'정상'};
+        const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],place:null,status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
       };
@@ -5771,7 +5771,7 @@ function jgbV47GoWpByLeak(leakCode){
         const meta={asset_code:String(code),name,category,locationCode:lc,place,model:g('editModel'),qty:g('editQty'),vendor:g('editVendor'),maker:g('editVendor'),asContact:g('editAs'),manufactureDate:g('editManufactureDate'),date:g('editManufactureDate'),installDate:g('editInstall'),life:g('editLife'),capacity:g('editCapacity'),grade:g('editGrade'),warranty:g('editWarranty'),asHistory:g('editAsHistory'),status:g('editStatus')||'정상',improvementPlan:g('editImprovementPlan'),note:g('editNote')};
         const btn=document.getElementById('eamEditSave');if(btn){btn.disabled=true;btn.textContent='저장 중…'}
         try{
-          const r=await SUPA.from('assets').update({name,category,place,status:meta.status,product_name:meta.model||category}).eq('id',a.id);if(r.error)throw r.error;
+          const r=await SUPA.from('assets').update({name,category,place,status:meta.status,product_name:category}).eq('id',a.id);if(r.error)throw r.error;
           const all=Object.assign({},readMeta(),{[String(code)]:meta});writeMeta(all);window.__eamMetaByCode=all;
           // 자산정보 수정은 assets/meta만 저장하며 유지관리 이력에는 기록하지 않습니다.
           document.getElementById('eamEditModal')?.remove();await window.eamLoad();window.__eamSelCode=String(code);window.__eamCat=CATMAP[category]||'other';render();
@@ -14492,4 +14492,37 @@ body {
   font-size:9px!important;
   z-index:6!important;
 }
+</style>
+
+<style id="v18-court-size-final">
+/* v18: 코트 세로 크기만 적당히 복원. 5개 코트 상·하단 동일선 유지 */
+.eam228-courts{
+  left:6%!important;
+  right:6%!important;
+  top:0%!important;
+  height:24%!important;
+  gap:7px!important;
+  align-items:stretch!important;
+}
+.eam228-court{
+  width:100%!important;
+  height:calc(100% - 10px)!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin-top:10px!important;
+  box-sizing:border-box!important;
+  align-self:stretch!important;
+  overflow:hidden!important;
+}
+.eam228-court::before{
+  left:9%!important;right:9%!important;top:50%!important;
+  border-top:2px solid #587489!important;
+  display:block!important;
+}
+.eam228-court::after{
+  left:14%!important;right:14%!important;top:15%!important;bottom:15%!important;
+  border:1px solid #668296!important;
+  display:block!important;
+}
+.eam228-court span{width:29px!important;height:29px!important;font-size:15px!important;z-index:5!important}
 </style>
