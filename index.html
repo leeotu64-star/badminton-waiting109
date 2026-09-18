@@ -15415,7 +15415,7 @@ window.JGB_EAM_CARD_V22_OPEN = async function(){
   <div id="jgbV12CardEditor" onclick="if(event.target===this)this.remove()">
     <div class="v12box">
       <div class="v12head">
-        <div><h3>📋 주요설비 이력카드 수정</h3><small>현재 선택된 자산만 수정합니다.</small></div>
+        <div><h3>📋 주요설비 이력카드 수정</h3><small>현재 선택된 자산만 수정합니다. 자산코드는 중복 입력도 허용합니다.</small></div>
         <button type="button" class="v12cancel" onclick="document.getElementById('jgbV12CardEditor')?.remove()">닫기</button>
       </div>
       <div class="v12grid">
@@ -15505,13 +15505,6 @@ window.JGB_EAM_CARD_V12_SAVE = async function(oldCode, assetId){
   if(!newC){alert('자산코드를 입력하세요.');return false}
   if(!/^[A-Z]{1,4}-[0-9]{1,4}$/.test(newC)){alert('자산코드는 예: AC-01 형식으로 입력하세요.');return false}
   if(!name){alert('자산명을 입력하세요.');return false}
-
-  const A=Array.isArray(window.__eamA)?window.__eamA:[];
-  const duplicate=A.find(a=>String(a?.asset_code||'').trim().toUpperCase()===newC && String(a?.id)!==String(assetId));
-  if(duplicate){
-    alert('이미 사용 중인 자산코드입니다.');
-    return false;
-  }
 
   const btn=document.getElementById('jgbV12_save');
   if(btn){btn.disabled=true;btn.textContent='저장 중…'}
