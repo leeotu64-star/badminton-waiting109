@@ -15324,6 +15324,20 @@ body {
   },true);
 })();
 </script>
+<script id="JGB_V24_LIVE_DIRECT_BUTTON_FIX">
+(function(){
+  // V24: EAM 수리 LIVE의 "직접입력" 버튼만 클릭을 최우선 처리한다.
+  // 다른 EAM 기능/배치도/누수 기능에는 관여하지 않는다.
+  window.addEventListener('click',function(e){
+    const btn=e.target && e.target.closest ? e.target.closest('.eh-live-card .eh-card-head button') : null;
+    if(!btn) return;
+    if(!btn.textContent.includes('직접입력')) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if(typeof window.eamManualLiveOpen==='function') window.eamManualLiveOpen();
+  },true);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
