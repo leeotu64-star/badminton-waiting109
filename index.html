@@ -13434,93 +13434,46 @@ function mapPoint(ev,map,offsetX,offsetY,el){
 
 document.addEventListener('pointerdown',function(ev){
   if(ev.button!==0)return;
-
   const el=ev.target.closest?.('#eam228Map .eam228-asset');
   if(!el)return;
-
   const map=el.closest('#eam228Map');
   if(!map)return;
-
-  const er=el.getBoundingClientRect();
-
-  drag={
-    el:el,
-    map:map,
-    id:ev.pointerId,
-    code:V(el.dataset.code||''),
-    sx:ev.clientX,
-    sy:ev.clientY,
-    grabX:ev.clientX-er.left,
-    grabY:ev.clientY-er.top,
-    moved:false
+  const r=map.getBoundingClientRect(), er=el.getBoundingClientRect();
+  const code=V(el.dataset.code||'');
+  let moved=false;
+  let lastX=Number(parseFloat(el.style.left)||50), lastY=Number(parseFloat(el.style.top)||50);
+  const move=ev2=>{
+    const x=Math.max(3,Math.min(97,((ev2.clientX-r.left)/r.width)*100));
+    const y=Math.max(4,Math.min(96,((ev2.clientY-r.top)/r.height)*100));
+    /* 누수 아이콘과 같은 방식: 실제로 움직였을 때만 드래그로 인정 */
+    if(Math.abs(x-lastX)>.1||Math.abs(y-lastY)>.1)moved=true;
+    lastX=x;lastY=y;
+    if(!moved)return;
+    el.classList.add('dragging');
+    el.style.left=x.toFixed(2)+'%';
+    el.style.top=y.toFixed(2)+'%';
+    try{ev2.preventDefault();ev2.stopPropagation()}catch(_){}
   };
-
-  try{el.setPointerCapture(ev.pointerId)}catch(_){}
-
-  /* 클릭인지 드래그인지 판단할 때까지는 기존 onclick을 방해하지 않는다. */
+  const up=ev2=>{
+    el.classList.remove('dragging');
+    window.removeEventListener('pointermove',move,true);
+    window.removeEventListener('pointerup',up,true);
+    window.removeEventListener('pointercancel',up,true);
+    if(!moved)return;
+    const x=Math.max(3,Math.min(97,((ev2.clientX-r.left)/r.width)*100));
+    const y=Math.max(4,Math.min(96,((ev2.clientY-r.top)/r.height)*100));
+    el.style.left=x.toFixed(2)+'%';
+    el.style.top=y.toFixed(2)+'%';
+    const pos=read(POS,{});
+    pos[code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+    if(!write(POS,pos))alert('아이콘 위치 저장에 실패했습니다.');
+    const ds=deletedSet();ds.delete(code);write(DEL,[...ds]);
+    try{ev2.preventDefault();ev2.stopPropagation()}catch(_){}
+  };
+  window.addEventListener('pointermove',move,true);
+  window.addEventListener('pointerup',up,true);
+  window.addEventListener('pointercancel',up,true);
 },true);
-
-document.addEventListener('pointermove',function(ev){
-  if(!drag||ev.pointerId!==drag.id)return;
-
-  const dx=ev.clientX-drag.sx;
-  const dy=ev.clientY-drag.sy;
-
-  if(!drag.moved){
-    if(Math.hypot(dx,dy)<6)return;
-    drag.moved=true;
-    drag.el.classList.add('dragging');
-    drag.el.style.pointerEvents='none';
-    drag.el.style.zIndex='9999';
-    document.body.style.userSelect='none';
-  }
-
-  ev.preventDefault();
-  ev.stopPropagation();
-
-  const [x,y]=mapPoint(ev,drag.map,drag.grabX,drag.grabY,drag.el);
-  drag.el.style.left=x.toFixed(2)+'%';
-  drag.el.style.top=y.toFixed(2)+'%';
-},true);
-
-function finish(ev){
-  if(!drag||ev.pointerId!==drag.id)return;
-
-  const d=drag;
-  drag=null;
-
-  d.el.classList.remove('dragging');
-  d.el.style.pointerEvents='auto';
-  d.el.style.zIndex='';
-  document.body.style.userSelect='';
-
-  /* 이동하지 않은 경우에는 AC-01 자동 클릭 등 기존 기능 그대로 */
-  if(!d.moved)return;
-
-  const [x,y]=mapPoint(ev,d.map,d.grabX,d.grabY,d.el);
-
-  d.el.style.left=x.toFixed(2)+'%';
-  d.el.style.top=y.toFixed(2)+'%';
-
-  const pos=read(POS,{});
-  pos[d.code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-
-  if(!write(POS,pos)){
-    alert('아이콘 위치 저장에 실패했습니다.');
-  }
-
-  /* 이동한 자산은 삭제 상태가 아니므로 다시 표시 가능 */
-  const ds=deletedSet();
-  ds.delete(d.code);
-  write(DEL,[...ds]);
-
-  /* 중요: pointerup에서 전체 render()를 하지 않는다.
-     render()가 지도 DOM을 통째로 교체하면 코트 위 배치가 끊길 수 있다. */
-  ev.preventDefault();
-  ev.stopPropagation();
-}
-
-document.addEventListener('pointerup',finish,true);
 document.addEventListener('pointercancel',finish,true);
 
 /* 아이콘 제거: 자산 자체는 건드리지 않음 */
