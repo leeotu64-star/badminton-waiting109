@@ -15349,6 +15349,60 @@ body {
 .jgb-v170-mapcard{min-height:0!important;}
 .jgb-v170-mapcard .jgb-v170-map{height:100%!important;min-height:620px!important;}
 </style>
+
+<script id="EAM_CARD_DIRECT_EDIT_V8">
+(function(){
+  if(window.__EAM_CARD_DIRECT_EDIT_V8)return;
+  window.__EAM_CARD_DIRECT_EDIT_V8=true;
+
+  function addButton(){
+    const roots=[...document.querySelectorAll('body *')];
+    const title=roots.find(el=>el.children.length===0 && /주요설비 이력카드/.test((el.textContent||'').trim()));
+    if(!title)return false;
+    const box=title.closest('.card,.panel,.section,.eam-card')||title.parentElement;
+    if(!box || box.querySelector('#eamDirectEditV8'))return true;
+
+    const b=document.createElement('button');
+    b.id='eamDirectEditV8';
+    b.type='button';
+    b.textContent='✎ 이력카드 수정';
+    b.style.cssText='margin-left:10px;padding:7px 13px;border:1px solid #1f6fa8;border-radius:6px;background:#fff;color:#0b4f7a;font-weight:800;cursor:pointer;';
+    b.addEventListener('click',function(e){
+      e.preventDefault(); e.stopPropagation();
+
+      // Reuse the currently selected asset and the existing edit function.
+      const code =
+        window.__eamSelCode ||
+        document.querySelector('[data-selected-code]')?.getAttribute('data-selected-code') ||
+        document.querySelector('.eam-detail [data-code]')?.getAttribute('data-code');
+
+      const fns=['openEamEditModal','openAssetEdit','editEamAsset','openEditAsset','showEamEditModal'];
+      for(const n of fns){
+        if(typeof window[n]==='function'){
+          try{
+            code ? window[n](code) : window[n]();
+            return;
+          }catch(_){}
+        }
+      }
+
+      // Fallback: click an existing "이력카드 수정/수정" control if present.
+      const existing=[...document.querySelectorAll('button')].find(x=>/이력카드 수정|자산 수정|수정/.test(x.textContent||'') && x!==b);
+      if(existing) existing.click();
+    });
+    title.parentElement.appendChild(b);
+    return true;
+  }
+
+  const mo=new MutationObserver(()=>addButton());
+  mo.observe(document.body,{childList:true,subtree:true});
+  addButton();
+})();
+</script>
+<style id="EAM_CARD_DIRECT_EDIT_V8_STYLE">
+#eamDirectEditV8:hover{filter:brightness(.96);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
