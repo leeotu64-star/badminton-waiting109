@@ -2635,6 +2635,38 @@ html::before,body::before{
 .jgb-lr-v54-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999}.jgb-lr-v54-modal.open{display:flex}.jgb-lr-v54-dialog{width:min(560px,92vw);background:#fff;border:3px solid #7894a8;border-radius:10px;padding:15px}.jgb-lr-v54-dialog h3{margin:0 0 10px;font-weight:950}.jgb-lr-v54-dialog textarea{width:100%;height:110px;resize:vertical;font:inherit;font-weight:700}.jgb-lr-v54-dialog .row{display:flex;gap:7px;justify-content:flex-end;margin-top:10px}.jgb-lr-v54-dialog button{padding:7px 12px;border:1px solid #829aaa;border-radius:5px;background:#edf6fb;font-weight:900}
 @media(max-width:1050px){.jgb-lr-v54-panes{grid-template-columns:1fr}.jgb-lr-v54-grid{min-height:220px}.jgb-lr-v54-detail{grid-template-columns:60fr 40fr}}
 </style>
+
+<style id="JGB_DIGITAL_TWIN_LOCK_V55">
+/* v55: 디지털트윈 메뉴 잠금 — 기능은 보존하고 메뉴만 색상으로 덮어 비활성화 */
+.jgb-link.jgb-dt-locked{
+  position:relative!important;
+  display:flex!important;
+  align-items:center!important;
+  width:100%!important;
+  min-height:40px!important;
+  padding:10px 12px!important;
+  margin:0!important;
+  color:#7890a5!important;
+  background:#06243e!important;
+  border:1px solid #123b5c!important;
+  border-radius:7px!important;
+  opacity:.92!important;
+  cursor:not-allowed!important;
+  pointer-events:none!important;
+  text-decoration:none!important;
+  font-weight:700!important;
+}
+.jgb-link.jgb-dt-locked::after{
+  content:"잠금";
+  margin-left:auto;
+  padding:3px 7px;
+  border-radius:5px;
+  background:#193b57;
+  color:#9fb3c4;
+  font-size:10px;
+  font-weight:800;
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -2824,7 +2856,7 @@ html::before,body::before{
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("digitalTwin","🗺 디지털트윈")}${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v47</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태">🔒 디지털트윈</span>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v47</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      }catch(err){
        console.error("화면 렌더링 오류",err);
        app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
