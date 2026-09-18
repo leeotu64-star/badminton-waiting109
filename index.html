@@ -2644,7 +2644,7 @@ html::before,body::before{
       };
      }catch(e){return{issues:[],tasks:{},schedule:{}}}
     }
-    let db=load(); let page=new URLSearchParams(location.search).get("page")||"dashboard"; let selectedDate=new Date().toISOString().slice(0,10);
+    let db=load(); let page=new URLSearchParams(location.search).get("page")||"dashboard"; if(page==="digitalTwin"){page="eam"; history.replaceState({page:"eam"},"","?page=eam");} let selectedDate=new Date().toISOString().slice(0,10);
     function save(){localStorage.setItem(KEY,JSON.stringify(db));if(window.BroadcastChannel){new BroadcastChannel("JGB_LIVE").postMessage("update")}}
     window.addEventListener("storage",()=>{db=load();render()});
     let bc;try{bc=new BroadcastChannel("JGB_LIVE");bc.onmessage=()=>{db=load();render()}}catch(e){}
