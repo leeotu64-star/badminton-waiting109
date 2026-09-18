@@ -3844,8 +3844,8 @@ html::before,body::before{
       const locData={};const normalize=v=>V(v).replace(/\s+/g,'');locationDefs.forEach(([label,keys])=>{const rows=assets.filter(a=>keys.some(k=>normalize(placeName(a)).includes(normalize(k))));locData[label]=rows});
       window.eam228Location=label=>{const rows=locData[label]||[];const box=document.getElementById('eam228Card');if(!box)return;box.innerHTML=`<div class="eam228-card-head"><div><small>LOCATION</small><b>${esc(label)}</b></div><span>${rows.length}건</span></div><div class="eam228-location-list">${rows.length?rows.map(a=>`<button onclick="window.eam228Pick('${attr(codeOf(a))}')"><strong>${esc(codeOf(a))}</strong><span>${esc(a.name||'자산')}</span><em class="${statusClass(statusOf(a))}">${statusText(statusOf(a))}</em></button>`).join(''):'<div class="eam228-empty">등록된 자산이 없습니다.</div>'}</div>`};
 
-      const markerAssets=assets.filter(a=>getPos(a));
-      const markers=markerAssets.map(a=>{const p=getPos(a);if(!p)return '';const st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}" ><b>${esc(code)}</b></button>`}).join('');
+      const markerAssets=assets.filter(a=>!readDeletedMap().has(codeOf(a)));
+      const markers=markerAssets.map((a,i)=>{let p=getPos(a);if(!p){const col=i%6,row=Math.floor(i/6);p=[8+col*16,12+row*9]}const st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}" ><b>${esc(code)}</b></button>`}).join('');
       const court=n=>`<button type="button" class="eam228-court" onclick="window.eam228Location('코트 ${n}')"><span>${n}</span></button>`;
       const zone=(label,sub,cls='')=>`<button type="button" class="eam228-zone ${cls}" onclick="window.eam228Location('${attr(label)}')"><b>${esc(label)}</b><small>${esc(sub)}</small></button>`;
       const map=`<div id="eam228Map" class="eam228-map"><div class="eam228-courts"><strong>코트 구역 · 에어컨 자산 6개</strong>${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div><div class="eam228-facility"><div class="eam228-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>창고</b></button><span>▲ 계단</span></div><div class="eam228-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button><div class="eam228-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span></div>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div>`;
@@ -14470,6 +14470,46 @@ body {
 #eam228Map .eam228-asset{min-width:0!important;width:auto!important;height:26px!important;padding:3px 8px!important;gap:0!important;border-width:2px!important;border-radius:999px!important;font-size:11px!important;font-weight:950!important;line-height:1!important;box-sizing:border-box!important}
 #eam228Map .eam228-asset b{font-size:11px!important;font-weight:950!important;letter-spacing:.02em!important;line-height:1!important}
 .eam228-code-line input#e223Number{display:block!important;width:68px!important;text-align:center!important;border:1px solid #b9cbd8!important;border-radius:6px!important;padding:7px 5px!important;font-size:16px!important;font-weight:950!important;box-sizing:border-box!important;background:#fff!important}
+</style>
+
+<style id="JGB_EAM_V79_MAP_CODE_LEAK_MATCH">
+/* V79: EAM 배치도 자산코드 표시 — 누수 아이콘과 동일한 코드 전용 입체형. 다른 기능은 변경하지 않음. */
+#eam228Map .eam228-asset{
+  min-width:0!important;
+  width:auto!important;
+  height:30px!important;
+  min-height:30px!important;
+  padding:5px 10px!important;
+  gap:0!important;
+  border:1.5px solid #b8d2ee!important;
+  border-radius:999px!important;
+  background:linear-gradient(180deg,#ffffff 0%,#eef6ff 100%)!important;
+  color:#1267b1!important;
+  box-shadow:0 4px 10px rgba(20,55,70,.20),0 1px 2px rgba(20,55,70,.16),inset 0 1px 0 rgba(255,255,255,.95)!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  justify-content:center!important;
+  transform:translate(-50%,-50%)!important;
+}
+#eam228Map .eam228-asset b{
+  display:block!important;
+  font-size:12px!important;
+  font-weight:950!important;
+  letter-spacing:.02em!important;
+  line-height:1!important;
+}
+#eam228Map .eam228-asset span,
+#eam228Map .eam228-asset::before,
+#eam228Map .eam228-asset::after{
+  display:none!important;
+  content:none!important;
+}
+#eam228Map .eam228-asset.dragging{
+  transform:translate(-50%,-50%) scale(1.04)!important;
+}
 </style>
 </body>
 
