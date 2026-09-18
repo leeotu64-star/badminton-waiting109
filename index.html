@@ -17783,3 +17783,54 @@ document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map
   .eh-main{grid-template-columns:1fr!important;}
 }
 </style>
+
+
+<style id="JGB_EAM_MOVE_FINAL_V11">
+#eam228Map .jgb-eam-move-final-v11{
+  border:2px solid #176fc1!important;background:#fff!important;color:#075b91!important;
+  border-radius:7px!important;padding:6px 12px!important;font-size:12px!important;
+  font-weight:900!important;cursor:pointer!important;white-space:nowrap!important;
+  box-shadow:0 2px 5px rgba(20,55,70,.12)!important;margin-left:auto!important;
+}
+#eam228Map .jgb-eam-move-final-v11.on{background:#176fc1!important;color:#fff!important;}
+</style>
+<script id="JGB_EAM_MOVE_FINAL_V11">
+(function(){
+'use strict';
+function getMap(){return document.getElementById('eam228Map');}
+function getHead(){
+  const map=getMap(); if(!map)return null;
+  const card=map.closest('.eh-card');
+  if(!card)return null;
+  return card.querySelector('.eh-card-head');
+}
+function sync(){
+  const btn=document.querySelector('#eam228Map .jgb-eam-move-final-v11');
+  if(!btn)return;
+  const on=!!window.__EAM228_MOVE_MODE;
+  btn.classList.toggle('on',on);
+  btn.textContent=on?'📍 위치 이동 종료':'📍 위치 이동';
+}
+function install(){
+  const map=getMap(), head=getHead();
+  if(!map||!head)return false;
+  let btn=head.querySelector('.jgb-eam-move-final-v11');
+  if(!btn){
+    btn=document.createElement('button');
+    btn.type='button';
+    btn.className='jgb-eam-move-final-v11';
+    btn.addEventListener('click',function(e){
+      e.preventDefault(); e.stopPropagation();
+      window.__EAM228_MOVE_MODE=!window.__EAM228_MOVE_MODE;
+      sync();
+    });
+    head.appendChild(btn);
+  }
+  sync();
+  return true;
+}
+function boot(){install();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+new MutationObserver(function(){install();}).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
