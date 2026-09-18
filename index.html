@@ -14398,7 +14398,6 @@ function mapPoint(ev,map,offsetX,offsetY,el){
 
 document.addEventListener('pointerdown',function(ev){
   if(ev.button!==0)return;
-  if(!window.__EAM228_MOVE_MODE)return;
   const el=ev.target.closest?.('#eam228Map .eam228-asset');
   if(!el)return;
   const map=el.closest('#eam228Map');
@@ -15026,7 +15025,7 @@ body {
   function historyRows(hist){return hist.length?hist.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join(''):`<tr><td colspan="4" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
   function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>점검·정비 내용</th><th>작업자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span>정상 ${counts.정상} · 점검 ${counts.점검} · 조치필요 ${counts.조치필요} · 수리중 ${counts.수리중}</span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
-  function markup(){const allStatus={};Object.keys(statusColors).forEach(s=>allStatus[s]=assets.filter(x=>x.light===s||x.reel===s).length);return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-states"><span class="jgb-lr-v54-state ok"><b>${allStatus.정상}</b><small>정상</small></span><span class="jgb-lr-v54-state check"><b>${allStatus.점검}</b><small>점검</small></span><span class="jgb-lr-v54-state action"><b>${allStatus.조치필요}</b><small>조치필요</small></span><span class="jgb-lr-v54-state repair"><b>${allStatus.수리중}</b><small>수리중</small></span><span class="jgb-lr-v54-state parts"><b>${allStatus.부품대기}</b><small>부품대기</small></span><span class="jgb-lr-v54-state discard"><b>${allStatus.폐기}</b><small>폐기</small></span></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`}
+  function markup(){const lightStatus={},reelStatus={};Object.keys(statusColors).forEach(s=>{lightStatus[s]=assets.filter(x=>x.light===s).length;reelStatus[s]=assets.filter(x=>x.reel===s).length});const states=(obj)=>`<span class="jgb-lr-v54-state ok"><b>${obj.정상}</b><small>정상</small></span><span class="jgb-lr-v54-state check"><b>${obj.점검}</b><small>점검</small></span><span class="jgb-lr-v54-state action"><b>${obj.조치필요}</b><small>조치필요</small></span><span class="jgb-lr-v54-state repair"><b>${obj.수리중}</b><small>수리중</small></span><span class="jgb-lr-v54-state parts"><b>${obj.부품대기}</b><small>부품대기</small></span><span class="jgb-lr-v54-state discard"><b>${obj.폐기}</b><small>폐기</small></span>`;return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>조명과 릴선을 각각 독립적으로 관리합니다.</p></div></div><div class="jgb-lr-v54-header-groups"><div class="jgb-lr-v54-header-group"><b>💡 조명 관리 현황</b><div class="jgb-lr-v54-states">${states(lightStatus)}</div></div><div class="jgb-lr-v54-header-group"><b>🔌 릴선 관리 현황</b><div class="jgb-lr-v54-states">${states(reelStatus)}</div></div></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`}
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
   window.jgbLRCardEdit=function(n,type){
@@ -15087,6 +15086,7 @@ body {
 .jgb-lr-v54-head{background:#eaf4fa!important;border:2px solid #1d78b7!important;border-top:5px solid #1477b8!important}
 .jgb-lr-v54-panehead{background:#dbeaf3!important;color:#173b55!important;border-top:2px solid #1c5d7c!important}
 .jgb-lr-v54-maptitle{background:#f0f6fa!important}
+.jgb-lr-v54-header-groups{display:flex;gap:10px;align-items:stretch;flex:1;justify-content:flex-end}.jgb-lr-v54-header-group{min-width:330px;padding:5px 7px;border:1px solid #9bbbd0;border-radius:7px;background:#f7fbfe;box-sizing:border-box}.jgb-lr-v54-header-group>b{display:block;text-align:left;font-size:12px;color:#173b55;margin:0 0 3px 3px}.jgb-lr-v54-header-group .jgb-lr-v54-states{display:flex;gap:4px}.jgb-lr-v54-header-group .jgb-lr-v54-state{min-width:40px}.jgb-lr-v54-header-group .jgb-lr-v54-state b{font-size:15px}.jgb-lr-v54-header-group .jgb-lr-v54-state small{font-size:9px}@media(max-width:1000px){.jgb-lr-v54-header-groups{flex-direction:column}.jgb-lr-v54-header-group{min-width:0;width:100%}}
 </style>
 
 <style id="JGB_V65_DASHBOARD_SPLIT">
@@ -15344,150 +15344,6 @@ body {
 #eamHyunIconDeleteModal .eh-delete-list-v13{box-sizing:border-box;padding:10px 18px 18px;width:100%;overflow-x:hidden}
 #eamHyunIconDeleteModal .eh-delete-list-v13>div{grid-template-columns:90px minmax(0,1fr) 64px;box-sizing:border-box;width:100%;}
 </style>
-
-
-<style id="JGB_EAM_V6_MOVE_MODE">
-/* V6: EAM 자산 배치도는 「위치 이동」을 켰을 때만 드래그 가능 */
-.jgb-eam-move-toggle{
-  border:1px solid #9db8ca!important;
-  background:#fff!important;
-  color:#173b56!important;
-  border-radius:7px!important;
-  padding:7px 11px!important;
-  font-size:12px!important;
-  font-weight:900!important;
-  cursor:pointer!important;
-  white-space:nowrap!important;
-  box-shadow:0 2px 5px rgba(20,55,70,.12)!important;
-}
-.jgb-eam-move-toggle.on{
-  background:#176fc1!important;
-  border-color:#176fc1!important;
-  color:#fff!important;
-}
-#eam228Map .eam228-asset{cursor:pointer!important;user-select:none!important;-webkit-user-select:none!important;}
-#eam228Map.eam-move-on .eam228-asset{cursor:grab!important;touch-action:none!important;}
-#eam228Map.eam-move-on .eam228-asset.dragging{cursor:grabbing!important;}
-</style>
-<script id="JGB_EAM_V6_MOVE_MODE_SCRIPT">
-(function(){
-  'use strict';
-  if(window.__JGB_EAM_V6_MOVE_MODE_SCRIPT)return;
-  window.__JGB_EAM_V6_MOVE_MODE_SCRIPT=true;
-  window.__EAM228_MOVE_MODE=false;
-  window.__EAM228_MOVE_SUPPRESS_UNTIL=0;
-
-  function getMap(){return document.getElementById('eam228Map');}
-  function getCode(el){return String(el?.getAttribute('data-code')||el?.dataset?.code||'').trim();}
-
-  function openAsset(code){
-    code=String(code||'').trim();
-    if(!code)return;
-    window.__eamSelCode=code;
-    if(typeof window.jgbOpenEamAssetByCode==='function'){
-      window.jgbOpenEamAssetByCode(code);
-      return;
-    }
-    if(typeof window.go==='function'){
-      window.go('eam');
-      return;
-    }
-    try{location.href='?page=eam'}catch(_){ }
-  }
-
-  function syncMap(){
-    const map=getMap();
-    if(!map)return;
-    map.classList.toggle('eam-move-on',!!window.__EAM228_MOVE_MODE);
-    const btn=document.querySelector('.jgb-eam-move-toggle');
-    if(btn){
-      btn.classList.toggle('on',!!window.__EAM228_MOVE_MODE);
-      btn.textContent=window.__EAM228_MOVE_MODE?'📍 위치 이동 종료':'📍 위치 이동';
-      btn.title=window.__EAM228_MOVE_MODE?'이동 모드를 종료합니다.':'이동 모드를 켜고 자산 아이콘을 드래그합니다.';
-    }
-  }
-
-  function addButton(){
-    const map=getMap();
-    if(!map)return false;
-    let btn=document.querySelector('.jgb-eam-move-toggle');
-    if(btn){syncMap();return true;}
-
-    btn=document.createElement('button');
-    btn.type='button';
-    btn.className='jgb-eam-move-toggle';
-    btn.textContent='📍 위치 이동';
-    btn.title='이동 모드를 켜고 자산 아이콘을 드래그합니다.';
-    btn.addEventListener('click',function(ev){
-      ev.preventDefault();
-      ev.stopPropagation();
-      window.__EAM228_MOVE_MODE=!window.__EAM228_MOVE_MODE;
-      syncMap();
-    });
-
-    const card=map.closest('.eam228-map-card');
-    const head=card?.querySelector('.eam228-section-head,.eam228-card-head,.eam228-title,.section-title');
-    if(head){
-      head.style.display='flex';
-      head.style.alignItems='center';
-      head.style.justifyContent='space-between';
-      head.appendChild(btn);
-    }else{
-      map.style.position='relative';
-      btn.style.position='absolute';
-      btn.style.right='10px';
-      btn.style.top='10px';
-      btn.style.zIndex='500';
-      map.appendChild(btn);
-    }
-    syncMap();
-    return true;
-  }
-
-  /* 평상시: 아이콘 드래그 이벤트 자체를 기존 코드에 전달하지 않음. */
-  window.addEventListener('pointerdown',function(ev){
-    if(window.__EAM228_MOVE_MODE)return;
-    if(ev.button!==0)return;
-    const el=ev.target.closest?.('#eam228Map .eam228-asset');
-    if(!el)return;
-    /* 이동 모드가 아니므로 기존 드래그 핸들러를 차단한다. */
-    ev.stopImmediatePropagation();
-  },true);
-
-  /* 이동 모드가 아닐 때만 단순 클릭 → EAM 자산 이력카드 이동. */
-  window.addEventListener('click',function(ev){
-    const el=ev.target.closest?.('#eam228Map .eam228-asset');
-    if(!el)return;
-    if(window.__EAM228_MOVE_MODE)return;
-    if(Date.now()<window.__EAM228_MOVE_SUPPRESS_UNTIL){
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-      return;
-    }
-    const code=getCode(el);
-    if(!code)return;
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
-    openAsset(code);
-  },true);
-
-  /* 이동 모드에서 실제 드래그가 끝난 직후 발생하는 click은 차단. */
-  window.addEventListener('pointerup',function(ev){
-    const el=ev.target.closest?.('#eam228Map .eam228-asset');
-    if(el && el.classList.contains('dragging')){
-      window.__EAM228_MOVE_SUPPRESS_UNTIL=Date.now()+300;
-    }
-  },true);
-
-  function boot(){
-    addButton();
-    syncMap();
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
-  new MutationObserver(function(){addButton();syncMap();}).observe(document.body,{childList:true,subtree:true});
-})();
-</script>
 </body>
 
 <style id="v19-court-position-final">
