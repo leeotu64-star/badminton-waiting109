@@ -15129,19 +15129,50 @@ body {
 .eh-marker.map-only{background:linear-gradient(145deg,#ffffff,#d9ecfa)!important;border-width:2px!important}
 </style>
 
-<style id="EAM-LIVE-LEFT-ALIGN">
-/* 수리 LIVE 표의 제목과 내용만 왼쪽부터 정렬 */
-.eh-live-card-v20 .eh-live-scroll table th,
-.eh-live-card-v20 .eh-live-scroll table td {
-  text-align: left !important;
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-}
-/* 상태/완료 버튼은 기존 기능과 표시를 유지 */
-.eh-live-card-v20 .eh-live-scroll table td .eh-done {
-  text-align: center !important;
-}
-</style>
+<script id="JGB_EAM_MAP_TO_EAM_BY_ASSET_CODE_V1">
+(function(){
+  'use strict';
+  /* 배치도 자산 아이콘 → 자산코드 기준 EAM 이력카드 직접 연결 */
+  window.jgbOpenEamAssetByCode=function(code){
+    const c=String(code||'').trim();
+    if(!c)return;
+    let cat='';
+    let actual=c;
+    try{
+      const defs=typeof window.eamCategoryDefs==='function'?window.eamCategoryDefs():{};
+      for(const [k,v] of Object.entries(defs||{})){
+        const item=(v.items||[]).find(x=>String(x?.code||x?.asset_code||'').trim()===c);
+        if(item){cat=k;actual=String(item.code||item.asset_code||c);break;}
+      }
+    }catch(e){}
+    if(!cat){
+      try{
+        const a=(window.__eamA||[]).find(x=>String(x?.asset_code||'').trim()===c);
+        if(a){
+          const t=String(a.type||a.category||'');
+          if(t.includes('냉난방'))cat='cooling';
+          else if(t.includes('소방'))cat='fire';
+          else if(t.includes('온수')||t.includes('보일러')||t.includes('난방'))cat='water';
+          else if(t.includes('전기'))cat='electrical';
+          else if(t.includes('조명'))cat='lighting';
+          else if(t.includes('방수'))cat='waterproof';
+          else if(t.includes('위생'))cat='sanitary';
+          else if(t.includes('문')||t.includes('창호')||t.includes('도어'))cat='doors';
+          else cat='other';
+          actual=String(a.asset_code||c);
+        }
+      }catch(e){}
+    }
+    window.__eamSelCode=actual;
+    if(cat)window.__eamCat=cat;
+    if(typeof window.go==='function'){
+      window.go('eam');
+    }else{
+      try{location.href='?page=eam'}catch(e){}
+    }
+  };
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
@@ -15399,7 +15430,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
     e.preventDefault();
     e.stopImmediatePropagation();
     const c=el.getAttribute('data-code')||'';
-    if(c && typeof window.eam228Pick==='function') window.eam228Pick(c);
+    if(c && typeof window.jgbOpenEamAssetByCode==='function') window.jgbOpenEamAssetByCode(c);
   },true);
 })();
 </script>
@@ -16789,9 +16820,8 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
     if(el.classList.contains('map-only'))return;
     const c=V(el.dataset.code||el.textContent||'');
     if(!c)return;
-    window.__eamSelCode=c;
-    if(typeof window.go==='function')window.go('eam');
-    else{try{location.href='?page=eam'}catch(_){}}
+    if(typeof window.jgbOpenEamAssetByCode==='function')window.jgbOpenEamAssetByCode(c);
+    else{window.__eamSelCode=c;if(typeof window.go==='function')window.go('eam');else{try{location.href='?page=eam'}catch(_){}}}
   },true);
 })();
 </script>
