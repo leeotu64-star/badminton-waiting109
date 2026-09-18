@@ -2336,7 +2336,7 @@ html::before,body::before{
     function go(p){if(!p)return;page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
     window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";render()})
     function body(){
-      if(page==="lighting")return lightingPage();
+      if(page==="lighting")return window.lightingPage();
     if(page==="dashboard2")return dashboard2();
       if(page==="process")return processPage();
      if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
@@ -3322,7 +3322,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   window.__dtSel=window.__dtSel||{type:'room',name:'1층 전체',place:'장군봉체육관 1층',status:'정상',code:'',category:'공간'};
   window.__dtZoom=window.__dtZoom||1;
   function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-    function lightingPage(){
+    window.lightingPage=function(){
       const esc=x=>typeof window.xEsc==='function'?window.xEsc(x==null?'':String(x)):String(x==null?'':x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
       const STORE='JGB_LIGHT_REEL_V1';
       const state=window.__lightingState||{selected:5,type:'lighting',status:{},hist:{},reel:{}};
@@ -3346,7 +3346,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       window.jgbLightAddHistory=(n,t)=>{const content=prompt(title(t)+' '+n+'번 이력 내용을 입력하세요.','정기점검');if(content===null||!content.trim())return;const worker=prompt('작업자 / 업체','');if(worker===null)return;const arr=state.hist[n+'_'+t]||[];arr.unshift({date:new Date().toISOString().slice(0,10),content:content.trim(),worker:worker.trim()||'-'});state.hist[n+'_'+t]=arr;save();render()};
       const courtFor=n=>'코트 도면 위치 · '+n+'번';
       const counts={};statuses.forEach(x=>counts[x]=0);pos.forEach(n=>['lighting','reel'].forEach(t=>counts[st(n,t)]++));
-      const grid=pos.slice().reverse().map(n=>`<div class="jgb-lr-dot ${n===selected?'sel':''}" onclick="jgbLightPick(${n},'${selectedType}')"><button type="button" class="jgb-lr-mini light" title="${n}번 조명" onclick="event.stopPropagation();jgbLightPick(${n},'lighting')"><span>💡</span></button><b>${n}</b><button type="button" class="jgb-lr-mini reel" title="${n}번 릴선" onclick="event.stopPropagation();jgbLightPick(${n},'reel')"><span>↻</span></button></div>`).join('');
+      const grid=pos.map(n=>`<div class="jgb-lr-dot ${n===selected?'sel':''}" onclick="jgbLightPick(${n},'${selectedType}')"><button type="button" class="jgb-lr-mini light" title="${n}번 조명" onclick="event.stopPropagation();jgbLightPick(${n},'lighting')"><span>💡</span></button><b>${n}</b><button type="button" class="jgb-lr-mini reel" title="${n}번 릴선" onclick="event.stopPropagation();jgbLightPick(${n},'reel')"><span>↻</span></button></div>`).join('');
       const history=state.hist[selected+'_'+selectedType]||[];
       const currentStatus=st(selected,selectedType);
       const reelState=state.reel[selected]||'올라감';
@@ -14351,3 +14351,42 @@ body {
   white-space:nowrap!important;
 }
 </style>
+
+<style id="JGB_V36_DIGITAL_TWIN_COVER">
+/* v36: 기존 디지털트윈 메뉴가 남아 있어도 기능은 잠그고 조명·릴선 관리 명칭으로 표시 */
+.jgb-link[data-page="digitalTwin"],
+.jgb-link[data-page="digital-twin"]{
+  pointer-events:none!important;
+  cursor:default!important;
+  background:#174b69!important;
+  color:#fff!important;
+  opacity:1!important;
+}
+.jgb-link[data-page="digitalTwin"]::after,
+.jgb-link[data-page="digital-twin"]::after{
+  content:"💡 조명·릴선 관리";
+  font-weight:1000!important;
+}
+.jgb-link[data-page="digitalTwin"],
+.jgb-link[data-page="digital-twin"]{
+  font-size:0!important;
+}
+.jgb-link[data-page="digitalTwin"]::after,
+.jgb-link[data-page="digital-twin"]::after{
+  font-size:14px!important;
+}
+</style>
+<script id="JGB_V36_DIGITAL_TWIN_LOCK">
+(function(){
+  function lockLegacyDigitalTwin(){
+    document.querySelectorAll('.jgb-link[data-page="digitalTwin"],.jgb-link[data-page="digital-twin"]').forEach(function(a){
+      a.removeAttribute('href');
+      a.setAttribute('aria-disabled','true');
+      a.onclick=function(e){e.preventDefault();e.stopPropagation();return false;};
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lockLegacyDigitalTwin);
+  else lockLegacyDigitalTwin();
+  new MutationObserver(lockLegacyDigitalTwin).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
