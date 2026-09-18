@@ -15440,6 +15440,75 @@ body {
   },true);
 })();
 </script>
+
+<!-- JGB EAM 자산관리 배치도: 실제 #eam228Map 단순 클릭 바로가기 FIX V5 -->
+<style id="JGB_EAM228_MAP_CLICK_LINK_V5_CSS">
+#eam228Map .eam228-asset{cursor:grab!important;}
+#eam228Map .eam228-asset.dragging{cursor:grabbing!important;}
+</style>
+<script id="JGB_EAM228_MAP_CLICK_LINK_V5_JS">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM228_MAP_CLICK_LINK_V5)return;
+  window.__JGB_EAM228_MAP_CLICK_LINK_V5=true;
+
+  let suppressUntil=0;
+  let dragStart={x:0,y:0,code:''};
+  let wasDragging=false;
+
+  document.addEventListener('pointerdown',function(e){
+    if(e.button!==0)return;
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el)return;
+    dragStart={x:e.clientX,y:e.clientY,code:String(el.dataset.code||'').trim()};
+    wasDragging=false;
+  },false);
+
+  document.addEventListener('pointermove',function(e){
+    if(!dragStart.code)return;
+    if(Math.hypot(e.clientX-dragStart.x,e.clientY-dragStart.y)>=6){
+      wasDragging=true;
+    }
+  },false);
+
+  document.addEventListener('pointerup',function(e){
+    if(!dragStart.code)return;
+    if(wasDragging)suppressUntil=Date.now()+500;
+    dragStart={x:0,y:0,code:''};
+    wasDragging=false;
+  },false);
+
+  /* 실제 자산관리 화면의 배치도(#eam228Map) 아이콘만 처리한다.
+     단순 클릭이면 기존 EAM 자산 바로가기 함수를 사용한다. */
+  document.addEventListener('click',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el)return;
+
+    if(Date.now()<suppressUntil){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
+
+    const code=String(el.dataset.code||'').trim();
+    if(!code)return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    /* 기존에 이미 검증된 자산코드 → EAM 이력카드 연결 함수를 사용 */
+    if(typeof window.jgbOpenEamAssetByCode==='function'){
+      window.jgbOpenEamAssetByCode(code);
+      return;
+    }
+
+    /* 함수가 아직 준비되지 않은 초기 렌더 상황의 안전장치 */
+    window.__eamSelCode=code;
+    if(typeof window.render==='function')window.render();
+  },false);
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
