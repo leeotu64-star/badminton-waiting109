@@ -3493,7 +3493,7 @@ html::before,body::before{
       window.eam228Save=async code=>{
         const a=assets.find(x=>codeOf(x)===V(code));if(!a||!SUPA)return;
         const g=id=>V(document.getElementById(id)?.value);
-        const payload={name:g('e223Name'),category:catMap[g('e223Cat')]||'기타설비',manufacturer:g('e223Maker')||null,model:g('e223Model')||null,install_date:g('e223Date')||null,place:g('e223Place')||null,status:g('e223Status')||'정상',product_name:catMap[g('e223Cat')]||'기타설비'};
+        const payload={name:g('e223Name'),category:catMap[g('e223Cat')]||'기타설비',model:g('e223Model')||null,install_date:g('e223Date')||null,place:g('e223Place')||null,status:g('e223Status')||'정상',product_name:catMap[g('e223Cat')]||'기타설비'};
         if(!payload.name){alert('자산명을 입력하세요.');return}
         const r=await SUPA.from('assets').update(payload).eq('id',a.id);if(r.error){alert('저장 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();await eamLoad();render();
@@ -3528,7 +3528,7 @@ html::before,body::before{
           alert('이미 등록된 자산코드입니다.\n기존 EAM 자산을 그대로 사용하려면 기존 자산을 선택하세요.');
           return;
         }
-        const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],manufacturer:null,model:null,place:null,status:'정상'};
+        const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],model:null,place:null,status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
       };
