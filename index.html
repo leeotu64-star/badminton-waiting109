@@ -3050,6 +3050,125 @@ a[data-page="digitalTwin"],
   .eam228-right-split{grid-template-rows:minmax(0,6fr) minmax(0,4fr)!important;}
 }
 </style>
+
+<style id="JGB_EAM_V17_LIVE_MATCH_LEAK_LAYOUT">
+/* 최종 고정: 누수현황 LIVE와 동일한 방식의 수리 LIVE 내부 스크롤
+   - 우측 전체 높이는 좌측 시설 자산 배치도와 동일
+   - 우측은 수리 LIVE 60% / 추가 관리영역 40%
+   - 수리 LIVE 표 영역만 가로+세로 스크롤
+   - 표는 한 줄 유지하며 폭을 억지로 줄이지 않음
+*/
+.eam228-main{
+  display:grid!important;
+  grid-template-columns:minmax(0,68fr) minmax(0,32fr)!important;
+  gap:10px!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  align-items:stretch!important;
+  box-sizing:border-box!important;
+}
+.eam228-main > .eam228-map-card,
+.eam228-main > .eam228-right{
+  height:100%!important;
+  min-height:0!important;
+  align-self:stretch!important;
+  box-sizing:border-box!important;
+}
+.eam228-right{
+  display:grid!important;
+  grid-template-rows:minmax(0,6fr) minmax(0,4fr)!important;
+  gap:9px!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.eam228-right-split{
+  display:grid!important;
+  grid-template-rows:minmax(0,6fr) minmax(0,4fr)!important;
+  gap:9px!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.eam228-live-card{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.eam228-live-card .eam228-section-head{
+  flex:0 0 auto!important;
+  min-height:42px!important;
+  box-sizing:border-box!important;
+}
+.eam228-live-scroll,
+.eam228-live-body{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  width:100%!important;
+  height:auto!important;
+  max-width:none!important;
+  max-height:none!important;
+  overflow-x:auto!important;
+  overflow-y:scroll!important;
+  box-sizing:border-box!important;
+  scrollbar-gutter:stable both-edges!important;
+  overscroll-behavior:contain!important;
+}
+.eam228-live-scroll .eam228-live-table,
+.eam228-live-scroll table{
+  width:max-content!important;
+  min-width:720px!important;
+  max-width:none!important;
+  table-layout:auto!important;
+  border-collapse:collapse!important;
+}
+.eam228-live-scroll th,
+.eam228-live-scroll td{
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  box-sizing:border-box!important;
+}
+.eam228-live-scroll::-webkit-scrollbar{
+  width:10px!important;
+  height:10px!important;
+}
+.eam228-live-scroll::-webkit-scrollbar-track{
+  background:#eef3f6!important;
+}
+.eam228-live-scroll::-webkit-scrollbar-thumb{
+  background:#8fa5b5!important;
+  border-radius:7px!important;
+  border:2px solid #eef3f6!important;
+}
+.eam228-future-card{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.eam228-future-card .eam228-section-head{
+  flex:0 0 auto!important;
+}
+.eam228-future-body{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -4049,37 +4168,33 @@ a[data-page="digitalTwin"],
         document.getElementById('eam228Modal')?.remove();
         const used=new Set(assets.map(a=>codeOf(a).toUpperCase()));
         const m=document.createElement('div');m.id='eam228Modal';m.className='eam228-modal';
-        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>누수관리 LK 생성처럼 번호를 직접 입력할 수 있습니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><strong id="e223Preview">자동 발급</strong></div><div class="eam228-modal-note">자산코드는 기존 자산번호와 중복되지 않도록 자동 발급됩니다. 등록 후 배치도에서 아이콘을 직접 배치합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
+        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE · 배치도 아이콘</small><h3>자산코드·배치도 아이콘 생성</h3><p>영문 자산분류는 시스템에서 선택하고, 번호는 직접 입력합니다. 생성 후 배치도에만 아이콘을 배치합니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><input id="e223Number" type="number" min="1" max="99" step="1" inputmode="numeric" placeholder="번호 입력" oninput="window.eam228Preview()"><strong id="e223Preview">번호를 입력하세요</strong></div><div class="eam228-modal-note">영문코드는 시스템에서 정하고 숫자 01~99는 직접 입력합니다. 이미 사용 중인 자산코드는 등록할 수 없습니다. 생성된 아이콘은 시설 자산 배치도에서만 위치를 지정합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산코드·아이콘 생성</button></div></div>`;
         document.body.appendChild(m);window.__eam228Used=used;window.eam228Prefix(defaultCat||'AC');
+        document.getElementById('e223Number')?.focus();
       };
       window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Prefix').textContent=p;document.querySelectorAll('.eam228-code-types button').forEach(b=>b.classList.toggle('on',b.dataset.cat===p));window.eam228Preview()};
-      window.eam228Preview=()=>{const p=window.__eam228Prefix||'AC',used=window.__eam228Used||new Set();let n=1;while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<100)n++;const el=document.getElementById('e223Preview');if(el)el.textContent=n<100?`${p}-${String(n).padStart(2,'0')}`:'생성 가능 번호 없음'};
+      window.eam228Preview=()=>{const p=window.__eam228Prefix||'AC',el=document.getElementById('e223Preview'),inp=document.getElementById('e223Number');if(!el)return;const raw=String(inp?.value||'').replace(/\D/g,'');if(inp&&raw!==inp.value)inp.value=raw;const n=Number(raw);if(!raw){el.textContent='번호를 입력하세요';return}if(!Number.isInteger(n)||n<1||n>99){el.textContent='01~99 입력';return}const code=`${p}-${String(n).padStart(2,'0')}`;el.textContent=code};
       window.eam228Create=async()=>{
         if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
-        const p=window.__eam228Prefix||'AC',used=window.__eam228Used||new Set();let n=1;while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<100)n++;if(n>99){alert(`${p} 자산코드는 01~99까지 모두 사용 중입니다.`);return}const code=`${p}-${String(n).padStart(2,'0')}`,name=catMap[p]||code;
-        if(n<1||n>99){alert('자동 생성 가능한 번호가 없습니다.');return}
+        const p=window.__eam228Prefix||'AC',inp=document.getElementById('e223Number'),raw=String(inp?.value||'').replace(/\D/g,'');const n=Number(raw);
+        if(!raw||!Number.isInteger(n)||n<1||n>99){alert('자산번호는 01~99 범위의 숫자를 직접 입력하세요.');inp?.focus();return}
+        const code=`${p}-${String(n).padStart(2,'0')}`,name=catMap[p]||code;
         const existing=assets.find(a=>codeOf(a).toUpperCase()===code);
         if(existing){
           let deletedCodes=new Set();
           try{const z=JSON.parse(localStorage.getItem('JGB_EAM_DASH_MAP_DELETED_V241')||'[]');deletedCodes=new Set(Array.isArray(z)?z.map(V):[])}catch(_){}
           if(deletedCodes.has(code)){
-            deletedCodes.delete(code);
-            localStorage.setItem('JGB_EAM_DASH_MAP_DELETED_V241',JSON.stringify([...deletedCodes]));
-            selected.code=code;
-            document.getElementById('eam228Modal')?.remove();
-            await eamLoad();
-            render();
-            setTimeout(()=>window.eam228Place(code),120);
-            return;
+            deletedCodes.delete(code);localStorage.setItem('JGB_EAM_DASH_MAP_DELETED_V241',JSON.stringify([...deletedCodes]));
+            selected.code=code;document.getElementById('eam228Modal')?.remove();await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);return;
           }
-          alert('이미 등록된 자산코드입니다.\n기존 EAM 자산을 그대로 사용하려면 기존 자산을 선택하세요.');
-          return;
+          alert('이미 등록된 자산코드입니다.\n다른 번호를 입력하세요.');return;
         }
         const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],place:'미배치',status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
       };
-      window.eam228LiveInput=code=>{
+      
+window.eam228LiveInput=code=>{
         document.getElementById('eam228Modal')?.remove();
         const m=document.createElement('div');m.id='eam228Modal';m.className='eam228-modal';
         m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>REPAIR LIVE</small><h3>수리 LIVE 직접입력</h3></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-form"><label>자산코드<input id="e223LiveCode" placeholder="자산코드를 직접 입력하세요" value=""></label><label>수리상태<select id="e223LiveStatus"><option>정상</option><option>점검</option><option>조치필요</option><option selected>수리중</option><option>부품대기</option><option>폐기</option></select></label><label class="wide">작업내용<input id="e223LiveContent" placeholder="예: 냉방 불량 점검 및 수리"></label><label>예정일<input id="e223LiveDate" type="date" value=""></label><label>담당자<input id="e223LiveManager" placeholder="담당자 입력"></label></div><div class="eam228-modal-note">등록하면 수리 LIVE 작업기록에만 저장됩니다. 이력카드 자산상태는 변경되지 않습니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228SaveLive()">LIVE 등록</button></div></div>`;
@@ -16325,116 +16440,5 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 }
 .eam228-live-card .eam228-live-scroll::-webkit-scrollbar-thumb:hover{
   background:#718a9c!important;
-}
-</style>
-
-
-<style id="JGB_EAM_FINAL_LIVE_60_40_SCROLL">
-/* 최종: EAM 우측 영역은 60:40 고정. 누수현황과 같은 방식으로 수리 LIVE 내부에 가로+세로 스크롤을 둠. */
-.eam228-right.eam228-right-split{
-  display:grid!important;
-  grid-template-rows:minmax(0,6fr) minmax(0,4fr)!important;
-  gap:9px!important;
-  height:100%!important;
-  min-height:0!important;
-  max-height:none!important;
-  overflow:hidden!important;
-  box-sizing:border-box!important;
-}
-
-/* 수리 LIVE 카드 크기 고정 */
-.eam228-right-split > .eam228-live-card{
-  height:100%!important;
-  min-height:0!important;
-  min-width:0!important;
-  max-height:none!important;
-  display:flex!important;
-  flex-direction:column!important;
-  overflow:hidden!important;
-  box-sizing:border-box!important;
-}
-
-/* 제목 영역은 고정, 아래 표 영역만 스크롤 */
-.eam228-live-card > .eam228-section-head{
-  flex:0 0 auto!important;
-  min-height:0!important;
-  box-sizing:border-box!important;
-  white-space:nowrap!important;
-}
-
-/* 누수현황 화면처럼 가로·세로 스크롤을 모두 표시 */
-.eam228-live-card > .eam228-live-body.eam228-live-scroll{
-  flex:1 1 auto!important;
-  min-height:0!important;
-  min-width:0!important;
-  width:100%!important;
-  height:auto!important;
-  max-width:100%!important;
-  max-height:none!important;
-  overflow:scroll!important;
-  scrollbar-gutter:stable both-edges!important;
-  box-sizing:border-box!important;
-}
-
-/* 표는 좁은 화면에 맞춰 강제로 줄이지 않고 원래 열 폭을 유지 */
-.eam228-live-card .eam228-live-scroll > table.eam228-live-table,
-.eam228-live-card .eam228-live-scroll > table{
-  width:max-content!important;
-  min-width:760px!important;
-  max-width:none!important;
-  table-layout:fixed!important;
-  box-sizing:border-box!important;
-}
-
-/* 글자 줄바꿈 금지: 길면 가로 스크롤로 확인 */
-.eam228-live-card .eam228-live-scroll th,
-.eam228-live-card .eam228-live-scroll td{
-  white-space:nowrap!important;
-  word-break:keep-all!important;
-  overflow:hidden!important;
-  text-overflow:clip!important;
-  box-sizing:border-box!important;
-}
-
-/* 열 폭을 확보하여 작업내용·담당자 등이 눌리지 않도록 함 */
-.eam228-live-card .eam228-live-table .live-col-code{width:110px!important;min-width:110px!important}
-.eam228-live-card .eam228-live-table .live-col-content{width:240px!important;min-width:240px!important}
-.eam228-live-card .eam228-live-table .live-col-status{width:120px!important;min-width:120px!important}
-.eam228-live-card .eam228-live-table .live-col-date{width:140px!important;min-width:140px!important}
-.eam228-live-card .eam228-live-table .live-col-manager{width:120px!important;min-width:120px!important}
-.eam228-live-card .eam228-live-table .live-col-action{width:90px!important;min-width:90px!important}
-
-.eam228-live-card .eam228-live-scroll::-webkit-scrollbar{
-  width:10px!important;
-  height:10px!important;
-}
-.eam228-live-card .eam228-live-scroll::-webkit-scrollbar-track{
-  background:#eef3f6!important;
-  border-left:1px solid #d5e0e7!important;
-}
-.eam228-live-card .eam228-live-scroll::-webkit-scrollbar-thumb{
-  background:#8fa5b5!important;
-  border-radius:7px!important;
-  border:2px solid #eef3f6!important;
-}
-
-/* 아래 추가 관리영역은 수리 LIVE와 별개의 40% 영역으로 고정 */
-.eam228-right-split > .eam228-future-card{
-  height:100%!important;
-  min-height:0!important;
-  min-width:0!important;
-  max-height:none!important;
-  display:flex!important;
-  flex-direction:column!important;
-  overflow:hidden!important;
-  box-sizing:border-box!important;
-}
-.eam228-right-split > .eam228-future-card > .eam228-section-head{
-  flex:0 0 auto!important;
-}
-.eam228-right-split > .eam228-future-card > .eam228-future-body{
-  flex:1 1 auto!important;
-  min-height:0!important;
-  overflow:hidden!important;
 }
 </style>
