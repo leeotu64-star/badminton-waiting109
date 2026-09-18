@@ -2680,6 +2680,40 @@ html::before,body::before{
   font-weight:800;
 }
 </style>
+
+<style id="JGB_V63_HISTORY_BOTH_SCROLL">
+/* V63: 유지관리 이력 영역 가로·세로 독립 스크롤 / 글씨 한 줄 고정 */
+.jgb-lr-v54-history{
+  min-width:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.jgb-lr-v54-historyscroll{
+  min-width:0!important;
+  min-height:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:auto!important;
+  scrollbar-width:auto!important;
+  scrollbar-gutter:stable both-edges!important;
+}
+.jgb-lr-v54-history table{
+  width:max-content!important;
+  min-width:620px!important;
+  table-layout:auto!important;
+}
+.jgb-lr-v54-history th,.jgb-lr-v54-history td{
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+.jgb-lr-v54-history th:nth-child(1){width:120px!important;min-width:120px!important}
+.jgb-lr-v54-history th:nth-child(2){width:105px!important;min-width:105px!important}
+.jgb-lr-v54-history th:nth-child(3){width:235px!important;min-width:235px!important}
+.jgb-lr-v54-history th:nth-child(4){width:100px!important;min-width:100px!important}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -14212,11 +14246,11 @@ body {
   const assets=Array.from({length:36},(_,i)=>({id:i+1,light:i===4?'점검':'정상',reel:i===17?'수리중':'정상',lightHistory:i===4?[['2026-09-18','정기점검','점검 필요','김']]:[],reelHistory:i===17?[['2026-09-18','수리','작동 확인 필요','이']]:[]}));
   let selectedLight=1,selectedReel=1;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  function ordered(){return [28,29,30,31,32,33,34,35,36,19,20,21,22,23,24,25,26,27,10,11,12,13,14,15,16,17,18,1,2,3,4,5,6,7,8,9];}
+  function ordered(){return Array.from({length:36},(_,i)=>i+1);}
   function cell(n,type){const a=assets[n-1],st=type==='light'?a.light:a.reel,sel=type==='light'?selectedLight===n:selectedReel===n;return `<button type="button" class="jgb-lr-v54-cell ${statusClass[st]} ${sel?'sel':''}" onclick="window.jgbLRSelect(${n},'${type}')" title="${n}번 ${type==='light'?'조명':'릴선'}">${n}</button>`}
   function historyRows(hist){return hist.length?hist.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join(''):`<tr><td colspan="4" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
   function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 자동권취 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>점검·정비 내용</th><th>작업자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
-  function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span>정상 ${counts.정상} · 점검 ${counts.점검} · 조치필요 ${counts.조치필요} · 수리중 ${counts.수리중}</span></div><div><div class="jgb-lr-v54-grid">${ordered().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
+  function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span>정상 ${counts.정상} · 점검 ${counts.점검} · 조치필요 ${counts.조치필요} · 수리중 ${counts.수리중}</span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
   function markup(){const allStatus={};Object.keys(statusColors).forEach(s=>allStatus[s]=assets.filter(x=>x.light===s||x.reel===s).length);return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-states"><span class="jgb-lr-v54-state ok"><b>${allStatus.정상}</b><small>정상</small></span><span class="jgb-lr-v54-state check"><b>${allStatus.점검}</b><small>점검</small></span><span class="jgb-lr-v54-state action"><b>${allStatus.조치필요}</b><small>조치필요</small></span><span class="jgb-lr-v54-state repair"><b>${allStatus.수리중}</b><small>수리중</small></span><span class="jgb-lr-v54-state parts"><b>${allStatus.부품대기}</b><small>부품대기</small></span><span class="jgb-lr-v54-state discard"><b>${allStatus.폐기}</b><small>폐기</small></span></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`}
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
@@ -14252,12 +14286,14 @@ body {
     const file=input.files&&input.files[0]; if(!file)return;
     const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
-  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2020-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="점검·정비 내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;modal.classList.add('open');document.getElementById('jgbLRText').value='';const now=new Date();const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateEl=document.getElementById('jgbLRDate');dateEl.value=today>='2020-01-01'&&today<='2035-12-31'?today:'2035-12-31';}
+  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog"><h3>유지관리 이력 등록</h3><textarea id="jgbLRText" placeholder="점검·정비 내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;modal.classList.add('open');document.getElementById('jgbLRText').value='';}
   window.jgbLRSave=function(){
-    const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim(),date=document.getElementById('jgbLRDate').value;
+    const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim();
     if(!text)return;
-    if(!date || date>'2035-12-31'){alert('관리일자를 확인하세요. 2035년 12월 31일까지 등록할 수 있습니다.');return;}
-    const row=[date,'유지관리',text,'담당자'];
+    /* 등록일자는 브라우저의 현지 날짜를 사용합니다. 연도가 바뀌면 새 연도가 자동 적용됩니다. */
+    const now=new Date();
+    const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+    const row=[today,'유지관리',text,'담당자'];
     if(type==='light')assets[n-1].lightHistory.unshift(row);else assets[n-1].reelHistory.unshift(row);
     m.classList.remove('open');window.jgbLRSelect(n,type);
   };
@@ -14274,64 +14310,6 @@ body {
 .jgb-lr-v54-head{background:#eaf4fa!important;border:2px solid #1d78b7!important;border-top:5px solid #1477b8!important}
 .jgb-lr-v54-panehead{background:#dbeaf3!important;color:#173b55!important;border-top:2px solid #1c5d7c!important}
 .jgb-lr-v54-maptitle{background:#f0f6fa!important}
-</style>
-
-<style id="JGB_LR_V62_REQUESTS">
-/* v62: 요청사항 통합 - 헤더 세로 100px / 상태색 확대 / 36칸 하단 왼쪽 1번 / 2.5D 타일 / 이력 양방향 스크롤 */
-.jgb-lr-v54-head{
-  min-height:100px!important;
-  height:100px!important;
-  padding:15px 18px!important;
-  background:linear-gradient(100deg,#0b3453 0%,#126b98 56%,#0b496e 100%)!important;
-  border:2px solid #123b59!important;
-  border-top:5px solid #0d78b8!important;
-  box-shadow:0 5px 12px rgba(10,35,55,.22)!important;
-}
-.jgb-lr-v54-brand{gap:13px!important;min-width:340px!important}
-.jgb-lr-v54-brandico{width:50px!important;height:50px!important;flex-basis:50px!important;font-size:36px!important}
-.jgb-lr-v54-brand h2{font-size:25px!important;font-weight:1000!important;color:#fff!important}
-.jgb-lr-v54-brand p{font-size:12px!important;color:#e4f4fc!important;font-weight:850!important}
-.jgb-lr-v54-states{gap:7px!important}
-.jgb-lr-v54-state{width:66px!important;min-height:62px!important;padding:6px 4px!important;border-radius:10px!important;box-shadow:0 3px 7px rgba(0,0,0,.2)!important}
-.jgb-lr-v54-state b{font-size:21px!important;line-height:21px!important;font-weight:1000!important}
-.jgb-lr-v54-state small{font-size:10px!important;line-height:12px!important;font-weight:950!important}
-
-/* 36개 위치: 하단 왼쪽이 1번, 오른쪽으로 1→9 / 위로 10→18 ... 28→36 */
-.jgb-lr-v54-grid{
-  grid-template-columns:repeat(9,minmax(0,1fr))!important;
-  grid-template-rows:repeat(4,minmax(58px,1fr))!important;
-  min-height:250px!important;
-  gap:6px!important;
-  padding:9px!important;
-  background:linear-gradient(145deg,#e9f2f7,#d9e7ee)!important;
-  perspective:1000px!important;
-}
-.jgb-lr-v54-cell{
-  min-height:58px!important;
-  border:2px solid #91aabb!important;
-  border-radius:7px!important;
-  background:linear-gradient(145deg,#fff 0%,#edf4f8 100%)!important;
-  box-shadow:0 4px 0 #7893a4,0 7px 10px rgba(34,65,83,.16)!important;
-  transform:translateY(-2px) rotateX(2deg)!important;
-  font-size:21px!important;
-  font-weight:1000!important;
-  color:#143c59!important;
-  transition:transform .12s,box-shadow .12s,filter .12s!important;
-}
-.jgb-lr-v54-cell:hover{transform:translateY(-5px) rotateX(2deg)!important;box-shadow:0 7px 0 #6f899a,0 11px 16px rgba(34,65,83,.2)!important;filter:brightness(1.03)!important}
-.jgb-lr-v54-cell.sel{transform:translateY(-5px) rotateX(2deg)!important;border:3px solid #1478c1!important;background:linear-gradient(145deg,#eef8ff,#dceeff)!important;box-shadow:0 7px 0 #0d5f99,0 12px 18px rgba(16,91,143,.25)!important}
-.jgb-lr-v54-cell.warn{background:linear-gradient(145deg,#fffdf1,#fff0b8)!important;border-color:#dfa900!important;box-shadow:0 4px 0 #bd8e00,0 7px 10px rgba(170,125,0,.17)!important}
-.jgb-lr-v54-cell.bad{background:linear-gradient(145deg,#fff8f8,#ffdede)!important;border-color:#d63d3d!important;box-shadow:0 4px 0 #ae2d2d,0 7px 10px rgba(170,40,40,.17)!important}
-.jgb-lr-v54-cell.repair{background:linear-gradient(145deg,#fff9ff,#ead9fa)!important;border-color:#8252b5!important;box-shadow:0 4px 0 #633d8c,0 7px 10px rgba(100,60,140,.17)!important}
-
-/* 이력은 한 줄 유지 + 필요할 때 가로/세로 모두 스크롤 */
-.jgb-lr-v54-historyscroll{overflow:auto!important;overflow-x:auto!important;overflow-y:auto!important;height:260px!important;max-height:260px!important}
-.jgb-lr-v54-history table{min-width:560px!important;width:max-content!important;table-layout:auto!important}
-.jgb-lr-v54-history th,.jgb-lr-v54-history td{white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
-
-/* 유지관리 등록: 관리일자 자동 생성, 2035-12-31까지 */
-.jgb-lr-date-label{display:grid!important;gap:5px!important;margin-bottom:9px!important;font-size:12px!important;font-weight:950!important;color:#29485d!important}
-.jgb-lr-date-label input{width:190px!important;padding:7px 8px!important;border:1px solid #9fb3c1!important;border-radius:5px!important;font:inherit!important;font-weight:800!important;background:#fff!important}
 </style>
 </body>
 
