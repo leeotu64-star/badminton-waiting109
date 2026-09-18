@@ -15086,3 +15086,107 @@ body {
   new MutationObserver(function(){paint()}).observe(document.documentElement,{subtree:true,childList:true});
 })();
 </script>
+
+
+<style id="JGB_EAM_V26_HISTORY_CARD_MASTER">
+/* 최종 상태 기준: 이력카드 자산상태 */
+:root{
+ --eam-normal:#2e9e57;
+ --eam-check:#e6b800;
+ --eam-action:#f28c28;
+ --eam-repair:#e53935;
+ --eam-parts:#7b3fc6;
+ --eam-discard:#555;
+}
+.eam-v26-normal{background:var(--eam-normal)!important;color:#fff!important}
+.eam-v26-check{background:var(--eam-check)!important;color:#111!important}
+.eam-v26-action{background:var(--eam-action)!important;color:#fff!important}
+.eam-v26-repair{background:var(--eam-repair)!important;color:#fff!important}
+.eam-v26-parts{background:var(--eam-parts)!important;color:#fff!important}
+.eam-v26-discard{background:var(--eam-discard)!important;color:#fff!important}
+.eam228-head-stats{
+ display:grid!important;
+ grid-template-columns:repeat(6,minmax(72px,1fr))!important;
+ gap:6px!important;
+}
+</style>
+<script id="JGB_EAM_V26_HISTORY_CARD_MASTER_JS">
+(function(){
+ const ORDER=['정상','점검','조치필요','수리중','부품대기','폐기'];
+ const MAP={
+  '정상':'eam-v26-normal','점검':'eam-v26-check','조치필요':'eam-v26-action',
+  '수리중':'eam-v26-repair','부품대기':'eam-v26-parts','폐기':'eam-v26-discard'
+ };
+ const OLD={
+  '점검필요':'점검','수리예정':'수리중','교체 예정':'부품대기',
+  '교체예정':'부품대기','원본':'정상','수리완료':'정상'
+ };
+ function norm(v){v=String(v||'').trim();return OLD[v]||v}
+ function cls(v){return MAP[norm(v)]||''}
+
+ /* 수리 LIVE의 상태 선택은 작업기록용으로만 유지 */
+ function isolateLive(){
+   document.querySelectorAll('[id*="LiveStatus"],[id*="liveStatus"]').forEach(function(el){
+     el.dataset.eamLiveOnly='1';
+   });
+ }
+
+ /* 이력카드 자산상태 select만 공통 6개로 유지 */
+ function normalizeHistorySelect(){
+   document.querySelectorAll('select').forEach(function(sel){
+     const id=(sel.id||'').toLowerCase();
+     const text=(sel.parentElement?.innerText||'').toLowerCase();
+     const isAssetStatus =
+       id==='e223status' ||
+       id.includes('assetstatus') ||
+       id.includes('eamstatus') ||
+       /자산상태/.test(text);
+     if(!isAssetStatus || sel.dataset.eamLiveOnly==='1') return;
+     const old=norm(sel.value);
+     sel.innerHTML=ORDER.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
+     sel.value=ORDER.includes(old)?old:'정상';
+   });
+ }
+
+ /* 이력카드의 상태를 읽어 현재 자산의 화면 표시를 갱신 */
+ function getHistoryStatus(){
+   const sel=document.getElementById('e223Status');
+   if(sel) return norm(sel.value);
+   const el=document.querySelector('[data-eam-history-status]');
+   return norm(el?.dataset?.eamHistoryStatus || el?.textContent);
+ }
+
+ function paint(){
+   isolateLive();
+   normalizeHistorySelect();
+
+   /* 상태 배지/헤더 색상 */
+   document.querySelectorAll('.eam228-stat,.eam-status,.asset-status,.status-badge,[data-status]').forEach(function(el){
+     const v=norm(el.dataset.status||el.textContent);
+     const c=cls(v);
+     if(!c) return;
+     el.classList.remove(...Object.values(MAP));
+     el.classList.add(c);
+   });
+
+   /* 배치도 아이콘은 이력카드 자산상태만 기준 */
+   const master=getHistoryStatus();
+   document.querySelectorAll('.eam228-asset-icon,[class*="asset-icon"]').forEach(function(icon){
+     const holder=icon.closest('[data-asset-code],[data-code],.eam228-asset,.eam228-marker,.eam228-item');
+     if(!holder) return;
+     const c=cls(master);
+     if(c){
+       icon.classList.remove(...Object.values(MAP));
+       icon.classList.add(c);
+     }
+   });
+ }
+ function boot(){
+   paint();
+   [100,300,700,1200,2000].forEach(t=>setTimeout(paint,t));
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+ else boot();
+ new MutationObserver(function(){paint()}).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
