@@ -3851,7 +3851,7 @@ html::before,body::before{
       const map=`<div id="eam228Map" class="eam228-map"><div class="eam228-courts"><strong>코트 구역 · 에어컨 자산 6개</strong>${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div><div class="eam228-facility"><div class="eam228-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>창고</b></button><span>▲ 계단</span></div><div class="eam228-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button><div class="eam228-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span></div>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div>`;
 
       const live=readLive().filter(x=>assets.some(a=>codeOf(a)===V(x.asset_code)));
-      const liveHtml=live.length?`<table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><button class="eam228-link" onclick="window.eam228Pick('${attr(x.asset_code)}')">${esc(x.asset_code)}</button></td><td>${esc(x.content||'-')}</td><td><span class="live-state">${esc(x.status||'수리중')}</span></td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="done" onclick="window.eam228Complete('${attr(x.asset_code)}')">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="eam228-empty"><b>현재 수리 대상 자산이 없습니다.</b><span>수리가 필요하면 「＋ 직접입력」으로 등록하세요.</span></div>`;
+      const liveHtml=live.length?`<table class="eam228-live-table"><colgroup><col class="live-col-code"><col class="live-col-content"><col class="live-col-status"><col class="live-col-date"><col class="live-col-manager"><col class="live-col-action"></colgroup><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><button class="eam228-link" onclick="window.eam228Pick('${attr(x.asset_code)}')">${esc(x.asset_code)}</button></td><td>${esc(x.content||'-')}</td><td><span class="live-state">${esc(x.status||'수리중')}</span></td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="done" onclick="window.eam228Complete('${attr(x.asset_code)}')">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="eam228-empty"><b>현재 수리 대상 자산이 없습니다.</b><span>수리가 필요하면 「＋ 직접입력」으로 등록하세요.</span></div>`;
       const cur=assets.find(a=>codeOf(a)===selected.code)||assets.find(a=>codeOf(a)==='AC-01')||assets[0];
       if(cur)selected.code=codeOf(cur);
       const p=cur?getPos(cur):null,lk=cur?V(cur.related_lk||cur.leak_code||cur.lk_code||''):'';
@@ -14426,6 +14426,23 @@ body {
 .eam228-asset.warn span{background:linear-gradient(145deg,#fffdf2,#ffe9a8 58%,#e5b62d)!important;border-color:#d09b16!important;}
 .eam228-asset.bad span{background:linear-gradient(145deg,#fff8f8,#ffc5c5 58%,#ef7777)!important;border-color:#d94b4b!important;}
 .eam228-asset.dragging span{transform:translateZ(4px) scale(1.05)!important;box-shadow:0 5px 8px rgba(20,50,70,.32),inset 0 1px 2px rgba(255,255,255,.95)!important;}
+</style>
+
+<style id="v74-live-table-align">
+/* V74: 자산 수리 LIVE 표의 자산코드 가시성 및 칸 정렬만 보정 */
+.eam228-live-body{overflow:auto!important}
+.eam228-live-body .eam228-live-table{width:100%!important;min-width:560px!important;table-layout:fixed!important;border-collapse:collapse!important}
+.eam228-live-body .eam228-live-table .live-col-code{width:16%!important}
+.eam228-live-body .eam228-live-table .live-col-content{width:34%!important}
+.eam228-live-body .eam228-live-table .live-col-status{width:15%!important}
+.eam228-live-body .eam228-live-table .live-col-date{width:15%!important}
+.eam228-live-body .eam228-live-table .live-col-manager{width:10%!important}
+.eam228-live-body .eam228-live-table .live-col-action{width:10%!important}
+.eam228-live-body .eam228-live-table th,
+.eam228-live-body .eam228-live-table td{box-sizing:border-box!important;vertical-align:middle!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important}
+.eam228-live-body .eam228-live-table td:nth-child(2){text-align:left!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important}
+.eam228-live-body .eam228-live-table .eam228-link{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:48px!important;min-height:24px!important;padding:4px 8px!important;box-sizing:border-box!important;background:#eef6ff!important;color:#126db0!important;border:0!important;border-radius:999px!important;font-size:10px!important;font-weight:950!important;line-height:1.2!important;text-decoration:none!important;visibility:visible!important;opacity:1!important}
+.eam228-live-body .eam228-live-table .live-state{display:inline-block!important;white-space:nowrap!important}
 </style>
 </body>
 
