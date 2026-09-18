@@ -14237,9 +14237,23 @@ window.eamDeleteSelectedAsset=async function(){
  if(!confirm(`'${name}' 시설·설비를 삭제할까요?\n왼쪽 목록과 오른쪽 이력카드가 함께 삭제됩니다.`))return;
  try{
    const d=await db();if(!d)throw new Error('Supabase 연결에 실패했습니다.');
-   const q=await d.from('assets').select('id').eq('asset_code',c).maybeSingle();if(q.error)throw q.error;
-   const id=q.data?.id;
-   if(id){let r=await d.from('asset_history').delete().eq('asset_id',id);if(r.error)throw r.error;try{r=await d.from('inspections').delete().eq('asset_id',id);if(r.error&&!/does not exist|relation/i.test(r.error.message))throw r.error}catch(e){if(!/does not exist|relation/i.test(e?.message||''))throw e}r=await d.from('assets').delete().eq('id',id);if(r.error)throw r.error}
+   // asset_code가 중복되거나 조회 결과가 0건이어도 삭제창 전체가 실패하지 않도록 배열 조회로 처리한다.
+   const q=await d.from('assets').select('id').eq('asset_code',c);
+   if(q.error)throw q.error;
+   const ids=Array.isArray(q.data)?q.data.map(x=>x?.id).filter(Boolean):[];
+   for(const id of ids){
+     let r=await d.from('asset_history').delete().eq('asset_id',id);
+     if(r.error)throw r.error;
+     try{
+       r=await d.from('inspections').delete().eq('asset_id',id);
+       if(r.error&&!/does not exist|relation/i.test(r.error.message))throw r.error;
+     }catch(e){
+       if(!/does not exist|relation/i.test(e?.message||''))throw e;
+     }
+     r=await d.from('assets').delete().eq('id',id);
+     if(r.error)throw r.error;
+   }
+   // 이미 DB에서 사라진 코드(0건)도 화면에서는 삭제 상태로 정리한다.
    const g=gone();g.add(c);saveGone(g);
    try{const m=JSON.parse(localStorage.getItem('JGB_EAM_META')||'{}');delete m[c];localStorage.setItem('JGB_EAM_META',JSON.stringify(m))}catch(e){}
    window.__eamSelCode='';document.getElementById('eamManageModal')?.remove();
