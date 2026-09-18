@@ -15432,7 +15432,7 @@ body {
 
     /* 실제 EAM 현황 배치도 카드의 헤더에만 위치 이동 버튼을 넣는다.
        다른 화면(조명/릴선/누수/방수)에는 절대 삽입하지 않는다. */
-    const card=map.closest('.eam228-map-card');
+    const card=map.closest('.eh-map-card');
     const head=card?.querySelector(':scope > .eh-card-head');
     if(head){
       head.style.display='flex';
@@ -15601,7 +15601,7 @@ function openAsset(c){
 }
 function header(){
   const m=map(); if(!m)return null;
-  const card=m.closest('.eam228-map-card');
+  const card=m.closest('.eh-map-card');
   if(!card)return null;
   return card.querySelector(':scope > .eh-card-head') || card.querySelector('.eh-card-head');
 }
@@ -15625,7 +15625,7 @@ function install(){
   sync();
 }
 function sync(){
-  const m=map(), b=document.querySelector('#eam228Map')?.closest('.eam228-map-card')?.querySelector('.jgb-eam-move-toggle-v10');
+  const m=map(), b=document.querySelector('.eh-map-card .jgb-eam-move-toggle-v10');
   if(!m)return;
   m.classList.toggle('eam-move-on',!!window.__EAM228_MOVE_MODE);
   if(b){b.classList.toggle('on',!!window.__EAM228_MOVE_MODE);b.textContent=window.__EAM228_MOVE_MODE?'📍 위치 이동 종료':'📍 위치 이동';}
@@ -17294,6 +17294,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
     if(e.button!==0)return;
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
+    if(!window.__EAM228_MOVE_MODE)return;
     const map=el.closest('.eh-map');
     if(!map)return;
     const r=map.getBoundingClientRect();
@@ -17337,18 +17338,19 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
     e.preventDefault();e.stopImmediatePropagation();
-  },true);
-
-  /* 더블클릭에서만 기존 EAM 자산으로 이동. 배치도 전용 아이콘은 이동하지 않음. */
-  document.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el)return;
-    e.preventDefault();e.stopImmediatePropagation();
+    if(window.__EAM228_MOVE_MODE)return;
     if(el.classList.contains('map-only'))return;
     const c=V(el.dataset.code||el.textContent||'');
     if(!c)return;
     if(typeof window.jgbOpenEamAssetByCode==='function')window.jgbOpenEamAssetByCode(c);
     else{window.__eamSelCode=c;if(typeof window.go==='function')window.go('eam');else{try{location.href='?page=eam'}catch(_){}}}
+  },true);
+
+  /* 더블클릭은 단일클릭과 중복 이동하지 않도록 차단한다. */
+  document.addEventListener('dblclick',function(e){
+    const el=e.target.closest?.('.eh-map .eh-marker');
+    if(!el)return;
+    e.preventDefault();e.stopImmediatePropagation();
   },true);
 })();
 </script>
@@ -17855,5 +17857,57 @@ function boot(){install();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else boot();
 new MutationObserver(function(){install();}).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+<style id="JGB_EAM_HYUN_FINAL_MOVE_BUTTON_V13">
+.eh-map-card .jgb-eam-move-toggle-final{display:inline-flex!important;align-items:center!important;justify-content:center!important;height:34px!important;padding:0 13px!important;border:2px solid #176fc1!important;border-radius:7px!important;background:#fff!important;color:#075b91!important;font-size:12px!important;font-weight:900!important;cursor:pointer!important;white-space:nowrap!important;box-sizing:border-box!important;z-index:50!important;}
+.eh-map-card .jgb-eam-move-toggle-final.on{background:#176fc1!important;color:#fff!important;}
+.eh-map.eh-move-on .eh-marker{cursor:grab!important;touch-action:none!important;}
+.eh-map:not(.eh-move-on) .eh-marker{cursor:pointer!important;touch-action:auto!important;}
+</style>
+<script id="JGB_EAM_HYUN_FINAL_MOVE_BUTTON_V13_JS">
+(function(){
+'use strict';
+if(window.__JGB_EAM_HYUN_FINAL_MOVE_V13)return;
+window.__JGB_EAM_HYUN_FINAL_MOVE_V13=true;
+window.__EAM228_MOVE_MODE=!!window.__EAM228_MOVE_MODE;
+function install(){
+  const page=document.querySelector('.eh-page');
+  const card=page?.querySelector('.eh-map-card');
+  const map=page?.querySelector('.eh-map');
+  const head=card?.querySelector('.eh-card-head');
+  if(!card||!map||!head)return false;
+  let btn=head.querySelector('.jgb-eam-move-toggle-final');
+  if(!btn){
+    btn=document.createElement('button');
+    btn.type='button';
+    btn.className='jgb-eam-move-toggle-final';
+    btn.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      window.__EAM228_MOVE_MODE=!window.__EAM228_MOVE_MODE;
+      sync();
+    });
+    head.appendChild(btn);
+  }
+  sync();
+  return true;
+}
+function sync(){
+  const page=document.querySelector('.eh-page');
+  const map=page?.querySelector('.eh-map');
+  const btn=page?.querySelector('.eh-map-card .jgb-eam-move-toggle-final');
+  if(!map)return;
+  map.classList.toggle('eh-move-on',!!window.__EAM228_MOVE_MODE);
+  if(btn){
+    btn.classList.toggle('on',!!window.__EAM228_MOVE_MODE);
+    btn.textContent=window.__EAM228_MOVE_MODE?'📍 위치 이동 종료':'📍 위치 이동';
+  }
+}
+let tries=0;
+const timer=setInterval(function(){
+  if(install()||++tries>40)clearInterval(timer);
+},100);
+window.addEventListener('load',install);
 })();
 </script>
