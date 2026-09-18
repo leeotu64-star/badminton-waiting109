@@ -14138,6 +14138,72 @@ body {
   display:block!important;
 }
 </style>
+
+<style id="EAM_COURT_LIVE_FINAL_V24">
+/* v24: 코트 모양이 F5 이후에야 적용되는 문제 방지. 최종 코트 CSS를 항상 마지막에 적용 */
+.eam228-courts{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:7px!important;
+  align-items:stretch!important;
+  box-sizing:border-box!important;
+}
+.eam228-court{
+  position:relative!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+  border:2px solid #607e92!important;
+  border-radius:5px!important;
+  background:linear-gradient(145deg,#dce8ed 0%,#f8fbfc 45%,#d3e1e7 100%)!important;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.62),0 4px 8px rgba(25,55,75,.18)!important;
+}
+/* 실제 코트 내부선: 외곽 + 중앙 세로선 */
+.eam228-court::before{
+  content:""!important;
+  position:absolute!important;
+  left:14%!important; right:14%!important;
+  top:14%!important; bottom:14%!important;
+  border:1px solid #587489!important;
+  background:linear-gradient(to right,transparent calc(50% - .5px),#587489 calc(50% - .5px),#587489 calc(50% + .5px),transparent calc(50% + .5px))!important;
+  z-index:1!important;
+  display:block!important;
+  pointer-events:none!important;
+}
+/* 번호와 겹치는 중앙 네트만 유지 */
+.eam228-court::after{
+  content:""!important;
+  position:absolute!important;
+  left:6%!important; right:6%!important; top:50%!important;
+  height:4px!important;
+  transform:translateY(-50%)!important;
+  background:#4f6f83!important;
+  box-shadow:0 2px 3px rgba(20,45,60,.28)!important;
+  z-index:2!important;
+  display:block!important;
+  pointer-events:none!important;
+}
+.eam228-court span{
+  z-index:5!important;
+  width:38px!important; height:38px!important;
+}
+</style>
+<script id="EAM_COURT_LIVE_FINAL_SCRIPT_V24">
+/* 코트 DOM이 다시 그려져도 F5 없이 즉시 최종 클래스를 유지 */
+(function(){
+  function fix(){
+    document.querySelectorAll('#eam228Map .eam228-court').forEach(function(el){
+      el.style.position='relative';
+      el.style.boxSizing='border-box';
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fix,{once:true});
+  else fix();
+  new MutationObserver(fix).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
 .jgb-v176-live-card .jgb-v178-live-table{
