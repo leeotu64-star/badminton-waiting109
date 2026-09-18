@@ -3705,7 +3705,7 @@ html::before,body::before{
       const parts=allAssets.filter(a=>statusOf(a)==='parts').length;
       const discard=allAssets.filter(a=>statusOf(a)==='discard').length;
       const defaultAC={'AC-01':[86,8],'AC-02':[68,8],'AC-03':[50,8],'AC-04':[32,8],'AC-05':[14,8],'AC-06':[7,30]};
-      const getPos=a=>{const c=codeOf(a);if(readDeletedMap().has(c))return null;if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];if(defaultAC[c])return defaultAC[c];const idx=assets.findIndex(x=>codeOf(x)===c);if(idx<0)return null;const cols=4,row=Math.floor(idx/cols),col=idx%cols;return [12+col*24,38+row*11]};
+      const getPos=a=>{const c=codeOf(a);if(readDeletedMap().has(c))return null;if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];if(defaultAC[c])return defaultAC[c];const plc=V(a?.place||a?.location||a?.zone||a?.area||'');if(!plc||plc==='미배치')return null;const idx=assets.findIndex(x=>codeOf(x)===c);if(idx<0)return null;const cols=4,row=Math.floor(idx/cols),col=idx%cols;return [12+col*24,38+row*11]};
       const placeName=a=>V(a?.place||a?.location||a?.zone||a?.area||'미지정');
       const attr=s=>esc(V(s)).replace(/\n/g,' ');
       const liveRows=readLive();
@@ -14567,6 +14567,61 @@ body {
   };
 })();
 </script>
+
+
+<style id="JGB_V14_ONLY_REQUESTED_FINAL">
+.eam228-right-split{
+  display:grid!important;
+  grid-template-rows:minmax(0,6fr) minmax(0,4fr)!important;
+  gap:9px!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.eam228-live-card{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+}
+.eam228-live-body.eam228-live-scroll{
+  display:block!important;
+  flex:1 1 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:auto!important;
+  overflow:scroll!important;
+  box-sizing:border-box!important;
+}
+.eam228-live-body.eam228-live-scroll table{
+  width:max-content!important;
+  min-width:700px!important;
+  max-width:none!important;
+}
+.eam228-future-card{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+}
+.eam228-future-body{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:auto!important;
+  overflow:hidden!important;
+}
+@media(max-width:1000px){
+  .eam228-right-split{
+    grid-template-rows:minmax(320px,6fr) minmax(240px,4fr)!important;
+  }
+}
+</style>
 
 </body>
 
