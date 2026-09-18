@@ -2599,6 +2599,36 @@ html::before,body::before{
   box-shadow:0 4px 9px rgba(20,50,70,.30),inset 0 1px 2px rgba(255,255,255,.9)!important;
 }
 </style>
+
+<style id="eam-light-reel-layout-v34">
+/* v34: 요청한 15:50:35 비율만 적용. 기존 기능/데이터 구조는 유지. */
+.eam-layout-v34{
+  display:grid!important;
+  grid-template-rows:15% 50% 35%!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.eam-v34-header{min-height:0!important;overflow:hidden!important}
+.eam-v34-map{min-height:0!important;overflow:auto!important}
+.eam-v34-bottom{
+  min-height:0!important;
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+  overflow:hidden!important;
+}
+.eam-v34-bottom > *{min-width:0!important;min-height:0!important;overflow:auto!important}
+@media(max-width:1000px){
+  .eam-layout-v34{
+    grid-template-rows:auto auto auto!important;
+    height:auto!important;
+    overflow:visible!important;
+  }
+  .eam-v34-bottom{grid-template-columns:1fr!important}
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -14108,6 +14138,43 @@ body {
 #eam228Map .eam228-asset.bad{border-color:#e34b4b!important;background:#fff0f0!important}
 #eam228Map .eam228-asset.dragging{transform:translate(-50%,-50%) scale(1.06)!important}
 </style>
+
+<script id="eam-light-reel-layout-v34-js">
+(function(){
+  function applyV34(){
+    if(document.querySelector('.eam-layout-v34')) return;
+    const body=document.body;
+    if(!body) return;
+
+    // Keep existing EAM content intact. Only identify the visible top-level
+    // sections and wrap them when they can be unambiguously separated.
+    const candidates=[...body.children].filter(el=>{
+      const s=getComputedStyle(el);
+      return s.display!=='none' && el.tagName!=='SCRIPT' && el.tagName!=='STYLE';
+    });
+    if(candidates.length<3) return;
+
+    // Prefer existing semantic EAM/header/map/live containers.
+    const header=candidates.find(el=>/header|헤더/i.test(el.className+' '+el.id));
+    const map=candidates.find(el=>/map|layout|배치|도면/i.test(el.className+' '+el.id));
+    const bottom=candidates.find(el=>/light|lighting|reel|릴선|조명/i.test(el.className+' '+el.id));
+
+    if(!(header&&map&&bottom)) return;
+
+    const wrap=document.createElement('div');
+    wrap.className='eam-layout-v34';
+    header.classList.add('eam-v34-header');
+    map.classList.add('eam-v34-map');
+    bottom.classList.add('eam-v34-bottom');
+
+    header.parentNode.insertBefore(wrap,header);
+    wrap.append(header,map,bottom);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',applyV34);
+  else applyV34();
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
