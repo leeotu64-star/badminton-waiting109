@@ -17785,52 +17785,75 @@ document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map
 </style>
 
 
-<style id="JGB_EAM_MOVE_FINAL_V11">
-#eam228Map .jgb-eam-move-final-v11{
-  border:2px solid #176fc1!important;background:#fff!important;color:#075b91!important;
-  border-radius:7px!important;padding:6px 12px!important;font-size:12px!important;
+<style id="JGB_EAM_MOVE_FINAL_V12">
+/* V12: EAM 현황 > 시설 자산 배치도 헤더에만 위치 이동 버튼 표시 */
+.jgb-eam-move-final-v12{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 auto!important;height:32px!important;padding:0 12px!important;
+  border:2px solid #176fc1!important;border-radius:7px!important;
+  background:#fff!important;color:#075b91!important;font-size:12px!important;
   font-weight:900!important;cursor:pointer!important;white-space:nowrap!important;
-  box-shadow:0 2px 5px rgba(20,55,70,.12)!important;margin-left:auto!important;
+  box-shadow:0 2px 5px rgba(20,55,70,.14)!important;margin-left:auto!important;
 }
-#eam228Map .jgb-eam-move-final-v11.on{background:#176fc1!important;color:#fff!important;}
+.jgb-eam-move-final-v12.on{background:#176fc1!important;color:#fff!important;}
+#eam228Map:not(.eam-move-on) .eam228-asset{cursor:pointer!important;}
+#eam228Map.eam-move-on .eam228-asset{cursor:grab!important;touch-action:none!important;}
+#eam228Map.eam-move-on .eam228-asset.dragging{cursor:grabbing!important;}
 </style>
-<script id="JGB_EAM_MOVE_FINAL_V11">
+<script id="JGB_EAM_MOVE_FINAL_V12">
 (function(){
 'use strict';
+if(window.__JGB_EAM_MOVE_FINAL_V12)return;
+window.__JGB_EAM_MOVE_FINAL_V12=true;
+
 function getMap(){return document.getElementById('eam228Map');}
 function getHead(){
-  const map=getMap(); if(!map)return null;
-  const card=map.closest('.eh-card');
+  const m=getMap();
+  if(!m)return null;
+  const card=m.closest('.eh-card');
   if(!card)return null;
   return card.querySelector('.eh-card-head');
 }
 function sync(){
-  const btn=document.querySelector('#eam228Map .jgb-eam-move-final-v11');
-  if(!btn)return;
+  const m=getMap();
+  const h=getHead();
+  if(!m||!h)return;
+  const b=h.querySelector('.jgb-eam-move-final-v12');
+  if(!b)return;
   const on=!!window.__EAM228_MOVE_MODE;
-  btn.classList.toggle('on',on);
-  btn.textContent=on?'📍 위치 이동 종료':'📍 위치 이동';
+  m.classList.toggle('eam-move-on',on);
+  b.classList.toggle('on',on);
+  b.textContent=on?'📍 위치 이동 종료':'📍 위치 이동';
 }
 function install(){
-  const map=getMap(), head=getHead();
-  if(!map||!head)return false;
-  let btn=head.querySelector('.jgb-eam-move-final-v11');
-  if(!btn){
-    btn=document.createElement('button');
-    btn.type='button';
-    btn.className='jgb-eam-move-final-v11';
-    btn.addEventListener('click',function(e){
-      e.preventDefault(); e.stopPropagation();
+  const m=getMap(), h=getHead();
+  if(!m||!h)return;
+
+  /* 과거에 잘못 삽입된 이동 버튼은 모두 제거 */
+  document.querySelectorAll('.jgb-eam-map-move-v8,.jgb-eam-move-toggle-v10,.jgb-eam-move-final-v11').forEach(el=>el.remove());
+
+  let b=h.querySelector('.jgb-eam-move-final-v12');
+  if(!b){
+    b=document.createElement('button');
+    b.type='button';
+    b.className='jgb-eam-move-final-v12';
+    b.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopPropagation();
       window.__EAM228_MOVE_MODE=!window.__EAM228_MOVE_MODE;
       sync();
     });
-    head.appendChild(btn);
+    h.style.display='flex';
+    h.style.alignItems='center';
+    h.style.gap='8px';
+    h.appendChild(b);
   }
   sync();
-  return true;
 }
+
 function boot(){install();}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+else boot();
 new MutationObserver(function(){install();}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
