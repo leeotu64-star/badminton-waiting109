@@ -13438,18 +13438,21 @@ document.addEventListener('pointerdown',function(ev){
   if(!el)return;
   const map=el.closest('#eam228Map');
   if(!map)return;
-  const r=map.getBoundingClientRect(), er=el.getBoundingClientRect();
+  const r=map.getBoundingClientRect();
   const code=V(el.dataset.code||'');
-  let moved=false;
-  let lastX=Number(parseFloat(el.style.left)||50), lastY=Number(parseFloat(el.style.top)||50);
+  const sx=ev.clientX, sy=ev.clientY;
+  const startX=Number(parseFloat(el.style.left)||50), startY=Number(parseFloat(el.style.top)||50);
+  let dragging=false, moved=false;
   const move=ev2=>{
-    const x=Math.max(3,Math.min(97,((ev2.clientX-r.left)/r.width)*100));
-    const y=Math.max(4,Math.min(96,((ev2.clientY-r.top)/r.height)*100));
-    /* 누수 아이콘과 같은 방식: 실제로 움직였을 때만 드래그로 인정 */
-    if(Math.abs(x-lastX)>.1||Math.abs(y-lastY)>.1)moved=true;
-    lastX=x;lastY=y;
-    if(!moved)return;
-    el.classList.add('dragging');
+    const dx=ev2.clientX-sx, dy=ev2.clientY-sy;
+    if(!dragging && Math.hypot(dx,dy)<6)return;
+    if(!dragging){
+      dragging=true; el.classList.add('dragging');
+      try{ev2.preventDefault();ev2.stopPropagation()}catch(_){}
+    }
+    const x=Math.max(1,Math.min(99,((ev2.clientX-r.left)/r.width)*100));
+    const y=Math.max(1,Math.min(99,((ev2.clientY-r.top)/r.height)*100));
+    moved=true;
     el.style.left=x.toFixed(2)+'%';
     el.style.top=y.toFixed(2)+'%';
     try{ev2.preventDefault();ev2.stopPropagation()}catch(_){}
@@ -13460,8 +13463,8 @@ document.addEventListener('pointerdown',function(ev){
     window.removeEventListener('pointerup',up,true);
     window.removeEventListener('pointercancel',up,true);
     if(!moved)return;
-    const x=Math.max(3,Math.min(97,((ev2.clientX-r.left)/r.width)*100));
-    const y=Math.max(4,Math.min(96,((ev2.clientY-r.top)/r.height)*100));
+    const x=Math.max(1,Math.min(99,((ev2.clientX-r.left)/r.width)*100));
+    const y=Math.max(1,Math.min(99,((ev2.clientY-r.top)/r.height)*100));
     el.style.left=x.toFixed(2)+'%';
     el.style.top=y.toFixed(2)+'%';
     const pos=read(POS,{});
@@ -14006,6 +14009,32 @@ body {
 }
 </style>
 
+
+<style id="v14-eam-code-leak-style">
+/* v14: EAM 자산코드 모양을 누수 아이콘과 같은 마커형으로 통일 + 상단까지 배치 허용 */
+#eam228Map .eam228-asset{
+  transform:translate(-50%,-50%)!important;
+  border:2px solid #19a974!important;
+  border-radius:999px!important;
+  background:linear-gradient(180deg,#fff,#eef8f3)!important;
+  padding:5px 10px 5px 7px!important;
+  display:flex!important;align-items:center!important;gap:5px!important;
+  box-shadow:0 5px 12px rgba(20,55,70,.20),0 0 0 2px rgba(255,255,255,.92)!important;
+  font-size:10px!important;font-weight:950!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+}
+#eam228Map .eam228-asset::after{
+  content:"";position:absolute;left:14px;bottom:-5px;width:9px;height:9px;
+  background:#eef8f3;border-right:1px solid rgba(42,75,98,.18);border-bottom:1px solid rgba(42,75,98,.18);
+  transform:rotate(45deg);z-index:-1;
+}
+#eam228Map .eam228-asset span{font-size:10px!important;line-height:1!important}
+#eam228Map .eam228-asset b{font-size:10px!important;letter-spacing:.02em!important}
+#eam228Map .eam228-asset.warn{border-color:#e3a91c!important;background:#fff9e8!important}
+#eam228Map .eam228-asset.bad{border-color:#e34b4b!important;background:#fff0f0!important}
+#eam228Map .eam228-asset.dragging{transform:translate(-50%,-50%) scale(1.06)!important}
+</style>
 </body>
 
 <style id="v19-court-position-final">
