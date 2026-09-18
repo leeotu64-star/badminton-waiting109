@@ -3467,9 +3467,9 @@ html::before,body::before{
       const V=s=>String(s??'').trim();
       const esc=s=>typeof xEsc==='function'?xEsc(s):String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
       const codeOf=a=>V(a?.asset_code||a?.code||'');
-      const statusOf=a=>{const s=V(a?.status||'정상');if(/수리예정|수리/.test(s))return 'repair';if(/점검/.test(s))return 'check';return 'normal'};
-      const statusText=k=>k==='repair'?'수리예정':k==='check'?'점검':'정상';
-      const statusClass=k=>k==='repair'?'bad':k==='check'?'warn':'ok';
+      const statusOf=a=>{const s=V(a?.status||'정상');if(s==='정상')return 'normal';if(s==='점검')return 'check';if(s==='조치필요')return 'action';if(s==='수리중'||/수리예정|수리 진행|수리/.test(s))return 'repair';if(s==='부품대기'||/부품 대기/.test(s))return 'parts';if(s==='폐기')return 'discard';return 'normal'};
+      const statusText=k=>({normal:'정상',check:'점검',action:'조치필요',repair:'수리중',parts:'부품대기',discard:'폐기'})[k]||'정상';
+      const statusClass=k=>({normal:'ok',check:'warn',action:'action',repair:'bad',parts:'parts',discard:'discard'})[k]||'ok';
       const catDefs=[['AC','에어컨','❄️'],['BO','보일러','♨️'],['FI','소방설비','🚒'],['EL','전기설비','⚡'],['DO','문·창호','🚪'],['SA','위생설비','🚻'],['OT','기타설비','🔧']];
       const catMap={AC:'에어컨',BO:'보일러',FI:'소방설비',EL:'전기설비',DO:'문·창호설비',SA:'위생설비',OT:'기타설비'};
       const posKey='JGB_EAM_DASH_MAP_POS_V228';
@@ -3489,12 +3489,13 @@ html::before,body::before{
       const normCat=a=>{const q=(codeOf(a)+' '+V(a?.category||a?.asset_type||'')).toUpperCase();if(/^AC[-_]/.test(q)||q.includes('에어컨'))return 'AC';if(/^BO[-_]/.test(q)||q.includes('보일러'))return 'BO';if(/^FI[-_]/.test(q)||q.includes('소방'))return 'FI';if(/^EL[-_]/.test(q)||q.includes('전기'))return 'EL';if(/^DO[-_]/.test(q)||q.includes('문·창호')||q.includes('문창호'))return 'DO';if(/^SA[-_]/.test(q)||q.includes('위생'))return 'SA';return 'OT'};
       const catLabel=k=>(catDefs.find(x=>x[0]===k)||catDefs[6])[1];
       const catIcon=k=>(catDefs.find(x=>x[0]===k)||catDefs[6])[2];
-      const normal=assets.filter(a=>statusOf(a)==='normal').length;
-      const check=assets.filter(a=>statusOf(a)==='check').length;
-      const action=assets.filter(a=>statusOf(a)==='action').length;
-      const repair=assets.filter(a=>statusOf(a)==='repair').length;
-      const parts=assets.filter(a=>statusOf(a)==='parts').length;
-      const discard=assets.filter(a=>statusOf(a)==='discard').length;
+      const allAssets=A;
+      const normal=allAssets.filter(a=>statusOf(a)==='normal').length;
+      const check=allAssets.filter(a=>statusOf(a)==='check').length;
+      const action=allAssets.filter(a=>statusOf(a)==='action').length;
+      const repair=allAssets.filter(a=>statusOf(a)==='repair').length;
+      const parts=allAssets.filter(a=>statusOf(a)==='parts').length;
+      const discard=allAssets.filter(a=>statusOf(a)==='discard').length;
       const defaultAC={'AC-01':[86,8],'AC-02':[68,8],'AC-03':[50,8],'AC-04':[32,8],'AC-05':[14,8],'AC-06':[7,30]};
       const getPos=a=>{const c=codeOf(a);if(readDeletedMap().has(c))return null;if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];return defaultAC[c]||null};
       const placeName=a=>V(a?.place||a?.location||a?.zone||a?.area||'미지정');
@@ -14876,6 +14877,17 @@ body {
 #eam228Map .eam228-asset.warn{border-color:#e3a91c!important;background:#fff9e8!important;color:#8b6700!important}
 #eam228Map .eam228-asset.bad{border-color:#e34b4b!important;background:#fff0f0!important;color:#c83b32!important}
 #eam228Map .eam228-asset.ok{border-color:#16aa72!important;background:#f3fff9!important;color:#16724f!important}
+
+/* v23: 상단 상태 헤더 6개를 한 줄로 고정 + 상태별 색상 통일 */
+.eam228-head-stats{display:grid!important;grid-template-columns:repeat(6,70px)!important;grid-template-rows:55px!important;gap:5px!important;flex:0 0 auto!important;white-space:nowrap!important;min-width:445px!important;margin-left:auto!important;align-items:stretch!important;}
+.eam228-stat{width:70px!important;height:55px!important;box-sizing:border-box!important;}
+.eam228-stat.ok b{color:#58e19b!important;}
+.eam228-stat.warn b{color:#ffd15a!important;}
+.eam228-stat.action b{color:#ff9b5f!important;}
+.eam228-stat.bad b{color:#ff6b6b!important;}
+.eam228-stat.parts b{color:#b58cff!important;}
+.eam228-stat.discard b{color:#c7c7cf!important;}
+@media(max-width:1200px){.eam228-head-stats{grid-template-columns:repeat(6,60px)!important;min-width:385px!important}.eam228-stat{width:60px!important}}
 </style>
 
 <script>
