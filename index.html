@@ -15334,20 +15334,7 @@ body {
   },true);
 })();
 </script>
-<script id="JGB_V24_LIVE_DIRECT_BUTTON_FIX">
-(function(){
-  // V24: EAM 수리 LIVE의 "직접입력" 버튼만 클릭을 최우선 처리한다.
-  // 다른 EAM 기능/배치도/누수 기능에는 관여하지 않는다.
-  window.addEventListener('click',function(e){
-    const btn=e.target && e.target.closest ? e.target.closest('.eh-live-card .eh-card-head button') : null;
-    if(!btn) return;
-    if(!btn.textContent.includes('직접입력')) return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    if(typeof window.eamManualLiveOpen==='function') window.eamManualLiveOpen();
-  },true);
-})();
-</script>
+
 <style id="JGB_V25_ICON_DELETE_FINAL_FIX">
 /* V25: 배치도 아이콘 삭제창의 목록 영역만 안정화 */
 #eamHyunIconDeleteModal .eh-modal-box{width:min(620px,95vw);max-height:88vh;overflow:auto}
@@ -15726,6 +15713,37 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 .eam228-live-scroll .eam228-live-table td:nth-child(2){
   text-align:left!important;
 }
+</style>
+<script id="JGB_V27_LIVE_DIRECT_BUTTON_FIX">
+(function(){
+  /* V27: 수리 LIVE 직접입력만 pointerdown에서 즉시 실행.
+     기존 EAM/배치도/누수 클릭 이벤트와 분리한다. */
+  if(window.__JGB_V27_LIVE_DIRECT_BOUND)return;
+  window.__JGB_V27_LIVE_DIRECT_BOUND=true;
+  window.addEventListener('pointerdown',function(e){
+    const btn=e.target?.closest?.('.eh-live-card .eh-card-head button');
+    if(!btn || !/직접입력/.test(btn.textContent||''))return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if(typeof window.eamManualLiveOpen==='function') window.eamManualLiveOpen();
+  },true);
+})();
+</script>
+<style id="JGB_V27_LIVE_ALIGN_2LINE">
+/* V27: 수리 LIVE만 정렬/열폭/2줄 표시 조정 */
+.eh-live-card .eh-card-head h2{margin-right:auto!important;text-align:left!important;}
+.eh-live-card .eh-card-head{justify-content:flex-start!important;}
+.eh-live-card .eh-card-head>button{margin-left:auto!important;}
+.eh-live-card table{table-layout:fixed!important;min-width:760px!important;width:760px!important;}
+.eh-live-card th,.eh-live-card td{text-align:left!important;vertical-align:middle!important;}
+.eh-live-card th:nth-child(1),.eh-live-card td:nth-child(1){width:110px!important;}
+.eh-live-card th:nth-child(2),.eh-live-card td:nth-child(2){width:220px!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;display:table-cell!important;line-height:1.35!important;}
+.eh-live-card th:nth-child(3),.eh-live-card td:nth-child(3){width:95px!important;}
+.eh-live-card th:nth-child(4),.eh-live-card td:nth-child(4){width:95px!important;}
+.eh-live-card th:nth-child(5),.eh-live-card td:nth-child(5){width:95px!important;}
+.eh-live-card th:nth-child(6),.eh-live-card td:nth-child(6){width:70px!important;}
+.eh-live-card th:nth-child(7),.eh-live-card td:nth-child(7){width:70px!important;}
+.eh-live-card td:nth-child(2){display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;max-height:2.8em!important;}
 </style>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
@@ -17437,36 +17455,5 @@ document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map
 /* 기존 1000px 이하의 1열 전환은 유지 */
 @media(max-width:1000px){
   .eh-main{grid-template-columns:1fr!important;}
-}
-</style>
-
-<style id="JGB_V26_REPAIR_LIVE_TEXT_ALIGN">
-/* V26: 수리 LIVE만 텍스트 정렬/작업내용 표시 방식 수정. 다른 영역은 변경하지 않음. */
-.eh-live-card-v20 .eh-live-scroll table th,
-.eh-live-card-v20 .eh-live-scroll table td{
-  text-align:left!important;
-}
-
-/* 작업내용 열만 폭을 넓히고 최대 2줄까지 표시 */
-.eh-live-card-v20 .eh-live-scroll table th:nth-child(2),
-.eh-live-card-v20 .eh-live-scroll table td:nth-child(2){
-  width:220px!important;
-  min-width:220px!important;
-  max-width:220px!important;
-  white-space:normal!important;
-  word-break:break-word!important;
-  overflow:hidden!important;
-  text-overflow:clip!important;
-  line-height:1.35!important;
-  height:42px!important;
-  max-height:42px!important;
-  vertical-align:middle!important;
-}
-
-/* 수리 LIVE 표의 나머지 열은 기존 가로 스크롤을 유지 */
-.eh-live-card-v20 .eh-live-scroll table{
-  width:max-content!important;
-  min-width:760px!important;
-  table-layout:fixed!important;
 }
 </style>
