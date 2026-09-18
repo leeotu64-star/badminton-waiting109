@@ -6334,12 +6334,11 @@ function jgbV47GoWpByLeak(leakCode){
         const val=id=>document.getElementById(id)?.value?.trim()||'';
         const cat=val('editCategory')||'기타설비';
         const name=val('editName');
-        const locCode=val('editLocCode');
         const detail=val('editDetailPlace');
-        const place=detail||({A:'코트',B:'복도',C:'사무실',D:'옥상',E:'유수장치실'}[locCode]||'');
+        const place=detail||String(a.place||'').trim();
         if(!name){alert('소분류(자산명)를 입력하세요.');return}
         const meta={
-          asset_code:String(code), name, category:cat, place, locationCode:locCode,
+          asset_code:String(code), name, category:cat, place,
           model:val('editModel'), qty:val('editQty'), vendor:val('editVendor'),
           asContact:val('editAs'), installDate:val('editInstall'), warranty:val('editWarranty'),
           asHistory:val('editAsHistory'), status:val('editStatus')||'정상', note:val('editNote')
@@ -6682,7 +6681,7 @@ function jgbV47GoWpByLeak(leakCode){
           <div class="jgb-paper-card-body"><section class="jgb-paper-info"><div class="jgb-paper-section-title">📄 기본정보</div><div class="jgb-basic-table-rebuild">
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">자산코드</div><div class="jgb-basic-value">${E(cur.asset_code||cur.code||'-')}</div><div class="jgb-basic-label">자산명</div><div class="jgb-basic-value">${E(cur.name||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">설비 종류</div><div class="jgb-basic-value">${E(cur.category||cur.type||'-')}</div><div class="jgb-basic-label">위치</div><div class="jgb-basic-value">${E(cur.place||'-')}</div></div>
-            <div class="jgb-basic-table-row"><div class="jgb-basic-label">위치코드</div><div class="jgb-basic-value">${E(cur.locationCode||placeCode(cur.place)||'-')}</div><div class="jgb-basic-label">모델·규격</div><div class="jgb-basic-value">${E(cur.model||'-')}</div></div>
+            <div class="jgb-basic-table-row"><div class="jgb-basic-label">모델·규격</div><div class="jgb-basic-value" style="grid-column:2 / 5">${E(cur.model||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">용량</div><div class="jgb-basic-value">${E(cur.capacity||'-')}</div><div class="jgb-basic-label">수량</div><div class="jgb-basic-value">${E(cur.qty??cur.quantity??'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">제조사</div><div class="jgb-basic-value">${E(cur.maker||cur.vendor||'-')}</div><div class="jgb-basic-label">A/S 연락처</div><div class="jgb-basic-value">${E(cur.asContact||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">제조일</div><div class="jgb-basic-value">${E(cur.date||cur.manufactureDate||'-')}</div><div class="jgb-basic-label">설치일</div><div class="jgb-basic-value">${E(cur.installDate||'-')}</div></div>
@@ -6722,7 +6721,7 @@ function jgbV47GoWpByLeak(leakCode){
         const detail=[...EAM_DETAIL_LOCATION_LIST];
         document.getElementById('eamEditModal')?.remove();document.body.insertAdjacentHTML('beforeend',`<div id="eamEditModal" class="eam-edit-overlay" onclick="if(event.target===this)this.remove()"><div class="eam-edit-card"><div class="eam-edit-head"><div><span>ASSET MASTER EDIT</span><h2>주요설비 이력카드 수정</h2><p>자산 기본정보와 이력카드 정보를 한 번에 수정합니다.</p></div><button type="button" onclick="document.getElementById('eamEditModal').remove()">×</button></div><div class="eam-edit-grid">
           <label>관리코드<input value="${esc(eamUnifiedCode(m))}" readonly></label><label>설비 종류<select id="editCategory" onchange="eamEditLocationChange(this.value)">${CATDEF.map(z=>`<option ${cat===z[2]?'selected':''}>${z[2]}</option>`).join('')}</select></label><label class="wide">소분류(자산명)<input id="editName" value="${esc(m.name||window.eamDisplayName(m))}"></label>
-          <label>위치코드<select id="editLocCode" onchange="eamEditLocationChange(this.value)"><option value="A" ${lc==='A'?'selected':''}>A · 코트</option><option value="B" ${lc==='B'?'selected':''}>B · 복도</option><option value="C" ${lc==='C'?'selected':''}>C · 사무실</option><option value="D" ${lc==='D'?'selected':''}>D · 옥상</option><option value="E" ${lc==='E'?'selected':''}>E · 유수장치실</option><option value="F" ${lc==='F'?'selected':''}>F · 창고</option><option value="G" ${lc==='G'?'selected':''}>G · 휴게실</option><option value="H" ${lc==='H'?'selected':''}>H · 남자 화장실</option><option value="I" ${lc==='I'?'selected':''}>I · 여자 화장실</option><option value="J" ${lc==='J'?'selected':''}>J · 남자 샤워실</option><option value="K" ${lc==='K'?'selected':''}>K · 여자 샤워실</option><option value="L" ${lc==='L'?'selected':''}>L · 좌측 외곽</option><option value="M" ${lc==='M'?'selected':''}>M · 우측 외곽</option></select></label><label>세부 위치<select id="editDetailPlace" onchange="eamShowCustomPlace('editDetailPlace','editCustomPlace')">${detail.map(z=>`<option ${v(m.place)===z?'selected':''}>${esc(z)}</option>`).join('')}</select><input id="editCustomPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
+          <label>세부 위치<select id="editDetailPlace" onchange="eamShowCustomPlace('editDetailPlace','editCustomPlace')">${detail.map(z=>`<option ${v(m.place)===z?'selected':''}>${esc(z)}</option>`).join('')}</select><input id="editCustomPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
           <label>모델·규격<input id="editModel" value="${esc(m.model||'')}"></label><label>용량<input id="editCapacity" value="${esc(m.capacity||'')}"></label><label>수량<input id="editQty" value="${esc(m.qty??m.quantity??'')}"></label><label>제조사<input id="editVendor" value="${esc(m.vendor||m.maker||'')}"></label><label>A/S 연락처<input id="editAs" value="${esc(m.asContact||'')}"></label><label>제조일<input id="editManufactureDate" value="${esc(m.date||m.manufactureDate||'')}"></label><label>설치일<input id="editInstall" value="${esc(m.installDate||'')}"></label><label>내용연수<input id="editLife" value="${esc(m.life||'')}"></label><label>평가등급<input id="editGrade" value="${esc(m.grade||'')}"></label><label>보증<input id="editWarranty" value="${esc(m.warranty||'')}"></label><label>A/S 기록<input id="editAsHistory" value="${esc(m.asHistory||'')}"></label><label>자산상태<select id="editStatus"><option ${v(m.status||'정상')==='정상'?'selected':''}>정상</option><option ${v(m.status)==='점검'?'selected':''}>점검</option><option ${v(m.status)==='조치필요'?'selected':''}>조치필요</option><option ${v(m.status)==='수리중'?'selected':''}>수리중</option><option ${v(m.status)==='부품대기'?'selected':''}>부품대기</option><option ${v(m.status)==='폐기'?'selected':''}>폐기</option></select></label><label class="wide">시설개선계획<input id="editImprovementPlan" value="${esc(m.improvementPlan||'')}"></label><label class="wide">특이사항<textarea id="editNote" rows="3">${esc(m.note||'')}</textarea></label>
           </div><div class="eam-edit-actions"><button class="btn gray" type="button" onclick="document.getElementById('eamEditModal').remove()">취소</button><button class="btn blue" type="button" id="eamEditSave" onclick="eamSaveFullEdit('${esc(code)}')">저장</button></div></div></div>`);eamEditLocationChange(lc,m.place);
       };
@@ -15431,9 +15430,6 @@ window.JGB_EAM_CARD_V22_OPEN = async function(){
         <label>설치 위치
           <input id="jgbV12_place" value="${V12.esc(x.place||'')}" autocomplete="off">
         </label>
-        <label>위치코드
-          <input id="jgbV12_loc" value="${V12.esc(x.locationCode||'')}" autocomplete="off">
-        </label>
         <label>모델·규격
           <input id="jgbV12_model" value="${V12.esc(x.model||x.product_name||'')}" autocomplete="off">
         </label>
@@ -15517,7 +15513,6 @@ window.JGB_EAM_CARD_V12_SAVE = async function(oldCode, assetId){
     name,
     category,
     place,
-    locationCode:V12.val('jgbV12_loc'),
     model:V12.val('jgbV12_model'),
     capacity:V12.val('jgbV12_capacity'),
     qty:V12.val('jgbV12_qty'),
@@ -17682,4 +17677,9 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 @media(max-width:1000px){
   .eh-main{grid-template-columns:1fr!important;}
 }
+</style>
+
+<style id="JGB_EAM_V16_LOCATION_CODE_REMOVED">
+/* V16: 위치코드는 EAM 화면에서 사용하지 않는다. */
+#editLocCode,#eamRegLocCode{display:none!important}
 </style>
