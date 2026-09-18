@@ -3534,12 +3534,12 @@ html::before,body::before{
         m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>누수관리 LK 생성처럼 번호를 직접 입력할 수 있습니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><span>${x[2]}</span><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><input id="e223No" maxlength="2" inputmode="numeric" placeholder="01"><strong id="e223Preview">${defaultCat||'AC'}-01</strong></div><div class="eam228-modal-note">코드 생성 후 배치도에서 아이콘을 직접 드래그하여 위치를 정합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
         document.body.appendChild(m);window.__eam228Used=used;window.eam228Prefix(defaultCat||'AC');document.getElementById('e223No')?.addEventListener('input',window.eam228Preview);
       };
-      window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Prefix').textContent=p;document.querySelectorAll('.eam228-code-types button').forEach(b=>b.classList.toggle('on',b.dataset.cat===p));window.eam228Preview()};
+      window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Prefix').textContent=p;document.querySelectorAll('.eam228-code-types button').forEach(b=>b.classList.toggle('on',b.dataset.cat===p));const inp=document.getElementById('e223No');const used=window.__eam228Used||new Set();let n=1;while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<100)n++;if(inp){inp.value=String(n).padStart(2,'0');}window.eam228Preview()};
       window.eam228Preview=()=>{const p=window.__eam228Prefix||'AC',used=window.__eam228Used||new Set(),raw=V(document.getElementById('e223No')?.value);let n=raw?Number(raw):1;if(!raw)while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<99)n++;n=Math.max(1,Math.min(99,n||1));const el=document.getElementById('e223Preview');if(el)el.textContent=`${p}-${String(n).padStart(2,'0')}`};
       window.eam228Create=async()=>{
         if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
-        const p=window.__eam228Prefix||'AC',raw=V(document.getElementById('e223No')?.value),n=Number(raw||0),code=`${p}-${String(n||1).padStart(2,'0')}`,name=catMap[p]||code;
-        if(!/^\d{1,2}$/.test(raw)||n<1||n>99){alert('번호는 1~99 사이 숫자로 입력하세요.');return}
+        const p=window.__eam228Prefix||'AC',inp=document.getElementById('e223No'),raw=V(inp?.value),used=window.__eam228Used||new Set();let n=Number(raw||0);if(!n){n=1;while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<100)n++;}const code=`${p}-${String(n).padStart(2,'0')}`,name=catMap[p]||code;
+        if(!/^\d{1,2}$/.test(String(n))||n<1||n>99){alert('번호는 1~99 사이 숫자로 입력하세요.');return}
         const existing=assets.find(a=>codeOf(a).toUpperCase()===code);
         if(existing){
           let deletedCodes=new Set();
