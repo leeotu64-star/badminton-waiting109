@@ -15642,6 +15642,20 @@ body {
 .eam-detail-panel .jgb-basic-value:where(:not(.keep-location-code)){ }
 </style>
 
+
+<style id="JGB_EAM_HYUN_V14_FIXED_POSITION">
+.eh-map .eh-marker{
+  position:absolute!important;
+  transform:translate(-50%,-50%) translateZ(8px)!important;
+  will-change:left,top!important;
+  touch-action:none!important;
+}
+.eh-map .eh-marker.dragging{
+  transform:translate(-50%,-50%) translateZ(8px) scale(1.04)!important;
+  z-index:999!important;
+}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -17264,138 +17278,143 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 }
 </style>
 
-<script id="JGB_EAM_HYUN_SINGLE_CLICK_DRAG_V9">
+<script id="JGB_EAM_HYUN_SINGLE_CLICK_DRAG_V14">
 (function(){
   'use strict';
-  if(window.__JGB_EAM_HYUN_SINGLE_CLICK_DRAG_V9)return;
-  window.__JGB_EAM_HYUN_SINGLE_CLICK_DRAG_V9=true;
+  if(window.__JGB_EAM_HYUN_SINGLE_CLICK_DRAG_V14)return;
+  window.__JGB_EAM_HYUN_SINGLE_CLICK_DRAG_V14=true;
 
   const V=x=>String(x??'').trim();
-  let active=null;
+  let drag=null;
   let suppressClickUntil=0;
 
-  function openAsset(el, ev){
-    if(!el || el.classList.contains('map-only')) return;
-    const code=V(el.dataset.code || el.getAttribute('data-code') || el.textContent);
-    if(!code) return;
-    if(ev){
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-    }
+  function openAsset(el,ev){
+    if(!el || el.classList.contains('map-only'))return;
+    const code=V(el.dataset.code||el.getAttribute('data-code')||el.textContent).toUpperCase();
+    if(!code)return;
+    ev?.preventDefault(); ev?.stopImmediatePropagation();
     if(typeof window.jgbOpenEamAssetByCode==='function'){
       window.jgbOpenEamAssetByCode(code);
     }else{
       window.__eamSelCode=code;
-      if(typeof window.go==='function'){
-        window.go('eam');
-      }else{
-        try{ location.href='?page=eam'; }catch(_){}
-      }
+      if(typeof window.go==='function')window.go('eam');
     }
+  }
+
+  function readJson(key){
+    try{
+      const x=JSON.parse(localStorage.getItem(key)||'{}');
+      return x&&typeof x==='object'?x:{};
+    }catch(_){return {}}
+  }
+  function writeJson(key,x){
+    try{localStorage.setItem(key,JSON.stringify(x));return true}catch(_){return false}
   }
 
   document.addEventListener('pointerdown',function(e){
     if(e.button!==0)return;
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
-
     const map=el.closest('.eh-map');
     if(!map)return;
 
-    const r=map.getBoundingClientRect();
-    active={
-      el:el,
-      map:map,
-      rect:r,
-      sx:e.clientX,
-      sy:e.clientY,
-      moved:false,
-      startLeft:parseFloat(el.style.left)||50,
-      startTop:parseFloat(el.style.top)||50
+    e.preventDefault();
+    e.stopPropagation();
+
+    const mr=map.getBoundingClientRect();
+    const startLeft=parseFloat(el.style.left);
+    const startTop=parseFloat(el.style.top);
+
+    drag={
+      el,map,mr,
+      pointerId:e.pointerId,
+      startClientX:e.clientX,startClientY:e.clientY,
+      startLeft:Number.isFinite(startLeft)?startLeft:50,
+      startTop:Number.isFinite(startTop)?startTop:50,
+      moved:false
     };
 
-    const move=function(ev){
-      if(!active)return;
-      const dx=ev.clientX-active.sx;
-      const dy=ev.clientY-active.sy;
-
-      if(!active.moved && Math.hypot(dx,dy)<6)return;
-
-      if(!active.moved){
-        active.moved=true;
-        active.el.classList.add('dragging');
-      }
-
-      const x=Math.max(2,Math.min(98,((ev.clientX-active.rect.left)/active.rect.width)*100));
-      const y=Math.max(2,Math.min(98,((ev.clientY-active.rect.top)/active.rect.height)*100));
-
-      active.el.style.left=x.toFixed(2)+'%';
-      active.el.style.top=y.toFixed(2)+'%';
-
-      ev.preventDefault();
-      ev.stopPropagation();
-    };
-
-    const up=function(ev){
-      if(!active)return;
-
-      const d=active;
-      active=null;
-
-      window.removeEventListener('pointermove',move,true);
-      window.removeEventListener('pointerup',up,true);
-      window.removeEventListener('pointercancel',up,true);
-
-      d.el.classList.remove('dragging');
-
-      if(d.moved){
-        const x=Math.max(2,Math.min(98,((ev.clientX-d.rect.left)/d.rect.width)*100));
-        const y=Math.max(2,Math.min(98,((ev.clientY-d.rect.top)/d.rect.height)*100));
-
-        d.el.style.left=x.toFixed(2)+'%';
-        d.el.style.top=y.toFixed(2)+'%';
-
-        const c=V(d.el.dataset.code || d.el.getAttribute('data-code') || d.el.textContent).toUpperCase();
-
-        if(d.el.classList.contains('map-only')){
-          try{
-            const key='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
-            const data=JSON.parse(localStorage.getItem(key)||'{}');
-            if(data[c]){
-              data[c].x=Number(x.toFixed(2));
-              data[c].y=Number(y.toFixed(2));
-              localStorage.setItem(key,JSON.stringify(data));
-            }
-          }catch(_){}
-        }else{
-          try{
-            const key='JGB_EAM_HYUNHWANG_MAP_V1';
-            const pos=JSON.parse(localStorage.getItem(key)||'{}');
-            const xx=Number(x.toFixed(2)), yy=Number(y.toFixed(2));
-            pos[c]=[xx,yy];
-            localStorage.setItem(key,JSON.stringify(pos));
-            /* 같은 코드의 배치도 전용 복제본이 있으면 삭제하여
-               다음 새로고침에서도 기존 EAM 아이콘 하나만 유지한다. */
-            const onlyKey='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
-            const only=JSON.parse(localStorage.getItem(onlyKey)||'{}');
-            Object.keys(only).forEach(k=>{if(V(k).toUpperCase()===c)delete only[k]});
-            localStorage.setItem(onlyKey,JSON.stringify(only));
-          }catch(_){}
-        }
-
-        /* 브라우저가 이어서 발생시키는 click은 이동으로 처리하지 않음 */
-        suppressClickUntil=Date.now()+350;
-        ev.preventDefault();
-        ev.stopPropagation();
-      }
-    };
-
-    window.addEventListener('pointermove',move,true);
-    window.addEventListener('pointerup',up,true);
-    window.addEventListener('pointercancel',up,true);
+    try{el.setPointerCapture?.(e.pointerId)}catch(_){}
   },true);
 
-  /* 단순 클릭만 EAM 이력관리로 이동 */
+  document.addEventListener('pointermove',function(e){
+    if(!drag || e.pointerId!==drag.pointerId)return;
+
+    const dx=e.clientX-drag.startClientX;
+    const dy=e.clientY-drag.startClientY;
+
+    if(!drag.moved && Math.hypot(dx,dy)<5)return;
+    drag.moved=true;
+    drag.el.classList.add('dragging');
+
+    const x=Math.max(2,Math.min(98,((e.clientX-drag.mr.left)/drag.mr.width)*100));
+    const y=Math.max(2,Math.min(98,((e.clientY-drag.mr.top)/drag.mr.height)*100));
+
+    drag.el.style.left=x.toFixed(2)+'%';
+    drag.el.style.top=y.toFixed(2)+'%';
+    e.preventDefault();
+    e.stopPropagation();
+  },true);
+
+  function finish(e){
+    if(!drag || (e.pointerId!=null && e.pointerId!==drag.pointerId))return;
+
+    const d=drag;
+    drag=null;
+    d.el.classList.remove('dragging');
+
+    if(!d.moved){
+      try{d.el.releasePointerCapture?.(d.pointerId)}catch(_){}
+      return;
+    }
+
+    const x=Math.max(2,Math.min(98,((e.clientX-d.mr.left)/d.mr.width)*100));
+    const y=Math.max(2,Math.min(98,((e.clientY-d.mr.top)/d.mr.height)*100));
+    const xx=Number(x.toFixed(2)), yy=Number(y.toFixed(2));
+    const code=V(d.el.dataset.code||d.el.getAttribute('data-code')||d.el.textContent).toUpperCase();
+
+    d.el.style.left=xx+'%';
+    d.el.style.top=yy+'%';
+
+    if(code){
+      if(d.el.classList.contains('map-only')){
+        const key='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+        const data=readJson(key);
+        const keyFound=Object.keys(data).find(k=>V(k).toUpperCase()===code);
+        if(keyFound){
+          data[keyFound].x=xx;
+          data[keyFound].y=yy;
+          writeJson(key,data);
+        }
+      }else{
+        const key='JGB_EAM_HYUNHWANG_MAP_V1';
+        const pos=readJson(key);
+        const oldKey=Object.keys(pos).find(k=>V(k).toUpperCase()===code);
+        if(oldKey && oldKey!==code){
+          pos[code]=pos[oldKey];
+          delete pos[oldKey];
+        }
+        pos[code]=[xx,yy];
+        writeJson(key,pos);
+
+        /* 동일 코드의 전용 아이콘 데이터가 남아 있어도 다음 렌더에서 중복되지 않도록 제거 */
+        const onlyKey='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+        const only=readJson(onlyKey);
+        Object.keys(only).forEach(k=>{if(V(k).toUpperCase()===code)delete only[k]});
+        writeJson(onlyKey,only);
+      }
+    }
+
+    /* 이동 직후 자동 render/재배치를 하지 않는다. 사용자가 놓은 좌표 그대로 유지 */
+    suppressClickUntil=Date.now()+500;
+    e.preventDefault();
+    e.stopPropagation();
+    try{d.el.releasePointerCapture?.(d.pointerId)}catch(_){}
+  }
+
+  document.addEventListener('pointerup',finish,true);
+  document.addEventListener('pointercancel',finish,true);
+
   document.addEventListener('click',function(e){
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
@@ -17415,7 +17434,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
     openAsset(el,e);
   },true);
 
-  /* 더블클릭 전용 이동은 사용하지 않음 */
+  /* 더블클릭 이동은 사용하지 않는다. */
   document.addEventListener('dblclick',function(e){
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
@@ -17484,77 +17503,6 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 };
 })();
 </script>
-
-<style id="JGB_EAM_HYUN_V11_ICON_NO_OVERLAP">
-/* v11: 배치도 아이콘끼리 겹치지 않도록 표시 영역만 정리 */
-.eh-map .eh-marker{z-index:20!important}
-.eh-map .eh-marker.dragging{z-index:100!important}
-</style>
-<script id="JGB_EAM_HYUN_V11_ICON_NO_OVERLAP_JS">
-(function(){
-'use strict';
-if(window.__JGB_EAM_HYUN_V11_ICON_NO_OVERLAP)return;
-window.__JGB_EAM_HYUN_V11_ICON_NO_OVERLAP=true;
-const MAPKEY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
-const POSKEY='JGB_EAM_HYUNHWANG_MAP_V1';
-const V=x=>String(x??'').trim();
-const read=(k,f)=>{try{const x=JSON.parse(localStorage.getItem(k)||'');return x&&typeof x==='object'?x:f}catch(_){return f}};
-const write=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x));return true}catch(_){return false}};
-function center(el,map){const a=el.getBoundingClientRect(),b=map.getBoundingClientRect();return {x:a.left+a.width/2,y:a.top+a.height/2,w:a.width,h:a.height};}
-function overlap(a,b,pad){return Math.abs(a.x-b.x)<(a.w+b.w)/2+pad && Math.abs(a.y-b.y)<(a.h+b.h)/2+pad;}
-function savePos(el,x,y){
- const c=V(el.dataset.code||el.textContent||''); if(!c)return;
- if(el.classList.contains('map-only')){
-   const d=read(MAPKEY,{}); if(d[c]){d[c].x=+x.toFixed(2);d[c].y=+y.toFixed(2);write(MAPKEY,d);}
- }else{
-   const p=read(POSKEY,{});p[c]=[+x.toFixed(2),+y.toFixed(2)];write(POSKEY,p);
- }
-}
-function findFree(el,map,startX,startY){
- const all=[...map.querySelectorAll('.eh-marker')].filter(x=>x!==el);
- const mr=map.getBoundingClientRect();
- const step=3.2;
- const candidates=[];
- for(let ring=1;ring<=12;ring++){
-   const d=step*ring;
-   candidates.push([startX+d,startY],[startX-d,startY],[startX,startY+d],[startX,startY-d],[startX+d,startY+d],[startX-d,startY-d],[startX+d,startY-d],[startX-d,startY+d]);
- }
- candidates.push([8,8],[20,12],[32,18],[44,12],[56,18],[68,12],[80,18],[92,12],[12,82],[28,86],[44,82],[60,86],[76,82],[90,78]);
- for(const [x,y] of candidates){
-   const nx=Math.max(3,Math.min(97,x)), ny=Math.max(3,Math.min(97,y));
-   el.style.left=nx+'%';el.style.top=ny+'%';
-   const r=center(el,map);
-   if(!all.some(o=>overlap(r,center(o,map),4)))return [nx,ny];
- }
- el.style.left=startX+'%';el.style.top=startY+'%';
- return [startX,startY];
-}
-function resolveMap(map){
- if(!map)return;
- const icons=[...map.querySelectorAll('.eh-marker')];
- if(icons.length<2)return;
- let changed=false;
- for(let i=0;i<icons.length;i++){
-   const el=icons[i]; if(!el.isConnected)continue;
-   const r=center(el,map);
-   let hit=false;
-   for(let j=0;j<i;j++) if(overlap(r,center(icons[j],map),4)){hit=true;break;}
-   if(hit){
-     const x=parseFloat(el.style.left)||50,y=parseFloat(el.style.top)||50;
-     const [nx,ny]=findFree(el,map,x,y);
-     savePos(el,nx,ny); changed=true;
-   }
- }
- if(changed) window.dispatchEvent(new Event('resize'));
-}
-function schedule(){clearTimeout(window.__JGB_EAM_V11_TIMER);window.__JGB_EAM_V11_TIMER=setTimeout(()=>document.querySelectorAll('.eh-map').forEach(resolveMap),180)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
-new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
-/* 드래그가 끝난 직후에도 겹침을 정리 */
-document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map .eh-marker'))setTimeout(schedule,40)},true);
-})();
-</script>
-
 
 <style id="JGB_EAM_HYUN_V16_3D_FINAL">
 /* v16 — 배치도/아이콘 3D 강화. 이미지 파일 없이 CSS만 사용. */
