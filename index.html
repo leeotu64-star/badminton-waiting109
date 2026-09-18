@@ -4415,7 +4415,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <div class="eam-modal-head"><div><span>EAM ASSET MASTER</span><h3>신규 자산 등록</h3><small>실제 신규 시설·설비 또는 신규 누수 항목만 등록합니다.</small></div><button type="button" onclick="closeEamRegisterModal()">×</button></div>
           <div class="eam-modal-grid">
             <label>시설·설비명 *<input id="eamRegName" placeholder="구매한 실제 제품명"></label>
-            <label>분류 *<select id="eamRegCat"><option>냉난방</option><option>소방설비</option><option>보일러·온수</option><option>전기설비</option><option>위생설비</option><option>문·창호설비</option><option>기타설비</option><option>누수관리</option></select></label>
+            <label>분류 *<select id="eamRegCat" onchange="eamRegPrefixPreview()"><option value="냉난방">냉난방</option><option value="소방설비">소방설비</option><option value="보일러·온수">보일러·온수</option><option value="전기설비">전기설비</option><option value="위생설비">위생설비</option><option value="문·창호설비">문·창호설비</option><option value="기타설비">기타설비</option></select></label>
+            <label>자산번호 숫자 *<input id="eamRegNo" inputmode="numeric" pattern="[0-9]+" maxlength="6" placeholder="예: 15"><small id="eamRegPrefix" style="display:block;margin-top:5px;color:#52718e;font-weight:800">접두어: AC → AC-숫자</small></label>
             <label>설치일<input id="eamRegDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label>
           </div>
           <div class="eam-modal-note">등록 후 배치도에서 자산 아이콘을 직접 배치합니다.</div>
@@ -4423,27 +4424,57 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         </div></div>`);
       const cat=document.getElementById('eamRegCat');
       if(cat && defaultCategory) cat.value=defaultCategory;
+      eamRegPrefixPreview();
     }
     function closeEamRegisterModal(){document.getElementById('eamRegisterModal')?.remove()}
+    const EAM_STRONG_PREFIX={
+      '냉난방':'AC','소방설비':'FI','보일러·온수':'BO','전기설비':'EL','위생설비':'SA','문·창호설비':'DO','기타설비':'OT'
+    };
+    function eamCanonicalCategory(x){
+      const t=String(x||'').trim();
+      if(t==='소방·방재'||t==='소방'||t==='소방설비'||t==='소방장비'||t==='소방제어')return '소방설비';
+      if(t==='온수·난방'||t==='온수기'||t==='보일러'||t==='보일러·온수')return '보일러·온수';
+      if(t==='문·창호'||t==='문·창호설비'||t==='유리문'||t==='도어')return '문·창호설비';
+      if(t==='전기'||t==='전기설비')return '전기설비';
+      if(t==='위생'||t==='위생설비')return '위생설비';
+      if(t==='냉방'||t==='냉난방')return '냉난방';
+      return '기타설비';
+    }
+    function eamRegPrefixPreview(){
+      const cat=eamCanonicalCategory(document.getElementById('eamRegCat')?.value);
+      const prefix=EAM_STRONG_PREFIX[cat]||'OT';
+      const el=document.getElementById('eamRegPrefix');
+      if(el)el.textContent=`접두어: ${prefix} → ${prefix}-숫자`;
+    }
+    function eamStrongAssetCode(category,number){
+      const canonical=eamCanonicalCategory(category), prefix=EAM_STRONG_PREFIX[canonical]||'OT';
+      const n=String(number||'').trim().replace(/[^0-9]/g,'');
+      if(!n)return '';
+      return `${prefix}-${String(Number(n)).padStart(2,'0')}`;
+    }
     async function submitEamRegister(){
       if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
       const name=document.getElementById('eamRegName')?.value.trim();
-      const category=document.getElementById('eamRegCat')?.value||'기타설비';
+      const category=eamCanonicalCategory(document.getElementById('eamRegCat')?.value||'기타설비');
+      const number=document.getElementById('eamRegNo')?.value.trim();
       const date=document.getElementById('eamRegDate')?.value||new Date().toISOString().slice(0,10);
       if(!name){alert('시설·설비명을 입력하세요.');return}
-      const btn=document.getElementById('eamRegSubmit'); if(btn)btn.disabled=true;
-      const code='AST-'+new Date().toISOString().replace(/\D/g,'').slice(0,14)+'-'+Math.random().toString(36).slice(2,5).toUpperCase();
+      if(!/^\d+$/.test(number||'')){alert('자산번호 숫자를 입력하세요.');return}
+      const code=eamStrongAssetCode(category,number);
+      const btn=document.getElementById('eamRegSubmit'); if(btn){btn.disabled=true;btn.textContent='등록 중…'}
       try{
-        const r=await SUPA.from('assets').insert({asset_code:code,name,category,place,status:'정상',product_name:category}).select('id,asset_code,name,category,place,status').single();
+        // 접두어는 분류와 무조건 1:1로 고정한다. 다른 접두어로 저장될 수 없다.
+        const exists=await SUPA.from('assets').select('id,asset_code').eq('asset_code',code).maybeSingle();
+        if(exists.error)throw exists.error;
+        if(exists.data){alert(`이미 사용 중인 자산코드입니다: ${code}`);return}
+        const r=await SUPA.from('assets').insert({asset_code:code,name,category,place:null,status:'정상',product_name:category}).select('id,asset_code,name,category,place,status').single();
         if(r.error)throw r.error;
-        await SUPA.from('asset_history').insert({asset_id:r.data.id,event_type:'자산등록',description:`신규 자산 등록 · ${name}`,worker_name:'관리자',cost:0,event_date:date});
+        await SUPA.from('asset_history').insert({asset_id:r.data.id,event_type:'자산등록',description:`신규 자산 등록 · ${name} · 자산코드 ${code}`,worker_name:'관리자',cost:0,event_date:date});
         window.__eamSelCode=code;
-        const map={'냉난방':'cooling','소방설비':'fire','보일러·온수':'water','전기설비':'electrical','위생설비':'sanitary','문·창호설비':'doors','기타설비':'other'};
-        window.__eamCat=map[category]||'other';
+        window.__eamCat=({ '냉난방':'cooling','소방설비':'fire','보일러·온수':'water','전기설비':'electrical','위생설비':'sanitary','문·창호설비':'doors','기타설비':'other' })[category]||'other';
         closeEamRegisterModal(); await eamLoad(); render();
-        if(category==='누수관리') go('leakage');
-      }catch(e){console.error(e);alert('신규 자산 등록 실패\\n'+(e?.message||''))}
-      finally{if(btn)btn.disabled=false}
+      }catch(e){console.error(e);alert('신규 자산 등록 실패\n'+(e?.message||''))}
+      finally{if(btn){btn.disabled=false;btn.textContent='EAM 자산 생성'}}
     }
 
     function eamPage(){
@@ -5822,9 +5853,13 @@ function jgbV47GoWpByLeak(leakCode){
           window.__eamMetaByCode=Object.assign({},hist,readMeta());
         }catch(e){console.warn('EAM 동기화 실패',e)}
       };
-      function codePrefixForCategory(category){return PREFIX[CATMAP[category]||'other']||'OT'}
+      function codePrefixForCategory(category){
+        const c=String(category||'').trim();
+        const strong={'냉난방':'AC','소방설비':'FI','소방·방재':'FI','보일러·온수':'BO','온수·난방':'BO','전기설비':'EL','위생설비':'SA','문·창호설비':'DO','문·창호':'DO','기타설비':'OT'};
+        return strong[c]||'OT';
+      }
       function nextAutoCode(category){
-        const prefix=codePrefixForCategory(category), used=new Set(sourceRows().map(x=>v(x.code)).filter(x=>x.startsWith(prefix+'-')));
+        const prefix=codePrefixForCategory(category), used=new Set(sourceRows().map(x=>v(x.code)).filter(x=>new RegExp('^'+prefix+'-\\d+$','i').test(x)));
         let n=1;while(used.has(prefix+'-'+String(n).padStart(2,'0')))n++;
         return prefix+'-'+String(n).padStart(2,'0');
       }
@@ -6019,7 +6054,7 @@ function jgbV47GoWpByLeak(leakCode){
         const extCount=jgbV22ExternalCount(H,reg,cardCode);
         const F=(label,value,cls='')=>`<div class="jgb-paper-cell ${cls}"><small>${esc(label)}</small><b>${esc(value??'-')}</b></div>`;
         return `<details class="eam-source-card jgb-history-card" ${window.eamHistoryCardOpen(cardCode)?'open':''} ontoggle="eamPersistHistoryCard(this,'${E(cardCode)}')">
-          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';return window.JGB_EAM_CARD_V22_OPEN('${E(cardCode)}')">✏️ 수정</button></div></summary>
+          <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';return window.eam228Edit('${E(cardCode)}')">✏️ 수정</button></div></summary>
           <div class="jgb-paper-card-body"><section class="jgb-paper-info"><div class="jgb-paper-section-title">📄 기본정보</div><div class="jgb-basic-table-rebuild">
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">자산코드</div><div class="jgb-basic-value">${E((/^DR-\d+$/i.test(String(cur.asset_code||cur.code||''))?'DO-'+String(cur.asset_code||cur.code).slice(3):String(cur.asset_code||cur.code||'-')))}</div><div class="jgb-basic-label">자산명</div><div class="jgb-basic-value">${E(cur.name||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">설비 종류</div><div class="jgb-basic-value">${E(cur.category||cur.type||'-')}</div><div class="jgb-basic-label">위치</div><div class="jgb-basic-value">${E(cur.place||'-')}</div></div>
