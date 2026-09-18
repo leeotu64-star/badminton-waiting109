@@ -3389,6 +3389,92 @@ a[data-page="digitalTwin"],
   overflow:hidden!important;
 }
 </style>
+
+<style id="JGB_EAM_V18_ACTUAL_EH_6040">
+/* V18: 실제 EAM 현황 구조(.eh-main)에만 적용
+   배치도 : 수리 LIVE = 60 : 40
+   수리 LIVE 내부만 가로/세로 스크롤
+*/
+@media (min-width:1001px){
+  .eh-main{
+    display:grid!important;
+    grid-template-columns:minmax(0,6fr) minmax(0,4fr)!important;
+    gap:10px!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    align-items:stretch!important;
+    box-sizing:border-box!important;
+  }
+  .eh-map-card,
+  .eh-right{
+    min-width:0!important;
+    width:100%!important;
+    min-height:0!important;
+    box-sizing:border-box!important;
+  }
+  .eh-map-card{
+    overflow:hidden!important;
+  }
+  .eh-right{
+    overflow:hidden!important;
+    min-height:0!important;
+  }
+  .eh-live-card{
+    min-width:0!important;
+    min-height:0!important;
+    width:100%!important;
+    height:100%!important;
+    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+    box-sizing:border-box!important;
+  }
+  .eh-live-card .eh-card-head{
+    flex:0 0 44px!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+  .eh-live-card .eh-card-body{
+    flex:1 1 auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    width:100%!important;
+    height:auto!important;
+    overflow-x:auto!important;
+    overflow-y:auto!important;
+    scrollbar-gutter:stable both-edges!important;
+    box-sizing:border-box!important;
+  }
+  .eh-live-card .eh-card-body table{
+    width:max-content!important;
+    min-width:760px!important;
+    max-width:none!important;
+    table-layout:fixed!important;
+    border-collapse:collapse!important;
+  }
+  .eh-live-card .eh-card-body th,
+  .eh-live-card .eh-card-body td{
+    white-space:nowrap!important;
+    word-break:keep-all!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    box-sizing:border-box!important;
+  }
+  .eh-live-card .eh-card-body::-webkit-scrollbar{
+    width:11px!important;
+    height:11px!important;
+  }
+  .eh-live-card .eh-card-body::-webkit-scrollbar-thumb{
+    background:#8299a9!important;
+    border-radius:7px!important;
+    border:2px solid #edf3f6!important;
+  }
+  .eh-live-card .eh-card-body::-webkit-scrollbar-track{
+    background:#edf3f6!important;
+  }
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -14983,70 +15069,6 @@ body {
 .eh-marker{padding:6px 10px!important;font-size:12px!important;min-width:46px;min-height:30px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#ffffff,#e7f1f6)!important;box-shadow:0 5px 10px rgba(20,55,70,.25),inset 0 1px 0 #fff!important}
 .eh-marker.map-only{background:linear-gradient(145deg,#ffffff,#d9ecfa)!important;border-width:2px!important}
 </style>
-
-<style id="JGB_EAM_V17_FINAL_RATIO_6_4">
-/* 최종 수정: 좌측 배치도 60% / 우측 영역 40% 고정 */
-.eam228-main{
-  display:grid!important;
-  grid-template-columns:minmax(0,60fr) minmax(0,40fr)!important;
-  gap:10px!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-  align-items:stretch!important;
-}
-/* 우측의 수리 LIVE + 하단 추가영역은 50:50 */
-.eam228-right{
-  display:grid!important;
-  grid-template-rows:minmax(0,1fr) minmax(0,1fr)!important;
-  gap:10px!important;
-  min-height:0!important;
-  height:100%!important;
-  overflow:hidden!important;
-}
-.eam228-right-split{
-  display:grid!important;
-  grid-template-rows:minmax(0,1fr) minmax(0,1fr)!important;
-  gap:10px!important;
-  min-height:0!important;
-  height:100%!important;
-  overflow:hidden!important;
-}
-/* 수리 LIVE 영역만 내부 가로·세로 스크롤 */
-.eam228-live-card,.eh-live-card{
-  min-width:0!important;
-  min-height:0!important;
-  height:100%!important;
-  overflow:hidden!important;
-}
-.eam228-live-scroll,.eh-live-card .eh-card-body{
-  min-width:0!important;
-  min-height:0!important;
-  width:100%!important;
-  height:100%!important;
-  overflow-x:auto!important;
-  overflow-y:scroll!important;
-  box-sizing:border-box!important;
-}
-/* 수리 LIVE 표는 내용 폭을 유지하여 가로 스크롤 발생 */
-.eam228-live-scroll table,.eh-live-card .eh-card-body table{
-  min-width:720px!important;
-  width:max-content!important;
-  max-width:none!important;
-  table-layout:fixed!important;
-}
-.eam228-live-scroll th,.eam228-live-scroll td,.eh-live-card .eh-card-body th,.eh-live-card .eh-card-body td{
-  white-space:nowrap!important;
-  word-break:keep-all!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-}
-/* 하단 추가영역 자체에는 수리 LIVE용 가로세로 스크롤을 강제하지 않음 */
-.eam228-future-card{
-  min-width:0!important;
-  min-height:0!important;
-}
-</style>
-
 </body>
 
 <style id="v19-court-position-final">
@@ -16831,23 +16853,3 @@ new MutationObserver(schedule).observe(document.documentElement,{childList:true,
 document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map .eh-marker'))setTimeout(schedule,40)},true);
 })();
 </script>
-
-<style id="JGB_EAM_V16_LIVE_ALIGN_ONLY">
-/* V16: EAM 전체 틀은 유지하고 수리 LIVE만 누수 현황표처럼 정렬 */
-.eam228-live-card{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;overflow:hidden!important}
-.eam228-live-card .eam228-section-head{flex:0 0 auto!important}
-.eam228-live-scroll{flex:1 1 auto!important;min-width:0!important;min-height:0!important;width:100%!important;height:auto!important;overflow-y:scroll!important;overflow-x:auto!important;scrollbar-gutter:stable!important}
-.eam228-live-scroll table,.eam228-live-scroll .eam228-live-table{width:100%!important;min-width:720px!important;max-width:none!important;table-layout:fixed!important;border-collapse:collapse!important}
-.eam228-live-scroll th,.eam228-live-scroll td{box-sizing:border-box!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;word-break:keep-all!important;text-align:center!important;vertical-align:middle!important}
-.eam228-live-scroll th{font-weight:900!important}
-.eam228-live-scroll td{font-weight:600!important}
-.eam228-live-scroll th:nth-child(1),.eam228-live-scroll td:nth-child(1){width:16%!important}
-.eam228-live-scroll th:nth-child(2),.eam228-live-scroll td:nth-child(2){width:27%!important}
-.eam228-live-scroll th:nth-child(3),.eam228-live-scroll td:nth-child(3){width:17%!important}
-.eam228-live-scroll th:nth-child(4),.eam228-live-scroll td:nth-child(4){width:17%!important}
-.eam228-live-scroll th:nth-child(5),.eam228-live-scroll td:nth-child(5){width:23%!important}
-.eam228-live-scroll::-webkit-scrollbar{width:10px!important;height:10px!important}
-.eam228-live-scroll::-webkit-scrollbar-track{background:#edf3f6!important}
-.eam228-live-scroll::-webkit-scrollbar-thumb{background:#8299a9!important;border-radius:7px!important;border:2px solid #edf3f6!important}
-.eam228-live-scroll::-webkit-scrollbar-thumb:hover{background:#627d90!important}
-</style>
