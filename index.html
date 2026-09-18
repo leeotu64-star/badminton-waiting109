@@ -15097,10 +15097,7 @@ body {
 .eam228-live-scroll::-webkit-scrollbar-track{background:#edf3f6!important;}
 </style>
 
-<style id="JGB_EAM_HYUN_V8_ICON_DRAG_STYLE">
-.eh-map .eh-marker{cursor:grab!important;user-select:none!important;-webkit-user-select:none!important;touch-action:none!important;}
-.eh-map .eh-marker.dragging{cursor:grabbing!important;transform:translate(-50%,-50%) scale(1.06)!important;z-index:99!important;}
-</style>
+
 
 <style id="JGB_EAM_HYUN_V14_3D_MAP_ONLY">
 /* 배치도 전용 3D 코트 · 자산이력/자산등록과 무관 */
@@ -17095,16 +17092,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 }
 </style>
 
-<style id="JGB_EAM_HYUN_ICON_CLICK_DRAG_CLEAN_V1">
-/* 배치도 자산 아이콘 최종 동작: 이동모드가 아니면 단일 클릭으로 EAM 이력관리, 이동모드에서는 드래그만 */
-.eh-map .eh-marker{
-  cursor:pointer!important;
-  user-select:none!important;
-  -webkit-user-select:none!important;
-  touch-action:none!important;
-}
-.eh-map .eh-marker.dragging{cursor:grabbing!important;}
-</style>
+
 
 
 <!-- JGB EAM 현황 v13: 배치도 아이콘 삭제를 LK 삭제 방식의 목록형으로 변경 -->
@@ -17481,146 +17469,198 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 </style>
 
 
-<style id="JGB_EAM_HYUN_V17_ICON_POSITION_FINAL">
-/* V17: EAM 현황 아이콘은 사용자가 놓은 위치를 그대로 고정 */
+
+
+
+
+
+<style id="JGB_EAM_HYUN_V19_ICON_FORCE_LOCK">
+/* V19 FINAL: EAM 현황 배치도 아이콘은 사용자가 놓은 위치를 강제로 유지 */
 .eh-map .eh-marker{
+  position:absolute!important;
+  transform:translate(-50%,-50%)!important;
   cursor:grab!important;
   user-select:none!important;
   -webkit-user-select:none!important;
+  -webkit-user-drag:none!important;
   touch-action:none!important;
-  position:absolute!important;
+  will-change:left,top!important;
 }
-.eh-map .eh-marker.dragging{
+.eh-map .eh-marker.jgb-v19-dragging{
   cursor:grabbing!important;
-  z-index:1000!important;
+  z-index:2147483000!important;
+  transform:translate(-50%,-50%) scale(1.08)!important;
 }
 </style>
-<script id="JGB_EAM_HYUN_V17_ICON_POSITION_FINAL_JS">
+
+<script id="JGB_EAM_HYUN_V19_ICON_FORCE_LOCK_JS">
 (function(){
   'use strict';
-  if(window.__JGB_EAM_HYUN_V17_ICON_POSITION_FINAL)return;
-  window.__JGB_EAM_HYUN_V17_ICON_POSITION_FINAL=true;
+  if(window.__JGB_EAM_HYUN_V19_ICON_FORCE_LOCK)return;
+  window.__JGB_EAM_HYUN_V19_ICON_FORCE_LOCK=true;
 
   const POS_KEY='JGB_EAM_HYUNHWANG_MAP_V1';
   const V=x=>String(x??'').trim();
+  let dragging=null;
+  let suppressClickUntil=0;
 
-  function readPos(){
+  function read(){
     try{
       const x=JSON.parse(localStorage.getItem(POS_KEY)||'{}');
       return x&&typeof x==='object'?x:{};
     }catch(_){return {}}
   }
-  function writePos(x){
+  function write(x){
     try{
       localStorage.setItem(POS_KEY,JSON.stringify(x));
       return true;
     }catch(_){return false}
   }
-
-  function assetKey(el){
+  function key(el){
     const id=V(el.getAttribute('data-asset-id'));
     if(id)return 'id:'+id;
-    return 'code:'+V(el.getAttribute('data-code'));
+    const code=V(el.getAttribute('data-code'));
+    return code?'code:'+code:'';
+  }
+  function codeKey(el){
+    const code=V(el.getAttribute('data-code'));
+    return code?'code:'+code:'';
+  }
+  function pos(el){
+    const idKey=key(el), code=codeKey(el), p=read();
+    return p[idKey]||p[code]||null;
+  }
+  function apply(el,p){
+    if(!el||!p||p.length<2)return;
+    const x=Math.max(1,Math.min(99,Number(p[0])));
+    const y=Math.max(1,Math.min(99,Number(p[1])));
+    el.style.setProperty('left',x.toFixed(2)+'%','important');
+    el.style.setProperty('top',y.toFixed(2)+'%','important');
+  }
+  function save(el,x,y){
+    const p=read();
+    const id=V(el.getAttribute('data-asset-id'));
+    const code=V(el.getAttribute('data-code'));
+    if(id)p['id:'+id]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+    if(code)p['code:'+code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+    /* 두 키에 같이 저장해 렌더링 방식이 달라도 위치가 유지되게 한다. */
+    if(!write(p))alert('아이콘 위치 저장에 실패했습니다.');
   }
 
-  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  function restoreAll(root=document){
+    root.querySelectorAll?.('.eh-map .eh-marker').forEach(el=>{
+      if(el.classList.contains('jgb-v19-dragging'))return;
+      const p=pos(el);
+      if(p)apply(el,p);
+    });
+  }
 
-  let drag=null;
+  /* 화면 재생성/이력카드 이동 후에도 저장 위치를 즉시 재적용 */
+  const observer=new MutationObserver(muts=>{
+    let changed=false;
+    for(const m of muts){
+      if(m.type==='childList' || m.type==='attributes' && m.attributeName==='style'){
+        changed=true; break;
+      }
+    }
+    if(changed) requestAnimationFrame(()=>restoreAll());
+  });
+  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style']});
 
   document.addEventListener('pointerdown',function(e){
     if(e.button!==0)return;
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el || el.classList.contains('map-only'))return;
-
     const map=el.closest('.eh-map');
     if(!map)return;
 
     const r=map.getBoundingClientRect();
-    drag={
+    if(!r.width||!r.height)return;
+
+    dragging={
       el,map,r,
-      sx:e.clientX,sy:e.clientY,
-      startLeft:parseFloat(el.style.left)||50,
-      startTop:parseFloat(el.style.top)||50,
-      moved:false,
-      dragging:false
+      pointerId:e.pointerId,
+      startX:e.clientX,startY:e.clientY,
+      active:false
     };
+    try{el.setPointerCapture?.(e.pointerId)}catch(_){}
 
     const move=function(ev){
-      if(!drag)return;
-      const d=drag;
-      const dx=ev.clientX-d.sx, dy=ev.clientY-d.sy;
+      if(!dragging || ev.pointerId!==dragging.pointerId)return;
+      const d=dragging;
+      const dx=ev.clientX-d.startX, dy=ev.clientY-d.startY;
 
-      if(!d.dragging && Math.hypot(dx,dy)<5)return;
+      if(!d.active && Math.hypot(dx,dy)<4)return;
 
-      if(!d.dragging){
-        d.dragging=true;
-        d.el.classList.add('dragging');
+      if(!d.active){
+        d.active=true;
+        d.el.classList.add('jgb-v19-dragging');
       }
 
-      const x=clamp(((ev.clientX-d.r.left)/d.r.width)*100,1,99);
-      const y=clamp(((ev.clientY-d.r.top)/d.r.height)*100,1,99);
+      const x=Math.max(1,Math.min(99,((ev.clientX-d.r.left)/d.r.width)*100));
+      const y=Math.max(1,Math.min(99,((ev.clientY-d.r.top)/d.r.height)*100));
 
-      d.el.style.left=x.toFixed(2)+'%';
-      d.el.style.top=y.toFixed(2)+'%';
-      d.moved=true;
-
+      apply(d.el,[x,y]);
       ev.preventDefault();
       ev.stopImmediatePropagation();
     };
 
-    const up=function(ev){
-      if(!drag)return;
-      const d=drag;
-      drag=null;
+    const finish=function(ev){
+      if(!dragging || ev.pointerId!==dragging.pointerId)return;
+      const d=dragging;
+      dragging=null;
 
       window.removeEventListener('pointermove',move,true);
-      window.removeEventListener('pointerup',up,true);
-      window.removeEventListener('pointercancel',up,true);
+      window.removeEventListener('pointerup',finish,true);
+      window.removeEventListener('pointercancel',finish,true);
 
-      d.el.classList.remove('dragging');
-
-      if(!d.moved)return;
-
-      const x=clamp(((ev.clientX-d.r.left)/d.r.width)*100,1,99);
-      const y=clamp(((ev.clientY-d.r.top)/d.r.height)*100,1,99);
-
-      d.el.style.left=x.toFixed(2)+'%';
-      d.el.style.top=y.toFixed(2)+'%';
-
-      const pos=readPos();
-      const key=assetKey(d.el);
-
-      /* 자산의 고유 ID에만 위치를 저장한다. 자산코드 변경과 무관하다. */
-      pos[key]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-
-      if(!writePos(pos)){
-        alert('아이콘 위치 저장에 실패했습니다.');
+      if(!d.active){
+        d.el.classList.remove('jgb-v19-dragging');
+        return;
       }
 
-      /* 드래그 직후 이력카드 이동을 막는다. */
-      window.__JGB_EAM_V17_DRAGGED_UNTIL=Date.now()+450;
+      const x=Math.max(1,Math.min(99,((ev.clientX-d.r.left)/d.r.width)*100));
+      const y=Math.max(1,Math.min(99,((ev.clientY-d.r.top)/d.r.height)*100));
+
+      apply(d.el,[x,y]);
+      save(d.el,x,y);
+
+      d.el.classList.remove('jgb-v19-dragging');
+      suppressClickUntil=Date.now()+700;
+
+      /* 다른 렌더/클릭 코드가 위치를 되돌리지 못하게 한 번 더 확정 */
+      requestAnimationFrame(()=>apply(d.el,[x,y]));
+      setTimeout(()=>apply(d.el,[x,y]),50);
+      setTimeout(()=>apply(d.el,[x,y]),180);
 
       ev.preventDefault();
       ev.stopImmediatePropagation();
     };
 
     window.addEventListener('pointermove',move,true);
-    window.addEventListener('pointerup',up,true);
-    window.addEventListener('pointercancel',up,true);
+    window.addEventListener('pointerup',finish,true);
+    window.addEventListener('pointercancel',finish,true);
 
     e.preventDefault();
     e.stopImmediatePropagation();
   },true);
 
-  /* 드래그 직후 클릭은 막고, 단순 클릭은 기존 선택/이력카드 연결을 방해하지 않는다. */
+  /* 드래그 후 발생하는 클릭만 차단. 평상시 클릭은 기존 이력카드 연결을 그대로 둔다. */
   document.addEventListener('click',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el)return;
-    if(Date.now() < Number(window.__JGB_EAM_V17_DRAGGED_UNTIL||0)){
-      e.preventDefault();
-      e.stopImmediatePropagation();
+    if(Date.now()<suppressClickUntil){
+      const el=e.target.closest?.('.eh-map .eh-marker');
+      if(el){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
     }
   },true);
+
+  /* 최초 표시 직후 저장된 위치 강제 적용 */
+  document.addEventListener('DOMContentLoaded',()=>restoreAll());
+  setTimeout(restoreAll,0);
+  setTimeout(restoreAll,100);
+  setTimeout(restoreAll,500);
 })();
 </script>
 
