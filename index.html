@@ -3845,7 +3845,7 @@ html::before,body::before{
       window.eam228Location=label=>{const rows=locData[label]||[];const box=document.getElementById('eam228Card');if(!box)return;box.innerHTML=`<div class="eam228-card-head"><div><small>LOCATION</small><b>${esc(label)}</b></div><span>${rows.length}건</span></div><div class="eam228-location-list">${rows.length?rows.map(a=>`<button onclick="window.eam228Pick('${attr(codeOf(a))}')"><strong>${esc(codeOf(a))}</strong><span>${esc(a.name||'자산')}</span><em class="${statusClass(statusOf(a))}">${statusText(statusOf(a))}</em></button>`).join(''):'<div class="eam228-empty">등록된 자산이 없습니다.</div>'}</div>`};
 
       const markerAssets=assets.filter(a=>getPos(a));
-      const markers=markerAssets.map(a=>{const p=getPos(a);if(!p)return '';const st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}" onclick="if(!window.__EAM228_DRAG_SUPPRESS)window.eam228Pick('${attr(code)}')"><span>${catIcon(cat)}</span><b>${esc(code)}</b></button>`}).join('');
+      const markers=markerAssets.map(a=>{const p=getPos(a);if(!p)return '';const st=statusOf(a),cat=normCat(a),code=codeOf(a);return `<button type="button" class="eam228-asset ${statusClass(st)}" data-code="${attr(code)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(code)} · ${attr(a.name||'자산')}" ><span>${catIcon(cat)}</span><b>${esc(code)}</b></button>`}).join('');
       const court=n=>`<button type="button" class="eam228-court" onclick="window.eam228Location('코트 ${n}')"><span>${n}</span></button>`;
       const zone=(label,sub,cls='')=>`<button type="button" class="eam228-zone ${cls}" onclick="window.eam228Location('${attr(label)}')"><b>${esc(label)}</b><small>${esc(sub)}</small></button>`;
       const map=`<div id="eam228Map" class="eam228-map"><div class="eam228-courts"><strong>코트 구역 · 에어컨 자산 6개</strong>${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div><div class="eam228-facility"><div class="eam228-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>창고</b></button><span>▲ 계단</span></div><div class="eam228-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button><div class="eam228-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span></div>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div>`;
@@ -4743,7 +4743,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
 <div class="jgb-v190-corridor">복도</div>
 <div class="jgb-v190-female"><div class="jgb-v190-zone"><div><b>샤워실(여)</b><small>여자 샤워실</small></div></div><div class="jgb-v190-zone"><div><b>탈의실(여)</b><small>여자 탈의실</small></div></div><div class="jgb-v190-zone"><div><b>화장실(여)</b><small>여자 화장실</small></div></div></div>
 <div class="jgb-v190-office"><div class="jgb-v190-zone jgb-v200-lounge"><div><b>휴게실</b><small>휴게공간</small></div></div><div class="jgb-v190-zone jgb-v200-water"><div><b>통합 유수장치실</b><small>소방·유수 설비</small></div></div><div class="jgb-v190-zone jgb-v200-office"><div><b>사무실</b><small>관리·운영</small></div></div></div></div><div class="entrance">코트 출입구</div><div class="main-entrance">주출입문</div>${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}</div></div><div class="jgb-v170-note">LK 아이콘 클릭 → 해당 LK의 방수공사 이력으로 이동 · 삭제·초기화는 상단 「LK 삭제·초기화」에서 선택</div></section>
-          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>AUTO 자산</b><span>자산 수리 연동</span></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>완료</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.asset_code||'')}</b></td><td>${esc(x.content||'')}</td><td><span class="eam-v71-status">${esc(x.status||'수리중')}</span></td><td class="jgb-v187-date">${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v182-live-edit" data-v47-action="edit-live" data-live-lk="${esc(x.asset_code||'')}">입력</button></td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.asset_code||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v187-empty"><div class="jgb-v187-empty-visual"><span>👷</span><i>✓</i></div><b>현재 진행 중인 수리내역이 없습니다.</b><span>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</span><em>🌱 작은 불편도 놓치지 않고, 쾌적한 시설을 위해 항상 노력하겠습니다.</em></div>`}</div>
+          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>AUTO LK</b><span>LK 등록 연동</span></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>LK</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.lk||'')}</b></td><td>${esc(x.content||'')}</td><td>${esc(x.status||'수리중')}</td><td class="jgb-v187-date">${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v182-live-edit" data-v47-action="edit-live" data-live-lk="${esc(x.lk||'')}">입력</button></td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.lk||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v187-empty"><div class="jgb-v187-empty-visual"><span>👷</span><i>✓</i></div><b>현재 진행 중인 수리내역이 없습니다.</b><span>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</span><em>🌱 작은 불편도 놓치지 않고, 쾌적한 시설을 위해 항상 노력하겠습니다.</em></div>`}</div>
           <section class="jgb-v189-live-notebook" aria-label="실시간 수리 안내 수첩">
             <div class="jgb-v189-book-head"><span>📒 수리관리 안내 수첩</span><small>실시간 수리 화면에서 필요한 내용을 확인하세요.</small></div>
             <div class="jgb-v188-book jgb-v189-book">
@@ -4759,7 +4759,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
               </div>
             </div>
           </section>
-          <div class="jgb-v176-live-footer"><span>● 자산 수리 LIVE</span><span>완료 전까지 LIVE 유지</span></div></section>
+          <div class="jgb-v176-live-footer"><span>● LK 자동 등록</span><span>완료 전까지 LIVE 유지</span></div></section>
         </div>
       </div>`;
     }
@@ -14427,64 +14427,6 @@ body {
 .eam228-asset.bad span{background:linear-gradient(145deg,#fff8f8,#ffc5c5 58%,#ef7777)!important;border-color:#d94b4b!important;}
 .eam228-asset.dragging span{transform:translateZ(4px) scale(1.05)!important;box-shadow:0 5px 8px rgba(20,50,70,.32),inset 0 1px 2px rgba(255,255,255,.95)!important;}
 </style>
-
-<style id="EAM_V71_RIGHT_LIVE_ASSET_STYLE">
-/* V71: EAM 오른쪽 실시간 수리 현황만 누수 LIVE 표 스타일로 정리 */
-.jgb-v176-live-card .jgb-v178-live-table{
-  padding:0!important; margin:0!important; overflow:auto!important;
-  max-height:390px!important; background:#fff!important;
-}
-.jgb-v176-live-card .jgb-v178-live-table table{
-  width:100%!important; min-width:720px!important; border-collapse:separate!important; border-spacing:0!important;
-  table-layout:auto!important;
-}
-.jgb-v176-live-card .jgb-v178-live-table thead th{
-  position:sticky!important; top:0!important; z-index:3!important;
-  background:#eaf3f8!important; color:#173b57!important;
-  border-bottom:1px solid #a9bfd0!important; border-right:1px solid #d1dee8!important;
-  padding:10px 8px!important; font-size:12px!important; font-weight:900!important; white-space:nowrap!important;
-}
-.jgb-v176-live-card .jgb-v178-live-table tbody td{
-  height:42px!important; padding:7px 8px!important; box-sizing:border-box!important;
-  border-bottom:1px solid #d7e2ea!important; border-right:1px solid #e1e9ef!important;
-  color:#17364f!important; font-size:12px!important; vertical-align:middle!important;
-}
-.jgb-v176-live-card .jgb-v178-live-table tbody tr:hover td{background:#f7fbfe!important}
-.jgb-v176-live-card .jgb-v178-live-table th:nth-child(1),
-.jgb-v176-live-card .jgb-v178-live-table td:nth-child(1){width:90px!important; min-width:90px!important; white-space:nowrap!important}
-.jgb-v176-live-card .jgb-v178-live-table th:nth-child(2),
-.jgb-v176-live-card .jgb-v178-live-table td:nth-child(2){width:auto!important; min-width:220px!important; white-space:normal!important; word-break:break-word!important}
-.jgb-v176-live-card .jgb-v178-live-table th:nth-child(3),
-.jgb-v176-live-card .jgb-v178-live-table td:nth-child(3){width:100px!important; min-width:100px!important; white-space:nowrap!important}
-.jgb-v176-live-card .jgb-v178-live-table th:nth-child(4),
-.jgb-v176-live-card .jgb-v178-live-table td:nth-child(4){width:105px!important; min-width:105px!important; white-space:nowrap!important}
-.jgb-v176-live-card .jgb-v178-live-table th:nth-child(5),
-.jgb-v176-live-card .jgb-v178-live-table td:nth-child(5){width:90px!important; min-width:90px!important; white-space:nowrap!important}
-.jgb-v176-live-card .jgb-v178-live-table th:nth-child(6),
-.jgb-v176-live-card .jgb-v178-live-table td:nth-child(6),
-.jgb-v176-live-card .jgb-v178-live-table th:nth-child(7),
-.jgb-v176-live-card .jgb-v178-live-table td:nth-child(7){width:68px!important; min-width:68px!important; white-space:nowrap!important}
-.jgb-v176-live-card .jgb-v178-live-table tbody td:first-child b{
-  display:inline-flex!important; align-items:center!important; padding:5px 9px!important;
-  border-radius:999px!important; background:#eef6ff!important; color:#1267b1!important;
-  font-size:12px!important; font-weight:900!important;
-}
-.eam-v71-status{
-  display:inline-flex!important; align-items:center!important; justify-content:center!important;
-  min-width:62px!important; padding:4px 8px!important; border-radius:999px!important;
-  background:#fff4df!important; color:#b56a00!important; font-weight:900!important;
-}
-.jgb-v176-live-card .jgb-v182-live-edit,
-.jgb-v176-live-card .jgb-v180-live-done{
-  width:100%!important; min-width:58px!important; border-radius:6px!important;
-  font-size:11px!important; font-weight:900!important; padding:6px 5px!important;
-}
-.jgb-v176-live-card .jgb-v182-live-edit{background:#eef6ff!important; border:1px solid #9fc2df!important; color:#1267b1!important}
-.jgb-v176-live-card .jgb-v180-live-done{background:#edf9f1!important; border:1px solid #9ed0ae!important; color:#16804b!important}
-.jgb-v176-live-card .jgb-v178-live-table::-webkit-scrollbar{width:9px;height:9px}
-.jgb-v176-live-card .jgb-v178-live-table::-webkit-scrollbar-thumb{background:#9db3c3;border-radius:9px}
-.jgb-v176-live-card .jgb-v178-live-table::-webkit-scrollbar-track{background:#edf3f7}
-</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -14710,6 +14652,42 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
   .jgb-lr-v54-states{flex-wrap:wrap!important}
 }
 </style>
+
+<style id="JGB_EAM_V72_ICON_DBLCLICK">
+/* V72: 자산 배치 아이콘은 단일 클릭으로 화면 이동하지 않고, 더블클릭에서만 이력카드로 이동 */
+#eam228Map .eam228-asset{cursor:grab!important;user-select:none!important;-webkit-user-select:none!important;touch-action:none!important;}
+#eam228Map .eam228-asset.dragging{cursor:grabbing!important;}
+</style>
+<script id="JGB_EAM_V72_ICON_DBLCLICK_SCRIPT">
+(function(){
+  if(window.__JGB_EAM_ICON_DBLCLICK_V72)return;
+  window.__JGB_EAM_ICON_DBLCLICK_V72=true;
+  let suppressUntil=0;
+  document.addEventListener('pointerup',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(el && el.classList.contains('dragging')) suppressUntil=Date.now()+180;
+  },true);
+  document.addEventListener('click',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el)return;
+    /* 단일 클릭은 선택만 하고 화면 이동하지 않음 */
+    if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const c=el.getAttribute('data-code')||'';
+    window.__eamSelCode=c;
+  },true);
+  document.addEventListener('dblclick',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el)return;
+    if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const c=el.getAttribute('data-code')||'';
+    if(c && typeof window.eam228Pick==='function') window.eam228Pick(c);
+  },true);
+})();
+</script>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
 .jgb-v176-live-card .jgb-v178-live-table{
