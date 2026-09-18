@@ -14984,3 +14984,105 @@ body {
   },true);
 })();
 </script>
+
+
+<style id="JGB_EAM_V25_FINAL_STATUS_COURT_FIX">
+/* 상태 공통 기준: 이력카드 자산상태가 유일한 기준 */
+.eam-v25-status-normal{background:#2e9e57!important;color:#fff!important}
+.eam-v25-status-check{background:#e6b800!important;color:#111!important}
+.eam-v25-status-action{background:#f28c28!important;color:#fff!important}
+.eam-v25-status-repair{background:#e53935!important;color:#fff!important}
+.eam-v25-status-parts{background:#7b3fc6!important;color:#fff!important}
+.eam-v25-status-discard{background:#555!important;color:#fff!important}
+
+/* 상태 헤더는 6개 한 줄 */
+.eam228-head-stats{display:grid!important;grid-template-columns:repeat(6,minmax(72px,1fr))!important;gap:6px!important}
+
+/* 코트: 실제 배드민턴 코트 형태를 하나의 규칙으로 고정 */
+.eam228-court{position:relative!important;overflow:hidden!important}
+.eam228-court::before{
+  content:""!important;position:absolute!important;
+  left:8%!important;right:8%!important;top:50%!important;
+  height:2px!important;transform:translateY(-50%)!important;
+  background:currentColor!important;opacity:.72!important;
+  pointer-events:none!important;z-index:2!important
+}
+.eam228-court::after{
+  content:""!important;position:absolute!important;
+  top:8%!important;bottom:8%!important;left:50%!important;
+  width:2px!important;transform:translateX(-50%)!important;
+  background:currentColor!important;opacity:.48!important;
+  pointer-events:none!important;z-index:2!important
+}
+/* 선이 번호/아이콘 클릭을 방해하지 않도록 */
+.eam228-court *{pointer-events:auto}
+.eam228-court::before,.eam228-court::after{pointer-events:none!important}
+
+/* 자산 아이콘 축소 */
+.eam228-asset-icon{transform:scale(.72)!important;transform-origin:center!important}
+</style>
+<script id="JGB_EAM_V25_FINAL_STATUS_SYNC">
+(function(){
+  const ORDER=['정상','점검','조치필요','수리중','부품대기','폐기'];
+  const CLS={
+    '정상':'eam-v25-status-normal',
+    '점검':'eam-v25-status-check',
+    '조치필요':'eam-v25-status-action',
+    '수리중':'eam-v25-status-repair',
+    '부품대기':'eam-v25-status-parts',
+    '폐기':'eam-v25-status-discard'
+  };
+  function norm(v){
+    v=String(v||'').trim();
+    const map={'점검필요':'점검','수리예정':'수리중','교체 예정':'부품대기','교체예정':'부품대기','원본':'정상','수리완료':'정상'};
+    return map[v]||v;
+  }
+  function statusClass(v){return CLS[norm(v)]||''}
+  function paint(){
+    // 이력카드의 자산상태 select를 공통 6개로 강제
+    document.querySelectorAll('select').forEach(function(sel){
+      const id=(sel.id||'').toLowerCase();
+      const name=(sel.name||'').toLowerCase();
+      if(id.includes('status') || name.includes('status') || sel.closest('.eam228-modal')){
+        const val=norm(sel.value);
+        if(ORDER.includes(val)){
+          const opts=Array.from(sel.options);
+          const hasAll=ORDER.every(x=>opts.some(o=>norm(o.value||o.textContent)===x));
+          if(!hasAll && (id.includes('e223status') || name.includes('asset'))){
+            sel.innerHTML=ORDER.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
+            sel.value=val;
+          }
+        }
+      }
+    });
+
+    // 상태 표시 요소에 공통 색상 클래스 적용
+    document.querySelectorAll('[data-status],.eam-status,.asset-status,.status-badge,.eam228-stat').forEach(function(el){
+      const text=norm(el.dataset.status || el.textContent);
+      const c=statusClass(text);
+      if(c){
+        el.classList.remove(...Object.values(CLS));
+        el.classList.add(c);
+      }
+    });
+
+    // 자산 아이콘: 가능한 경우 자산코드와 같은 상태값을 찾아 색상 적용
+    document.querySelectorAll('.eam228-asset-icon,[class*="asset-icon"]').forEach(function(icon){
+      const holder=icon.closest('[data-asset-code],[data-code],.eam228-asset,.eam228-marker,.eam228-item');
+      const status=holder?.dataset?.status || holder?.querySelector?.('.asset-status')?.textContent || '';
+      const c=statusClass(status);
+      if(c){
+        icon.classList.remove(...Object.values(CLS));
+        icon.classList.add(c);
+      }
+    });
+  }
+  function boot(){
+    paint();
+    [50,200,500,1000,2000].forEach(t=>setTimeout(paint,t));
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+  new MutationObserver(function(){paint()}).observe(document.documentElement,{subtree:true,childList:true});
+})();
+</script>
