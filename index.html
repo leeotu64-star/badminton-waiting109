@@ -4458,32 +4458,42 @@ a[data-page="digitalTwin"],
       window.eamManualLiveOpen=()=>{
         document.getElementById('eamManualLiveModal')?.remove();
         const m=document.createElement('div');m.id='eamManualLiveModal';m.className='eh-modal';
-        m.innerHTML=`<div class="eh-modal-box eh-icon-create" style="width:min(520px,94vw)">
-          <div class="eh-modal-head"><div><small>REPAIR LIVE</small><h3>수리 LIVE 등록</h3><p>누수현황과 동일하게 필요한 수리 건만 직접 입력합니다. EAM 자산정보와 자동 연동하지 않습니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px">
-            <label style="font-size:12px;font-weight:900;color:#405c72">자산코드<input id="eamLiveCode" type="text" placeholder="예: AC-01" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px;font-weight:800"></label>
+        const cats=[['AC','에어컨','❄️'],['BO','보일러','♨️'],['FI','소방설비','🧯'],['EL','전기설비','⚡'],['DO','문·창호','🚪'],['SA','위생설비','🚻'],['OT','기타설비','🔧']];
+        m.innerHTML=`<div class="eh-modal-box eh-icon-create" style="width:min(620px,95vw)">
+          <div class="eh-modal-head"><div><small>REPAIR LIVE</small><h3>수리 LIVE 등록</h3><p>자산 분류를 선택한 후 번호만 입력하면 자산코드가 자동 생성됩니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div>
+          <div style="padding:14px 16px 6px"><div style="font-size:12px;font-weight:900;color:#405c72;margin-bottom:8px">자산 분류 선택</div>
+            <div id="eamLiveCatGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">${cats.map((c,i)=>`<button type="button" data-cat="${c[0]}" style="border:1px solid #c9d9e5;border-radius:9px;background:${i===0?'#eaf5ff':'#fff'};padding:9px 3px;cursor:pointer;box-shadow:0 3px 8px rgba(20,55,75,.10)"><span style="display:block;font-size:20px">${c[2]}</span><b style="display:block;font-size:12px;color:#176da0">${c[0]}</b><small style="display:block;font-size:8px;color:#718797;margin-top:2px">${c[1]}</small></button>`).join('')}</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:8px 16px 14px;background:#f3f8fb;border-top:1px solid #dbe6ed;border-bottom:1px solid #dbe6ed">
+            <label style="font-size:12px;font-weight:900;color:#405c72">자산번호 입력<input id="eamLiveNumber" inputmode="numeric" maxlength="3" placeholder="예: 01" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px;font-size:16px;font-weight:900"></label>
+            <label style="font-size:12px;font-weight:900;color:#405c72">생성 자산코드<input id="eamLiveCodePreview" type="text" value="AC-" readonly style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px;background:#fff;font-size:16px;font-weight:900;color:#126db0"></label>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px">
             <label style="font-size:12px;font-weight:900;color:#405c72">수리상태<select id="eamLiveStatus" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px;background:#fff"><option>수리예정</option><option selected>수리중</option><option>재조치 필요</option></select></label>
-            <label style="grid-column:1/-1;font-size:12px;font-weight:900;color:#405c72">작업내용 *<input id="eamLiveContent" type="text" placeholder="예: 냉방 불량 점검 및 수리" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label>
             <label style="font-size:12px;font-weight:900;color:#405c72">예정일<input id="eamLiveDate" type="date" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label>
-            <label style="font-size:12px;font-weight:900;color:#405c72">담당<input id="eamLiveManager" type="text" placeholder="담당자 입력" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label>
+            <label style="grid-column:1/-1;font-size:12px;font-weight:900;color:#405c72">작업내용 *<input id="eamLiveContent" type="text" placeholder="예: 냉방 불량 점검 및 수리" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label>
+            <label style="grid-column:1/-1;font-size:12px;font-weight:900;color:#405c72">담당<input id="eamLiveManager" type="text" placeholder="담당자 입력" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label>
           </div>
           <div class="eh-modal-foot"><button type="button" class="gray" onclick="this.closest('.eh-modal').remove()">취소</button><button type="button" class="primary" id="eamLiveSaveBtn">수리 LIVE 등록</button></div>
         </div>`;
         document.body.appendChild(m);
+        let prefix='AC';
+        const grid=m.querySelector('#eamLiveCatGrid'), preview=m.querySelector('#eamLiveCodePreview'), num=m.querySelector('#eamLiveNumber');
+        grid.querySelectorAll('[data-cat]').forEach(btn=>btn.onclick=()=>{prefix=btn.dataset.cat;grid.querySelectorAll('[data-cat]').forEach(x=>{x.style.background=x===btn?'#eaf5ff':'#fff';x.style.border=x===btn?'2px solid #1675c2':'1px solid #c9d9e5'});preview.value=prefix+'-'+String(num.value||'').padStart(2,'0')});
+        num.oninput=()=>{num.value=num.value.replace(/\D/g,'').slice(0,3);preview.value=prefix+'-'+String(num.value||'').padStart(2,'0')};
         m.querySelector('#eamLiveSaveBtn').onclick=()=>{
-          const code=(m.querySelector('#eamLiveCode')?.value||'').trim().toUpperCase();
+          const n=(num.value||'').trim(), code=prefix+'-'+String(n).padStart(2,'0');
           const content=(m.querySelector('#eamLiveContent')?.value||'').trim();
           const status=m.querySelector('#eamLiveStatus')?.value||'수리중';
           const scheduled=m.querySelector('#eamLiveDate')?.value||'';
           const manager=(m.querySelector('#eamLiveManager')?.value||'').trim();
-          if(!code){alert('자산코드를 입력하세요.');return}
+          if(!n){alert('자산번호를 입력하세요.');num.focus();return}
           if(!content){alert('작업내용을 입력하세요.');return}
           const rows=readLive();
           if(rows.some(x=>String(x.asset_code||'').trim().toUpperCase()===code)){alert('같은 자산코드가 이미 수리 LIVE에 등록되어 있습니다.');return}
           rows.push({id:'EL-'+Date.now(),asset_code:code,content,status,scheduled,manager,createdAt:new Date().toISOString()});
           window.eamManualLiveSave(rows);m.remove();render();
         };
-        m.querySelector('#eamLiveCode')?.focus();
+        num.focus();
       };
       window.eamManualLiveEdit=code=>{
         const rows=readLive();const t=rows.find(x=>String(x.asset_code||'').trim().toUpperCase()===String(code||'').trim().toUpperCase());
@@ -15338,6 +15348,14 @@ body {
   },true);
 })();
 </script>
+<style id="JGB_V25_ICON_DELETE_FINAL_FIX">
+/* V25: 배치도 아이콘 삭제창의 목록 영역만 안정화 */
+#eamHyunIconDeleteModal .eh-modal-box{width:min(620px,95vw);max-height:88vh;overflow:auto}
+#eamHyunIconDeleteModal .eh-modal-head{box-sizing:border-box}
+#eamHyunIconDeleteModal .eh-delete-count-v13{box-sizing:border-box;padding:12px 18px 4px}
+#eamHyunIconDeleteModal .eh-delete-list-v13{box-sizing:border-box;padding:10px 18px 18px;width:100%;overflow-x:hidden}
+#eamHyunIconDeleteModal .eh-delete-list-v13>div{grid-template-columns:90px minmax(0,1fr) 64px;box-sizing:border-box;width:100%;}
+</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -16993,7 +17011,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 
 <!-- JGB EAM 현황 v13: 배치도 아이콘 삭제를 LK 삭제 방식의 목록형으로 변경 -->
 <style id="JGB_EAM_HYUN_V13_ICON_DELETE_LIST">
-.eh-delete-list-v13{padding:14px 18px 18px;display:grid;gap:8px;max-height:58vh;overflow:auto}
+.eh-delete-list-v13{padding:14px 18px 18px;display:grid;gap:8px;max-height:58vh;overflow:auto;box-sizing:border-box;width:100%}.eh-delete-list-v13>div{box-sizing:border-box;width:100%}
 .eh-delete-list-v13>div{display:grid;grid-template-columns:90px 1fr 64px;align-items:center;gap:12px;padding:12px 13px;border:1px solid #d7e2ea;border-radius:9px;background:#fff;min-height:48px;box-sizing:border-box}
 .eh-delete-list-v13 .code{font-weight:900;color:#173f5f;font-size:13px}
 .eh-delete-list-v13 .name{font-weight:800;color:#2d4659;font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
