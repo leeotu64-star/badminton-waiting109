@@ -14435,9 +14435,14 @@ document.addEventListener('pointerdown',function(ev){
     const y=Math.max(1,Math.min(99,((ev2.clientY-r.top)/r.height)*100));
     el.style.left=x.toFixed(2)+'%';
     el.style.top=y.toFixed(2)+'%';
+    /* 이동 위치를 두 배치도 저장키에 동시에 기록하여 재렌더링 후에도 현재 위치를 유지 */
+    const saved=[Number(x.toFixed(2)),Number(y.toFixed(2))];
     const pos=read(POS,{});
-    pos[code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-    if(!write(POS,pos))alert('아이콘 위치 저장에 실패했습니다.');
+    pos[code]=saved;
+    const legacyPos=read('JGB_EAM_HYUNHWANG_MAP_V1',{});
+    legacyPos[code]=saved;
+    const ok1=write(POS,pos), ok2=write('JGB_EAM_HYUNHWANG_MAP_V1',legacyPos);
+    if(!ok1 || !ok2)alert('아이콘 위치 저장에 실패했습니다.');
     const ds=deletedSet();ds.delete(code);write(DEL,[...ds]);
     try{ev2.preventDefault();ev2.stopPropagation()}catch(_){}
   };
@@ -15353,6 +15358,29 @@ body {
 .jgb-v170-mapcard{min-height:0!important;}
 .jgb-v170-mapcard .jgb-v170-map{height:100%!important;min-height:620px!important;}
 </style>
+
+<script id="JGB_EAM_ICON_POSITION_FINAL_SYNC_V2">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_ICON_POSITION_FINAL_SYNC_V2)return;
+  window.__JGB_EAM_ICON_POSITION_FINAL_SYNC_V2=true;
+  document.addEventListener('pointerup',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el)return;
+    const c=String(el.dataset.code||'').trim();
+    const x=parseFloat(el.style.left), y=parseFloat(el.style.top);
+    if(!c || !Number.isFinite(x) || !Number.isFinite(y))return;
+    const v=[+x.toFixed(2),+y.toFixed(2)];
+    try{
+      for(const k of ['JGB_EAM_DASH_MAP_POS_V228','JGB_EAM_HYUNHWANG_MAP_V1']){
+        const o=JSON.parse(localStorage.getItem(k)||'{}')||{};
+        o[c]=v;
+        localStorage.setItem(k,JSON.stringify(o));
+      }
+    }catch(_){ }
+  },true);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
@@ -17021,8 +17049,14 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
         const key='JGB_EAM_HYUNHWANG_MAP_V1';
         let pos={};
         try{pos=JSON.parse(localStorage.getItem(key)||'{}')}catch(_){pos={};}
-        pos[c]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-        try{localStorage.setItem(key,JSON.stringify(pos));}catch(_){ }
+        const saved=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+        pos[c]=saved;
+        try{
+          localStorage.setItem(key,JSON.stringify(pos));
+          const dash=JSON.parse(localStorage.getItem('JGB_EAM_DASH_MAP_POS_V228')||'{}')||{};
+          dash[c]=saved;
+          localStorage.setItem('JGB_EAM_DASH_MAP_POS_V228',JSON.stringify(dash));
+        }catch(_){ }
       }
       suppressClickUntil=Date.now()+300;
       ev.preventDefault();
