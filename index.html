@@ -2611,10 +2611,8 @@ html::before,body::before{
 .jgb-lr-v54-brandico{width:43px;height:43px;display:flex;align-items:center;justify-content:center;font-size:31px;flex:0 0 43px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
 .jgb-lr-v54-brand h2{margin:0 0 2px;font-size:23px;font-weight:950;letter-spacing:-.04em;color:#fff}
 .jgb-lr-v54-brand p{margin:0;font-size:11px;font-weight:800;color:#d9edf8;white-space:nowrap}
-.jgb-lr-v54-states{display:flex;gap:8px;flex-wrap:nowrap;justify-content:flex-end;align-items:stretch;margin-left:auto}
-.jgb-lr-v54-status-group{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid rgba(255,255,255,.35);border-radius:10px;background:rgba(255,255,255,.08)}
-.jgb-lr-v54-status-title{writing-mode:vertical-rl;text-orientation:mixed;color:#fff;font-size:10px;font-weight:950;letter-spacing:-.05em;padding:2px 1px}
-.jgb-lr-v54-state{width:52px;min-height:48px;padding:5px 3px;border:1px solid rgba(255,255,255,.5);border-radius:9px;background:#fff;color:#173c58;font-size:11px;font-weight:950;white-space:nowrap;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;box-shadow:0 2px 4px rgba(0,0,0,.16)}
+.jgb-lr-v54-states{display:flex;gap:6px;flex-wrap:nowrap;justify-content:flex-end;align-items:stretch;margin-left:auto}
+.jgb-lr-v54-state{width:58px;min-height:48px;padding:5px 4px;border:1px solid rgba(255,255,255,.5);border-radius:9px;background:#fff;color:#173c58;font-size:11px;font-weight:950;white-space:nowrap;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;box-shadow:0 2px 4px rgba(0,0,0,.16)}
 .jgb-lr-v54-state b{display:block;font-size:18px;line-height:18px;margin-bottom:2px}
 .jgb-lr-v54-state small{display:block;font-size:9px;line-height:11px;color:#34566c;font-weight:900}
 .jgb-lr-v54-state.ok{background:#21b45d;color:#fff;border-color:#72db9b}.jgb-lr-v54-state.ok small{color:#eafff1}
@@ -3548,6 +3546,26 @@ a[data-page="digitalTwin"],
   margin-left:auto!important;
 }
 </style>
+
+<style id="JGB_LR_ICON_STYLE_V4">
+/* 조명·릴선 배치 아이콘: 색상 배지 + 진한 흰색 글씨 */
+.jgb-lr-v54 .jgb-lr-v54-marker,
+.jgb-lr-v54 .jgb-lr-marker,
+.jgb-lr-v54 [data-jgb-lr-icon]{
+  color:#fff !important;
+  font-weight:950 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.45) !important;
+  border:2px solid rgba(255,255,255,.9) !important;
+  box-shadow:0 3px 7px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.3) !important;
+}
+.jgb-lr-v54 .jgb-lr-v54-marker.light,
+.jgb-lr-v54 .jgb-lr-marker.light,
+.jgb-lr-v54 [data-jgb-lr-icon][data-type="light"]{background:#1473d4 !important;}
+.jgb-lr-v54 .jgb-lr-v54-marker.reel,
+.jgb-lr-v54 .jgb-lr-marker.reel,
+.jgb-lr-v54 [data-jgb-lr-icon][data-type="reel"]{background:#d94b3d !important;}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -15027,7 +15045,7 @@ body {
   function historyRows(hist){return hist.length?hist.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join(''):`<tr><td colspan="4" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
   function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>점검·정비 내용</th><th>작업자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span>정상 ${counts.정상} · 점검 ${counts.점검} · 조치필요 ${counts.조치필요} · 수리중 ${counts.수리중}</span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
-  function markup(){const lightStatus={};const reelStatus={};Object.keys(statusColors).forEach(s=>{lightStatus[s]=assets.filter(x=>x.light===s).length;reelStatus[s]=assets.filter(x=>x.reel===s).length;});const stateHtml=(data)=>`<span class="jgb-lr-v54-state ok"><b>${data.정상||0}</b><small>정상</small></span><span class="jgb-lr-v54-state check"><b>${data.점검||0}</b><small>점검</small></span><span class="jgb-lr-v54-state action"><b>${data.조치필요||0}</b><small>조치필요</small></span><span class="jgb-lr-v54-state repair"><b>${data.수리중||0}</b><small>수리중</small></span><span class="jgb-lr-v54-state parts"><b>${data.부품대기||0}</b><small>부품대기</small></span>`;return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-states"><div class="jgb-lr-v54-status-group"><span class="jgb-lr-v54-status-title">💡 조명 관리 현황</span>${stateHtml(lightStatus)}</div><div class="jgb-lr-v54-status-group"><span class="jgb-lr-v54-status-title">🔌 릴선 관리 현황</span>${stateHtml(reelStatus)}</div></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`}
+  function markup(){const allStatus={};Object.keys(statusColors).forEach(s=>allStatus[s]=assets.filter(x=>x.light===s||x.reel===s).length);return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-states"><span class="jgb-lr-v54-state ok"><b>${allStatus.정상}</b><small>정상</small></span><span class="jgb-lr-v54-state check"><b>${allStatus.점검}</b><small>점검</small></span><span class="jgb-lr-v54-state action"><b>${allStatus.조치필요}</b><small>조치필요</small></span><span class="jgb-lr-v54-state repair"><b>${allStatus.수리중}</b><small>수리중</small></span><span class="jgb-lr-v54-state parts"><b>${allStatus.부품대기}</b><small>부품대기</small></span><span class="jgb-lr-v54-state discard"><b>${allStatus.폐기}</b><small>폐기</small></span></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`}
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
   window.jgbLRCardEdit=function(n,type){
@@ -15345,6 +15363,30 @@ body {
 #eamHyunIconDeleteModal .eh-delete-list-v13{box-sizing:border-box;padding:10px 18px 18px;width:100%;overflow-x:hidden}
 #eamHyunIconDeleteModal .eh-delete-list-v13>div{grid-template-columns:90px minmax(0,1fr) 64px;box-sizing:border-box;width:100%;}
 </style>
+
+<script id="JGB_LR_DUPLICATE_ICON_GUARD_V4">
+(function(){
+  if(window.__JGB_LR_DUPLICATE_ICON_GUARD_V4) return;
+  window.__JGB_LR_DUPLICATE_ICON_GUARD_V4=true;
+  function clean(){
+    document.querySelectorAll('.jgb-lr-v54').forEach(function(root){
+      ['light','reel'].forEach(function(type){
+        var seen={};
+        root.querySelectorAll('[data-jgb-lr-icon][data-type="'+type+'"]').forEach(function(el){
+          var code=(el.getAttribute('data-code')||el.textContent||'').trim();
+          if(!code) return;
+          if(seen[code]) el.remove();
+          else seen[code]=el;
+        });
+      });
+    });
+  }
+  new MutationObserver(function(){clean();}).observe(document.documentElement,{subtree:true,childList:true});
+  document.addEventListener('DOMContentLoaded',clean);
+  setTimeout(clean,300);
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
