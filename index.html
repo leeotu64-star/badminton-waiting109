@@ -6417,28 +6417,31 @@ function jgbV47GoWpByLeak(leakCode){
       function readMeta(){try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}catch(e){return {}}}
       function writeMeta(x){try{localStorage.setItem(META_KEY,JSON.stringify(x||{}))}catch(e){console.warn(e)}}
       function catKey(x){
-        const code=v(x?.code||x?.asset_code), m=readMeta()[code]||{};
-        const text=[x?.name,x?.model,x?.type,x?.category,x?.place,m?.name,m?.model,m?.category,m?.place].map(v).join(' ');
-        // 누수 관련 자산은 기타설비에 남기지 않고 방수 자산으로 통합한다.
-        // 기존 메타/DB의 '기타' 분류보다 설비명·규격·위치에 포함된 '누수'를 우선한다.
-        if(/누수/.test(text))return 'waterproof';
-        // 기존 기타설비에 들어 있던 실제 문·창호/위생 자산을 새 분류로 이동한다.
-        // 자산명 기준으로만 분류하며 나머지 기존 자산은 변경하지 않는다.
-        const n=v(x?.name);
-        if(/흰지|힌지|유리문|도어클로저|도어|문짝|창호/.test(n))return 'doors';
-        if(/소변기|양변기|세면대|수전/.test(n))return 'sanitary';
-        if(m.category&&CATMAP[m.category])return CATMAP[m.category];
-        if(x?.category&&CATMAP[x.category])return CATMAP[x.category];
-        const t=v(x?.type);
-        if(FIRE.has(code)||/소방|저수조/.test(t))return 'fire';
-        if(/냉난방|냉방/.test(t))return 'cooling';
-        if(/온수|보일러|난방/.test(t))return 'water';
-        if(/전기/.test(t))return 'electrical';
-        if(/조명/.test(t))return 'lighting';
-        if(/방수/.test(t))return 'waterproof';
-        return 'other';
-      }
-      function categoryLabel(k){return (CATDEF.find(x=>x[0]===k)||[])[2]||'기타설비'}
+         const code=v(x?.code||x?.asset_code).toUpperCase(), m=readMeta()[code]||{};
+         /* V23: 자산코드를 최우선 분류 기준으로 사용한다.
+            과거 DB에서 category가 '기타설비'로 저장된 자산도 정상 코드에 따라 원래 설비로 복원한다. */
+         const prefix=code.split('-')[0];
+         const CODEMAP={AC:'cooling',BO:'water',FI:'fire',EL:'electrical',DO:'doors',DR:'doors',SA:'sanitary',LT:'lighting',RL:'lighting',WP:'waterproof',OT:'other'};
+         if(CODEMAP[prefix])return CODEMAP[prefix];
+         const EQMAP={'EQ-01':'fire','EQ-02':'fire','EQ-03':'fire','EQ-04':'water','EQ-05':'fire','EQ-06':'water','EQ-07':'fire'};
+         if(EQMAP[code])return EQMAP[code];
+         const text=[x?.name,x?.model,x?.type,x?.category,x?.place,m?.name,m?.model,m?.category,m?.place].map(v).join(' ');
+         if(/누수/.test(text))return 'waterproof';
+         const n=v(x?.name);
+         if(/흰지|힌지|유리문|도어클로저|도어|문짝|창호/.test(n))return 'doors';
+         if(/소변기|양변기|세면대|수전/.test(n))return 'sanitary';
+         if(m.category&&CATMAP[m.category])return CATMAP[m.category];
+         if(x?.category&&CATMAP[x.category])return CATMAP[x.category];
+         const t=v(x?.type);
+         if(FIRE.has(code)||/소방|저수조/.test(t))return 'fire';
+         if(/냉난방|냉방/.test(t))return 'cooling';
+         if(/온수|보일러|난방/.test(t))return 'water';
+         if(/전기/.test(t))return 'electrical';
+         if(/조명/.test(t))return 'lighting';
+         if(/방수/.test(t))return 'waterproof';
+         return 'other';
+       }
+       function categoryLabel(k){return (CATDEF.find(x=>x[0]===k)||[])[2]||'기타설비'}
       function placeCode(p){p=v(p);if(p.includes('좌측 외곽'))return'L';if(p.includes('우측 외곽'))return'M';if(p.includes('유수장치실'))return'E';if(p.includes('옥상'))return'D';if(p.includes('창고'))return'F';if(p.includes('사무실'))return'C';if(p.includes('복도'))return'B';if(p.includes('코트'))return'A';if(p.includes('남자 화장실'))return'H';if(p.includes('여자 화장실'))return'I';if(p.includes('남자 샤워실'))return'J';if(p.includes('여자 샤워실'))return'K';if(p.includes('휴게실'))return'G';return'-'}
       function placeLabel(p){return v(p)||'-'}
       function rawRows(){
@@ -6498,7 +6501,7 @@ function jgbV47GoWpByLeak(leakCode){
       function codePrefixForCategory(category){return PREFIX[CATMAP[category]||'other']||'OT'}
       function nextAutoCode(category){
         const prefix=codePrefixForCategory(category), used=new Set(sourceRows().map(x=>v(x.code)).filter(x=>x.startsWith(prefix+'-')));
-        // V18: 문·창호설비 신규 생성 코드는 DR-01, DR-02... 순으로 발급한다. 기존 DR 코드는 변경하지 않는다.
+        // V23: 문·창호설비 신규 생성 코드는 DO-01, DO-02, DO-03... 순으로 발급한다. 기존 DR 코드는 변경하지 않는다.
         let n=1;while(used.has(prefix+'-'+String(n).padStart(2,'0')))n++;
         return prefix+'-'+String(n).padStart(2,'0');
       }
@@ -15158,81 +15161,7 @@ body {
 
 
 <!-- JGB FINAL: 배치도 AC 자산아이콘 → 자산코드 기준 EAM 이력카드 연결 -->
-<script id="JGB_EAM_MAP_AC_DBLCLICK_FINAL">
-(function(){
-  'use strict';
-  if(window.__JGB_EAM_MAP_AC_DBLCLICK_FINAL)return;
-  window.__JGB_EAM_MAP_AC_DBLCLICK_FINAL=true;
 
-  const V=x=>String(x??'').trim();
-
-  function resolve(code){
-    const c=V(code);
-    let cat='', actual=c;
-    try{
-      const defs=typeof window.eamCategoryDefs==='function'?window.eamCategoryDefs():{};
-      for(const [k,v] of Object.entries(defs||{})){
-        const item=(v.items||[]).find(x=>V(x?.code||x?.asset_code)===c);
-        if(item){cat=k;actual=V(item.code||item.asset_code||c);break;}
-      }
-    }catch(e){}
-    if(!cat){
-      try{
-        const a=(Array.isArray(window.__eamA)?window.__eamA:[]).find(x=>V(x?.asset_code)===c);
-        if(a){
-          const t=V(a.type||a.category);
-          if(t.includes('냉난방'))cat='cooling';
-          else if(t.includes('소방'))cat='fire';
-          else if(t.includes('온수')||t.includes('보일러')||t.includes('난방'))cat='water';
-          else if(t.includes('전기'))cat='electrical';
-          else if(t.includes('조명'))cat='lighting';
-          else if(t.includes('방수'))cat='waterproof';
-          else if(t.includes('위생'))cat='sanitary';
-          else if(t.includes('문')||t.includes('창호')||t.includes('도어'))cat='doors';
-          else cat='other';
-          actual=V(a.asset_code||c);
-        }
-      }catch(e){}
-    }
-    return {cat,actual};
-  }
-
-  function openEam(code){
-    const r=resolve(code);
-    if(!r.actual)return;
-    window.__eamSelCode=r.actual;
-    if(r.cat)window.__eamCat=r.cat;
-
-    if(typeof window.go==='function') window.go('eam');
-    else { try{location.href='?page=eam'}catch(e){} }
-
-    /* 라우팅 직후에도 해당 AC 코드의 이력카드를 확실히 선택 */
-    const pick=()=>{
-      if(r.cat && typeof window.eamPick==='function'){
-        window.__eamSelCode=r.actual;
-        window.__eamCat=r.cat;
-        window.eamPick(r.cat,r.actual);
-        return true;
-      }
-      const row=document.querySelector('.eam-asset-row[data-code="'+CSS.escape(r.actual)+'"]');
-      if(row){row.click();return true;}
-      return false;
-    };
-    requestAnimationFrame(()=>{if(!pick())setTimeout(pick,80);});
-  }
-
-  /* 한 번 클릭: 아무 화면 이동 없음. 더블클릭: AC 자산코드로 EAM 이력카드 이동 */
-  document.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el || el.classList.contains('map-only'))return;
-    const code=V(el.getAttribute('data-code'));
-    if(!code)return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    openEam(code);
-  },true);
-})();
-</script>
 
 <style id="JGB_V25_ICON_DELETE_FINAL_FIX">
 /* V25: 배치도 아이콘 삭제창의 목록 영역만 안정화 */
@@ -15486,6 +15415,227 @@ window.eamEditSelectedAsset=function(){
 };
 window.eamHistoryCardEdit=window.eamEditSelectedAsset;
 
+})();
+</script>
+
+
+<style id="JGB_EAM_HYUN_V22_ICON_HARD_LOCK">
+/* V22 FINAL — 배치도 아이콘 이동/고정 전용
+   핵심: style 속성 감시 금지. 드래그 중 저장된 좌표를 되돌리는 코드가 없어야 한다. */
+.eh-map .eh-marker{
+  position:absolute!important;
+  transform:translate(-50%,-50%)!important;
+  cursor:grab!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-user-drag:none!important;
+  touch-action:none!important;
+  pointer-events:auto!important;
+}
+.eh-map .eh-marker.jgb-v22-dragging{
+  cursor:grabbing!important;
+  z-index:2147483646!important;
+  transform:translate(-50%,-50%) scale(1.08)!important;
+}
+</style>
+
+<script id="JGB_EAM_HYUN_V22_ICON_HARD_LOCK_JS">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_HYUN_V22_ICON_HARD_LOCK)return;
+  window.__JGB_EAM_HYUN_V22_ICON_HARD_LOCK=true;
+
+  const POS_KEY='JGB_EAM_HYUNHWANG_MAP_V1';
+  const ICON_KEY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+  const V=x=>String(x??'').trim();
+  let drag=null;
+  let suppressClickUntil=0;
+
+  function readObj(key){
+    try{
+      const x=JSON.parse(localStorage.getItem(key)||'{}');
+      return x&&typeof x==='object'?x:{};
+    }catch(_){return {}}
+  }
+  function writeObj(key,obj){
+    try{localStorage.setItem(key,JSON.stringify(obj));return true}
+    catch(_){return false}
+  }
+  function clamp(n,min,max){return Math.max(min,Math.min(max,Number(n)||0))}
+  function apply(el,x,y){
+    x=clamp(x,1,99); y=clamp(y,1,99);
+    el.style.setProperty('left',x.toFixed(2)+'%','important');
+    el.style.setProperty('top',y.toFixed(2)+'%','important');
+  }
+
+  function assetKey(el){
+    const id=V(el.dataset.assetId||'');
+    if(id)return 'id:'+id;
+    const code=V(el.dataset.code||'');
+    return code?'code:'+code:'';
+  }
+
+  function saveAsset(el,x,y){
+    const p=readObj(POS_KEY), code=V(el.dataset.code||''), id=V(el.dataset.assetId||'');
+    const value=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+    if(id)p['id:'+id]=value;
+    if(code)p['code:'+code]=value;
+    if(!writeObj(POS_KEY,p)){
+      alert('아이콘 위치 저장에 실패했습니다.');
+      return false;
+    }
+    return true;
+  }
+
+  function saveMapOnly(el,x,y){
+    const p=readObj(ICON_KEY), code=V(el.dataset.code||'');
+    if(!code)return false;
+    if(!p[code])p[code]={code,name:'배치도 전용 아이콘'};
+    p[code].x=Number(x.toFixed(2));
+    p[code].y=Number(y.toFixed(2));
+    return writeObj(ICON_KEY,p);
+  }
+
+  /* 화면을 다시 렌더링했을 때 저장 좌표를 한 번만 적용한다.
+     절대로 style attribute를 감시하지 않는다. */
+  function restore(root=document){
+    root.querySelectorAll?.('.eh-map .eh-marker').forEach(el=>{
+      if(el.classList.contains('jgb-v22-dragging'))return;
+      const code=V(el.dataset.code||'');
+      if(el.dataset.mapOnly==='1'){
+        const p=readObj(ICON_KEY)[code];
+        if(p)apply(el,p.x,p.y);
+        return;
+      }
+      const p=readObj(POS_KEY);
+      const id=V(el.dataset.assetId||'');
+      const saved=(id&&p['id:'+id])||p['code:'+code];
+      if(saved)apply(el,saved[0],saved[1]);
+    });
+  }
+
+  /* 화면 교체/이력카드 이동 등 childList 변경만 감시한다. */
+  const observer=new MutationObserver(muts=>{
+    if(muts.some(m=>m.type==='childList')){
+      requestAnimationFrame(()=>restore());
+    }
+  });
+  observer.observe(document.body,{subtree:true,childList:true});
+
+  function openAsset(el){
+    const code=V(el.dataset.code||'');
+    if(!code)return;
+    if(typeof window.jgbOpenEamAssetByCode==='function'){
+      window.jgbOpenEamAssetByCode(code);
+      return;
+    }
+    window.__eamSelCode=code;
+    if(typeof window.go==='function')window.go('eam');
+  }
+
+  document.addEventListener('pointerdown',function(e){
+    if(e.button!==0)return;
+    const el=e.target.closest?.('.eh-map .eh-marker');
+    if(!el)return;
+    const map=el.closest('.eh-map');
+    if(!map)return;
+
+    const r=map.getBoundingClientRect();
+    if(!r.width||!r.height)return;
+
+    const isMapOnly=el.dataset.mapOnly==='1';
+    const oldPos=isMapOnly ? readObj(ICON_KEY)[V(el.dataset.code||'')] : null;
+    const p=oldPos || (()=>{
+      const store=readObj(POS_KEY), id=V(el.dataset.assetId||''), code=V(el.dataset.code||'');
+      return (id&&store['id:'+id])||store['code:'+code]||null;
+    })();
+
+    drag={
+      el,map,r,pointerId:e.pointerId,
+      sx:e.clientX,sy:e.clientY,
+      startX:p ? Number(p[0] ?? p.x ?? parseFloat(el.style.left) ?? 50) : (parseFloat(el.style.left) || 50),
+      startY:p ? Number(p[1] ?? p.y ?? parseFloat(el.style.top) ?? 50) : (parseFloat(el.style.top) || 50),
+      x:p ? Number(p[0] ?? p.x ?? parseFloat(el.style.left) ?? 50) : (parseFloat(el.style.left) || 50),
+      y:p ? Number(p[1] ?? p.y ?? parseFloat(el.style.top) ?? 50) : (parseFloat(el.style.top) || 50),
+      moved:false
+    };
+
+    try{el.setPointerCapture?.(e.pointerId)}catch(_){ }
+
+    const move=ev=>{
+      if(!drag || ev.pointerId!==drag.pointerId)return;
+      const d=drag;
+      const dx=ev.clientX-d.sx,dy=ev.clientY-d.sy;
+      if(!d.moved && Math.hypot(dx,dy)<5)return;
+      if(!d.moved){
+        d.moved=true;
+        d.el.classList.add('jgb-v22-dragging');
+      }
+      d.x=clamp(((ev.clientX-d.r.left)/d.r.width)*100,1,99);
+      d.y=clamp(((ev.clientY-d.r.top)/d.r.height)*100,1,99);
+      apply(d.el,d.x,d.y);
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+    };
+
+    const finish=ev=>{
+      if(!drag || ev.pointerId!==drag.pointerId)return;
+      const d=drag;
+      drag=null;
+      window.removeEventListener('pointermove',move,true);
+      window.removeEventListener('pointerup',finish,true);
+      window.removeEventListener('pointercancel',finish,true);
+
+      if(!d.moved){
+        d.el.classList.remove('jgb-v22-dragging');
+        return;
+      }
+
+      /* 마지막 좌표를 먼저 화면에 확정 */
+      apply(d.el,d.x,d.y);
+      const ok=d.el.dataset.mapOnly==='1'
+        ? saveMapOnly(d.el,d.x,d.y)
+        : saveAsset(d.el,d.x,d.y);
+      d.el.classList.remove('jgb-v22-dragging');
+
+      /* 다른 렌더 코드가 즉시 건드려도 저장 좌표를 재확정 */
+      requestAnimationFrame(()=>apply(d.el,d.x,d.y));
+      setTimeout(()=>apply(d.el,d.x,d.y),50);
+      setTimeout(()=>apply(d.el,d.x,d.y),250);
+
+      suppressClickUntil=Date.now()+700;
+      if(!ok)return;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+    };
+
+    window.addEventListener('pointermove',move,true);
+    window.addEventListener('pointerup',finish,true);
+    window.addEventListener('pointercancel',finish,true);
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  },true);
+
+  /* 평상시에는 왼쪽 클릭으로 기존 EAM 이력카드 이동.
+     방금 드래그한 경우에는 클릭을 완전히 차단한다. */
+  document.addEventListener('click',function(e){
+    const el=e.target.closest?.('.eh-map .eh-marker');
+    if(!el)return;
+    if(Date.now()<suppressClickUntil){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
+    if(el.dataset.mapOnly==='1')return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    openAsset(el);
+  },true);
+
+  document.addEventListener('DOMContentLoaded',()=>restore());
+  requestAnimationFrame(()=>restore());
+  setTimeout(()=>restore(),100);
 })();
 </script>
 
@@ -17474,193 +17624,7 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 
 
 
-<style id="JGB_EAM_HYUN_V19_ICON_FORCE_LOCK">
-/* V19 FINAL: EAM 현황 배치도 아이콘은 사용자가 놓은 위치를 강제로 유지 */
-.eh-map .eh-marker{
-  position:absolute!important;
-  transform:translate(-50%,-50%)!important;
-  cursor:grab!important;
-  user-select:none!important;
-  -webkit-user-select:none!important;
-  -webkit-user-drag:none!important;
-  touch-action:none!important;
-  will-change:left,top!important;
-}
-.eh-map .eh-marker.jgb-v19-dragging{
-  cursor:grabbing!important;
-  z-index:2147483000!important;
-  transform:translate(-50%,-50%) scale(1.08)!important;
-}
-</style>
 
-<script id="JGB_EAM_HYUN_V19_ICON_FORCE_LOCK_JS">
-(function(){
-  'use strict';
-  if(window.__JGB_EAM_HYUN_V19_ICON_FORCE_LOCK)return;
-  window.__JGB_EAM_HYUN_V19_ICON_FORCE_LOCK=true;
 
-  const POS_KEY='JGB_EAM_HYUNHWANG_MAP_V1';
-  const V=x=>String(x??'').trim();
-  let dragging=null;
-  let suppressClickUntil=0;
 
-  function read(){
-    try{
-      const x=JSON.parse(localStorage.getItem(POS_KEY)||'{}');
-      return x&&typeof x==='object'?x:{};
-    }catch(_){return {}}
-  }
-  function write(x){
-    try{
-      localStorage.setItem(POS_KEY,JSON.stringify(x));
-      return true;
-    }catch(_){return false}
-  }
-  function key(el){
-    const id=V(el.getAttribute('data-asset-id'));
-    if(id)return 'id:'+id;
-    const code=V(el.getAttribute('data-code'));
-    return code?'code:'+code:'';
-  }
-  function codeKey(el){
-    const code=V(el.getAttribute('data-code'));
-    return code?'code:'+code:'';
-  }
-  function pos(el){
-    const idKey=key(el), code=codeKey(el), p=read();
-    return p[idKey]||p[code]||null;
-  }
-  function apply(el,p){
-    if(!el||!p||p.length<2)return;
-    const x=Math.max(1,Math.min(99,Number(p[0])));
-    const y=Math.max(1,Math.min(99,Number(p[1])));
-    el.style.setProperty('left',x.toFixed(2)+'%','important');
-    el.style.setProperty('top',y.toFixed(2)+'%','important');
-  }
-  function save(el,x,y){
-    const p=read();
-    const id=V(el.getAttribute('data-asset-id'));
-    const code=V(el.getAttribute('data-code'));
-    if(id)p['id:'+id]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-    if(code)p['code:'+code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-    /* 두 키에 같이 저장해 렌더링 방식이 달라도 위치가 유지되게 한다. */
-    if(!write(p))alert('아이콘 위치 저장에 실패했습니다.');
-  }
-
-  function restoreAll(root=document){
-    root.querySelectorAll?.('.eh-map .eh-marker').forEach(el=>{
-      if(el.classList.contains('jgb-v19-dragging'))return;
-      const p=pos(el);
-      if(p)apply(el,p);
-    });
-  }
-
-  /* 화면 재생성/이력카드 이동 후에도 저장 위치를 즉시 재적용 */
-  const observer=new MutationObserver(muts=>{
-    let changed=false;
-    for(const m of muts){
-      if(m.type==='childList' || m.type==='attributes' && m.attributeName==='style'){
-        changed=true; break;
-      }
-    }
-    if(changed) requestAnimationFrame(()=>restoreAll());
-  });
-  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style']});
-
-  document.addEventListener('pointerdown',function(e){
-    if(e.button!==0)return;
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el || el.classList.contains('map-only'))return;
-    const map=el.closest('.eh-map');
-    if(!map)return;
-
-    const r=map.getBoundingClientRect();
-    if(!r.width||!r.height)return;
-
-    dragging={
-      el,map,r,
-      pointerId:e.pointerId,
-      startX:e.clientX,startY:e.clientY,
-      active:false
-    };
-    try{el.setPointerCapture?.(e.pointerId)}catch(_){}
-
-    const move=function(ev){
-      if(!dragging || ev.pointerId!==dragging.pointerId)return;
-      const d=dragging;
-      const dx=ev.clientX-d.startX, dy=ev.clientY-d.startY;
-
-      if(!d.active && Math.hypot(dx,dy)<4)return;
-
-      if(!d.active){
-        d.active=true;
-        d.el.classList.add('jgb-v19-dragging');
-      }
-
-      const x=Math.max(1,Math.min(99,((ev.clientX-d.r.left)/d.r.width)*100));
-      const y=Math.max(1,Math.min(99,((ev.clientY-d.r.top)/d.r.height)*100));
-
-      apply(d.el,[x,y]);
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-    };
-
-    const finish=function(ev){
-      if(!dragging || ev.pointerId!==dragging.pointerId)return;
-      const d=dragging;
-      dragging=null;
-
-      window.removeEventListener('pointermove',move,true);
-      window.removeEventListener('pointerup',finish,true);
-      window.removeEventListener('pointercancel',finish,true);
-
-      if(!d.active){
-        d.el.classList.remove('jgb-v19-dragging');
-        return;
-      }
-
-      const x=Math.max(1,Math.min(99,((ev.clientX-d.r.left)/d.r.width)*100));
-      const y=Math.max(1,Math.min(99,((ev.clientY-d.r.top)/d.r.height)*100));
-
-      apply(d.el,[x,y]);
-      save(d.el,x,y);
-
-      d.el.classList.remove('jgb-v19-dragging');
-      suppressClickUntil=Date.now()+700;
-
-      /* 다른 렌더/클릭 코드가 위치를 되돌리지 못하게 한 번 더 확정 */
-      requestAnimationFrame(()=>apply(d.el,[x,y]));
-      setTimeout(()=>apply(d.el,[x,y]),50);
-      setTimeout(()=>apply(d.el,[x,y]),180);
-
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-    };
-
-    window.addEventListener('pointermove',move,true);
-    window.addEventListener('pointerup',finish,true);
-    window.addEventListener('pointercancel',finish,true);
-
-    e.preventDefault();
-    e.stopImmediatePropagation();
-  },true);
-
-  /* 드래그 후 발생하는 클릭만 차단. 평상시 클릭은 기존 이력카드 연결을 그대로 둔다. */
-  document.addEventListener('click',function(e){
-    if(Date.now()<suppressClickUntil){
-      const el=e.target.closest?.('.eh-map .eh-marker');
-      if(el){
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      }
-    }
-  },true);
-
-  /* 최초 표시 직후 저장된 위치 강제 적용 */
-  document.addEventListener('DOMContentLoaded',()=>restoreAll());
-  setTimeout(restoreAll,0);
-  setTimeout(restoreAll,100);
-  setTimeout(restoreAll,500);
-})();
-</script>
 
