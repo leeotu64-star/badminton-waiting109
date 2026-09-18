@@ -4908,38 +4908,15 @@ function jgbV47GoWpByLeak(leakCode){
   const parseMaint=(h)=>{let d={};const raw=String(h?.description??'');if(raw.startsWith('MAINT::')){try{d=JSON.parse(raw.slice(7))||{}}catch(e){d={}}}return d};
   const val=(v)=>xEsc(v==null||v===''?'-':String(v));
   const date=(v)=>{const s=String(v||'');const m=s.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:(s?s.slice(0,10):'-')};
-  if(!hs.length)return '<div class="eamx-empty">등록된 작업·교체 이력이 없습니다.</div>';
-  return `<div class="jgb-eam-history-rebuild">${hs.slice(0,10).map((h,i)=>{
-    const d=parseMaint(h),method=d.maintenanceMethod||d.method||h.event_type||'외주정비',type=d.type||'수리',mtype=d.maintenanceType||d.type||'예방정비';
-    const issue=d.issue||'-',action=d.action||'-',cause=d.cause||'-',part=d.part||'-';
-    const start=d.startDate||d.workStartDate||h.event_date||'',end=d.endDate||d.workEndDate||'',next=d.nextDate||d.nextInspectionDate||'-';
-    const result=d.result||'조치완료',note=d.note||'-',vendor=h.worker_name||d.vendor||'-';
-    const cost=Number(h.cost||0)?Number(h.cost||0).toLocaleString()+'원':'-',hid=String(h.id||('hist-'+i));
-    const photo=(label)=>`<div class="jgb-eam-history-photo" onclick="window.jgbPickWorkPhoto&&jgbPickWorkPhoto('${val(hid)}','${label}')"><span>📷</span><b>${label}</b><small>사진 등록 · 클릭</small></div>`;
-    return `<article class="jgb-eam-history-card" data-maint-history-id="${val(hid)}">
-      <div class="jgb-eam-history-head">
-        <div class="jgb-eam-history-head-title"><strong>이력 ${i+1}</strong><span>${val(date(h.event_date))} · ${val(type)} · ${val(mtype)}</span></div>
-        <div class="jgb-eam-history-actions">
-          <button type="button" class="jgb-real-toggle" onclick="event.preventDefault();event.stopPropagation();jgbRealToggleHistory(this)">접기</button>
-          
-          <button type="button" class="jgb-real-delete" onclick="event.preventDefault();event.stopPropagation();window.eamDeleteMaintenanceHistory&&eamDeleteMaintenanceHistory('${val(hid)}')">삭제</button>
-        </div>
-      </div>
-      <div class="jgb-eam-history-body">
-        <div class="jgb-eam-history-info">
-          <div><small>작업일자</small><b>${val(date(h.event_date))}</b></div><div><small>정비구분</small><b>${val(type)}</b></div>
-          <div><small>정비유형</small><b>${val(mtype)}</b></div><div><small>정비방식</small><b>${val(method)}</b></div>
-          <div><small>정비업체</small><b>${val(vendor)}</b></div><div><small>정비비용</small><b>${val(cost)}</b></div>
-          <div><small>고장·이상내용</small><b>${val(issue)}</b></div><div><small>고장원인</small><b>${val(cause)}</b></div>
-          <div><small>조치내용</small><b>${val(action)}</b></div><div><small>교체부품</small><b>${val(part)}</b></div>
-          <div><small>작업시작일</small><b>${val(date(start))}</b></div><div><small>작업완료일</small><b>${val(date(end))}</b></div>
-          <div><small>차기 점검일</small><b>${val(date(next))}</b></div><div><small>조치상태</small><b>${val(result)}</b></div>
-          <div class="wide"><small>비고</small><b>${val(note)}</b></div>
-        </div>
-        <div class="jgb-eam-history-right"><h4>📷 작업사진 <em>최대 3장</em></h4><div class="jgb-eam-history-photos">${photo('작업 전')}${photo('작업 중')}${photo('작업 후')}${photo('완료')}</div><div class="jgb-eam-history-attach">📎 첨부파일 · 작업확인서 / 정비보고서 등</div></div>
-      </div>
-    </article>`;
-  }).join('')}</div>`;
+  if(!hs.length)return '<div class="eamx-empty">등록된 유지관리 이력이 없습니다.</div>';
+  return `<div class="jgb-maint-list-scroll"><table class="jgb-maint-simple-table"><colgroup><col class="c-date"><col class="c-type"><col class="c-content"><col class="c-worker"></colgroup><thead><tr><th>관리일자</th><th>관리구분</th><th>점검·정비 내용</th><th>작업자</th></tr></thead><tbody>${hs.slice(0,50).map((h,i)=>{
+    const d=parseMaint(h);
+    const rawType=String(d.maintenanceType||d.type||h.event_type||'').trim();
+    const type=/고장|수리/.test(rawType)||d.issue||d.cause?'고장정비':(rawType||'예방정비');
+    const content=d.action||d.issue||d.cause||d.note||String(h.description||'').replace(/^MAINT::/,'')||'-';
+    const worker=h.worker_name||d.worker||d.manager||d.inspector||'-';
+    return `<tr><td>${val(date(h.event_date))}</td><td>${val(type)}</td><td class="content">${val(content)}</td><td>${val(worker)}</td></tr>`;
+  }).join('')}</tbody></table></div>`;
 }
     window.jgbRealToggleHistory=function(btn){
       const card=btn?.closest('.jgb-eam-history-card');if(!card)return;
@@ -13373,6 +13350,61 @@ window.eamDeleteSelectedAsset=async function(){
   flex:0 0 100px!important;box-sizing:border-box!important;
   overflow:hidden!important;
 }
+</style>
+
+<style id="JGB_EAM_HISTORY_SIMPLE_FINAL_V15">
+/* V15: 유지관리 이력은 사진 없는 4열 표로 표시하고, 폭이 부족하면 가로 스크롤 */
+.jgb-maint-list-scroll{
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  box-sizing:border-box!important;
+  border:1px solid #c5d4e1!important;
+  background:#fff!important;
+}
+.jgb-maint-simple-table{
+  width:100%!important;
+  min-width:760px!important;
+  border-collapse:collapse!important;
+  table-layout:fixed!important;
+  margin:0!important;
+  background:#fff!important;
+  font-family:inherit!important;
+}
+.jgb-maint-simple-table .c-date{width:145px!important}
+.jgb-maint-simple-table .c-type{width:145px!important}
+.jgb-maint-simple-table .c-content{width:360px!important}
+.jgb-maint-simple-table .c-worker{width:125px!important}
+.jgb-maint-simple-table th,
+.jgb-maint-simple-table td{
+  height:38px!important;
+  padding:7px 10px!important;
+  border-right:1px solid #c5d4e1!important;
+  border-bottom:1px solid #c5d4e1!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+  vertical-align:middle!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  font-size:13px!important;
+  line-height:1.2!important;
+}
+.jgb-maint-simple-table th:last-child,
+.jgb-maint-simple-table td:last-child{border-right:0!important}
+.jgb-maint-simple-table th{
+  background:#e7f0f7!important;
+  color:#24445e!important;
+  font-weight:900!important;
+}
+.jgb-maint-simple-table td{background:#fff!important;color:#173b5d!important;font-weight:700!important}
+.jgb-maint-simple-table tbody tr:last-child td{border-bottom:0!important}
+.jgb-maint-simple-table td.content{text-align:left!important}
+/* 이전 카드/사진 렌더링이 남아 있어도 이 표에서는 사진 영역을 만들지 않음 */
+.jgb-maint-list-scroll + .jgb-eam-history-right,
+.jgb-maint-list-scroll .jgb-eam-history-right{display:none!important}
 </style>
 </body>
 </html><style>
