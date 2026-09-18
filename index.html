@@ -15261,101 +15261,64 @@ body {
   z-index:10000!important;
 }
 </style>
-<script id="JGB_EAM_ICON_DRAG_CLEAN_V10">
+<script id="JGB_EAM_ICON_DRAG_CLEAN_V12">
 (function(){
   'use strict';
-  if(window.__JGB_EAM_ICON_DRAG_CLEAN_V10)return;
-  window.__JGB_EAM_ICON_DRAG_CLEAN_V10=true;
+  if(window.__JGB_EAM_ICON_DRAG_CLEAN_V12)return;
+  window.__JGB_EAM_ICON_DRAG_CLEAN_V12=true;
 
   const POS_KEY='JGB_EAM_HYUNHWANG_MAP_V1';
   const DASH_KEY='JGB_EAM_DASH_MAP_POS_V228';
   const S=x=>String(x??'').trim();
-
-  function read(key){
-    try{
-      const v=JSON.parse(localStorage.getItem(key)||'{}');
-      return v&&typeof v==='object'?v:{};
-    }catch(_){return {}}
-  }
-  function write(key,obj){
-    try{localStorage.setItem(key,JSON.stringify(obj));return true}catch(_){return false}
-  }
-  function save(code,x,y){
-    const c=S(code);
-    if(!c)return;
-    const value=[Number(x.toFixed(3)),Number(y.toFixed(3))];
-    const a=read(POS_KEY);
-    a[c]=value;
-    write(POS_KEY,a);
-    const b=read(DASH_KEY);
-    b[c]=value;
-    write(DASH_KEY,b);
-  }
+  function read(key){try{const v=JSON.parse(localStorage.getItem(key)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}}
+  function write(key,obj){try{localStorage.setItem(key,JSON.stringify(obj));return true}catch(_){return false}}
+  function save(code,x,y){const c=S(code);if(!c)return;const value=[Number(x.toFixed(3)),Number(y.toFixed(3))];const a=read(POS_KEY);a[c]=value;write(POS_KEY,a);const b=read(DASH_KEY);b[c]=value;write(DASH_KEY,b)}
 
   let drag=null;
-
   function marker(e){
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return null;
     const map=el.closest('.eh-map');
-    if(!map)return null;
-    return {el,map};
+    return map?{el,map}:null;
   }
-
-  function block(e){
-    e.preventDefault();
-    e.stopPropagation();
-    if(e.stopImmediatePropagation)e.stopImmediatePropagation();
-  }
+  function stopOnly(e){e.preventDefault();e.stopPropagation();}
 
   function begin(e){
     if(e.button!==0)return;
-    const t=marker(e);
-    if(!t)return;
+    const t=marker(e); if(!t)return;
     const rect=t.map.getBoundingClientRect();
     const mr=t.el.getBoundingClientRect();
-    drag={
-      el:t.el, map:t.map, rect,
-      pointerId:e.pointerId,
-      startX:e.clientX, startY:e.clientY,
-      grabX:e.clientX-(mr.left+mr.width/2),
-      grabY:e.clientY-(mr.top+mr.height/2),
-      moved:false
-    };
+    drag={el:t.el,map:t.map,rect,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,
+      grabX:e.clientX-(mr.left+mr.width/2),grabY:e.clientY-(mr.top+mr.height/2),moved:false};
     t.el.classList.add('eam-fixed-dragging');
-    try{t.el.setPointerCapture(e.pointerId)}catch(_){}
-    block(e);
+    try{t.el.setPointerCapture?.(e.pointerId)}catch(_){ }
+    // 중요: pointerdown에서는 클릭을 막지 않는다. 클릭/더블클릭이 정상적으로 발생해야 한다.
   }
 
   function move(e){
     if(!drag || e.pointerId!==drag.pointerId)return;
-    const d=drag;
-    const dx=e.clientX-d.startX,dy=e.clientY-d.startY;
-    if(!d.moved && Math.hypot(dx,dy)<3){block(e);return;}
+    const d=drag,dx=e.clientX-d.startX,dy=e.clientY-d.startY;
+    if(!d.moved && Math.hypot(dx,dy)<5)return;
     d.moved=true;
-    // 마우스로 잡은 지점이 유지되도록 중심 좌표가 아니라 잡은 위치를 반영
     const x=Math.max(0.5,Math.min(99.5,((e.clientX-d.grabX-d.rect.left)/d.rect.width)*100));
     const y=Math.max(0.5,Math.min(99.5,((e.clientY-d.grabY-d.rect.top)/d.rect.height)*100));
-    d.el.style.left=x+'%';
-    d.el.style.top=y+'%';
-    block(e);
+    d.el.style.left=x+'%'; d.el.style.top=y+'%';
+    stopOnly(e);
   }
 
   function finish(e){
     if(!drag || (e.pointerId!=null && e.pointerId!==drag.pointerId))return;
-    const d=drag;
-    drag=null;
+    const d=drag; drag=null;
     if(d.moved){
       const x=Math.max(0.5,Math.min(99.5,((e.clientX-d.grabX-d.rect.left)/d.rect.width)*100));
       const y=Math.max(0.5,Math.min(99.5,((e.clientY-d.grabY-d.rect.top)/d.rect.height)*100));
-      d.el.style.left=x+'%';
-      d.el.style.top=y+'%';
+      d.el.style.left=x+'%'; d.el.style.top=y+'%';
       save(d.el.getAttribute('data-code'),x,y);
-      window.__JGB_EAM_DRAG_SUPPRESS_UNTIL=Date.now()+400;
+      window.__JGB_EAM_DRAG_SUPPRESS_UNTIL=Date.now()+450;
+      stopOnly(e);
     }
     d.el.classList.remove('eam-fixed-dragging');
-    try{d.el.releasePointerCapture?.(d.pointerId)}catch(_){}
-    block(e);
+    try{d.el.releasePointerCapture?.(d.pointerId)}catch(_){ }
   }
 
   window.addEventListener('pointerdown',begin,true);
@@ -15363,12 +15326,35 @@ body {
   window.addEventListener('pointerup',finish,true);
   window.addEventListener('pointercancel',finish,true);
 
-  // 이동 직후 클릭으로 EAM 이력카드가 열리는 것을 방지한다.
+  // 드래그로 놓은 직후 발생하는 click만 차단한다. 일반 클릭은 통과시킨다.
   window.addEventListener('click',function(e){
-    if(Date.now()<(window.__JGB_EAM_DRAG_SUPPRESS_UNTIL||0)){
-      if(e.target.closest?.('.eh-map .eh-marker'))block(e);
+    if(Date.now()<(window.__JGB_EAM_DRAG_SUPPRESS_UNTIL||0) && e.target.closest?.('.eh-map .eh-marker')){
+      stopOnly(e);
+      return;
     }
+    const el=e.target.closest?.('.eh-map .eh-marker');
+    if(!el || el.classList.contains('map-only'))return;
+    const code=S(el.getAttribute('data-code'));
+    if(!code)return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(typeof window.__JGB_EAM_OPEN_EAM==='function') window.__JGB_EAM_OPEN_EAM(code);
   },true);
+
+  // 기존 더블클릭 이동 기능과도 호환
+  window.__JGB_EAM_OPEN_EAM=window.__JGB_EAM_OPEN_EAM||function(code){
+    const c=S(code), pre=c.split('-')[0];
+    const cat={AC:'cooling',BO:'heating',FI:'fire',SA:'sanitary',EL:'electrical',DO:'door',OT:'other'}[pre]||'cooling';
+    window.__eamSelCode=c; window.__eamCat=cat;
+    if(typeof window.go==='function')window.go('eam');
+    const pick=()=>{
+      const row=document.querySelector('.eam-asset-row[data-code="'+CSS.escape(c)+'"]');
+      if(row){row.click();return true;}
+      if(typeof window.eamPick==='function'){try{window.eamPick(cat,c);return true}catch(_){}}
+      return false;
+    };
+    requestAnimationFrame(()=>{if(!pick())setTimeout(pick,120);});
+  };
 })();
 </script>
 
