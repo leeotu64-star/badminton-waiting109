@@ -3705,7 +3705,7 @@ html::before,body::before{
       const parts=allAssets.filter(a=>statusOf(a)==='parts').length;
       const discard=allAssets.filter(a=>statusOf(a)==='discard').length;
       const defaultAC={'AC-01':[86,8],'AC-02':[68,8],'AC-03':[50,8],'AC-04':[32,8],'AC-05':[14,8],'AC-06':[7,30]};
-      const getPos=a=>{const c=codeOf(a);if(readDeletedMap().has(c))return null;if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];return defaultAC[c]||null};
+      const getPos=a=>{const c=codeOf(a);if(readDeletedMap().has(c))return null;if(freshPositions[c]&&Number.isFinite(Number(freshPositions[c][0]))&&Number.isFinite(Number(freshPositions[c][1])))return freshPositions[c];if(defaultAC[c])return defaultAC[c];const idx=assets.findIndex(x=>codeOf(x)===c);if(idx<0)return null;const cols=4,row=Math.floor(idx/cols),col=idx%cols;return [12+col*24,38+row*11]};
       const placeName=a=>V(a?.place||a?.location||a?.zone||a?.area||'미지정');
       const attr=s=>esc(V(s)).replace(/\n/g,' ');
       const liveRows=readLive();
@@ -15995,4 +15995,55 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
   border-radius:8px!important;
   border:2px solid #eef3f6!important;
 }
+</style>
+
+
+<style id="JGB_EAM_V79_MAP_CODE_ONLY_3D">
+/* V79: 배치도 미표시 자산도 위치를 갖도록 하고, 누수 아이콘과 같은 코드 전용 3D 마커로 표시 */
+#eam228Map .eam228-asset{
+  position:absolute!important;
+  z-index:100!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:auto!important;
+  min-width:58px!important;
+  height:32px!important;
+  box-sizing:border-box!important;
+  padding:4px 10px!important;
+  gap:0!important;
+  border:2px solid #c6d5df!important;
+  border-radius:999px!important;
+  background:linear-gradient(145deg,#ffffff 0%,#f5f8fa 48%,#dbe5eb 100%)!important;
+  color:#174b70!important;
+  font-size:12px!important;
+  font-weight:950!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  transform:translate(-50%,-50%)!important;
+  transform-style:preserve-3d!important;
+  box-shadow:0 5px 10px rgba(25,55,75,.22),inset 0 1px 0 rgba(255,255,255,.98),0 1px 0 rgba(105,130,145,.22)!important;
+}
+#eam228Map .eam228-asset::after{
+  display:block!important;
+  content:""!important;
+  position:absolute!important;
+  left:50%!important;
+  bottom:-5px!important;
+  width:9px!important;
+  height:9px!important;
+  margin-left:-5px!important;
+  background:#e3ebf0!important;
+  border-right:1px solid rgba(65,95,112,.25)!important;
+  border-bottom:1px solid rgba(65,95,112,.25)!important;
+  transform:rotate(45deg)!important;
+  z-index:-1!important;
+}
+#eam228Map .eam228-asset span{display:none!important}
+#eam228Map .eam228-asset b{display:inline-block!important;font-size:12px!important;font-weight:950!important;letter-spacing:.01em!important;line-height:1!important}
+#eam228Map .eam228-asset.ok{border-color:#9db8aa!important;background:linear-gradient(145deg,#ffffff,#f1faf5 55%,#d7eee1 100%)!important;color:#16724f!important}
+#eam228Map .eam228-asset.warn{border-color:#d6b65b!important;background:linear-gradient(145deg,#ffffff,#fff9e8 55%,#f2df9c 100%)!important;color:#8b6700!important}
+#eam228Map .eam228-asset.bad{border-color:#d9a0a0!important;background:linear-gradient(145deg,#ffffff,#fff4f4 55%,#f3d4d4 100%)!important;color:#c83b32!important}
+#eam228Map .eam228-asset.dragging{transform:translate(-50%,-50%) scale(1.05)!important}
 </style>
