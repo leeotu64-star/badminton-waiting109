@@ -16916,3 +16916,50 @@ document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map
 }
 </style>
 
+
+<style id="JGB_EAM_V21_ICON_INTERACTION_FIX">
+/* 배치도 아이콘: 드래그 가능 / 단일 클릭 이동 금지 */
+.eh-map .eh-marker,
+#eam228Map .eam228-asset{cursor:grab!important;}
+.eh-map .eh-marker.dragging,
+#eam228Map .eam228-asset.dragging{cursor:grabbing!important;}
+</style>
+<script id="JGB_EAM_V21_ICON_INTERACTION_FIX_SCRIPT">
+(function(){
+  if(window.__JGB_EAM_ICON_INTERACTION_V21)return;
+  window.__JGB_EAM_ICON_INTERACTION_V21=true;
+
+  function marker(e){
+    return e.target && e.target.closest ? e.target.closest('.eh-map .eh-marker, #eam228Map .eam228-asset') : null;
+  }
+
+  /* 단일 클릭은 절대 자산 화면으로 이동하지 않음.
+     기존에 뒤에서 등록된 click 핸들러까지 도달하지 않도록 capture 단계에서 차단. */
+  document.addEventListener('click',function(e){
+    const el=marker(e); if(!el)return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const c=el.getAttribute('data-code')||'';
+    if(c) window.__eamSelCode=String(c).trim();
+  },true);
+
+  /* 더블클릭에서만 기존 EAM 자산 화면으로 이동.
+     배치도 전용 아이콘(map-only)은 이동하지 않음. */
+  document.addEventListener('dblclick',function(e){
+    const el=marker(e); if(!el)return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if(el.classList.contains('map-only') || el.getAttribute('data-map-only')==='1')return;
+    const c=(el.getAttribute('data-code')||'').trim();
+    if(!c)return;
+    window.__eamSelCode=c;
+    if(typeof window.eam228Pick==='function'){
+      window.eam228Pick(c);
+    }else if(typeof window.go==='function'){
+      window.go('eam');
+    }else{
+      try{location.href='?page=eam'}catch(_){ }
+    }
+  },true);
+})();
+</script>
