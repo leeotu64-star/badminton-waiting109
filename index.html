@@ -15344,6 +15344,43 @@ body {
 #eamHyunIconDeleteModal .eh-delete-list-v13{box-sizing:border-box;padding:10px 18px 18px;width:100%;overflow-x:hidden}
 #eamHyunIconDeleteModal .eh-delete-list-v13>div{grid-template-columns:90px minmax(0,1fr) 64px;box-sizing:border-box;width:100%;}
 </style>
+
+<style id="JGB_LR_MOVE_BUTTON_V2">
+.jgb-lr-v54-group-title{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
+.jgb-lr-v54-group-title>b{margin:0!important}
+.jgb-lr-move-btn{border:1px solid #39779b!important;background:#fff!important;color:#174b68!important;border-radius:5px!important;padding:5px 10px!important;font-size:11px!important;font-weight:950!important;cursor:pointer!important;white-space:nowrap!important}
+.jgb-lr-move-btn.on{background:#176db0!important;color:#fff!important;border-color:#0d568e!important}
+.jgb-lr-v54-grid.lr-moving{outline:2px solid #176db0!important;outline-offset:2px!important}
+.jgb-lr-v54-grid.lr-moving .jgb-lr-v54-cell{cursor:grab!important}
+</style>
+<script id="JGB_LR_MOVE_BUTTON_V2_SCRIPT">
+(function(){
+  let moveLight=false, moveReel=false;
+  function install(){
+    const host=document.querySelector('.jgb-lr-v54');
+    if(!host) return;
+    const groups=host.querySelectorAll('.jgb-lr-v54-header-group');
+    if(groups.length<2) return;
+    groups.forEach((group,i)=>{
+      if(group.querySelector('.jgb-lr-move-btn')) return;
+      const title=document.createElement('div');
+      title.className='jgb-lr-v54-group-title';
+      const b=group.querySelector('b');
+      if(b){b.parentNode.insertBefore(title,b);title.appendChild(b);}
+      const btn=document.createElement('button');
+      btn.type='button';btn.className='jgb-lr-move-btn';
+      const type=i===0?'light':'reel';
+      const set=()=>{const on=type==='light'?moveLight:moveReel;btn.classList.toggle('on',on);btn.textContent=on?'✓ 이동 종료':'↔ 위치 이동';host.querySelectorAll('.jgb-lr-v54-pane')[i]?.querySelector('.jgb-lr-v54-grid')?.classList.toggle('lr-moving',on);};
+      btn.textContent='↔ 위치 이동';
+      btn.addEventListener('click',e=>{e.stopPropagation();if(type==='light')moveLight=!moveLight;else moveReel=!moveReel;set();});
+      title.appendChild(btn);
+    });
+  }
+  const obs=new MutationObserver(install);
+  obs.observe(document.body,{childList:true,subtree:true});
+  setTimeout(install,50);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
