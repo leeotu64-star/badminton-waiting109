@@ -17084,86 +17084,177 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 </style>
 
 <style id="JGB_EAM_HYUN_V7_ICON_LINK_FIX">
-/* EAM 현황: 기존 EAM 자산 아이콘은 단일클릭 선택, 더블클릭으로만 EAM 상세 이동 */
-.eh-map .eh-marker:not(.map-only){cursor:pointer!important;user-select:none!important;-webkit-user-select:none!important;}
-.eh-map .eh-marker.map-only{cursor:pointer!important;}
+/* EAM 현황: 단일 클릭은 해당 자산 이력관리, 드래그는 위치 이동 */
+.eh-map .eh-marker:not(.map-only){
+  cursor:grab!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  touch-action:none!important;
+}
+.eh-map .eh-marker.map-only{
+  cursor:grab!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  touch-action:none!important;
+}
+.eh-map .eh-marker.dragging{
+  cursor:grabbing!important;
+}
 </style>
-<script id="JGB_EAM_HYUN_V8_ICON_DRAG_DBLCLICK_JS">
+
+<script id="JGB_EAM_HYUN_SINGLE_CLICK_DRAG_V9">
 (function(){
   'use strict';
-  if(window.__JGB_EAM_HYUN_V8_FIX)return;
-  window.__JGB_EAM_HYUN_V8_FIX=true;
-  const V=x=>String(x??'').trim();
-  const esc=x=>V(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  const KEY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
-  const read=()=>{try{const x=JSON.parse(localStorage.getItem(KEY)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
-  const write=x=>{try{localStorage.setItem(KEY,JSON.stringify(x));return true}catch(_){return false}};
-  let drag=null;
+  if(window.__JGB_EAM_HYUN_SINGLE_CLICK_DRAG_V9)return;
+  window.__JGB_EAM_HYUN_SINGLE_CLICK_DRAG_V9=true;
 
-  /* EAM 현황 아이콘: 클릭은 아무 이동도 하지 않음. 드래그만 위치를 변경. */
+  const V=x=>String(x??'').trim();
+  let active=null;
+  let suppressClickUntil=0;
+
+  function openAsset(el, ev){
+    if(!el || el.classList.contains('map-only')) return;
+    const code=V(el.dataset.code || el.getAttribute('data-code') || el.textContent);
+    if(!code) return;
+    if(ev){
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+    }
+    if(typeof window.jgbOpenEamAssetByCode==='function'){
+      window.jgbOpenEamAssetByCode(code);
+    }else{
+      window.__eamSelCode=code;
+      if(typeof window.go==='function'){
+        window.go('eam');
+      }else{
+        try{ location.href='?page=eam'; }catch(_){}
+      }
+    }
+  }
+
   document.addEventListener('pointerdown',function(e){
     if(e.button!==0)return;
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
+
     const map=el.closest('.eh-map');
     if(!map)return;
+
     const r=map.getBoundingClientRect();
-    drag={el,map,code:V(el.dataset.code||el.textContent||''),sx:e.clientX,sy:e.clientY,startX:parseFloat(el.style.left)||50,startY:parseFloat(el.style.top)||50,moved:false,dragging:false};
-    const move=ev=>{
-      if(!drag)return;
-      const dx=ev.clientX-drag.sx,dy=ev.clientY-drag.sy;
-      if(!drag.dragging && Math.hypot(dx,dy)<6)return;
-      if(!drag.dragging){drag.dragging=true;el.classList.add('dragging');}
-      const x=Math.max(2,Math.min(98,((ev.clientX-r.left)/r.width)*100));
-      const y=Math.max(2,Math.min(98,((ev.clientY-r.top)/r.height)*100));
-      el.style.left=x.toFixed(2)+'%';el.style.top=y.toFixed(2)+'%';drag.moved=true;
-      ev.preventDefault();ev.stopPropagation();
+    active={
+      el:el,
+      map:map,
+      rect:r,
+      sx:e.clientX,
+      sy:e.clientY,
+      moved:false,
+      startLeft:parseFloat(el.style.left)||50,
+      startTop:parseFloat(el.style.top)||50
     };
-    const up=ev=>{
-      if(!drag)return;
-      const d=drag;drag=null;el.classList.remove('dragging');
-      window.removeEventListener('pointermove',move,true);window.removeEventListener('pointerup',up,true);window.removeEventListener('pointercancel',up,true);
-      if(!d.moved)return;
-      const x=Math.max(2,Math.min(98,((ev.clientX-r.left)/r.width)*100));
-      const y=Math.max(2,Math.min(98,((ev.clientY-r.top)/r.height)*100));
-      el.style.left=x.toFixed(2)+'%';el.style.top=y.toFixed(2)+'%';
-      const c=d.code;
-      if(el.classList.contains('map-only')){
-        const data=read();
-        if(data[c]){data[c].x=Number(x.toFixed(2));data[c].y=Number(y.toFixed(2));write(data);}
-      }else{
-        const k='JGB_EAM_HYUNHWANG_MAP_V1';
-        let pos={};try{pos=JSON.parse(localStorage.getItem(k)||'{}')}catch(_){}
-        pos[c]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-        try{localStorage.setItem(k,JSON.stringify(pos))}catch(_){}
+
+    const move=function(ev){
+      if(!active)return;
+      const dx=ev.clientX-active.sx;
+      const dy=ev.clientY-active.sy;
+
+      if(!active.moved && Math.hypot(dx,dy)<6)return;
+
+      if(!active.moved){
+        active.moved=true;
+        active.el.classList.add('dragging');
       }
-      window.__EAM_HYUN_DRAG_SUPPRESS_UNTIL=Date.now()+250;
-      ev.preventDefault();ev.stopPropagation();
+
+      const x=Math.max(2,Math.min(98,((ev.clientX-active.rect.left)/active.rect.width)*100));
+      const y=Math.max(2,Math.min(98,((ev.clientY-active.rect.top)/active.rect.height)*100));
+
+      active.el.style.left=x.toFixed(2)+'%';
+      active.el.style.top=y.toFixed(2)+'%';
+
+      ev.preventDefault();
+      ev.stopPropagation();
     };
-    window.addEventListener('pointermove',move,true);window.addEventListener('pointerup',up,true);window.addEventListener('pointercancel',up,true);
+
+    const up=function(ev){
+      if(!active)return;
+
+      const d=active;
+      active=null;
+
+      window.removeEventListener('pointermove',move,true);
+      window.removeEventListener('pointerup',up,true);
+      window.removeEventListener('pointercancel',up,true);
+
+      d.el.classList.remove('dragging');
+
+      if(d.moved){
+        const x=Math.max(2,Math.min(98,((ev.clientX-d.rect.left)/d.rect.width)*100));
+        const y=Math.max(2,Math.min(98,((ev.clientY-d.rect.top)/d.rect.height)*100));
+
+        d.el.style.left=x.toFixed(2)+'%';
+        d.el.style.top=y.toFixed(2)+'%';
+
+        const c=V(d.el.dataset.code || d.el.getAttribute('data-code') || d.el.textContent);
+
+        if(d.el.classList.contains('map-only')){
+          try{
+            const key='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+            const data=JSON.parse(localStorage.getItem(key)||'{}');
+            if(data[c]){
+              data[c].x=Number(x.toFixed(2));
+              data[c].y=Number(y.toFixed(2));
+              localStorage.setItem(key,JSON.stringify(data));
+            }
+          }catch(_){}
+        }else{
+          try{
+            const key='JGB_EAM_HYUNHWANG_MAP_V1';
+            const pos=JSON.parse(localStorage.getItem(key)||'{}');
+            pos[c]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+            localStorage.setItem(key,JSON.stringify(pos));
+          }catch(_){}
+        }
+
+        /* 브라우저가 이어서 발생시키는 click은 이동으로 처리하지 않음 */
+        suppressClickUntil=Date.now()+350;
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    };
+
+    window.addEventListener('pointermove',move,true);
+    window.addEventListener('pointerup',up,true);
+    window.addEventListener('pointercancel',up,true);
   },true);
 
-  /* 드래그 후 발생하는 click은 완전히 차단. 단일 클릭 자체도 이동시키지 않음. */
+  /* 단순 클릭만 EAM 이력관리로 이동 */
   document.addEventListener('click',function(e){
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
-    e.preventDefault();e.stopImmediatePropagation();
+
+    if(Date.now()<suppressClickUntil){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
+
+    if(el.classList.contains('map-only')){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
+
+    openAsset(el,e);
   },true);
 
-  /* 더블클릭에서만 기존 EAM 자산으로 이동. 배치도 전용 아이콘은 이동하지 않음. */
+  /* 더블클릭 전용 이동은 사용하지 않음 */
   document.addEventListener('dblclick',function(e){
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
-    e.preventDefault();e.stopImmediatePropagation();
-    if(el.classList.contains('map-only'))return;
-    const c=V(el.dataset.code||el.textContent||'');
-    if(!c)return;
-    if(typeof window.jgbOpenEamAssetByCode==='function')window.jgbOpenEamAssetByCode(c);
-    else{window.__eamSelCode=c;if(typeof window.go==='function')window.go('eam');else{try{location.href='?page=eam'}catch(_){}}}
+    e.preventDefault();
+    e.stopImmediatePropagation();
   },true);
 })();
 </script>
-
 <!-- JGB EAM 현황 v13: 배치도 아이콘 삭제를 LK 삭제 방식의 목록형으로 변경 -->
 <style id="JGB_EAM_HYUN_V13_ICON_DELETE_LIST">
 .eh-delete-list-v13{padding:14px 18px 18px;display:grid;gap:8px;max-height:58vh;overflow:auto;box-sizing:border-box;width:100%}.eh-delete-list-v13>div{box-sizing:border-box;width:100%}
