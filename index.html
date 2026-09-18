@@ -3689,84 +3689,31 @@ html::before,body::before{
 </section>
 <section class="eam228-right-card eam228-future-card">
   <div class="eam228-section-head">
-    <h2>⚡ 시설관리 CONTROL CENTER</h2>
-    <small>현장 대응 우선순위</small>
+    <h2>📒 시설관리 수첩</h2>
+    <small>현장 메모 · 후속조치</small>
   </div>
-  <div class="eam228-control-center">
-    <div class="eam228-control-top">
-      <div class="eam228-command">
-        <div class="eam228-command-label">TODAY · 시설관리 판단</div>
-        <div class="eam228-command-title">지금 확인해야 할 자산</div>
-        <div class="eam228-command-sub">상태 이상 자산을 우선순위로 정렬하여 바로 조치합니다.</div>
-      </div>
-      <div class="eam228-priority">
-        <span>우선조치</span>
-        <b>${assets.filter(a=>statusOf(a)==='action').length}</b>
-        <small>건</small>
-      </div>
+  <div class="eam228-notebook">
+    <div class="eam228-note-row">
+      <div class="eam228-note-tab">01</div>
+      <div><b>오늘 확인사항</b><span>점검 또는 조치가 필요한 현장을 기록합니다.</span></div>
+      <em>${assets.filter(a=>statusOf(a)==='action').length}건</em>
     </div>
-
-    <div class="eam228-action-strip">
-      <div class="eam228-action action-red">
-        <span class="eam228-action-dot"></span>
-        <div><b>조치필요</b><small>즉시 확인</small></div>
-        <strong>${assets.filter(a=>statusOf(a)==='action').length}</strong>
-      </div>
-      <div class="eam228-action action-yellow">
-        <span class="eam228-action-dot"></span>
-        <div><b>점검</b><small>점검 예정</small></div>
-        <strong>${assets.filter(a=>statusOf(a)==='check').length}</strong>
-      </div>
-      <div class="eam228-action action-purple">
-        <span class="eam228-action-dot"></span>
-        <div><b>부품대기</b><small>후속조치</small></div>
-        <strong>${assets.filter(a=>statusOf(a)==='parts').length}</strong>
-      </div>
-      <div class="eam228-action action-gray">
-        <span class="eam228-action-dot"></span>
-        <div><b>폐기</b><small>교체 검토</small></div>
-        <strong>${assets.filter(a=>statusOf(a)==='discard').length}</strong>
-      </div>
+    <div class="eam228-note-row">
+      <div class="eam228-note-tab">02</div>
+      <div><b>정비 메모</b><span>시설보수 현황에서 등록된 작업을 확인합니다.</span></div>
+      <em>${live.length}건</em>
     </div>
-
-    <div class="eam228-control-grid">
-      <div class="eam228-control-card">
-        <div class="eam228-control-card-head">
-          <b>🚨 우선 확인 목록</b><span>상태 이상 자산</span>
-        </div>
-        <div class="eam228-priority-list">
-          ${assets.filter(a=>['action','repair','parts'].includes(statusOf(a))).slice(0,5).map(a=>`
-            <div class="eam228-priority-item">
-              <span class="eam228-mini-status ${statusClass(statusOf(a))}"></span>
-              <b>${attr(a.code||'-')}</b>
-              <span>${attr(a.name||'-')}</span>
-              <em>${statusLabel(statusOf(a))}</em>
-            </div>`).join('') || '<div class="eam228-empty-line">현재 우선 확인 대상 없음</div>'}
-        </div>
-      </div>
-
-      <div class="eam228-control-card">
-        <div class="eam228-control-card-head">
-          <b>📍 현장 대응 흐름</b><span>한눈에 관리</span>
-        </div>
-        <div class="eam228-flow">
-          <div><i>01</i><b>상태 확인</b><span>이력카드</span></div>
-          <div class="flow-arrow">→</div>
-          <div><i>02</i><b>정비 등록</b><span>보수 현황</span></div>
-          <div class="flow-arrow">→</div>
-          <div><i>03</i><b>조치 완료</b><span>이력 기록</span></div>
-        </div>
-      </div>
+    <div class="eam228-note-row">
+      <div class="eam228-note-tab">03</div>
+      <div><b>현장 특이사항</b><span>누수·시설 이상 등 현장에서 발견한 사항을 남깁니다.</span></div>
+      <em>메모</em>
     </div>
-
-    <div class="eam228-live-summary">
-      <span>시설관리 핵심지표</span>
-      <b>전체 ${assets.length}개 자산</b>
-      <i></i>
-      <span>현재 LIVE ${live.length}건</span>
-      <i></i>
-      <span>우선조치 ${assets.filter(a=>['action','repair','parts'].includes(statusOf(a))).length}건</span>
+    <div class="eam228-note-row">
+      <div class="eam228-note-tab">04</div>
+      <div><b>다음 조치</b><span>부품대기·수리중 자산의 후속조치를 확인합니다.</span></div>
+      <em>${assets.filter(a=>['repair','parts'].includes(statusOf(a))).length}건</em>
     </div>
+    <div class="eam228-note-footer">※ 자산상태의 기준은 이력카드이며, 시설보수 현황은 별도 작업기록으로 관리합니다.</div>
   </div>
 </section>
 </aside></div></div>`;
@@ -15683,5 +15630,67 @@ body {
 /* 세로 스크롤이 실제로 생기도록 행 영역을 제한 */
 .eam228-live-body.eam228-live-scroll > table{
   margin-bottom:2px!important;
+}
+</style>
+
+
+<style id="JGB_EAM_V38_NOTEBOOK">
+.eam228-notebook{
+  height:100%;
+  min-height:0;
+  overflow:auto;
+  padding:10px;
+  box-sizing:border-box;
+  background:#f7fafb;
+}
+.eam228-note-row{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  align-items:center;
+  gap:9px;
+  min-height:58px;
+  padding:7px 8px;
+  margin-bottom:7px;
+  box-sizing:border-box;
+  background:#fff;
+  border:1px solid #cbdde6;
+  border-radius:8px;
+  box-shadow:0 1px 3px rgba(30,70,90,.06);
+}
+.eam228-note-tab{
+  width:28px;height:28px;
+  border-radius:7px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eaf3f7;
+  color:#175a7c;
+  font-size:10px;
+  font-weight:900;
+}
+.eam228-note-row>div:nth-child(2){min-width:0}
+.eam228-note-row b,
+.eam228-note-row span{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.eam228-note-row b{font-size:11px;color:#194f6c}
+.eam228-note-row span{font-size:9px;color:#7d8d96;margin-top:3px}
+.eam228-note-row em{
+  font-style:normal;
+  font-size:10px;
+  font-weight:900;
+  color:#17628a;
+  white-space:nowrap;
+}
+.eam228-note-footer{
+  margin-top:8px;
+  padding:8px 9px;
+  border-top:1px dashed #b9ccd6;
+  color:#71838d;
+  font-size:8px;
+  line-height:1.5;
 }
 </style>
