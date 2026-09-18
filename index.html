@@ -4285,15 +4285,22 @@ a[data-page="digitalTwin"],
 window.eam228LiveInput=code=>{
         document.getElementById('eam228Modal')?.remove();
         const m=document.createElement('div');m.id='eam228Modal';m.className='eam228-modal';
-        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>REPAIR LIVE</small><h3>수리 LIVE 직접입력</h3></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-form"><label>자산코드<input id="e223LiveCode" placeholder="자산코드를 직접 입력하세요" value=""></label><label>수리상태<select id="e223LiveStatus"><option>정상</option><option>점검</option><option>조치필요</option><option selected>수리중</option><option>부품대기</option><option>폐기</option></select></label><label class="wide">작업내용<input id="e223LiveContent" placeholder="예: 냉방 불량 점검 및 수리"></label><label>예정일<input id="e223LiveDate" type="date" value=""></label><label>담당자<input id="e223LiveManager" placeholder="담당자 입력"></label></div><div class="eam228-modal-note">등록하면 수리 LIVE 작업기록에만 저장됩니다. 이력카드 자산상태는 변경되지 않습니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228SaveLive()">LIVE 등록</button></div></div>`;
+        const liveAssets=[...assets].sort((a,b)=>String(codeOf(a)||'').localeCompare(String(codeOf(b)||''),undefined,{numeric:true}));
+        const selectedCode=liveAssets.some(a=>V(codeOf(a))===V(code))?V(code):V(codeOf(liveAssets[0])||'');
+        const options=liveAssets.map(a=>`<option value="${attr(codeOf(a))}" ${V(codeOf(a))===selectedCode?'selected':''}>${esc(codeOf(a))} · ${esc(a.name||catLabel(normCat(a)))}</option>`).join('');
+        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>REPAIR LIVE</small><h3>수리 LIVE 등록</h3><p>등록된 자산코드는 목록에서 선택하고, 수리 작업내용만 직접 입력합니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-form"><label>자산코드<select id="e223LiveCode" ${liveAssets.length?'':'disabled'}>${options||'<option value="">등록된 자산이 없습니다.</option>'}</select></label><label>수리상태<input id="e223LiveStatus" value="수리중" disabled></label><label class="wide">수리 작업내용 *<input id="e223LiveContent" placeholder="예: 냉방 불량 점검 및 수리"></label><label>예정일<input id="e223LiveDate" type="date" value=""></label><label>담당자<input id="e223LiveManager" placeholder="담당자 입력"></label></div><div class="eam228-modal-note">자산코드는 EAM에 등록된 자산에서 선택합니다. 직접 입력은 수리 작업내용에만 사용합니다. 등록하면 수리 LIVE 작업기록에만 저장되며 이력카드 자산정보는 변경되지 않습니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228SaveLive()" ${liveAssets.length?'':'disabled'}>LIVE 등록</button></div></div>`;
         document.body.appendChild(m);
+        document.getElementById('e223LiveContent')?.focus();
       };
       window.eam228SaveLive=async()=>{
-        const g=id=>V(document.getElementById(id)?.value),code=g('e223LiveCode');if(!code){alert('자산코드를 직접 입력하세요.');return}
-        const rows=readLive().filter(x=>V(x.asset_code)!==code);rows.unshift({id:'EAMLIVE-'+Date.now(),asset_code:code,content:g('e223LiveContent')||'수리 작업 등록',status:g('e223LiveStatus')||'수리중',scheduled:g('e223LiveDate'),manager:g('e223LiveManager'),createdAt:new Date().toISOString()});writeLive(rows);
+        const g=id=>V(document.getElementById(id)?.value),code=g('e223LiveCode'),content=g('e223LiveContent');
+        if(!code){alert('자산코드를 목록에서 선택하세요.');return}
+        if(!content){alert('수리 작업내용을 입력하세요.');document.getElementById('e223LiveContent')?.focus();return}
+        const rows=readLive().filter(x=>V(x.asset_code)!==code);rows.unshift({id:'EAMLIVE-'+Date.now(),asset_code:code,content,status:'수리중',scheduled:g('e223LiveDate'),manager:g('e223LiveManager'),createdAt:new Date().toISOString()});writeLive(rows);
         // 수리 LIVE는 작업기록만 저장합니다. 이력카드 자산상태에는 영향을 주지 않습니다.
         document.getElementById('eam228Modal')?.remove();render();
       };
+      
       window.eam228DeleteLive=code=>{const rows=readLive().filter(x=>V(x.asset_code)!==V(code));writeLive(rows);render()};
 
       const locationDefs=[['코트 5',['5번 코트','코트5','5코트']],['코트 4',['4번 코트','코트4','4코트']],['코트 3',['3번 코트','코트3','3코트']],['코트 2',['2번 코트','코트2','2코트']],['코트 1',['1번 코트','코트1','1코트']],['옥상',['옥상','지붕']],['창고',['창고','2층 창고']],['샤워실(남)',['남자 샤워실','샤워실(남)']],['화장실(남)',['남자 화장실','화장실(남)']],['탈의실(남)',['남자 탈의실','탈의실(남)']],['샤워실(여)',['여자 샤워실','샤워실(여)']],['탈의실(여)',['여자 탈의실','탈의실(여)']],['화장실(여)',['여자 화장실','화장실(여)']],['휴게실',['휴게실']],['통합 유수장치실',['유수장치실','통합 유수장치실']],['사무실',['사무실']],['복도',['복도']]];
