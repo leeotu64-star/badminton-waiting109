@@ -15231,6 +15231,84 @@ body {
   };
 })();
 </script>
+
+
+<!-- JGB FINAL: 배치도 AC 자산아이콘 → 자산코드 기준 EAM 이력카드 연결 -->
+<script id="JGB_EAM_MAP_AC_DBLCLICK_FINAL">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_MAP_AC_DBLCLICK_FINAL)return;
+  window.__JGB_EAM_MAP_AC_DBLCLICK_FINAL=true;
+
+  const V=x=>String(x??'').trim();
+
+  function resolve(code){
+    const c=V(code);
+    let cat='', actual=c;
+    try{
+      const defs=typeof window.eamCategoryDefs==='function'?window.eamCategoryDefs():{};
+      for(const [k,v] of Object.entries(defs||{})){
+        const item=(v.items||[]).find(x=>V(x?.code||x?.asset_code)===c);
+        if(item){cat=k;actual=V(item.code||item.asset_code||c);break;}
+      }
+    }catch(e){}
+    if(!cat){
+      try{
+        const a=(Array.isArray(window.__eamA)?window.__eamA:[]).find(x=>V(x?.asset_code)===c);
+        if(a){
+          const t=V(a.type||a.category);
+          if(t.includes('냉난방'))cat='cooling';
+          else if(t.includes('소방'))cat='fire';
+          else if(t.includes('온수')||t.includes('보일러')||t.includes('난방'))cat='water';
+          else if(t.includes('전기'))cat='electrical';
+          else if(t.includes('조명'))cat='lighting';
+          else if(t.includes('방수'))cat='waterproof';
+          else if(t.includes('위생'))cat='sanitary';
+          else if(t.includes('문')||t.includes('창호')||t.includes('도어'))cat='doors';
+          else cat='other';
+          actual=V(a.asset_code||c);
+        }
+      }catch(e){}
+    }
+    return {cat,actual};
+  }
+
+  function openEam(code){
+    const r=resolve(code);
+    if(!r.actual)return;
+    window.__eamSelCode=r.actual;
+    if(r.cat)window.__eamCat=r.cat;
+
+    if(typeof window.go==='function') window.go('eam');
+    else { try{location.href='?page=eam'}catch(e){} }
+
+    /* 라우팅 직후에도 해당 AC 코드의 이력카드를 확실히 선택 */
+    const pick=()=>{
+      if(r.cat && typeof window.eamPick==='function'){
+        window.__eamSelCode=r.actual;
+        window.__eamCat=r.cat;
+        window.eamPick(r.cat,r.actual);
+        return true;
+      }
+      const row=document.querySelector('.eam-asset-row[data-code="'+CSS.escape(r.actual)+'"]');
+      if(row){row.click();return true;}
+      return false;
+    };
+    requestAnimationFrame(()=>{if(!pick())setTimeout(pick,80);});
+  }
+
+  /* 한 번 클릭: 아무 화면 이동 없음. 더블클릭: AC 자산코드로 EAM 이력카드 이동 */
+  document.addEventListener('dblclick',function(e){
+    const el=e.target.closest?.('.eh-map .eh-marker');
+    if(!el || el.classList.contains('map-only'))return;
+    const code=V(el.getAttribute('data-code'));
+    if(!code)return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    openEam(code);
+  },true);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
