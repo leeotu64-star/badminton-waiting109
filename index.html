@@ -3795,14 +3795,14 @@ html::before,body::before{
         document.getElementById('eam228Modal')?.remove();
         const used=new Set(assets.map(a=>codeOf(a).toUpperCase()));
         const m=document.createElement('div');m.id='eam228Modal';m.className='eam228-modal';
-        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>누수관리 LK 생성처럼 번호를 직접 입력할 수 있습니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><strong id="e223Preview">자동 발급</strong></div><div class="eam228-modal-note">자산코드는 기존 자산번호와 중복되지 않도록 자동 발급됩니다. 등록 후 배치도에서 아이콘을 직접 배치합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
+        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>영문 분류코드와 하이픈은 자동 적용됩니다. 번호만 입력하세요.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><input id="e223Number" type="text" inputmode="numeric" maxlength="2" placeholder="번호" aria-label="자산번호 숫자만 입력" oninput="window.eam228Preview()"><strong id="e223Preview">${defaultCat||'AC'}-__</strong></div><div class="eam228-modal-note">자산코드는 <b>AC-01</b>처럼 영문 분류코드와 하이픈은 자동으로 들어가고, 사용자는 번호만 입력합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
         document.body.appendChild(m);window.__eam228Used=used;window.eam228Prefix(defaultCat||'AC');
       };
       window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Prefix').textContent=p;document.querySelectorAll('.eam228-code-types button').forEach(b=>b.classList.toggle('on',b.dataset.cat===p));window.eam228Preview()};
-      window.eam228Preview=()=>{const p=window.__eam228Prefix||'AC',used=window.__eam228Used||new Set();let n=1;while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<100)n++;const el=document.getElementById('e223Preview');if(el)el.textContent=n<100?`${p}-${String(n).padStart(2,'0')}`:'생성 가능 번호 없음'};
+      window.eam228Preview=()=>{const p=window.__eam228Prefix||'AC',el=document.getElementById('e223Preview'),inp=document.getElementById('e223Number');if(!el)return;const raw=String(inp?.value||'').replace(/\D/g,'').slice(0,2);if(inp&&inp.value!==raw)inp.value=raw;if(!raw){el.textContent=`${p}-__`;return}const n=Number(raw);el.textContent=(n>=1&&n<=99)?`${p}-${String(n).padStart(2,'0')}`:'01~99';};
       window.eam228Create=async()=>{
         if(!SUPA){alert('Supabase 연결이 필요합니다.');return}
-        const p=window.__eam228Prefix||'AC',used=window.__eam228Used||new Set();let n=1;while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<100)n++;if(n>99){alert(`${p} 자산코드는 01~99까지 모두 사용 중입니다.`);return}const code=`${p}-${String(n).padStart(2,'0')}`,name=catMap[p]||code;
+        const p=window.__eam228Prefix||'AC',used=window.__eam228Used||new Set();const raw=String(document.getElementById('e223Number')?.value||'').replace(/\D/g,'');const n=Number(raw);if(!raw||!Number.isInteger(n)||n<1||n>99){alert('자산번호는 01~99 중 숫자만 입력하세요.');return}const code=`${p}-${String(n).padStart(2,'0')}`,name=catMap[p]||code;
         if(n<1||n>99){alert('자동 생성 가능한 번호가 없습니다.');return}
         const existing=assets.find(a=>codeOf(a).toUpperCase()===code);
         if(existing){
@@ -14463,6 +14463,13 @@ body {
 /* 상단 6개 상태 현황 */
 .eam228-head-stats .eam228-stat b{font-size:26px!important;font-weight:950!important;line-height:1!important;}
 .eam228-head-stats .eam228-stat small{font-size:11px!important;font-weight:950!important;margin-top:3px!important;line-height:1.1!important;}
+</style>
+<style id="JGB_EAM_V78_ICON_CLEAN_CODE_INPUT">
+/* V78: 아이콘의 작은 점/꼬리 제거 + 크기 축소. 자산코드는 영문/하이픈 자동, 번호만 입력. */
+#eam228Map .eam228-asset::after{display:none!important;content:none!important}
+#eam228Map .eam228-asset{min-width:0!important;width:auto!important;height:26px!important;padding:3px 8px!important;gap:0!important;border-width:2px!important;border-radius:999px!important;font-size:11px!important;font-weight:950!important;line-height:1!important;box-sizing:border-box!important}
+#eam228Map .eam228-asset b{font-size:11px!important;font-weight:950!important;letter-spacing:.02em!important;line-height:1!important}
+.eam228-code-line input#e223Number{display:block!important;width:68px!important;text-align:center!important;border:1px solid #b9cbd8!important;border-radius:6px!important;padding:7px 5px!important;font-size:16px!important;font-weight:950!important;box-sizing:border-box!important;background:#fff!important}
 </style>
 </body>
 
