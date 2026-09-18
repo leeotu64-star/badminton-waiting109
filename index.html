@@ -4550,7 +4550,8 @@ a[data-page="digitalTwin"],
       const assets=A.filter(a=>String(a.status||'정상')!=='폐기');
       const V=s=>String(s??'').trim();
       const esc=s=>typeof xEsc==='function'?xEsc(s):String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-      const codeOf=a=>V(a?.asset_code||a?.code||'');
+      const codeOf=a=>V(a?.asset_code||a?.code||'').toUpperCase();
+      const sameCode=(a,b)=>V(a).toUpperCase()===V(b).toUpperCase();
       const statusOf=a=>{const s=V(a?.status||'정상');if(s==='정상')return 'normal';if(s==='점검')return 'check';if(s==='조치필요')return 'action';if(s==='수리중'||/수리예정|수리 진행|수리/.test(s))return 'repair';if(s==='부품대기'||/부품 대기/.test(s))return 'parts';return 'normal'};
       const catDefs=[['AC','에어컨','❄️'],['BO','보일러','♨️'],['FI','소방설비','🚒'],['EL','전기설비','⚡'],['DO','문·창호','🚪'],['SA','위생설비','🚻'],['OT','기타설비','🔧']];
       const catMap={AC:'에어컨',BO:'보일러',FI:'소방설비',EL:'전기설비',DO:'문·창호',SA:'위생설비',OT:'기타설비'};
@@ -4683,12 +4684,32 @@ a[data-page="digitalTwin"],
 
       /* 현재 배치도에 표시되는 기존 EAM 자산만 렌더링한다.
          삭제된 자산은 EAM DB에는 남아 있지만 현황 배치도에서는 숨긴다. */
-      const markerAssets=assets.filter(a=>{const c=codeOf(a);return !!getPos(a)&&!mapHidden[c]});
+      const seenAssetCodes=new Set();
+      const markerAssets=assets.filter(a=>{
+        const c=codeOf(a);
+        if(!c || mapHidden[c])return false;
+        if(seenAssetCodes.has(c))return false;
+        if(!getPos(a))return false;
+        seenAssetCodes.add(c);
+        return true;
+      });
       const markerCodes=new Set(markerAssets.map(a=>codeOf(a)));
-      /* 동일 코드의 배치도 전용 아이콘은 기존 EAM 자산 아이콘과 중복 표시하지 않는다.
-         기존 EAM 자산을 우선하여 상태값과 클릭→이력관리 연결을 유지한다. */
-      const markers=markerAssets.map(a=>{const p=getPos(a);const st=statusOf(a);return `<button type="button" class="eh-marker ${st}" data-code="${attr(codeOf(a))}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(codeOf(a))}"><b>${esc(codeOf(a))}</b></button>`}).join('');
-      const mapOnlyMarkers=Object.values(mapOnly).filter(x=>!markerCodes.has(V(x.code))).map(x=>`<button type="button" class="eh-marker map-only" data-map-only="1" data-code="${attr(x.code)}" style="left:${Number(x.x)}%;top:${Number(x.y)}%" title="배치도 전용 ${attr(x.code)}"><b>${esc(x.code)}</b></button>`).join('');
+      /* 같은 자산코드는 기존 EAM 자산 아이콘을 단 하나만 표시한다.
+         배치도 전용 아이콘도 같은 코드면 기존 EAM 아이콘을 우선한다. */
+      const markers=markerAssets.map(a=>{
+        const p=getPos(a),st=statusOf(a),c=codeOf(a);
+        return `<button type="button" class="eh-marker ${st}" data-code="${attr(c)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%" title="${attr(c)}"><b>${esc(c)}</b></button>`;
+      }).join('');
+      const seenMapOnlyCodes=new Set();
+      const mapOnlyMarkers=Object.values(mapOnly).filter(x=>{
+        const c=V(x?.code).toUpperCase();
+        if(!c || markerCodes.has(c) || seenMapOnlyCodes.has(c))return false;
+        seenMapOnlyCodes.add(c);
+        return true;
+      }).map(x=>{
+        const c=V(x.code).toUpperCase();
+        return `<button type="button" class="eh-marker map-only" data-map-only="1" data-code="${attr(c)}" style="left:${Number(x.x)}%;top:${Number(x.y)}%" title="배치도 전용 ${attr(c)}"><b>${esc(c)}</b></button>`;
+      }).join('');
       const zone=(label,sub,cls='')=>`<div class="eh-zone ${cls}"><b>${esc(label)}</b><small>${esc(sub)}</small></div>`;
       const map=`<div class="eh-map"><div class="eh-courts"><b>코트 구역</b>${[5,4,3,2,1].map(n=>`<div class="eh-court eh-court-3d" data-court="${n}"><div class="eh-court-surface"><span class="eh-court-net"></span><b>${n}</b></div></div>`).join('')}</div><div class="eh-facility"><div class="eh-roof"><span>옥상</span><span>옥상</span><span>창고</span><span>▲ 계단</span></div><div class="eh-row">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><div class="eh-corridor">복도</div><div class="eh-bottom">${zone('휴게실','휴게공간')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영')}</div></div>${markers}${mapOnlyMarkers}${!markers&&!mapOnlyMarkers?'<div class="eh-empty-map">배치된 자산·아이콘이 없습니다.</div>':''}</div>`;
       const liveHtml=liveRows.length?`<div class="eh-live-scroll"><table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${liveRows.map(x=>`<tr><td>${esc(x.asset_code||'-')}</td><td class="left">${esc(x.content||'-')}</td><td class="eh-live-state">${esc(x.status||'수리중')}</td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="eh-done eh-live-edit-btn" onclick="window.eamManualLiveEdit('${attr(x.asset_code||'')}')">입력</button></td><td><button class="eh-done" onclick="window.eamManualLiveComplete('${attr(x.asset_code||'')}')">완료</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="eh-empty">현재 수리 LIVE 등록 건이 없습니다.</div>';
@@ -15561,6 +15582,29 @@ body {
 })();
 </script>
 
+
+<script id="JGB_EAM_HYUN_DEDUP_PERSIST_V11">
+(function(){
+  if(window.__JGB_EAM_HYUN_DEDUP_PERSIST_V11)return;
+  window.__JGB_EAM_HYUN_DEDUP_PERSIST_V11=true;
+  const ONLY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+  const POS='JGB_EAM_HYUNHWANG_MAP_V1';
+  const v=x=>String(x??'').trim();
+  try{
+    const only=JSON.parse(localStorage.getItem(ONLY)||'{}');
+    const pos=JSON.parse(localStorage.getItem(POS)||'{}');
+    const out={},seen=new Set();
+    Object.keys(only).forEach(k=>{
+      const c=v(k).toUpperCase();
+      if(!c||seen.has(c)||Object.prototype.hasOwnProperty.call(pos,c))return;
+      seen.add(c);
+      out[c]={...only[k],code:c};
+    });
+    localStorage.setItem(ONLY,JSON.stringify(out));
+  }catch(_){}
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -17274,7 +17318,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
         d.el.style.left=x.toFixed(2)+'%';
         d.el.style.top=y.toFixed(2)+'%';
 
-        const c=V(d.el.dataset.code || d.el.getAttribute('data-code') || d.el.textContent);
+        const c=V(d.el.dataset.code || d.el.getAttribute('data-code') || d.el.textContent).toUpperCase();
 
         if(d.el.classList.contains('map-only')){
           try{
@@ -17290,8 +17334,15 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
           try{
             const key='JGB_EAM_HYUNHWANG_MAP_V1';
             const pos=JSON.parse(localStorage.getItem(key)||'{}');
-            pos[c]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+            const xx=Number(x.toFixed(2)), yy=Number(y.toFixed(2));
+            pos[c]=[xx,yy];
             localStorage.setItem(key,JSON.stringify(pos));
+            /* 같은 코드의 배치도 전용 복제본이 있으면 삭제하여
+               다음 새로고침에서도 기존 EAM 아이콘 하나만 유지한다. */
+            const onlyKey='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+            const only=JSON.parse(localStorage.getItem(onlyKey)||'{}');
+            Object.keys(only).forEach(k=>{if(V(k).toUpperCase()===c)delete only[k]});
+            localStorage.setItem(onlyKey,JSON.stringify(only));
           }catch(_){}
         }
 
