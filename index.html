@@ -3557,7 +3557,7 @@ html::before,body::before{
           alert('이미 등록된 자산코드입니다.\n기존 EAM 자산을 그대로 사용하려면 기존 자산을 선택하세요.');
           return;
         }
-        const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],place:null,status:'정상'};
+        const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],place:'미배치',status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
         document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
       };
@@ -14524,4 +14524,54 @@ body {
   display:block!important;
 }
 .eam228-court span{width:29px!important;height:29px!important;font-size:15px!important;z-index:5!important}
+</style>
+
+
+<style id="v20-court-reference-height-only">
+/* v20: 현재 화면의 옥상/배치도 기준선에 맞춰 5개 코트의 상·하 높이를 동일하게 정렬 */
+.eam228-courts{
+  left:6%!important;
+  right:6%!important;
+  top:3.5%!important;
+  height:19%!important;
+  gap:7px!important;
+  align-items:stretch!important;
+  box-sizing:border-box!important;
+}
+.eam228-court{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin-top:0!important;
+  box-sizing:border-box!important;
+  align-self:stretch!important;
+  overflow:hidden!important;
+}
+.eam228-court::before{
+  left:9%!important;
+  right:9%!important;
+  top:50%!important;
+  border-top:2px solid #587489!important;
+  display:block!important;
+}
+.eam228-court::after{
+  left:14%!important;
+  right:14%!important;
+  top:15%!important;
+  bottom:15%!important;
+  border:1px solid #668296!important;
+  display:block!important;
+}
+.eam228-court span{
+  width:29px!important;
+  height:29px!important;
+  font-size:15px!important;
+  z-index:5!important;
+}
+.eam228-courts strong{
+  top:-12px!important;
+  font-size:9px!important;
+  z-index:6!important;
+}
 </style>
