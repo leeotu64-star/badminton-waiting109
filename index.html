@@ -15024,19 +15024,10 @@ body {
   function cell(n,type){const a=assets[n-1],st=type==='light'?a.light:a.reel,sel=type==='light'?selectedLight===n:selectedReel===n;return `<button type="button" class="jgb-lr-v54-cell ${statusClass[st]} ${sel?'sel':''}" onclick="window.jgbLRSelect(${n},'${type}')" title="${n}번 ${type==='light'?'조명':'릴선'}">${n}</button>`}
   function historyRows(hist){return hist.length?hist.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join(''):`<tr><td colspan="4" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
   function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>점검·정비 내용</th><th>작업자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
-  function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane" data-lr-pane="${type}"><div class="jgb-lr-v54-panehead"><button type="button" class="jgb-lr-v54-pane-icon ${isL?'light':'reel'}" aria-label="${isL?'조명 관리':'릴선 관리'}" onclick="window.jgbLRHeaderSelect('${type}')">${isL?'💡':'🔌'}</button><b>${isL?'조명 관리':'릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div>${panel(n,type)}</div></section>`}
+  function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span>정상 ${counts.정상} · 점검 ${counts.점검} · 조치필요 ${counts.조치필요} · 수리중 ${counts.수리중}</span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
   function markup(){const allStatus={};Object.keys(statusColors).forEach(s=>allStatus[s]=assets.filter(x=>x.light===s||x.reel===s).length);return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-states"><span class="jgb-lr-v54-state ok"><b>${allStatus.정상}</b><small>정상</small></span><span class="jgb-lr-v54-state check"><b>${allStatus.점검}</b><small>점검</small></span><span class="jgb-lr-v54-state action"><b>${allStatus.조치필요}</b><small>조치필요</small></span><span class="jgb-lr-v54-state repair"><b>${allStatus.수리중}</b><small>수리중</small></span><span class="jgb-lr-v54-state parts"><b>${allStatus.부품대기}</b><small>부품대기</small></span><span class="jgb-lr-v54-state discard"><b>${allStatus.폐기}</b><small>폐기</small></span></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`}
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
-  window.jgbLRHeaderSelect=function(type){
-    const n=type==='light'?selectedLight:selectedReel;
-    window.jgbLRSelect(n,type);
-    setTimeout(function(){
-      const pane=document.querySelector(`.jgb-lr-v54-pane[data-lr-pane="${type}"]`);
-      if(pane) pane.scrollIntoView({behavior:'smooth',block:'start',inline:'nearest'});
-    },0);
-  };
-
   window.jgbLRCardEdit=function(n,type){
     const a=assets[n-1], isL=type==='light', name=isL?'코트 조명':'릴선', code=(isL?'L-':'RL-')+String(n).padStart(2,'0');
     document.getElementById('jgbLRCardEditModal')?.remove();
@@ -15352,145 +15343,6 @@ body {
 #eamHyunIconDeleteModal .eh-delete-list-v13{box-sizing:border-box;padding:10px 18px 18px;width:100%;overflow-x:hidden}
 #eamHyunIconDeleteModal .eh-delete-list-v13>div{grid-template-columns:90px minmax(0,1fr) 64px;box-sizing:border-box;width:100%;}
 </style>
-
-<style id="JGB_V31_LIGHT_REEL_HEADER_ONLY">
-/* v31: 조명/릴선 화면에서 코트 배치도만 제거하고 각 관리 헤더에 아이콘을 독립 배치 */
-.jgb-lr-v54 .jgb-lr-v54-maptitle,
-.jgb-lr-v54 .jgb-lr-v54-grid{
-  display:none!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-panehead{
-  display:flex!important;
-  align-items:center!important;
-  gap:12px!important;
-  min-height:68px!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-panehead b{
-  font-size:22px!important;
-  font-weight:950!important;
-  flex:0 0 auto!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-panehead span{
-  margin-left:auto!important;
-  font-weight:850!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-pane-icon{
-  width:50px!important;
-  height:50px!important;
-  min-width:50px!important;
-  border:2px solid #8baabd!important;
-  border-radius:13px!important;
-  background:linear-gradient(145deg,#fff 0%,#e9f3f8 48%,#c8dce6 100%)!important;
-  box-shadow:0 4px 0 #718c9a,0 7px 12px rgba(16,49,67,.25),inset 0 2px 3px rgba(255,255,255,.98)!important;
-  font-size:30px!important;
-  line-height:1!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  cursor:pointer!important;
-  flex:0 0 50px!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-pane-icon:hover{
-  transform:translateY(-1px)!important;
-}
-</style>
-
-
-<script id="JGB_EAM_HARD_DBLCLICK_V32">
-(function(){
-  'use strict';
-  if(window.__JGB_EAM_HARD_DBLCLICK_V32)return;
-  window.__JGB_EAM_HARD_DBLCLICK_V32=true;
-
-  const val=x=>String(x??'').trim();
-  let lastCode='', lastTime=0;
-
-  function codeOf(el){
-    if(!el)return '';
-    return val(el.getAttribute('data-code') || el.dataset?.code || el.querySelector('b')?.textContent || '');
-  }
-
-  function findCategory(code){
-    try{
-      const defs=typeof window.eamCategoryDefs==='function'?window.eamCategoryDefs():{};
-      for(const [k,v] of Object.entries(defs||{})){
-        if((v.items||[]).some(x=>val(x?.code||x?.asset_code)===code)) return k;
-      }
-    }catch(_){ }
-    try{
-      const a=(Array.isArray(window.__eamA)?window.__eamA:[]).find(x=>val(x?.asset_code)===code);
-      const t=val(a?.type||a?.category);
-      if(t.includes('냉난방'))return 'cooling';
-      if(t.includes('소방'))return 'fire';
-      if(t.includes('온수')||t.includes('보일러')||t.includes('난방'))return 'water';
-      if(t.includes('전기'))return 'electrical';
-      if(t.includes('조명'))return 'lighting';
-      if(t.includes('방수'))return 'waterproof';
-      if(t.includes('위생'))return 'sanitary';
-      if(t.includes('문')||t.includes('창호')||t.includes('도어'))return 'doors';
-    }catch(_){ }
-    return '';
-  }
-
-  function open(code){
-    code=val(code);
-    if(!code)return;
-    const cat=findCategory(code);
-    window.__eamSelCode=code;
-    if(cat)window.__eamCat=cat;
-
-    if(typeof window.go==='function')window.go('eam');
-    else { try{location.href='?page=eam'}catch(_){ } }
-
-    const forcePick=function(){
-      window.__eamSelCode=code;
-      if(cat)window.__eamCat=cat;
-      if(typeof window.eamPick==='function'){
-        window.eamPick(cat||window.__eamCat||'cooling',code);
-        return true;
-      }
-      const row=document.querySelector('.eam-asset-row[data-code]');
-      if(row){
-        const target=[...document.querySelectorAll('.eam-asset-row[data-code]')].find(x=>val(x.getAttribute('data-code'))===code);
-        if(target){target.click();return true;}
-      }
-      return false;
-    };
-    [0,50,150,350,700].forEach(ms=>setTimeout(forcePick,ms));
-  }
-
-  /* 가장 먼저 window 캡처 단계에서 기존 EAM 아이콘의 오래된 클릭/드래그 코드를 차단 */
-  window.addEventListener('pointerdown',function(e){
-    if(e.button!==0)return;
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el || el.classList.contains('map-only'))return;
-    e.stopImmediatePropagation();
-  },true);
-
-  /* 기존 단일 클릭/드래그 코드가 실행되지 않도록 차단 */
-  window.addEventListener('click',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el || el.classList.contains('map-only'))return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-  },true);
-
-  /* 오직 더블클릭일 때만 자산코드로 EAM 이동 */
-  window.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el || el.classList.contains('map-only'))return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    const code=codeOf(el);
-    if(!code)return;
-    const now=Date.now();
-    if(code===lastCode && now-lastTime<250)return;
-    lastCode=code;lastTime=now;
-    open(code);
-  },true);
-})();
-</script>
-
 </body>
 
 <style id="v19-court-position-final">
