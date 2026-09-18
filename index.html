@@ -3643,7 +3643,7 @@ html::before,body::before{
       const map=`<div id="eam228Map" class="eam228-map"><div class="eam228-courts"><strong>코트 구역 · 에어컨 자산 6개</strong>${court(5)}${court(4)}${court(3)}${court(2)}${court(1)}</div><div class="eam228-facility"><div class="eam228-roof"><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('옥상')"><b>옥상</b></button><button onclick="window.eam228Location('창고')"><b>창고</b></button><span>▲ 계단</span></div><div class="eam228-row1">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><button class="eam228-corridor" onclick="window.eam228Location('복도')">복도</button><div class="eam228-bottom">${zone('휴게실','휴게공간','small')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영','small')}</div><span class="eam228-entry court">코트 출입구</span><span class="eam228-entry main">주출입문</span></div>${markers||'<div class="eam228-empty-map">등록된 자산이 없습니다.</div>'}</div>`;
 
       const live=readLive().filter(x=>assets.some(a=>codeOf(a)===V(x.asset_code)));
-      const liveHtml=live.length?`<table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><button class="eam228-link" onclick="window.eam228Pick('${attr(x.asset_code)}')">${esc(x.asset_code)}</button></td><td>${esc(x.content||'-')}</td><td><span class="live-state">${esc(x.status||'수리중')}</span></td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="done" onclick="window.eam228Complete('${attr(x.asset_code)}')">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="eam228-empty"><b>현재 수리 대상 자산이 없습니다.</b><span>수리가 필요하면 「＋ 직접입력」으로 등록하세요.</span></div>`;
+      const liveHtml=live.length?`<table><thead><tr><th>자산코드</th><th>정비내용</th><th>정비상태</th><th>정비예정일</th><th>담당자</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><button class="eam228-link" onclick="window.eam228Pick('${attr(x.asset_code)}')">${esc(x.asset_code)}</button></td><td>${esc(x.content||'-')}</td><td><span class="live-state">${esc(x.status||'수리중')}</span></td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="done" onclick="window.eam228Complete('${attr(x.asset_code)}')">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="eam228-empty"><b>현재 수리 대상 자산이 없습니다.</b><span>수리가 필요하면 「＋ 직접입력」으로 등록하세요.</span></div>`;
       const cur=assets.find(a=>codeOf(a)===selected.code)||assets.find(a=>codeOf(a)==='AC-01')||assets[0];
       if(cur)selected.code=codeOf(cur);
       const p=cur?getPos(cur):null,lk=cur?V(cur.related_lk||cur.leak_code||cur.lk_code||''):'';
@@ -3682,18 +3682,42 @@ html::before,body::before{
 </style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${action}</b><small>조치필요</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리중</small></div><div class="eam228-stat warn"><b>${parts}</b><small>부품대기</small></div><div class="eam228-stat bad"><b>${discard}</b><small>폐기</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right eam228-right-split">
 <section class="eam228-right-card eam228-live-card">
   <div class="eam228-section-head">
-    <h2>🔧 수리 LIVE</h2>
-    <div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div>
+    <h2>🔧 시설보수 현황</h2>
+    <div><small>보수 진행 현황</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div>
   </div>
   <div class="eam228-live-body eam228-live-scroll">${liveHtml}</div>
 </section>
 <section class="eam228-right-card eam228-future-card">
   <div class="eam228-section-head">
-    <h2>＋ 추가 관리영역</h2>
-    <small>추후 기능 추가</small>
+    <h2>▦ 시설관리 운영정보</h2>
+    <small>자산상태 기준</small>
   </div>
-  <div class="eam228-future-body">
-    <div class="eam228-future-empty">추가할 기능을 이 영역에 배치합니다.</div>
+  <div class="eam228-future-body eam228-management-grid">
+    <div class="eam228-mini-card">
+      <div class="eam228-mini-title">자산 현황</div>
+      <div class="eam228-mini-big">${assets.length}<small> 관리 자산</small></div>
+      <div class="eam228-mini-line">정상 <b>${assets.filter(a=>statusOf(a)==='normal').length}</b> · 관리필요 <b>${assets.filter(a=>['check','action','repair','parts'].includes(statusOf(a))).length}</b></div>
+    </div>
+    <div class="eam228-mini-card">
+      <div class="eam228-mini-title">상태별 현황</div>
+      <div class="eam228-status-grid">
+        ${[['normal','정상'],['check','점검'],['action','조치필요'],['repair','수리중'],['parts','부품대기'],['discard','폐기']].map(([k,t])=>`<span class="eam228-status-chip ${statusClass(k)}"><i></i>${t} <b>${A.filter(a=>statusOf(a)===k).length}</b></span>`).join('')}
+      </div>
+    </div>
+    <div class="eam228-mini-card">
+      <div class="eam228-mini-title">정비 관리</div>
+      <div class="eam228-kpi-row"><span>보수 등록</span><b>${live.length}</b></div>
+      <div class="eam228-kpi-row"><span>조치필요</span><b>${assets.filter(a=>statusOf(a)==='action').length}</b></div>
+      <div class="eam228-kpi-row"><span>부품대기</span><b>${assets.filter(a=>statusOf(a)==='parts').length}</b></div>
+    </div>
+    <div class="eam228-mini-card">
+      <div class="eam228-mini-title">시설관리 바로보기</div>
+      <div class="eam228-shortcuts">
+        <button type="button" onclick="document.querySelector('.eam228-right-split')?.scrollIntoView({behavior:'smooth'})">보수 현황</button>
+        <button type="button" onclick="document.querySelector('[data-tab*="history"],.eam228-history-card')?.scrollIntoView({behavior:'smooth'})">이력카드</button>
+        <button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">배치도</button>
+      </div>
+    </div>
   </div>
 </section>
 </aside></div></div>`;
@@ -15206,4 +15230,107 @@ body {
 .eam228-live-card .eam228-section-head button{
   white-space:nowrap!important;
 }
+</style>
+
+
+<style id="JGB_EAM_V34_MANAGEMENT_AREA">
+/* 아래 70% 영역을 실제 시설관리 정보판으로 사용 */
+.eam228-management-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-template-rows:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  padding:8px!important;
+  overflow:auto!important;
+  align-content:stretch!important;
+}
+.eam228-mini-card{
+  min-width:0;
+  min-height:0;
+  background:#fff;
+  border:1px solid #c7d8e2;
+  border-radius:8px;
+  padding:10px 12px;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+.eam228-mini-title{
+  font-weight:900;
+  font-size:13px;
+  color:#164f70;
+  border-bottom:1px solid #d9e5eb;
+  padding-bottom:6px;
+  margin-bottom:7px;
+}
+.eam228-mini-big{
+  font-size:25px;
+  font-weight:900;
+  color:#145b82;
+  line-height:1.1;
+}
+.eam228-mini-big small{
+  font-size:11px;
+  font-weight:700;
+  color:#718391;
+}
+.eam228-mini-line{
+  margin-top:8px;
+  font-size:11px;
+  color:#607481;
+  white-space:nowrap;
+}
+.eam228-mini-line b{color:#173e55}
+.eam228-status-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px;
+}
+.eam228-status-chip{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 6px;
+  border:1px solid #d5e0e6;
+  border-radius:6px;
+  background:#f8fbfc;
+  font-size:10px;
+  font-weight:800;
+  color:#394d58;
+  white-space:nowrap;
+}
+.eam228-status-chip i{
+  width:8px;height:8px;border-radius:50%;display:inline-block;flex:none;
+}
+.eam228-status-chip.ok i{background:#2e9e57}
+.eam228-status-chip.warn i{background:#e6b800}
+.eam228-status-chip.action i{background:#f28c28}
+.eam228-status-chip.bad i{background:#e53935}
+.eam228-status-chip.parts i{background:#7b3fc6}
+.eam228-status-chip.discard i{background:#555}
+.eam228-kpi-row{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 2px;
+  border-bottom:1px solid #edf1f3;
+  font-size:11px;
+  white-space:nowrap;
+}
+.eam228-kpi-row b{font-size:15px;color:#175f86}
+.eam228-shortcuts{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:6px;
+}
+.eam228-shortcuts button{
+  border:1px solid #b8ccd8;
+  background:#f7fafc;
+  color:#175a7d;
+  border-radius:6px;
+  padding:6px 8px;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+  text-align:left;
+}
+.eam228-shortcuts button:hover{background:#eaf3f8}
 </style>
