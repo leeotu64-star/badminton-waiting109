@@ -13541,8 +13541,10 @@ window.eamDeleteMapIconByCode=function(c){
   }catch(err){
     console.error(err);alert('아이콘 삭제 저장에 실패했습니다.');return;
   }
-  document.querySelector(`#eam228Map .eam228-asset[data-code="${CSS.escape(c)}"]`)?.remove();
+  document.querySelectorAll(`#eam228Map .eam228-asset[data-code="${CSS.escape(c)}"]`).forEach(el=>el.remove());
   document.getElementById('eamAssetIconDeleteModal')?.remove();
+  /* 아이콘 삭제 결과를 즉시 다시 렌더링하여 기존 아이콘이 되살아나지 않게 함 */
+  setTimeout(()=>{try{location.reload()}catch(_){ }},50);
 };
 
 window.eamDeleteSelectedAssetByCode=async function(c){window.__eamSelCode=V(c);return window.eamDeleteSelectedAsset()};
