@@ -16952,85 +16952,109 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 }
 </style>
 
-<style id="JGB_EAM_HYUN_V7_ICON_LINK_FIX">
-/* EAM 현황: 기존 EAM 자산 아이콘은 단일클릭 선택, 더블클릭으로만 EAM 상세 이동 */
-.eh-map .eh-marker:not(.map-only){cursor:pointer!important;user-select:none!important;-webkit-user-select:none!important;}
-.eh-map .eh-marker.map-only{cursor:pointer!important;}
+<style id="JGB_EAM_HYUN_ICON_CLICK_DRAG_CLEAN_V1">
+/* 배치도 자산 아이콘 최종 동작: 이동모드가 아니면 단일 클릭으로 EAM 이력관리, 이동모드에서는 드래그만 */
+.eh-map .eh-marker{
+  cursor:pointer!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  touch-action:none!important;
+}
+.eh-map .eh-marker.dragging{cursor:grabbing!important;}
 </style>
-<script id="JGB_EAM_HYUN_V8_ICON_DRAG_DBLCLICK_JS">
+<script id="JGB_EAM_HYUN_ICON_CLICK_DRAG_CLEAN_V1">
 (function(){
   'use strict';
-  if(window.__JGB_EAM_HYUN_V8_FIX)return;
-  window.__JGB_EAM_HYUN_V8_FIX=true;
+  if(window.__JGB_EAM_HYUN_ICON_CLICK_DRAG_CLEAN_V1)return;
+  window.__JGB_EAM_HYUN_ICON_CLICK_DRAG_CLEAN_V1=true;
   const V=x=>String(x??'').trim();
   let drag=null;
-  let suppressClick=false;
+  let suppressClickUntil=0;
 
-  function openAsset(code){
-    const c=V(code);
-    if(!c || typeof window.jgbOpenEamAssetByCode!=='function')return;
-    window.jgbOpenEamAssetByCode(c);
-  }
-
-  /* 배치도 아이콘: 움직이지 않고 한 번 클릭하면 해당 자산 EAM 이력카드로 이동.
-     아이콘을 실제로 끌었을 때만 위치를 변경하고 클릭 이동은 취소한다. */
   document.addEventListener('pointerdown',function(e){
     if(e.button!==0)return;
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
     const map=el.closest('.eh-map');
     if(!map)return;
-    drag={el,map,code:V(el.dataset.code||el.textContent||''),sx:e.clientX,sy:e.clientY,startX:parseFloat(el.style.left)||50,startY:parseFloat(el.style.top)||50,moved:false};
+    const r=map.getBoundingClientRect();
+    drag={el,map,r,sx:e.clientX,sy:e.clientY,moved:false,dragging:false};
+
+    const move=function(ev){
+      if(!drag)return;
+      const d=drag;
+      const dx=ev.clientX-d.sx,dy=ev.clientY-d.sy;
+      if(!d.dragging && Math.hypot(dx,dy)<6)return;
+      if(!d.dragging){
+        d.dragging=true;
+        d.el.classList.add('dragging');
+      }
+      const x=Math.max(2,Math.min(98,((ev.clientX-d.r.left)/d.r.width)*100));
+      const y=Math.max(2,Math.min(98,((ev.clientY-d.r.top)/d.r.height)*100));
+      d.el.style.left=x.toFixed(2)+'%';
+      d.el.style.top=y.toFixed(2)+'%';
+      d.moved=true;
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+
+    const up=function(ev){
+      if(!drag)return;
+      const d=drag;
+      drag=null;
+      d.el.classList.remove('dragging');
+      window.removeEventListener('pointermove',move,true);
+      window.removeEventListener('pointerup',up,true);
+      window.removeEventListener('pointercancel',up,true);
+
+      if(!d.moved)return;
+      const x=Math.max(2,Math.min(98,((ev.clientX-d.r.left)/d.r.width)*100));
+      const y=Math.max(2,Math.min(98,((ev.clientY-d.r.top)/d.r.height)*100));
+      d.el.style.left=x.toFixed(2)+'%';
+      d.el.style.top=y.toFixed(2)+'%';
+      const c=V(d.el.dataset.code||d.el.textContent||'');
+      if(c){
+        const key='JGB_EAM_HYUNHWANG_MAP_V1';
+        let pos={};
+        try{pos=JSON.parse(localStorage.getItem(key)||'{}')}catch(_){pos={};}
+        pos[c]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+        try{localStorage.setItem(key,JSON.stringify(pos));}catch(_){ }
+      }
+      suppressClickUntil=Date.now()+300;
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+
+    window.addEventListener('pointermove',move,true);
+    window.addEventListener('pointerup',up,true);
+    window.addEventListener('pointercancel',up,true);
   },true);
 
-  document.addEventListener('pointermove',function(e){
-    if(!drag)return;
-    const dx=e.clientX-drag.sx, dy=e.clientY-drag.sy;
-    if(!drag.moved && Math.hypot(dx,dy)<6)return;
-    drag.moved=true;
-    const r=drag.map.getBoundingClientRect();
-    if(!r.width||!r.height)return;
-    const x=Math.max(2,Math.min(98,drag.startX+(dx/r.width)*100));
-    const y=Math.max(2,Math.min(98,drag.startY+(dy/r.height)*100));
-    drag.el.style.left=x+'%';
-    drag.el.style.top=y+'%';
-    drag.el.classList.add('dragging');
-    e.preventDefault();
-  },true);
-
-  document.addEventListener('pointerup',function(e){
-    if(!drag)return;
-    const d=drag; drag=null;
-    d.el.classList.remove('dragging');
-    if(d.moved){
-      suppressClick=true;
-      try{
-        const p=JSON.parse(localStorage.getItem('JGB_EAM_HYUNHWANG_MAP_V1')||'{}');
-        p[d.code]=[parseFloat(d.el.style.left)||d.startX,parseFloat(d.el.style.top)||d.startY];
-        localStorage.setItem('JGB_EAM_HYUNHWANG_MAP_V1',JSON.stringify(p));
-      }catch(_){}
-      setTimeout(()=>{suppressClick=false},80);
-    }
-  },true);
-
-  /* 단순 클릭만 EAM 이력카드로 연결. 드래그 직후 click은 무시. */
+  /* 단순 클릭만 EAM 이력관리로 이동. 드래그 직후 click은 차단. */
   document.addEventListener('click',function(e){
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
     e.preventDefault();
     e.stopImmediatePropagation();
-    if(suppressClick || el.classList.contains('map-only'))return;
-    openAsset(el.dataset.code||el.textContent||'');
+    if(Date.now()<suppressClickUntil)return;
+    const c=V(el.dataset.code||el.textContent||'');
+    if(!c)return;
+    window.__eamSelCode=c;
+    if(typeof window.jgbOpenEamAssetByCode==='function'){
+      window.jgbOpenEamAssetByCode(c);
+    }else if(typeof window.go==='function'){
+      window.go('eam');
+    }else{
+      location.href='?page=eam';
+    }
   },true);
 
-  /* 더블클릭도 단일 클릭과 동일하게 처리하되, 중복 이동은 막는다. */
+  /* 더블클릭은 별도 기능으로 사용하지 않는다. 브라우저의 두 번째 click만 막고 끝낸다. */
   document.addEventListener('dblclick',function(e){
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
     e.preventDefault();
     e.stopImmediatePropagation();
-    if(el.classList.contains('map-only'))return;
-    openAsset(el.dataset.code||el.textContent||'');
   },true);
 })();
 </script>
