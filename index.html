@@ -5054,8 +5054,17 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
     function eamRegisteredForSource(src){
       const A=window.__eamA||[];
-      const a=A.find(v=>String(v.asset_code)===String(src.code));
-      return a||null;
+      const sourceCode=String(src?.code||'').trim();
+      if(!sourceCode) return null;
+      // 자산코드는 표시/관리용 값이다. 이력카드의 동일 자산 식별은 DB id로 유지한다.
+      let idMap={};
+      try{idMap=JSON.parse(localStorage.getItem('JGB_EAM_SOURCE_ASSET_ID_MAP_V1')||'{}')||{}}catch(e){}
+      const mappedId=idMap[sourceCode];
+      if(mappedId!=null){
+        const byId=A.find(v=>String(v?.id)===String(mappedId));
+        if(byId)return byId;
+      }
+      return A.find(v=>String(v?.asset_code||'').trim()===sourceCode)||null;
     }
     function eamStatusText(a){ return String(a?.status||"정상"); }
 
@@ -15222,10 +15231,15 @@ const V12 = {
   selected(){
     const code=String(window.__eamSelCode||'').trim();
     const A=Array.isArray(window.__eamA)?window.__eamA:[];
-    return {
-      code,
-      asset:A.find(a=>String(a?.asset_code||'').trim()===code)||null
-    };
+    let asset=A.find(a=>String(a?.asset_code||'').trim()===code)||null;
+    if(!asset){
+      try{
+        const idMap=JSON.parse(localStorage.getItem('JGB_EAM_SOURCE_ASSET_ID_MAP_V1')||'{}')||{};
+        const mappedId=idMap[code];
+        if(mappedId!=null) asset=A.find(a=>String(a?.id)===String(mappedId))||null;
+      }catch(e){}
+    }
+    return {code,asset};
   }
 };
 
@@ -15237,6 +15251,9 @@ window.JGB_EAM_CARD_V22_OPEN = async function(){
   if(!a && typeof window.eamLoad==='function'){
     try{await window.eamLoad()}catch(e){}
     a=(window.__eamA||[]).find(x=>String(x?.asset_code||'').trim()===sel.code)||null;
+    if(!a){
+      try{const idMap=JSON.parse(localStorage.getItem('JGB_EAM_SOURCE_ASSET_ID_MAP_V1')||'{}')||{};const mappedId=idMap[sel.code];if(mappedId!=null)a=(window.__eamA||[]).find(x=>String(x?.id)===String(mappedId))||null}catch(e){}
+    }
   }
   if(!a){alert('선택한 자산 정보를 찾을 수 없습니다.');return false}
 
@@ -15251,7 +15268,7 @@ window.JGB_EAM_CARD_V22_OPEN = async function(){
   <div id="jgbV12CardEditor" onclick="if(event.target===this)this.remove()">
     <div class="v12box">
       <div class="v12head">
-        <div><h3>📋 주요설비 이력카드 수정</h3><small>현재 선택된 자산만 수정합니다. 자산코드는 중복 입력도 허용합니다.</small></div>
+        <div><h3>📋 주요설비 이력카드 수정</h3><small>현재 선택된 자산만 수정합니다. 자산코드는 수정할 수 있으며, 자산의 동일성은 내부 ID로 유지합니다.</small></div>
         <button type="button" class="v12cancel" onclick="document.getElementById('jgbV12CardEditor')?.remove()">닫기</button>
       </div>
       <div class="v12grid">
@@ -15387,17 +15404,22 @@ window.JGB_EAM_CARD_V12_SAVE = async function(oldCode, assetId){
     const r=await db.from('assets').update(payload).eq('id',assetId);
     if(r.error)throw r.error;
 
+    // 자산코드는 변경해도 이력카드의 동일 자산 연결은 DB id로 유지한다.
+    // 따라서 코드 변경 때문에 왼쪽 목록/이력카드가 사라지거나 다른 자산으로 바뀌지 않는다.
+    let idMap={};
+    try{idMap=JSON.parse(localStorage.getItem('JGB_EAM_SOURCE_ASSET_ID_MAP_V1')||'{}')||{}}catch(e){}
+    idMap[oldC]=assetId;
+    if(newC!==oldC) idMap[newC]=assetId;
+    try{localStorage.setItem('JGB_EAM_SOURCE_ASSET_ID_MAP_V1',JSON.stringify(idMap))}catch(e){}
+
     const all=V12.meta();
-    if(newC!==oldC){
-      all[newC]=meta;
-      delete all[oldC];
-    }else{
-      all[oldC]=meta;
-    }
+    // 이력카드 상세정보는 기존 선택키에도 남겨 둔다. 코드 변경은 카드 자체에 영향을 주지 않는다.
+    all[oldC]={...meta,asset_code:newC};
+    all[newC]={...meta,asset_code:newC};
     V12.saveMeta(all);
 
-    // 현재 선택도 변경된 코드로 유지.
-    window.__eamSelCode=newC;
+    // 화면의 선택 기준은 원본 목록의 고정 코드(oldC)를 유지한다.
+    window.__eamSelCode=oldC;
 
     document.getElementById('jgbV12CardEditor')?.remove();
 
