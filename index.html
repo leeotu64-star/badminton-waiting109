@@ -17006,11 +17006,59 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
     window.addEventListener('pointermove',move,true);window.addEventListener('pointerup',up,true);window.addEventListener('pointercancel',up,true);
   },true);
 
-  /* 드래그 후 발생하는 click은 완전히 차단. 단일 클릭 자체도 이동시키지 않음. */
+  /* 배치도 아이콘: 드래그 이동은 유지하고, 실제 단순 클릭만 EAM으로 이동 */
+  let eamMapPointerDown=null;
+  let eamMapDragged=false;
+  let eamMapSuppressClick=false;
+
+  document.addEventListener('pointerdown',function(e){
+    const el=e.target.closest?.('.eh-map .eh-marker');
+    if(!el)return;
+    eamMapPointerDown={el:el,x:e.clientX,y:e.clientY,pointerId:e.pointerId};
+    eamMapDragged=false;
+    eamMapSuppressClick=false;
+  },true);
+
+  document.addEventListener('pointermove',function(e){
+    if(!eamMapPointerDown || eamMapPointerDown.pointerId!==e.pointerId)return;
+    const dx=e.clientX-eamMapPointerDown.x;
+    const dy=e.clientY-eamMapPointerDown.y;
+    if(!eamMapDragged && Math.hypot(dx,dy)<5)return;
+    eamMapDragged=true;
+    eamMapSuppressClick=true;
+  },true);
+
+  document.addEventListener('pointerup',function(e){
+    if(!eamMapPointerDown || eamMapPointerDown.pointerId!==e.pointerId)return;
+    const wasDragged=eamMapDragged;
+    eamMapPointerDown=null;
+    if(wasDragged){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      setTimeout(function(){eamMapSuppressClick=false;},0);
+    }
+  },true);
+
   document.addEventListener('click',function(e){
     const el=e.target.closest?.('.eh-map .eh-marker');
     if(!el)return;
-    e.preventDefault();e.stopImmediatePropagation();
+    if(eamMapSuppressClick){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      eamMapSuppressClick=false;
+      return;
+    }
+    if(el.classList.contains('map-only'))return;
+    const c=V(el.dataset.code||el.textContent||'');
+    if(!c)return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if(typeof window.jgbOpenEamAssetByCode==='function')window.jgbOpenEamAssetByCode(c);
+    else{
+      window.__eamSelCode=c;
+      if(typeof window.go==='function')window.go('eam');
+      else{try{location.href='?page=eam'}catch(_){}}
+    }
   },true);
 
   /* 더블클릭에서만 기존 EAM 자산으로 이동. 배치도 전용 아이콘은 이동하지 않음. */
