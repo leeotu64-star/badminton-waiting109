@@ -2823,9 +2823,8 @@ a[data-page="digitalTwin"],
 }
 </style>
 
-<style id="JGB_EAM_V6_LIVE_60_40_VERTICAL">
-/* V6: EAM 우측 영역 — 수리 LIVE 60% / 추가 관리영역 40%
-   수리 LIVE는 세로 스크롤만 사용하고 가로 스크롤은 제거 */
+<style id="JGB_EAM_V9_LIVE_60_40_FIXED_BOTH_SCROLL">
+/* V9: 우측 EAM 영역은 60:40 고정. 내용이 영역을 넘으면 해당 내부에서 가로/세로 스크롤 */
 .eam228-right-split{
   display:grid!important;
   grid-template-rows:minmax(0,6fr) minmax(0,4fr)!important;
@@ -2836,37 +2835,44 @@ a[data-page="digitalTwin"],
 }
 .eam228-live-card,
 .eam228-future-card{
+  min-width:0!important;
   min-height:0!important;
   height:100%!important;
   overflow:hidden!important;
 }
+/* 수리 LIVE: 60% 영역은 고정하고 내부 콘텐츠만 양방향 스크롤 */
 .eam228-live-scroll{
   min-width:0!important;
   min-height:0!important;
   width:100%!important;
   height:100%!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  scrollbar-gutter:stable!important;
+  overflow:auto!important;
+  scrollbar-gutter:stable both-edges!important;
 }
 .eam228-live-scroll table{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
+  width:max-content!important;
+  min-width:720px!important;
+  max-width:none!important;
   table-layout:fixed!important;
 }
 .eam228-live-scroll th,
 .eam228-live-scroll td{
-  min-width:0!important;
-  max-width:100%!important;
   white-space:nowrap!important;
   overflow:hidden!important;
   text-overflow:ellipsis!important;
   word-break:keep-all!important;
 }
-.eam228-live-scroll::-webkit-scrollbar{width:10px!important;height:0!important}
-.eam228-live-scroll::-webkit-scrollbar-thumb{background:#8299a9!important;border-radius:7px!important}
-.eam228-live-scroll::-webkit-scrollbar-track{background:#edf3f6!important}
+/* 추가 관리영역: 40% 고정, 내용이 넘치면 양방향 스크롤 */
+.eam228-future-card{
+  overflow:auto!important;
+  scrollbar-gutter:stable both-edges!important;
+}
+.eam228-live-scroll::-webkit-scrollbar,
+.eam228-future-card::-webkit-scrollbar{width:10px!important;height:10px!important}
+.eam228-live-scroll::-webkit-scrollbar-thumb,
+.eam228-future-card::-webkit-scrollbar-thumb{background:#8299a9!important;border-radius:7px!important}
+.eam228-live-scroll::-webkit-scrollbar-track,
+.eam228-future-card::-webkit-scrollbar-track{background:#edf3f6!important}
 </style>
 
 <style id="JGB_EAM_V7_LIVE_VERTICAL_ONLY">
@@ -14851,6 +14857,71 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
   },true);
 })();
 </script>
+
+<style id="JGB_EAM_V8_LIVE_SCREEN_FORMAT">
+/* V8: 참고 화면처럼 수리 LIVE만 독립 스크롤 영역으로 구성
+   - 우측 전체 비율은 6:4 유지
+   - 수리 LIVE 헤더는 고정
+   - 표 영역만 세로 스크롤
+   - 가로 스크롤은 발생하지 않도록 열을 화면 안에 맞춤
+   - 추가 관리영역은 수정하지 않음 */
+.eam228-right-split{
+  display:grid!important;
+  grid-template-rows:minmax(0,6fr) minmax(0,4fr)!important;
+  gap:9px!important;
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+}
+.eam228-live-card{
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.eam228-live-card .eam228-section-head{
+  flex:0 0 auto!important;
+}
+.eam228-live-scroll{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:auto!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-gutter:stable!important;
+}
+.eam228-live-scroll table.eam228-live-table{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  table-layout:fixed!important;
+  border-collapse:collapse!important;
+}
+.eam228-live-scroll .eam228-live-table th,
+.eam228-live-scroll .eam228-live-table td{
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+}
+.eam228-live-scroll .eam228-live-table .live-col-code{width:15%!important}
+.eam228-live-scroll .eam228-live-table .live-col-content{width:27%!important}
+.eam228-live-scroll .eam228-live-table .live-col-status{width:17%!important}
+.eam228-live-scroll .eam228-live-table .live-col-date{width:15%!important}
+.eam228-live-scroll .eam228-live-table .live-col-manager{width:13%!important}
+.eam228-live-scroll .eam228-live-table .live-col-action{width:13%!important}
+.eam228-live-scroll::-webkit-scrollbar{width:10px!important;height:0!important}
+.eam228-live-scroll::-webkit-scrollbar-thumb{background:#9db2c1!important;border-radius:8px!important}
+.eam228-live-scroll::-webkit-scrollbar-track{background:#eef3f6!important}
+.eam228-live-scroll{scrollbar-width:auto!important;scrollbar-color:#9db2c1 #eef3f6!important}
+</style>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
 .jgb-v176-live-card .jgb-v178-live-table{
