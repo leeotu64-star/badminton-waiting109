@@ -3564,7 +3564,7 @@ html::before,body::before{
         const idx=readLive().findIndex(x=>V(x.asset_code)===V(code));
         const next=readLive();if(idx>=0)next.splice(idx,1);writeLive(next);
         const a=assets.find(x=>codeOf(x)===V(code));
-        if(a&&SUPA){const r=await SUPA.from('assets').update({status:'정상'}).eq('id',a.id);if(r.error){alert('완료 처리 실패');return}}
+        // LIVE 완료는 LIVE 기록만 종료합니다. 이력카드 자산상태는 변경하지 않습니다.
         if(a&&SUPA){try{await SUPA.from('asset_history').insert({asset_id:a.id,event_type:'수리완료',description:`${code} 수리 LIVE 완료`,worker_name:'관리자',cost:0,event_date:new Date().toISOString().slice(0,10)})}catch(_){}}
         await eamLoad();render();
       };
@@ -3621,13 +3621,13 @@ html::before,body::before{
         const a=assets.find(x=>codeOf(x)===V(code));
         document.getElementById('eam228Modal')?.remove();
         const m=document.createElement('div');m.id='eam228Modal';m.className='eam228-modal';
-        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>REPAIR LIVE</small><h3>수리 LIVE 직접입력</h3></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-form"><label>자산코드<select id="e223LiveCode">${assets.map(x=>`<option value="${attr(codeOf(x))}" ${codeOf(x)===V(code)?'selected':''}>${esc(codeOf(x))} · ${esc(x.name||'자산')}</option>`).join('')}</select></label><label>수리상태<select id="e223LiveStatus"><option>정상</option><option>점검</option><option>조치필요</option><option selected>수리중</option><option>부품대기</option><option>폐기</option></select></label><label class="wide">작업내용<input id="e223LiveContent" placeholder="예: 냉방 불량 점검 및 수리"></label><label>예정일<input id="e223LiveDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label><label>담당자<input id="e223LiveManager" placeholder="담당자 입력"></label></div><div class="eam228-modal-note">등록하면 선택한 상태가 해당 자산의 현재 상태에 반영됩니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228SaveLive()">LIVE 등록</button></div></div>`;
+        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>REPAIR LIVE</small><h3>수리 LIVE 직접입력</h3></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-form"><label>자산코드<select id="e223LiveCode">${assets.map(x=>`<option value="${attr(codeOf(x))}" ${codeOf(x)===V(code)?'selected':''}>${esc(codeOf(x))} · ${esc(x.name||'자산')}</option>`).join('')}</select></label><label>수리상태<select id="e223LiveStatus"><option>정상</option><option>점검</option><option>조치필요</option><option selected>수리중</option><option>부품대기</option><option>폐기</option></select></label><label class="wide">작업내용<input id="e223LiveContent" placeholder="예: 냉방 불량 점검 및 수리"></label><label>예정일<input id="e223LiveDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label><label>담당자<input id="e223LiveManager" placeholder="담당자 입력"></label></div><div class="eam228-modal-note">등록하면 수리 LIVE 작업기록에만 저장됩니다. 이력카드 자산상태는 변경되지 않습니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228SaveLive()">LIVE 등록</button></div></div>`;
         document.body.appendChild(m);
       };
       window.eam228SaveLive=async()=>{
         const g=id=>V(document.getElementById(id)?.value),code=g('e223LiveCode');if(!code){alert('자산코드를 선택하세요.');return}
         const rows=readLive().filter(x=>V(x.asset_code)!==code);rows.unshift({id:'EAMLIVE-'+Date.now(),asset_code:code,content:g('e223LiveContent')||'수리 작업 등록',status:g('e223LiveStatus')||'수리중',scheduled:g('e223LiveDate'),manager:g('e223LiveManager'),createdAt:new Date().toISOString()});writeLive(rows);
-        const a=assets.find(x=>codeOf(x)===code);if(a&&SUPA){const liveStatus=g('e223LiveStatus')||'수리중';const r=await SUPA.from('assets').update({status:liveStatus}).eq('id',a.id);if(r.error){alert('자산 상태 저장 실패');return}await eamLoad()}
+        // 수리 LIVE는 작업기록만 저장합니다. 이력카드 자산상태에는 영향을 주지 않습니다.
         document.getElementById('eam228Modal')?.remove();render();
       };
       window.eam228DeleteLive=code=>{const rows=readLive().filter(x=>V(x.asset_code)!==V(code));writeLive(rows);render()};
@@ -5817,7 +5817,7 @@ function jgbV47GoWpByLeak(leakCode){
         document.getElementById('eamEditModal')?.remove();document.body.insertAdjacentHTML('beforeend',`<div id="eamEditModal" class="eam-edit-overlay" onclick="if(event.target===this)this.remove()"><div class="eam-edit-card"><div class="eam-edit-head"><div><span>ASSET MASTER EDIT</span><h2>주요설비 이력카드 수정</h2><p>자산 기본정보와 이력카드 정보를 한 번에 수정합니다.</p></div><button type="button" onclick="document.getElementById('eamEditModal').remove()">×</button></div><div class="eam-edit-grid">
           <label>관리코드<input value="${esc(eamUnifiedCode(m))}" readonly></label><label>설비 종류<select id="editCategory" onchange="eamEditLocationChange(this.value)">${CATDEF.map(z=>`<option ${cat===z[2]?'selected':''}>${z[2]}</option>`).join('')}</select></label><label class="wide">소분류(자산명)<input id="editName" value="${esc(m.name||window.eamDisplayName(m))}"></label>
           <label>위치코드<select id="editLocCode" onchange="eamEditLocationChange(this.value)"><option value="A" ${lc==='A'?'selected':''}>A · 코트</option><option value="B" ${lc==='B'?'selected':''}>B · 복도</option><option value="C" ${lc==='C'?'selected':''}>C · 사무실</option><option value="D" ${lc==='D'?'selected':''}>D · 옥상</option><option value="E" ${lc==='E'?'selected':''}>E · 유수장치실</option><option value="F" ${lc==='F'?'selected':''}>F · 창고</option><option value="G" ${lc==='G'?'selected':''}>G · 휴게실</option><option value="H" ${lc==='H'?'selected':''}>H · 남자 화장실</option><option value="I" ${lc==='I'?'selected':''}>I · 여자 화장실</option><option value="J" ${lc==='J'?'selected':''}>J · 남자 샤워실</option><option value="K" ${lc==='K'?'selected':''}>K · 여자 샤워실</option><option value="L" ${lc==='L'?'selected':''}>L · 좌측 외곽</option><option value="M" ${lc==='M'?'selected':''}>M · 우측 외곽</option></select></label><label>세부 위치<select id="editDetailPlace" onchange="eamShowCustomPlace('editDetailPlace','editCustomPlace')">${detail.map(z=>`<option ${v(m.place)===z?'selected':''}>${esc(z)}</option>`).join('')}</select><input id="editCustomPlace" style="display:none;margin-top:7px" placeholder="세부 위치를 직접 입력"></label>
-          <label>모델·규격<input id="editModel" value="${esc(m.model||'')}"></label><label>용량<input id="editCapacity" value="${esc(m.capacity||'')}"></label><label>수량<input id="editQty" value="${esc(m.qty??m.quantity??'')}"></label><label>제조사<input id="editVendor" value="${esc(m.vendor||m.maker||'')}"></label><label>A/S 연락처<input id="editAs" value="${esc(m.asContact||'')}"></label><label>제조일<input id="editManufactureDate" value="${esc(m.date||m.manufactureDate||'')}"></label><label>설치일<input id="editInstall" value="${esc(m.installDate||'')}"></label><label>내용연수<input id="editLife" value="${esc(m.life||'')}"></label><label>평가등급<input id="editGrade" value="${esc(m.grade||'')}"></label><label>보증<input id="editWarranty" value="${esc(m.warranty||'')}"></label><label>A/S 기록<input id="editAsHistory" value="${esc(m.asHistory||'')}"></label><label>상태<select id="editStatus"><option ${v(m.status||'정상')==='정상'?'selected':''}>정상</option><option ${v(m.status)==='점검필요'?'selected':''}>점검필요</option><option ${v(m.status)==='조치필요'?'selected':''}>조치필요</option></select></label><label class="wide">시설개선계획<input id="editImprovementPlan" value="${esc(m.improvementPlan||'')}"></label><label class="wide">특이사항<textarea id="editNote" rows="3">${esc(m.note||'')}</textarea></label>
+          <label>모델·규격<input id="editModel" value="${esc(m.model||'')}"></label><label>용량<input id="editCapacity" value="${esc(m.capacity||'')}"></label><label>수량<input id="editQty" value="${esc(m.qty??m.quantity??'')}"></label><label>제조사<input id="editVendor" value="${esc(m.vendor||m.maker||'')}"></label><label>A/S 연락처<input id="editAs" value="${esc(m.asContact||'')}"></label><label>제조일<input id="editManufactureDate" value="${esc(m.date||m.manufactureDate||'')}"></label><label>설치일<input id="editInstall" value="${esc(m.installDate||'')}"></label><label>내용연수<input id="editLife" value="${esc(m.life||'')}"></label><label>평가등급<input id="editGrade" value="${esc(m.grade||'')}"></label><label>보증<input id="editWarranty" value="${esc(m.warranty||'')}"></label><label>A/S 기록<input id="editAsHistory" value="${esc(m.asHistory||'')}"></label><label>자산상태<select id="editStatus"><option ${v(m.status||'정상')==='정상'?'selected':''}>정상</option><option ${v(m.status)==='점검'?'selected':''}>점검</option><option ${v(m.status)==='조치필요'?'selected':''}>조치필요</option><option ${v(m.status)==='수리중'?'selected':''}>수리중</option><option ${v(m.status)==='부품대기'?'selected':''}>부품대기</option><option ${v(m.status)==='폐기'?'selected':''}>폐기</option></select></label><label class="wide">시설개선계획<input id="editImprovementPlan" value="${esc(m.improvementPlan||'')}"></label><label class="wide">특이사항<textarea id="editNote" rows="3">${esc(m.note||'')}</textarea></label>
           </div><div class="eam-edit-actions"><button class="btn gray" type="button" onclick="document.getElementById('eamEditModal').remove()">취소</button><button class="btn blue" type="button" id="eamEditSave" onclick="eamSaveFullEdit('${esc(code)}')">저장</button></div></div></div>`);eamEditLocationChange(lc,m.place);
       };
       window.eamEditLocationChange=function(value,current){const cat=document.getElementById('editCategory')?.value||'';const lc=cat==='소방·방재'?'E':String(value||'A');const box=document.getElementById('editDetailPlace');if(!box)return;const arr=[...EAM_DETAIL_LOCATION_LIST];box.innerHTML=arr.map(z=>`<option value="${esc(z)}">${esc(z)}</option>`).join('');if(current&&[...box.options].some(o=>o.value===current))box.value=current;if(cat==='소방·방재'){const s=document.getElementById('editLocCode');if(s)s.value='E';box.value='유수장치실'}const custom=document.getElementById('editCustomPlace');if(custom){custom.style.display=box.value==='직접 입력'?'block':'none';if(box.value!=='직접 입력')custom.value=''}};
@@ -14984,213 +14984,6 @@ body {
   },true);
 })();
 </script>
-
-
-<style id="JGB_EAM_V25_FINAL_STATUS_COURT_FIX">
-/* 상태 공통 기준: 이력카드 자산상태가 유일한 기준 */
-.eam-v25-status-normal{background:#2e9e57!important;color:#fff!important}
-.eam-v25-status-check{background:#e6b800!important;color:#111!important}
-.eam-v25-status-action{background:#f28c28!important;color:#fff!important}
-.eam-v25-status-repair{background:#e53935!important;color:#fff!important}
-.eam-v25-status-parts{background:#7b3fc6!important;color:#fff!important}
-.eam-v25-status-discard{background:#555!important;color:#fff!important}
-
-/* 상태 헤더는 6개 한 줄 */
-.eam228-head-stats{display:grid!important;grid-template-columns:repeat(6,minmax(72px,1fr))!important;gap:6px!important}
-
-/* 코트: 실제 배드민턴 코트 형태를 하나의 규칙으로 고정 */
-.eam228-court{position:relative!important;overflow:hidden!important}
-.eam228-court::before{
-  content:""!important;position:absolute!important;
-  left:8%!important;right:8%!important;top:50%!important;
-  height:2px!important;transform:translateY(-50%)!important;
-  background:currentColor!important;opacity:.72!important;
-  pointer-events:none!important;z-index:2!important
-}
-.eam228-court::after{
-  content:""!important;position:absolute!important;
-  top:8%!important;bottom:8%!important;left:50%!important;
-  width:2px!important;transform:translateX(-50%)!important;
-  background:currentColor!important;opacity:.48!important;
-  pointer-events:none!important;z-index:2!important
-}
-/* 선이 번호/아이콘 클릭을 방해하지 않도록 */
-.eam228-court *{pointer-events:auto}
-.eam228-court::before,.eam228-court::after{pointer-events:none!important}
-
-/* 자산 아이콘 축소 */
-.eam228-asset-icon{transform:scale(.72)!important;transform-origin:center!important}
-</style>
-<script id="JGB_EAM_V25_FINAL_STATUS_SYNC">
-(function(){
-  const ORDER=['정상','점검','조치필요','수리중','부품대기','폐기'];
-  const CLS={
-    '정상':'eam-v25-status-normal',
-    '점검':'eam-v25-status-check',
-    '조치필요':'eam-v25-status-action',
-    '수리중':'eam-v25-status-repair',
-    '부품대기':'eam-v25-status-parts',
-    '폐기':'eam-v25-status-discard'
-  };
-  function norm(v){
-    v=String(v||'').trim();
-    const map={'점검필요':'점검','수리예정':'수리중','교체 예정':'부품대기','교체예정':'부품대기','원본':'정상','수리완료':'정상'};
-    return map[v]||v;
-  }
-  function statusClass(v){return CLS[norm(v)]||''}
-  function paint(){
-    // 이력카드의 자산상태 select를 공통 6개로 강제
-    document.querySelectorAll('select').forEach(function(sel){
-      const id=(sel.id||'').toLowerCase();
-      const name=(sel.name||'').toLowerCase();
-      if(id.includes('status') || name.includes('status') || sel.closest('.eam228-modal')){
-        const val=norm(sel.value);
-        if(ORDER.includes(val)){
-          const opts=Array.from(sel.options);
-          const hasAll=ORDER.every(x=>opts.some(o=>norm(o.value||o.textContent)===x));
-          if(!hasAll && (id.includes('e223status') || name.includes('asset'))){
-            sel.innerHTML=ORDER.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
-            sel.value=val;
-          }
-        }
-      }
-    });
-
-    // 상태 표시 요소에 공통 색상 클래스 적용
-    document.querySelectorAll('[data-status],.eam-status,.asset-status,.status-badge,.eam228-stat').forEach(function(el){
-      const text=norm(el.dataset.status || el.textContent);
-      const c=statusClass(text);
-      if(c){
-        el.classList.remove(...Object.values(CLS));
-        el.classList.add(c);
-      }
-    });
-
-    // 자산 아이콘: 가능한 경우 자산코드와 같은 상태값을 찾아 색상 적용
-    document.querySelectorAll('.eam228-asset-icon,[class*="asset-icon"]').forEach(function(icon){
-      const holder=icon.closest('[data-asset-code],[data-code],.eam228-asset,.eam228-marker,.eam228-item');
-      const status=holder?.dataset?.status || holder?.querySelector?.('.asset-status')?.textContent || '';
-      const c=statusClass(status);
-      if(c){
-        icon.classList.remove(...Object.values(CLS));
-        icon.classList.add(c);
-      }
-    });
-  }
-  function boot(){
-    paint();
-    [50,200,500,1000,2000].forEach(t=>setTimeout(paint,t));
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
-  else boot();
-  new MutationObserver(function(){paint()}).observe(document.documentElement,{subtree:true,childList:true});
-})();
-</script>
-
-
-<style id="JGB_EAM_V26_HISTORY_CARD_MASTER">
-/* 최종 상태 기준: 이력카드 자산상태 */
-:root{
- --eam-normal:#2e9e57;
- --eam-check:#e6b800;
- --eam-action:#f28c28;
- --eam-repair:#e53935;
- --eam-parts:#7b3fc6;
- --eam-discard:#555;
-}
-.eam-v26-normal{background:var(--eam-normal)!important;color:#fff!important}
-.eam-v26-check{background:var(--eam-check)!important;color:#111!important}
-.eam-v26-action{background:var(--eam-action)!important;color:#fff!important}
-.eam-v26-repair{background:var(--eam-repair)!important;color:#fff!important}
-.eam-v26-parts{background:var(--eam-parts)!important;color:#fff!important}
-.eam-v26-discard{background:var(--eam-discard)!important;color:#fff!important}
-.eam228-head-stats{
- display:grid!important;
- grid-template-columns:repeat(6,minmax(72px,1fr))!important;
- gap:6px!important;
-}
-</style>
-<script id="JGB_EAM_V26_HISTORY_CARD_MASTER_JS">
-(function(){
- const ORDER=['정상','점검','조치필요','수리중','부품대기','폐기'];
- const MAP={
-  '정상':'eam-v26-normal','점검':'eam-v26-check','조치필요':'eam-v26-action',
-  '수리중':'eam-v26-repair','부품대기':'eam-v26-parts','폐기':'eam-v26-discard'
- };
- const OLD={
-  '점검필요':'점검','수리예정':'수리중','교체 예정':'부품대기',
-  '교체예정':'부품대기','원본':'정상','수리완료':'정상'
- };
- function norm(v){v=String(v||'').trim();return OLD[v]||v}
- function cls(v){return MAP[norm(v)]||''}
-
- /* 수리 LIVE의 상태 선택은 작업기록용으로만 유지 */
- function isolateLive(){
-   document.querySelectorAll('[id*="LiveStatus"],[id*="liveStatus"]').forEach(function(el){
-     el.dataset.eamLiveOnly='1';
-   });
- }
-
- /* 이력카드 자산상태 select만 공통 6개로 유지 */
- function normalizeHistorySelect(){
-   document.querySelectorAll('select').forEach(function(sel){
-     const id=(sel.id||'').toLowerCase();
-     const text=(sel.parentElement?.innerText||'').toLowerCase();
-     const isAssetStatus =
-       id==='e223status' ||
-       id.includes('assetstatus') ||
-       id.includes('eamstatus') ||
-       /자산상태/.test(text);
-     if(!isAssetStatus || sel.dataset.eamLiveOnly==='1') return;
-     const old=norm(sel.value);
-     sel.innerHTML=ORDER.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
-     sel.value=ORDER.includes(old)?old:'정상';
-   });
- }
-
- /* 이력카드의 상태를 읽어 현재 자산의 화면 표시를 갱신 */
- function getHistoryStatus(){
-   const sel=document.getElementById('e223Status');
-   if(sel) return norm(sel.value);
-   const el=document.querySelector('[data-eam-history-status]');
-   return norm(el?.dataset?.eamHistoryStatus || el?.textContent);
- }
-
- function paint(){
-   isolateLive();
-   normalizeHistorySelect();
-
-   /* 상태 배지/헤더 색상 */
-   document.querySelectorAll('.eam228-stat,.eam-status,.asset-status,.status-badge,[data-status]').forEach(function(el){
-     const v=norm(el.dataset.status||el.textContent);
-     const c=cls(v);
-     if(!c) return;
-     el.classList.remove(...Object.values(MAP));
-     el.classList.add(c);
-   });
-
-   /* 배치도 아이콘은 이력카드 자산상태만 기준 */
-   const master=getHistoryStatus();
-   document.querySelectorAll('.eam228-asset-icon,[class*="asset-icon"]').forEach(function(icon){
-     const holder=icon.closest('[data-asset-code],[data-code],.eam228-asset,.eam228-marker,.eam228-item');
-     if(!holder) return;
-     const c=cls(master);
-     if(c){
-       icon.classList.remove(...Object.values(MAP));
-       icon.classList.add(c);
-     }
-   });
- }
- function boot(){
-   paint();
-   [100,300,700,1200,2000].forEach(t=>setTimeout(paint,t));
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
- else boot();
- new MutationObserver(function(){paint()}).observe(document.documentElement,{childList:true,subtree:true});
-})();
-</script>
-
 <style id="JGB_EAM_V27_COLOR_MAX">
 /* 상단 상태 헤더: 상태별 색상을 최대한 명확하게 */
 .eam228-head-stats .eam228-stat:nth-child(1){background:linear-gradient(145deg,#39b96b,#18894b)!important;border-color:#77e0a2!important;box-shadow:0 3px 0 #126d3b,0 5px 12px rgba(0,0,0,.18)!important;color:#fff!important}
@@ -15225,5 +15018,21 @@ body {
  function boot(){apply();[100,400,900,1600].forEach(t=>setTimeout(apply,t));}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot); else boot();
  new MutationObserver(apply).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
+<style id="JGB_EAM_V28_FINAL">
+.eam228-courts{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:10px!important;align-items:stretch!important;}
+.eam228-court{position:relative!important;display:block!important;width:100%!important;height:100%!important;min-height:150px!important;margin:0!important;padding:0!important;box-sizing:border-box!important;overflow:hidden!important;border:2px solid #587489!important;border-radius:6px!important;background:linear-gradient(135deg,#f7fbfd 0%,#e4eff4 58%,#f9fcfd 100%)!important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.75),0 5px 12px rgba(45,73,90,.18)!important;}
+.eam228-court::before{content:""!important;position:absolute!important;left:10%!important;right:10%!important;top:14%!important;bottom:14%!important;border:1px solid #587489!important;background:linear-gradient(to right,transparent 49.5%,#587489 49.5%,#587489 50.5%,transparent 50.5%)!important;box-sizing:border-box!important;z-index:1!important;opacity:1!important;}
+.eam228-court::after{content:""!important;position:absolute!important;left:6%!important;right:6%!important;top:50%!important;height:3px!important;transform:translateY(-50%)!important;background:#526f82!important;border:0!important;box-shadow:0 1px 2px rgba(30,55,70,.28)!important;z-index:3!important;}
+.eam228-court span{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:38px!important;height:38px!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;background:linear-gradient(145deg,#ffffff,#e7f0f4)!important;border:2px solid #416278!important;box-shadow:0 4px 8px rgba(35,65,80,.32),inset 0 1px 2px #fff!important;z-index:5!important;font-size:17px!important;font-weight:900!important;color:#18384d!important;}
+</style>
+<script id="JGB_EAM_V28_STATUS_MASTER">
+(function(){
+ const states=['정상','점검','조치필요','수리중','부품대기','폐기'];
+ function n(v){return String(v||'').trim().replace('점검필요','점검').replace('수리예정','수리중').replace('교체예정','부품대기').replace('원본','정상')}
+ function paint(){document.querySelectorAll('#editStatus').forEach(function(sel){const val=n(sel.value);if(states.includes(val))sel.value=val;});}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint);else paint();
 })();
 </script>
