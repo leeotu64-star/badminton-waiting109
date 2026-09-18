@@ -3584,7 +3584,7 @@ html::before,body::before{
         }
         const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],place:'미배치',status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
-        document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
+        document.getElementById('eam228Modal')?.remove();selected.code='';await eamLoad();render();
       };
       window.eam228LiveInput=code=>{
         document.getElementById('eam228Modal')?.remove();
@@ -3646,7 +3646,7 @@ html::before,body::before{
       .eam228-bottom{grid-template-columns:2fr 3fr 1fr!important}
       .eam228-entry.main{right:0!important;top:46%!important}
       .eam228-entry.court{right:12%!important;top:41%!important}
-</style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${action}</b><small>조치필요</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리중</small></div><div class="eam228-stat warn"><b>${parts}</b><small>부품대기</small></div><div class="eam228-stat bad"><b>${discard}</b><small>폐기</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('${attr(selected.code||'')}')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
+</style><div class="eam228-page"><header class="eam228-header"><div class="eam228-brand"><span class="ico">🏢</span><div><b>장군봉체육관 · EAM 시설 자산관리</b><small>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</small></div></div><div class="eam228-head-stats"><div class="eam228-stat ok"><b>${normal}</b><small>정상</small></div><div class="eam228-stat warn"><b>${check}</b><small>점검</small></div><div class="eam228-stat bad"><b>${action}</b><small>조치필요</small></div><div class="eam228-stat bad"><b>${repair}</b><small>수리중</small></div><div class="eam228-stat warn"><b>${parts}</b><small>부품대기</small></div><div class="eam228-stat bad"><b>${discard}</b><small>폐기</small></div></div><button class="eam228-head-btn primary" onclick="window.eam228New('AC')">＋ 자산코드 생성</button><button class="eam228-head-btn danger" onclick="window.eamOpenAssetIconDelete()">🗑 아이콘 삭제</button></header><div class="eam228-main"><section class="eam228-map-card"><div class="eam228-map-head"><h2>🗺 시설 자산 배치도</h2><span>자산코드를 드래그하여 원하는 위치에 배치</span></div><div class="eam228-map-wrap">${map}<div id="eam228Hint" class="eam228-hint">배치도에서 자산 위치를 지정하세요.</div></div></section><aside class="eam228-right"><section class="eam228-right-card"><div class="eam228-section-head"><h2>🔧 수리 LIVE</h2><div><small>수리예정만 표시</small><button class="eam228-direct" onclick="window.eam228LiveInput('')">＋ 직접입력</button></div></div><div class="eam228-live-body">${liveHtml}</div></section></aside></div></div>`;
       const render=()=>{const root=document.querySelector('.eam228-page');if(root){const parent=root.parentElement;parent.innerHTML=dashboard2()} };
     }
 
@@ -15058,3 +15058,8 @@ body {
   new MutationObserver(function(){paint()}).observe(document.documentElement,{subtree:true,childList:true});
 })();
 </script>
+
+<style id="JGB_V27_REPAIR_LIVE_ONLY">
+/* 수리 LIVE는 EAM 자산 선택값을 가져오지 않음 */
+.eam228-live-body .eam228-link{cursor:default!important;}
+</style>
