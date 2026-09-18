@@ -2644,7 +2644,13 @@ html::before,body::before{
       };
      }catch(e){return{issues:[],tasks:{},schedule:{}}}
     }
-    let db=load(); let page=new URLSearchParams(location.search).get("page")||"dashboard"; if(page==="digitalTwin"){page="eam"; history.replaceState({page:"eam"},"","?page=eam");} let selectedDate=new Date().toISOString().slice(0,10);
+    let db=load();
+    let page=new URLSearchParams(location.search).get("page")||"dashboard";
+    if(page==="digitalTwin"){
+      page="eam";
+      try{history.replaceState({page:"eam"},"","?page=eam");}catch(e){/* ignore */}
+    }
+    let selectedDate=new Date().toISOString().slice(0,10);
     function save(){localStorage.setItem(KEY,JSON.stringify(db));if(window.BroadcastChannel){new BroadcastChannel("JGB_LIVE").postMessage("update")}}
     window.addEventListener("storage",()=>{db=load();render()});
     let bc;try{bc=new BroadcastChannel("JGB_LIVE");bc.onmessage=()=>{db=load();render()}}catch(e){}
@@ -2707,7 +2713,7 @@ html::before,body::before{
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v50</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v52</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div style="text-align:right"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.page)));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      }catch(err){
        console.error("화면 렌더링 오류",err);
        app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
@@ -2716,7 +2722,14 @@ html::before,body::before{
     function nav(p,t){return `<a class="jgb-link ${page===p?"on":""}" href="?page=${encodeURIComponent(p)}" data-page="${p}">${t}</a>`}
     function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
     function go(p){if(!p)return;page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
-    window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";render()})
+    window.addEventListener("popstate",()=>{
+      page=new URLSearchParams(location.search).get("page")||"dashboard";
+      if(page==="digitalTwin"){
+        page="eam";
+        try{history.replaceState({page:"eam"},"","?page=eam");}catch(e){/* ignore */}
+      }
+      render();
+    })
 
 (function(){
   const pages=[
@@ -3791,95 +3804,8 @@ function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length
     }
 
 
-const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK_V53';_dtStyle.textContent='.dt-link-asset{width:100%;text-align:left;border:1px solid #dbe5ee;background:#f8fbff;border-radius:9px;padding:8px 10px;color:#1b5e9e;cursor:pointer}.dt-link-asset span{float:right}.dt-hot.room{white-space:nowrap;transform:translate(-50%,-50%)}';document.head.appendChild(_dtStyle);
 
-(function(){
-
-  window.__dtView=window.__dtView||'floor';
-  window.__dtSel=window.__dtSel||{type:'room',name:'1층 전체',place:'장군봉체육관 1층',status:'정상',code:'',category:'공간'};
-  window.__dtZoom=window.__dtZoom||1;
-  function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-  function asset(code,name,place,status,category){
-    const A=Array.isArray(window.__eamA)?window.__eamA:[]; const a=A.find(x=>String(x.asset_code||'')===code)||{};
-    return {type:'asset',name:a.name||name,place:a.place||place,status:a.status||status,code:a.asset_code||code,category:a.category||category,id:a.id||''};
-  }
-  const rooms=[
-    {id:'court-1',name:'1코트',place:'1층 1코트',status:'정상',category:'코트',cls:'blue',x:13,y:62},
-    {id:'court-2',name:'2코트',place:'1층 2코트',status:'정상',category:'코트',cls:'blue',x:34,y:62},
-    {id:'court-3',name:'3코트',place:'1층 3코트',status:'정상',category:'코트',cls:'blue',x:55,y:62},
-    {id:'court-4',name:'4코트',place:'1층 4코트',status:'정상',category:'코트',cls:'blue',x:76,y:62},
-    {id:'court-5',name:'5코트',place:'1층 5코트',status:'정상',category:'코트',cls:'blue',x:93,y:62},
-    {id:'office',name:'관리사무실',place:'1층 관리사무실',status:'정상',category:'공간',x:11,y:15},
-    {id:'lounge',name:'휴게실',place:'1층 휴게실',status:'정상',category:'공간',x:39,y:15},
-    {id:'storage-2f',name:'창고',place:'2층 창고',status:'정상',category:'공간',x:23,y:15},
-    {id:'mens-toilet',name:'남자 화장실',place:'1층 남자 화장실',status:'정상',category:'공간',view:'toilet',x:24,y:75},
-    {id:'womens-toilet',name:'여자 화장실',place:'1층 여자 화장실',status:'정상',category:'공간',view:'toilet',x:76,y:75},
-    {id:'mens-shower',name:'남자 샤워실',place:'1층 남자 샤워실',status:'정상',category:'공간',view:'toilet',x:42,y:75},
-    {id:'womens-shower',name:'여자 샤워실',place:'1층 여자 샤워실',status:'정상',category:'공간',view:'toilet',x:58,y:75}
-  ];
-  const DT_LOCATIONS=rooms.reduce((m,r)=>(m[r.id]=r,m),{});
-  function getLocationAssets(r){
-    const A=Array.isArray(window.__eamA)?window.__eamA:[], p=String(r.place||'').replace(/^1층 /,'');
-    return A.filter(a=>{const q=String(a.place||''); if(/^\d코트$/.test(p)) return q.includes(p); return q===p || q.includes(p) || q===String(r.name||'') || q.includes(String(r.name||''));});
-  }
-  function getLocationIssues(r){
-    const issues=Array.isArray(db?.issues)?db.issues:[]; const keys=[String(r.place||''),String(r.name||''),String(r.place||'').replace(/^1층 /,'')];
-    return issues.filter(i=>keys.some(k=>k&&String(i.place||'').includes(k)));
-  }
-  function selectRoom(r){window.__dtSel=r.code&&/^SA-|^DR-/.test(r.code)?asset(r.code,r.name,r.place,r.status,r.category):r;window.__dtView='floor';render();}
-  function view(v){window.__dtView=v;render();}
-  window.dtSelectRoom=selectRoom; window.dtView=view;
-  window.dtZoom=function(delta){window.__dtZoom=Math.max(.75,Math.min(1.8,(window.__dtZoom||1)+delta));const im=document.querySelector('.dt-v43-map img');if(im)im.style.transform='scale('+window.__dtZoom+')';};
-  window.dtOpenAsset=function(code){
-    const a=(window.__eamA||[]).find(x=>String(x.asset_code)===String(code));
-    if(!a){alert('연결된 EAM 자산을 찾을 수 없습니다.');return;}
-    window.__dtSel={type:'asset',name:a.name||a.product_name||code,place:a.place||'-',status:a.status||'정상',code:a.asset_code,category:a.category||a.type||'-',id:a.id||''};
-    window.__eamSelCode=a.asset_code;
-    window.__dtView='floor'; render();
-  };
-    window.digitalTwinPage=function(){
-    const v=window.__dtView||'floor', s=window.__dtSel||rooms[0];
-    const title=v==='floor'?'1층 전체 평면도':v==='toilet'?'화장실 상세도':'조명·전등릴 교체 이력';
-    const sub=v==='floor'?'실제 공간과 코트 위치를 확인하고 EAM 자산을 클릭해 상태·이력·작업으로 연결합니다.':v==='toilet'?'화장실 상세도에서 위생설비 위치를 확인합니다.':'조명·전등릴은 별도 도면에서 위치와 교체 이력을 관리합니다.';
-    const statusClass=s.status==='주의'?'warn':s.status==='점검필요'?'bad':'';
-    const hist=[['2025.09.10','막힘','완료'],['2025.08.21','누수','완료'],['2025.07.15','막힘','완료'],['2025.05.03','센서불량','완료']];
-    const lightingHotspots=[];
-    const courtAssetMap=[
-      {code:'AC-05',label:'A-1',court:'1번',side:'좌측'},
-      {code:'AC-02',label:'A-2',court:'1번',side:'우측'},
-      {code:'AC-06',label:'A-3',court:'3번',side:'좌측'},
-      {code:'AC-03',label:'A-4',court:'3번',side:'우측'},
-      {code:'AC-07',label:'A-5',court:'5번',side:'좌측'},
-      {code:'AC-04',label:'A-6',court:'5번',side:'우측'}
-    ];
-    const courtAssetButton=(z)=>{const a=asset(z.code,'냉방기(난방겸용)',z.court+' 코트('+z.side+')','정상','냉난방');return `<button class="dt-ac ${z.side==='좌측'?'left':'right'}" onclick="dtOpenAsset('${z.code}')" title="${esc(z.label+' · '+z.court+' '+z.side)}">${esc(z.label)}<small>${esc(z.side)}</small></button>`};
-    const courtHotspots=`<div class="dt-court-map"><div class="dt-court-map-title">1층 코트 · 에어컨 위치</div><div class="dt-court-row">
-      ${['1번','2번','3번','4번','5번'].map(c=>{const aa=courtAssetMap.filter(z=>z.court===c);return `<div class="dt-court"><span class="dt-court-label">${esc(c)} 코트</span>${aa.map(courtAssetButton).join('')}${aa.length===0?'<span class="dt-court-empty">등록 자산 없음</span>':''}</div>`}).join('')}
-    </div></div>`;
-    const floorHotspots=courtHotspots;
-    const toiletHotspots='<div class="dt-hot-layer toilet">'+rooms.filter(r=>r.view==='toilet').map(r=>`<button class="dt-hot room" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.name.replace('남자 ','남 ').replace('여자 ','여 '))}</span></button>`).join('')+
-      [
-        {name:'남자소변기 수리',place:'남자 화장실',status:'정상',code:'SA-01',category:'위생설비',cls:'asset',x:26,y:42,icon:'SA'},
-        {name:'샤워실 하부판',place:'남녀 샤워실',status:'정상',code:'OT-05',category:'기타',cls:'asset',x:18,y:18,icon:'OT'},
-        {name:'흰지',place:'샤워실/주출입문',status:'정상',code:'DR-01',category:'문·창호설비',cls:'asset',x:67,y:50,icon:'DR'}
-      ].map(r=>`<button class="dt-hot asset" style="left:${r.x}%;top:${r.y}%" onclick='dtSelectRoom(${JSON.stringify(r).replace(/'/g,"&#39;")})' title="${esc(r.name)}"><span>${esc(r.icon)}</span><b>${esc(r.code)}</b></button>`).join('')+'</div>';
-    const lightingMini=`<div class="dt-mini-card"><div class="dt-mini-title"><b>조명·전등릴 교체 이력</b><span>코트장 조명 관리</span></div><div class="dt-image-removed">조명 도면 이미지는 제외됨</div><button onclick="dtView('lighting')">전체 이력 보기 →</button></div>`;
-    return `<div class="dt-v43 dt-v43-new">
-      <div class="dt-v43-head"><div><div class="dt-v43-kicker">DIGITAL TWIN · JANGGUNBONG</div><div class="dt-v43-title">장군봉체육관 공간 안내</div><div class="dt-v43-sub">실제 평면도에 공간 · 코트 · EAM 자산을 연결하고, 조명은 별도 도면에서 관리합니다.</div></div><div class="dt-v43-actions"><button class="dt-v43-btn" onclick="go('eam')">EAM 자산관리</button><button class="dt-v43-btn primary" onclick="go('process')">QR 접수관리</button></div></div>
-      <div class="dt-v43-tabs"><button class="dt-v43-tab ${v==='floor'?'on':''}" onclick="dtView('floor')">전체 평면도</button><button class="dt-v43-tab ${v==='toilet'?'on':''}" onclick="dtView('toilet')">화장실 상세도</button><button class="dt-v43-tab ${v==='lighting'?'on':''}" onclick="dtView('lighting')">조명·전등릴 이력</button></div>
-      <div class="dt-twin-strip">
-        <div class="dt-floor-main"><div class="dt-v43-maphead"><div><strong>${title}</strong><small>${sub}</small></div><div class="dt-v43-legend"><span><i class="dt-dot g"></i>정상</span><span><i class="dt-dot y"></i>주의</span><span><i class="dt-dot r"></i>점검필요</span></div></div><div class="dt-v43-map"><div class="dt-image-removed">도면 이미지는 용량 절감을 위해 제외했습니다.<br><small>자산 정보와 위치 데이터는 유지됩니다.</small></div>${v==='floor'?floorHotspots:v==='toilet'?toiletHotspots:''}<div class="dt-v43-zoom"><button onclick="dtZoom(.1)">＋</button><button onclick="dtZoom(-.1)">−</button><button onclick="window.__dtZoom=1;render()">1:1</button></div></div></div>
-        <div class="dt-right-stack">
-          <aside class="dt-v43-sidecard">${(()=>{const loc=s?.id&&DT_LOCATIONS[s.id]?DT_LOCATIONS[s.id]:s;const selectedAsset=s?.code?(window.__eamA||[]).find(a=>String(a.asset_code)===String(s.code))||asset(s.code,s.name,s.place,s.status,s.category):null;const assets=s?.code?[selectedAsset]:getLocationAssets(loc);const issues=getLocationIssues(loc);const assetHist=selectedAsset?(window.__eamH||[]).filter(h=>String(h.asset_id)===String(selectedAsset.id)||String(h.asset_code||'')===String(selectedAsset.asset_code)):(window.__eamH||[]).filter(h=>assets.some(a=>String(a.id)===String(h.asset_id)));const histCount=assetHist.length;return `<div class="dt-v43-sidehead"><span>SELECTED LOCATION / ASSET</span><h3>${esc(loc.name||s.name||'선택 없음')}</h3><p>${esc(loc.place||s.place||'도면에서 위치를 선택하세요.')}</p></div><div class="dt-v43-status ${statusClass}">${issues.some(i=>i.status==='미조치')?'⚠ 미조치 접수 있음':'● '+esc(s.status||'정상')}</div><dl class="dt-v43-info"><dt>EAM 자산</dt><dd>${assets.length}개</dd><dt>고장접수</dt><dd>${issues.length}건${issues.filter(i=>i.status==='미조치').length?' · 미조치 '+issues.filter(i=>i.status==='미조치').length+'건':''}</dd><dt>작업/이력</dt><dd>${histCount}건</dd><dt>공간</dt><dd>${esc(loc.place||'-')}</dd></dl><div class="dt-v43-actions2"><button class="primary" onclick="go('eam')">EAM 전체</button><button onclick="go('process')">작업관리</button></div><div style="display:grid;gap:6px;margin-top:10px">${assets.length?assets.map(a=>`<button class="dt-link-asset" onclick="dtOpenAsset('${esc(a.asset_code)}')"><b>${esc(a.asset_code)}</b> · ${esc(a.name||a.product_name||'-')} <span>→</span></button>`).join(''):'<div class="dt-v43-empty">이 위치에 등록된 EAM 자산이 없습니다.</div>'}</div>${selectedAsset?`<div class="dt-asset-quick"><h4>자산 상세</h4><div class="qrow"><div class="qcell"><small>자산명</small><b>${esc(selectedAsset.name||selectedAsset.product_name||'-')}</b></div><div class="qcell"><small>설치 위치</small><b>${esc(selectedAsset.place||'-')}</b></div><div class="qcell"><small>상태</small><b>${esc(selectedAsset.status||'정상')}</b></div><div class="qcell"><small>고장 이력</small><b>${esc(selectedAsset.asHistory||'등록된 고장 이력 없음')}</b></div></div>${assetHist.length?`<div style="margin-top:8px;background:#fff;border:1px solid #e1e9f0;border-radius:9px;padding:8px"><small style="color:#8191a1;font-size:9px">작업 이력</small>${assetHist.slice(0,5).map(h=>`<div style="font-size:10px;padding:5px 0;border-bottom:1px solid #eef2f6"><b>${esc(h.event_type||h.action_type||'작업')}</b> · ${esc(h.description||h.result||'-')} <span style="float:right;color:#8a99a7">${esc(h.event_date||h.inspection_date||'')}</span></div>`).join('')}</div>`:'<div style="margin-top:8px;font-size:10px;color:#8191a1">등록된 작업 이력이 없습니다.</div>'}</div>`:''}<div class="dt-v43-history"><h4>연결 데이터</h4><div class="dt-v43-hrow"><time>ISSUE</time><b>고장접수 ${issues.length}건</b><span class="dt-v43-badge">${issues.filter(i=>i.status==='미조치').length?'미조치 있음':'확인'}</span></div><div class="dt-v43-hrow"><time>EAM</time><b>자산 ${assets.length}개</b><span class="dt-v43-badge">연결</span></div><div class="dt-v43-hrow"><time>HISTORY</time><b>이력 ${histCount}건</b><span class="dt-v43-badge">연결</span></div></div>`})()}</aside>
-          ${v==='lighting'?lightingMini:''}
-        </div>
-      </div>
-      ${v==='floor'?`<div class="dt-v43-detailgrid"><div class="dt-v43-detail"><h4>공간 기반 시설안내</h4><p>도면에서 코트·공간·EAM 자산을 선택하면 현재 상태와 연결 이력을 바로 확인할 수 있습니다.</p></div><div class="dt-v43-detail"><h4>관리 흐름</h4><p>위치 선택 → 자산 확인 → EAM 이력 → 작업/접수로 이어지는 공간 기반 관리 구조입니다.</p></div></div>`:''}
-      ${v==='toilet'?`<div class="dt-v43-detailgrid"><div class="dt-v43-detail"><h4>화장실 상세도 연결</h4><p>제공된 실제 화장실 도면을 그대로 사용합니다. 위생설비 자산을 선택하면 EAM 자산번호와 작업·정비이력으로 연결할 수 있습니다.</p></div><div class="dt-v43-detail"><h4>현재 등록된 위생설비</h4><p>SA-01 등 위생설비는 EAM 분류와 연동됩니다. 도면 위 좌표는 실제 위치에 맞춰 추가 조정할 수 있습니다.</p></div></div>`:''}
-      ${v==='lighting'?`<div class="dt-v43-detailgrid"><div class="dt-v43-detail"><h4>코트장 조명 연결</h4><p>조명은 체육관 코트 상부 설비로 표시합니다. L-01~L-05처럼 위치를 나누어 선택하고 교체 이력과 연결하는 구조입니다.</p></div><div class="dt-v43-detail"><h4>교체 이력 자료</h4><p>현재 제공된 조명등·전등릴 교체 이력 자료를 원본 기준으로 연결해 사용합니다.</p></div></div>`:''}
-    </div>`;
-  };})();
-
+    // Digital Twin removed: EAM is the destination for legacy digitalTwin URLs.
     render();
     function scheduleOptions(){return ["","새벽조","오전조","오후조","휴무","주휴일","연가","공가/건강검진","대체휴무","대휴","추석","8/15대체휴무","8/17대체휴무","9/24대체휴무","9/25대체휴무"]}
     function saveScheduleMonthFromText(){
