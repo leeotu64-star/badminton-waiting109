@@ -15259,81 +15259,7 @@ body {
 
 
 <!-- JGB FINAL: 배치도 AC 자산아이콘 → 자산코드 기준 EAM 이력카드 연결 -->
-<script id="JGB_EAM_MAP_AC_DBLCLICK_FINAL">
-(function(){
-  'use strict';
-  if(window.__JGB_EAM_MAP_AC_DBLCLICK_FINAL)return;
-  window.__JGB_EAM_MAP_AC_DBLCLICK_FINAL=true;
 
-  const V=x=>String(x??'').trim();
-
-  function resolve(code){
-    const c=V(code);
-    let cat='', actual=c;
-    try{
-      const defs=typeof window.eamCategoryDefs==='function'?window.eamCategoryDefs():{};
-      for(const [k,v] of Object.entries(defs||{})){
-        const item=(v.items||[]).find(x=>V(x?.code||x?.asset_code)===c);
-        if(item){cat=k;actual=V(item.code||item.asset_code||c);break;}
-      }
-    }catch(e){}
-    if(!cat){
-      try{
-        const a=(Array.isArray(window.__eamA)?window.__eamA:[]).find(x=>V(x?.asset_code)===c);
-        if(a){
-          const t=V(a.type||a.category);
-          if(t.includes('냉난방'))cat='cooling';
-          else if(t.includes('소방'))cat='fire';
-          else if(t.includes('온수')||t.includes('보일러')||t.includes('난방'))cat='water';
-          else if(t.includes('전기'))cat='electrical';
-          else if(t.includes('조명'))cat='lighting';
-          else if(t.includes('방수'))cat='waterproof';
-          else if(t.includes('위생'))cat='sanitary';
-          else if(t.includes('문')||t.includes('창호')||t.includes('도어'))cat='doors';
-          else cat='other';
-          actual=V(a.asset_code||c);
-        }
-      }catch(e){}
-    }
-    return {cat,actual};
-  }
-
-  function openEam(code){
-    const r=resolve(code);
-    if(!r.actual)return;
-    window.__eamSelCode=r.actual;
-    if(r.cat)window.__eamCat=r.cat;
-
-    if(typeof window.go==='function') window.go('eam');
-    else { try{location.href='?page=eam'}catch(e){} }
-
-    /* 라우팅 직후에도 해당 AC 코드의 이력카드를 확실히 선택 */
-    const pick=()=>{
-      if(r.cat && typeof window.eamPick==='function'){
-        window.__eamSelCode=r.actual;
-        window.__eamCat=r.cat;
-        window.eamPick(r.cat,r.actual);
-        return true;
-      }
-      const row=document.querySelector('.eam-asset-row[data-code="'+CSS.escape(r.actual)+'"]');
-      if(row){row.click();return true;}
-      return false;
-    };
-    requestAnimationFrame(()=>{if(!pick())setTimeout(pick,80);});
-  }
-
-  /* 한 번 클릭: 아무 화면 이동 없음. 더블클릭: AC 자산코드로 EAM 이력카드 이동 */
-  document.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el || el.classList.contains('map-only'))return;
-    const code=V(el.getAttribute('data-code'));
-    if(!code)return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    openEam(code);
-  },true);
-})();
-</script>
 
 <style id="JGB_V25_ICON_DELETE_FINAL_FIX">
 /* V25: 배치도 아이콘 삭제창의 목록 영역만 안정화 */
@@ -15343,6 +15269,177 @@ body {
 #eamHyunIconDeleteModal .eh-delete-list-v13{box-sizing:border-box;padding:10px 18px 18px;width:100%;overflow-x:hidden}
 #eamHyunIconDeleteModal .eh-delete-list-v13>div{grid-template-columns:90px minmax(0,1fr) 64px;box-sizing:border-box;width:100%;}
 </style>
+
+<!-- JGB EAM MAP CLICK/DRAG FINAL V3 -->
+<style id="JGB_EAM_MAP_CLICK_DRAG_V3_CSS">
+.eh-map .eh-marker{cursor:grab!important;user-select:none!important;-webkit-user-select:none!important;touch-action:none!important;}
+.eh-map .eh-marker.dragging{cursor:grabbing!important;}
+</style>
+
+
+<style id="JGB_EAM_MAP_CLICK_DRAG_FINAL_V4_CSS">
+/* EAM 현황 배치도: 드래그 + 단순 클릭 바로가기 */
+.eh-map .eh-marker{
+  cursor:grab!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-user-drag:none!important;
+  touch-action:none!important;
+}
+.eh-map .eh-marker.dragging{
+  cursor:grabbing!important;
+  z-index:999!important;
+}
+</style>
+<script id="JGB_EAM_MAP_CLICK_DRAG_FINAL_V4_JS">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_MAP_CLICK_DRAG_FINAL_V4)return;
+  window.__JGB_EAM_MAP_CLICK_DRAG_FINAL_V4=true;
+
+  const THRESHOLD=6;
+  let state=null;
+  let suppressClickUntil=0;
+
+  const getMarker=e=>e.target?.closest?.('.eh-map .eh-marker');
+  const codeOf=el=>String(el?.dataset?.code||el?.getAttribute?.('data-code')||el?.textContent||'').trim();
+
+  function savePosition(el,x,y){
+    const code=codeOf(el);
+    if(!code)return;
+    try{
+      if(el.classList.contains('map-only')){
+        const key='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+        const data=JSON.parse(localStorage.getItem(key)||'{}');
+        if(data[code]){
+          data[code].x=Number(x.toFixed(2));
+          data[code].y=Number(y.toFixed(2));
+          localStorage.setItem(key,JSON.stringify(data));
+        }
+      }else{
+        const key='JGB_EAM_HYUNHWANG_MAP_V1';
+        const pos=JSON.parse(localStorage.getItem(key)||'{}');
+        pos[code]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
+        localStorage.setItem(key,JSON.stringify(pos));
+      }
+    }catch(err){
+      console.warn('배치도 위치 저장 실패',err);
+    }
+  }
+
+  document.addEventListener('pointerdown',function(e){
+    if(e.button!==0)return;
+    const el=getMarker(e);
+    if(!el)return;
+    const map=el.closest('.eh-map');
+    if(!map)return;
+
+    const rect=map.getBoundingClientRect();
+    state={
+      el:el,
+      map:map,
+      rect:rect,
+      pointerId:e.pointerId,
+      startX:e.clientX,
+      startY:e.clientY,
+      moved:false,
+      dragging:false
+    };
+
+    try{el.setPointerCapture?.(e.pointerId)}catch(_){}
+  },true);
+
+  document.addEventListener('pointermove',function(e){
+    const d=state;
+    if(!d || d.pointerId!==e.pointerId)return;
+
+    const dx=e.clientX-d.startX;
+    const dy=e.clientY-d.startY;
+
+    if(!d.dragging && Math.hypot(dx,dy)<THRESHOLD)return;
+
+    if(!d.dragging){
+      d.dragging=true;
+      d.moved=true;
+      d.el.classList.add('dragging');
+    }
+
+    const r=d.map.getBoundingClientRect();
+    let x=((e.clientX-r.left)/r.width)*100;
+    let y=((e.clientY-r.top)/r.height)*100;
+    x=Math.max(2,Math.min(98,x));
+    y=Math.max(2,Math.min(98,y));
+
+    d.el.style.left=x.toFixed(2)+'%';
+    d.el.style.top=y.toFixed(2)+'%';
+
+    e.preventDefault();
+  },true);
+
+  function finishPointer(e){
+    const d=state;
+    if(!d || d.pointerId!==e.pointerId)return;
+    state=null;
+
+    const el=d.el;
+    el.classList.remove('dragging');
+
+    if(d.dragging){
+      const r=d.map.getBoundingClientRect();
+      let x=((e.clientX-r.left)/r.width)*100;
+      let y=((e.clientY-r.top)/r.height)*100;
+      x=Math.max(2,Math.min(98,x));
+      y=Math.max(2,Math.min(98,y));
+      el.style.left=x.toFixed(2)+'%';
+      el.style.top=y.toFixed(2)+'%';
+      savePosition(el,x,y);
+
+      /* 브라우저가 이어서 발생시키는 click은 EAM 이동에 사용하지 않는다. */
+      suppressClickUntil=Date.now()+350;
+      e.preventDefault();
+    }
+  }
+
+  document.addEventListener('pointerup',finishPointer,true);
+  document.addEventListener('pointercancel',finishPointer,true);
+
+  /* 단순 클릭만 EAM 자산 이력카드로 이동 */
+  document.addEventListener('click',function(e){
+    const el=getMarker(e);
+    if(!el)return;
+
+    if(Date.now()<suppressClickUntil){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
+
+    /* 배치도 전용 아이콘은 이동하지 않는다. */
+    if(el.classList.contains('map-only'))return;
+
+    const code=codeOf(el);
+    if(!code)return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    if(typeof window.jgbOpenEamAssetByCode==='function'){
+      window.jgbOpenEamAssetByCode(code);
+    }else{
+      window.__eamSelCode=code;
+      if(typeof window.go==='function'){
+        window.go('eam');
+      }else{
+        try{location.href='?page=eam'}catch(_){}
+      }
+    }
+  },true);
+
+  document.addEventListener('dragstart',function(e){
+    if(getMarker(e))e.preventDefault();
+  },true);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
@@ -15575,34 +15672,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 #eam228Map .eam228-asset.dragging{cursor:grabbing!important;}
 </style>
 <script id="JGB_EAM_V72_ICON_DBLCLICK_SCRIPT">
-(function(){
-  if(window.__JGB_EAM_ICON_DBLCLICK_V72)return;
-  window.__JGB_EAM_ICON_DBLCLICK_V72=true;
-  let suppressUntil=0;
-  document.addEventListener('pointerup',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(el && el.classList.contains('dragging')) suppressUntil=Date.now()+180;
-  },true);
-  document.addEventListener('click',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(!el)return;
-    /* 단일 클릭은 선택만 하고 화면 이동하지 않음 */
-    if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    const c=el.getAttribute('data-code')||'';
-    window.__eamSelCode=c;
-  },true);
-  document.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(!el)return;
-    if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    const c=el.getAttribute('data-code')||'';
-    if(c && typeof window.jgbOpenEamAssetByCode==='function') window.jgbOpenEamAssetByCode(c);
-  },true);
-})();
+/* V72 disabled: single-click navigation is handled by the final pointer handler. */
 </script>
 
 <style id="JGB_EAM_V8_LIVE_SCREEN_FORMAT">
@@ -16951,129 +17021,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 .eh-map .eh-marker:not(.map-only){cursor:pointer!important;user-select:none!important;-webkit-user-select:none!important;}
 .eh-map .eh-marker.map-only{cursor:pointer!important;}
 </style>
-<script id="JGB_EAM_HYUN_V8_ICON_DRAG_DBLCLICK_JS">
-(function(){
-  'use strict';
-  if(window.__JGB_EAM_HYUN_V8_FIX)return;
-  window.__JGB_EAM_HYUN_V8_FIX=true;
-  const V=x=>String(x??'').trim();
-  const esc=x=>V(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  const KEY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
-  const read=()=>{try{const x=JSON.parse(localStorage.getItem(KEY)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
-  const write=x=>{try{localStorage.setItem(KEY,JSON.stringify(x));return true}catch(_){return false}};
-  let drag=null;
 
-  /* EAM 현황 아이콘: 클릭은 아무 이동도 하지 않음. 드래그만 위치를 변경. */
-  document.addEventListener('pointerdown',function(e){
-    if(e.button!==0)return;
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el)return;
-    const map=el.closest('.eh-map');
-    if(!map)return;
-    const r=map.getBoundingClientRect();
-    drag={el,map,code:V(el.dataset.code||el.textContent||''),sx:e.clientX,sy:e.clientY,startX:parseFloat(el.style.left)||50,startY:parseFloat(el.style.top)||50,moved:false,dragging:false};
-    const move=ev=>{
-      if(!drag)return;
-      const dx=ev.clientX-drag.sx,dy=ev.clientY-drag.sy;
-      if(!drag.dragging && Math.hypot(dx,dy)<6)return;
-      if(!drag.dragging){drag.dragging=true;el.classList.add('dragging');}
-      const x=Math.max(2,Math.min(98,((ev.clientX-r.left)/r.width)*100));
-      const y=Math.max(2,Math.min(98,((ev.clientY-r.top)/r.height)*100));
-      el.style.left=x.toFixed(2)+'%';el.style.top=y.toFixed(2)+'%';drag.moved=true;
-      ev.preventDefault();ev.stopPropagation();
-    };
-    const up=ev=>{
-      if(!drag)return;
-      const d=drag;drag=null;el.classList.remove('dragging');
-      window.removeEventListener('pointermove',move,true);window.removeEventListener('pointerup',up,true);window.removeEventListener('pointercancel',up,true);
-      if(!d.moved)return;
-      const x=Math.max(2,Math.min(98,((ev.clientX-r.left)/r.width)*100));
-      const y=Math.max(2,Math.min(98,((ev.clientY-r.top)/r.height)*100));
-      el.style.left=x.toFixed(2)+'%';el.style.top=y.toFixed(2)+'%';
-      const c=d.code;
-      if(el.classList.contains('map-only')){
-        const data=read();
-        if(data[c]){data[c].x=Number(x.toFixed(2));data[c].y=Number(y.toFixed(2));write(data);}
-      }else{
-        const k='JGB_EAM_HYUNHWANG_MAP_V1';
-        let pos={};try{pos=JSON.parse(localStorage.getItem(k)||'{}')}catch(_){}
-        pos[c]=[Number(x.toFixed(2)),Number(y.toFixed(2))];
-        try{localStorage.setItem(k,JSON.stringify(pos))}catch(_){}
-      }
-      window.__EAM_HYUN_DRAG_SUPPRESS_UNTIL=Date.now()+250;
-      ev.preventDefault();ev.stopPropagation();
-    };
-    window.addEventListener('pointermove',move,true);window.addEventListener('pointerup',up,true);window.addEventListener('pointercancel',up,true);
-  },true);
-
-  /* 배치도 아이콘: 드래그 이동은 유지하고, 실제 단순 클릭만 EAM으로 이동 */
-  let eamMapPointerDown=null;
-  let eamMapDragged=false;
-  let eamMapSuppressClick=false;
-
-  document.addEventListener('pointerdown',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el)return;
-    eamMapPointerDown={el:el,x:e.clientX,y:e.clientY,pointerId:e.pointerId};
-    eamMapDragged=false;
-    eamMapSuppressClick=false;
-  },true);
-
-  document.addEventListener('pointermove',function(e){
-    if(!eamMapPointerDown || eamMapPointerDown.pointerId!==e.pointerId)return;
-    const dx=e.clientX-eamMapPointerDown.x;
-    const dy=e.clientY-eamMapPointerDown.y;
-    if(!eamMapDragged && Math.hypot(dx,dy)<5)return;
-    eamMapDragged=true;
-    eamMapSuppressClick=true;
-  },true);
-
-  document.addEventListener('pointerup',function(e){
-    if(!eamMapPointerDown || eamMapPointerDown.pointerId!==e.pointerId)return;
-    const wasDragged=eamMapDragged;
-    eamMapPointerDown=null;
-    if(wasDragged){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      setTimeout(function(){eamMapSuppressClick=false;},0);
-    }
-  },true);
-
-  document.addEventListener('click',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el)return;
-    if(eamMapSuppressClick){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      eamMapSuppressClick=false;
-      return;
-    }
-    if(el.classList.contains('map-only'))return;
-    const c=V(el.dataset.code||el.textContent||'');
-    if(!c)return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    if(typeof window.jgbOpenEamAssetByCode==='function')window.jgbOpenEamAssetByCode(c);
-    else{
-      window.__eamSelCode=c;
-      if(typeof window.go==='function')window.go('eam');
-      else{try{location.href='?page=eam'}catch(_){}}
-    }
-  },true);
-
-  /* 더블클릭에서만 기존 EAM 자산으로 이동. 배치도 전용 아이콘은 이동하지 않음. */
-  document.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('.eh-map .eh-marker');
-    if(!el)return;
-    e.preventDefault();e.stopImmediatePropagation();
-    if(el.classList.contains('map-only'))return;
-    const c=V(el.dataset.code||el.textContent||'');
-    if(!c)return;
-    if(typeof window.jgbOpenEamAssetByCode==='function')window.jgbOpenEamAssetByCode(c);
-    else{window.__eamSelCode=c;if(typeof window.go==='function')window.go('eam');else{try{location.href='?page=eam'}catch(_){}}}
-  },true);
-})();
-</script>
 
 <!-- JGB EAM 현황 v13: 배치도 아이콘 삭제를 LK 삭제 방식의 목록형으로 변경 -->
 <style id="JGB_EAM_HYUN_V13_ICON_DELETE_LIST">
@@ -17505,3 +17453,100 @@ document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map
   .eh-main{grid-template-columns:1fr!important;}
 }
 </style>
+
+<!-- JGB DIGITAL TWIN HARD LOCK V2
+     디지털트윈 기능/원본 코드는 보존하되 사용자 메뉴에서는 완전 비표시.
+     동적으로 다시 생성되는 경우에도 즉시 숨김 처리. -->
+<style id="JGB_DIGITAL_TWIN_HARD_LOCK_V2">
+  .jgb-dt-locked,
+  [data-page="digitalTwin"],
+  a[href*="page=digitalTwin"],
+  a[href*="digitalTwin"]{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    width:0!important;
+    height:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+    user-select:none!important;
+  }
+</style>
+<script id="JGB_DIGITAL_TWIN_HARD_LOCK_V2_JS">
+(function(){
+  'use strict';
+  function lockDigitalTwin(){
+    var selectors=[
+      '.jgb-dt-locked',
+      '[data-page="digitalTwin"]',
+      'a[href*="page=digitalTwin"]',
+      'a[href*="digitalTwin"]'
+    ];
+    document.querySelectorAll(selectors.join(',')).forEach(function(el){
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('opacity','0','important');
+      el.style.setProperty('width','0','important');
+      el.style.setProperty('height','0','important');
+      el.style.setProperty('min-width','0','important');
+      el.style.setProperty('min-height','0','important');
+      el.style.setProperty('margin','0','important');
+      el.style.setProperty('padding','0','important');
+      el.style.setProperty('border','0','important');
+      el.style.setProperty('overflow','hidden','important');
+      el.style.setProperty('pointer-events','none','important');
+      el.setAttribute('aria-hidden','true');
+      el.setAttribute('tabindex','-1');
+    });
+
+    /* 메뉴가 다른 코드에 의해 class/data-page 없이 재생성되는 경우까지 차단 */
+    document.querySelectorAll('.jgb-nav .jgb-link, .jgb-nav a, .jgb-nav button, .jgb-nav span').forEach(function(el){
+      var t=(el.textContent||'').replace(/\\s+/g,'').trim();
+      if(t.indexOf('디지털트윈')!==-1){
+        el.style.setProperty('display','none','important');
+        el.style.setProperty('visibility','hidden','important');
+        el.style.setProperty('width','0','important');
+        el.style.setProperty('height','0','important');
+        el.style.setProperty('min-height','0','important');
+        el.style.setProperty('margin','0','important');
+        el.style.setProperty('padding','0','important');
+        el.style.setProperty('border','0','important');
+        el.style.setProperty('overflow','hidden','important');
+        el.setAttribute('aria-hidden','true');
+        el.setAttribute('tabindex','-1');
+      }
+    });
+  }
+
+  function blockDigitalTwinRoute(){
+    try{
+      var p=new URLSearchParams(location.search).get('page');
+      if(p==='digitalTwin'){
+        if(typeof window.go==='function') window.go('dashboard');
+        else history.replaceState(null,'','?page=dashboard');
+      }
+    }catch(e){}
+  }
+
+  lockDigitalTwin();
+  blockDigitalTwinRoute();
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',function(){
+      lockDigitalTwin();
+      blockDigitalTwinRoute();
+    },{once:true});
+  }
+  new MutationObserver(function(){
+    lockDigitalTwin();
+    blockDigitalTwinRoute();
+  }).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
