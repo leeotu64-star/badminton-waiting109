@@ -6397,7 +6397,7 @@ function jgbV47GoWpByLeak(leakCode){
         ['doors','🚪','문·창호설비','유리문 · 힌지 · 도어클로저'],
         ['other','🔧','기타설비','사무 · 공용']
       ];
-      const PREFIX={cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DR',other:'OT'};
+      const PREFIX={cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DO',other:'OT'};
       const FIRE=new Set(['EQ-01','EQ-02','EQ-03','EQ-05','FI-01','FI-02','FI-03','FI-04','FI-05','FI-06','FI-07','FI-08','EQ-07']);
       const v=x=>String(x??'').trim();
       function readMeta(){try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}catch(e){return {}}}
@@ -17309,7 +17309,7 @@ window.eamHyunDeleteMapIcon=function(code,kind){
       const maps={};
       Object.keys(defs).forEach(cat=>{
         const items=Array.isArray(defs[cat]?.items)?defs[cat].items:[];
-        const prefix=({cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DR',other:'OT'})[cat]||'OT';
+        const prefix=({cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DO',other:'OT'})[cat]||'OT';
         items.forEach((x,i)=>{maps[String(x.code||x.asset_code||'')]=prefix+'-'+String(i+1).padStart(2,'0')});
       });
       document.querySelectorAll('.eam-asset-row[data-code]').forEach(el=>{
@@ -17329,3 +17329,4 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 <!-- JGB EAM ICON POSITION REAL LOCK V5 -->
 
 
+\n<script id="JGB_EAM_DO_EDIT_FIX_V9">\n(function(){\n  const oldEdit=window.eamEditSelectedAsset;\n  if(typeof oldEdit!=='function') return;\n  window.eamEditSelectedAsset=async function(){\n    const shown=String(window.__eamSelCode||'').trim();\n    if(!shown) return oldEdit();\n    try{\n      const rows=typeof sourceRows==='function'?sourceRows():[];\n      const src=rows.find(x=>String(x.code||'').trim()===shown || (typeof window.eamUnifiedCode==='function' && String(window.eamUnifiedCode(x))===shown));\n      if(src && String(src.code)!==shown){\n        window.__eamSelCode=String(src.code);\n        return await oldEdit();\n      }\n      return await oldEdit();\n    }catch(e){\n      console.error(e);\n      alert('문·창호설비 이력카드 수정 대상을 찾을 수 없습니다.\\n'+(e?.message||''));\n    }\n  };\n})();\n</script>\n
