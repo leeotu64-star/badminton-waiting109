@@ -6411,7 +6411,7 @@ function jgbV47GoWpByLeak(leakCode){
         ['doors','🚪','문·창호설비','유리문 · 힌지 · 도어클로저'],
         ['other','🔧','기타설비','사무 · 공용']
       ];
-      const PREFIX={cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DR',other:'OT'};
+      const PREFIX={cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DO',other:'OT'};
       const FIRE=new Set(['EQ-01','EQ-02','EQ-03','EQ-05','FI-01','FI-02','FI-03','FI-04','FI-05','FI-06','FI-07','FI-08','EQ-07']);
       const v=x=>String(x??'').trim();
       function readMeta(){try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}catch(e){return {}}}
@@ -6498,6 +6498,7 @@ function jgbV47GoWpByLeak(leakCode){
       function codePrefixForCategory(category){return PREFIX[CATMAP[category]||'other']||'OT'}
       function nextAutoCode(category){
         const prefix=codePrefixForCategory(category), used=new Set(sourceRows().map(x=>v(x.code)).filter(x=>x.startsWith(prefix+'-')));
+        // V18: 문·창호설비 신규 생성 코드는 DO-01, DO-02... 순으로 발급한다. 기존 DR 코드는 변경하지 않는다.
         let n=1;while(used.has(prefix+'-'+String(n).padStart(2,'0')))n++;
         return prefix+'-'+String(n).padStart(2,'0');
       }
