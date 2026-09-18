@@ -16057,22 +16057,21 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
   document.addEventListener('click',function(e){
     const el=e.target.closest?.('#eam228Map .eam228-asset');
     if(!el)return;
-    /* 단일 클릭은 선택만 하고 화면 이동하지 않음 */
+    /* 단일 클릭: 아이콘과 왼쪽 자산목록을 동일 자산으로 선택 */
     if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
     e.preventDefault();
     e.stopImmediatePropagation();
     const c=el.getAttribute('data-code')||'';
+    if(!c)return;
     window.__eamSelCode=c;
+    const prefix=String(c).toUpperCase().split('-')[0];
+    const catMap={AC:'cooling',BO:'water',FI:'fire',EL:'electrical',DO:'doors',DR:'doors',SA:'sanitary',LT:'lighting',RL:'lighting',WP:'waterproof',OT:'other'};
+    window.__eamCat=catMap[prefix]||window.__eamCat||'other';
+    /* 기존 EAM 선택 함수만 호출하여 왼쪽 목록과 이력카드를 함께 갱신 */
+    if(typeof window.eamPick==='function')window.eamPick(window.__eamCat,c);
+    else if(typeof window.render==='function')window.render();
   },true);
-  document.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(!el)return;
-    if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    const c=el.getAttribute('data-code')||'';
-    if(c && typeof window.jgbOpenEamAssetByCode==='function') window.jgbOpenEamAssetByCode(c);
-  },true);
+  /* 더블클릭은 별도 이동을 하지 않는다. 단일 클릭으로 선택한다. */
 })();
 </script>
 
@@ -17803,3 +17802,8 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 
 
 
+
+<style id="JGB_EAM_V29_CLICK_UNIFIED">
+/* V29: 배치도 모든 자산 아이콘은 동일하게 클릭 가능. BO만 예외적으로 동작하지 않도록 통합. */
+#eam228Map .eam228-asset{pointer-events:auto!important;cursor:pointer!important;}
+</style>
