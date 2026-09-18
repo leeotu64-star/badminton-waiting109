@@ -16046,33 +16046,57 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 #eam228Map .eam228-asset{cursor:grab!important;user-select:none!important;-webkit-user-select:none!important;touch-action:none!important;}
 #eam228Map .eam228-asset.dragging{cursor:grabbing!important;}
 </style>
-<script id="JGB_EAM_V72_ICON_DBLCLICK_SCRIPT">
+<script id="JGB_EAM_V31_ICON_CLICK_FINAL">
 (function(){
-  if(window.__JGB_EAM_ICON_DBLCLICK_V72)return;
-  window.__JGB_EAM_ICON_DBLCLICK_V72=true;
+  /* V31: 배치도 아이콘 클릭을 최종 단일 경로로 통합.
+     AC/BO/FI/EL/DO/SA/LT/WP/OT 등 코드별로 별도 이벤트를 만들지 않는다. */
+  if(window.__JGB_EAM_ICON_CLICK_V31)return;
+  window.__JGB_EAM_ICON_CLICK_V31=true;
   let suppressUntil=0;
+
   document.addEventListener('pointerup',function(e){
     const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(el && el.classList.contains('dragging')) suppressUntil=Date.now()+180;
+    if(el && el.classList.contains('jgb-v27-dragging')) suppressUntil=Date.now()+250;
   },true);
+
+  function codeOf(el){
+    return String(el?.dataset?.code || el?.getAttribute?.('data-code') || '').trim().toUpperCase();
+  }
+
+  function findCategory(code){
+    const prefix=(String(code).match(/^([A-Z]{2})-/)||[])[1]||'';
+    const prefixMap={AC:'cooling',BO:'water',FI:'fire',EL:'electrical',DO:'doors',DR:'doors',SA:'sanitary',LT:'lighting',RL:'lighting',WP:'waterproof',OT:'other'};
+    try{
+      const defs=typeof window.eamCategoryDefs==='function'?window.eamCategoryDefs():{};
+      for(const k of Object.keys(defs||{})){
+        const items=Array.isArray(defs[k]?.items)?defs[k].items:[];
+        if(items.some(x=>String(x?.code||x?.asset_code||'').trim().toUpperCase()===code)) return k;
+      }
+    }catch(_){}
+    return prefixMap[prefix] || 'other';
+  }
+
   document.addEventListener('click',function(e){
     const el=e.target.closest?.('#eam228Map .eam228-asset');
     if(!el)return;
-    /* 단일 클릭: 아이콘과 왼쪽 자산목록을 동일 자산으로 선택 */
     if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
+
+    const code=codeOf(el);
+    if(!code)return;
+    const cat=findCategory(code);
+
     e.preventDefault();
     e.stopImmediatePropagation();
-    const c=el.getAttribute('data-code')||'';
-    if(!c)return;
-    window.__eamSelCode=c;
-    const prefix=String(c).toUpperCase().split('-')[0];
-    const catMap={AC:'cooling',BO:'water',FI:'fire',EL:'electrical',DO:'doors',DR:'doors',SA:'sanitary',LT:'lighting',RL:'lighting',WP:'waterproof',OT:'other'};
-    window.__eamCat=catMap[prefix]||window.__eamCat||'other';
-    /* 기존 EAM 선택 함수만 호출하여 왼쪽 목록과 이력카드를 함께 갱신 */
-    if(typeof window.eamPick==='function')window.eamPick(window.__eamCat,c);
-    else if(typeof window.render==='function')window.render();
+    window.__eamCat=cat;
+    window.__eamSelCode=code;
+
+    /* 반드시 실제 자산목록의 동일 코드가 선택되도록 기존 EAM 선택 함수 사용 */
+    if(typeof window.eamPick==='function'){
+      window.eamPick(cat,code);
+    }else if(typeof window.render==='function'){
+      window.render();
+    }
   },true);
-  /* 더블클릭은 별도 이동을 하지 않는다. 단일 클릭으로 선택한다. */
 })();
 </script>
 
@@ -17807,4 +17831,14 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 <style id="JGB_EAM_V29_CLICK_UNIFIED">
 /* V29: 배치도 모든 자산 아이콘은 동일하게 클릭 가능. BO만 예외적으로 동작하지 않도록 통합. */
 #eam228Map .eam228-asset{pointer-events:auto!important;cursor:pointer!important;}
+</style>
+
+<style id="JGB_EAM_V31_ICON_CLICK_CSS">
+#eam228Map .eam228-asset{
+  pointer-events:auto!important;
+  cursor:pointer!important;
+  position:absolute!important;
+  z-index:1000!important;
+}
+#eam228Map .eam228-asset *{pointer-events:none!important;}
 </style>
