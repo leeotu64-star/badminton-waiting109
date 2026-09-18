@@ -4540,7 +4540,7 @@ a[data-page="digitalTwin"],
         if(!pre||!n){alert('숫자를 입력해주세요.');return} n=String(Math.max(1,Math.min(99,Number(n)))).padStart(2,'0');
         const code=pre+'-'+n;const p=readObj(iconKey);
         if(p[code]){alert('이미 배치도에 등록된 아이콘입니다.\n다른 숫자를 입력해주세요.');return}
-        p[code]={code,prefix:pre,number:n,name:catMap[pre]||'기타설비',x:50,y:50,createdAt:new Date().toISOString()};writeObj(iconKey,p);
+        const iconCategory={AC:'에어컨',BO:'보일러',FI:'소방설비',EL:'전기설비',DO:'문·창호',SA:'위생설비',LT:'코트조명',WP:'방수',OT:'기타설비'}; p[code]={code,prefix:pre,number:n,name:iconCategory[pre]||'기타설비',x:50,y:50,createdAt:new Date().toISOString()};writeObj(iconKey,p);
         document.getElementById('eamHyunIconModal')?.remove();render();
       };
       /* 배치도 아이콘 삭제: 기존 EAM 자산 + 배치도 전용 아이콘을 모두 관리한다.
@@ -6426,13 +6426,22 @@ function jgbV47GoWpByLeak(leakCode){
       function readMeta(){try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}catch(e){return {}}}
       function writeMeta(x){try{localStorage.setItem(META_KEY,JSON.stringify(x||{}))}catch(e){console.warn(e)}}
       function catKey(x){
-        const code=v(x?.code||x?.asset_code), m=readMeta()[code]||{};
+        const code=v(x?.code||x?.asset_code).toUpperCase(), m=readMeta()[code]||{};
+        /*
+         * 설비 분류의 최우선 기준은 자산코드 접두사.
+         * DB의 category/type 값이 '기타설비'로 잘못 저장되어 있어도
+         * AC/BO/FI/EL/DO/SA/LT/WP 자산은 절대로 기타설비로 보내지 않는다.
+         */
+        const prefix=(code.match(/^([A-Z]{2})-/)||[])[1]||'';
+        const prefixCat={
+          AC:'cooling', BO:'water', FI:'fire', EL:'electrical',
+          DO:'doors', SA:'sanitary', LT:'lighting', WP:'waterproof',
+          OT:'other'
+        };
+        if(prefixCat[prefix])return prefixCat[prefix];
+
         const text=[x?.name,x?.model,x?.type,x?.category,x?.place,m?.name,m?.model,m?.category,m?.place].map(v).join(' ');
-        // 누수 관련 자산은 기타설비에 남기지 않고 방수 자산으로 통합한다.
-        // 기존 메타/DB의 '기타' 분류보다 설비명·규격·위치에 포함된 '누수'를 우선한다.
         if(/누수/.test(text))return 'waterproof';
-        // 기존 기타설비에 들어 있던 실제 문·창호/위생 자산을 새 분류로 이동한다.
-        // 자산명 기준으로만 분류하며 나머지 기존 자산은 변경하지 않는다.
         const n=v(x?.name);
         if(/흰지|힌지|유리문|도어클로저|도어|문짝|창호/.test(n))return 'doors';
         if(/소변기|양변기|세면대|수전/.test(n))return 'sanitary';
@@ -15669,6 +15678,142 @@ window.eamHistoryCardEdit=window.eamEditSelectedAsset;
 })();
 </script>
 
+
+<style id="JGB_EAM_V27_AC_DRAG_FINAL">
+/* V27: 실제 EAM 배치도(#eam228Map) 아이콘 이동·고정 최종 수정.
+   기존 BO/AC 등 모든 자산 아이콘에 동일하게 적용하며 이력카드/DB 자산정보는 건드리지 않는다. */
+#eam228Map .eam228-asset{
+  position:absolute!important;
+  transform:translate(-50%,-50%)!important;
+  cursor:grab!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-user-drag:none!important;
+  touch-action:none!important;
+  pointer-events:auto!important;
+  z-index:100!important;
+}
+#eam228Map .eam228-asset.jgb-v27-dragging{
+  cursor:grabbing!important;
+  z-index:2147483646!important;
+  transform:translate(-50%,-50%) scale(1.06)!important;
+}
+</style>
+<script id="JGB_EAM_V27_AC_DRAG_FINAL_JS">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_V27_AC_DRAG_FINAL)return;
+  window.__JGB_EAM_V27_AC_DRAG_FINAL=true;
+
+  const KEY='JGB_EAM_DASH_MAP_POS_V228';
+  const V=x=>String(x??'').trim();
+  let drag=null, suppressClickUntil=0;
+
+  function read(){
+    try{
+      const x=JSON.parse(localStorage.getItem(KEY)||'{}');
+      return x&&typeof x==='object'?x:{};
+    }catch(_){return {}}
+  }
+  function write(x){
+    try{localStorage.setItem(KEY,JSON.stringify(x));return true}catch(_){return false}
+  }
+  function clamp(n,min,max){return Math.max(min,Math.min(max,Number(n)||0))}
+  function apply(el,x,y){
+    x=clamp(x,1,99); y=clamp(y,1,99);
+    el.style.setProperty('left',x.toFixed(2)+'%','important');
+    el.style.setProperty('top',y.toFixed(2)+'%','important');
+  }
+  function restore(root=document){
+    const p=read();
+    root.querySelectorAll?.('#eam228Map .eam228-asset').forEach(el=>{
+      if(el.classList.contains('jgb-v27-dragging'))return;
+      const c=V(el.dataset.code||el.getAttribute('data-code')||'');
+      if(!c)return;
+      const v=p[c];
+      if(Array.isArray(v)&&v.length>=2)apply(el,v[0],v[1]);
+      else if(v&&typeof v==='object'&&v.x!=null&&v.y!=null)apply(el,v.x,v.y);
+    });
+  }
+
+  /* 렌더링으로 DOM이 교체되어도 저장된 좌표를 다시 적용한다. */
+  const mo=new MutationObserver(()=>requestAnimationFrame(()=>restore()));
+  const start=()=>{
+    if(document.body)mo.observe(document.body,{subtree:true,childList:true});
+    restore();
+    setTimeout(restore,80);
+    setTimeout(restore,300);
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
+
+  /* 실제 배치도 아이콘 전용 드래그. AC/BO 구분 없이 동일하게 처리한다. */
+  window.addEventListener('pointerdown',function(e){
+    if(e.button!==0)return;
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el)return;
+    const map=el.closest('#eam228Map');
+    if(!map)return;
+    const r=map.getBoundingClientRect();
+    if(!r.width||!r.height)return;
+
+    const c=V(el.dataset.code||el.getAttribute('data-code')||'');
+    if(!c)return;
+    const p=read()[c];
+    const left=parseFloat(el.style.left);
+    const top=parseFloat(el.style.top);
+    drag={
+      el,map,pid:e.pointerId,c,sx:e.clientX,sy:e.clientY,r,
+      x:Array.isArray(p)?Number(p[0]):(p&&p.x!=null?Number(p.x):(Number.isFinite(left)?left:50)),
+      y:Array.isArray(p)?Number(p[1]):(p&&p.y!=null?Number(p.y):(Number.isFinite(top)?top:50)),
+      moved:false
+    };
+    try{el.setPointerCapture?.(e.pointerId)}catch(_){}
+
+    const move=ev=>{
+      if(!drag||ev.pointerId!==drag.pid)return;
+      const d=drag,dx=ev.clientX-d.sx,dy=ev.clientY-d.sy;
+      if(!d.moved && Math.hypot(dx,dy)<5)return;
+      if(!d.moved){d.moved=true;d.el.classList.add('jgb-v27-dragging');}
+      d.x=clamp(((ev.clientX-d.r.left)/d.r.width)*100,1,99);
+      d.y=clamp(((ev.clientY-d.r.top)/d.r.height)*100,1,99);
+      apply(d.el,d.x,d.y);
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+    const finish=ev=>{
+      if(!drag||ev.pointerId!==drag.pid)return;
+      const d=drag;drag=null;
+      window.removeEventListener('pointermove',move,true);
+      window.removeEventListener('pointerup',finish,true);
+      window.removeEventListener('pointercancel',finish,true);
+      if(!d.moved){d.el.classList.remove('jgb-v27-dragging');return;}
+      const p=read();p[d.c]={x:Number(d.x.toFixed(2)),y:Number(d.y.toFixed(2))};
+      write(p);
+      apply(d.el,d.x,d.y);
+      d.el.classList.remove('jgb-v27-dragging');
+      suppressClickUntil=Date.now()+500;
+      ev.preventDefault();
+      ev.stopPropagation();
+      requestAnimationFrame(()=>apply(d.el,d.x,d.y));
+      setTimeout(()=>apply(d.el,d.x,d.y),80);
+      setTimeout(()=>apply(d.el,d.x,d.y),300);
+    };
+    window.addEventListener('pointermove',move,true);
+    window.addEventListener('pointerup',finish,true);
+    window.addEventListener('pointercancel',finish,true);
+    e.preventDefault();
+    e.stopPropagation();
+  },true);
+
+  /* 드래그 직후 생성되는 click만 차단. 평상시 클릭 동작은 기존 코드에 맡긴다. */
+  window.addEventListener('click',function(e){
+    if(Date.now()<suppressClickUntil && e.target.closest?.('#eam228Map .eam228-asset')){
+      e.preventDefault();e.stopPropagation();
+    }
+  },true);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
