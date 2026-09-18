@@ -3566,6 +3566,99 @@ a[data-page="digitalTwin"],
 .jgb-lr-v54 [data-jgb-lr-icon][data-type="reel"]{background:#d94b3d !important;}
 </style>
 
+
+<style id="JGB_LR_STATUS_FINAL_V5">
+.jgb-lr-v54-states{
+  display:flex!important;
+  align-items:stretch!important;
+  justify-content:flex-end!important;
+  gap:18px!important;
+  flex:0 0 auto!important;
+  margin-left:auto!important;
+}
+.jgb-lr-v54-status-group{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:7px!important;
+  padding:5px 8px 7px!important;
+  border:1px solid rgba(255,255,255,.30)!important;
+  border-radius:10px!important;
+  background:rgba(0,0,0,.10)!important;
+  box-sizing:border-box!important;
+}
+.jgb-lr-v54-status-title{
+  display:block!important;
+  writing-mode:horizontal-tb!important;
+  color:#fff!important;
+  font-size:16px!important;
+  line-height:20px!important;
+  font-weight:1000!important;
+  letter-spacing:-.04em!important;
+  text-shadow:0 2px 0 #063452, 0 3px 5px rgba(0,0,0,.55)!important;
+  white-space:nowrap!important;
+}
+.jgb-lr-v54-status-group .jgb-lr-v54-states-row{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+.jgb-lr-v54-state{
+  width:58px!important;
+  height:58px!important;
+  min-width:58px!important;
+  min-height:58px!important;
+  padding:4px 3px!important;
+  border-radius:9px!important;
+  border:2px solid rgba(255,255,255,.52)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  color:#fff!important;
+  font-weight:1000!important;
+  box-shadow:
+    0 4px 0 rgba(0,0,0,.25),
+    0 6px 9px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.38)!important;
+  text-shadow:0 2px 2px rgba(0,0,0,.42)!important;
+}
+.jgb-lr-v54-state b{
+  display:block!important;
+  font-size:21px!important;
+  line-height:22px!important;
+  font-weight:1000!important;
+  color:#fff!important;
+  text-shadow:0 2px 0 rgba(0,0,0,.22),0 3px 4px rgba(0,0,0,.38)!important;
+}
+.jgb-lr-v54-state small{
+  display:block!important;
+  margin-top:2px!important;
+  font-size:10px!important;
+  line-height:12px!important;
+  font-weight:1000!important;
+  color:#fff!important;
+  white-space:nowrap!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.45)!important;
+}
+.jgb-lr-v54-state.ok{background:linear-gradient(#20b95f,#07964a)!important}
+.jgb-lr-v54-state.check{background:linear-gradient(#f3bd13,#d89c00)!important}
+.jgb-lr-v54-state.action{background:linear-gradient(#ff8a20,#ed6710)!important}
+.jgb-lr-v54-state.repair{background:linear-gradient(#f34a52,#db3039)!important}
+.jgb-lr-v54-state.parts{background:linear-gradient(#8d55cf,#6d3eaa)!important}
+.jgb-lr-v54-state.discard{display:none!important}
+
+@media(max-width:1200px){
+  .jgb-lr-v54-states{gap:8px!important}
+  .jgb-lr-v54-status-group{padding-left:4px!important;padding-right:4px!important}
+  .jgb-lr-v54-status-group .jgb-lr-v54-states-row{gap:5px!important}
+  .jgb-lr-v54-state{width:52px!important;min-width:52px!important;height:56px!important}
+  .jgb-lr-v54-state b{font-size:19px!important}
+  .jgb-lr-v54-status-title{font-size:14px!important}
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -15045,7 +15138,7 @@ body {
   function historyRows(hist){return hist.length?hist.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join(''):`<tr><td colspan="4" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
   function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>점검·정비 내용</th><th>작업자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span>정상 ${counts.정상} · 점검 ${counts.점검} · 조치필요 ${counts.조치필요} · 수리중 ${counts.수리중}</span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
-  function markup(){const allStatus={};Object.keys(statusColors).forEach(s=>allStatus[s]=assets.filter(x=>x.light===s||x.reel===s).length);return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-states"><span class="jgb-lr-v54-state ok"><b>${allStatus.정상}</b><small>정상</small></span><span class="jgb-lr-v54-state check"><b>${allStatus.점검}</b><small>점검</small></span><span class="jgb-lr-v54-state action"><b>${allStatus.조치필요}</b><small>조치필요</small></span><span class="jgb-lr-v54-state repair"><b>${allStatus.수리중}</b><small>수리중</small></span><span class="jgb-lr-v54-state parts"><b>${allStatus.부품대기}</b><small>부품대기</small></span><span class="jgb-lr-v54-state discard"><b>${allStatus.폐기}</b><small>폐기</small></span></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`}
+  function markup(){const count=(type,status)=>assets.filter(x=>(type==='light'?x.light:x.reel)===status).length;const group=(type,title,icon)=>{const data={정상:count(type,'정상'),점검:count(type,'점검'),조치필요:count(type,'조치필요'),수리중:count(type,'수리중'),부품대기:count(type,'부품대기')};return `<div class="jgb-lr-v54-status-group"><div class="jgb-lr-v54-status-title">${icon} ${title}</div><div class="jgb-lr-v54-states-row"><span class="jgb-lr-v54-state ok"><b>${data.정상}</b><small>정상</small></span><span class="jgb-lr-v54-state check"><b>${data.점검}</b><small>점검</small></span><span class="jgb-lr-v54-state action"><b>${data.조치필요}</b><small>조치필요</small></span><span class="jgb-lr-v54-state repair"><b>${data.수리중}</b><small>수리중</small></span><span class="jgb-lr-v54-state parts"><b>${data.부품대기}</b><small>부품대기</small></span></div></div>`};return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-states">${group('light','조명 관리 현황','💡')}${group('reel','릴선 관리 현황','🔌')}</div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`}
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
   window.jgbLRCardEdit=function(n,type){
