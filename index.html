@@ -6672,6 +6672,9 @@ function jgbV47GoWpByLeak(leakCode){
       };
       function cardHtml(cur,reg,H,I){
         const cardCode=String(cur?.asset_code||cur?.code||window.__eamSelCode||'');
+        // 화면에 표시되는 이력카드 번호는 현재 자산 목록 기준으로 매번 자동 오름차순 재계산한다.
+        // 내부 DB 연결키(cardCode)는 기존 자산코드를 그대로 유지한다.
+        const displayCardCode=typeof window.eamUnifiedCode==='function'?window.eamUnifiedCode(cur):cardCode;
         const equipDeleted=localStorage.getItem('JGB_EQUIP_PHOTO_DELETED_'+cardCode)==='1';
         const equipPhoto=equipDeleted?'':((window.__jgbEquipPhotoCache&&window.__jgbEquipPhotoCache[cardCode])||localStorage.getItem('JGB_EQUIP_PHOTO_'+cardCode)||cur.photo||'');
         const assetId=String(reg?.id||'');
@@ -6680,7 +6683,7 @@ function jgbV47GoWpByLeak(leakCode){
         return `<details class="eam-source-card jgb-history-card" ${window.eamHistoryCardOpen(cardCode)?'open':''} ontoggle="eamPersistHistoryCard(this,'${E(cardCode)}')">
           <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';return window.JGB_EAM_CARD_V22_OPEN('${E(cardCode)}')">✏️ 수정</button></div></summary>
           <div class="jgb-paper-card-body"><section class="jgb-paper-info"><div class="jgb-paper-section-title">📄 기본정보</div><div class="jgb-basic-table-rebuild">
-            <div class="jgb-basic-table-row"><div class="jgb-basic-label">자산코드</div><div class="jgb-basic-value">${E(cur.asset_code||cur.code||'-')}</div><div class="jgb-basic-label">자산명</div><div class="jgb-basic-value">${E(cur.name||'-')}</div></div>
+            <div class="jgb-basic-table-row"><div class="jgb-basic-label">자산코드</div><div class="jgb-basic-value">${E(displayCardCode||'-')}</div><div class="jgb-basic-label">자산명</div><div class="jgb-basic-value">${E(cur.name||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">설비 종류</div><div class="jgb-basic-value">${E(cur.category||cur.type||'-')}</div><div class="jgb-basic-label">위치</div><div class="jgb-basic-value">${E(cur.place||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">위치코드</div><div class="jgb-basic-value">${E(cur.locationCode||placeCode(cur.place)||'-')}</div><div class="jgb-basic-label">모델·규격</div><div class="jgb-basic-value">${E(cur.model||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">용량</div><div class="jgb-basic-value">${E(cur.capacity||'-')}</div><div class="jgb-basic-label">수량</div><div class="jgb-basic-value">${E(cur.qty??cur.quantity??'-')}</div></div>
@@ -14244,6 +14247,7 @@ window.eamDeleteSelectedAsset=async function(){
    window.__eamSelCode='';document.getElementById('eamManageModal')?.remove();
    if(typeof window.eamLoad==='function')await window.eamLoad();
    window.__eamSelCode='';if(typeof window.render==='function')window.render();
+   requestAnimationFrame(()=>{if(typeof window.jgbRenumberHistoryCardDisplay==='function')window.jgbRenumberHistoryCardDisplay()});
    alert('삭제되었습니다.');
  }catch(e){console.error('JGB_V182_DELETE',e);alert('삭제하지 못했습니다.\n'+(e?.message||e))}
 };
@@ -17489,3 +17493,33 @@ document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map
   .eh-main{grid-template-columns:1fr!important;}
 }
 </style>
+
+
+<script id="JGB_HISTORY_CARD_AUTO_RENUMBER_V1">
+(function(){
+  'use strict';
+  // 이력카드 번호 표시만 현재 목록 순서에 맞춰 자동 재정렬한다.
+  // 실제 DB asset_code와 유지관리 연결키는 변경하지 않는다.
+  window.jgbRenumberHistoryCardDisplay=function(){
+    try{
+      if(typeof window.eamCategoryDefs!=='function') return;
+      const defs=window.eamCategoryDefs()||{};
+      const maps={};
+      Object.keys(defs).forEach(cat=>{
+        const items=Array.isArray(defs[cat]?.items)?defs[cat].items:[];
+        const prefix=({cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DR',other:'OT'})[cat]||'OT';
+        items.forEach((x,i)=>{maps[String(x.code||x.asset_code||'')]=prefix+'-'+String(i+1).padStart(2,'0')});
+      });
+      document.querySelectorAll('.eam-asset-row[data-code]').forEach(el=>{
+        const c=String(el.getAttribute('data-code')||'');
+        const n=maps[c];
+        const node=el.querySelector('.row-code');
+        if(node&&n) node.textContent=n;
+      });
+      const sel=String(window.__eamSelCode||'');
+      const hero=document.querySelector('.eam-detail-panel .hero-code');
+      if(hero&&maps[sel]) hero.textContent=maps[sel];
+    }catch(e){console.warn('JGB_HISTORY_CARD_AUTO_RENUMBER_V1',e)}
+  };
+})();
+</script>
