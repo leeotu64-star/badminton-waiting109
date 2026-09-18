@@ -16593,51 +16593,54 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 })();
 </script>
 
-<!-- JGB EAM 현황 v10: 배치도 아이콘 삭제창에 실제 배치도 표시 + 즉시 삭제 -->
-<style id="JGB_EAM_HYUN_V10_ICON_DELETE_MAP">
-.eh-delete-map-preview{margin:12px;border:1px solid #cbd9e3;border-radius:9px;background:#f3f8fb;padding:8px}
-.eh-delete-map-preview .mini-map{position:relative;height:190px;border:2px solid #5b7485;background:#f7fafc;overflow:hidden}
-.eh-delete-map-preview .mini-court{position:absolute;top:10%;height:27%;border:1px solid #79909f;background:#e7eef2;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#36566c}
-.eh-delete-map-preview .mini-fac{position:absolute;left:2%;right:2%;top:42%;bottom:2%;border:1px solid #aabac5;background:#f5f8fa}
-.eh-delete-map-preview .mini-icon{position:absolute;transform:translate(-50%,-50%);z-index:5;border:2px solid #176db0;background:#eaf5ff;color:#075b91;border-radius:999px;padding:3px 6px;font-size:9px;font-weight:900;white-space:nowrap;box-shadow:0 3px 8px rgba(20,55,70,.18)}
-.eh-delete-map-preview .mini-icon.selected{outline:3px solid rgba(214,71,71,.22);border-color:#d64747;background:#fff0f0;color:#b52e2e}
-.eh-delete-map-label{padding:0 12px 5px;font-size:10px;color:#718797}
-.eh-delete-list-v10{padding:8px 12px 14px;display:grid;gap:6px;max-height:31vh;overflow:auto}
-.eh-delete-list-v10>div{display:grid;grid-template-columns:48px 1fr 58px;align-items:center;gap:8px;padding:9px 10px;border:1px solid #dbe4eb;border-radius:7px;background:#fff}
-.eh-delete-list-v10 .code{font-weight:900;color:#176db0}
-.eh-delete-list-v10 .name{font-weight:800;color:#35536a;font-size:11px}
-.eh-delete-list-v10 button{border:1px solid #efc8c8;background:#fff;color:#d64747;border-radius:6px;padding:6px;font-weight:900;cursor:pointer}
+<!-- JGB EAM 현황 v13: 배치도 아이콘 삭제를 LK 삭제 방식의 목록형으로 변경 -->
+<style id="JGB_EAM_HYUN_V13_ICON_DELETE_LIST">
+.eh-delete-list-v13{padding:14px 18px 18px;display:grid;gap:8px;max-height:58vh;overflow:auto}
+.eh-delete-list-v13>div{display:grid;grid-template-columns:90px 1fr 64px;align-items:center;gap:12px;padding:12px 13px;border:1px solid #d7e2ea;border-radius:9px;background:#fff;min-height:48px;box-sizing:border-box}
+.eh-delete-list-v13 .code{font-weight:900;color:#173f5f;font-size:13px}
+.eh-delete-list-v13 .name{font-weight:800;color:#2d4659;font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eh-delete-list-v13 .kind{display:block;color:#8295a3;font-size:9px;font-weight:600;margin-top:2px}
+.eh-delete-list-v13 button{border:0;background:#fff;color:#d64747;font-size:12px;font-weight:900;cursor:pointer;padding:8px 4px}
+.eh-delete-list-v13 button:hover{background:#fff2f2;border-radius:6px}
+.eh-delete-count-v13{padding:12px 18px 0;font-size:11px;color:#6d8292;border-top:1px solid #e1e8ed}
+.eh-delete-empty-v13{display:flex!important;grid-template-columns:1fr!important;justify-content:center;text-align:center;color:#8799a6;font-size:11px;min-height:90px!important}
+@media(max-width:700px){.eh-delete-list-v13>div{grid-template-columns:76px 1fr 54px}.eh-delete-list-v13 .name{font-size:11px}}
 </style>
-<script id="JGB_EAM_HYUN_V10_ICON_DELETE_MAP_JS">
+<script id="JGB_EAM_HYUN_V13_ICON_DELETE_LIST_JS">
 (function(){
 'use strict';
-if(window.__JGB_EAM_HYUN_V10_ICON_DELETE_MAP)return;
-window.__JGB_EAM_HYUN_V10_ICON_DELETE_MAP=true;
+if(window.__JGB_EAM_HYUN_V13_ICON_DELETE_LIST)return;
+window.__JGB_EAM_HYUN_V13_ICON_DELETE_LIST=true;
 const KEY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
 const V=x=>String(x??'').trim();
 const esc=x=>V(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const read=()=>{try{const x=JSON.parse(localStorage.getItem(KEY)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
 const write=x=>{try{localStorage.setItem(KEY,JSON.stringify(x));return true}catch(_){return false}};
-window.eamHyunOpenIconDelete=function(){
-  document.getElementById('eamHyunIconDeleteModal')?.remove();
+function getRows(){
   const only=read();
   const hidden=(()=>{try{const x=JSON.parse(localStorage.getItem('JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1')||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}})();
   const assets=Array.isArray(window.__eamA)?window.__eamA:[];
   const pos=(()=>{try{const x=JSON.parse(localStorage.getItem('JGB_EAM_HYUNHWANG_MAP_V1')||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}})();
   const defaults={'AC-01':[86,8],'AC-02':[68,8],'AC-03':[50,8],'AC-04':[32,8],'AC-05':[14,8],'AC-06':[7,30]};
   const codeOf=a=>V(a?.asset_code||a?.code||'');
-  const assetRows=assets.filter(a=>{const c=codeOf(a);return c&&!hidden[c]&&(pos[c]||defaults[c])}).map(a=>({code:codeOf(a),name:V(a?.name||a?.asset_name||a?.assetName||a?.location||'기존 EAM 자산'),kind:'asset',position:pos[codeOf(a)]||defaults[codeOf(a)]}));
-  const onlyRows=Object.values(only).filter(x=>x&&x.code).map(x=>({code:V(x.code),name:V(x.name)||'배치도 전용 아이콘',kind:'map-only',position:[Number(x.x)||50,Number(x.y)||50] }));
-  const rows=[...assetRows,...onlyRows];
-  const m=document.createElement('div');m.id='eamHyunIconDeleteModal';m.className='eh-modal';
-  const icons=rows.map(x=>`<span class="mini-icon ${x.kind==='asset'?'asset-mini':''}" style="left:${Number(x.position[0])}%;top:${Number(x.position[1])}%">${esc(x.code)}</span>`).join('');
-  const list=rows.length?rows.map(x=>`<div data-delete-row="${esc(x.code)}"><span class="code">${esc(x.code)}</span><span class="name">${esc(x.name)}${x.kind==='asset'?' · 기존 EAM 자산':' · 배치도 전용'}</span><button type="button" onclick="window.eamHyunDeleteMapIcon('${esc(x.code)}','${x.kind}')">삭제</button></div>`).join(''):'<div class="eh-empty">현재 배치도에 표시된 아이콘이 없습니다.</div>';
-  m.innerHTML=`<div class="eh-modal-box"><div class="eh-modal-head"><div><small>EAM MAP ONLY</small><h3>배치도 아이콘 삭제</h3><p>배치도에서만 아이콘을 삭제합니다. 기존 EAM 자산등록 정보와 수리 LIVE 정보는 유지됩니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div><div class="eh-delete-map-preview"><div class="mini-map"><div class="mini-court" style="left:8%;width:15%">5</div><div class="mini-court" style="left:25%;width:15%">4</div><div class="mini-court" style="left:42%;width:15%">3</div><div class="mini-court" style="left:59%;width:15%">2</div><div class="mini-court" style="left:76%;width:15%">1</div><div class="mini-fac"></div>${icons}</div></div><div class="eh-delete-map-label">현재 배치도에 표시된 아이콘 ${rows.length}개</div><div class="eh-delete-list-v10">${list}</div></div>`;
-  document.body.appendChild(m);
-};
+  const assetRows=assets.filter(a=>{const c=codeOf(a);return c&&!hidden[c]&&(pos[c]||defaults[c])}).map(a=>({
+    code:codeOf(a),name:V(a?.name||a?.asset_name||a?.assetName||a?.location||'기존 EAM 자산'),kind:'asset'
+  }));
+  const onlyRows=Object.values(only).filter(x=>x&&x.code).map(x=>({
+    code:V(x.code),name:V(x.name)||'배치도 전용 아이콘',kind:'map-only'
+  }));
+  return [...assetRows,...onlyRows];
+}
+function renderDeleteModal(){
+  let m=document.getElementById('eamHyunIconDeleteModal');
+  if(!m){m=document.createElement('div');m.id='eamHyunIconDeleteModal';m.className='eh-modal';document.body.appendChild(m);}
+  const rows=getRows();
+  const list=rows.length?rows.map(x=>`<div data-delete-row="${esc(x.code)}"><span class="code">${esc(x.code)}</span><span class="name">${esc(x.name)}<small class="kind">${x.kind==='asset'?'기존 EAM 자산 · 배치도 표시만 삭제':'배치도 전용 아이콘'}</small></span><button type="button" onclick="window.eamHyunDeleteMapIcon('${esc(x.code)}','${x.kind}')">삭제</button></div>`).join(''):'<div class="eh-delete-empty-v13">현재 배치도에 표시된 아이콘이 없습니다.</div>';
+  m.innerHTML=`<div class="eh-modal-box"><div class="eh-modal-head"><div><small>EAM MAP ONLY</small><h3>배치도 아이콘 삭제</h3><p>아래 목록에서 삭제할 아이콘을 선택하세요. 기존 EAM 자산등록 정보는 삭제되지 않습니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div><div class="eh-delete-count-v13">현재 배치도에 표시된 아이콘 ${rows.length}개</div><div class="eh-delete-list-v13">${list}</div></div>`;
+}
+window.eamHyunOpenIconDelete=renderDeleteModal;
 window.eamHyunDeleteMapIcon=function(code,kind){
   const c=V(code);if(!c)return;
-  if(!confirm(c+' 배치도 아이콘만 삭제할까요?\nEAM 자산등록 정보와 수리 LIVE 정보는 삭제되지 않습니다.'))return;
   if(kind==='asset'){
     let hidden={};try{const x=JSON.parse(localStorage.getItem('JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1')||'{}');if(x&&typeof x==='object')hidden=x}catch(_){}
     hidden[c]=true;
@@ -16645,8 +16648,8 @@ window.eamHyunDeleteMapIcon=function(code,kind){
   }else{
     const p=read();delete p[c];if(!write(p)){alert('아이콘 삭제 저장에 실패했습니다.');return}
   }
-  document.getElementById('eamHyunIconDeleteModal')?.remove();
   if(typeof render==='function')render();
+  renderDeleteModal();
 };
 })();
 </script>
