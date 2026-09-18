@@ -3815,7 +3815,6 @@ html::before,body::before{
             document.getElementById('eam228Modal')?.remove();
             await eamLoad();
             render();
-            setTimeout(()=>window.eam228Place(code),120);
             return;
           }
           alert('이미 등록된 자산코드입니다.\n기존 EAM 자산을 그대로 사용하려면 기존 자산을 선택하세요.');
@@ -3823,7 +3822,7 @@ html::before,body::before{
         }
         const payload={asset_code:code,name,category:catMap[p],product_name:catMap[p],place:'미배치',status:'정상'};
         const r=await SUPA.from('assets').insert(payload).select('id,asset_code').single();if(r.error){alert('자산 생성 실패\n'+(r.error.message||''));return}
-        document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();setTimeout(()=>window.eam228Place(code),120);
+        document.getElementById('eam228Modal')?.remove();selected.code=code;await eamLoad();render();
       };
       window.eam228LiveInput=code=>{
         const a=assets.find(x=>codeOf(x)===V(code));
