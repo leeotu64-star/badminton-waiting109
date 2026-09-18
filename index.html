@@ -3795,7 +3795,7 @@ html::before,body::before{
         document.getElementById('eam228Modal')?.remove();
         const used=new Set(assets.map(a=>codeOf(a).toUpperCase()));
         const m=document.createElement('div');m.id='eam228Modal';m.className='eam228-modal';
-        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>누수관리 LK 생성처럼 번호를 직접 입력할 수 있습니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><span>${x[2]}</span><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><input id="e223No" maxlength="2" inputmode="numeric" placeholder="01"><strong id="e223Preview">${defaultCat||'AC'}-01</strong></div><div class="eam228-modal-note">코드 생성 후 배치도에서 아이콘을 직접 드래그하여 위치를 정합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
+        m.innerHTML=`<div class="eam228-modal-box"><div class="eam228-modal-head"><div><small>EAM ASSET CODE</small><h3>자산코드 생성</h3><p>누수관리 LK 생성처럼 번호를 직접 입력할 수 있습니다.</p></div><button onclick="this.closest('.eam228-modal').remove()">×</button></div><div class="eam228-code-types">${catDefs.map(x=>`<button type="button" data-cat="${x[0]}" class="${x[0]===defaultCat?'on':''}" onclick="window.eam228Prefix('${x[0]}')"><span>${x[2]}</span><b>${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div><div class="eam228-code-line"><b id="e223Prefix">${defaultCat||'AC'}</b><span>-</span><strong id="e223Preview">자동 발급</strong></div><div class="eam228-modal-note">자산코드는 기존 자산번호와 중복되지 않도록 자동 발급됩니다. 등록 후 배치도에서 아이콘을 직접 배치합니다.</div><div class="eam228-modal-actions"><button class="gray" onclick="this.closest('.eam228-modal').remove()">취소</button><button class="blue" onclick="window.eam228Create()">자산 생성</button></div></div>`;
         document.body.appendChild(m);window.__eam228Used=used;window.eam228Prefix(defaultCat||'AC');document.getElementById('e223No')?.addEventListener('input',window.eam228Preview);
       };
       window.eam228Prefix=p=>{window.__eam228Prefix=p;document.getElementById('e223Prefix').textContent=p;document.querySelectorAll('.eam228-code-types button').forEach(b=>b.classList.toggle('on',b.dataset.cat===p));const inp=document.getElementById('e223No');const used=window.__eam228Used||new Set();let n=1;while(used.has(`${p}-${String(n).padStart(2,'0')}`)&&n<100)n++;if(inp){inp.value=String(n).padStart(2,'0');}window.eam228Preview()};
@@ -15764,3 +15764,55 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 .jgb-lr-maint-dialog .jgb-lr-date-label{display:flex!important;flex-direction:column!important;gap:5px!important;margin:0 0 10px!important;font-size:13px!important;font-weight:900!important;color:#17384e!important}
 .jgb-lr-maint-dialog #jgbLRDate{box-sizing:border-box!important;width:100%!important;padding:9px 10px!important;border:1px solid #b8cbd8!important;border-radius:5px!important;background:#fff!important;font:inherit!important;font-weight:800!important;color:#17384e!important}
 </style>
+
+
+<style id="JGB_EAM_V73_ICON_CLEAN_AUTO">
+/* V73: EAM 배치 아이콘 정리 — 그림/상태점 제거 + 크기 축소. 기능은 유지. */
+#eam228Map .eam228-asset{
+  padding:3px 7px 3px 7px!important;
+  gap:0!important;
+  min-height:20px!important;
+  height:20px!important;
+  box-sizing:border-box!important;
+  font-size:8px!important;
+  line-height:1!important;
+  border-width:1.5px!important;
+  box-shadow:0 3px 7px rgba(20,55,70,.16),0 0 0 1px rgba(255,255,255,.88)!important;
+}
+#eam228Map .eam228-asset::before{
+  display:none!important;
+  content:none!important;
+}
+#eam228Map .eam228-asset::after{
+  left:11px!important;
+  bottom:-4px!important;
+  width:7px!important;
+  height:7px!important;
+}
+#eam228Map .eam228-asset span{
+  display:none!important;
+}
+#eam228Map .eam228-asset b{
+  font-size:8px!important;
+  line-height:1!important;
+  letter-spacing:.01em!important;
+}
+#eam228Map .eam228-asset.dragging{
+  transform:translate(-50%,-50%) scale(1.02)!important;
+}
+/* 코드 생성창: 번호 직접 입력 없이 자동 발급 */
+#eam228Map + .eam228-modal .eam228-code-line input{display:none!important;}
+</style>
+<script id="JGB_EAM_V73_AUTO_CODE_FIX">
+(function(){
+  if(window.__JGB_EAM_V73_AUTO_CODE_FIX)return;
+  window.__JGB_EAM_V73_AUTO_CODE_FIX=true;
+  /* 기존 생성 로직은 번호가 비어 있으면 사용 중인 번호를 건너뛰어 자동 발급한다. */
+  document.addEventListener('click',function(e){
+    const b=e.target.closest?.('#eam228Modal .eam228-modal-actions .blue');
+    if(!b)return;
+    const input=document.getElementById('e223No');
+    if(input) input.value='';
+  },true);
+})();
+</script>
