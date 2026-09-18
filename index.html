@@ -17377,68 +17377,17 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 .eh-map .eh-marker{z-index:20!important}
 .eh-map .eh-marker.dragging{z-index:100!important}
 </style>
-<script id="JGB_EAM_HYUN_V11_ICON_NO_OVERLAP_JS">
+<script id="JGB_EAM_HYUN_V13_ICON_POSITION_LOCK">
 (function(){
-'use strict';
-if(window.__JGB_EAM_HYUN_V11_ICON_NO_OVERLAP)return;
-window.__JGB_EAM_HYUN_V11_ICON_NO_OVERLAP=true;
-const MAPKEY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
-const POSKEY='JGB_EAM_HYUNHWANG_MAP_V1';
-const V=x=>String(x??'').trim();
-const read=(k,f)=>{try{const x=JSON.parse(localStorage.getItem(k)||'');return x&&typeof x==='object'?x:f}catch(_){return f}};
-const write=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x));return true}catch(_){return false}};
-function center(el,map){const a=el.getBoundingClientRect(),b=map.getBoundingClientRect();return {x:a.left+a.width/2,y:a.top+a.height/2,w:a.width,h:a.height};}
-function overlap(a,b,pad){return Math.abs(a.x-b.x)<(a.w+b.w)/2+pad && Math.abs(a.y-b.y)<(a.h+b.h)/2+pad;}
-function savePos(el,x,y){
- const c=V(el.dataset.code||el.textContent||''); if(!c)return;
- if(el.classList.contains('map-only')){
-   const d=read(MAPKEY,{}); if(d[c]){d[c].x=+x.toFixed(2);d[c].y=+y.toFixed(2);write(MAPKEY,d);}
- }else{
-   const p=read(POSKEY,{});p[c]=[+x.toFixed(2),+y.toFixed(2)];write(POSKEY,p);
- }
-}
-function findFree(el,map,startX,startY){
- const all=[...map.querySelectorAll('.eh-marker')].filter(x=>x!==el);
- const mr=map.getBoundingClientRect();
- const step=3.2;
- const candidates=[];
- for(let ring=1;ring<=12;ring++){
-   const d=step*ring;
-   candidates.push([startX+d,startY],[startX-d,startY],[startX,startY+d],[startX,startY-d],[startX+d,startY+d],[startX-d,startY-d],[startX+d,startY-d],[startX-d,startY+d]);
- }
- candidates.push([8,8],[20,12],[32,18],[44,12],[56,18],[68,12],[80,18],[92,12],[12,82],[28,86],[44,82],[60,86],[76,82],[90,78]);
- for(const [x,y] of candidates){
-   const nx=Math.max(3,Math.min(97,x)), ny=Math.max(3,Math.min(97,y));
-   el.style.left=nx+'%';el.style.top=ny+'%';
-   const r=center(el,map);
-   if(!all.some(o=>overlap(r,center(o,map),4)))return [nx,ny];
- }
- el.style.left=startX+'%';el.style.top=startY+'%';
- return [startX,startY];
-}
-function resolveMap(map){
- if(!map)return;
- const icons=[...map.querySelectorAll('.eh-marker')];
- if(icons.length<2)return;
- let changed=false;
- for(let i=0;i<icons.length;i++){
-   const el=icons[i]; if(!el.isConnected)continue;
-   const r=center(el,map);
-   let hit=false;
-   for(let j=0;j<i;j++) if(overlap(r,center(icons[j],map),4)){hit=true;break;}
-   if(hit){
-     const x=parseFloat(el.style.left)||50,y=parseFloat(el.style.top)||50;
-     const [nx,ny]=findFree(el,map,x,y);
-     savePos(el,nx,ny); changed=true;
-   }
- }
- if(changed) window.dispatchEvent(new Event('resize'));
-}
-function schedule(){clearTimeout(window.__JGB_EAM_V11_TIMER);window.__JGB_EAM_V11_TIMER=setTimeout(()=>document.querySelectorAll('.eh-map').forEach(resolveMap),180)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
-new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
-/* 드래그가 끝난 직후에도 겹침을 정리 */
-document.addEventListener('pointerup',function(e){if(e.target.closest?.('.eh-map .eh-marker'))setTimeout(schedule,40)},true);
+  'use strict';
+  /*
+   * V13:
+   * 아이콘 겹침 자동 재배치를 완전히 사용하지 않는다.
+   * 사용자가 드래그해서 저장한 left/top 좌표를 그대로 유지한다.
+   * 위치가 겹쳐도 시스템이 임의로 다른 위치로 이동시키지 않는다.
+   */
+  if(window.__JGB_EAM_HYUN_V13_POSITION_LOCK)return;
+  window.__JGB_EAM_HYUN_V13_POSITION_LOCK=true;
 })();
 </script>
 
