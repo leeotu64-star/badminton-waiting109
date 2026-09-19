@@ -15249,61 +15249,7 @@ body {
 
 
 
-<style id="JGB_EAM_REAL_MARKER_DRAG_V18_CSS">
-.eh-map .eh-marker{touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important;cursor:grab!important;}
-.eh-map .eh-marker.eam-v18-dragging{cursor:grabbing!important;z-index:999999!important;transition:none!important;}
-.eh-map .eh-marker.eam-v18-dragging:hover{transform:translate(-50%,-50%)!important;}
-</style>
-<script id="JGB_EAM_REAL_MARKER_DRAG_V18">
-(function(){
-'use strict';
-if(window.__JGB_EAM_REAL_MARKER_DRAG_V18)return;
-window.__JGB_EAM_REAL_MARKER_DRAG_V18=true;
-const SEL='#eamHyunMap .eh-marker, .eh-map .eh-marker';
-const KEY='JGB_EAM_HYUNHWANG_MAP_V1';
-const read=()=>{try{const x=JSON.parse(localStorage.getItem(KEY)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
-const save=(code,x,y)=>{const p=read();p[code]=[+x.toFixed(3),+y.toFixed(3)];localStorage.setItem(KEY,JSON.stringify(p));};
-let d=null;
-function down(e){
- if(e.pointerType==='mouse'&&e.button!==0)return;
- const el=e.target.closest?.(SEL); if(!el)return;
- const map=el.closest('.eh-map'); if(!map)return;
- const mr=el.getBoundingClientRect(),r=map.getBoundingClientRect();
- d={el,map,pid:e.pointerId,r,startX:e.clientX,startY:e.clientY,ox:e.clientX-(mr.left+mr.width/2),oy:e.clientY-(mr.top+mr.height/2),moved:false};
- try{el.setPointerCapture(e.pointerId)}catch(_){}
-}
-function move(e){
- if(!d||e.pointerId!==d.pid)return;
- const dx=e.clientX-d.startX,dy=e.clientY-d.startY;
- if(!d.moved&&Math.hypot(dx,dy)<6)return;
- d.moved=true;
- const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.ox-d.r.left)/d.r.width*100));
- const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.oy-d.r.top)/d.r.height*100));
- d.el.style.left=x+'%';d.el.style.top=y+'%';d.el.classList.add('eam-v18-dragging');
- e.preventDefault();
-}
-function up(e){
- if(!d||e.pointerId!==d.pid)return;
- const q=d;d=null;
- if(q.moved){
-  const x=Math.max(0.5,Math.min(99.5,(e.clientX-q.ox-q.r.left)/q.r.width*100));
-  const y=Math.max(0.5,Math.min(99.5,(e.clientY-q.oy-q.r.top)/q.r.height*100));
-  q.el.style.left=x+'%';q.el.style.top=y+'%';
-  const code=String(q.el.dataset.code||'').trim();
-  if(code)save(code,x,y);
-  q.el.dataset.eamV18Moved='1';
-  q.el.dataset.eamV18MovedAt=String(Date.now());
-  e.preventDefault();e.stopPropagation();
- }
- q.el.classList.remove('eam-v18-dragging');
- try{q.el.releasePointerCapture(e.pointerId)}catch(_){}
-}
-document.addEventListener('pointerdown',down,true);
-document.addEventListener('pointermove',move,true);
-document.addEventListener('pointerup',up,true);
-document.addEventListener('pointercancel',up,true);
-})();
-</script>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -17279,3 +17225,83 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 
 
 \n<script id="JGB_EAM_DO_EDIT_FIX_V9">\n(function(){\n  const oldEdit=window.eamEditSelectedAsset;\n  if(typeof oldEdit!=='function') return;\n  window.eamEditSelectedAsset=async function(){\n    const shown=String(window.__eamSelCode||'').trim();\n    if(!shown) return oldEdit();\n    try{\n      const rows=typeof sourceRows==='function'?sourceRows():[];\n      const src=rows.find(x=>String(x.code||'').trim()===shown || (typeof window.eamUnifiedCode==='function' && String(window.eamUnifiedCode(x))===shown));\n      if(src && String(src.code)!==shown){\n        window.__eamSelCode=String(src.code);\n        return await oldEdit();\n      }\n      return await oldEdit();\n    }catch(e){\n      console.error(e);\n      alert('문·창호설비 이력카드 수정 대상을 찾을 수 없습니다.\\n'+(e?.message||''));\n    }\n  };\n})();\n</script>\n
+
+<style id="JGB_EAM_MAP_ICON_REBUILD_V19_CSS">
+.eh-map .eh-marker{touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important;cursor:grab!important;}
+.eh-map .eh-marker.eam-v19-dragging{cursor:grabbing!important;z-index:999999!important;transition:none!important;transform:translate(-50%,-50%)!important;}
+.eh-map .eh-marker.eam-v19-dragging:hover{transform:translate(-50%,-50%)!important;}
+</style>
+<script id="JGB_EAM_MAP_ICON_REBUILD_V19">
+(function(){
+'use strict';
+if(window.__JGB_EAM_MAP_ICON_REBUILD_V19)return;
+window.__JGB_EAM_MAP_ICON_REBUILD_V19=true;
+const KEY='JGB_EAM_HYUNHWANG_MAP_V1';
+const SEL='.eh-map .eh-marker';
+const read=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}};
+const write=v=>{try{localStorage.setItem(KEY,JSON.stringify(v));return true}catch(_){return false}};
+const save=(code,x,y)=>{if(!code)return;const v=read();v[code]=[Number(x.toFixed(3)),Number(y.toFixed(3))];write(v)};
+let drag=null;
+function getTarget(e){return e.target&&e.target.closest?e.target.closest(SEL):null}
+function down(e){
+ const el=getTarget(e); if(!el)return;
+ if(e.pointerType==='mouse' && e.button!==0)return;
+ const map=el.closest('.eh-map'); if(!map)return;
+ const mr=el.getBoundingClientRect(), rr=map.getBoundingClientRect();
+ drag={el,map,pid:e.pointerId,rr,startX:e.clientX,startY:e.clientY,ox:e.clientX-(mr.left+mr.width/2),oy:e.clientY-(mr.top+mr.height/2),moved:false};
+ try{el.setPointerCapture(e.pointerId)}catch(_){ }
+}
+function move(e){
+ const d=drag;if(!d||e.pointerId!==d.pid)return;
+ const dx=e.clientX-d.startX,dy=e.clientY-d.startY;
+ if(!d.moved && Math.hypot(dx,dy)<6)return;
+ d.moved=true;
+ const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.ox-d.rr.left)/d.rr.width*100));
+ const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.oy-d.rr.top)/d.rr.height*100));
+ d.el.style.left=x+'%';d.el.style.top=y+'%';d.el.classList.add('eam-v19-dragging');
+ e.preventDefault();
+}
+function finish(e){
+ const d=drag;if(!d||e.pointerId!==d.pid)return;
+ drag=null;
+ if(d.moved){
+  const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.ox-d.rr.left)/d.rr.width*100));
+  const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.oy-d.rr.top)/d.rr.height*100));
+  d.el.style.left=x+'%';d.el.style.top=y+'%';
+  save(String(d.el.getAttribute('data-code')||'').trim(),x,y);
+  d.el.dataset.v19Dragged='1';
+  d.el.dataset.v19DraggedAt=String(Date.now());
+  e.preventDefault();e.stopPropagation();
+ }
+ d.el.classList.remove('eam-v19-dragging');
+ try{d.el.releasePointerCapture(e.pointerId)}catch(_){ }
+}
+function click(e){
+ const el=getTarget(e);if(!el)return;
+ if(el.dataset.v19Dragged==='1'){
+  const at=Number(el.dataset.v19DraggedAt||0);
+  el.dataset.v19Dragged='';
+  if(Date.now()-at<500){e.preventDefault();e.stopImmediatePropagation();return;}
+ }
+ const code=String(el.getAttribute('data-code')||'').trim();if(!code)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ window.__eamSelCode=code;
+ const prefix=code.split('-')[0];
+ const cat={AC:'cooling',BO:'heating',FI:'fire',SA:'sanitary',EL:'electrical',DO:'door',OT:'other'}[prefix]||'other';
+ window.__eamCat=cat;
+ if(typeof window.go==='function')window.go('eam');
+ const pick=()=>{
+  const row=document.querySelector('.eam-asset-row[data-code="'+CSS.escape(code)+'"]');
+  if(row){row.click();return true;}
+  if(typeof window.eamPick==='function'){try{window.eamPick(cat,code);return true}catch(_){} }
+  return false;
+ };
+ requestAnimationFrame(()=>{if(!pick())setTimeout(pick,150)});
+}
+document.addEventListener('pointerdown',down,true);
+document.addEventListener('pointermove',move,true);
+document.addEventListener('pointerup',finish,true);
+document.addEventListener('pointercancel',finish,true);
+document.addEventListener('click',click,true);
+})();
+</script>
