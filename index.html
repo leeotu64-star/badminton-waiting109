@@ -18572,3 +18572,60 @@ window.eamDeleteSelectedAssetByCode=async function(c){window.__eamSelCode=V(c);r
 .jgb-history-card .jgb-paper-auto > .jgb-paper-cell:nth-child(5){grid-column:1!important;grid-row:3!important;}
 .jgb-history-card .jgb-paper-auto > .jgb-paper-cell:nth-child(6){grid-column:2!important;grid-row:3!important;}
 </style>
+
+<!-- JGB EAM v6: 배치도 아이콘 단일 클릭 최종 강제 연결 -->
+<script id="JGB_EAM_ICON_CLICK_FINAL_V6">
+(function(){
+'use strict';
+if(window.__JGB_EAM_ICON_CLICK_FINAL_V6)return;
+window.__JGB_EAM_ICON_CLICK_FINAL_V6=true;
+const V=x=>String(x??'').trim();
+let down=null;
+function target(e){return e.target&&e.target.closest?e.target.closest('.eh-map .eh-marker[data-code]'):null}
+function cat(code){
+ const p=V(code).split('-')[0].toUpperCase();
+ return ({AC:'cooling',BO:'water',FI:'fire',EL:'electrical',LT:'lighting',SA:'sanitary',DO:'doors',WP:'waterproof',OT:'other'})[p]||'other';
+}
+function select(el){
+ const c=V(el&&el.getAttribute('data-code')); if(!c||el.classList.contains('map-only'))return false;
+ window.__eamSelCode=c;
+ window.__eamCat=cat(c);
+ try{
+   if(typeof window.eamPick==='function'){
+     window.eamPick(window.__eamCat,c);
+     return true;
+   }
+ }catch(err){console.error('EAM icon select',err)}
+ try{if(typeof window.go==='function')window.go('eam')}catch(_){ }
+ return false;
+}
+document.addEventListener('pointerdown',function(e){
+ const el=target(e); if(!el)return;
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ down={el,x:e.clientX,y:e.clientY,pid:e.pointerId,moved:false};
+},true);
+document.addEventListener('pointermove',function(e){
+ if(!down||e.pointerId!==down.pid)return;
+ if(Math.hypot(e.clientX-down.x,e.clientY-down.y)>7)down.moved=true;
+},true);
+document.addEventListener('pointerup',function(e){
+ if(!down||e.pointerId!==down.pid)return;
+ const d=down;down=null;
+ if(d.moved)return;
+ const el=d.el&&d.el.isConnected?d.el:target(e);
+ if(!el)return;
+ /* 클릭으로 판단되는 경우에만 이력카드 선택. 드래그는 기존 위치이동 기능에 맡긴다. */
+ e.preventDefault();
+ e.stopPropagation();
+ try{e.stopImmediatePropagation()}catch(_){ }
+ select(el);
+},true);
+/* 키보드 접근도 동일하게 처리 */
+document.addEventListener('keydown',function(e){
+ if(e.key!=='Enter'&&e.key!==' ')return;
+ const el=e.target&&e.target.closest?e.target.closest('.eh-map .eh-marker[data-code]'):null;
+ if(!el)return;
+ e.preventDefault();e.stopPropagation();select(el);
+},true);
+})();
+</script>
