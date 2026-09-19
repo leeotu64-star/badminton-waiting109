@@ -6924,7 +6924,7 @@ function jgbV47GoWpByLeak(leakCode){
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">내용연수</div><div class="jgb-basic-value">${E(cur.life||'-')}</div><div class="jgb-basic-label">평가등급</div><div class="jgb-basic-value">${E(cur.grade||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">보증</div><div class="jgb-basic-value">${E(cur.warranty||'-')}</div><div class="jgb-basic-label">A/S 기록</div><div class="jgb-basic-value">${E(cur.asHistory||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">자산상태</div><div class="jgb-basic-value">${E(cur.status||'정상')}</div><div class="jgb-basic-label">취득구분</div><div class="jgb-basic-value">${E(cur.acquisitionType||'기존 자산')}</div></div>
-          </div><div class="jgb-operation-info"><div class="jgb-operation-title">⚙ 설비 운영·관리정보</div><div class="jgb-operation-row operation"><span>작동방법</span><b>${E(cur.operationMethod||cur.operation||'-')}</b></div><div class="jgb-operation-row use"><span>사용방법</span><b>${E(cur.usageMethod||cur.useMethod||cur.usage||'-')}</b></div><div class="jgb-operation-row caution"><span>주의사항</span><b>${E(cur.caution||cur.warning||'-')}</b></div></div></section><section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149"><div class="jgb-paper-section-title">📷 설비 사진 (현재)</div><div class="jgb-equip-photo-stage"><div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">${equipPhoto?`<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">×</button>`:`<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택"></div></div><div class="jgb-equip-photo-actions-rebuilt"><button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button><span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div><div class="jgb-v149-detail-title">설비 상세사진 · 각 4×4cm</div><div class="jgb-v149-detail-scroll"><div class="jgb-v149-detail-grid">${['정면','측면','명판','설치환경'].map((label,i)=>{const key='JGB_EQUIP_SUBPHOTO_'+cardCode+'_'+i;let src='';try{src=localStorage.getItem(key)||''}catch(e){}const desc=['설비 정면 사진','설비 측면 사진','제조·규격 명판','설치 상태 사진'][i];return `<div class="jgb-v149-detail-item"><div class="jgb-v149-detail-box" onclick="window.jgbV145PickSubPhoto&&window.jgbV145PickSubPhoto('${E(cardCode)}',${i})" title="${E(label)} 사진 등록">${src?`<img src="${E(src)}" alt="${E(label)}"><button type="button" class="jgb-v149-detail-del" onclick="event.preventDefault();event.stopPropagation();window.jgbV145DeleteSubPhoto&&window.jgbV145DeleteSubPhoto('${E(cardCode)}',${i})">×</button>`:`<span>📷<br>사진 등록</span>`}</div><b>${E(label)}</b><small>${E(desc)}</small></div>`}).join('')}</div></div></section></div>
+          </div><section class="jgb-operating-info"><div class="jgb-operating-title">⚙ 설비 운영·관리정보</div><div class="jgb-operating-row"><div class="jgb-operating-label operating">작동방법</div><div class="jgb-operating-value">${E(cur.operationMethod||cur.operatingMethod||cur.startMethod||'-')}</div></div><div class="jgb-operating-row"><div class="jgb-operating-label usage">사용방법</div><div class="jgb-operating-value">${E(cur.usageMethod||cur.useMethod||cur.operationGuide||'-')}</div></div><div class="jgb-operating-row"><div class="jgb-operating-label caution">주의사항</div><div class="jgb-operating-value">${E(cur.caution||cur.safetyNote||cur.operatingCaution||'-')}</div></div></section></section><section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149"><div class="jgb-paper-section-title">📷 설비 사진 (현재)</div><div class="jgb-equip-photo-stage"><div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">${equipPhoto?`<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">×</button>`:`<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택"></div></div><div class="jgb-equip-photo-actions-rebuilt"><button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button><span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div><div class="jgb-v149-detail-title">설비 상세사진 · 각 4×4cm</div><div class="jgb-v149-detail-scroll"><div class="jgb-v149-detail-grid">${['정면','측면','명판','설치환경'].map((label,i)=>{const key='JGB_EQUIP_SUBPHOTO_'+cardCode+'_'+i;let src='';try{src=localStorage.getItem(key)||''}catch(e){}const desc=['설비 정면 사진','설비 측면 사진','제조·규격 명판','설치 상태 사진'][i];return `<div class="jgb-v149-detail-item"><div class="jgb-v149-detail-box" onclick="window.jgbV145PickSubPhoto&&window.jgbV145PickSubPhoto('${E(cardCode)}',${i})" title="${E(label)} 사진 등록">${src?`<img src="${E(src)}" alt="${E(label)}"><button type="button" class="jgb-v149-detail-del" onclick="event.preventDefault();event.stopPropagation();window.jgbV145DeleteSubPhoto&&window.jgbV145DeleteSubPhoto('${E(cardCode)}',${i})">×</button>`:`<span>📷<br>사진 등록</span>`}</div><b>${E(label)}</b><small>${E(desc)}</small></div>`}).join('')}</div></div></section></div>
           <div class="jgb-paper-auto">${F('최근 외주정비일',cur.recentExternalMaintenanceDate||cur.externalMaintenanceDate||'-')}${F('누적 외주정비 건수',extCount+'건')}${F('최근 조치내용',cur.recentExternalMaintenanceAction||cur.externalMaintenanceAction||'-')}${F('누적 자체정비 건수',selfCount+'건')}${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}${F('','')}</div>
           <div class="jgb-paper-notes">${F('시설개선계획',cur.improvementPlan||'-','wide')}${F('특이사항',cur.note||'-','wide')}</div></details>`;
       }
@@ -15976,72 +15976,98 @@ document.addEventListener('click',handle,true);
 })();
 </script>
 
-<style id="JGB_V8_FINAL_LINES_AND_ICON_DRAG">
-/* V8: 이력카드 하단 표 선/제목 정리 + 배치도 아이콘 드래그/클릭 충돌 해소 */
+<style id="JGB_V9_FINAL_TABLE_LINES_ONLY">
+/* v9: v7 기준. 요청사항: 하단 이력카드 선과 제목만 최종 정리. 기능/배치/아이콘/사진 변경 없음. */
 .jgb-history-card .jgb-paper-auto{
   display:grid!important;
-  grid-template-columns:125px minmax(0,1fr) 125px minmax(0,1fr)!important;
-  grid-template-rows:52px 52px 52px!important;
-  width:100%!important; height:156px!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  width:100%!important;
   margin:0!important; padding:0!important; gap:0!important;
   box-sizing:border-box!important;
-  background:#faf8f2!important;
-  border:2px solid #718492!important;
+  border:2px solid #4c6272!important;
   border-bottom:0!important;
+  background:#faf8f2!important;
 }
 .jgb-history-card .jgb-paper-auto>.jgb-paper-cell{
   display:grid!important;
-  grid-template-columns:125px minmax(0,1fr)!important;
-  width:100%!important; height:52px!important; min-height:52px!important;
+  grid-template-columns:155px minmax(0,1fr)!important;
+  min-width:0!important; height:52px!important; min-height:52px!important;
   margin:0!important; padding:0!important;
   box-sizing:border-box!important;
   border:0!important;
-  border-right:1px solid #718492!important;
-  border-bottom:1px solid #718492!important;
+  border-right:2px solid #4c6272!important;
+  border-bottom:2px solid #4c6272!important;
   background:#faf8f2!important;
 }
-.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(1){grid-column:1 / 3!important;grid-row:1!important}
-.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(2){grid-column:3 / 5!important;grid-row:1!important;border-right:0!important}
-.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(3){grid-column:1 / 3!important;grid-row:2!important}
-.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(4){grid-column:3 / 5!important;grid-row:2!important;border-right:0!important}
-.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1 / 5!important;grid-row:3!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(2n){border-right:0!important}
 .jgb-history-card .jgb-paper-auto>.jgb-paper-cell small{
   display:flex!important; align-items:center!important;
-  width:125px!important; height:52px!important; min-width:125px!important;
-  margin:0!important; padding:6px 8px!important; box-sizing:border-box!important;
+  width:155px!important; min-width:155px!important; height:52px!important;
+  margin:0!important; padding:0 10px!important; box-sizing:border-box!important;
+  border:0!important; border-right:2px solid #4c6272!important;
   background:#d9e1e5!important; color:#203c4f!important;
-  border-right:1px solid #718492!important;
   font-size:13px!important; font-weight:900!important; line-height:1.15!important;
-  white-space:nowrap!important; word-break:keep-all!important; overflow:visible!important; text-overflow:clip!important;
+  white-space:nowrap!important; word-break:keep-all!important;
+  overflow:visible!important; text-overflow:clip!important;
 }
 .jgb-history-card .jgb-paper-auto>.jgb-paper-cell b{
-  display:flex!important; align-items:center!important; min-width:0!important;
-  width:100%!important; height:52px!important; margin:0!important; padding:6px 10px!important;
-  box-sizing:border-box!important; background:#faf8f2!important; color:#172f40!important;
-  font-size:13px!important; font-weight:750!important; line-height:1.2!important;
+  display:flex!important; align-items:center!important;
+  min-width:0!important; width:100%!important; height:52px!important;
+  margin:0!important; padding:0 10px!important; box-sizing:border-box!important;
+  border:0!important; background:#faf8f2!important; color:#172f40!important;
+  font-size:14px!important; font-weight:750!important; line-height:1.2!important;
   white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important;
 }
-.jgb-history-card .jgb-paper-notes{display:block!important;width:100%!important;margin:0!important;padding:0!important;box-sizing:border-box!important;border-left:2px solid #718492!important;border-right:2px solid #718492!important;border-bottom:2px solid #718492!important}
-.jgb-history-card .jgb-paper-notes .jgb-paper-cell.wide{
-  display:grid!important; grid-template-columns:125px minmax(0,1fr)!important;
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1 / 3!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(6){display:none!important}
+.jgb-history-card .jgb-paper-notes{
+  display:block!important; width:100%!important; margin:0!important; padding:0!important;
+  box-sizing:border-box!important;
+  border-left:2px solid #4c6272!important;
+  border-right:2px solid #4c6272!important;
+  border-bottom:2px solid #4c6272!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide{
+  display:grid!important; grid-template-columns:155px minmax(0,1fr)!important;
   width:100%!important; height:52px!important; min-height:52px!important;
   margin:0!important; padding:0!important; box-sizing:border-box!important;
-  border:0!important; border-bottom:1px solid #718492!important;
+  border:0!important; border-bottom:2px solid #4c6272!important;
+  background:#faf8f2!important;
 }
-.jgb-history-card .jgb-paper-notes .jgb-paper-cell.wide:last-child{border-bottom:0!important}
-.jgb-history-card .jgb-paper-notes .jgb-paper-cell.wide small{display:flex!important;align-items:center!important;width:125px!important;height:52px!important;min-width:125px!important;padding:6px 8px!important;background:#d9e1e5!important;color:#203c4f!important;border-right:1px solid #718492!important;font-size:13px!important;font-weight:900!important;white-space:nowrap!important;word-break:keep-all!important;overflow:visible!important}
-.jgb-history-card .jgb-paper-notes .jgb-paper-cell.wide b{display:flex!important;align-items:center!important;height:52px!important;min-width:0!important;padding:6px 10px!important;background:#faf8f2!important;color:#172f40!important;font-size:13px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-.jgb-operation-info{margin:0!important;border-top:2px solid #718492!important;border-bottom:2px solid #718492!important;background:#faf8f2!important}
-.jgb-operation-title{height:34px!important;display:flex!important;align-items:center!important;padding:0 10px!important;background:#d9e1e5!important;color:#203c4f!important;border-bottom:1px solid #718492!important;font-size:13px!important;font-weight:900!important;white-space:nowrap!important}
-.jgb-operation-row{display:grid!important;grid-template-columns:78px minmax(0,1fr)!important;min-height:42px!important;height:42px!important;border-bottom:1px solid #718492!important}
-.jgb-operation-row:last-child{border-bottom:0!important}
-.jgb-operation-row span{display:flex!important;align-items:center!important;padding:0 8px!important;font-size:12px!important;font-weight:900!important;border-right:1px solid #718492!important;white-space:nowrap!important}
-.jgb-operation-row b{display:flex!important;align-items:center!important;padding:0 10px!important;font-size:12px!important;font-weight:700!important;min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-.jgb-operation-row.operation span{background:#edf9ef!important;color:#159447!important}.jgb-operation-row.use span{background:#eef5ff!important;color:#1769c1!important}.jgb-operation-row.caution span{background:#fff0f0!important;color:#d93636!important}
-.eh-map .eh-marker[data-code]{pointer-events:auto!important;cursor:grab!important;touch-action:none!important;z-index:1000!important;user-select:none!important}
-.eh-map .eh-marker[data-code].eam-v19-dragging{cursor:grabbing!important}
-@media(max-width:750px){.jgb-history-card .jgb-paper-auto{grid-template-columns:125px minmax(0,1fr)!important;grid-template-rows:repeat(5,52px)!important;height:260px!important}.jgb-history-card .jgb-paper-auto>.jgb-paper-cell{grid-column:1 / 3!important;grid-row:auto!important;border-right:0!important}.jgb-history-card .jgb-paper-auto>.jgb-paper-cell small{width:125px!important}}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide:last-child{border-bottom:0!important}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide small{
+  display:flex!important; align-items:center!important;
+  width:155px!important; min-width:155px!important; height:52px!important;
+  margin:0!important; padding:0 10px!important; box-sizing:border-box!important;
+  border:0!important; border-right:2px solid #4c6272!important;
+  background:#d9e1e5!important; color:#203c4f!important;
+  font-size:13px!important; font-weight:900!important; line-height:1.15!important;
+  white-space:nowrap!important; word-break:keep-all!important;
+  overflow:visible!important; text-overflow:clip!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide b{
+  display:flex!important; align-items:center!important; width:100%!important; min-width:0!important; height:52px!important;
+  margin:0!important; padding:0 10px!important; box-sizing:border-box!important;
+  border:0!important; background:#faf8f2!important; color:#172f40!important;
+  font-size:14px!important; font-weight:750!important; line-height:1.2!important;
+  white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important;
+}
+/* 운영·관리정보도 같은 페이퍼 표선 */
+.jgb-history-card .jgb-operating-info{border:2px solid #4c6272!important;border-top:0!important}
+.jgb-history-card .jgb-operating-title{border-bottom:2px solid #4c6272!important}
+.jgb-history-card .jgb-operating-row{border-bottom:2px solid #4c6272!important}
+.jgb-history-card .jgb-operating-label{border-right:2px solid #4c6272!important}
+.jgb-history-card .jgb-operating-row:last-child{border-bottom:0!important}
+@media(max-width:700px){
+ .jgb-history-card .jgb-paper-auto{grid-template-columns:1fr!important}
+ .jgb-history-card .jgb-paper-auto>.jgb-paper-cell{grid-column:1!important;border-right:0!important}
+ .jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1!important}
+ .jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide{grid-template-columns:120px minmax(0,1fr)!important}
+ .jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide small{width:120px!important;min-width:120px!important}
+}
 </style>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -19147,3 +19173,221 @@ if(typeof oldReg==='function'&&!window.__JGB_EAM_V6_REG_WRAP){
 cleanupDuplicateOnly();
 })();
 </script>
+
+
+<style id="JGB_V8_REQUESTED_ONLY_FINAL">
+/* v8: v7 기준. 요청사항은 설비 운영·관리정보 + 하단 선/제목만 수정. */
+.jgb-history-card .jgb-operating-info{
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:1.5px solid #718492!important;
+  border-top:0!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-operating-title{
+  height:38px!important;
+  min-height:38px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:0 12px!important;
+  box-sizing:border-box!important;
+  background:#dfe6ea!important;
+  color:#203c50!important;
+  border-bottom:1.5px solid #718492!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+}
+.jgb-history-card .jgb-operating-row{
+  display:grid!important;
+  grid-template-columns:92px minmax(0,1fr)!important;
+  width:100%!important;
+  min-height:42px!important;
+  height:42px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border-bottom:1.5px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-operating-row:last-child{border-bottom:0!important}
+.jgb-history-card .jgb-operating-label{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  height:42px!important;
+  padding:0 9px!important;
+  box-sizing:border-box!important;
+  border-right:1.5px solid #718492!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+}
+.jgb-history-card .jgb-operating-label.operating{background:#e7f6ed!important;color:#159447!important}
+.jgb-history-card .jgb-operating-label.usage{background:#eaf2ff!important;color:#176fce!important}
+.jgb-history-card .jgb-operating-label.caution{background:#fff0f0!important;color:#d93636!important}
+.jgb-history-card .jgb-operating-value{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  height:42px!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:13px!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+/* 하단 자동정보: 제목 한 줄 + 모든 구분선 고정 */
+.jgb-history-card .jgb-paper-auto{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  width:100%!important;
+  height:auto!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  box-sizing:border-box!important;
+  border-top:1.5px solid #718492!important;
+  border-left:1.5px solid #718492!important;
+  border-right:1.5px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell{
+  display:grid!important;
+  grid-template-columns:155px minmax(0,1fr)!important;
+  width:100%!important;
+  min-width:0!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1.5px solid #718492!important;
+  border-bottom:1.5px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(2n){border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell small{
+  display:flex!important;
+  align-items:center!important;
+  width:155px!important;
+  min-width:155px!important;
+  height:52px!important;
+  margin:0!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1.5px solid #718492!important;
+  background:#d9e1e5!important;
+  color:#203c4f!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  width:100%!important;
+  height:52px!important;
+  margin:0!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:14px!important;
+  font-weight:750!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+/* 차기 점검일은 오른쪽 짝 없이 전체 폭 한 줄 */
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1 / 3!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(6){display:none!important}
+/* 시설개선계획 / 특이사항: 제목-내용 세로선 + 행 가로선 */
+.jgb-history-card .jgb-paper-notes{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border-left:1.5px solid #718492!important;
+  border-right:1.5px solid #718492!important;
+  border-bottom:1.5px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide{
+  display:grid!important;
+  grid-template-columns:155px minmax(0,1fr)!important;
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-bottom:1.5px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide:last-child{border-bottom:0!important}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide small{
+  display:flex!important;
+  align-items:center!important;
+  width:155px!important;
+  min-width:155px!important;
+  height:52px!important;
+  margin:0!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1.5px solid #718492!important;
+  background:#d9e1e5!important;
+  color:#203c4f!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:visible!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide b{
+  display:flex!important;
+  align-items:center!important;
+  width:100%!important;
+  min-width:0!important;
+  height:52px!important;
+  margin:0!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:14px!important;
+  font-weight:750!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+@media(max-width:700px){
+  .jgb-history-card .jgb-paper-auto{grid-template-columns:1fr!important}
+  .jgb-history-card .jgb-paper-auto>.jgb-paper-cell{grid-column:1!important;border-right:0!important}
+  .jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1!important}
+  .jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide{grid-template-columns:120px minmax(0,1fr)!important}
+  .jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide small{width:120px!important;min-width:120px!important}
+}
+</style>
