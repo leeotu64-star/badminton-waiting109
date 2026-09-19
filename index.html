@@ -4782,7 +4782,13 @@ a[data-page="digitalTwin"],
          기존 EAM 아이콘 하나만 표시한다. 이것이 중복 아이콘/엉뚱한 클릭의 직접 원인이다. */
       const mapOnlyMarkers=Object.values(mapOnly)
         .filter(x=>{const c=V(x?.code);return c&&!assetCodeSet.has(c)})
-        .map(x=>`<button type="button" class="eh-marker map-only" data-map-only="1" data-code="${attr(x.code)}" style="left:${Number(x.x)}%;top:${Number(x.y)}%" title="배치도 전용 ${attr(x.code)}"><b>${esc(x.code)}</b></button>`).join('');
+        .map(x=>{
+          const c=V(x.code);
+          const realAsset=assets.find(a=>codeOf(a)===c);
+          /* 실제 자산이 존재하면 map-only 상태를 없애고 동일 자산코드의 EAM 아이콘으로 취급 */
+          const cls=realAsset?'eh-marker':'eh-marker map-only';
+          return `<button type="button" class="${cls}" data-map-only="${realAsset?'':'1'}" data-code="${attr(c)}" style="left:${Number(x.x)}%;top:${Number(x.y)}%" title="${realAsset?'EAM 자산 '+attr(c):'배치도 전용 '+attr(c)}"><b>${esc(c)}</b></button>`;
+        }).join('');
       const zone=(label,sub,cls='')=>`<div class="eh-zone ${cls}"><b>${esc(label)}</b><small>${esc(sub)}</small></div>`;
       const map=`<div class="eh-map"><div class="eh-courts"><b>코트 구역</b>${[5,4,3,2,1].map(n=>`<div class="eh-court eh-court-3d" data-court="${n}"><div class="eh-court-surface"><span class="eh-court-net"></span><b>${n}</b></div></div>`).join('')}</div><div class="eh-facility"><div class="eh-roof"><span>옥상</span><span>옥상</span><span>창고</span><span>▲ 계단</span></div><div class="eh-row">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><div class="eh-corridor">복도</div><div class="eh-bottom">${zone('휴게실','휴게공간')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영')}</div></div>${markers}${mapOnlyMarkers}${!markers&&!mapOnlyMarkers?'<div class="eh-empty-map">배치된 자산·아이콘이 없습니다.</div>':''}</div>`;
       const liveHtml=liveRows.length?`<div class="eh-live-scroll"><table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${liveRows.map(x=>`<tr><td>${esc(x.asset_code||'-')}</td><td class="left">${esc(x.content||'-')}</td><td class="eh-live-state">${esc(x.status||'수리중')}</td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="eh-done eh-live-edit-btn" onclick="window.eamManualLiveEdit('${attr(x.asset_code||'')}')">입력</button></td><td><button class="eh-done" onclick="window.eamManualLiveComplete('${attr(x.asset_code||'')}')">완료</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="eh-empty">현재 수리 LIVE 등록 건이 없습니다.</div>';
@@ -15729,6 +15735,55 @@ try{
 }
 </style>
 
+<script id="JGB_EAM_V35_ICON_AUTO_CREATE_CLICK_FIX">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_V35_ICON_AUTO_CREATE_CLICK_FIX)return;
+  window.__JGB_EAM_V35_ICON_AUTO_CREATE_CLICK_FIX=true;
+  const V=x=>String(x??'').trim();
+  const catFor=c=>({AC:'cooling',BO:'water',FI:'fire',EL:'electrical',LT:'lighting',WP:'waterproof',SA:'sanitary',DO:'doors',OT:'other'}[V(c).toUpperCase().split('-')[0]]||'other');
+  function fixStaleOnly(){
+    try{
+      const assets=Array.isArray(window.__eamA)?window.__eamA:[];
+      const aset=new Set(assets.map(a=>V(a?.asset_code||a?.code)));
+      const k='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+      const o=JSON.parse(localStorage.getItem(k)||'{}')||{};
+      let changed=false;
+      Object.keys(o).forEach(c=>{if(aset.has(c)){delete o[c];changed=true;}});
+      if(changed)localStorage.setItem(k,JSON.stringify(o));
+    }catch(_){}
+  }
+  function bind(){
+    document.querySelectorAll('.eh-map .eh-marker[data-code]').forEach(el=>{
+      if(el.__v35DirectClick)return;
+      el.__v35DirectClick=true;
+      el.addEventListener('click',function(e){
+        const c=V(this.getAttribute('data-code'));
+        if(!c || this.classList.contains('map-only'))return;
+        e.preventDefault();
+        window.__eamSelCode=c;
+        window.__eamCat=catFor(c);
+        try{
+          if(typeof window.go==='function')window.go('eam');
+          setTimeout(()=>{try{if(typeof window.eamPick==='function')window.eamPick(window.__eamCat,c)}catch(_){}},0);
+        }catch(_){}
+      });
+    });
+  }
+  const oldRender=window.render;
+  if(typeof oldRender==='function'&&!window.__JGB_EAM_V35_RENDER_WRAP){
+    window.__JGB_EAM_V35_RENDER_WRAP=true;
+    window.render=function(){
+      const r=oldRender.apply(this,arguments);
+      setTimeout(fixStaleOnly,0);
+      setTimeout(bind,0);
+      setTimeout(bind,120);
+      return r;
+    };
+  }
+  setTimeout(fixStaleOnly,0);setTimeout(bind,100);setTimeout(bind,400);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
@@ -17780,8 +17835,13 @@ function click(e){
  }
  e.preventDefault();e.stopImmediatePropagation();
  window.__eamSelCode=code;
- const prefix=code.split('-')[0];
- const cat={AC:'cooling',BO:'heating',FI:'fire',SA:'sanitary',EL:'electrical',DO:'doors',OT:'other'}[prefix]||'other';
+ const prefix=code.split('-')[0].toUpperCase();
+ /* 아이콘 클릭은 자산코드 하나를 기준으로 실제 EAM 분류에 연결한다.
+    특히 BO는 heating이 아니라 EAM의 water 분류로 연결한다. */
+ const cat={
+   AC:'cooling', BO:'water', FI:'fire', EL:'electrical', LT:'lighting',
+   WP:'waterproof', SA:'sanitary', DO:'doors', OT:'other'
+ }[prefix]||'other';
  window.__eamCat=cat;
  /* 행의 DOM 클릭을 중간에 거치지 않고 EAM의 공식 선택 함수에 직접 전달한다.
     그래서 아이콘 클릭 → 같은 자산코드의 이력카드가 바로 열린다. */
@@ -18493,6 +18553,24 @@ window.eamDeleteSelectedAssetByCode=async function(c){window.__eamSelCode=V(c);r
 
       // 삭제됐던 동일 번호를 다시 등록하면 삭제 표시를 즉시 해제한다.
       markActive(code);
+
+      /* 신규 자산 등록 = 배치도 아이콘 1개를 동일 자산코드로 자동 생성
+         기존 배치도 전용 아이콘이 같은 코드로 남아 있으면 제거하고
+         자산용 배치 위치를 최초 중앙(50%,50%)으로 만든다. */
+      try{
+        const posKey='JGB_EAM_HYUNHWANG_MAP_V1';
+        const onlyKey='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+        const hiddenKey='JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1';
+        const pos=JSON.parse(localStorage.getItem(posKey)||'{}')||{};
+        const only=JSON.parse(localStorage.getItem(onlyKey)||'{}')||{};
+        const hidden=JSON.parse(localStorage.getItem(hiddenKey)||'{}')||{};
+        if(!pos[code])pos[code]=[50,50];
+        delete only[code];
+        delete hidden[code];
+        localStorage.setItem(posKey,JSON.stringify(pos));
+        localStorage.setItem(onlyKey,JSON.stringify(only));
+        localStorage.setItem(hiddenKey,JSON.stringify(hidden));
+      }catch(e){console.warn('신규 자산 배치도 아이콘 자동 생성 실패',e)}
 
       const metaKey='JGB_EAM_ASSET_META_V40';
       try{
