@@ -7290,7 +7290,7 @@ function jgbV47GoWpByLeak(leakCode){
               <section class="jgb-paper-info jgb-basic-v13"><div class="jgb-paper-section-title">📄 기본정보</div><div class="jgb-basic-table-rebuild">
                 <div class="jgb-basic-table-row"><div class="jgb-basic-label">자산코드</div><div class="jgb-basic-value">${E(displayCardCode||'-')}</div><div class="jgb-basic-label">자산명</div><div class="jgb-basic-value">${E(cur.name||'-')}</div></div>
                 <div class="jgb-basic-table-row"><div class="jgb-basic-label">설비 종류</div><div class="jgb-basic-value">${E(cur.category||cur.type||'-')}</div><div class="jgb-basic-label">위치</div><div class="jgb-basic-value">${E(cur.place||'-')}</div></div>
-                <div class="jgb-basic-table-row"><div class="jgb-basic-label">특이사항</div><div class="jgb-basic-value">${E(cur.note||'-')}</div><div class="jgb-basic-label">모델·규격</div><div class="jgb-basic-value">${E(cur.model||'-')}</div></div>
+                <div class="jgb-basic-table-row"><div class="jgb-basic-label">위치코드</div><div class="jgb-basic-value">${E(cur.locationCode||placeCode(cur.place)||'-')}</div><div class="jgb-basic-label">모델·규격</div><div class="jgb-basic-value">${E(cur.model||'-')}</div></div>
                 <div class="jgb-basic-table-row"><div class="jgb-basic-label">용량</div><div class="jgb-basic-value">${E(cur.capacity||'-')}</div><div class="jgb-basic-label">수량</div><div class="jgb-basic-value">${E(cur.qty??cur.quantity??'-')}</div></div>
                 <div class="jgb-basic-table-row"><div class="jgb-basic-label">제조사</div><div class="jgb-basic-value">${E(cur.maker||cur.vendor||'-')}</div><div class="jgb-basic-label">A/S 연락처</div><div class="jgb-basic-value">${E(cur.asContact||'-')}</div></div>
                 <div class="jgb-basic-table-row"><div class="jgb-basic-label">제조일</div><div class="jgb-basic-value">${E(cur.date||cur.manufactureDate||'-')}</div><div class="jgb-basic-label">설치일</div><div class="jgb-basic-value">${E(cur.installDate||'-')}</div></div>
@@ -7301,7 +7301,7 @@ function jgbV47GoWpByLeak(leakCode){
               <section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v13"><div class="jgb-paper-section-title">📷 설비 사진 (현재)</div><div class="jgb-equip-photo-stage"><div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">${equipPhoto?`<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">×</button>`:`<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택"></div></div><div class="jgb-equip-photo-actions-rebuilt"><button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button><span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div><div class="jgb-v149-detail-title">설비 상세사진 · 각 3×3cm (가로 슬라이더)</div><div class="jgb-photo-slider-wrap"><div class="jgb-v149-detail-scroll"><div class="jgb-v149-detail-grid">${detailHtml}</div></div></div><div class="jgb-photo-slider-bar" aria-label="설비 상세사진 슬라이더"><span></span></div></section>
             </div>
 
-            <div class="jgb-paper-auto">${F('최근 외주정비일',cur.recentExternalMaintenanceDate||cur.externalMaintenanceDate||'-')}${F('누적 외주정비 건수',extCount+'건')}${F('최근 조치내용',cur.recentExternalMaintenanceAction||cur.externalMaintenanceAction||'-')}${F('누적 자체정비 건수',selfCount+'건')}${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}${F('시설개선계획',cur.improvementPlan||'-')}</div>
+            <div class="jgb-paper-auto">${F('최근 외주정비일',cur.recentExternalMaintenanceDate||cur.externalMaintenanceDate||'-')}${F('누적 외주정비 건수',extCount+'건')}${F('최근 조치내용',cur.recentExternalMaintenanceAction||cur.externalMaintenanceAction||'-')}${F('누적 자체정비 건수',selfCount+'건')}${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}${F('시설개선계획',cur.improvementPlan||'-')}${F('특이사항',cur.note||'-','wide')}</div>
             <div class="jgb-history-slider-bar" aria-label="주요이력 슬라이더"><span></span></div>
 
             <section class="jgb-operating-info jgb-operating-v13"><div class="jgb-operating-title">⚙ 설비 운영·관리정보</div>
@@ -16645,77 +16645,6 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
 new MutationObserver(function(){boot()}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
-
-<style id="JGB_V13_STRICT_GRID_20260920">
-/* 13 기준: 이력카드 선/높이/폭 강제 정렬 */
-.jgb-history-card .jgb-basic-table-rebuild,
-.jgb-history-card .jgb-paper-auto,
-.jgb-history-card .jgb-operating-v13{
-  width:100%!important;box-sizing:border-box!important;
-}
-.jgb-history-card .jgb-basic-table-row{
-  display:grid!important;
-  grid-template-columns:125px minmax(0,1fr) 125px minmax(0,1fr)!important;
-  height:50px!important;min-height:50px!important;
-  border-bottom:1.5px solid #718492!important;
-  box-sizing:border-box!important;
-}
-.jgb-history-card .jgb-basic-table-row:last-child{border-bottom:1.5px solid #718492!important}
-.jgb-history-card .jgb-basic-label,
-.jgb-history-card .jgb-basic-value{
-  height:50px!important;min-height:50px!important;
-  box-sizing:border-box!important;
-  border-right:1.5px solid #718492!important;
-  border-bottom:0!important;
-  display:flex!important;align-items:center!important;
-}
-.jgb-history-card .jgb-basic-label{padding:0 12px!important;font-weight:900!important;white-space:nowrap!important}
-.jgb-history-card .jgb-basic-value{padding:0 12px!important;min-width:0!important}
-.jgb-history-card .jgb-basic-table-row > :last-child{border-right:0!important}
-.jgb-history-card .jgb-paper-auto{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  grid-auto-rows:50px!important;
-  border-left:1.5px solid #718492!important;
-  border-top:1.5px solid #718492!important;
-}
-.jgb-history-card .jgb-paper-auto .jgb-paper-cell{
-  display:grid!important;
-  grid-template-columns:125px minmax(0,1fr)!important;
-  height:50px!important;min-height:50px!important;
-  border-right:1.5px solid #718492!important;
-  border-bottom:1.5px solid #718492!important;
-  box-sizing:border-box!important;
-}
-.jgb-history-card .jgb-paper-auto .jgb-paper-cell small,
-.jgb-history-card .jgb-paper-auto .jgb-paper-cell b{
-  min-height:50px!important;height:50px!important;
-  box-sizing:border-box!important;
-  display:flex!important;align-items:center!important;
-  border-right:1.5px solid #718492!important;
-}
-.jgb-history-card .jgb-paper-auto .jgb-paper-cell b{border-right:0!important;padding:0 12px!important;min-width:0!important}
-.jgb-history-card .jgb-paper-auto .jgb-paper-cell small{padding:0 12px!important;white-space:nowrap!important}
-.jgb-history-card .jgb-operating-v13 .jgb-operating-row{
-  grid-template-columns:125px minmax(0,1fr)!important;
-  height:50px!important;min-height:50px!important;
-  border-bottom:1.5px solid #718492!important;
-}
-.jgb-history-card .jgb-operating-v13 .jgb-operating-label,
-.jgb-history-card .jgb-operating-v13 .jgb-operating-value{
-  height:50px!important;min-height:50px!important;
-  box-sizing:border-box!important;
-}
-.jgb-history-card .jgb-operating-v13 .jgb-operating-label{
-  border-right:1.5px solid #718492!important;
-  padding:0 12px!important;
-}
-.jgb-history-card .jgb-operating-v13 .jgb-operating-value{padding:0 12px!important}
-.jgb-history-card .jgb-operating-v13 .jgb-operating-title{
-  height:50px!important;min-height:50px!important;
-  border-bottom:1.5px solid #718492!important;
-}
-</style>
 </body>
 
 <style id="v19-court-position-final">
