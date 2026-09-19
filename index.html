@@ -6826,6 +6826,18 @@ function jgbV47GoWpByLeak(leakCode){
           return method==='외주정비'||method==='외부정비'||method==='외부수리'||method==='외주수리'||text.includes('외주정비')||text.includes('외부정비')||text.includes('외부수리');
         }).length;
       }
+      function jgbV22SelfCount(H,asset,code){
+        const aid=String(asset?.id||''), cc=String(code||'').trim();
+        return (Array.isArray(H)?H:[]).filter(h=>{
+          if(aid && String(h?.asset_id||'')===aid){} else if(cc && String(h?.asset_code||'').trim()===cc){} else return false;
+          const raw=String(h?.description||''); let md={};
+          if(raw.startsWith('MAINT::')){try{md=JSON.parse(raw.slice(7))||{}}catch(e){}}
+          else if(raw.startsWith('MAINT:')){try{md=JSON.parse(raw.slice(6))||{}}catch(e){}}
+          const method=String(md.maintenanceMethod||md.method||h?.event_type||h?.action_type||'').replace(/\s/g,'');
+          const text=(method+' '+String(h?.event_type||'')+' '+String(h?.action_type||'')).replace(/\s/g,'');
+          return method==='자체정비'||method==='자체수리'||text.includes('자체정비')||text.includes('자체수리');
+        }).length;
+      }
       function jgbV22Field(label,id,value,extra=''){
         return `<label>${jgbV22Esc(label)}<input id="${id}" value="${jgbV22Esc(value??'')}" ${extra}></label>`;
       }
@@ -6895,6 +6907,7 @@ function jgbV47GoWpByLeak(leakCode){
         const equipPhoto=equipDeleted?'':((window.__jgbEquipPhotoCache&&window.__jgbEquipPhotoCache[cardCode])||localStorage.getItem('JGB_EQUIP_PHOTO_'+cardCode)||cur.photo||'');
         const assetId=String(reg?.id||'');
         const extCount=jgbV22ExternalCount(H,reg,cardCode);
+        const selfCount=jgbV22SelfCount(H,reg,cardCode);
         const F=(label,value,cls='')=>`<div class="jgb-paper-cell ${cls}"><small>${esc(label)}</small><b>${esc(value??'-')}</b></div>`;
         return `<details class="eam-source-card jgb-history-card" ${window.eamHistoryCardOpen(cardCode)?'open':''} ontoggle="eamPersistHistoryCard(this,'${E(cardCode)}')">
           <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';return window.JGB_EAM_CARD_V22_OPEN('${E(cardCode)}')">✏️ 수정</button></div></summary>
@@ -6909,7 +6922,7 @@ function jgbV47GoWpByLeak(leakCode){
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">보증</div><div class="jgb-basic-value">${E(cur.warranty||'-')}</div><div class="jgb-basic-label">A/S 기록</div><div class="jgb-basic-value">${E(cur.asHistory||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">자산상태</div><div class="jgb-basic-value">${E(cur.status||'정상')}</div><div class="jgb-basic-label">취득구분</div><div class="jgb-basic-value">${E(cur.acquisitionType||'기존 자산')}</div></div>
           </div><section class="jgb-paper-operation"><div class="jgb-paper-operation-title">설비 운영·관리정보</div><div class="jgb-paper-operation-row"><div class="jgb-paper-operation-label">작동방법</div><div class="jgb-paper-operation-value">${E(cur.operationMethod||'-')}</div></div><div class="jgb-paper-operation-row"><div class="jgb-paper-operation-label">사용방법</div><div class="jgb-paper-operation-value">${E(cur.useMethod||'-')}</div></div><div class="jgb-paper-operation-row"><div class="jgb-paper-operation-label">주의사항</div><div class="jgb-paper-operation-value">${E(cur.caution||'-')}</div></div></section></section><section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149"><div class="jgb-paper-section-title">📷 설비 사진 (현재)</div><div class="jgb-equip-photo-stage"><div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">${equipPhoto?`<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">×</button>`:`<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택"></div></div><div class="jgb-equip-photo-actions-rebuilt"><button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button><span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div><div class="jgb-v149-detail-title">설비 상세사진 · 각 4×4cm</div><div class="jgb-v149-detail-scroll"><div class="jgb-v149-detail-grid">${['정면','측면','명판','설치환경'].map((label,i)=>{const key='JGB_EQUIP_SUBPHOTO_'+cardCode+'_'+i;let src='';try{src=localStorage.getItem(key)||''}catch(e){}const desc=['설비 정면 사진','설비 측면 사진','제조·규격 명판','설치 상태 사진'][i];return `<div class="jgb-v149-detail-item"><div class="jgb-v149-detail-box" onclick="window.jgbV145PickSubPhoto&&window.jgbV145PickSubPhoto('${E(cardCode)}',${i})" title="${E(label)} 사진 등록">${src?`<img src="${E(src)}" alt="${E(label)}"><button type="button" class="jgb-v149-detail-del" onclick="event.preventDefault();event.stopPropagation();window.jgbV145DeleteSubPhoto&&window.jgbV145DeleteSubPhoto('${E(cardCode)}',${i})">×</button>`:`<span>📷<br>사진 등록</span>`}</div><b>${E(label)}</b><small>${E(desc)}</small></div>`}).join('')}</div></div></section></div>
-          <div class="jgb-paper-auto">${F('최근 외주정비일',cur.recentExternalMaintenanceDate||cur.externalMaintenanceDate||'-')}${F('누적 외주정비 건수',extCount+'건')}${F('최근 조치내용',cur.recentExternalMaintenanceAction||cur.externalMaintenanceAction||'-')}${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}${F('교체·폐기 예정 여부',cur.disposalPlan||cur.retirementPlan||'미정')}</div>
+          <div class="jgb-paper-auto">${F('최근 외주정비일',cur.recentExternalMaintenanceDate||cur.externalMaintenanceDate||'-')}${F('누적 외주정비 건수',extCount+'건')}${F('최근 조치내용',cur.recentExternalMaintenanceAction||cur.externalMaintenanceAction||'-')}${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}${F('교체·폐기 예정 여부',cur.disposalPlan||cur.retirementPlan||'미정')}${F('누적 자체정비 건수',selfCount+'건','jgb-self-maintenance-count')}</div>
           <div class="jgb-paper-notes">${F('시설개선계획',cur.improvementPlan||'-','wide')}${F('특이사항',cur.note||'-','wide')}</div></details>`;
       }
       window.JGB_EAM_CARD_V22_HTML=function(cur,reg,H,I){
@@ -12534,7 +12547,25 @@ function jgbV47GoWpByLeak(leakCode){
 }
 </style>
 
-
+<style id="JGB_EAM_SELF_MAINTENANCE_V3">
+/* v3: 기존 외주정비 연동과 동일하게 유지관리 이력의 자체정비 누적 건수를 표시 */
+.jgb-history-card .jgb-paper-auto > .jgb-paper-cell.jgb-self-maintenance-count{
+  grid-column:2!important;
+  grid-row:3!important;
+  border-right:0!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-auto > .jgb-paper-cell.jgb-self-maintenance-count small{
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  font-size:14px!important;
+  line-height:1!important;
+}
+.jgb-history-card .jgb-paper-auto > .jgb-paper-cell.jgb-self-maintenance-count b{
+  white-space:nowrap!important;
+}
+</style>
 
 <!-- JGB V116 : 하단 이력정보 2쌍 정렬
      시설개선계획/특이사항은 각각 한 줄 전체폭 유지 -->
@@ -18523,4 +18554,9 @@ window.eamDeleteSelectedAssetByCode=async function(c){window.__eamSelCode=V(c);r
 @media(max-width:750px){
   .jgb-paper-operation-row{grid-template-columns:110px minmax(0,1fr)!important;}
 }
+</style>
+
+<style id="JGB_EAM_SELF_MAINTENANCE_LAYOUT_V3">
+.jgb-history-card .jgb-paper-auto > .jgb-paper-cell:nth-child(5){grid-column:1!important;grid-row:3!important;}
+.jgb-history-card .jgb-paper-auto > .jgb-paper-cell:nth-child(6){grid-column:2!important;grid-row:3!important;}
 </style>
