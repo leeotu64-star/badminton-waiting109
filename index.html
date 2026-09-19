@@ -19184,3 +19184,107 @@ if(typeof oldReg==='function'&&!window.__JGB_EAM_V6_REG_WRAP){
 cleanupDuplicateOnly();
 })();
 </script>
+
+<style id="EAM_HYUN_V9_COURT_3D_ALIGN">
+/* V9: EAM 현황 배치도만 정렬. 기존 기능/아이콘/클릭/데이터는 변경하지 않음. */
+.eh-map-wrap{
+  padding:7px!important;
+  background:linear-gradient(145deg,#edf5f9 0%,#dbe8ee 100%)!important;
+}
+.eh-map{
+  border:2px solid #294e65!important;
+  border-radius:4px!important;
+  background:linear-gradient(145deg,#fbfdfe 0%,#e7f0f4 100%)!important;
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.92),inset 0 0 24px rgba(43,83,104,.10),0 6px 0 #8ba4b2,0 10px 18px rgba(24,58,78,.18)!important;
+}
+/* 코트 5개: 동일 폭 + 동일 간격 + 회전 제거로 상·하단선을 정확히 수평 정렬 */
+.eh-courts{
+  left:6%!important;
+  right:6%!important;
+  top:2%!important;
+  height:30%!important;
+  gap:14px!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  perspective:none!important;
+  transform:none!important;
+}
+.eh-court{
+  margin-top:16px!important;
+  width:100%!important;
+  height:calc(100% - 16px)!important;
+  min-width:0!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+  transform:none!important;
+  transform-origin:center center!important;
+  border:0!important;
+  border-radius:6px!important;
+  background:transparent!important;
+  overflow:visible!important;
+  box-shadow:none!important;
+}
+/* 코트 자체는 3D 느낌을 유지하되 기울어지지 않게 */
+.eh-court::before{
+  inset:0!important;
+  border:1.5px solid #54758a!important;
+  border-radius:6px!important;
+  background:linear-gradient(145deg,#f8fcfe 0%,#e1edf2 55%,#c9dce5 100%)!important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.96),inset 0 -6px 10px rgba(62,91,108,.12),0 5px 0 #7e9aa8,0 8px 12px rgba(20,55,75,.22)!important;
+  transform:none!important;
+}
+.eh-court::after{
+  left:9%!important;
+  right:9%!important;
+  top:12%!important;
+  bottom:12%!important;
+  border:1px solid #607f91!important;
+  background:linear-gradient(90deg,transparent 49.5%,#607f91 49.5%,#607f91 50.5%,transparent 50.5%)!important;
+  transform:none!important;
+}
+.eh-court .eh-court-surface{
+  transform:none!important;
+}
+.eh-court .eh-court-surface::before{
+  left:4%!important;
+  right:4%!important;
+  height:4px!important;
+}
+.eh-court .eh-court-surface>b{
+  width:34px!important;
+  height:34px!important;
+  font-size:15px!important;
+}
+/* 코트 아래 시설: 하나의 기준선으로 직각 정렬 */
+.eh-facility{
+  left:2%!important;
+  right:2%!important;
+  top:34%!important;
+  bottom:1.5%!important;
+  grid-template-rows:10% 34% 8% 48%!important;
+  box-sizing:border-box!important;
+  border:1.5px solid #526a7b!important;
+  filter:none!important;
+}
+.eh-roof,.eh-row,.eh-bottom,.eh-corridor{
+  box-shadow:none!important;
+  transform:none!important;
+}
+.eh-roof span,.eh-zone,.eh-corridor,.eh-bottom>div{
+  box-sizing:border-box!important;
+}
+.eh-roof span:last-child,.eh-row .eh-zone:last-child,.eh-bottom>div:last-child{
+  border-right:0!important;
+}
+/* 모든 구획선은 동일한 실선 두께 */
+.eh-roof,.eh-row,.eh-bottom{border-color:#879daa!important}
+.eh-roof span,.eh-zone,.eh-corridor,.eh-bottom>div{border-color:#879daa!important}
+/* 3D는 아주 약하게만 남겨서 삐뚤어져 보이는 효과 제거 */
+.eh-roof,.eh-row,.eh-bottom,.eh-corridor,.eh-zone{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.72)!important;
+}
+@media(max-width:1000px){
+  .eh-courts{gap:9px!important;left:5%!important;right:5%!important;height:30%!important}
+  .eh-facility{left:2%!important;right:2%!important;top:34%!important}
+}
+</style>
