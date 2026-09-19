@@ -4217,67 +4217,68 @@ a[data-page="digitalTwin"],
 </style>
 
 
-<style id="JGB_EAM_CLEAN_EQUIPMENT_HEADER_V20">
-/* 기존 설비 헤더의 중복 스타일을 사용하지 않는 독립 헤더 */
+
+<style id="JGB_EAM_REAL_HEADER_V21">
 .eam-detail-hero-clean{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
   width:100% !important;
   height:76px !important;
   min-height:76px !important;
   max-height:76px !important;
-  box-sizing:border-box !important;
+  padding:7px 14px !important;
   margin:0 !important;
-  padding:8px 14px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:space-between !important;
-  gap:12px !important;
+  box-sizing:border-box !important;
   overflow:hidden !important;
 }
 .eam-detail-hero-clean .eam-hero-left{
   min-width:0 !important;
-  height:60px !important;
-  display:flex !important;
-  flex-direction:column !important;
-  justify-content:center !important;
+  width:100% !important;
+  height:62px !important;
+  margin:0 !important;
+  padding:0 !important;
+  box-sizing:border-box !important;
+  display:grid !important;
+  grid-template-rows:18px 23px 15px !important;
+  align-content:center !important;
   overflow:hidden !important;
 }
-.eam-detail-hero-clean .eam-hero-code{
-  width:max-content !important;
-  height:19px !important;
-  line-height:19px !important;
-  margin:0 0 2px 0 !important;
-  padding:0 7px !important;
+.eam-detail-hero-clean .eam-hero-code,
+.eam-detail-hero-clean .eam-hero-title,
+.eam-detail-hero-clean .eam-hero-meta{
+  margin:0 !important;
+  padding:0 !important;
   box-sizing:border-box !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+}
+.eam-detail-hero-clean .eam-hero-code{
+  height:18px !important;
+  line-height:18px !important;
   font-size:10px !important;
   font-weight:800 !important;
 }
 .eam-detail-hero-clean .eam-hero-title{
-  height:24px !important;
-  line-height:24px !important;
-  margin:0 !important;
-  padding:0 !important;
-  font-size:20px !important;
+  height:23px !important;
+  line-height:23px !important;
+  font-size:19px !important;
   font-weight:900 !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
 }
 .eam-detail-hero-clean .eam-hero-meta{
   height:15px !important;
   line-height:15px !important;
-  margin:0 !important;
-  padding:0 !important;
   font-size:10px !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
 }
 .eam-detail-hero-clean .eam-hero-status{
-  flex:0 0 auto !important;
+  align-self:center !important;
+  margin:0 !important;
   padding:5px 9px !important;
   box-sizing:border-box !important;
   font-size:10px !important;
-  font-weight:800 !important;
   line-height:12px !important;
+  white-space:nowrap !important;
 }
 </style>
 
@@ -5909,10 +5910,15 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         <div class="eam-innovation-layout">
           <aside class="eam-assets-panel"><div class="eam-assets-head"><div><b>${C.ico} ${C.label}</b><span>${list.length}개 자산</span></div><div class="eam-filter-row"><select id="eamProLocationFilter" onchange="eamProFilter('',this.value)"><option value="">전체 위치</option><option value="A">A · 코트</option><option value="B">B · 복도</option><option value="C">C · 사무실</option><option value="D">D · 옥상</option><option value="E">E · 유수장치실</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option></select></div></div><div id="eamproGrid" class="eam-asset-list">${list.map(v=>{const a=eamRegisteredForSource(v), mm=meta[v.code]||{};const merged={...(a||v),...mm};const st=a?.status||'원본';return `<button class="eam-asset-row ${v.code===sel?'on':''}" data-code="${xEsc(v.code)}" data-loc="${xEsc(placeCode(merged))}" onclick="eamPick('${cat}','${xEsc(v.code)}')"><span class="row-code">${xEsc(eamUnifiedCode(v))}</span><span class="row-copy"><b>${xEsc(eamDisplayName(merged))}</b><small>${xEsc(eamDisplaySubName(merged))} · ${xEsc(displayPlace(merged))}</small><span class="row-origin">표시코드 ${xEsc(eamUnifiedCode(v))} · 기존코드 ${xEsc(v.code)}</span></span><i class="${st==='정상'?'ok':st==='원본'?'source':'bad'}">${xEsc(st)}</i></button>`}).join('')||'<div class="eam-empty">등록된 자산이 없습니다.</div>'}</div></aside>
           <main class="eam-detail-panel">${current?`
-            <div class="eam-detail-hero eam-detail-hero-clean">
+            <div class="eam-detail-hero-clean">
   <div class="eam-hero-left">
     <div class="eam-hero-code">FI-01</div>
-    <div class="eam-hero-title">${xEsc(eamDisplayName(current))}</div>
+    <div class="eam-hero-title">설비명</div>
+    <div class="eam-hero-meta">설비종류&nbsp;&nbsp; 위치정보</div>
+  </div>
+  <div class="eam-hero-status">정상</div>
+</div>
+<div class="eam-hero-title">${xEsc(eamDisplayName(current))}</div>
     <div class="eam-hero-meta">설비종류&nbsp;&nbsp; 위치정보</div>
   </div>
   <div class="eam-hero-status">정상</div>
