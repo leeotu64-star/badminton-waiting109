@@ -3546,6 +3546,78 @@ a[data-page="digitalTwin"],
   margin-left:auto!important;
 }
 </style>
+
+<style id="JGB_EAM_REPAIR_LIVE_FONT_ALIGN_V22">
+/* V22: 수리 LIVE 가독성/열 정렬만 개선. 기존 기능·데이터는 변경하지 않음. */
+.eam228-live-card .eam228-section-head,
+.eh-live-card-v20 .eh-card-head{
+  min-height:48px!important;
+  padding:9px 12px!important;
+  align-items:center!important;
+}
+.eam228-live-card .eam228-section-head h2,
+.eh-live-card-v20 .eh-card-head h2{
+  font-size:21px!important;
+  font-weight:900!important;
+  line-height:1.25!important;
+  letter-spacing:-.3px!important;
+}
+.eam228-live-card table,
+.eh-live-card-v20 table{
+  width:100%!important;
+  table-layout:fixed!important;
+  border-collapse:collapse!important;
+  font-size:14px!important;
+}
+.eam228-live-card th, .eam228-live-card td,
+.eh-live-card-v20 th, .eh-live-card-v20 td{
+  height:38px!important;
+  padding:7px 8px!important;
+  font-size:14px!important;
+  line-height:1.35!important;
+  vertical-align:middle!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.eam228-live-card th, .eh-live-card-v20 th{
+  font-size:14px!important;
+  font-weight:900!important;
+}
+.eam228-live-card td:first-child, .eh-live-card-v20 td:first-child{
+  text-align:left!important;
+  font-weight:800!important;
+}
+.eam228-live-card td:nth-child(2), .eh-live-card-v20 td:nth-child(2){
+  text-align:left!important;
+}
+.eam228-live-card td .eh-done,
+.eam228-live-card td button,
+.eh-live-card-v20 td button{
+  font-size:13px!important;
+  min-height:30px!important;
+  padding:4px 9px!important;
+  white-space:nowrap!important;
+}
+.eam228-live-card .eam228-live-scroll{
+  font-size:14px!important;
+}
+/* 수리 LIVE 등록 창 글씨 확대 */
+.eh-modal-box.eh-icon-create .eh-modal-head small{font-size:12px!important;font-weight:800!important}
+.eh-modal-box.eh-icon-create .eh-modal-head h3{font-size:23px!important;line-height:1.25!important}
+.eh-modal-box.eh-icon-create .eh-modal-head p{font-size:13px!important}
+.eh-modal-box.eh-icon-create label{font-size:14px!important;font-weight:900!important}
+.eh-modal-box.eh-icon-create input,
+.eh-modal-box.eh-icon-create select,
+.eh-modal-box.eh-icon-create textarea{
+  font-size:15px!important;
+  min-height:38px!important;
+}
+#eamLiveCatGrid button{font-size:13px!important;font-weight:900!important;min-height:60px!important}
+#eamLiveSaveBtn{font-size:15px!important;font-weight:900!important}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -17313,5 +17385,63 @@ document.addEventListener('pointermove',move,true);
 document.addEventListener('pointerup',finish,true);
 document.addEventListener('pointercancel',finish,true);
 document.addEventListener('click',click,true);
+})();
+</script>
+
+<!-- JGB EAM v21: 배치도 아이콘 삭제창 중복/깨짐 최종 정리 -->
+<style id="JGB_EAM_V21_DELETE_MODAL_FIX">
+#eamHyunIconDeleteModal .eh-delete-map-preview{display:none!important}
+#eamHyunIconDeleteModal .eh-delete-list-v21{padding:14px 18px 18px;display:grid;gap:8px;max-height:58vh;overflow:auto;box-sizing:border-box;width:100%;background:#fff}
+#eamHyunIconDeleteModal .eh-delete-list-v21>div{display:grid;grid-template-columns:90px minmax(0,1fr) 58px;align-items:center;gap:12px;padding:11px 13px;border:1px solid #d7e2ea;border-radius:9px;background:#fff;min-height:48px;box-sizing:border-box}
+#eamHyunIconDeleteModal .eh-delete-list-v21 .code{font-weight:900;color:#173f5f;font-size:13px}
+#eamHyunIconDeleteModal .eh-delete-list-v21 .name{font-weight:800;color:#2d4659;font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#eamHyunIconDeleteModal .eh-delete-list-v21 .kind{display:block;color:#8295a3;font-size:9px;font-weight:600;margin-top:2px}
+#eamHyunIconDeleteModal .eh-delete-list-v21 button{border:1px solid #d9a0a0;background:#fff7f7;color:#c83f3f;font-size:12px;font-weight:900;cursor:pointer;padding:7px 8px;border-radius:6px}
+#eamHyunIconDeleteModal .eh-delete-list-v21 button:hover{background:#ffecec}
+#eamHyunIconDeleteModal .eh-delete-count-v21{padding:12px 18px 0;font-size:11px;color:#6d8292;border-top:1px solid #e1e8ed}
+@media(max-width:700px){#eamHyunIconDeleteModal .eh-delete-list-v21>div{grid-template-columns:72px minmax(0,1fr) 54px}}
+</style>
+<script id="JGB_EAM_V21_DELETE_MODAL_FIX">
+(function(){
+'use strict';
+function V(x){return String(x??'').trim()}
+function esc(x){return V(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function readObj(k){try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}}
+function uniqueRows(){
+  const byCode=new Map();
+  const assets=Array.isArray(window.__eamA)?window.__eamA:[];
+  const hidden=readObj('JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1');
+  const pos=readObj('JGB_EAM_HYUNHWANG_MAP_V1');
+  const only=readObj('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1');
+  const codeOf=a=>V(a&& (a.asset_code||a.code));
+
+  /* 실제 화면에 존재하는 아이콘을 우선 수집하되 같은 코드가 여러 번 생성된 경우 1개만 남긴다. */
+  document.querySelectorAll('#eam228Map .eam228-asset').forEach(el=>{
+    const c=V(el.getAttribute('data-code'));
+    if(!c || byCode.has(c)) return;
+    byCode.set(c,{code:c,name:V(el.getAttribute('title'))||V(el.textContent).replace(/\s+/g,' ')||'배치도 아이콘',kind:'map-only'});
+  });
+
+  assets.forEach(a=>{
+    const c=codeOf(a); if(!c||hidden[c]||byCode.has(c)) return;
+    if(pos[c]) byCode.set(c,{code:c,name:V(a.name||a.asset_name||a.assetName||a.location||'미지정'),kind:'asset'});
+  });
+
+  Object.values(only).forEach(x=>{
+    const c=V(x&&x.code); if(!c||byCode.has(c)) return;
+    byCode.set(c,{code:c,name:V(x.name)||'배치도 전용 아이콘',kind:'map-only'});
+  });
+
+  return [...byCode.values()].sort((a,b)=>a.code.localeCompare(b.code,undefined,{numeric:true}));
+}
+function openFixed(){
+  document.getElementById('eamHyunIconDeleteModal')?.remove();
+  const rows=uniqueRows();
+  const m=document.createElement('div');m.id='eamHyunIconDeleteModal';m.className='eh-modal';
+  const list=rows.length?rows.map(x=>`<div data-delete-row="${esc(x.code)}"><span class="code">${esc(x.code)}</span><span class="name">${esc(x.name)}<small class="kind">${x.kind==='asset'?'기존 EAM 자산 · 배치도 표시만 삭제':'배치도 전용 아이콘'}</small></span><button type="button" onclick="window.eamHyunDeleteMapIcon('${esc(x.code)}','${x.kind}')">삭제</button></div>`).join(''):'<div style="padding:30px;text-align:center;color:#8799a6">현재 배치도에 표시된 아이콘이 없습니다.</div>';
+  m.innerHTML=`<div class="eh-modal-box"><div class="eh-modal-head"><div><small>EAM MAP ONLY</small><h3>배치도 아이콘 삭제</h3><p>배치도에서만 아이콘을 삭제합니다. 기존 EAM 자산등록 정보와 수리 LIVE 정보는 유지됩니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div><div class="eh-delete-count-v21">현재 배치도에 표시된 아이콘 ${rows.length}개</div><div class="eh-delete-list-v21">${list}</div></div>`;
+  document.body.appendChild(m);
+}
+window.eamHyunOpenIconDelete=openFixed;
 })();
 </script>
