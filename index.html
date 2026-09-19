@@ -17511,7 +17511,7 @@ function click(e){
   if(Date.now()-at<500){e.preventDefault();e.stopImmediatePropagation();return;}
  }
  const code=String(el.getAttribute('data-code')||'').trim();if(!code)return;
- /* 배치도 전용 아이콘은 EAM 이력카드 자산이 아니므로 EAM 클릭 대상으로 사용하지 않는다. */
+ /* 배치도 전용 아이콘은 EAM 이력카드 연결 대상이 아니다. */
  if(el.classList.contains('map-only')){
    e.preventDefault();e.stopImmediatePropagation();
    return;
@@ -17519,16 +17519,17 @@ function click(e){
  e.preventDefault();e.stopImmediatePropagation();
  window.__eamSelCode=code;
  const prefix=code.split('-')[0];
- const cat={AC:'cooling',BO:'heating',FI:'fire',SA:'sanitary',EL:'electrical',DO:'door',OT:'other'}[prefix]||'other';
+ const cat={AC:'cooling',BO:'heating',FI:'fire',SA:'sanitary',EL:'electrical',DO:'doors',OT:'other'}[prefix]||'other';
  window.__eamCat=cat;
+ /* 행의 DOM 클릭을 중간에 거치지 않고 EAM의 공식 선택 함수에 직접 전달한다.
+    그래서 아이콘 클릭 → 같은 자산코드의 이력카드가 바로 열린다. */
+ try{
+   if(typeof window.eamPick==='function'){
+     window.eamPick(cat,code);
+     return;
+   }
+ }catch(_){}
  if(typeof window.go==='function')window.go('eam');
- const pick=()=>{
-  const row=document.querySelector('.eam-asset-row[data-code="'+CSS.escape(code)+'"]');
-  if(row){row.click();return true;}
-  if(typeof window.eamPick==='function'){try{window.eamPick(cat,code);return true}catch(_){} }
-  return false;
- };
- requestAnimationFrame(()=>{if(!pick())setTimeout(pick,150)});
 }
 document.addEventListener('pointerdown',down,true);
 document.addEventListener('pointermove',move,true);
@@ -17912,5 +17913,85 @@ if(typeof oldRender==='function'&&!window.__JGB_EAM_V28_RENDER_WRAP){
   window.__JGB_EAM_V28_RENDER_WRAP=true;
   window.render=function(){const r=oldRender.apply(this,arguments);setTimeout(purgeDuplicateMarkers,0);return r};
 }
+})();
+</script>
+
+
+<!-- JGB EAM V29: 아이콘 클릭/상태색상 최종 연결 -->
+<style id="JGB_EAM_V29_ICON_STATUS_FINAL">
+/* 마지막에 다시 정의되는 일반 .eh-marker 배경을 상태색상이 확실히 덮도록 한다. */
+.eh-map .eh-marker.normal{
+  border-color:#159447!important;
+  background:#e9fff2!important;
+  color:#08743f!important;
+}
+.eh-map .eh-marker.check{
+  border-color:#d49a00!important;
+  background:#fff7d6!important;
+  color:#8a6200!important;
+}
+.eh-map .eh-marker.action{
+  border-color:#159fb3!important;
+  background:#e8fbff!important;
+  color:#08788b!important;
+}
+.eh-map .eh-marker.repair{
+  border-color:#d9364b!important;
+  background:#fff0f2!important;
+  color:#b51f35!important;
+}
+.eh-map .eh-marker.parts{
+  border-color:#7b4bb7!important;
+  background:#f3eaff!important;
+  color:#63339d!important;
+}
+</style>
+<script id="JGB_EAM_V29_STATUS_BRIDGE">
+(function(){
+'use strict';
+if(window.__JGB_EAM_V29_STATUS_BRIDGE)return;
+window.__JGB_EAM_V29_STATUS_BRIDGE=true;
+const V=x=>String(x??'').trim();
+function meta(){try{const x=JSON.parse(localStorage.getItem('JGB_EAM_ASSET_META_V40')||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}}
+function statusClass(s){
+  s=V(s).replace('점검필요','점검').replace('수리예정','수리중').replace('수리 진행','수리중').replace('교체예정','부품대기');
+  if(s==='점검')return 'check';
+  if(s==='조치필요'||s==='재조치 필요'||s==='재조치필요')return 'action';
+  if(s==='수리중'||/수리/.test(s))return 'repair';
+  if(s==='부품대기'||/부품\s*대기/.test(s))return 'parts';
+  return 'normal';
+}
+function syncMarkerColors(){
+  if(!document.querySelector('.eh-page'))return;
+  const M=meta();
+  const A=Array.isArray(window.__eamA)?window.__eamA:[];
+  document.querySelectorAll('.eh-map .eh-marker:not(.map-only)[data-code]').forEach(el=>{
+    const c=V(el.getAttribute('data-code'));
+    const a=A.find(x=>V(x?.asset_code||x?.code)===c);
+    const m=M[c]||{};
+    const cls=statusClass(m.status||a?.status||'정상');
+    el.classList.remove('normal','check','action','repair','parts');
+    el.classList.add(cls);
+    const colors={
+      normal:['#159447','#e9fff2','#08743f'],
+      check:['#d49a00','#fff7d6','#8a6200'],
+      action:['#159fb3','#e8fbff','#08788b'],
+      repair:['#d9364b','#fff0f2','#b51f35'],
+      parts:['#7b4bb7','#f3eaff','#63339d']
+    }[cls];
+    el.style.setProperty('--st-border',colors[0]);
+    el.style.setProperty('--st-bg',colors[1]);
+    el.style.setProperty('--st-text',colors[2]);
+  });
+}
+window.jgbEamSyncMarkerColors=syncMarkerColors;
+const oldRender=window.render;
+if(typeof oldRender==='function'&&!window.__JGB_EAM_V29_RENDER_WRAP){
+  window.__JGB_EAM_V29_RENDER_WRAP=true;
+  window.render=function(){const r=oldRender.apply(this,arguments);setTimeout(syncMarkerColors,0);setTimeout(syncMarkerColors,80);return r};
+}
+window.addEventListener('storage',e=>{if(e.key==='JGB_EAM_ASSET_META_V40')setTimeout(syncMarkerColors,20)});
+setTimeout(syncMarkerColors,0);
+setTimeout(syncMarkerColors,150);
 })();
 </script>
