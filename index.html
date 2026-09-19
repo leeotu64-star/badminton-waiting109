@@ -6711,18 +6711,40 @@ function jgbV47GoWpByLeak(leakCode){
         const place=g('eamRegDetailPlace');
         const date=g('eamRegDate')||new Date().toISOString().slice(0,10);
         if(!name){alert('시설·설비명은 필수입니다.');return}
-        const code=nextAutoCode(category),btn=document.getElementById('eamRegSubmit');if(btn){btn.disabled=true;btn.textContent='등록 중…'}
+        const btn=document.getElementById('eamRegSubmit');if(btn){btn.disabled=true;btn.textContent='등록 중…'}
         const finalPlace=category==='소방·방재'?'유수장치실':place;
         try{
+          /* 신규 등록의 단일 기준: assets의 실제 asset_code를 이력카드/배치도/LIVE 모두의 공통키로 사용 */
+          const code=nextAutoCode(category);
           const r=await SUPA.from('assets').insert({asset_code:code,name,category,place:finalPlace,status:'정상',product_name:category}).select('id,asset_code,name,category,place,status').single();
           if(r.error)throw r.error;
+
           const meta={asset_code:code,name,category,locationCode:locCode,place:finalPlace,model:'',qty:'1',vendor:'',maker:'',asContact:'',manufactureDate:'',date:'',installDate:date,life:'',capacity:'',grade:'',warranty:'',asHistory:'',status:'정상',improvementPlan:'',note:''};
           const all=Object.assign({},readMeta(),{[code]:meta});writeMeta(all);window.__eamMetaByCode=all;
+
           await SUPA.from('asset_history').insert({asset_id:r.data.id,event_type:'자산등록',description:'신규 자산 등록 · '+name+' · 위치코드 '+locCode+' · '+finalPlace,worker_name:'관리자',cost:0,event_date:date});
-          window.__eamSelCode=code;window.__eamCat=CATMAP[category]||'other';closeEamRegisterModal();await window.eamLoad();render();
-        }catch(e){console.error(e);alert('신규 자산 등록 실패\n'+(e?.message||''))}finally{if(btn){btn.disabled=false;btn.textContent='EAM 자산 생성'}}
-      };
-      function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+          /* 등록과 동시에 배치도 아이콘 1개를 자동 생성한다.
+             실제 asset_code 하나만 저장하므로 별도의 EQ/AST 임시코드를 만들지 않는다. */
+          try{
+            const posKey='JGB_EAM_HYUNHWANG_MAP_V1';
+            const hiddenKey='JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1';
+            const readObjSafe=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(_){return {}}};
+            const writeObjSafe=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x))}catch(_) {}};
+            const pos=readObjSafe(posKey);
+            /* 신규 아이콘은 처음 생성 시 배치도 중앙에서 시작 */
+            if(!pos[code])pos[code]=[50,50];
+            writeObjSafe(posKey,pos);
+            const hidden=readObjSafe(hiddenKey);delete hidden[code];writeObjSafe(hiddenKey,hidden);
+          }catch(iconErr){console.warn('신규 자산 배치도 아이콘 자동 생성 저장 실패',iconErr)}
+
+          window.__eamSelCode=code;window.__eamCat=CATMAP[category]||'other';
+          if(typeof window.closeEamRegisterModal==='function')window.closeEamRegisterModal();
+          if(typeof window.eamLoad==='function')await window.eamLoad();
+          if(typeof window.render==='function')window.render();
+        }catch(e){console.error(e);alert('신규 자산 등록 실패\n'+(e?.message||''))}
+        finally{if(btn){btn.disabled=false;btn.textContent='EAM 자산 생성'}}
+      };      function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
       function maintenanceData(reg,H,I,code){
         const AA=Array.isArray(window.__eamA)?window.__eamA:[];
         const key=v(code||reg?.asset_code||reg?.code||window.__eamSelCode);
@@ -15626,6 +15648,62 @@ try{
   const cat=V(localStorage.getItem(CATKEY)||'');
   if(cat)window.__eamCat=cat;
 }catch(_){ }
+})();
+</script>
+
+
+<!-- EAM v1: v34 기준 / 외주정비·자체정비 통합 표시 -->
+<style id="JGB_EAM_V1_MAINTENANCE_TYPE">
+.jgb-paper-maintenance-type{display:flex;align-items:stretch;min-height:64px;background:#748897;border-top:1px solid #596f7e;border-bottom:1px solid #596f7e;box-sizing:border-box}
+.jgb-paper-maintenance-next{display:flex;align-items:center;gap:18px;padding:10px 16px;color:#fff;min-width:250px;box-sizing:border-box}
+.jgb-paper-maintenance-next .label{font-weight:900;white-space:nowrap}
+.jgb-paper-maintenance-next .value{font-weight:900}
+.jgb-paper-maintenance-buttons{margin-left:auto;display:flex;align-items:center;gap:8px;padding:10px 14px}
+.jgb-maint-type-btn{border:1px solid #c8d2d9;border-radius:6px;padding:8px 18px;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;box-sizing:border-box}
+.jgb-maint-type-btn.external{background:#2b79b8;color:#fff;border-color:#1e659d}
+.jgb-maint-type-btn.internal{background:#e4e8eb;color:#263b4a;border-color:#c3ccd2}
+.jgb-maint-type-btn.active{box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 2px 5px rgba(0,0,0,.18)}
+@media(max-width:700px){.jgb-paper-maintenance-type{flex-wrap:wrap}.jgb-paper-maintenance-next{min-width:100%;}.jgb-paper-maintenance-buttons{margin-left:0;padding-top:0}}
+</style>
+<script id="JGB_EAM_V1_MAINTENANCE_TYPE_JS">
+(function(){
+'use strict';
+if(window.__JGB_EAM_V1_MAINTENANCE_TYPE)return;
+window.__JGB_EAM_V1_MAINTENANCE_TYPE=true;
+const V=x=>String(x??'').trim();
+function parseMaint(h){const raw=V(h?.description);if(raw.startsWith('MAINT::')){try{return JSON.parse(raw.slice(7))||{}}catch(_){}}if(raw.startsWith('MAINT:')){try{return JSON.parse(raw.slice(6))||{}}catch(_){}}return {}}
+function selectedAsset(){const c=V(window.__eamSelCode);return (window.__eamA||[]).find(a=>V(a.asset_code)===c)||null}
+function maintenanceType(code){
+ const A=selectedAsset();const id=V(A?.id);const hs=(window.__eamH||[]).filter(h=>V(h.asset_id)===id||V(h.asset_code)===V(code));
+ const latest=hs.find(h=>!['자산등록','자산정보수정'].includes(V(h.event_type)));
+ if(!latest)return 'external';const d=parseMaint(latest);const m=V(d.maintenanceMethod||d.method||latest.event_type);return m.replace(/\s/g,'')==='자체정비'?'internal':'external';
+}
+function addTypeArea(card){
+ if(!card||card.querySelector('.jgb-paper-maintenance-type'))return;
+ const auto=card.querySelector('.jgb-paper-auto');if(!auto)return;
+ const code=V(window.__eamSelCode||card.querySelector('.jgb-basic-value')?.textContent);let next='-';
+ const cells=[...auto.querySelectorAll('.jgb-paper-cell')];const find=(label)=>cells.find(x=>V(x.querySelector('small')?.textContent)===label)?.querySelector('b')?.textContent||'-';
+ const nextFrom=find('차기 점검일');if(nextFrom)next=nextFrom;
+ const bar=document.createElement('div');bar.className='jgb-paper-maintenance-type';
+ bar.innerHTML='<div class="jgb-paper-maintenance-next"><span class="label">차기 점검일</span><span class="value"></span></div><div class="jgb-paper-maintenance-buttons"><button type="button" class="jgb-maint-type-btn external">외주정비</button><button type="button" class="jgb-maint-type-btn internal">자체정비</button></div>';
+ bar.querySelector('.value').textContent=next;
+ const type=maintenanceType(code);bar.querySelector('.'+(type==='internal'?'internal':'external')).classList.add('active');
+ bar.querySelectorAll('.jgb-maint-type-btn').forEach(btn=>btn.addEventListener('click',()=>{
+   bar.querySelectorAll('.jgb-maint-type-btn').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
+   /* 다음 유지관리 등록 시 선택값을 사용할 수 있도록 공통 상태로 저장 */
+   window.__eamMaintenanceMethod=btn.classList.contains('internal')?'자체정비':'외주정비';
+ }));
+ auto.insertAdjacentElement('afterend',bar);
+ // 기존 auto 영역의 '차기 점검일' 중복 표시를 숨겨 회색 영역에서만 보이게 한다.
+ cells.forEach(c=>{if(V(c.querySelector('small')?.textContent)==='차기 점검일')c.style.display='none'});
+}
+function apply(){document.querySelectorAll('.jgb-history-card').forEach(addTypeArea)}
+const oldRender=window.render;
+if(typeof oldRender==='function'&&!window.__JGB_EAM_V1_RENDER_WRAP){
+ window.__JGB_EAM_V1_RENDER_WRAP=true;window.render=function(){const r=oldRender.apply(this,arguments);setTimeout(apply,0);setTimeout(apply,100);return r};
+}
+setTimeout(apply,200);setTimeout(apply,500);
+window.eamSelectMaintenanceType=function(type){window.__eamMaintenanceMethod=type==='internal'?'자체정비':'외주정비'};
 })();
 </script>
 </body>
