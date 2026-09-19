@@ -2057,7 +2057,7 @@ html::before,body::before{
 }
 .jgb-eam-card-final .jgb-eam-notes-bottom .jgb-eam-note{
   width:100%!important;
-  grid-template-columns:155px minmax(0,1fr) 155px minmax(0,1fr)!important;
+  grid-template-columns:125px minmax(0,1fr) 125px minmax(0,1fr)!important;
   min-width:0!important;
   box-sizing:border-box!important;
   border-bottom:2px solid #8fa3b5!important;
@@ -4782,7 +4782,13 @@ a[data-page="digitalTwin"],
          기존 EAM 아이콘 하나만 표시한다. 이것이 중복 아이콘/엉뚱한 클릭의 직접 원인이다. */
       const mapOnlyMarkers=Object.values(mapOnly)
         .filter(x=>{const c=V(x?.code);return c&&!assetCodeSet.has(c)})
-        .map(x=>`<button type="button" class="eh-marker map-only" data-map-only="1" data-code="${attr(x.code)}" style="left:${Number(x.x)}%;top:${Number(x.y)}%" title="배치도 전용 ${attr(x.code)}"><b>${esc(x.code)}</b></button>`).join('');
+        .map(x=>{
+          const c=V(x.code);
+          const realAsset=assets.find(a=>codeOf(a)===c);
+          /* 실제 자산이 존재하면 map-only 상태를 없애고 동일 자산코드의 EAM 아이콘으로 취급 */
+          const cls=realAsset?'eh-marker':'eh-marker map-only';
+          return `<button type="button" class="${cls}" data-map-only="${realAsset?'':'1'}" data-code="${attr(c)}" style="left:${Number(x.x)}%;top:${Number(x.y)}%" title="${realAsset?'EAM 자산 '+attr(c):'배치도 전용 '+attr(c)}"><b>${esc(c)}</b></button>`;
+        }).join('');
       const zone=(label,sub,cls='')=>`<div class="eh-zone ${cls}"><b>${esc(label)}</b><small>${esc(sub)}</small></div>`;
       const map=`<div class="eh-map"><div class="eh-courts"><b>코트 구역</b>${[5,4,3,2,1].map(n=>`<div class="eh-court eh-court-3d" data-court="${n}"><div class="eh-court-surface"><span class="eh-court-net"></span><b>${n}</b></div></div>`).join('')}</div><div class="eh-facility"><div class="eh-roof"><span>옥상</span><span>옥상</span><span>창고</span><span>▲ 계단</span></div><div class="eh-row">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div><div class="eh-corridor">복도</div><div class="eh-bottom">${zone('휴게실','휴게공간')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영')}</div></div>${markers}${mapOnlyMarkers}${!markers&&!mapOnlyMarkers?'<div class="eh-empty-map">배치된 자산·아이콘이 없습니다.</div>':''}</div>`;
       const liveHtml=liveRows.length?`<div class="eh-live-scroll"><table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${liveRows.map(x=>`<tr><td>${esc(x.asset_code||'-')}</td><td class="left">${esc(x.content||'-')}</td><td class="eh-live-state">${esc(x.status||'수리중')}</td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="eh-done eh-live-edit-btn" onclick="window.eamManualLiveEdit('${attr(x.asset_code||'')}')">입력</button></td><td><button class="eh-done" onclick="window.eamManualLiveComplete('${attr(x.asset_code||'')}')">완료</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="eh-empty">현재 수리 LIVE 등록 건이 없습니다.</div>';
@@ -6613,7 +6619,7 @@ function jgbV47GoWpByLeak(leakCode){
         ['other','🔧','기타설비','사무 · 공용']
       ];
       const PREFIX={cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DO',other:'OT'};
-      const FIRE=new Set(['FI-01','FI-02','FI-03','FI-04','FI-05','FI-06','FI-07','FI-08']);
+      const FIRE=new Set(['EQ-01','EQ-02','EQ-03','EQ-05','FI-01','FI-02','FI-03','FI-04','FI-05','FI-06','FI-07','FI-08','EQ-07']);
       const v=x=>String(x??'').trim();
       function readMeta(){try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}catch(e){return {}}}
       function writeMeta(x){try{localStorage.setItem(META_KEY,JSON.stringify(x||{}))}catch(e){console.warn(e)}}
@@ -6645,7 +6651,7 @@ function jgbV47GoWpByLeak(leakCode){
       function rawRows(){
         const main=typeof JGB_MAIN_EQUIPMENT!=='undefined'&&Array.isArray(JGB_MAIN_EQUIPMENT)?JGB_MAIN_EQUIPMENT:[];
         const excel=typeof JGB_EXCEL_EQUIPMENT!=='undefined'&&Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[];
-        const rows=[...main,...excel].filter(x=>x&&x.code&&!['OT-04','OT-05','OT-06'].includes(v(x.code))&&!/^EQ-\d+$/i.test(v(x.code)));
+        const rows=[...main,...excel].filter(x=>x&&x.code&&!['OT-04','OT-05','OT-06'].includes(v(x.code)));
         const map=new Map();
         rows.forEach(x=>{if(!map.has(v(x.code)))map.set(v(x.code),x)});
         return [...map.values()];
@@ -6662,7 +6668,7 @@ function jgbV47GoWpByLeak(leakCode){
           map.set(code,row);
         });
         A.forEach(a=>{
-          const code=v(a.asset_code); if(!code||/^EQ-\d+$/i.test(code)||map.has(code))return;
+          const code=v(a.asset_code); if(!code||map.has(code))return;
           const m=meta[code]||{}, k=catKey(Object.assign({},a,m));
           map.set(code,Object.assign({},a,m,{code,name:v(m.name||a.name)||'-',type:categoryLabel(k),category:categoryLabel(k),place:k==='fire'?'유수장치실':v(m.place||a.place)||'-',model:v(m.model||a.product_name)||'',qty:m.qty??a.quantity??'-',vendor:v(m.vendor||a.vendor)||'-',maker:v(m.maker||m.vendor||a.vendor)||'-',asContact:v(m.asContact)||'-',installDate:v(m.installDate)||'',warranty:v(m.warranty)||'-',asHistory:v(m.asHistory)||'-',note:v(m.note)||'',capacity:v(m.capacity)||'',life:v(m.life)||'',grade:v(m.grade)||'',date:v(m.date||m.manufactureDate)||'',improvementPlan:v(m.improvementPlan)||'',status:v(m.status||a.status)||'정상',acquisitionType:v(m.acquisitionType)||'기존 자산',internalCode:code}));
         });
@@ -6826,18 +6832,6 @@ function jgbV47GoWpByLeak(leakCode){
           return method==='외주정비'||method==='외부정비'||method==='외부수리'||method==='외주수리'||text.includes('외주정비')||text.includes('외부정비')||text.includes('외부수리');
         }).length;
       }
-      function jgbV22SelfCount(H,asset,code){
-        const aid=String(asset?.id||''), cc=String(code||'').trim();
-        return (Array.isArray(H)?H:[]).filter(h=>{
-          if(aid && String(h?.asset_id||'')===aid){} else if(cc && String(h?.asset_code||'').trim()===cc){} else return false;
-          const raw=String(h?.description||''); let md={};
-          if(raw.startsWith('MAINT::')){try{md=JSON.parse(raw.slice(7))||{}}catch(e){}}
-          else if(raw.startsWith('MAINT:')){try{md=JSON.parse(raw.slice(6))||{}}catch(e){}}
-          const method=String(md.maintenanceMethod||md.method||h?.event_type||h?.action_type||'').replace(/\s/g,'');
-          const text=(method+' '+String(h?.event_type||'')+' '+String(h?.action_type||'')).replace(/\s/g,'');
-          return method==='자체정비'||method==='자체수리'||text.includes('자체정비')||text.includes('자체수리');
-        }).length;
-      }
       function jgbV22Field(label,id,value,extra=''){
         return `<label>${jgbV22Esc(label)}<input id="${id}" value="${jgbV22Esc(value??'')}" ${extra}></label>`;
       }
@@ -6907,7 +6901,16 @@ function jgbV47GoWpByLeak(leakCode){
         const equipPhoto=equipDeleted?'':((window.__jgbEquipPhotoCache&&window.__jgbEquipPhotoCache[cardCode])||localStorage.getItem('JGB_EQUIP_PHOTO_'+cardCode)||cur.photo||'');
         const assetId=String(reg?.id||'');
         const extCount=jgbV22ExternalCount(H,reg,cardCode);
-        const selfCount=jgbV22SelfCount(H,reg,cardCode);
+        const selfCount=(Array.isArray(H)?H:[]).filter(h=>{
+          const aid=String(reg?.id||''), hc=String(cardCode||'').trim();
+          if(!((aid&&String(h?.asset_id||'')===aid)||(hc&&String(h?.asset_code||'').trim()===hc)))return false;
+          const raw=String(h?.description||''); let md={};
+          if(raw.startsWith('MAINT::')){try{md=JSON.parse(raw.slice(7))||{}}catch(e){}}
+          else if(raw.startsWith('MAINT:')){try{md=JSON.parse(raw.slice(6))||{}}catch(e){}}
+          const method=String(md.maintenanceMethod||md.method||h?.event_type||h?.action_type||'').replace(/\s/g,'');
+          const text=(method+' '+String(h?.event_type||'')+' '+String(h?.action_type||'')).replace(/\s/g,'');
+          return method==='자체정비'||text.includes('자체정비');
+        }).length;
         const F=(label,value,cls='')=>`<div class="jgb-paper-cell ${cls}"><small>${esc(label)}</small><b>${esc(value??'-')}</b></div>`;
         return `<details class="eam-source-card jgb-history-card" ${window.eamHistoryCardOpen(cardCode)?'open':''} ontoggle="eamPersistHistoryCard(this,'${E(cardCode)}')">
           <summary><div class="jgb-card-head"><span>📋 주요설비 이력카드</span><button type="button" class="jgb-card-edit" onclick="event.preventDefault();event.stopPropagation();window.__eamSelCode='${E(cardCode)}';return window.JGB_EAM_CARD_V22_OPEN('${E(cardCode)}')">✏️ 수정</button></div></summary>
@@ -6921,8 +6924,8 @@ function jgbV47GoWpByLeak(leakCode){
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">내용연수</div><div class="jgb-basic-value">${E(cur.life||'-')}</div><div class="jgb-basic-label">평가등급</div><div class="jgb-basic-value">${E(cur.grade||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">보증</div><div class="jgb-basic-value">${E(cur.warranty||'-')}</div><div class="jgb-basic-label">A/S 기록</div><div class="jgb-basic-value">${E(cur.asHistory||'-')}</div></div>
             <div class="jgb-basic-table-row"><div class="jgb-basic-label">자산상태</div><div class="jgb-basic-value">${E(cur.status||'정상')}</div><div class="jgb-basic-label">취득구분</div><div class="jgb-basic-value">${E(cur.acquisitionType||'기존 자산')}</div></div>
-          </div><section class="jgb-paper-operation"><div class="jgb-paper-operation-title">설비 운영·관리정보</div><div class="jgb-paper-operation-row"><div class="jgb-paper-operation-label">작동방법</div><div class="jgb-paper-operation-value">${E(cur.operationMethod||'-')}</div></div><div class="jgb-paper-operation-row"><div class="jgb-paper-operation-label">사용방법</div><div class="jgb-paper-operation-value">${E(cur.useMethod||'-')}</div></div><div class="jgb-paper-operation-row"><div class="jgb-paper-operation-label">주의사항</div><div class="jgb-paper-operation-value">${E(cur.caution||'-')}</div></div></section></section><section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149"><div class="jgb-paper-section-title">📷 설비 사진 (현재)</div><div class="jgb-equip-photo-stage"><div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">${equipPhoto?`<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">×</button>`:`<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택"></div></div><div class="jgb-equip-photo-actions-rebuilt"><button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button><span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div><div class="jgb-v149-detail-title">설비 상세사진 · 각 4×4cm</div><div class="jgb-v149-detail-scroll"><div class="jgb-v149-detail-grid">${['정면','측면','명판','설치환경'].map((label,i)=>{const key='JGB_EQUIP_SUBPHOTO_'+cardCode+'_'+i;let src='';try{src=localStorage.getItem(key)||''}catch(e){}const desc=['설비 정면 사진','설비 측면 사진','제조·규격 명판','설치 상태 사진'][i];return `<div class="jgb-v149-detail-item"><div class="jgb-v149-detail-box" onclick="window.jgbV145PickSubPhoto&&window.jgbV145PickSubPhoto('${E(cardCode)}',${i})" title="${E(label)} 사진 등록">${src?`<img src="${E(src)}" alt="${E(label)}"><button type="button" class="jgb-v149-detail-del" onclick="event.preventDefault();event.stopPropagation();window.jgbV145DeleteSubPhoto&&window.jgbV145DeleteSubPhoto('${E(cardCode)}',${i})">×</button>`:`<span>📷<br>사진 등록</span>`}</div><b>${E(label)}</b><small>${E(desc)}</small></div>`}).join('')}</div></div></section></div>
-          <div class="jgb-paper-auto">${F('최근 외주정비일',cur.recentExternalMaintenanceDate||cur.externalMaintenanceDate||'-')}${F('누적 외주정비 건수',extCount+'건')}${F('최근 조치내용',cur.recentExternalMaintenanceAction||cur.externalMaintenanceAction||'-')}${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}${F('교체·폐기 예정 여부',cur.disposalPlan||cur.retirementPlan||'미정')}${F('누적 자체정비 건수',selfCount+'건','jgb-self-maintenance-count')}</div>
+          </div></section><section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v149"><div class="jgb-paper-section-title">📷 설비 사진 (현재)</div><div class="jgb-equip-photo-stage"><div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">${equipPhoto?`<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">×</button>`:`<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택"></div></div><div class="jgb-equip-photo-actions-rebuilt"><button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button><span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div><div class="jgb-v149-detail-title">설비 상세사진 · 각 4×4cm</div><div class="jgb-v149-detail-scroll"><div class="jgb-v149-detail-grid">${['정면','측면','명판','설치환경'].map((label,i)=>{const key='JGB_EQUIP_SUBPHOTO_'+cardCode+'_'+i;let src='';try{src=localStorage.getItem(key)||''}catch(e){}const desc=['설비 정면 사진','설비 측면 사진','제조·규격 명판','설치 상태 사진'][i];return `<div class="jgb-v149-detail-item"><div class="jgb-v149-detail-box" onclick="window.jgbV145PickSubPhoto&&window.jgbV145PickSubPhoto('${E(cardCode)}',${i})" title="${E(label)} 사진 등록">${src?`<img src="${E(src)}" alt="${E(label)}"><button type="button" class="jgb-v149-detail-del" onclick="event.preventDefault();event.stopPropagation();window.jgbV145DeleteSubPhoto&&window.jgbV145DeleteSubPhoto('${E(cardCode)}',${i})">×</button>`:`<span>📷<br>사진 등록</span>`}</div><b>${E(label)}</b><small>${E(desc)}</small></div>`}).join('')}</div></div></section></div>
+          <div class="jgb-paper-auto">${F('최근 외주정비일',cur.recentExternalMaintenanceDate||cur.externalMaintenanceDate||'-')}${F('누적 외주정비 건수',extCount+'건')}${F('최근 조치내용',cur.recentExternalMaintenanceAction||cur.externalMaintenanceAction||'-')}${F('누적 자체정비 건수',selfCount+'건')}${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}${F('','')}</div>
           <div class="jgb-paper-notes">${F('시설개선계획',cur.improvementPlan||'-','wide')}${F('특이사항',cur.note||'-','wide')}</div></details>`;
       }
       window.JGB_EAM_CARD_V22_HTML=function(cur,reg,H,I){
@@ -11739,7 +11742,7 @@ function jgbV47GoWpByLeak(leakCode){
   min-height:52px!important;
   max-height:52px!important;
   display:grid!important;
-  grid-template-columns:155px minmax(0,1fr)!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
   box-sizing:border-box!important;
   border-right:2px solid #718492!important;
   border-bottom:2px solid #718492!important;
@@ -11763,13 +11766,10 @@ function jgbV47GoWpByLeak(leakCode){
   background:#d9e1e5!important;
   color:#203c4f!important;
   border-right:2px solid #718492!important;
-  font-size:13px!important;
+  font-size:14px!important;
   font-weight:900!important;
   line-height:1.2!important;
   text-align:left!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:clip!important;
 }
 
 /* 내용 */
@@ -12550,25 +12550,7 @@ function jgbV47GoWpByLeak(leakCode){
 }
 </style>
 
-<style id="JGB_EAM_SELF_MAINTENANCE_V3">
-/* v3: 기존 외주정비 연동과 동일하게 유지관리 이력의 자체정비 누적 건수를 표시 */
-.jgb-history-card .jgb-paper-auto > .jgb-paper-cell.jgb-self-maintenance-count{
-  grid-column:2!important;
-  grid-row:3!important;
-  border-right:0!important;
-  background:#faf8f2!important;
-}
-.jgb-history-card .jgb-paper-auto > .jgb-paper-cell.jgb-self-maintenance-count small{
-  white-space:nowrap!important;
-  overflow:visible!important;
-  text-overflow:clip!important;
-  font-size:14px!important;
-  line-height:1!important;
-}
-.jgb-history-card .jgb-paper-auto > .jgb-paper-cell.jgb-self-maintenance-count b{
-  white-space:nowrap!important;
-}
-</style>
+
 
 <!-- JGB V116 : 하단 이력정보 2쌍 정렬
      시설개선계획/특이사항은 각각 한 줄 전체폭 유지 -->
@@ -15663,22 +15645,335 @@ try{
 })();
 </script>
 
-<script id="JGB_EAM_ASSET_CARD_CLICK_V2">
+<style id="JGB_V1_MAINT_BOTTOM_LAYOUT">
+/* v1: 요청 최종 구조
+   1행 최근 외주정비일 + 누적 외주정비 건수
+   2행 최근 조치내용 + 누적 자체정비 건수
+   3행 차기 점검일 전체폭
+   교체·폐기 예정 여부 및 정비 버튼은 하단 카드에서 표시하지 않음
+*/
+.jgb-history-card .jgb-paper-auto{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  grid-template-rows:52px 52px 52px!important;
+  grid-auto-flow:row!important;
+  width:100%!important;
+  height:156px!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  box-sizing:border-box!important;
+  background:#718492!important;
+  border-top:2px solid #718492!important;
+  border-left:2px solid #718492!important;
+  border-right:2px solid #718492!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  border-bottom:1px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(1){grid-column:1!important;grid-row:1!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(2){grid-column:2!important;grid-row:1!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(3){grid-column:1!important;grid-row:2!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(4){grid-column:2!important;grid-row:2!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1 / -1!important;grid-row:3!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell small{
+  display:flex!important;
+  align-items:center!important;
+  width:125px!important;
+  height:52px!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  background:#d9e1e5!important;
+  color:#203c4f!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  line-height:1.2!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  width:100%!important;
+  height:52px!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:14px!important;
+  font-weight:750!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+@media(max-width:750px){
+  .jgb-history-card .jgb-paper-auto{
+    grid-template-columns:1fr!important;
+    grid-template-rows:repeat(5,52px)!important;
+    height:260px!important;
+  }
+  .jgb-history-card .jgb-paper-auto>.jgb-paper-cell{
+    grid-column:1!important;
+    grid-row:auto!important;
+    border-right:0!important;
+  }
+}
+</style>
+
+<script id="JGB_EAM_V35_ICON_AUTO_CREATE_CLICK_FIX">
 (function(){
-  if(window.__JGB_EAM_ASSET_CARD_CLICK_V2)return;
-  window.__JGB_EAM_ASSET_CARD_CLICK_V2=true;
-  document.addEventListener('click',function(e){
-    const card=e.target.closest?.('.eam-asset-row');
-    if(!card)return;
-    const code=String(card.getAttribute('data-code')||'').trim();
-    if(!code)return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    const cat=String(window.__eamCat||'cooling');
-    if(typeof window.eamPick==='function'){
-      window.eamPick(cat,code);
-    }
-  },true);
+  'use strict';
+  if(window.__JGB_EAM_V35_ICON_AUTO_CREATE_CLICK_FIX)return;
+  window.__JGB_EAM_V35_ICON_AUTO_CREATE_CLICK_FIX=true;
+  const V=x=>String(x??'').trim();
+  const catFor=c=>({AC:'cooling',BO:'water',FI:'fire',EL:'electrical',LT:'lighting',WP:'waterproof',SA:'sanitary',DO:'doors',OT:'other'}[V(c).toUpperCase().split('-')[0]]||'other');
+  function fixStaleOnly(){
+    try{
+      const assets=Array.isArray(window.__eamA)?window.__eamA:[];
+      const aset=new Set(assets.map(a=>V(a?.asset_code||a?.code)));
+      const k='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+      const o=JSON.parse(localStorage.getItem(k)||'{}')||{};
+      let changed=false;
+      Object.keys(o).forEach(c=>{if(aset.has(c)){delete o[c];changed=true;}});
+      if(changed)localStorage.setItem(k,JSON.stringify(o));
+    }catch(_){}
+  }
+  function bind(){
+    document.querySelectorAll('.eh-map .eh-marker[data-code]').forEach(el=>{
+      if(el.__v35DirectClick)return;
+      el.__v35DirectClick=true;
+      el.addEventListener('click',function(e){
+        const c=V(this.getAttribute('data-code'));
+        if(!c || this.classList.contains('map-only'))return;
+        e.preventDefault();
+        window.__eamSelCode=c;
+        window.__eamCat=catFor(c);
+        try{
+          if(typeof window.go==='function')window.go('eam');
+          setTimeout(()=>{try{if(typeof window.eamPick==='function')window.eamPick(window.__eamCat,c)}catch(_){}},0);
+        }catch(_){}
+      });
+    });
+  }
+  const oldRender=window.render;
+  if(typeof oldRender==='function'&&!window.__JGB_EAM_V35_RENDER_WRAP){
+    window.__JGB_EAM_V35_RENDER_WRAP=true;
+    window.render=function(){
+      const r=oldRender.apply(this,arguments);
+      setTimeout(fixStaleOnly,0);
+      setTimeout(bind,0);
+      setTimeout(bind,120);
+      return r;
+    };
+  }
+  setTimeout(fixStaleOnly,0);setTimeout(bind,100);setTimeout(bind,400);
+})();
+</script>
+
+<style id="JGB_EAM_V5_HISTORY_NOTE_FINAL">
+/* v5: 하단 자동정보를 공공기관 문서/노트식 표로 정리. 기존 기능·데이터는 변경하지 않음. */
+.jgb-history-card .jgb-paper-auto{
+  display:grid!important;
+  grid-template-columns:minmax(150px,150px) minmax(0,1fr) minmax(150px,150px) minmax(0,1fr)!important;
+  grid-template-rows:52px 52px 52px!important;
+  width:100%!important;
+  height:156px!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  box-sizing:border-box!important;
+  border:1px solid #718492!important;
+  border-bottom:0!important;
+  background:#faf8f2!important;
+  overflow:hidden!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell{
+  display:grid!important;
+  grid-template-columns:150px minmax(0,1fr)!important;
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  border-bottom:1px solid #718492!important;
+  background:#faf8f2!important;
+  overflow:hidden!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(1){grid-column:1 / 3!important;grid-row:1!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(2){grid-column:3 / 5!important;grid-row:1!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(3){grid-column:1 / 3!important;grid-row:2!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(4){grid-column:3 / 5!important;grid-row:2!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1 / 3!important;grid-row:3!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(6){grid-column:3 / 5!important;grid-row:3!important;border-right:0!important;background:#faf8f2!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(6) small,
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(6) b{visibility:hidden!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell small{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  width:150px!important;
+  min-width:150px!important;
+  height:52px!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  background:#d9e1e5!important;
+  color:#203c4f!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  width:100%!important;
+  height:52px!important;
+  margin:0!important;
+  padding:8px 12px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:14px!important;
+  font-weight:750!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.jgb-history-card .jgb-paper-notes{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:1px solid #718492!important;
+  border-top:0!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide{
+  display:grid!important;
+  grid-template-columns:150px minmax(0,1fr)!important;
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-bottom:1px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide:last-child{border-bottom:0!important}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide small{
+  display:flex!important;
+  align-items:center!important;
+  width:150px!important;
+  min-width:150px!important;
+  height:52px!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  background:#d9e1e5!important;
+  color:#203c4f!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide b{
+  display:flex!important;
+  align-items:center!important;
+  width:100%!important;
+  min-width:0!important;
+  height:52px!important;
+  margin:0!important;
+  padding:8px 12px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:14px!important;
+  font-weight:750!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+@media(max-width:750px){
+  .jgb-history-card .jgb-paper-auto{
+    grid-template-columns:150px minmax(0,1fr)!important;
+    grid-template-rows:repeat(6,52px)!important;
+    height:312px!important;
+  }
+  .jgb-history-card .jgb-paper-auto>.jgb-paper-cell{
+    grid-column:1 / 3!important;
+    grid-row:auto!important;
+    border-right:0!important;
+  }
+}
+</style>
+
+<!-- JGB EAM V7: 이력카드 자동정보 제목 1줄 + 배치도 아이콘 강제 선택 -->
+<style id="JGB_EAM_V7_FINAL_FIX">
+.jgb-history-card .jgb-paper-auto > .jgb-paper-cell,.jgb-paper-auto > .jgb-paper-cell{grid-template-columns:155px minmax(0,1fr)!important}
+.jgb-history-card .jgb-paper-auto > .jgb-paper-cell small,.jgb-paper-auto > .jgb-paper-cell small{white-space:nowrap!important;word-break:keep-all!important;overflow:visible!important;text-overflow:clip!important;font-size:13px!important;padding-left:9px!important;padding-right:7px!important}
+.jgb-history-card .jgb-paper-auto > .jgb-paper-cell b,.jgb-paper-auto > .jgb-paper-cell b{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.eh-map .eh-marker[data-code]{pointer-events:auto!important;cursor:pointer!important;z-index:1000!important;touch-action:manipulation!important}
+</style>
+<script id="JGB_EAM_V7_FORCE_ICON_OPEN">
+(function(){
+'use strict';
+if(window.__JGB_EAM_V7_FORCE_ICON_OPEN)return;
+window.__JGB_EAM_V7_FORCE_ICON_OPEN=true;
+var last={code:'',time:0};
+function V(x){return String(x==null?'':x).trim()}
+function catFor(code){
+ var c=V(code),A=Array.isArray(window.__eamA)?window.__eamA:[],a=A.find(function(x){return V(x&&x.asset_code)===c}),t=V(a&&(a.category||a.type));
+ if(t.indexOf('냉난방')>=0)return'cooling'; if(t.indexOf('소방')>=0)return'fire'; if(t.indexOf('온수')>=0||t.indexOf('보일러')>=0||t.indexOf('난방')>=0)return'water'; if(t.indexOf('전기')>=0)return'electrical'; if(t.indexOf('조명')>=0)return'lighting'; if(t.indexOf('방수')>=0)return'waterproof'; if(t.indexOf('위생')>=0)return'sanitary'; if(t.indexOf('문')>=0||t.indexOf('창호')>=0||t.indexOf('도어')>=0)return'doors';
+ return({AC:'cooling',BO:'water',FI:'fire',EL:'electrical',SA:'sanitary',DO:'doors',OT:'other'}[c.split('-')[0]]||'other');
+}
+function openAsset(code){
+ var c=V(code);if(!c)return; window.__eamSelCode=c;window.__eamCat=catFor(c);
+ try{if(typeof window.go==='function')window.go('eam')}catch(_){ }
+ function pick(){try{if(typeof window.eamPick==='function'){window.eamPick(window.__eamCat,c);return true}}catch(_){ }return false}
+ requestAnimationFrame(function(){if(!pick())setTimeout(pick,80);setTimeout(pick,220)});
+}
+function handle(e){
+ var el=e.target&&e.target.closest?e.target.closest('.eh-map .eh-marker[data-code]'):null;if(!el)return;
+ var c=V(el.getAttribute('data-code'));if(!c)return;
+ if(e.type==='click'&&last.code===c&&Date.now()-last.time<500){e.preventDefault();e.stopImmediatePropagation();return}
+ last={code:c,time:Date.now()};e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();openAsset(c);
+}
+document.addEventListener('pointerdown',handle,true);
+document.addEventListener('click',handle,true);
 })();
 </script>
 </body>
@@ -15924,21 +16219,12 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
   document.addEventListener('click',function(e){
     const el=e.target.closest?.('#eam228Map .eam228-asset');
     if(!el)return;
+    /* 단일 클릭은 선택만 하고 화면 이동하지 않음 */
     if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
     e.preventDefault();
     e.stopImmediatePropagation();
     const c=el.getAttribute('data-code')||'';
-    if(!c)return;
     window.__eamSelCode=c;
-    const prefix=String(c).split('-')[0];
-    const cat={AC:'cooling',BO:'water',FI:'fire',EL:'electrical',LT:'lighting',WP:'waterproof',SA:'sanitary',DO:'doors',OT:'other'}[prefix]||'other';
-    window.__eamCat=cat;
-    if(typeof window.eamPick==='function'){
-      window.eamPick(cat,c);
-    }else if(typeof window.go==='function'){
-      window.go('eam');
-      requestAnimationFrame(()=>{if(typeof window.eamPick==='function')window.eamPick(cat,c);});
-    }
   },true);
   document.addEventListener('dblclick',function(e){
     const el=e.target.closest?.('#eam228Map .eam228-asset');
@@ -17741,8 +18027,13 @@ function click(e){
  }
  e.preventDefault();e.stopImmediatePropagation();
  window.__eamSelCode=code;
- const prefix=code.split('-')[0];
- const cat={AC:'cooling',BO:'heating',FI:'fire',SA:'sanitary',EL:'electrical',DO:'doors',OT:'other'}[prefix]||'other';
+ const prefix=code.split('-')[0].toUpperCase();
+ /* 아이콘 클릭은 자산코드 하나를 기준으로 실제 EAM 분류에 연결한다.
+    특히 BO는 heating이 아니라 EAM의 water 분류로 연결한다. */
+ const cat={
+   AC:'cooling', BO:'water', FI:'fire', EL:'electrical', LT:'lighting',
+   WP:'waterproof', SA:'sanitary', DO:'doors', OT:'other'
+ }[prefix]||'other';
  window.__eamCat=cat;
  /* 행의 DOM 클릭을 중간에 거치지 않고 EAM의 공식 선택 함수에 직접 전달한다.
     그래서 아이콘 클릭 → 같은 자산코드의 이력카드가 바로 열린다. */
@@ -18455,6 +18746,24 @@ window.eamDeleteSelectedAssetByCode=async function(c){window.__eamSelCode=V(c);r
       // 삭제됐던 동일 번호를 다시 등록하면 삭제 표시를 즉시 해제한다.
       markActive(code);
 
+      /* 신규 자산 등록 = 배치도 아이콘 1개를 동일 자산코드로 자동 생성
+         기존 배치도 전용 아이콘이 같은 코드로 남아 있으면 제거하고
+         자산용 배치 위치를 최초 중앙(50%,50%)으로 만든다. */
+      try{
+        const posKey='JGB_EAM_HYUNHWANG_MAP_V1';
+        const onlyKey='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+        const hiddenKey='JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1';
+        const pos=JSON.parse(localStorage.getItem(posKey)||'{}')||{};
+        const only=JSON.parse(localStorage.getItem(onlyKey)||'{}')||{};
+        const hidden=JSON.parse(localStorage.getItem(hiddenKey)||'{}')||{};
+        if(!pos[code])pos[code]=[50,50];
+        delete only[code];
+        delete hidden[code];
+        localStorage.setItem(posKey,JSON.stringify(pos));
+        localStorage.setItem(onlyKey,JSON.stringify(only));
+        localStorage.setItem(hiddenKey,JSON.stringify(hidden));
+      }catch(e){console.warn('신규 자산 배치도 아이콘 자동 생성 실패',e)}
+
       const metaKey='JGB_EAM_ASSET_META_V40';
       try{
         const m=JSON.parse(localStorage.getItem(metaKey)||'{}');
@@ -18484,148 +18793,291 @@ window.eamDeleteSelectedAssetByCode=async function(c){window.__eamSelCode=V(c);r
 })();
 </script>
 
-<style id="JGB_EAM_OPERATION_PAPER_V1">
-/* v1: 기존 주요설비 이력카드 기능은 유지하고 빈 좌측 공간에 설비 운영·관리정보만 추가 */
-.jgb-paper-info{
-  background:#f7f3e9!important;
+<style id="JGB_EAM_V3_ONLY_REQUESTED_LINE_FIX">
+/* v3: 현재 요청한 하단 이력카드 표 선/제목만 수정. 기능·데이터·다른 화면은 변경하지 않음. */
+.jgb-history-card .jgb-paper-auto{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr) 125px minmax(0,1fr)!important;
+  grid-template-rows:52px 52px 52px!important;
+  width:100%!important;
+  height:156px!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  box-sizing:border-box!important;
+  border:1px solid #718492!important;
+  background:#faf8f2!important;
 }
-.jgb-paper-operation{
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  border-bottom:1px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(1){grid-column:1 / 3!important;grid-row:1!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(2){grid-column:3 / 5!important;grid-row:1!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(3){grid-column:1 / 3!important;grid-row:2!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(4){grid-column:3 / 5!important;grid-row:2!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1 / 5!important;grid-row:3!important;border-right:0!important;border-bottom:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell small{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  width:125px!important;
+  height:52px!important;
+  min-width:125px!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  background:#d9e1e5!important;
+  color:#203c4f!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:visible!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  width:100%!important;
+  height:52px!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:14px!important;
+  font-weight:750!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+/* 시설개선계획·특이사항도 같은 표 선을 끝까지 연결 */
+.jgb-history-card .jgb-paper-notes{
+  display:block!important;
   width:100%!important;
   margin:0!important;
   padding:0!important;
   box-sizing:border-box!important;
-  background:#f8f4ea!important;
-  border-top:2px solid #566a78!important;
+  border:1px solid #718492!important;
+  border-top:0!important;
+  background:#faf8f2!important;
 }
-.jgb-paper-operation-title{
-  height:38px!important;
-  min-height:38px!important;
-  display:flex!important;
-  align-items:center!important;
-  padding:0 12px!important;
-  box-sizing:border-box!important;
-  background:#d7dfe4!important;
-  color:#233d50!important;
-  border-bottom:2px solid #667a88!important;
-  font-size:14px!important;
-  font-weight:900!important;
-  line-height:1!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-}
-.jgb-paper-operation-row{
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide{
   display:grid!important;
   grid-template-columns:125px minmax(0,1fr)!important;
   width:100%!important;
-  min-height:50px!important;
-  height:50px!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
   box-sizing:border-box!important;
-  border-bottom:2px solid #718492!important;
+  border:0!important;
+  border-bottom:1px solid #718492!important;
   background:#faf8f2!important;
 }
-.jgb-paper-operation-label{
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide:last-child{border-bottom:0!important}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide small{
   display:flex!important;
   align-items:center!important;
-  padding:7px 9px!important;
+  width:125px!important;
+  min-width:125px!important;
+  height:52px!important;
+  margin:0!important;
+  padding:8px 10px!important;
   box-sizing:border-box!important;
-  background:#dfe6ea!important;
-  color:#223c4e!important;
-  border-right:2px solid #718492!important;
-  font-size:13px!important;
+  border:0!important;
+  border-right:1px solid #718492!important;
+  background:#d9e1e5!important;
+  color:#203c4f!important;
+  font-size:14px!important;
   font-weight:900!important;
   line-height:1.2!important;
   white-space:nowrap!important;
+  word-break:keep-all!important;
 }
-.jgb-paper-operation-value{
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide b{
   display:flex!important;
   align-items:center!important;
+  width:100%!important;
   min-width:0!important;
-  padding:7px 10px!important;
+  height:52px!important;
+  margin:0!important;
+  padding:8px 10px!important;
   box-sizing:border-box!important;
+  border:0!important;
   background:#faf8f2!important;
   color:#172f40!important;
-  font-size:13px!important;
-  font-weight:700!important;
-  line-height:1.3!important;
-  word-break:keep-all!important;
-  overflow:hidden!important;
-}
-/* 종이서식 느낌: 표 제목과 경계선을 한 줄 기준으로 명확히 */
-.jgb-history-card .jgb-paper-section-title,
-.jgb-history-card .jgb-paper-operation-title,
-.jgb-history-card .jgb-v149-detail-title{
+  font-size:14px!important;
+  font-weight:750!important;
+  line-height:1.25!important;
   white-space:nowrap!important;
   overflow:hidden!important;
   text-overflow:ellipsis!important;
 }
-.jgb-history-card .jgb-paper-section-title,
-.jgb-history-card .jgb-paper-operation-title{
-  border-bottom:2px solid #667a88!important;
-}
 @media(max-width:750px){
-  .jgb-paper-operation-row{grid-template-columns:110px minmax(0,1fr)!important;}
+  .jgb-history-card .jgb-paper-auto{
+    grid-template-columns:125px minmax(0,1fr)!important;
+    grid-template-rows:repeat(5,52px)!important;
+    height:260px!important;
+  }
+  .jgb-history-card .jgb-paper-auto>.jgb-paper-cell{
+    grid-column:1 / 3!important;
+    grid-row:auto!important;
+    border-right:0!important;
+  }
 }
 </style>
 
-<style id="JGB_EAM_SELF_MAINTENANCE_LAYOUT_V3">
-.jgb-history-card .jgb-paper-auto > .jgb-paper-cell:nth-child(5){grid-column:1!important;grid-row:3!important;}
-.jgb-history-card .jgb-paper-auto > .jgb-paper-cell:nth-child(6){grid-column:2!important;grid-row:3!important;}
+<!-- JGB EAM V4: 좌측 자산목록 클릭 최종 고정 / 표시코드와 실제 자산코드 분리 -->
+<style id="JGB_EAM_V4_LEFT_ASSET_CLICK_FIX">
+.eam-assets-panel .eam-asset-row{pointer-events:auto!important;cursor:pointer!important;position:relative;z-index:20!important}
 </style>
+<script id="JGB_EAM_V4_LEFT_ASSET_CLICK_FIX_SCRIPT">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_V4_LEFT_ASSET_CLICK_FIX)return;
+  window.__JGB_EAM_V4_LEFT_ASSET_CLICK_FIX=true;
+  const V=x=>String(x??'').trim();
+  function realCodeFromRow(row){
+    return V(row?.getAttribute('data-code')||'');
+  }
+  function category(){return V(window.__eamCat||'cooling')||'cooling'}
+  function selectAsset(code){
+    const c=V(code); if(!c)return false;
+    window.__eamSelCode=c;
+    window.__eamCat=category();
+    try{localStorage.setItem('JGB_EAM_SELECTED_ASSET_CODE_V33',c);localStorage.setItem('JGB_EAM_SELECTED_CATEGORY_V33',window.__eamCat)}catch(_){ }
+    /* 최종 선택 함수가 존재하면 반드시 실제 data-code를 그대로 전달 */
+    try{
+      if(typeof window.eamPick==='function'){
+        window.eamPick(window.__eamCat,c);
+        return true;
+      }
+    }catch(_){ }
+    try{if(typeof window.render==='function'){window.render();return true}}catch(_){ }
+    return false;
+  }
+  document.addEventListener('click',function(e){
+    const row=e.target?.closest?.('.eam-assets-panel .eam-asset-row[data-code]');
+    if(!row)return;
+    const code=realCodeFromRow(row);if(!code)return;
+    /* 기존 inline onclick/구버전 선택 이벤트가 다른 코드로 바꾸지 못하게 차단 */
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    selectAsset(code);
+  },true);
+})();
+</script>
 
-<!-- JGB EAM v6: 배치도 아이콘 단일 클릭 최종 강제 연결 -->
-<script id="JGB_EAM_ICON_CLICK_FINAL_V6">
+<!-- JGB EAM V6 FINAL : 자산등록·이력카드·배치도 아이콘 1세트 통합 -->
+<style id="JGB_EAM_V6_SINGLE_SET">
+/* 신규 자산 등록 시 별도 배치도 아이콘 추가를 사용하지 않는다. */
+.eh-head button[onclick*="eamHyunOpenIconAdd"]{display:none!important}
+</style>
+<script id="JGB_EAM_V6_SINGLE_SET_SCRIPT">
 (function(){
 'use strict';
-if(window.__JGB_EAM_ICON_CLICK_FINAL_V6)return;
-window.__JGB_EAM_ICON_CLICK_FINAL_V6=true;
+if(window.__JGB_EAM_V6_SINGLE_SET)return;
+window.__JGB_EAM_V6_SINGLE_SET=true;
 const V=x=>String(x??'').trim();
-let down=null;
-function target(e){return e.target&&e.target.closest?e.target.closest('.eh-map .eh-marker[data-code]'):null}
-function cat(code){
- const p=V(code).split('-')[0].toUpperCase();
- return ({AC:'cooling',BO:'water',FI:'fire',EL:'electrical',LT:'lighting',SA:'sanitary',DO:'doors',WP:'waterproof',OT:'other'})[p]||'other';
+const POS_KEY='JGB_EAM_HYUNHWANG_MAP_V1';
+const ONLY_KEY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+const HIDDEN_KEY='JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1';
+const META_KEY='JGB_EAM_ASSET_META_V40';
+function obj(k){try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(_){return {}}}
+function put(k,x){try{localStorage.setItem(k,JSON.stringify(x))}catch(_){}
 }
-function select(el){
- const c=V(el&&el.getAttribute('data-code')); if(!c||el.classList.contains('map-only'))return false;
- window.__eamSelCode=c;
- window.__eamCat=cat(c);
- try{
-   if(typeof window.eamPick==='function'){
-     window.eamPick(window.__eamCat,c);
-     return true;
-   }
- }catch(err){console.error('EAM icon select',err)}
- try{if(typeof window.go==='function')window.go('eam')}catch(_){ }
- return false;
+function bindIcon(code){
+  const c=V(code);if(!c)return;
+  const pos=obj(POS_KEY),only=obj(ONLY_KEY),hidden=obj(HIDDEN_KEY);
+  /* 실제 자산은 배치도 위치 저장소의 한 좌표만 가진다. */
+  if(!pos[c])pos[c]=[50,50];
+  delete only[c];
+  delete hidden[c];
+  put(POS_KEY,pos);put(ONLY_KEY,only);put(HIDDEN_KEY,hidden);
 }
-document.addEventListener('pointerdown',function(e){
- const el=target(e); if(!el)return;
- if(e.pointerType==='mouse'&&e.button!==0)return;
- down={el,x:e.clientX,y:e.clientY,pid:e.pointerId,moved:false};
+function cleanupDuplicateOnly(){
+  const A=Array.isArray(window.__eamA)?window.__eamA:[];
+  const codes=new Set(A.map(a=>V(a?.asset_code)).filter(Boolean));
+  const only=obj(ONLY_KEY);let changed=false;
+  Object.keys(only).forEach(c=>{if(codes.has(c)){delete only[c];changed=true}});
+  if(changed)put(ONLY_KEY,only);
+}
+/* 최종 신규등록 함수의 성공 후처리를 한 번 더 보장한다. */
+const oldSubmit=window.submitEamRegister;
+if(typeof oldSubmit==='function'&&!window.__JGB_EAM_V6_SUBMIT_WRAP){
+  window.__JGB_EAM_V6_SUBMIT_WRAP=true;
+  window.submitEamRegister=async function(){
+    const before=V(window.__eamSelCode);
+    await oldSubmit.apply(this,arguments);
+    const after=V(window.__eamSelCode);
+    if(after&&after!==before){
+      bindIcon(after);
+      cleanupDuplicateOnly();
+      try{if(typeof window.eamLoad==='function')await window.eamLoad()}catch(_){}
+      try{if(typeof window.render==='function')window.render()}catch(_){}
+    }
+  };
+}
+/* 기존/신규 자산의 배치도 아이콘을 같은 자산코드로 직접 연결한다. */
+document.addEventListener('click',function(e){
+  const el=e.target?.closest?.('.eh-map .eh-marker[data-code]');
+  if(!el)return;
+  const c=V(el.getAttribute('data-code'));if(!c)return;
+  /* map-only가 남아 있어도 실제 자산코드가 존재하면 자산 아이콘으로 승격 */
+  const A=Array.isArray(window.__eamA)?window.__eamA:[];
+  const real=A.find(a=>V(a?.asset_code)===c);
+  if(real){
+    e.preventDefault();e.stopImmediatePropagation();
+    bindIcon(c);
+    window.__eamSelCode=c;
+    const cat=(()=>{
+      const t=V(real.category||real.type);
+      if(t.includes('냉난방'))return'cooling';
+      if(t.includes('소방'))return'fire';
+      if(t.includes('온수')||t.includes('보일러')||t.includes('난방'))return'water';
+      if(t.includes('전기'))return'electrical';
+      if(t.includes('조명'))return'lighting';
+      if(t.includes('방수'))return'waterproof';
+      if(t.includes('위생'))return'sanitary';
+      if(t.includes('문')||t.includes('창호')||t.includes('도어'))return'doors';
+      return'other';
+    })();
+    window.__eamCat=cat;
+    if(typeof window.go==='function')window.go('eam');
+    requestAnimationFrame(()=>{try{window.eamPick(cat,c)}catch(_){} });
+  }
 },true);
-document.addEventListener('pointermove',function(e){
- if(!down||e.pointerId!==down.pid)return;
- if(Math.hypot(e.clientX-down.x,e.clientY-down.y)>7)down.moved=true;
-},true);
-document.addEventListener('pointerup',function(e){
- if(!down||e.pointerId!==down.pid)return;
- const d=down;down=null;
- if(d.moved)return;
- const el=d.el&&d.el.isConnected?d.el:target(e);
- if(!el)return;
- /* 클릭으로 판단되는 경우에만 이력카드 선택. 드래그는 기존 위치이동 기능에 맡긴다. */
- e.preventDefault();
- e.stopPropagation();
- try{e.stopImmediatePropagation()}catch(_){ }
- select(el);
-},true);
-/* 키보드 접근도 동일하게 처리 */
-document.addEventListener('keydown',function(e){
- if(e.key!=='Enter'&&e.key!==' ')return;
- const el=e.target&&e.target.closest?e.target.closest('.eh-map .eh-marker[data-code]'):null;
- if(!el)return;
- e.preventDefault();e.stopPropagation();select(el);
-},true);
+/* 등록 모달의 안내문도 실제 동작과 일치시킨다. */
+function fixRegisterNote(){
+  const modal=document.getElementById('eamRegisterModal');
+  if(!modal)return;
+  const notes=modal.querySelectorAll('.eam-modal-note');
+  notes.forEach(n=>{n.textContent='자산코드 생성과 동시에 동일 자산코드의 배치도 아이콘이 자동 생성됩니다. 아이콘·이력카드는 하나의 자산으로 연결됩니다.'});
+}
+const oldReg=window.eamRegisterNewAsset;
+if(typeof oldReg==='function'&&!window.__JGB_EAM_V6_REG_WRAP){
+  window.__JGB_EAM_V6_REG_WRAP=true;
+  window.eamRegisterNewAsset=function(){const r=oldReg.apply(this,arguments);setTimeout(fixRegisterNote,0);return r};
+}
+/* 현재 DOM에 남은 기존 map-only 중 실제 자산과 동일한 코드는 즉시 제거한다. */
+cleanupDuplicateOnly();
 })();
 </script>
