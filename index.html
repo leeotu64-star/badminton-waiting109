@@ -15468,6 +15468,110 @@ body {
 
 
 
+<script id="JGB_EAM_V32_CANONICAL_ASSET_LINK">
+(function(){
+'use strict';
+if(window.__JGB_EAM_V32_CANONICAL_ASSET_LINK)return;
+window.__JGB_EAM_V32_CANONICAL_ASSET_LINK=true;
+const V=x=>String(x??'').trim();
+const CODE=x=>V(x).toUpperCase();
+function meta(){try{const x=JSON.parse(localStorage.getItem('JGB_EAM_ASSET_META_V40')||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}}
+function uniqueByCode(rows){
+  const out=[], seen=new Set();
+  for(const r of Array.isArray(rows)?rows:[]){
+    const c=CODE(r?.code||r?.asset_code); if(!c||seen.has(c))continue;
+    seen.add(c); out.push(Object.assign({},r,{code:c,asset_code:c}));
+  }
+  return out;
+}
+/* 기존 등록 데이터는 삭제하지 않는다. 화면/연결에서만 자산코드별 1개를 기준으로 사용한다. */
+const oldSource=window.eamSourceAssets;
+if(typeof oldSource==='function'&&!oldSource.__v32Canonical){
+  const f=function(){return uniqueByCode(oldSource.apply(this,arguments));};
+  f.__v32Canonical=true; window.eamSourceAssets=f;
+}
+function findAsset(c){
+  const code=CODE(c), A=Array.isArray(window.__eamA)?window.__eamA:[];
+  return A.find(a=>CODE(a?.asset_code||a?.code)===code)||null;
+}
+function findSource(c){
+  const code=CODE(c); try{const rows=window.eamSourceAssets?.()||[];return rows.find(x=>CODE(x?.code||x?.asset_code)===code)||null}catch(_){return null}
+}
+function canonicalRecord(c){
+  const code=CODE(c), a=findAsset(code), s=findSource(code), m=meta()[code]||{};
+  const cur=Object.assign({},s||{},a||{},m||{});
+  cur.code=code; cur.asset_code=code;
+  return {code,asset:a,source:s,meta:m,cur};
+}
+/* 이력카드 표시 번호는 선택된 자산코드 하나만 사용한다. */
+const oldCardHtml=window.JGB_EAM_CARD_V22_HTML;
+if(typeof oldCardHtml==='function'&&!oldCardHtml.__v32Canonical){
+  const f=function(cur,reg,H,I){
+    const selected=CODE(window.__eamSelCode||cur?.asset_code||cur?.code);
+    if(!selected)return oldCardHtml.apply(this,arguments);
+    const r=canonicalRecord(selected);
+    const merged=Object.assign({},r.source||{},r.asset||{},r.meta||{},r.cur||{});
+    merged.code=selected; merged.asset_code=selected;
+    /* 내부 기존 함수가 다른 meta.asset_code를 덮어쓰지 않도록 강제 */
+    let html=oldCardHtml.call(this,merged,r.asset,H,I);
+    /* 기존 내부 렌더러가 오래된 META의 asset_code를 다시 덮어써도 화면의 이력카드 코드는 선택값으로 강제한다. */
+    html=html.replace(/(자산코드<\/div><div class=\"jgb-basic-value\">)[^<]*(<\/div>)/,`$1${selected}$2`);
+    html=html.replace(/JGB_EAM_CARD_V22_OPEN\('(?:[^']*)'\)/g,`JGB_EAM_CARD_V22_OPEN('${selected}')`);
+    return html;
+  };
+  f.__v32Canonical=true; window.JGB_EAM_CARD_V22_HTML=f;
+}
+/* 수정 버튼도 현재 선택값만 전달 */
+const oldEdit=window.JGB_EAM_CARD_V22_OPEN;
+if(typeof oldEdit==='function'&&!oldEdit.__v32Canonical){
+  const f=function(code){const c=CODE(code||window.__eamSelCode);window.__eamSelCode=c;return oldEdit.call(this,c)};
+  f.__v32Canonical=true;window.JGB_EAM_CARD_V22_OPEN=f;
+}
+/* 왼쪽 선택 → 중앙 이력카드가 같은 코드만 사용 */
+const oldPick=window.eamPick;
+if(typeof oldPick==='function'&&!oldPick.__v32Canonical){
+  const f=function(cat,code){
+    const c=CODE(code);
+    if(c)window.__eamSelCode=c;
+    if(cat)window.__eamCat=cat;
+    return oldPick.apply(this,[cat,c]);
+  };
+  f.__v32Canonical=true;window.eamPick=f;
+}
+/* 배치도 아이콘은 동일 자산코드 하나만 표시하고 클릭 시 동일 코드로 EAM 선택 */
+function purgeMap(){
+  const seen=new Set();
+  document.querySelectorAll('.eh-map .eh-marker[data-code]').forEach(el=>{
+    const c=CODE(el.getAttribute('data-code')); if(!c)return;
+    el.setAttribute('data-code',c);
+    if(seen.has(c)){el.remove();return} seen.add(c);
+  });
+}
+function bindMap(){
+  document.querySelectorAll('.eh-map .eh-marker[data-code]').forEach(el=>{
+    if(el.__v32Bound)return; el.__v32Bound=true;
+    el.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      if(this.classList.contains('map-only'))return;
+      const c=CODE(this.dataset.code); if(!c)return;
+      window.__eamSelCode=c;
+      const cat=(()=>{try{const defs=window.eamCategoryDefs?.()||{};for(const [k,z] of Object.entries(defs)){if((z.items||[]).some(x=>CODE(x.code||x.asset_code)===c))return k}}catch(_){}return ({AC:'cooling',BO:'water',FI:'fire',EL:'electrical',SA:'sanitary',DO:'doors',OT:'other'}[c.split('-')[0]]||'other')})();
+      window.__eamCat=cat;
+      if(typeof window.go==='function')window.go('eam');
+      setTimeout(()=>{if(typeof window.eamPick==='function')window.eamPick(cat,c)},0);
+    },true);
+  });
+}
+function sync(){purgeMap();bindMap();}
+const oldRender=window.render;
+if(typeof oldRender==='function'&&!window.__JGB_EAM_V32_RENDER_WRAP){
+  window.__JGB_EAM_V32_RENDER_WRAP=true;
+  window.render=function(){const r=oldRender.apply(this,arguments);setTimeout(sync,0);setTimeout(sync,80);return r};
+}
+setTimeout(sync,100);setTimeout(sync,400);
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
