@@ -18751,3 +18751,45 @@ window.eamDeleteSelectedAssetByCode=async function(c){window.__eamSelCode=V(c);r
   }
 }
 </style>
+
+<!-- JGB EAM V4: 좌측 자산목록 클릭 최종 고정 / 표시코드와 실제 자산코드 분리 -->
+<style id="JGB_EAM_V4_LEFT_ASSET_CLICK_FIX">
+.eam-assets-panel .eam-asset-row{pointer-events:auto!important;cursor:pointer!important;position:relative;z-index:20!important}
+</style>
+<script id="JGB_EAM_V4_LEFT_ASSET_CLICK_FIX_SCRIPT">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_V4_LEFT_ASSET_CLICK_FIX)return;
+  window.__JGB_EAM_V4_LEFT_ASSET_CLICK_FIX=true;
+  const V=x=>String(x??'').trim();
+  function realCodeFromRow(row){
+    return V(row?.getAttribute('data-code')||'');
+  }
+  function category(){return V(window.__eamCat||'cooling')||'cooling'}
+  function selectAsset(code){
+    const c=V(code); if(!c)return false;
+    window.__eamSelCode=c;
+    window.__eamCat=category();
+    try{localStorage.setItem('JGB_EAM_SELECTED_ASSET_CODE_V33',c);localStorage.setItem('JGB_EAM_SELECTED_CATEGORY_V33',window.__eamCat)}catch(_){ }
+    /* 최종 선택 함수가 존재하면 반드시 실제 data-code를 그대로 전달 */
+    try{
+      if(typeof window.eamPick==='function'){
+        window.eamPick(window.__eamCat,c);
+        return true;
+      }
+    }catch(_){ }
+    try{if(typeof window.render==='function'){window.render();return true}}catch(_){ }
+    return false;
+  }
+  document.addEventListener('click',function(e){
+    const row=e.target?.closest?.('.eam-assets-panel .eam-asset-row[data-code]');
+    if(!row)return;
+    const code=realCodeFromRow(row);if(!code)return;
+    /* 기존 inline onclick/구버전 선택 이벤트가 다른 코드로 바꾸지 못하게 차단 */
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    selectAsset(code);
+  },true);
+})();
+</script>
