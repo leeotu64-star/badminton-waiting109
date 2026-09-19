@@ -3724,21 +3724,203 @@ a[data-page="digitalTwin"],
 .eh-marker.action{background:linear-gradient(145deg,#38e8f4 0%,#0ea5c7 52%,#08758e 100%)!important;border-color:#056477!important;color:#fff!important}
 .eh-marker.repair{background:linear-gradient(145deg,#ff727d 0%,#e83242 52%,#a90e22 100%)!important;border-color:#870b1b!important;color:#fff!important}
 </style>
-<style id="JGB_OPERATING_SLIDER_V10">
-/* 설비 운영·관리정보: 사진 영역과 동일한 가로 스크롤 */
-.jgb-operating-info{
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-  scrollbar-width:auto !important;
-  box-sizing:border-box !important;
+
+
+<style id="JGB_HISTORY_CARD_LAYOUT_V13">
+/* v13: 주요설비 이력카드 - 운영정보/하단정보 표 구조를 단일 기준으로 재정렬 */
+.jgb-history-card .jgb-operating-info{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  background:#faf8f2!important;
+  border:1.5px solid #718492!important;
+  border-top:0!important;
 }
-.jgb-operating-info::-webkit-scrollbar{height:10px !important;}
-.jgb-operating-info::-webkit-scrollbar-track{background:#edf2f5 !important;border-top:1px solid #9aaab5 !important;}
-.jgb-operating-info::-webkit-scrollbar-thumb{background:#8b969d !important;border-radius:6px !important;border:2px solid #edf2f5 !important;}
-.jgb-operating-info > .jgb-operating-title,
-.jgb-operating-info > .jgb-operating-row{min-width:720px !important;}
-.jgb-operating-info > .jgb-operating-title{white-space:nowrap !important;}
-.jgb-operating-info > .jgb-operating-row{box-sizing:border-box !important;}
+.jgb-history-card .jgb-operating-title{
+  width:100%!important;
+  min-width:0!important;
+  height:38px!important;
+  min-height:38px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:0 12px!important;
+  box-sizing:border-box!important;
+  background:#dfe6ea!important;
+  color:#203c50!important;
+  border-bottom:1.5px solid #718492!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+}
+.jgb-history-card .jgb-operating-row{
+  display:grid!important;
+  grid-template-columns:92px minmax(0,1fr)!important;
+  width:100%!important;
+  min-width:0!important;
+  height:42px!important;
+  min-height:42px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#faf8f2!important;
+  border:0!important;
+  border-bottom:1.5px solid #718492!important;
+}
+.jgb-history-card .jgb-operating-row:last-child{border-bottom:0!important}
+.jgb-history-card .jgb-operating-label{
+  display:flex!important;
+  align-items:center!important;
+  width:auto!important;
+  min-width:0!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0 9px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1.5px solid #718492!important;
+  background:#eaf0f4!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:visible!important;
+}
+.jgb-history-card .jgb-operating-label.operating{color:#159447!important;background:#edf8f0!important}
+.jgb-history-card .jgb-operating-label.usage{color:#1264c5!important;background:#eef5ff!important}
+.jgb-history-card .jgb-operating-label.caution{color:#e02424!important;background:#fff0f0!important}
+.jgb-history-card .jgb-operating-value{
+  display:flex!important;
+  align-items:center!important;
+  width:auto!important;
+  min-width:0!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:13px!important;
+  font-weight:650!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  word-break:keep-all!important;
+}
+/* 하단 자동정보: 2쌍/2행 + 차기 점검일 1행 */
+.jgb-history-card .jgb-paper-auto{
+  display:grid!important;
+  grid-template-columns:50% 50%!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border-top:1.5px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  width:auto!important;
+  min-width:0!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-right:1.5px solid #718492!important;
+  border-bottom:1.5px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(2n){border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1/-1!important;border-right:0!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(6){display:none!important}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell small,
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide small{
+  display:flex!important;
+  align-items:center!important;
+  width:auto!important;
+  min-width:0!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0 9px!important;
+  box-sizing:border-box!important;
+  background:#dfe6ea!important;
+  border:0!important;
+  border-right:1.5px solid #718492!important;
+  color:#203c50!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:visible!important;
+}
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell b,
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide b{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  width:auto!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#faf8f2!important;
+  color:#172f40!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  word-break:keep-all!important;
+}
+/* 시설개선계획 / 특이사항: 각각 완전 독립 행 */
+.jgb-history-card .jgb-paper-notes{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#faf8f2!important;
+  border:0!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide{
+  display:grid!important;
+  grid-template-columns:125px minmax(0,1fr)!important;
+  width:100%!important;
+  min-width:0!important;
+  height:52px!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-bottom:1.5px solid #718492!important;
+  background:#faf8f2!important;
+}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide:last-child{border-bottom:1.5px solid #718492!important}
+/* 글자가 절대 잘리지 않도록 제목 폭과 줄바꿈을 고정 */
+.jgb-history-card .jgb-paper-auto>.jgb-paper-cell small,
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide small,
+.jgb-history-card .jgb-operating-label{white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
+@media(max-width:700px){
+  .jgb-history-card .jgb-paper-auto{grid-template-columns:1fr!important}
+  .jgb-history-card .jgb-paper-auto>.jgb-paper-cell{grid-column:1!important;border-right:0!important}
+  .jgb-history-card .jgb-paper-auto>.jgb-paper-cell:nth-child(5){grid-column:1!important}
+}
 </style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19409,140 +19591,6 @@ cleanupDuplicateOnly();
 </style>
 
 
-<style id="JGB_OPERATING_3ROW_FINAL_V11">
-/* v11: 설비 운영·관리정보 3개 독립 행 + 오른쪽 내용칸까지 가로선 + 사진영역과 같은 가로 스크롤 */
-.jgb-history-card .jgb-operating-info{
-  display:block!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  height:auto!important;
-  overflow-x:auto!important;
-  overflow-y:hidden!important;
-  box-sizing:border-box!important;
-  border:2px solid #718492!important;
-  border-top:0!important;
-  background:#faf8f2!important;
-  scrollbar-width:auto!important;
-}
-.jgb-history-card .jgb-operating-info::-webkit-scrollbar{height:10px!important;}
-.jgb-history-card .jgb-operating-info::-webkit-scrollbar-track{
-  background:#edf2f5!important;
-  border-top:1px solid #9aaab5!important;
-}
-.jgb-history-card .jgb-operating-info::-webkit-scrollbar-thumb{
-  background:#8b969d!important;
-  border-radius:6px!important;
-  border:2px solid #edf2f5!important;
-}
-.jgb-history-card .jgb-operating-title,
-.jgb-history-card .jgb-operating-row{
-  width:720px!important;
-  min-width:720px!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-}
-.jgb-history-card .jgb-operating-title{
-  height:38px!important;
-  min-height:38px!important;
-  display:flex!important;
-  align-items:center!important;
-  padding:0 12px!important;
-  background:#dfe6ea!important;
-  color:#203c50!important;
-  border-bottom:2px solid #718492!important;
-  font-size:14px!important;
-  font-weight:900!important;
-  white-space:nowrap!important;
-  box-sizing:border-box!important;
-}
-.jgb-history-card .jgb-operating-row{
-  display:grid!important;
-  grid-template-columns:92px minmax(0,1fr)!important;
-  height:42px!important;
-  min-height:42px!important;
-  margin:0!important;
-  padding:0!important;
-  background:#faf8f2!important;
-  border:0!important;
-  box-sizing:border-box!important;
-}
-.jgb-history-card .jgb-operating-row:not(:last-child){
-  box-shadow:inset 0 -2px 0 #718492!important;
-}
-.jgb-history-card .jgb-operating-row:last-child{
-  box-shadow:none!important;
-}
-.jgb-history-card .jgb-operating-label,
-.jgb-history-card .jgb-operating-value{
-  height:42px!important;
-  min-height:42px!important;
-  box-sizing:border-box!important;
-  border-bottom:0!important;
-}
-.jgb-history-card .jgb-operating-label{
-  display:flex!important;
-  align-items:center!important;
-  padding:0 9px!important;
-  border-right:2px solid #718492!important;
-  font-size:12px!important;
-  font-weight:900!important;
-  white-space:nowrap!important;
-  word-break:keep-all!important;
-}
-.jgb-history-card .jgb-operating-value{
-  display:flex!important;
-  align-items:center!important;
-  padding:0 10px!important;
-  background:#faf8f2!important;
-  color:#172f40!important;
-  font-size:13px!important;
-  line-height:1.25!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-}
-</style>
 
-<style id="JGB_OPERATING_3ROW_LINES_FINAL_V12">
-/* v12: 설비 운영·관리정보 3행을 실제 표처럼 보이게 하고 각 행 전체에 가로선을 강제 */
-.jgb-history-card .jgb-operating-info{
-  border:1px solid #718492!important;
-  border-top:0!important;
-  overflow-x:auto!important;
-  overflow-y:hidden!important;
-  background:#faf8f2!important;
-}
-.jgb-history-card .jgb-operating-title{
-  width:720px!important;
-  min-width:720px!important;
-  height:38px!important;
-  min-height:38px!important;
-  border-bottom:1px solid #718492!important;
-}
-.jgb-history-card .jgb-operating-row{
-  width:720px!important;
-  min-width:720px!important;
-  height:42px!important;
-  min-height:42px!important;
-  display:grid!important;
-  grid-template-columns:92px minmax(0,1fr)!important;
-  border-bottom:1px solid #718492!important;
-  box-shadow:none!important;
-}
-.jgb-history-card .jgb-operating-row:last-child{
-  border-bottom:0!important;
-}
-.jgb-history-card .jgb-operating-label{
-  height:41px!important;
-  min-height:41px!important;
-  border-right:1px solid #718492!important;
-  border-bottom:0!important;
-}
-.jgb-history-card .jgb-operating-value{
-  height:41px!important;
-  min-height:41px!important;
-  border:0!important;
-  border-bottom:0!important;
-}
-</style>
+
+
