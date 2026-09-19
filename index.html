@@ -7806,7 +7806,7 @@ function jgbV47GoWpByLeak(leakCode){
   function rerender(){try{if(typeof window.eamLoad==='function')window.eamLoad().then(()=>{if(typeof window.render==='function')window.render();else location.reload()});else if(typeof window.render==='function')window.render();else location.reload()}catch(e){location.reload()}}
   function formHtml(title, data, id){
     const today=date(new Date().toISOString());const d=data||{};const edit=!!id;
-    return `<div id="jgbV136Modal" class="jgb-v136-modal"><div class="jgb-v136-card"><div class="jgb-v136-modal-head"><h3>${E(title)}</h3><button type="button" class="jgb-v136-close" onclick="document.getElementById('jgbV136Modal')?.remove()">×</button></div><div class="jgb-v136-form"><label>작업일자<input id="v136_date" type="date" value="${E(date(d.event_date||today))}"></label><label>정비구분<select id="v136_type"><option ${d.type==='점검'?'selected':''}>점검</option><option ${d.type==='수리'||!d.type?'selected':''}>수리</option><option ${d.type==='부품교체'?'selected':''}>부품교체</option><option ${d.type==='설비교체'?'selected':''}>설비교체</option><option ${d.type==='기타'?'selected':''}>기타</option></select></label><label>정비유형<select id="v136_sub"><option ${d.maintenanceType==='예방정비'||!d.maintenanceType?'selected':''}>예방정비</option><option ${d.maintenanceType==='고장정비'?'selected':''}>고장정비</option><option ${d.maintenanceType==='계획정비'?'selected':''}>계획정비</option></select></label><label>정비방식<select id="v136_method"><option ${d.maintenanceMethod==='자체정비'||d.method==='자체정비'?'selected':''}>자체정비</option><option ${d.maintenanceMethod==='외주정비'||d.method==='외주정비'||(!d.method&&!d.maintenanceMethod)?'selected':''}>외주정비</option></select></label><label>정비업체<input id="v136_vendor" value="${E(data?.worker_name||d.vendor||'')}"></label><label>정비비용(원)<input id="v136_cost" type="number" min="0" value="${E(data?.cost??0)}"></label><label>고장·이상내용<input id="v136_issue" value="${E(d.issue||'')}"></label><label>고장원인<input id="v136_cause" value="${E(d.cause||'')}"></label><label class="full">조치내용<textarea id="v136_action">${E(d.action||'')}</textarea></label><label>교체부품<input id="v136_part" value="${E(d.part||'')}"></label><label>작업시작일<input id="v136_start" type="date" value="${E(date(d.startDate||d.workStartDate||today))}"></label><label>작업완료일<input id="v136_end" type="date" value="${E(date(d.endDate||d.workEndDate||today))}"></label><label>차기 점검일<input id="v136_next" type="date" value="${E(date(d.nextDate||d.nextInspectionDate||''))}"></label><label>조치상태<select id="v136_result"><option ${d.result==='조치완료'||!d.result?'selected':''}>조치완료</option><option ${d.result==='조치필요'?'selected':''}>조치필요</option></select></label><label class="full">비고<textarea id="v136_note">${E(d.note||'')}</textarea></label></div><div class="jgb-v136-actions"><button type="button" class="cancel" onclick="document.getElementById('jgbV136Modal')?.remove()">취소</button><button type="button" class="save" onclick="window.jgbV136Save('${E(id||'')}')">${edit?'수정 저장':'등록'}</button></div></div></div>`;
+    return `<div id="jgbV136Modal" class="jgb-v136-modal"><div class="jgb-v136-card"><div class="jgb-v136-modal-head"><h3>${E(title)}</h3><button type="button" class="jgb-v136-close" onclick="document.getElementById('jgbV136Modal')?.remove()">×</button></div><div class="jgb-v136-form"><label>작업일자<input id="v136_date" type="date" value="${E(date(d.event_date||today))}"></label><label>정비구분<select id="v136_type"><option ${d.type==='점검'?'selected':''}>점검</option><option ${d.type==='수리'||!d.type?'selected':''}>수리</option><option ${d.type==='부품교체'?'selected':''}>부품교체</option><option ${d.type==='설비교체'?'selected':''}>설비교체</option><option ${d.type==='기타'?'selected':''}>기타</option></select></label><label>정비유형<select id="v136_sub"><option ${d.maintenanceType==='예방정비'||!d.maintenanceType?'selected':''}>예방정비</option><option ${d.maintenanceType==='고장정비'?'selected':''}>고장정비</option><option ${d.maintenanceType==='계획정비'?'selected':''}>계획정비</option></select></label><label class="jgb-v136-method-wrap">정비방식<div class="jgb-v136-method-buttons"><button type="button" class="jgb-v136-method-btn external ${d.maintenanceMethod==='외주정비'||d.method==='외주정비'||(!d.method&&!d.maintenanceMethod)?'selected':''}" onclick="window.jgbV136SetMethod('외주정비')">외주정비</button><button type="button" class="jgb-v136-method-btn internal ${d.maintenanceMethod==='자체정비'||d.method==='자체정비'?'selected':''}" onclick="window.jgbV136SetMethod('자체정비')">자체정비</button></div><input id="v136_method" type="hidden" value="${E(d.maintenanceMethod||d.method||'외주정비')}"></label><label>정비업체<input id="v136_vendor" value="${E(data?.worker_name||d.vendor||'')}"></label><label>정비비용(원)<input id="v136_cost" type="number" min="0" value="${E(data?.cost??0)}"></label><label>고장·이상내용<input id="v136_issue" value="${E(d.issue||'')}"></label><label>고장원인<input id="v136_cause" value="${E(d.cause||'')}"></label><label class="full">조치내용<textarea id="v136_action">${E(d.action||'')}</textarea></label><label>교체부품<input id="v136_part" value="${E(d.part||'')}"></label><label>작업시작일<input id="v136_start" type="date" value="${E(date(d.startDate||d.workStartDate||today))}"></label><label>작업완료일<input id="v136_end" type="date" value="${E(date(d.endDate||d.workEndDate||today))}"></label><label>차기 점검일<input id="v136_next" type="date" value="${E(date(d.nextDate||d.nextInspectionDate||''))}"></label><label>조치상태<select id="v136_result"><option ${d.result==='조치완료'||!d.result?'selected':''}>조치완료</option><option ${d.result==='조치필요'?'selected':''}>조치필요</option></select></label><label class="full">비고<textarea id="v136_note">${E(d.note||'')}</textarea></label></div><div class="jgb-v136-actions"><button type="button" class="cancel" onclick="document.getElementById('jgbV136Modal')?.remove()">취소</button><button type="button" class="save" onclick="window.jgbV136Save('${E(id||'')}')">${edit?'수정 저장':'등록'}</button></div></div></div>`;
   }
   window.jgbV136OpenRegister=function(){const a=getAsset();if(!a?.id){alert('먼저 등록할 자산을 선택하세요.');return}document.getElementById('jgbV136Modal')?.remove();document.body.insertAdjacentHTML('beforeend',formHtml('유지관리 이력 등록',null,''));};
   window.jgbV136OpenEdit=function(id){const h=(window.__eamH||[]).find(x=>V(x.id)===V(id));if(!h){alert('수정할 유지관리 이력을 찾을 수 없습니다.');return}document.getElementById('jgbV136Modal')?.remove();document.body.insertAdjacentHTML('beforeend',formHtml('유지관리 이력 수정',Object.assign({},h,parse(h)),id));};
@@ -13783,6 +13783,107 @@ body {
 }
 </style>
 
+
+<style id="JGB_V37_MAINTENANCE_METHOD_AND_AUTO_SYNC">
+.jgb-v136-method-wrap{display:block!important}
+.jgb-v136-method-buttons{display:flex!important;gap:8px!important;margin-top:6px!important}
+.jgb-v136-method-btn{appearance:none!important;border:1px solid #c7d2dc!important;border-radius:6px!important;min-height:38px!important;padding:0 18px!important;font-size:14px!important;font-weight:900!important;cursor:pointer!important;background:#e5e5e5!important;color:#33485a!important;box-sizing:border-box!important}
+.jgb-v136-method-btn.external{background:#1769bd!important;color:#fff!important;border-color:#1769bd!important}
+.jgb-v136-method-btn.internal{background:#e3e3e3!important;color:#3d4a54!important;border-color:#c4c4c4!important}
+.jgb-v136-method-btn.external:not(.selected),.jgb-v136-method-btn.internal:not(.selected){opacity:.72!important}
+.jgb-v136-method-btn.selected{opacity:1!important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)!important}
+/* 이력카드 자동 반영 영역: 누적 건수는 한 줄, 차기 점검일은 회색 하단 영역 */
+.jgb-paper-auto{display:grid!important;grid-template-columns:minmax(150px,1fr) minmax(120px,.75fr) minmax(180px,1.2fr)!important;gap:0!important}
+.jgb-paper-auto .jgb-paper-cell:nth-child(2){white-space:nowrap!important}
+.jgb-maint-gray-auto{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:18px!important;background:#748897!important;color:#fff!important;padding:10px 14px!important;box-sizing:border-box!important;min-height:54px!important}
+.jgb-maint-gray-auto .jgb-next-label{font-weight:900!important;white-space:nowrap!important}
+.jgb-maint-gray-auto .jgb-next-value{font-weight:900!important}
+.jgb-maint-gray-auto .jgb-maint-type-buttons{display:flex!important;gap:8px!important;margin-left:auto!important}
+.jgb-maint-gray-auto .jgb-maint-type-buttons button{border:1px solid #c4cbd1!important;border-radius:6px!important;padding:8px 16px!important;font-weight:900!important;cursor:pointer!important}
+.jgb-maint-gray-auto .jgb-maint-type-buttons .external{background:#1769bd!important;color:#fff!important;border-color:#1769bd!important}
+.jgb-maint-gray-auto .jgb-maint-type-buttons .internal{background:#e2e2e2!important;color:#37424b!important}
+</style>
+<script id="JGB_V37_MAINTENANCE_METHOD_AND_AUTO_SYNC_JS">
+(function(){
+  'use strict';
+  window.jgbV136SetMethod=function(method){
+    method=String(method||'외주정비');
+    var input=document.getElementById('v136_method');
+    if(input) input.value=method;
+    document.querySelectorAll('.jgb-v136-method-btn').forEach(function(b){
+      var on=(b.textContent||'').trim()===method;
+      b.classList.toggle('selected',on);
+    });
+  };
+  function syncCardMeta(code, method, date, action, next){
+    try{
+      if(!code)return;
+      var key='JGB_EAM_ASSET_META_V40';
+      var all=JSON.parse(localStorage.getItem(key)||'{}')||{};
+      var x=all[code]||{};
+      if(method==='외주정비'){
+        x.recentExternalMaintenanceDate=date||x.recentExternalMaintenanceDate||'';
+        x.externalMaintenanceDate=x.recentExternalMaintenanceDate;
+      }
+      x.recentExternalMaintenanceAction=action||x.recentExternalMaintenanceAction||'';
+      x.externalMaintenanceAction=x.recentExternalMaintenanceAction;
+      x.nextInspectionDate=next||x.nextInspectionDate||'';
+      x.nextDate=x.nextInspectionDate;
+      all[code]=x;
+      localStorage.setItem(key,JSON.stringify(all));
+      window.__eamMetaByCode=all;
+    }catch(e){console.error('JGB_V37_META_SYNC',e)}
+  }
+  var oldSave=window.jgbV136Save;
+  if(typeof oldSave==='function'){
+    window.jgbV136Save=async function(id){
+      var code=window.__eamSelCode||'';
+      var method=(document.getElementById('v136_method')?.value||'외주정비').trim();
+      var date=(document.getElementById('v136_date')?.value||'').trim();
+      var action=(document.getElementById('v136_action')?.value||'').trim();
+      var next=(document.getElementById('v136_next')?.value||'').trim();
+      await oldSave(id);
+      /* 기존 저장 함수가 성공하면 모달이 닫힌다. 실패하면 그대로 남는다. */
+      if(!document.getElementById('jgbV136Modal')){
+        syncCardMeta(code,method,date,action,next);
+        if(typeof window.eamLoad==='function') await window.eamLoad();
+        window.__eamSelCode=code;
+        if(typeof window.render==='function') window.render();
+      }
+    };
+  }
+  window.jgbV37OpenMaint=function(method){
+    try{
+      if(typeof window.jgbV136OpenRegister==='function') window.jgbV136OpenRegister();
+      setTimeout(function(){window.jgbV136SetMethod(method||'외주정비');},30);
+    }catch(e){console.error('JGB_V37_OPEN_MAINT',e)}
+  };
+  function moveNextInspectionToGray(){
+    document.querySelectorAll('.jgb-paper-auto').forEach(function(auto){
+      if(auto.dataset.v37Done==='1')return;
+      var cells=auto.querySelectorAll('.jgb-paper-cell');
+      if(!cells.length)return;
+      var next=null;
+      cells.forEach(function(c){
+        var small=c.querySelector('small');
+        if(small && (small.textContent||'').trim()==='차기 점검일') next=c;
+      });
+      if(!next)return;
+      var notes=auto.parentElement?.querySelector('.jgb-paper-notes');
+      var gray=document.createElement('div');
+      gray.className='jgb-maint-gray-auto';
+      var label=next.querySelector('small')?.textContent||'차기 점검일';
+      var value=next.querySelector('b')?.textContent||'-';
+      gray.innerHTML='<div><span class="jgb-next-label">'+label+'</span> <span class="jgb-next-value">'+value+'</span></div><div class="jgb-maint-type-buttons"><button type="button" class="external" onclick="window.jgbV37OpenMaint(\'외주정비\')">외주정비</button><button type="button" class="internal" onclick="window.jgbV37OpenMaint(\'자체정비\')">자체정비</button></div>';
+      next.remove();
+      auto.parentElement?.insertBefore(gray,notes||null);
+      auto.dataset.v37Done='1';
+    });
+  }
+  new MutationObserver(moveNextInspectionToGray).observe(document.body,{childList:true,subtree:true});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',moveNextInspectionToGray);else setTimeout(moveNextInspectionToGray,100);
+})();
+</script>
 </body>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
