@@ -15572,6 +15572,62 @@ setTimeout(sync,100);setTimeout(sync,400);
 })();
 </script>
 
+
+<!-- JGB EAM V33: F5 새로고침 후에도 마지막 선택 자산코드 유지 -->
+<script id="JGB_EAM_V33_PERSIST_SELECTED_ASSET">
+(function(){
+'use strict';
+if(window.__JGB_EAM_V33_PERSIST_SELECTED_ASSET)return;
+window.__JGB_EAM_V33_PERSIST_SELECTED_ASSET=true;
+const KEY='JGB_EAM_SELECTED_ASSET_CODE_V33';
+const CATKEY='JGB_EAM_SELECTED_CATEGORY_V33';
+const V=x=>String(x??'').trim();
+function saveSelection(cat,code){
+  const c=V(code); if(!c)return;
+  try{localStorage.setItem(KEY,c);if(cat)localStorage.setItem(CATKEY,V(cat));}catch(_){ }
+}
+function findCat(code){
+  const c=V(code).toUpperCase();
+  try{
+    const defs=typeof window.eamCategoryDefs==='function'?window.eamCategoryDefs():{};
+    for(const [k,d] of Object.entries(defs||{})){
+      if((d.items||[]).some(x=>V(x?.code||x?.asset_code).toUpperCase()===c))return k;
+    }
+  }catch(_){ }
+  return V(localStorage.getItem(CATKEY)||'cooling');
+}
+const oldPick=window.eamPick;
+if(typeof oldPick==='function'){
+  window.eamPick=function(cat,code){
+    if(code!==undefined&&code!==null&&V(code))saveSelection(cat,V(code));
+    else {
+      try{localStorage.setItem(CATKEY,V(cat||'cooling'))}catch(_){ }
+    }
+    return oldPick.apply(this,arguments);
+  };
+}
+const oldLoad=window.eamLoad;
+if(typeof oldLoad==='function'){
+  window.eamLoad=async function(){
+    const r=await oldLoad.apply(this,arguments);
+    let c='';try{c=V(localStorage.getItem(KEY)||'')}catch(_){ }
+    if(c){
+      const A=Array.isArray(window.__eamA)?window.__eamA:[];
+      const exists=A.some(x=>V(x?.asset_code).toUpperCase()===c.toUpperCase());
+      if(exists){window.__eamSelCode=c;window.__eamCat=findCat(c);}
+    }
+    return r;
+  };
+}
+// 최초 진입 시에도 저장된 선택값을 먼저 복원한다.
+try{
+  const c=V(localStorage.getItem(KEY)||'');
+  if(c)window.__eamSelCode=c;
+  const cat=V(localStorage.getItem(CATKEY)||'');
+  if(cat)window.__eamCat=cat;
+}catch(_){ }
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
