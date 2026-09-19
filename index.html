@@ -4041,6 +4041,56 @@ a[data-page="digitalTwin"],
   new MutationObserver(function(){setupPhotoSliders(document)}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+<style id="JGB_V13_USER_FINAL_20260920">
+/* 13 기준 최종: 주요설비 이력카드 1페이지 배치만 수정 */
+.jgb-history-card .jgb-history-body-v13{display:flex!important;flex-direction:column!important;gap:0!important}
+.jgb-history-card .jgb-history-topgrid-v13{order:1!important;grid-template-columns:minmax(0,7fr) minmax(320px,3fr)!important}
+.jgb-history-card .jgb-paper-auto{order:2!important;grid-template-columns:1fr 1fr!important;display:grid!important}
+.jgb-history-card .jgb-paper-notes{order:2!important;display:grid!important;grid-template-columns:1fr 1fr!important}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide{width:100%!important;grid-template-columns:125px minmax(0,1fr)!important;border-right:1.5px solid #718492!important;border-bottom:1.5px solid #718492!important}
+.jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide:last-child{border-right:0!important}
+.jgb-history-card .jgb-operating-v13{order:4!important;width:100%!important;border-top:1.5px solid #718492!important;border-left:1.5px solid #718492!important;border-right:1.5px solid #718492!important}
+.jgb-history-card .jgb-operating-v13 .jgb-operating-title{height:38px!important;min-height:38px!important}
+.jgb-history-card .jgb-operating-slider-label,.jgb-history-card .jgb-operating-slider-track{display:none!important}
+/* 상세사진: 4장 가로 원본 유지, 화면에는 2장씩 표시 */
+.jgb-history-card .jgb-photo-slider-wrap{padding:4px 28px 3px!important}
+.jgb-history-card .jgb-photo-area-v13 .jgb-v149-detail-scroll{overflow:hidden!important;padding:0!important}
+.jgb-history-card .jgb-photo-area-v13 .jgb-v149-detail-grid{grid-template-columns:repeat(4,4.4cm)!important;gap:6px!important;transition:transform .2s ease!important}
+.jgb-photo-slider-bar{height:7px!important;margin:2px 38px 7px!important;border-radius:8px!important;background:#c7d1db!important;position:relative!important;overflow:hidden!important}
+.jgb-photo-slider-bar span{display:block!important;height:100%!important;width:50%!important;border-radius:8px!important;background:#3b82f6!important;transition:transform .2s ease,width .2s ease!important}
+.jgb-history-slider-bar{height:7px!important;margin:2px 12px 7px!important;border-radius:8px!important;background:#c7d1db!important;position:relative!important;overflow:hidden!important;order:3!important}
+.jgb-history-slider-bar span{display:block!important;height:100%!important;width:50%!important;border-radius:8px!important;background:#3b82f6!important}
+@media(max-width:900px){
+ .jgb-history-card .jgb-history-topgrid-v13{grid-template-columns:1fr!important}
+ .jgb-history-card .jgb-paper-notes{grid-template-columns:1fr!important}
+ .jgb-history-card .jgb-paper-notes>.jgb-paper-cell.wide{border-right:0!important}
+}
+</style>
+<script>
+(function(){
+  function enhancePhotoBars(root){
+    (root||document).querySelectorAll('.jgb-photo-area-v13').forEach(function(area){
+      var wrap=area.querySelector('.jgb-photo-slider-wrap'), sc=area.querySelector('.jgb-v149-detail-scroll'), grid=area.querySelector('.jgb-v149-detail-grid'), bar=area.querySelector('.jgb-photo-slider-bar');
+      if(!wrap||!sc||!grid||!bar||wrap.dataset.sliderReady!=='1') return;
+      if(bar.dataset.bound==='1') return; bar.dataset.bound='1';
+      var span=bar.querySelector('span');
+      var prev=wrap.querySelector('.jgb-photo-slide-btn.prev'), next=wrap.querySelector('.jgb-photo-slide-btn.next');
+      function updateBar(){
+        var max=Math.max(0,grid.scrollWidth-sc.clientWidth);
+        var pos=0; var tr=grid.style.transform.match(/-([0-9.]+)px/); if(tr) pos=parseFloat(tr[1])||0;
+        var ratio=max?Math.min(1,pos/max):0;
+        span.style.width=max?'50%':'100%'; span.style.transform='translateX('+((max?ratio:0)*100)+'%)';
+      }
+      if(prev) prev.addEventListener('click',function(){setTimeout(updateBar,30)});
+      if(next) next.addEventListener('click',function(){setTimeout(updateBar,30)});
+      window.addEventListener('resize',updateBar); setTimeout(updateBar,80);
+    });
+  }
+  function boot(){enhancePhotoBars(document)}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+  new MutationObserver(function(){enhancePhotoBars(document)}).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -7248,18 +7298,18 @@ function jgbV47GoWpByLeak(leakCode){
                 <div class="jgb-basic-table-row"><div class="jgb-basic-label">보증</div><div class="jgb-basic-value">${E(cur.warranty||'-')}</div><div class="jgb-basic-label">A/S 기록</div><div class="jgb-basic-value">${E(cur.asHistory||'-')}</div></div>
                 <div class="jgb-basic-table-row"><div class="jgb-basic-label">자산상태</div><div class="jgb-basic-value">${E(cur.status||'정상')}</div><div class="jgb-basic-label">취득구분</div><div class="jgb-basic-value">${E(cur.acquisitionType||'기존 자산')}</div></div>
               </div></section>
-              <section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v13"><div class="jgb-paper-section-title">📷 설비 사진 (현재)</div><div class="jgb-equip-photo-stage"><div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">${equipPhoto?`<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">×</button>`:`<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택"></div></div><div class="jgb-equip-photo-actions-rebuilt"><button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button><span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div><div class="jgb-v149-detail-title">설비 상세사진 · 각 4.4×4.4cm (가로 슬라이더)</div><div class="jgb-photo-slider-wrap"><div class="jgb-v149-detail-scroll"><div class="jgb-v149-detail-grid">${detailHtml}</div></div></div></section>
+              <section class="jgb-paper-photo jgb-equip-photo-rebuilt jgb-photo-area-v13"><div class="jgb-paper-section-title">📷 설비 사진 (현재)</div><div class="jgb-equip-photo-stage"><div class="jgb-equip-photo-box jgb-photo-click" onclick="jgbPickEquipPhoto('${E(cardCode)}')" title="사진을 클릭하면 등록할 수 있습니다">${equipPhoto?`<img src="${esc(equipPhoto)}" alt="${esc(cur.name||'설비 사진')}" class="jgb-equip-photo-fixed"><button type="button" class="jgb-equip-photo-x" onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">×</button>`:`<div class="jgb-equip-empty-icon">📷</div><strong>설비 사진 등록</strong><span>사진을 클릭하여 JPG / PNG 등록</span>`}<input type="file" accept="image/*" class="jgb-equip-photo-file" onchange="window.jgbEquipPhotoFile&&window.jgbEquipPhotoFile(this,'${E(cardCode)}')" aria-label="설비 사진 선택"></div></div><div class="jgb-equip-photo-actions-rebuilt"><button type="button" class="jgb-equip-photo-delete-rebuilt" ${equipPhoto?'':'disabled'} onclick="event.preventDefault();event.stopPropagation();window.jgbDeleteEquipPhoto&&window.jgbDeleteEquipPhoto('${E(cardCode)}')">🗑 사진 삭제</button><span>${equipPhoto?'등록된 설비 사진을 삭제할 수 있습니다.':'설비 사진은 1장만 등록합니다.'}</span></div><div class="jgb-v149-detail-title">설비 상세사진 · 각 4.4×4.4cm (가로 슬라이더)</div><div class="jgb-photo-slider-wrap"><div class="jgb-v149-detail-scroll"><div class="jgb-v149-detail-grid">${detailHtml}</div></div></div><div class="jgb-photo-slider-bar" aria-label="설비 상세사진 슬라이더"><span></span></div></section>
             </div>
-
-            <section class="jgb-operating-info jgb-operating-v13"><div class="jgb-operating-title">⚙ 설비 운영·관리정보 <span class="jgb-operating-slider-label">1 / 3</span></div>
-              <div class="jgb-operating-row"><div class="jgb-operating-label operating">작동방법</div><div class="jgb-operating-value">${E(cur.operationMethod||cur.operatingMethod||cur.startMethod||'-')}</div></div>
-              <div class="jgb-operating-row"><div class="jgb-operating-label usage">사용방법</div><div class="jgb-operating-value">${E(cur.usageMethod||cur.useMethod||cur.operationGuide||'-')}</div></div>
-              <div class="jgb-operating-row"><div class="jgb-operating-label caution">주의사항</div><div class="jgb-operating-value">${E(cur.caution||cur.safetyNote||cur.operatingCaution||'-')}</div></div>
-              <div class="jgb-operating-slider-track" aria-label="설비 운영·관리정보 슬라이더"><span></span></div>
-            </section>
 
             <div class="jgb-paper-auto">${F('최근 외주정비일',cur.recentExternalMaintenanceDate||cur.externalMaintenanceDate||'-')}${F('누적 외주정비 건수',extCount+'건')}${F('최근 조치내용',cur.recentExternalMaintenanceAction||cur.externalMaintenanceAction||'-')}${F('누적 자체정비 건수',selfCount+'건')}${F('차기 점검일',cur.nextInspectionDate||cur.nextDate||'-')}${F('','')}</div>
             <div class="jgb-paper-notes">${F('시설개선계획',cur.improvementPlan||'-','wide')}${F('특이사항',cur.note||'-','wide')}</div>
+            <div class="jgb-history-slider-bar" aria-label="주요이력 슬라이더"><span></span></div>
+
+            <section class="jgb-operating-info jgb-operating-v13"><div class="jgb-operating-title">⚙ 설비 운영·관리정보</div>
+              <div class="jgb-operating-row"><div class="jgb-operating-label operating">작동방법</div><div class="jgb-operating-value">${E(cur.operationMethod||cur.operatingMethod||cur.startMethod||'-')}</div></div>
+              <div class="jgb-operating-row"><div class="jgb-operating-label usage">사용방법</div><div class="jgb-operating-value">${E(cur.usageMethod||cur.useMethod||cur.operationGuide||'-')}</div></div>
+              <div class="jgb-operating-row"><div class="jgb-operating-label caution">주의사항</div><div class="jgb-operating-value">${E(cur.caution||cur.safetyNote||cur.operatingCaution||'-')}</div></div>
+            </section>
           </div>
         </details>`;
       }
