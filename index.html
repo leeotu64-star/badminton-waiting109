@@ -4217,88 +4217,67 @@ a[data-page="digitalTwin"],
 </style>
 
 
-<style id="JGB_EAM_HEADER_SINGLE_RULE_V19">
-/* EAM 설비 상세 헤더 - 단일 기준값 */
-.eam-innovation-layout .eam-detail-panel > .eam-detail-hero{
+<style id="JGB_EAM_CLEAN_EQUIPMENT_HEADER_V20">
+/* 기존 설비 헤더의 중복 스타일을 사용하지 않는 독립 헤더 */
+.eam-detail-hero-clean{
+  width:100% !important;
   height:76px !important;
   min-height:76px !important;
   max-height:76px !important;
-  padding:6px 12px !important;
-  margin:0 !important;
   box-sizing:border-box !important;
+  margin:0 !important;
+  padding:8px 14px !important;
   display:flex !important;
   align-items:center !important;
   justify-content:space-between !important;
-  gap:10px !important;
+  gap:12px !important;
   overflow:hidden !important;
 }
-
-/* 왼쪽 헤더 묶음 */
-.eam-innovation-layout .eam-detail-panel > .eam-detail-hero > div:first-child{
+.eam-detail-hero-clean .eam-hero-left{
   min-width:0 !important;
-  height:64px !important;
-  margin:0 !important;
-  padding:0 !important;
+  height:60px !important;
   display:flex !important;
   flex-direction:column !important;
   justify-content:center !important;
   overflow:hidden !important;
 }
-
-/* 설비코드 */
-.eam-innovation-layout .eam-detail-panel > .eam-detail-hero .hero-code{
-  height:20px !important;
-  min-height:20px !important;
-  max-height:20px !important;
+.eam-detail-hero-clean .eam-hero-code{
   width:max-content !important;
+  height:19px !important;
+  line-height:19px !important;
   margin:0 0 2px 0 !important;
-  padding:3px 7px !important;
+  padding:0 7px !important;
   box-sizing:border-box !important;
-  display:flex !important;
-  align-items:center !important;
   font-size:10px !important;
-  line-height:1 !important;
+  font-weight:800 !important;
 }
-
-/* 설비명 */
-.eam-innovation-layout .eam-detail-panel > .eam-detail-hero h2{
-  height:22px !important;
-  min-height:22px !important;
-  max-height:22px !important;
+.eam-detail-hero-clean .eam-hero-title{
+  height:24px !important;
+  line-height:24px !important;
   margin:0 !important;
   padding:0 !important;
-  font-size:19px !important;
-  line-height:22px !important;
-  letter-spacing:-.025em !important;
+  font-size:20px !important;
   font-weight:900 !important;
   white-space:nowrap !important;
   overflow:hidden !important;
   text-overflow:ellipsis !important;
 }
-
-/* 설비종류 / 위치 */
-.eam-innovation-layout .eam-detail-panel > .eam-detail-hero .hero-meta{
-  height:16px !important;
-  min-height:16px !important;
-  max-height:16px !important;
-  margin:1px 0 0 0 !important;
+.eam-detail-hero-clean .eam-hero-meta{
+  height:15px !important;
+  line-height:15px !important;
+  margin:0 !important;
   padding:0 !important;
-  gap:5px !important;
   font-size:10px !important;
-  line-height:16px !important;
   white-space:nowrap !important;
   overflow:hidden !important;
 }
-
-/* 정상 상태 */
-.eam-innovation-layout .eam-detail-panel > .eam-detail-hero .hero-status{
+.eam-detail-hero-clean .eam-hero-status{
   flex:0 0 auto !important;
-  margin:0 !important;
-  padding:5px 8px !important;
-  font-size:10px !important;
-  line-height:12px !important;
+  padding:5px 9px !important;
   box-sizing:border-box !important;
-  white-space:nowrap !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+  line-height:12px !important;
 }
 </style>
 
@@ -5930,7 +5909,15 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         <div class="eam-innovation-layout">
           <aside class="eam-assets-panel"><div class="eam-assets-head"><div><b>${C.ico} ${C.label}</b><span>${list.length}개 자산</span></div><div class="eam-filter-row"><select id="eamProLocationFilter" onchange="eamProFilter('',this.value)"><option value="">전체 위치</option><option value="A">A · 코트</option><option value="B">B · 복도</option><option value="C">C · 사무실</option><option value="D">D · 옥상</option><option value="E">E · 유수장치실</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option></select></div></div><div id="eamproGrid" class="eam-asset-list">${list.map(v=>{const a=eamRegisteredForSource(v), mm=meta[v.code]||{};const merged={...(a||v),...mm};const st=a?.status||'원본';return `<button class="eam-asset-row ${v.code===sel?'on':''}" data-code="${xEsc(v.code)}" data-loc="${xEsc(placeCode(merged))}" onclick="eamPick('${cat}','${xEsc(v.code)}')"><span class="row-code">${xEsc(eamUnifiedCode(v))}</span><span class="row-copy"><b>${xEsc(eamDisplayName(merged))}</b><small>${xEsc(eamDisplaySubName(merged))} · ${xEsc(displayPlace(merged))}</small><span class="row-origin">표시코드 ${xEsc(eamUnifiedCode(v))} · 기존코드 ${xEsc(v.code)}</span></span><i class="${st==='정상'?'ok':st==='원본'?'source':'bad'}">${xEsc(st)}</i></button>`}).join('')||'<div class="eam-empty">등록된 자산이 없습니다.</div>'}</div></aside>
           <main class="eam-detail-panel">${current?`
-            <div class="eam-detail-hero"><div><div class="hero-code">${xEsc(eamUnifiedCode(src||current))} <span style="font-size:11px;color:#8a98a9;font-weight:500;margin-left:6px">기존코드 ${xEsc(code)}</span></div><h2>${xEsc(eamDisplayName(current))}</h2><div class="hero-meta"><span>${xEsc(C.label)}</span><b>${xEsc(displayPlace(current))}</b></div></div><span class="hero-status ${status==='정상'?'good':status==='원본'?'source':'bad'}">${xEsc(status)}</span></div>
+            <div class="eam-detail-hero eam-detail-hero-clean">
+  <div class="eam-hero-left">
+    <div class="eam-hero-code">FI-01</div>
+    <div class="eam-hero-title">${xEsc(eamDisplayName(current))}</div>
+    <div class="eam-hero-meta">설비종류&nbsp;&nbsp; 위치정보</div>
+  </div>
+  <div class="eam-hero-status">정상</div>
+</div>
+<span class="hero-status ${status==='정상'?'good':status==='원본'?'source':'bad'}">${xEsc(status)}</span></div>
             <section class="eam-detail-section eam-master"><div class="section-title"><h3>자산 기본정보</h3><span>기존 자산정보를 한 곳에서 확인</span></div><div class="master-grid">
               <div><small>관리코드</small><b>${xEsc(eamUnifiedCode(src||current))}</b></div><div><small>기존 자산코드</small><b>${xEsc(code)}</b></div><div><small>설비 종류</small><b>${xEsc(current.category||current.type||C.label||'-')}</b></div><div><small>소분류(자산명)</small><b>${xEsc(eamDisplayName(current))}</b></div><div><small>위치</small><b>${xEsc(displayPlace(current))}</b></div><div><small>모델·규격</small><b>${xEsc(current.model||'-')}</b></div><div><small>수량</small><b>${xEsc(current.qty??current.quantity??'-')}</b></div><div><small>제작·구매</small><b>${xEsc(current.vendor||current.maker||'-')}</b></div><div><small>A/S 연락처</small><b>${xEsc(current.asContact||'-')}</b></div><div><small>설치일</small><b>${xEsc(current.installDate||current.date||'-')}</b></div><div><small>보증</small><b>${xEsc(current.warranty||'-')}</b></div><div><small>A/S 기록</small><b>${xEsc(current.asHistory||'-')}</b></div><div class="wide"><small>비고</small><b>${xEsc(current.note||'-')}</b></div>
             </div></section>
@@ -20134,6 +20121,61 @@ cleanupDuplicateOnly();
 
 
 
+
+<style id="JGB_V7_HEADER_FORCE_SHRINK">
+/* V7: 현재 EAM 우측 설비 상세 헤더만 강제 축소. 다른 화면/기능/이력카드 구조는 변경하지 않음. */
+.eam-detail-panel > .eam-detail-hero{
+  height:78px!important;
+  min-height:78px!important;
+  max-height:78px!important;
+  padding:7px 12px!important;
+  box-sizing:border-box!important;
+  gap:10px!important;
+  overflow:hidden!important;
+  align-items:center!important;
+}
+.eam-detail-panel > .eam-detail-hero > div:first-child{
+  min-width:0!important;
+  overflow:hidden!important;
+}
+.eam-detail-panel > .eam-detail-hero .hero-code{
+  height:28px!important;
+  min-height:28px!important;
+  max-height:28px!important;
+  display:flex!important;
+  align-items:center!important;
+  width:max-content!important;
+  box-sizing:border-box!important;
+  padding:4px 9px!important;
+  margin:0 0 2px!important;
+  border-radius:8px!important;
+  font-size:11px!important;
+  line-height:1!important;
+}
+.eam-detail-panel > .eam-detail-hero h2{
+  margin:0!important;
+  font-size:18px!important;
+  line-height:1.05!important;
+  letter-spacing:-.02em!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.eam-detail-panel > .eam-detail-hero .hero-meta{
+  margin-top:2px!important;
+  gap:5px!important;
+  font-size:10px!important;
+  line-height:1.1!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+}
+.eam-detail-panel > .eam-detail-hero .hero-status{
+  flex:0 0 auto!important;
+  font-size:10px!important;
+  padding:5px 8px!important;
+  line-height:1!important;
+}
+</style>
 
 <style id="JGB_V160_3PAIR_REBUILD_FINAL">
 /* V160: 주요설비 이력카드 기본정보를 3쌍 가로 구조로 강제 재구성 */
