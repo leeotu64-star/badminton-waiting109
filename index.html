@@ -15236,89 +15236,102 @@ body {
 .jgb-v170-mapcard .jgb-v170-map{height:100%!important;min-height:620px!important;}
 </style>
 
-
-
-
-
-
-
-
-
-<style id="JGB_EAM_MAP_INTERACTION_V14">
-.eh-map .eh-marker{
-  touch-action:none!important;
+<style id="JGB_EAM_REAL_ICON_DRAG_FINAL">
+/* EAM 배치도 실제 자산 아이콘 전용: 위치는 사용자가 놓은 좌표를 그대로 유지 */
+#eam228Map .eam228-asset{
+  cursor:grab!important;
   user-select:none!important;
   -webkit-user-select:none!important;
   -webkit-user-drag:none!important;
-  cursor:grab!important;
-  transform:translate(-50%,-50%)!important;
+  touch-action:none!important;
 }
-.eh-map .eh-marker.eam-v14-dragging{
+#eam228Map .eam228-asset.jgb-real-dragging{
   cursor:grabbing!important;
-  z-index:99999!important;
-  transition:none!important;
-  transform:translate(-50%,-50%)!important;
+  z-index:999999!important;
 }
 </style>
-<script id="JGB_EAM_MAP_INTERACTION_V14">
+<script id="JGB_EAM_REAL_ICON_DRAG_FINAL_JS">
 (function(){
   'use strict';
-  if(window.__JGB_EAM_MAP_INTERACTION_V14)return;
-  window.__JGB_EAM_MAP_INTERACTION_V14=true;
+  if(window.__JGB_EAM_REAL_ICON_DRAG_FINAL)return;
+  window.__JGB_EAM_REAL_ICON_DRAG_FINAL=true;
 
-  const POS_KEY='JGB_EAM_HYUNHWANG_MAP_V1';
-  const DASH_KEY='JGB_EAM_DASH_MAP_POS_V228';
-  const S=v=>String(v??'').trim();
-  const read=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
-  const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}};
+  const KEYS=['JGB_EAM_DASH_MAP_POS_V228','JGB_EAM_HYUNHWANG_MAP_V1'];
+  let drag=null;
+  let suppressUntil=0;
+
+  function read(key){try{const v=JSON.parse(localStorage.getItem(key)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}}
+  function write(key,v){try{localStorage.setItem(key,JSON.stringify(v));}catch(_){} }
+  function codeOf(el){return String(el?.getAttribute('data-code')||'').trim()}
+
   function save(code,x,y){
-    code=S(code); if(!code)return;
-    const p=[+Number(x).toFixed(3),+Number(y).toFixed(3)];
-    const a=read(POS_KEY);a[code]=p;write(POS_KEY,a);
-    const b=read(DASH_KEY);b[code]=p;write(DASH_KEY,b);
+    if(!code)return;
+    const p=[Number(x.toFixed(3)),Number(y.toFixed(3))];
+    KEYS.forEach(k=>{const o=read(k);o[code]=p;write(k,o);});
   }
-  function getMarker(e){
-    const el=e.target?.closest?.('.eh-map .eh-marker');
-    if(!el)return null;
-    const map=el.closest('.eh-map');
+
+  function restore(){
+    const a=read(KEYS[0]), b=read(KEYS[1]);
+    document.querySelectorAll('#eam228Map .eam228-asset').forEach(el=>{
+      const c=codeOf(el), p=a[c]||b[c];
+      if(!p||p.length<2)return;
+      el.style.left=Number(p[0])+'%';
+      el.style.top=Number(p[1])+'%';
+    });
+  }
+
+  function get(el){
+    const map=el?.closest?.('#eam228Map');
     return map?{el,map}:null;
   }
-  let drag=null;
-  let suppressClickUntil=0;
 
   function down(e){
     if(e.pointerType==='mouse' && e.button!==0)return;
-    const t=getMarker(e); if(!t)return;
-    const mr=t.el.getBoundingClientRect();
-    const rect=t.map.getBoundingClientRect();
-    drag={el:t.el,map:t.map,rect,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,
-      grabX:e.clientX-(mr.left+mr.width/2),grabY:e.clientY-(mr.top+mr.height/2),moved:false};
-    t.el.classList.add('eam-v14-dragging');
-    try{t.el.setPointerCapture?.(e.pointerId)}catch(_){ }
+    const el=e.target?.closest?.('#eam228Map .eam228-asset');
+    if(!el)return;
+    const t=get(el); if(!t)return;
+    const r=t.map.getBoundingClientRect();
+    const er=el.getBoundingClientRect();
+    const cs=getComputedStyle(el);
+    let leftPx=parseFloat(cs.left);
+    let topPx=parseFloat(cs.top);
+    if(!Number.isFinite(leftPx)) leftPx=er.left-r.left;
+    if(!Number.isFinite(topPx)) topPx=er.top-r.top;
+    drag={el,map:t.map,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,startLeft:leftPx,startTop:topPx,moved:false,width:r.width,height:r.height};
+    try{el.setPointerCapture?.(e.pointerId)}catch(_){}
   }
+
   function move(e){
-    const d=drag;if(!d||e.pointerId!==d.pointerId)return;
-    const dx=e.clientX-d.startX,dy=e.clientY-d.startY;
-    if(!d.moved && Math.hypot(dx,dy)<6)return;
+    const d=drag;
+    if(!d||e.pointerId!==d.pointerId)return;
+    const dx=e.clientX-d.startX, dy=e.clientY-d.startY;
+    if(!d.moved && Math.hypot(dx,dy)<5)return;
     d.moved=true;
-    const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.grabX-d.rect.left)/d.rect.width*100));
-    const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.grabY-d.rect.top)/d.rect.height*100));
-    d.el.style.left=x+'%';d.el.style.top=y+'%';
-    e.preventDefault();e.stopPropagation();
+    const x=Math.max(0,Math.min(100,(d.startLeft+dx)/d.width*100));
+    const y=Math.max(0,Math.min(100,(d.startTop+dy)/d.height*100));
+    d.el.style.left=x+'%';
+    d.el.style.top=y+'%';
+    d.el.classList.add('jgb-real-dragging');
+    e.preventDefault();
+    e.stopPropagation();
   }
+
   function up(e){
-    const d=drag;if(!d|| (e.pointerId!=null&&e.pointerId!==d.pointerId))return;
+    const d=drag;
+    if(!d||e.pointerId!==d.pointerId)return;
     drag=null;
     if(d.moved){
-      const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.grabX-d.rect.left)/d.rect.width*100));
-      const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.grabY-d.rect.top)/d.rect.height*100));
-      d.el.style.left=x+'%';d.el.style.top=y+'%';
-      save(d.el.getAttribute('data-code'),x,y);
-      suppressClickUntil=Date.now()+500;
-      e.preventDefault();e.stopPropagation();
+      const r=d.map.getBoundingClientRect();
+      const er=d.el.getBoundingClientRect();
+      const x=Math.max(0,Math.min(100,(er.left-r.left)/r.width*100));
+      const y=Math.max(0,Math.min(100,(er.top-r.top)/r.height*100));
+      save(codeOf(d.el),x,y);
+      suppressUntil=Date.now()+350;
+      e.preventDefault();
+      e.stopPropagation();
     }
-    d.el.classList.remove('eam-v14-dragging');
-    try{d.el.releasePointerCapture?.(d.pointerId)}catch(_){ }
+    d.el.classList.remove('jgb-real-dragging');
+    try{d.el.releasePointerCapture?.(e.pointerId)}catch(_){}
   }
 
   window.addEventListener('pointerdown',down,true);
@@ -15326,25 +15339,23 @@ body {
   window.addEventListener('pointerup',up,true);
   window.addEventListener('pointercancel',up,true);
 
-  // 클릭은 드래그가 아닐 때만 실행한다.
+  // 드래그 직후에만 클릭을 막고, 평범한 클릭은 기존 V72 클릭 처리를 그대로 둔다.
   window.addEventListener('click',function(e){
-    const el=e.target?.closest?.('.eh-map .eh-marker');
-    if(!el || el.classList.contains('map-only'))return;
-    if(Date.now()<suppressClickUntil){e.preventDefault();e.stopImmediatePropagation();return;}
-    const code=S(el.getAttribute('data-code'));if(!code)return;
-    e.preventDefault();e.stopImmediatePropagation();
-    const pre=code.split('-')[0];
-    const cat={AC:'cooling',BO:'heating',FI:'fire',SA:'sanitary',EL:'electrical',DO:'door',OT:'other'}[pre]||'other';
-    window.__eamSelCode=code;window.__eamCat=cat;
-    if(typeof window.go==='function')window.go('eam');
-    const pick=()=>{
-      const row=document.querySelector('.eam-asset-row[data-code="'+CSS.escape(code)+'"]');
-      if(row){row.click();return true;}
-      if(typeof window.eamPick==='function'){try{window.eamPick(cat,code);return true}catch(_){} }
-      return false;
-    };
-    requestAnimationFrame(()=>{if(!pick())setTimeout(pick,120);});
+    if(Date.now()<suppressUntil){
+      const el=e.target?.closest?.('#eam228Map .eam228-asset');
+      if(el){e.preventDefault();e.stopImmediatePropagation();}
+    }
   },true);
+
+  // 배치도가 다시 렌더링되어도 저장된 위치를 복원한다. 자산/이력 데이터에는 손대지 않는다.
+  const obs=new MutationObserver(()=>{
+    clearTimeout(window.__JGB_EAM_RESTORE_TIMER);
+    window.__JGB_EAM_RESTORE_TIMER=setTimeout(restore,0);
+  });
+  obs.observe(document.body,{childList:true,subtree:true});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',restore,{once:true});
+  else restore();
+  setTimeout(restore,100);setTimeout(restore,500);setTimeout(restore,1200);
 })();
 </script>
 
@@ -16501,35 +16512,6 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 .eam228-stat.discard b{color:#c7c7cf!important;}
 @media(max-width:1200px){.eam228-head-stats{grid-template-columns:repeat(6,60px)!important;min-width:385px!important}.eam228-stat{width:60px!important}}
 </style>
-
-<script>
-/* v15: 누수 아이콘처럼 6px 이상 움직였을 때만 드래그, 드래그 후 클릭은 차단 */
-(function(){
-  if(window.__JGB_EAM_DRAG_V15)return;
-  window.__JGB_EAM_DRAG_V15=true;
-  let active=false;
-  document.addEventListener('pointerdown',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(!el)return;
-    active=false;
-    window.__EAM228_DRAG_SUPPRESS=false;
-  },true);
-  document.addEventListener('pointermove',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(el&&el.classList.contains('dragging'))active=true;
-  },true);
-  document.addEventListener('pointerup',function(e){
-    if(active){
-      window.__EAM228_DRAG_SUPPRESS=true;
-      setTimeout(()=>{window.__EAM228_DRAG_SUPPRESS=false},80);
-    }
-    active=false;
-  },true);
-  document.addEventListener('click',function(e){
-    if(window.__EAM228_DRAG_SUPPRESS){e.preventDefault();e.stopImmediatePropagation();}
-  },true);
-})();
-</script>
 <style id="JGB_EAM_V27_COLOR_MAX">
 /* 상단 상태 헤더: 상태별 색상을 최대한 명확하게 */
 .eam228-head-stats .eam228-stat:nth-child(1){background:linear-gradient(145deg,#39b96b,#18894b)!important;border-color:#77e0a2!important;box-shadow:0 3px 0 #126d3b,0 5px 12px rgba(0,0,0,.18)!important;color:#fff!important}
