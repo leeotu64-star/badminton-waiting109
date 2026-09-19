@@ -18950,3 +18950,99 @@ window.eamDeleteSelectedAssetByCode=async function(c){window.__eamSelCode=V(c);r
   },true);
 })();
 </script>
+
+<!-- JGB EAM V6 FINAL : 자산등록·이력카드·배치도 아이콘 1세트 통합 -->
+<style id="JGB_EAM_V6_SINGLE_SET">
+/* 신규 자산 등록 시 별도 배치도 아이콘 추가를 사용하지 않는다. */
+.eh-head button[onclick*="eamHyunOpenIconAdd"]{display:none!important}
+</style>
+<script id="JGB_EAM_V6_SINGLE_SET_SCRIPT">
+(function(){
+'use strict';
+if(window.__JGB_EAM_V6_SINGLE_SET)return;
+window.__JGB_EAM_V6_SINGLE_SET=true;
+const V=x=>String(x??'').trim();
+const POS_KEY='JGB_EAM_HYUNHWANG_MAP_V1';
+const ONLY_KEY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+const HIDDEN_KEY='JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1';
+const META_KEY='JGB_EAM_ASSET_META_V40';
+function obj(k){try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(_){return {}}}
+function put(k,x){try{localStorage.setItem(k,JSON.stringify(x))}catch(_){}
+}
+function bindIcon(code){
+  const c=V(code);if(!c)return;
+  const pos=obj(POS_KEY),only=obj(ONLY_KEY),hidden=obj(HIDDEN_KEY);
+  /* 실제 자산은 배치도 위치 저장소의 한 좌표만 가진다. */
+  if(!pos[c])pos[c]=[50,50];
+  delete only[c];
+  delete hidden[c];
+  put(POS_KEY,pos);put(ONLY_KEY,only);put(HIDDEN_KEY,hidden);
+}
+function cleanupDuplicateOnly(){
+  const A=Array.isArray(window.__eamA)?window.__eamA:[];
+  const codes=new Set(A.map(a=>V(a?.asset_code)).filter(Boolean));
+  const only=obj(ONLY_KEY);let changed=false;
+  Object.keys(only).forEach(c=>{if(codes.has(c)){delete only[c];changed=true}});
+  if(changed)put(ONLY_KEY,only);
+}
+/* 최종 신규등록 함수의 성공 후처리를 한 번 더 보장한다. */
+const oldSubmit=window.submitEamRegister;
+if(typeof oldSubmit==='function'&&!window.__JGB_EAM_V6_SUBMIT_WRAP){
+  window.__JGB_EAM_V6_SUBMIT_WRAP=true;
+  window.submitEamRegister=async function(){
+    const before=V(window.__eamSelCode);
+    await oldSubmit.apply(this,arguments);
+    const after=V(window.__eamSelCode);
+    if(after&&after!==before){
+      bindIcon(after);
+      cleanupDuplicateOnly();
+      try{if(typeof window.eamLoad==='function')await window.eamLoad()}catch(_){}
+      try{if(typeof window.render==='function')window.render()}catch(_){}
+    }
+  };
+}
+/* 기존/신규 자산의 배치도 아이콘을 같은 자산코드로 직접 연결한다. */
+document.addEventListener('click',function(e){
+  const el=e.target?.closest?.('.eh-map .eh-marker[data-code]');
+  if(!el)return;
+  const c=V(el.getAttribute('data-code'));if(!c)return;
+  /* map-only가 남아 있어도 실제 자산코드가 존재하면 자산 아이콘으로 승격 */
+  const A=Array.isArray(window.__eamA)?window.__eamA:[];
+  const real=A.find(a=>V(a?.asset_code)===c);
+  if(real){
+    e.preventDefault();e.stopImmediatePropagation();
+    bindIcon(c);
+    window.__eamSelCode=c;
+    const cat=(()=>{
+      const t=V(real.category||real.type);
+      if(t.includes('냉난방'))return'cooling';
+      if(t.includes('소방'))return'fire';
+      if(t.includes('온수')||t.includes('보일러')||t.includes('난방'))return'water';
+      if(t.includes('전기'))return'electrical';
+      if(t.includes('조명'))return'lighting';
+      if(t.includes('방수'))return'waterproof';
+      if(t.includes('위생'))return'sanitary';
+      if(t.includes('문')||t.includes('창호')||t.includes('도어'))return'doors';
+      return'other';
+    })();
+    window.__eamCat=cat;
+    if(typeof window.go==='function')window.go('eam');
+    requestAnimationFrame(()=>{try{window.eamPick(cat,c)}catch(_){} });
+  }
+},true);
+/* 등록 모달의 안내문도 실제 동작과 일치시킨다. */
+function fixRegisterNote(){
+  const modal=document.getElementById('eamRegisterModal');
+  if(!modal)return;
+  const notes=modal.querySelectorAll('.eam-modal-note');
+  notes.forEach(n=>{n.textContent='자산코드 생성과 동시에 동일 자산코드의 배치도 아이콘이 자동 생성됩니다. 아이콘·이력카드는 하나의 자산으로 연결됩니다.'});
+}
+const oldReg=window.eamRegisterNewAsset;
+if(typeof oldReg==='function'&&!window.__JGB_EAM_V6_REG_WRAP){
+  window.__JGB_EAM_V6_REG_WRAP=true;
+  window.eamRegisterNewAsset=function(){const r=oldReg.apply(this,arguments);setTimeout(fixRegisterNote,0);return r};
+}
+/* 현재 DOM에 남은 기존 map-only 중 실제 자산과 동일한 코드는 즉시 제거한다. */
+cleanupDuplicateOnly();
+})();
+</script>
