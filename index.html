@@ -17757,3 +17757,160 @@ window.eamHyunOpenIconDelete=openFixed;
   });
 })();
 </script>
+
+<!-- JGB EAM V28: 자산코드 단일기준 통합 + 신규 이력카드 아이콘 자동생성 + 다중삭제 -->
+<style id="JGB_EAM_V28_SINGLE_CODE_DELETE">
+#eamHyunIconDeleteModal .eh-v28-delete-toolbar{display:flex;align-items:center;gap:10px;padding:12px 18px;border-top:1px solid #e1e8ed;border-bottom:1px solid #e1e8ed;background:#f7fafc}
+#eamHyunIconDeleteModal .eh-v28-delete-toolbar label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:900;color:#29495e;cursor:pointer}
+#eamHyunIconDeleteModal .eh-v28-delete-toolbar input{width:18px;height:18px;accent-color:#1675c2}
+#eamHyunIconDeleteModal .eh-v28-delete-actions{margin-left:auto;display:flex;gap:7px}
+#eamHyunIconDeleteModal .eh-v28-delete-actions button{border:1px solid #cbd9e3;background:#fff;color:#34586e;border-radius:7px;padding:7px 10px;font-weight:900;cursor:pointer}
+#eamHyunIconDeleteModal .eh-v28-delete-actions .danger{background:#d63f4f;border-color:#c83242;color:#fff}
+#eamHyunIconDeleteModal .eh-delete-list-v28{padding:12px 18px 18px;display:grid;gap:7px;max-height:58vh;overflow:auto}
+#eamHyunIconDeleteModal .eh-delete-list-v28>div{display:grid;grid-template-columns:30px 90px minmax(0,1fr) 62px;align-items:center;gap:10px;padding:10px 12px;border:1px solid #d7e2ea;border-radius:9px;background:#fff;min-height:46px}
+#eamHyunIconDeleteModal .eh-delete-list-v28>div.is-selected{border-color:#1675c2;background:#f0f7ff}
+#eamHyunIconDeleteModal .eh-delete-list-v28 input{width:18px;height:18px;accent-color:#1675c2;cursor:pointer}
+#eamHyunIconDeleteModal .eh-delete-list-v28 .code{font-weight:950;color:#173f5f;font-size:13px}
+#eamHyunIconDeleteModal .eh-delete-list-v28 .name{font-weight:800;color:#2d4659;font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#eamHyunIconDeleteModal .eh-delete-list-v28 .kind{display:block;color:#8295a3;font-size:9px;font-weight:600;margin-top:2px}
+#eamHyunIconDeleteModal .eh-delete-list-v28 .one-delete{border:1px solid #d9a0a0;background:#fff7f7;color:#c83f3f;font-size:12px;font-weight:900;cursor:pointer;padding:7px 7px;border-radius:6px}
+@media(max-width:700px){#eamHyunIconDeleteModal .eh-delete-list-v28>div{grid-template-columns:28px 72px minmax(0,1fr) 52px}}
+</style>
+<script id="JGB_EAM_V28_SINGLE_CODE_BRIDGE">
+(function(){
+'use strict';
+if(window.__JGB_EAM_V28_SINGLE_CODE_BRIDGE)return;
+window.__JGB_EAM_V28_SINGLE_CODE_BRIDGE=true;
+const V=x=>String(x??'').trim();
+const readObj=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
+const writeObj=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x));return true}catch(_){return false}};
+const codeOf=x=>V(x&&((x.asset_code)||(x.code)));
+
+/* ① 자산코드 자체를 네 화면의 유일한 연결키로 사용한다.
+      AC-02를 화면용 AC-04 등으로 다시 번호 매기지 않는다. */
+window.eamUnifiedCode=function(x){return codeOf(x)};
+window.jgbRenumberHistoryCardDisplay=function(){};
+
+/* ② 배치도 위치 저장: 새 이력카드/자산이 처음 만들어질 때 중앙(50%,50%)에 1개만 생성한다. */
+function ensureMapIcon(code){
+  const c=V(code); if(!c)return;
+  const posKey='JGB_EAM_HYUNHWANG_MAP_V1';
+  const hiddenKey='JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1';
+  const onlyKey='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+  const pos=readObj(posKey), hidden=readObj(hiddenKey), only=readObj(onlyKey);
+  if(hidden[c]===true)return;
+  if(!pos[c]){
+    pos[c]=[50,50];
+    writeObj(posKey,pos);
+  }
+  /* 기존 배치도 전용 중복 아이콘은 같은 자산이 등록되는 순간 제거한다. */
+  if(only[c]){delete only[c];writeObj(onlyKey,only)}
+}
+window.jgbEamEnsureMapIcon=ensureMapIcon;
+
+/* 신규 EAM 자산 등록 성공 직후 아이콘 1개 자동 생성 */
+const oldSubmit=window.submitEamRegister;
+if(typeof oldSubmit==='function'){
+  window.submitEamRegister=async function(){
+    const before=V(window.__eamSelCode);
+    const r=await oldSubmit.apply(this,arguments);
+    const after=V(window.__eamSelCode);
+    if(after&&after!==before)ensureMapIcon(after);
+    return r;
+  };
+}
+
+/* 주요설비 이력카드 저장 성공 직후에도 동일 규칙 적용 */
+const oldCardSave=window.JGB_EAM_CARD_V22_SAVE;
+if(typeof oldCardSave==='function'){
+  window.JGB_EAM_CARD_V22_SAVE=async function(code){
+    const c=V(code||window.__eamSelCode);
+    const result=await oldCardSave.apply(this,arguments);
+    if(result!==false&&c)ensureMapIcon(c);
+    return result;
+  };
+}
+
+/* 현재 화면에 존재하는 아이콘도 자산코드 기준으로 1개만 남긴다. */
+function purgeDuplicateMarkers(){
+  const seen=new Set();
+  document.querySelectorAll('.eh-map .eh-marker').forEach(el=>{
+    const c=V(el.getAttribute('data-code')); if(!c)return;
+    if(el.classList.contains('map-only')){
+      const asset=document.querySelector('.eh-map .eh-marker:not(.map-only)[data-code="'+CSS.escape(c)+'"]');
+      if(asset){el.remove();return;}
+    }
+    if(seen.has(c)){el.remove();return}
+    seen.add(c);
+  });
+}
+window.jgbEamPurgeDuplicateMarkers=purgeDuplicateMarkers;
+
+/* 아이콘 삭제: 자산은 배치도 표시만 숨기고, 자산/이력카드는 삭제하지 않는다. */
+function deleteIconOnly(c){
+  c=V(c);if(!c)return;
+  const hidden=readObj('JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1');
+  hidden[c]=true;writeObj('JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1',hidden);
+  const only=readObj('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1');
+  if(only[c]){delete only[c];writeObj('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1',only)}
+  const oldDel=(()=>{try{const a=JSON.parse(localStorage.getItem('JGB_EAM_DASH_MAP_DELETED_V241')||'[]');return Array.isArray(a)?a.map(V):[]}catch(_){return []}})();
+  if(!oldDel.includes(c))oldDel.push(c);
+  try{localStorage.setItem('JGB_EAM_DASH_MAP_DELETED_V241',JSON.stringify(oldDel))}catch(_){ }
+}
+window.eamHyunDeleteMapIconOnlyV28=deleteIconOnly;
+
+function getDeleteRows(){
+  const assets=Array.isArray(window.__eamA)?window.__eamA:[];
+  const hidden=readObj('JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1');
+  const pos=readObj('JGB_EAM_HYUNHWANG_MAP_V1');
+  const only=readObj('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1');
+  const defaults={'AC-01':[86,8],'AC-02':[68,8],'AC-03':[50,8],'AC-04':[32,8],'AC-05':[14,8],'AC-06':[7,30]};
+  const map=new Map();
+  assets.forEach(a=>{
+    const c=codeOf(a);if(!c||hidden[c]===true||(!pos[c]&&!defaults[c]))return;
+    map.set(c,{code:c,name:V(a.name||a.asset_name||a.assetName||a.location||'기존 EAM 자산'),kind:'asset'});
+  });
+  Object.values(only).forEach(x=>{
+    const c=V(x&&x.code);if(!c||map.has(c))return;
+    map.set(c,{code:c,name:V(x.name)||'배치도 전용 아이콘',kind:'map-only'});
+  });
+  return [...map.values()].sort((a,b)=>a.code.localeCompare(b.code,undefined,{numeric:true}));
+}
+
+/* ③ 자산이 많아도 체크박스로 한꺼번에 삭제한다. */
+window.eamHyunOpenIconDelete=function(){
+  document.getElementById('eamHyunIconDeleteModal')?.remove();
+  const rows=getDeleteRows();
+  const m=document.createElement('div');m.id='eamHyunIconDeleteModal';m.className='eh-modal';
+  const list=rows.length?rows.map(x=>`<div data-code="${xEsc(x.code)}"><input class="v28-row-check" type="checkbox" value="${xEsc(x.code)}" aria-label="${xEsc(x.code)} 선택"><span class="code">${xEsc(x.code)}</span><span class="name">${xEsc(x.name)}<small class="kind">${x.kind==='asset'?'기존 EAM 자산 · 배치도 표시만 삭제':'배치도 전용 아이콘'}</small></span><button class="one-delete" type="button" data-one-delete="${xEsc(x.code)}">삭제</button></div>`).join(''):'<div style="grid-template-columns:1fr!important;padding:30px;text-align:center;color:#8799a6">현재 배치도에 표시된 아이콘이 없습니다.</div>';
+  m.innerHTML=`<div class="eh-modal-box"><div class="eh-modal-head"><div><small>EAM MAP</small><h3>배치도 아이콘 삭제</h3><p>자산코드 기준으로 배치도 아이콘만 삭제합니다. 이력카드와 자산정보는 유지됩니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div><div class="eh-delete-count-v21">현재 배치도 표시 아이콘 ${rows.length}개</div><div class="eh-v28-delete-toolbar"><label><input id="v28-check-all" type="checkbox"> 전체선택</label><div class="eh-v28-delete-actions"><button type="button" id="v28-clear-select">선택해제</button><button type="button" class="danger" id="v28-delete-selected">선택 항목 삭제</button></div></div><div class="eh-delete-list-v28">${list}</div></div>`;
+  document.body.appendChild(m);
+  const all=m.querySelector('#v28-check-all'), checks=()=>[...m.querySelectorAll('.v28-row-check')];
+  const sync=()=>{const cs=checks();all.checked=cs.length>0&&cs.every(x=>x.checked);m.querySelectorAll('.eh-delete-list-v28>div').forEach(r=>r.classList.toggle('is-selected',!!r.querySelector('input')?.checked))};
+  all?.addEventListener('change',()=>{checks().forEach(x=>x.checked=all.checked);sync()});
+  checks().forEach(x=>x.addEventListener('change',sync));
+  m.querySelector('#v28-clear-select')?.addEventListener('click',()=>{checks().forEach(x=>x.checked=false);sync()});
+  m.querySelector('#v28-delete-selected')?.addEventListener('click',()=>{
+    const selected=checks().filter(x=>x.checked).map(x=>V(x.value));
+    if(!selected.length){alert('삭제할 아이콘을 선택하세요.');return}
+    if(!confirm(selected.join(', ')+' 배치도 아이콘 '+selected.length+'개를 삭제할까요?\n이력카드와 자산정보는 삭제되지 않습니다.'))return;
+    selected.forEach(deleteIconOnly);
+    m.remove();
+    if(typeof render==='function')render();
+    setTimeout(purgeDuplicateMarkers,0);
+  });
+  m.querySelectorAll('[data-one-delete]').forEach(btn=>btn.addEventListener('click',()=>{
+    const c=V(btn.dataset.oneDelete);if(!c)return;
+    if(!confirm(c+' 배치도 아이콘만 삭제할까요?'))return;
+    deleteIconOnly(c);m.remove();if(typeof render==='function')render();setTimeout(purgeDuplicateMarkers,0);
+  }));
+};
+
+/* 렌더링 때마다 중복을 정리한다. */
+const oldRender=window.render;
+if(typeof oldRender==='function'&&!window.__JGB_EAM_V28_RENDER_WRAP){
+  window.__JGB_EAM_V28_RENDER_WRAP=true;
+  window.render=function(){const r=oldRender.apply(this,arguments);setTimeout(purgeDuplicateMarkers,0);return r};
+}
+})();
+</script>
