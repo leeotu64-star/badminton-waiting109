@@ -17268,7 +17268,17 @@ function finish(e){
   const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.ox-d.rr.left)/d.rr.width*100));
   const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.oy-d.rr.top)/d.rr.height*100));
   d.el.style.left=x+'%';d.el.style.top=y+'%';
-  save(String(d.el.getAttribute('data-code')||'').trim(),x,y);
+  const savedCode=String(d.el.getAttribute('data-code')||'').trim();
+  save(savedCode,x,y);
+  /* 배치도 전용 아이콘은 별도 저장소의 x/y도 함께 갱신해야 재렌더링 후 같은 위치를 유지한다. */
+  try{
+    const only=JSON.parse(localStorage.getItem('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1')||'{}');
+    if(only && only[savedCode]){
+      only[savedCode].x=Number(x.toFixed(3));
+      only[savedCode].y=Number(y.toFixed(3));
+      localStorage.setItem('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1',JSON.stringify(only));
+    }
+  }catch(_){}
   d.el.dataset.v19Dragged='1';
   d.el.dataset.v19DraggedAt=String(Date.now());
   e.preventDefault();e.stopPropagation();
