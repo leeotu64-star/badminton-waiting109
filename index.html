@@ -6613,7 +6613,7 @@ function jgbV47GoWpByLeak(leakCode){
         ['other','🔧','기타설비','사무 · 공용']
       ];
       const PREFIX={cooling:'AC',fire:'FI',water:'BO',electrical:'EL',lighting:'LT',waterproof:'WP',sanitary:'SA',doors:'DO',other:'OT'};
-      const FIRE=new Set(['EQ-01','EQ-02','EQ-03','EQ-05','FI-01','FI-02','FI-03','FI-04','FI-05','FI-06','FI-07','FI-08','EQ-07']);
+      const FIRE=new Set(['FI-01','FI-02','FI-03','FI-04','FI-05','FI-06','FI-07','FI-08']);
       const v=x=>String(x??'').trim();
       function readMeta(){try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}catch(e){return {}}}
       function writeMeta(x){try{localStorage.setItem(META_KEY,JSON.stringify(x||{}))}catch(e){console.warn(e)}}
@@ -6645,7 +6645,7 @@ function jgbV47GoWpByLeak(leakCode){
       function rawRows(){
         const main=typeof JGB_MAIN_EQUIPMENT!=='undefined'&&Array.isArray(JGB_MAIN_EQUIPMENT)?JGB_MAIN_EQUIPMENT:[];
         const excel=typeof JGB_EXCEL_EQUIPMENT!=='undefined'&&Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[];
-        const rows=[...main,...excel].filter(x=>x&&x.code&&!['OT-04','OT-05','OT-06'].includes(v(x.code)));
+        const rows=[...main,...excel].filter(x=>x&&x.code&&!['OT-04','OT-05','OT-06'].includes(v(x.code))&&!/^EQ-\d+$/i.test(v(x.code)));
         const map=new Map();
         rows.forEach(x=>{if(!map.has(v(x.code)))map.set(v(x.code),x)});
         return [...map.values()];
@@ -6662,7 +6662,7 @@ function jgbV47GoWpByLeak(leakCode){
           map.set(code,row);
         });
         A.forEach(a=>{
-          const code=v(a.asset_code); if(!code||map.has(code))return;
+          const code=v(a.asset_code); if(!code||/^EQ-\d+$/i.test(code)||map.has(code))return;
           const m=meta[code]||{}, k=catKey(Object.assign({},a,m));
           map.set(code,Object.assign({},a,m,{code,name:v(m.name||a.name)||'-',type:categoryLabel(k),category:categoryLabel(k),place:k==='fire'?'유수장치실':v(m.place||a.place)||'-',model:v(m.model||a.product_name)||'',qty:m.qty??a.quantity??'-',vendor:v(m.vendor||a.vendor)||'-',maker:v(m.maker||m.vendor||a.vendor)||'-',asContact:v(m.asContact)||'-',installDate:v(m.installDate)||'',warranty:v(m.warranty)||'-',asHistory:v(m.asHistory)||'-',note:v(m.note)||'',capacity:v(m.capacity)||'',life:v(m.life)||'',grade:v(m.grade)||'',date:v(m.date||m.manufactureDate)||'',improvementPlan:v(m.improvementPlan)||'',status:v(m.status||a.status)||'정상',acquisitionType:v(m.acquisitionType)||'기존 자산',internalCode:code}));
         });
@@ -15626,6 +15626,25 @@ try{
   const cat=V(localStorage.getItem(CATKEY)||'');
   if(cat)window.__eamCat=cat;
 }catch(_){ }
+})();
+</script>
+
+<script id="JGB_EAM_ASSET_CARD_CLICK_V2">
+(function(){
+  if(window.__JGB_EAM_ASSET_CARD_CLICK_V2)return;
+  window.__JGB_EAM_ASSET_CARD_CLICK_V2=true;
+  document.addEventListener('click',function(e){
+    const card=e.target.closest?.('.eam-asset-row');
+    if(!card)return;
+    const code=String(card.getAttribute('data-code')||'').trim();
+    if(!code)return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const cat=String(window.__eamCat||'cooling');
+    if(typeof window.eamPick==='function'){
+      window.eamPick(cat,code);
+    }
+  },true);
 })();
 </script>
 </body>
