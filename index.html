@@ -15960,7 +15960,7 @@ body {
     const file=input.files&&input.files[0]; if(!file)return;
     const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;persist();window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
-  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>관리구분<select id="jgbLRMethod"><option>자체정비</option><option>외주정비</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="점검 내역을 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체정비';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value=current==='정상'?'수리예정':current;}
+  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>관리구분<select id="jgbLRMethod"><option>자체정비</option><option>외주정비</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="점검 내역을 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체정비';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs){rs.value=(current==='수리예정'||current==='수리중'||current==='정상')?current:'수리예정';}}
   window.jgbLRSave=function(){
     const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim();
     if(!text)return;
@@ -22627,6 +22627,76 @@ cleanupDuplicateOnly();
   min-width:620px!important;
   max-width:none!important;
   table-layout:fixed!important;
+  box-sizing:border-box!important;
+}
+</style>
+
+<style id="JGB_LR_MAINT_OUTER_SAME_INNER_SCROLL_V18">
+/* V18: 유지관리 이력 외곽은 이력카드와 동일 폭, 내부 표만 넓게 유지하여 가로 슬라이더 표시 */
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+
+/* 왼쪽 이력카드와 오른쪽 유지관리 이력의 외곽 폭은 동일 */
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-card,
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+
+/* 유지관리 이력 외곽 자체는 부모 폭을 넘지 않음 */
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history{
+  overflow:hidden!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+
+/* 유지관리 헤더는 외곽 폭에 정확히 맞춤 */
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history > .jgb-lr-rebuild-historyhead,
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history > .jgb-lr-v54-historyhead{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+
+/* 내부 표 영역은 외곽보다 넓게 유지하고 여기에서만 가로 슬라이더 생성 */
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history > .jgb-lr-rebuild-historyscroll,
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history > .jgb-lr-v54-historyscroll{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:auto!important;
+  box-sizing:border-box!important;
+  scrollbar-width:auto!important;
+  scrollbar-gutter:stable!important;
+}
+
+/* 표는 외곽 폭에 맞춰 줄어들지 않도록 고정된 내부 폭 유지 */
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history table{
+  width:620px!important;
+  min-width:620px!important;
+  max-width:none!important;
+  table-layout:fixed!important;
+  box-sizing:border-box!important;
+}
+
+/* 열 폭은 내부 620px 기준으로 유지 */
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history table th,
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history table td{
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
   box-sizing:border-box!important;
 }
 </style>
