@@ -15736,6 +15736,13 @@ body {
 .jgb-lr-v54-type-text small{font-size:8px!important;line-height:11px!important;font-weight:850!important;white-space:nowrap!important;color:rgba(255,255,255,.88)!important}
 @media(max-width:900px){.jgb-lr-v54-type-card{min-width:135px!important}.jgb-lr-v54-type-icon{font-size:24px!important}}
 </style>
+<style id="JGB_LR_MAINTENANCE_V3">
+.jgb-lr-maint-grid{display:grid;grid-template-columns:1.2fr .9fr 1fr;gap:8px;margin-bottom:9px}
+.jgb-lr-maint-grid label,.jgb-lr-maint-note{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;color:#173f60}
+.jgb-lr-maint-grid input,.jgb-lr-maint-grid select{height:36px;box-sizing:border-box;border:1px solid #b8cbd8;border-radius:5px;padding:0 9px;background:#fff;color:#163c5a;font-weight:700}
+.jgb-lr-maint-note textarea{min-height:105px;resize:vertical;margin-top:0}
+@media(max-width:650px){.jgb-lr-maint-grid{grid-template-columns:1fr}}
+</style>
 <script id="jgb-lr-v54-script">
 (function(){
   const statusColors={정상:'#2e9b57',점검:'#e0a600',조치필요:'#e87916',수리중:'#d93636',부품대기:'#7b4bb7',폐기:'#555'};
@@ -15789,7 +15796,7 @@ body {
     const file=input.files&&input.files[0]; if(!file)return;
     const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
-  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="점검·정비 내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';}
+  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><div class="jgb-lr-maint-grid"><label>관리대상<input id="jgbLRTarget" type="text" readonly></label><label>관리구분<select id="jgbLRStatus"><option value="정상">정상</option><option value="조치필요">조치필요</option></select></label><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label></div><label class="jgb-lr-maint-note">유지관리 이력<textarea id="jgbLRText" placeholder="점검·정비 내용 및 조치결과를 입력하세요."></textarea></label><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const isL=type==='light';const target=(isL?'💡 조명 관리':'🔌 릴선 관리')+' · '+(isL?'L-':'RL-')+String(n).padStart(2,'0');document.getElementById('jgbLRTarget').value=target;document.getElementById('jgbLRStatus').value=(assets[n-1][isL?'light':'reel']==='조치필요'?'조치필요':'정상');const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';}
   window.jgbLRSave=function(){
     const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim();
     if(!text)return;
@@ -15798,8 +15805,9 @@ body {
     const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     const picked=document.getElementById('jgbLRDate')?.value||today;
     const y=Number(String(picked).slice(0,4));
-    const row=[(y>=2026&&y<=2035)?picked:today,'유지관리',text,'담당자'];
-    if(type==='light')assets[n-1].lightHistory.unshift(row);else assets[n-1].reelHistory.unshift(row);
+    const status=document.getElementById('jgbLRStatus')?.value||'정상';
+    const row=[(y>=2026&&y<=2035)?picked:today,status,text,'담당자'];
+    if(type==='light'){assets[n-1].lightHistory.unshift(row);assets[n-1].light=status;}else{assets[n-1].reelHistory.unshift(row);assets[n-1].reel=status;}
     m.classList.remove('open');window.jgbLRSelect(n,type);
   };
   /* 최초 렌더 시 이 스크립트가 뒤늦게 정의되는 경우에도 조명·릴선 화면을 즉시 다시 그립니다. */
