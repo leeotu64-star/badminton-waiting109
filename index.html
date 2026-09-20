@@ -21939,197 +21939,70 @@ cleanupDuplicateOnly();
 </style>
 
 
-<style id="JGB_LR_MAINT_REBUILD_V14">
-/* 유지관리 이력 영역 재구성: 패널 자체를 좁히고, 내부는 왼쪽부터 촘촘하게 */
+<style id="JGB_LR_INDEPENDENT_PARENTS_V18">
+/* V18
+   이력카드와 유지관리 이력은 서로 크기를 따라가지 않는다.
+   기존 기능/디자인은 유지하고, 각 영역의 크기만 독립적으로 계산한다.
+*/
+
+/* 두 영역은 같은 행에 두되 서로의 높이를 강제로 공유하지 않음 */
 .jgb-lr-v54-detail{
-  grid-template-columns:minmax(0,72fr) minmax(0,28fr)!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,60fr) minmax(0,40fr)!important;
+  align-items:start!important;
+  gap:0!important;
+  min-height:260px!important;
+  height:auto!important;
+  overflow:visible!important;
 }
 
-/* 유지관리 제목 바 */
-.jgb-lr-v54-history{
-  min-width:0!important;
+/* 이력카드 부모 — 독립 */
+.jgb-lr-v54-card{
   width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:auto!important;
+  min-height:260px!important;
+  max-height:none!important;
+  align-self:start!important;
+  box-sizing:border-box!important;
+  overflow:auto!important;
+}
+
+/* 유지관리 이력 부모 — 독립 */
+.jgb-lr-v54-history{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:auto!important;
+  min-height:260px!important;
+  max-height:none!important;
+  align-self:start!important;
+  box-sizing:border-box!important;
   overflow:hidden!important;
 }
+
+/* 두 헤더는 각자 자기 부모 폭만 사용 */
+.jgb-lr-v54-cardtitle,
 .jgb-lr-v54-historyhead{
   width:100%!important;
   box-sizing:border-box!important;
-  padding:7px 8px!important;
-  font-size:17px!important;
-  font-weight:1000!important;
-  line-height:1.1!important;
 }
 
-/* 좁아진 영역 안에서 가로 슬라이더 */
+/* 유지관리 이력 스크롤은 유지관리 부모 안에서만 독립 */
 .jgb-lr-v54-historyscroll{
   width:100%!important;
   min-width:0!important;
+  height:260px!important;
+  max-height:260px!important;
+  box-sizing:border-box!important;
   overflow-x:auto!important;
   overflow-y:auto!important;
-  scrollbar-width:auto!important;
-}
-.jgb-lr-v54-historyscroll::-webkit-scrollbar{
-  height:9px!important;
-}
-.jgb-lr-v54-historyscroll::-webkit-scrollbar-thumb{
-  background:#7c92a3!important;
-  border-radius:8px!important;
-}
-.jgb-lr-v54-historyscroll::-webkit-scrollbar-track{
-  background:#e6eef3!important;
 }
 
-/* 6개 항목은 모두 유지 */
-.jgb-lr-v54-historyscroll table{
-  width:max-content!important;
-  min-width:610px!important;
-  table-layout:fixed!important;
-  border-collapse:collapse!important;
-}
-.jgb-lr-v54-historyscroll th,
-.jgb-lr-v54-historyscroll td{
-  box-sizing:border-box!important;
-  padding:5px 5px!important;
-  height:28px!important;
-  font-size:13px!important;
-  font-weight:1000!important;
-  line-height:1.1!important;
-  text-align:center!important;
-  white-space:nowrap!important;
-}
-
-/* 왼쪽부터 촘촘하게 */
-.jgb-lr-v54-historyscroll th:nth-child(1),
-.jgb-lr-v54-historyscroll td:nth-child(1){width:92px!important;min-width:92px!important}
-.jgb-lr-v54-historyscroll th:nth-child(2),
-.jgb-lr-v54-historyscroll td:nth-child(2){width:86px!important;min-width:86px!important}
-.jgb-lr-v54-historyscroll th:nth-child(3),
-.jgb-lr-v54-historyscroll td:nth-child(3){width:86px!important;min-width:86px!important}
-.jgb-lr-v54-historyscroll th:nth-child(4),
-.jgb-lr-v54-historyscroll td:nth-child(4){width:96px!important;min-width:96px!important}
-.jgb-lr-v54-historyscroll th:nth-child(5),
-.jgb-lr-v54-historyscroll td:nth-child(5){width:170px!important;min-width:170px!important}
-.jgb-lr-v54-historyscroll th:nth-child(6),
-.jgb-lr-v54-historyscroll td:nth-child(6){width:80px!important;min-width:80px!important}
-</style>
-
-
-
-<style id="JGB_LR_PARENT_MATCH_CARD_V15">
-/* 이력카드와 유지관리 이력의 부모 영역 비율을 원래 60:40으로 맞춤 */
-.jgb-lr-v54-detail{
-  grid-template-columns:minmax(0,60fr) minmax(0,40fr)!important;
-}
-
-/* 부모 폭에 맞춰 유지관리 제목/내용이 함께 움직이도록 */
-.jgb-lr-v54-history,
-.jgb-lr-v54-historyhead,
-.jgb-lr-v54-historyscroll{
-  min-width:0!important;
-  box-sizing:border-box!important;
-}
-
-/* 이력카드와 같은 높이/경계선 기준 */
-.jgb-lr-v54-card,
-.jgb-lr-v54-history{
-  height:100%!important;
-  min-height:0!important;
-}
-</style>
-
-
-
-<style id="JGB_LR_CARD_HISTORY_HEADER_MATCH_V16">
-/* 이력카드와 유지관리 이력: 같은 부모, 같은 상단 기준선, 같은 헤더 높이/서식 */
-.jgb-lr-v54-detail{
-  grid-template-columns:minmax(0,60fr) minmax(0,40fr)!important;
-  align-items:stretch!important;
-  gap:0!important;
-}
-
-.jgb-lr-v54-card,
-.jgb-lr-v54-history{
-  min-width:0!important;
-  height:100%!important;
-  box-sizing:border-box!important;
-}
-
-/* 두 헤더를 완전히 같은 규격으로 */
-.jgb-lr-v54-cardtitle,
-.jgb-lr-v54-historyhead{
-  height:34px!important;
-  min-height:34px!important;
-  box-sizing:border-box!important;
-  margin:0 0 7px 0!important;
-  padding:7px 9px!important;
-  background:#e8f2f7!important;
-  border:1px solid #a9bdcb!important;
-  border-bottom:1px solid #a9bdcb!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  font-size:16px!important;
-  line-height:1!important;
-  font-weight:1000!important;
-  color:#17384e!important;
-  white-space:nowrap!important;
-}
-
-/* 유지관리 이력 헤더의 건수도 같은 글씨 체계 */
-.jgb-lr-v54-historyhead span{
-  font-size:16px!important;
-  line-height:1!important;
-  font-weight:1000!important;
-}
-
-/* 카드와 유지관리 영역이 따로 움직이지 않도록 같은 부모 높이 */
-.jgb-lr-v54-detail > .jgb-lr-v54-card,
-.jgb-lr-v54-detail > .jgb-lr-v54-history{
-  align-self:stretch!important;
-}
-</style>
-
-
-
-<style id="JGB_LR_EQUAL_PAIR_WIDTH_V17">
-/* 좌측 조명 / 우측 릴선 패널 폭을 완전히 동일하게 */
-.jgb-lr-v54-panes{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-  gap:10px!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-}
+/* 좌우 설비 패널도 서로 높이를 따라가지 않음 */
 .jgb-lr-v54-pane{
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-}
-
-/* 두 설비의 이력카드 : 유지관리 이력 비율도 완전히 동일 */
-.jgb-lr-v54-detail{
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-  grid-template-columns:minmax(0,60%) minmax(0,40%)!important;
-  gap:0!important;
-}
-.jgb-lr-v54-card,
-.jgb-lr-v54-history{
-  min-width:0!important;
-  width:100%!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-}
-
-/* 헤더도 각각 자기 칸의 100%를 정확히 사용 */
-.jgb-lr-v54-cardtitle,
-.jgb-lr-v54-historyhead{
-  width:100%!important;
-  box-sizing:border-box!important;
-  margin-left:0!important;
-  margin-right:0!important;
+  align-items:start!important;
+  height:auto!important;
 }
 </style>
