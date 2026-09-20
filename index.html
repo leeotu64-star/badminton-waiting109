@@ -4539,6 +4539,102 @@ a[data-page="digitalTwin"],
 .jgb-dashboard-mode.ops .employee-section > *:not(.opx-board){display:none!important}
 .jgb-dashboard-mode.ops .employee-section .opx-board{display:block!important;width:100%!important;margin:0!important}
 </style>
+<style id="OPSBOARD_HEADER_MAX_ICON_STATS_V30">
+/* V30: 운영게시판 기존 4개 요약카드 제거 → 헤더 아이콘형 대형 현황으로 통합 */
+.jgb-dashboard-mode.ops .opx-board-head-max{
+  min-height:150px!important;
+  box-sizing:border-box!important;
+  padding:22px 24px!important;
+  display:grid!important;
+  grid-template-columns:minmax(250px,1fr) auto!important;
+  grid-template-rows:auto auto!important;
+  align-items:center!important;
+  gap:12px 18px!important;
+}
+.jgb-dashboard-mode.ops .opx-board-title-area h3{
+  font-size:32px!important;
+  line-height:1.05!important;
+  margin:4px 0 7px!important;
+  font-weight:1000!important;
+}
+.jgb-dashboard-mode.ops .opx-board-title-area p{
+  font-size:12px!important;
+  line-height:1.45!important;
+  margin:0!important;
+  max-width:720px!important;
+}
+.jgb-dashboard-mode.ops .opx-board-header-stats{
+  grid-column:2!important;
+  grid-row:1 / span 2!important;
+  display:flex!important;
+  align-items:stretch!important;
+  gap:9px!important;
+}
+.jgb-dashboard-mode.ops .opx-head-stat{
+  min-width:112px!important;
+  min-height:92px!important;
+  padding:10px 13px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  border-radius:14px!important;
+  background:rgba(255,255,255,.13)!important;
+  color:#fff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 4px 12px rgba(0,30,60,.12)!important;
+}
+.jgb-dashboard-mode.ops .opx-head-stat-icon{
+  width:42px!important;height:42px!important;
+  flex:0 0 42px!important;
+  display:grid!important;place-items:center!important;
+  border-radius:12px!important;
+  background:rgba(255,255,255,.18)!important;
+  border:1px solid rgba(255,255,255,.25)!important;
+  font-size:23px!important;font-weight:1000!important;
+  color:#fff!important;
+}
+.jgb-dashboard-mode.ops .opx-head-stat small{
+  display:block!important;
+  font-size:12px!important;
+  font-weight:850!important;
+  color:rgba(255,255,255,.9)!important;
+  margin-bottom:3px!important;
+}
+.jgb-dashboard-mode.ops .opx-head-stat b{
+  display:block!important;
+  font-size:29px!important;
+  line-height:1!important;
+  font-weight:1000!important;
+  color:#fff!important;
+  white-space:nowrap!important;
+}
+.jgb-dashboard-mode.ops .opx-head-stat em{
+  font-size:12px!important;
+  font-style:normal!important;
+  margin-left:2px!important;
+  font-weight:850!important;
+  color:rgba(255,255,255,.92)!important;
+}
+.jgb-dashboard-mode.ops .opx-board-clock{
+  grid-column:1!important;
+  grid-row:2!important;
+  justify-self:start!important;
+  margin-top:2px!important;
+}
+.jgb-dashboard-mode.ops .qrx-management-summary-v9{display:none!important}
+@media(max-width:1100px){
+  .jgb-dashboard-mode.ops .opx-board-head-max{grid-template-columns:1fr!important}
+  .jgb-dashboard-mode.ops .opx-board-header-stats{grid-column:1!important;grid-row:auto!important;justify-content:flex-start!important;flex-wrap:wrap!important}
+  .jgb-dashboard-mode.ops .opx-board-clock{grid-column:1!important;grid-row:auto!important}
+}
+@media(max-width:650px){
+  .jgb-dashboard-mode.ops .opx-board-head-max{min-height:0!important;padding:18px!important}
+  .jgb-dashboard-mode.ops .opx-board-title-area h3{font-size:27px!important}
+  .jgb-dashboard-mode.ops .opx-head-stat{min-width:calc(50% - 5px)!important}
+  .jgb-dashboard-mode.ops .opx-board-header-stats{display:grid!important;grid-template-columns:repeat(2,1fr)!important;width:100%!important}
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -5437,16 +5533,15 @@ a[data-page="digitalTwin"],
             </div>
           </section>
           <section class="opx-board opx-board-v7">
-            <div class="opx-board-head">
-              <div><span class="opx-board-kicker">QR CUSTOMER OPERATION INTELLIGENCE</span><h3>운영게시판</h3><p>직원실적·레벨은 그대로 두고, 고객 QR 접수 내용만으로 위험도·주의도·반복·빈번시간·요일·처리우선순위를 상세 분석합니다.</p></div>
+            <div class="opx-board-head opx-board-head-max">
+              <div class="opx-board-title-area"><span class="opx-board-kicker">QR CUSTOMER OPERATION INTELLIGENCE</span><h3>운영게시판</h3><p>직원실적·레벨은 그대로 두고, 고객 QR 접수 내용만으로 위험도·주의도·반복·빈번시간·요일·처리우선순위를 상세 분석합니다.</p></div>
+              <div class="opx-board-header-stats" aria-label="고객 접수 현황">
+                <div class="opx-head-stat blue"><span class="opx-head-stat-icon">📥</span><div><small>접수</small><b>${customerReceived}<em>건</em></b></div></div>
+                <div class="opx-head-stat green"><span class="opx-head-stat-icon">✓</span><div><small>조치완료</small><b>${customerCompleted}<em>건</em></b></div></div>
+                <div class="opx-head-stat orange"><span class="opx-head-stat-icon">⚠</span><div><small>미조치</small><b>${customerPending}<em>건</em></b></div></div>
+                <div class="opx-head-stat status"><span class="opx-head-stat-icon">●</span><div><small>관리 점수</small><b>${qrManagementScore}<em>/100</em></b></div></div>
+              </div>
               <div class="opx-board-clock"><b>${year}.${month}.${String(selectedDate).slice(8,10)}</b><span>고객접수 기반 실시간 분석</span></div>
-            </div>
-
-            <div class="qrx-management-summary-v9">
-              <div class="qrx-mgmt-card blue"><div class="qrx-mgmt-label">접수</div><div class="qrx-mgmt-value">${customerReceived}<span>건</span></div><div class="qrx-mgmt-sub">선택기간 고객 QR 접수</div></div>
-              <div class="qrx-mgmt-card green"><div class="qrx-mgmt-label">조치완료</div><div class="qrx-mgmt-value">${customerCompleted}<span>건</span></div><div class="qrx-mgmt-sub">처리율 ${customerRate}%</div></div>
-              <div class="qrx-mgmt-card orange"><div class="qrx-mgmt-label">미조치</div><div class="qrx-mgmt-value">${customerPending}<span>건</span></div><div class="qrx-mgmt-sub">담당 미지정 ${unassignedRows.length}건</div></div>
-              <div class="qrx-mgmt-card status"><div class="qrx-mgmt-label">관리 점수</div><div class="qrx-mgmt-value">${qrManagementScore}<span>/100</span></div><div class="qrx-mgmt-status">${xEsc(qrOverall)}</div><div class="qrx-mgmt-sub">처리율 50% · 미조치 20% · 위험도 안정성 30%</div></div>
             </div>
 
             <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:14px">
