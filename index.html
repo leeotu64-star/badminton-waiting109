@@ -15720,6 +15720,16 @@ body {
 @media(max-width:650px){.jgb-lr-edit-grid{grid-template-columns:1fr}}
 </style>
 <style id="JGB_LR_V57_SEPARATE_HEADER">
+/* v58: 조명/릴선별 정상·조치필요·수리중 상태 아이콘을 헤더에 표시 */
+.jgb-lr-v54-status-row{display:flex;align-items:center;gap:3px;margin-top:3px;white-space:nowrap}
+.jgb-lr-v54-status-badge{display:inline-flex;align-items:center;gap:2px;padding:2px 4px;border-radius:5px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);line-height:1;color:#fff}
+.jgb-lr-v54-status-badge i{font-style:normal;font-size:8px}
+.jgb-lr-v54-status-badge b{font-size:10px;font-weight:950}
+.jgb-lr-v54-status-badge small{font-size:7px!important;font-weight:900;color:#fff!important;margin:0!important}
+.jgb-lr-v54-status-badge.normal{background:rgba(24,170,91,.72)}
+.jgb-lr-v54-status-badge.action{background:rgba(232,121,22,.78)}
+.jgb-lr-v54-status-badge.repair{background:rgba(217,54,54,.78)}
+
 /* v57: 헤더 상태 6개 통합 박스를 제거하고 조명/릴선 2개를 독립 표시 */
 .jgb-lr-v54-type-card{
   min-width:150px!important;height:62px!important;box-sizing:border-box!important;
@@ -15757,10 +15767,13 @@ body {
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span>정상 ${counts.정상} · 점검 ${counts.점검} · 조치필요 ${counts.조치필요} · 수리중 ${counts.수리중}</span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
   function markup(){
     const lightNormal=assets.filter(x=>x.light==='정상').length;
+    const lightAction=assets.filter(x=>x.light==='조치필요').length;
     const lightRepair=assets.filter(x=>x.light==='수리중').length;
     const reelNormal=assets.filter(x=>x.reel==='정상').length;
+    const reelAction=assets.filter(x=>x.reel==='조치필요').length;
     const reelRepair=assets.filter(x=>x.reel==='수리중').length;
-    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-states"><div class="jgb-lr-v54-type-card"><span class="jgb-lr-v54-type-icon">💡</span><div class="jgb-lr-v54-type-text"><b>조명 관리</b><strong>${assets.length}개</strong><small>정상 ${lightNormal} · 수리중 ${lightRepair}</small></div></div><div class="jgb-lr-v54-type-card"><span class="jgb-lr-v54-type-icon">🔌</span><div class="jgb-lr-v54-type-text"><b>릴선 관리</b><strong>${assets.length}개</strong><small>정상 ${reelNormal} · 수리중 ${reelRepair}</small></div></div></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`
+    const statusBadge=(label,count,cls,icon)=>`<span class="jgb-lr-v54-status-badge ${cls}"><i>${icon}</i><b>${count}</b><small>${label}</small></span>`;
+    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-states"><div class="jgb-lr-v54-type-card"><span class="jgb-lr-v54-type-icon">💡</span><div class="jgb-lr-v54-type-text"><b>조명 관리</b><strong>${assets.length}개</strong><div class="jgb-lr-v54-status-row">${statusBadge('정상',lightNormal,'normal','●')}${statusBadge('조치필요',lightAction,'action','⚠')}${statusBadge('수리중',lightRepair,'repair','🔧')}</div></div></div><div class="jgb-lr-v54-type-card"><span class="jgb-lr-v54-type-icon">🔌</span><div class="jgb-lr-v54-type-text"><b>릴선 관리</b><strong>${assets.length}개</strong><div class="jgb-lr-v54-status-row">${statusBadge('정상',reelNormal,'normal','●')}${statusBadge('조치필요',reelAction,'action','⚠')}${statusBadge('수리중',reelRepair,'repair','🔧')}</div></div></div></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`
   }
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
