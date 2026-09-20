@@ -4397,6 +4397,16 @@ a[data-page="digitalTwin"],
   text-shadow:0 1px 1px rgba(0,0,0,.30)!important;
 }
 </style>
+
+<style id="JGB_LR_V30_STATUS_MODEL_FIX">
+/* V30: 수리예정 상태를 이력카드에서도 노란색으로 명확히 표시 */
+.jgb-lr-v54-state-warn,
+.jgb-lr-state-warn{
+  color:#e0a500!important;
+  font-weight:1000!important;
+}
+/* V30: 모델·규격 표기 */
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -15897,9 +15907,9 @@ body {
     const st=isL?a.light:a.reel;
     const hist=isL?(a.lightHistory||[]):(a.reelHistory||[]);
     const photoKey=isL?'lightPhoto':'reelPhoto';
-    const equipment=a.equipment||name;
+    const equipment=isL?'코트 조명':'릴선';
     const location=a.location||`${n}번 위치`;
-    const model=a.model||(isL?'LED 코트 조명':'CSI-7 릴선');
+    const model=isL?'LED 조명':'릴선';
     return `<div class="jgb-lr-v54-detail jgb-lr-v54-rebuild">
       <section class="jgb-lr-v54-card">
         <div class="jgb-lr-rebuild-title">📋 ${name} 주요시설 이력카드 · ${code}</div>
@@ -15995,7 +16005,7 @@ body {
         <label>관리번호<input value="${n}" disabled></label>
         <label>설비종류<input id="jgbLREquipment" value="${esc(name)}"></label>
         <label>설치위치<input id="jgbLRLocation" value="${esc(a.location||`${n}번 위치`)}"></label>
-        <label>모델·규격<input id="jgbLRModel" value="${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}"></label>
+        <label>모델·규격<input id="jgbLRModel" value="${esc(isL?'LED 조명':'릴선')}"></label>
         <label>현재상태<select id="jgbLRStatus">${Object.keys(statusColors).map(st=>`<option ${a[isL?'light':'reel']===st?'selected':''}>${st}</option>`).join('')}</select></label>
       </div>
       <div class="row"><button type="button" onclick="document.getElementById('jgbLRCardEditModal').remove()">취소</button><button type="button" onclick="window.jgbLRCardSave(${n},'${type}')">저장</button></div>
@@ -16005,8 +16015,8 @@ body {
   window.jgbLRCardSave=function(n,type){
     const a=assets[n-1], isL=type==='light';
     a.location=document.getElementById('jgbLRLocation').value.trim()||`${n}번 위치`;
-    a.model=document.getElementById('jgbLRModel').value.trim()|| (isL?'LED 코트 조명':'CSI-7 릴선');
-    a.equipment=document.getElementById('jgbLREquipment').value.trim()|| (isL?'코트 조명':'릴선');
+    a.model=document.getElementById('jgbLRModel').value.trim()|| (isL?'LED 조명':'릴선');
+    a.equipment=isL?'코트 조명':'릴선';
     a[isL?'light':'reel']=document.getElementById('jgbLRStatus').value;
     persist();
     document.getElementById('jgbLRCardEditModal')?.remove();
