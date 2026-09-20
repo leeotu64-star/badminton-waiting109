@@ -15804,6 +15804,22 @@ body {
 @media(max-width:1050px){.jgb-lr-v54-head{align-items:flex-start!important}.jgb-lr-v54-brand{min-width:240px!important}.jgb-lr-v54-head-statuses{gap:5px!important}.jgb-lr-v54-head-status{min-width:48px!important}.jgb-lr-v54-status-group{padding:5px!important}}
 @media(max-width:800px){.jgb-lr-v54-head{flex-direction:column!important;align-items:stretch!important}.jgb-lr-v54-head-statuses{justify-content:flex-end!important;overflow-x:auto!important}.jgb-lr-v54-brand{min-width:0!important}}
 </style>
+<style id="JGB_LR_V58_HEADER_MAINT">
+.jgb-lr-v54-head-statuses{gap:8px!important}
+.jgb-lr-v54-status-group{padding:7px 8px!important;border:2px solid #7fa8c2!important;box-shadow:0 3px 9px rgba(15,55,80,.18)!important}
+.jgb-lr-v54-status-group .group-title{font-size:15px!important;font-weight:1000!important;letter-spacing:-.03em!important;text-shadow:0 1px 0 #fff,0 2px 2px rgba(0,50,70,.2)!important;margin-bottom:6px!important}
+.jgb-lr-v54-status-group .group-title span{font-size:22px!important}
+.jgb-lr-v54-status-group .group-items{gap:5px!important}
+.jgb-lr-v54-head-status{min-width:54px!important;height:49px!important;padding:4px 5px!important;border-width:2px!important;border-radius:8px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 2px 0 rgba(20,50,70,.16),0 4px 7px rgba(20,50,70,.13)!important}
+.jgb-lr-v54-head-status .status-icon{font-size:16px!important}
+.jgb-lr-v54-head-status .status-copy b{font-size:10px!important;font-weight:1000!important;line-height:1!important;text-shadow:0 1px 0 rgba(255,255,255,.8),0 2px 2px rgba(0,40,60,.16)!important}
+.jgb-lr-v54-head-status .status-copy strong{font-size:20px!important;font-weight:1000!important;line-height:1!important;margin-top:3px!important;text-shadow:0 1px 0 rgba(255,255,255,.8),0 2px 2px rgba(0,40,60,.16)!important}
+.jgb-lr-v54-head-status.self{background:#eef7ff!important;border-color:#6ca9d5!important;color:#075b91!important}
+.jgb-lr-v54-head-status.external{background:#f4efff!important;border-color:#a18be0!important;color:#5b3aa4!important}
+.jgb-lr-v54-brand h2{font-size:25px!important;font-weight:1000!important;text-shadow:0 2px 3px rgba(0,0,0,.3)!important}
+.jgb-lr-v54-brand p{font-size:12px!important;font-weight:900!important}
+@media(max-width:1200px){.jgb-lr-v54-head-status{min-width:49px!important}.jgb-lr-v54-status-group .group-title{font-size:13px!important}.jgb-lr-v54-status-group .group-title span{font-size:19px!important}}
+</style>
 <script id="jgb-lr-v54-script">
 (function(){
   const statusColors={정상:'#16a957',수리예정:'#e7ae00',수리중:'#ed3d45'};
@@ -15824,7 +15840,22 @@ body {
     const lc={정상:0,수리예정:0,수리중:0},rc={정상:0,수리예정:0,수리중:0};
     assets.forEach(x=>{if(lc[x.light]!==undefined)lc[x.light]++;if(rc[x.reel]!==undefined)rc[x.reel]++;});
     const statusBox=(icon,label,count,cls)=>`<div class="jgb-lr-v54-head-status ${cls}"><span class="status-icon">${icon}</span><span class="status-copy"><b>${label}</b><strong>${count}</strong></span></div>`;
-    const group=(icon,label,c)=>`<div class="jgb-lr-v54-status-group"><div class="group-title"><span>${icon}</span>${label}</div><div class="group-items">${statusBox('🟢','정상',c.정상,'normal')}${statusBox('🟡','수리예정',c.수리예정,'planned')}${statusBox('🔴','수리중',c.수리중,'repair')}</div></div>`;
+    const maintenanceHeaderCounts=(type)=>{
+      let external=0,self=0;
+      assets.forEach(a=>{
+        const hist=type==='light'?(a.lightHistory||[]):(a.reelHistory||[]);
+        hist.forEach(r=>{
+          const method=String(r?.[1]||'');
+          if(method.includes('외주')) external++;
+          if(method.includes('자체')) self++;
+        });
+      });
+      return {external,self};
+    };
+    const group=(icon,label,c,type)=>{
+      const m=maintenanceHeaderCounts(type);
+      return `<div class="jgb-lr-v54-status-group"><div class="group-title"><span>${icon}</span>${label}</div><div class="group-items">${statusBox('🟢','정상',c.정상,'normal')}${statusBox('🟡','수리예정',c.수리예정,'planned')}${statusBox('🔴','수리중',c.수리중,'repair')}${statusBox('🔧','자체정비',m.self,'self')}${statusBox('🛠️','외주정비',m.external,'external')}</div></div>`;
+    };
     const years=Array.from({length:10},(_,i)=>2026+i);
     const annualStats=(type,year)=>{
       let external=0,self=0,total=0,parts=0;
@@ -15848,7 +15879,7 @@ body {
       const s=annualStats(type,year);
       return `<div class="jgb-lr-v54-annual-card"><div class="jgb-lr-v54-annual-head"><strong>${type==='light'?'💡 조명 유지관리 실적':'🔌 릴선 유지관리 실적'}</strong><div class="jgb-lr-v54-year-control"><span>연도 선택</span><button type="button" onclick="window.jgbLRAnnualYear('${type}',-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="window.jgbLRAnnualYear('${type}',1)" aria-label="다음 연도">›</button></div></div><table><thead><tr><th>연도</th><th>자체정비 건수</th><th>외주정비 건수</th><th>부품 교체 건수</th></tr></thead><tbody><tr><th>${year}년</th><td>${s.self}건</td><td>${s.external}건</td><td>${s.parts}건</td></tr></tbody></table><p class="jgb-lr-v54-annual-note">※ 선택한 연도의 실적만 표시됩니다.</p></div>`;
     };
-    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc)}${group('🔌','릴선',rc)}</div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
+    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc,'light')}${group('🔌','릴선',rc,'reel')}</div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
   }
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
