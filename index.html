@@ -6116,7 +6116,7 @@ a[data-page="digitalTwin"],
                 <div class="qrx-v8-panel"><div class="qrx-alertbox"><div><strong>${qrUrgent}</strong><small>긴급 접수 · 즉시 확인 권장</small></div></div></div>
               </div>
 
-              <div class="qrx-v8-grid-3">
+              <div class="qrx-v8-grid">
                 ${(()=>{
                   const nowD=new Date(); const dayKey=d=>{const z=new Date(d);return Number.isFinite(z.getTime())?`${z.getFullYear()}-${String(z.getMonth()+1).padStart(2,'0')}-${String(z.getDate()).padStart(2,'0')}`:''};
                   const todayKey=dayKey(nowD), todayRows=qrRiskRows.filter(r=>dayKey(r.x?.createdAt)===todayKey);
@@ -6139,10 +6139,6 @@ a[data-page="digitalTwin"],
                     <div class="qrx-change-item" style="background:#eff6ff;border-color:#bfdbfe"><div class="qrx-change-icon" style="background:#2563eb">!</div><div class="qrx-change-copy"><b>갑작스러운 변화</b><span>${suddenPlace?`${xEsc(suddenPlace.place)} ${suddenPlace.old||0}건 → ${suddenPlace.cur}건`:'뚜렷한 급변 없음'}</span></div><strong style="color:#1d4ed8">${suddenPlace?'점검':'정상'}</strong></div>
                   </div><div class="qrx-change-reco"><small>💡 관리자 추천</small><b>${recommendation?'오늘 확인할 곳 : '+xEsc(recommendation):'오늘은 특별한 변화가 없습니다'}</b><span>${recommendationText}</span></div><div class="qrx-change-foot">최근 7일 데이터를 기준으로 평소와 다른 변화만 표시합니다.</div></div></div>`;
                 })()}
-
-                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📍 반복·집중 장소 TOP 5</b><span>관리 가능성</span></div><div class="qrx-v8-body"><div class="qrx-place-list">
-                  ${qrPlaceInsights.slice(0,5).map((o,i)=>{const m=o.managementScore;const state=m>=80?'관리 양호':m>=60?'관리 주의':'집중 관리';return `<div class="qrx-place"><span class="qrx-rank">${i+1}</span><div><b>${xEsc(o.place)}</b><small>${o.total}건 · ${xEsc(o.topIssue)} · 미조치 ${o.pending} · 반복 ${Math.max(0,o.total-1)}</small></div><div class="qrx-score">${m}<small>${state}</small></div></div>`}).join('')||'<div style="padding:12px;color:#64748b">장소별 데이터 없음</div>'}
-                </div></div></div>
 
                 <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>⏰ 시간대별 접수</b><span>발생 밀도</span></div><div class="qrx-v8-body"><div class="qrx-bars">
                   ${qrHourBandStats.map(o=>`<div class="qrx-barrow"><b>${o.label}</b><div class="qrx-track"><i class="qrx-fill" style="width:${Math.max(o.n?8:0,Math.round(o.n/qrHourMax*100))}%"></i></div><strong>${o.n}</strong></div>`).join('')}
@@ -18424,6 +18420,18 @@ document.addEventListener('click',handle,true);
   .jgb-dashboard-mode.ops .qrx-v8-grid{
     grid-template-columns:1fr!important;
   }
+}
+</style>
+
+<style id="OPSBOARD_TOP5_DELETE_V38">
+/* V38: 반복·집중 장소 TOP 5 삭제 후 하단 분석 2분할 */
+.jgb-dashboard-mode.ops .qrx-v8-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:12px!important;
+  width:100%!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
 }
 </style>
 </body>
