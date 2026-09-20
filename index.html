@@ -15762,8 +15762,8 @@ body {
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   function ordered(){return Array.from({length:36},(_,i)=>i+1);}
   function cell(n,type){const a=assets[n-1],st=type==='light'?a.light:a.reel,sel=type==='light'?selectedLight===n:selectedReel===n;return `<button type="button" class="jgb-lr-v54-cell ${statusClass[st]} ${sel?'sel':''}" onclick="window.jgbLRSelect(${n},'${type}')" title="${n}번 ${type==='light'?'조명':'릴선'}">${n}</button>`}
-  function historyRows(hist){return hist.length?hist.map(r=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=r[4]||'';return `<tr><td>${esc(date)}</td><td>${esc(method)}</td><td class="history-status ${status==='정상'?'normal':status==='수리예정'?'planned':status==='수리중'?'repair':''}">${esc(status)}</td><td class="history-content">${esc(text)}</td><td>${esc(manager)}</td></tr>`}).join(''):`<tr><td colspan="5" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
-  function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>처리상태</th><th>정비내용 및 조치결과</th><th>담당자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
+  function historyRows(hist){return hist.length?hist.map(r=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=r[4]||'',completion=r[5]||'';return `<tr><td>${esc(date)}</td><td>${esc(method)}</td><td class="history-status ${status==='정상'?'normal':status==='수리예정'?'planned':status==='수리중'?'repair':''}">${esc(status)}</td><td>${esc(completion)}</td><td class="history-content">${esc(text)}</td><td>${esc(manager)}</td></tr>`}).join(''):`<tr><td colspan="6" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
+  function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>처리상태</th><th>완료예정일</th><th>정비내용 및 조치결과</th><th>담당자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span class="jgb-lr-state-summary"><b class="ok">● 정상 ${counts.정상}</b><b class="planned">● 수리예정 ${counts.수리예정}</b><b class="repair">● 수리중 ${counts.수리중}</b></span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
   function markup(){
     const lc={정상:0,수리예정:0,수리중:0},rc={정상:0,수리예정:0,수리중:0};
@@ -15807,7 +15807,7 @@ body {
     const file=input.files&&input.files[0]; if(!file)return;
     const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;persist();window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
-  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>관리구분<select id="jgbLRMethod"><option>자체정비</option><option>외주정비</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><textarea id="jgbLRText" placeholder="정비내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체정비';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value=current==='정상'?'수리예정':current;}
+  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>관리구분<select id="jgbLRMethod"><option>자체정비</option><option>외주정비</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="정비내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체정비';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value=current==='정상'?'수리예정':current;}
   window.jgbLRSave=function(){
     const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim();
     if(!text)return;
@@ -15816,7 +15816,7 @@ body {
     const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     const picked=document.getElementById('jgbLRDate')?.value||today;
     const y=Number(String(picked).slice(0,4));
-    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const nextStatus=document.getElementById('jgbLRStatusReg')?.value||'수리예정'; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager,nextStatus];
+    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const nextStatus=document.getElementById('jgbLRStatusReg')?.value||'수리예정'; const completion=document.getElementById('jgbLRCompletionDate')?.value||''; const cy=Number(String(completion).slice(0,4)); const validCompletion=(cy>=2026&&cy<=2035)?completion:''; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager,nextStatus,validCompletion];
     /* 등록한 이력을 반드시 현재 선택 자산의 조명/릴선 이력카드와 상태에 동시에 반영 */
     if(type==='light'){assets[n-1].lightHistory=Array.isArray(assets[n-1].lightHistory)?assets[n-1].lightHistory:[];assets[n-1].lightHistory.unshift(row);assets[n-1].light=nextStatus;}else{assets[n-1].reelHistory=Array.isArray(assets[n-1].reelHistory)?assets[n-1].reelHistory:[];assets[n-1].reelHistory.unshift(row);assets[n-1].reel=nextStatus;}
     persist();m.classList.remove('open');window.jgbLRSelect(n,type);
@@ -16847,6 +16847,17 @@ document.addEventListener('click',handle,true);
 .jgb-lr-v54-history td.history-status.normal{color:#16a765!important;font-weight:900!important}
 .jgb-lr-v54-history td.history-status.planned{color:#d49c00!important;font-weight:900!important}
 .jgb-lr-v54-history td.history-status.repair{color:#e12635!important;font-weight:900!important}
+</style>
+<style id="jgb-lr-v16-completion-css">
+.jgb-lr-v54-history table{width:max-content!important;min-width:860px!important;table-layout:fixed!important}
+.jgb-lr-v54-history th,.jgb-lr-v54-history td{box-sizing:border-box!important;text-align:center!important;vertical-align:middle!important}
+.jgb-lr-v54-history th:nth-child(1),.jgb-lr-v54-history td:nth-child(1){width:120px!important;min-width:120px!important}
+.jgb-lr-v54-history th:nth-child(2),.jgb-lr-v54-history td:nth-child(2){width:105px!important;min-width:105px!important}
+.jgb-lr-v54-history th:nth-child(3),.jgb-lr-v54-history td:nth-child(3){width:105px!important;min-width:105px!important}
+.jgb-lr-v54-history th:nth-child(4),.jgb-lr-v54-history td:nth-child(4){width:120px!important;min-width:120px!important}
+.jgb-lr-v54-history th:nth-child(5),.jgb-lr-v54-history td:nth-child(5){width:285px!important;min-width:285px!important}
+.jgb-lr-v54-history th:nth-child(6),.jgb-lr-v54-history td:nth-child(6){width:100px!important;min-width:100px!important}
+.jgb-lr-v54-history td.history-content{text-align:left!important;white-space:normal!important;word-break:keep-all!important;line-height:1.35!important}
 </style>
 </body>
 
@@ -20485,4 +20496,111 @@ cleanupDuplicateOnly();
 .jgb-lr-v54-cell.sel.normal{border:3px solid #18a957!important;box-shadow:inset 0 0 0 1px #fff,0 0 0 1px rgba(24,169,87,.18)!important;background:#edfff5!important}
 .jgb-lr-v54-cell.sel.warn{border:3px solid #e0ad00!important;box-shadow:inset 0 0 0 1px #fff,0 0 0 1px rgba(224,173,0,.18)!important;background:#fff7dc!important}
 .jgb-lr-v54-cell.sel.repair{border:3px solid #ed3d45!important;box-shadow:inset 0 0 0 1px #fff,0 0 0 1px rgba(237,61,69,.18)!important;background:#ffe8eb!important}
+</style>
+
+<!-- V17 FINAL: 조명·릴선 요청사항 최종 적용 -->
+<style id="JGB_LR_V17_FINAL">
+/* 헤더: 조명 / 릴선 2개 그룹만 크게 표시 */
+.jgb-lr-v54-head-statuses{
+  display:flex!important;align-items:center!important;gap:10px!important;
+  flex:0 0 auto!important;
+}
+.jgb-lr-v54-status-group{
+  min-width:205px!important;padding:7px 8px!important;
+  border:1px solid rgba(255,255,255,.65)!important;border-radius:9px!important;
+  background:rgba(255,255,255,.10)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 3px 8px rgba(0,0,0,.16)!important;
+}
+.jgb-lr-v54-status-group .group-title{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  gap:7px!important;margin-bottom:5px!important;
+  color:#fff!important;font-size:15px!important;font-weight:950!important;
+}
+.jgb-lr-v54-status-group .group-title span{
+  font-size:24px!important;line-height:1!important;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))!important;
+}
+.jgb-lr-v54-status-group .group-items{
+  display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:5px!important;
+}
+.jgb-lr-v54-head-status{
+  min-width:0!important;width:100%!important;height:48px!important;
+  padding:4px 5px!important;border-radius:7px!important;
+  gap:5px!important;box-sizing:border-box!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 2px 4px rgba(0,0,0,.12)!important;
+}
+.jgb-lr-v54-head-status .status-icon{font-size:19px!important;line-height:1!important}
+.jgb-lr-v54-head-status .status-copy b{font-size:10px!important;font-weight:950!important}
+.jgb-lr-v54-head-status .status-copy strong{font-size:19px!important;font-weight:1000!important}
+
+/* 배치도 상태: 정상은 초록 테두리, 수리예정/수리중은 전체 색 + 흰 숫자 */
+.jgb-lr-v54-cell.normal{
+  background:#f7fff9!important;border:2px solid #18a957!important;color:#173c58!important;
+}
+.jgb-lr-v54-cell.warn{
+  background:linear-gradient(145deg,#f4c62f,#dda600)!important;
+  border:2px solid #b98200!important;color:#fff!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.35)!important;
+}
+.jgb-lr-v54-cell.repair{
+  background:linear-gradient(145deg,#f0525c,#d82f3c)!important;
+  border:2px solid #a91d28!important;color:#fff!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.35)!important;
+}
+.jgb-lr-v54-cell.normal:hover{background:#edfff5!important;border-color:#0c9148!important}
+.jgb-lr-v54-cell.warn:hover{background:linear-gradient(145deg,#f8cf45,#e0a900)!important;border-color:#a97800!important}
+.jgb-lr-v54-cell.repair:hover{background:linear-gradient(145deg,#f45c66,#d52d38)!important;border-color:#991e28!important}
+.jgb-lr-v54-cell.sel.normal{border:3px solid #18a957!important;background:#edfff5!important;color:#173c58!important}
+.jgb-lr-v54-cell.sel.warn{border:3px solid #b98200!important;background:linear-gradient(145deg,#f4c62f,#dda600)!important;color:#fff!important}
+.jgb-lr-v54-cell.sel.repair{border:3px solid #a91d28!important;background:linear-gradient(145deg,#f0525c,#d82f3c)!important;color:#fff!important}
+
+/* 유지관리 이력: 6개 항목을 한 화면에 정확히 정렬 */
+.jgb-lr-v54-historyscroll{
+  width:100%!important;min-width:0!important;height:260px!important;max-height:260px!important;
+  overflow-x:hidden!important;overflow-y:auto!important;box-sizing:border-box!important;
+}
+.jgb-lr-v54-history table{
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  table-layout:fixed!important;border-collapse:collapse!important;
+}
+.jgb-lr-v54-history th,.jgb-lr-v54-history td{
+  box-sizing:border-box!important;min-width:0!important;max-width:none!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  text-align:center!important;vertical-align:middle!important;
+  padding:7px 4px!important;font-size:11px!important;
+}
+.jgb-lr-v54-history th:nth-child(1),.jgb-lr-v54-history td:nth-child(1){width:17%!important}
+.jgb-lr-v54-history th:nth-child(2),.jgb-lr-v54-history td:nth-child(2){width:15%!important}
+.jgb-lr-v54-history th:nth-child(3),.jgb-lr-v54-history td:nth-child(3){width:15%!important}
+.jgb-lr-v54-history th:nth-child(4),.jgb-lr-v54-history td:nth-child(4){width:17%!important}
+.jgb-lr-v54-history th:nth-child(5),.jgb-lr-v54-history td:nth-child(5){width:22%!important}
+.jgb-lr-v54-history th:nth-child(6),.jgb-lr-v54-history td:nth-child(6){width:14%!important}
+.jgb-lr-v54-history td.history-content{
+  text-align:left!important;white-space:nowrap!important;overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.jgb-lr-v54-history td.history-status.normal{color:#16a957!important;font-weight:950!important}
+.jgb-lr-v54-history td.history-status.planned{color:#d49b00!important;font-weight:950!important}
+.jgb-lr-v54-history td.history-status.repair{color:#e12635!important;font-weight:950!important}
+
+/* 등록창: 담당자 / 관리구분 / 처리상태 / 완료예정일을 명확하게 표시 */
+.jgb-lr-maint-dialog{
+  width:min(560px,94vw)!important;box-sizing:border-box!important;
+}
+.jgb-lr-maint-dialog label{
+  display:flex!important;flex-direction:column!important;gap:5px!important;
+  margin:0 0 10px!important;font-size:13px!important;font-weight:900!important;
+  color:#17384e!important;
+}
+.jgb-lr-maint-dialog input,.jgb-lr-maint-dialog select{
+  width:100%!important;box-sizing:border-box!important;height:38px!important;
+  padding:7px 10px!important;border:1px solid #b9cddd!important;border-radius:6px!important;
+  background:#fff!important;color:#17384e!important;font-size:13px!important;font-weight:650!important;
+}
+.jgb-lr-maint-dialog textarea{
+  width:100%!important;box-sizing:border-box!important;min-height:105px!important;
+  padding:9px 10px!important;border:1px solid #b9cddd!important;border-radius:6px!important;
+  font-size:13px!important;resize:vertical!important;
+}
+.jgb-lr-maint-dialog .jgb-lr-date-label{margin-bottom:10px!important}
 </style>
