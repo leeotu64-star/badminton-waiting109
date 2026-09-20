@@ -5961,14 +5961,14 @@ a[data-page="digitalTwin"],
               <table class="opx-staff-matrix opx-mixed-staff-table">
                 <thead>
                   <tr>
-                    <th rowspan="2">직원명</th>
-                    <th colspan="12">직원별 월별 누계 실적</th>
-                    <th rowspan="2">연간 누계</th>
-                    <th colspan="5" class="detail-group-head">${month}월 세부 실적</th>
-                  </tr>
-                  <tr>
+                    <th class="staff-head">직원명</th>
                     ${Array.from({length:12},(_,i)=>`<th class="${i+1===month?'current':''}">${i+1}월</th>`).join('')}
-                    <th>정규업무</th><th>근무편성 인정</th><th>업무지시</th><th>종합실적</th><th>달성률</th>
+                    <th class="annual-head">연간 누계</th>
+                    <th class="detail-head detail-blue-head">정규업무</th>
+                    <th class="detail-head detail-green-head">근무편성 인정</th>
+                    <th class="detail-head detail-orange-head">업무지시</th>
+                    <th class="detail-head detail-total-head">종합실적</th>
+                    <th class="detail-head detail-rate-head">달성률</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -6035,14 +6035,31 @@ a[data-page="digitalTwin"],
 
             <style>
               .opx-mixed-staff-panel{overflow:hidden}
-              .opx-mixed-table-wrap{overflow-x:auto}
-              .opx-mixed-staff-table{min-width:1500px}
-              .opx-mixed-staff-table th,.opx-mixed-staff-table td{white-space:nowrap}
-              .opx-mixed-staff-table .detail-group-head{background:#eef4fb;border-left:2px solid #d6e2f0}
+              .opx-mixed-table-wrap{width:100%;overflow:hidden}
+              .opx-mixed-staff-table{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse}
+              .opx-mixed-staff-table th,.opx-mixed-staff-table td{white-space:nowrap;overflow:hidden;text-overflow:clip;text-align:center;box-sizing:border-box}
+              .opx-mixed-staff-table th{font-size:12px;padding:8px 3px;line-height:1.15}
+              .opx-mixed-staff-table td{font-size:13px;padding:9px 3px}
+              .opx-mixed-staff-table th:first-child,.opx-mixed-staff-table td:first-child{width:7.5%}
+              .opx-mixed-staff-table th:nth-child(n+2):nth-child(-n+13),.opx-mixed-staff-table td:nth-child(n+2):nth-child(-n+13){width:4.55%}
+              .opx-mixed-staff-table th:nth-child(14),.opx-mixed-staff-table td:nth-child(14){width:7.5%;background:#f5f0ff}
+              .opx-mixed-staff-table th:nth-child(n+15),.opx-mixed-staff-table td:nth-child(n+15){width:7.5%}
+              .opx-mixed-staff-table .detail-head{background:#eef4fb;font-weight:800;border-left:1px solid #d6e2f0}
               .opx-mixed-staff-table .detail-blue,.opx-mixed-staff-table .detail-green,.opx-mixed-staff-table .detail-orange,.opx-mixed-staff-table .detail-total,.opx-mixed-staff-table .detail-rate{font-weight:700;text-align:center}
               .opx-mixed-staff-table .detail-blue{border-left:2px solid #d6e2f0}
               .opx-mixed-staff-table .staff-name-cell{font-weight:700}
-              .opx-mixed-staff-table small{font-size:11px;font-weight:500}
+              .opx-mixed-staff-table small{font-size:9px;font-weight:500}
+              @media(max-width:1100px){
+                .opx-mixed-staff-table th{font-size:11px;padding:7px 2px}
+                .opx-mixed-staff-table td{font-size:12px;padding:8px 2px}
+                .opx-mixed-staff-table th:nth-child(n+15),.opx-mixed-staff-table td:nth-child(n+15){width:7.2%}
+              }
+              @media(max-width:760px){
+                .opx-mixed-staff-table{font-size:10px}
+                .opx-mixed-staff-table th{font-size:9px}
+                .opx-mixed-staff-table td{font-size:10px}
+                .opx-mixed-staff-table small{font-size:7px}
+              }
               .opx-rule-panel-merged{margin-top:12px}
               .opx-rule-panel-merged .opx-rule{grid-template-columns:repeat(4,minmax(0,1fr))}
               @media(max-width:1100px){.opx-rule-panel-merged .opx-rule{grid-template-columns:repeat(2,minmax(0,1fr))}}
