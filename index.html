@@ -21939,70 +21939,56 @@ cleanupDuplicateOnly();
 </style>
 
 
-<style id="JGB_LR_INDEPENDENT_PARENTS_V18">
-/* V18
-   이력카드와 유지관리 이력은 서로 크기를 따라가지 않는다.
-   기존 기능/디자인은 유지하고, 각 영역의 크기만 독립적으로 계산한다.
-*/
+<style id="JGB_LR_CLEAN_50_50_V19">
+/* V19: 기능·디자인 유지 / 내부 폭만 50:50 / 유지관리 슬라이더 제거 */
 
-/* 두 영역은 같은 행에 두되 서로의 높이를 강제로 공유하지 않음 */
+/* 이력카드와 유지관리 이력은 각각 독립적으로 50:50 */
 .jgb-lr-v54-detail{
   display:grid!important;
-  grid-template-columns:minmax(0,60fr) minmax(0,40fr)!important;
-  align-items:start!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
   gap:0!important;
-  min-height:260px!important;
-  height:auto!important;
-  overflow:visible!important;
-}
-
-/* 이력카드 부모 — 독립 */
-.jgb-lr-v54-card{
   width:100%!important;
   min-width:0!important;
-  max-width:none!important;
   height:auto!important;
-  min-height:260px!important;
-  max-height:none!important;
-  align-self:start!important;
-  box-sizing:border-box!important;
-  overflow:auto!important;
+  align-items:start!important;
 }
 
-/* 유지관리 이력 부모 — 독립 */
+/* 두 부모는 서로 높이를 강제로 따라가지 않음 */
+.jgb-lr-v54-card,
 .jgb-lr-v54-history{
   width:100%!important;
   min-width:0!important;
   max-width:none!important;
   height:auto!important;
-  min-height:260px!important;
-  max-height:none!important;
   align-self:start!important;
   box-sizing:border-box!important;
-  overflow:hidden!important;
 }
 
-/* 두 헤더는 각자 자기 부모 폭만 사용 */
-.jgb-lr-v54-cardtitle,
-.jgb-lr-v54-historyhead{
-  width:100%!important;
-  box-sizing:border-box!important;
-}
-
-/* 유지관리 이력 스크롤은 유지관리 부모 안에서만 독립 */
+/* 유지관리 이력 가로 슬라이더 제거 */
 .jgb-lr-v54-historyscroll{
   width:100%!important;
   min-width:0!important;
-  height:260px!important;
-  max-height:260px!important;
-  box-sizing:border-box!important;
-  overflow-x:auto!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
   overflow-y:auto!important;
+  scrollbar-width:none!important;
+}
+.jgb-lr-v54-historyscroll::-webkit-scrollbar{
+  display:none!important;
 }
 
-/* 좌우 설비 패널도 서로 높이를 따라가지 않음 */
-.jgb-lr-v54-pane{
-  align-items:start!important;
-  height:auto!important;
+/* 유지관리 표는 부모 폭 안에 맞춤 */
+.jgb-lr-v54-historyscroll table{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  table-layout:fixed!important;
+}
+.jgb-lr-v54-historyscroll th,
+.jgb-lr-v54-historyscroll td{
+  box-sizing:border-box!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
 }
 </style>
