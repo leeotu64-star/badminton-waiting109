@@ -4611,7 +4611,8 @@ a[data-page="digitalTwin"],
     const workers=[
      {id:"w1",name:"김",shift:"새벽조",start:"06:00",end:"15:00"},
      {id:"w2",name:"안",shift:"오전조",start:"09:00",end:"18:00"},
-     {id:"w3",name:"한",shift:"오후조",start:"13:30",end:"22:20"}
+     {id:"w3",name:"한",shift:"오후조",start:"13:30",end:"22:20"},
+     {id:"w4",name:"이",shift:"지원조",start:"09:00",end:"18:00"}
     ];
     const tasks=["화장실 점검","샤워실 점검","코트 주변 점검","탈의실 점검","복도·계단 점검","출입구 점검","시설물 상태 확인","조명 상태 확인","청소 상태 확인","안전 위험요소 확인"];
     const BASIC_TASK_VERSION="v3";
@@ -5388,25 +5389,51 @@ a[data-page="digitalTwin"],
             <div class="opx-kpi violet"><span>종합 업무실적</span><strong>${sum.total}<small>건</small></strong><div class="opx-track"><i style="width:${rate}%"></i></div><em>세 가지 실적 자동 합산</em></div>
           </section>
 
-          <section class="opx-panel opx-main-matrix">
-            <div class="opx-head"><div><h3>직원별 월별 누계 실적</h3><p>${year}년 1월부터 현재 선택월까지 직원별 종합실적을 한눈에 확인합니다. 노란색은 선택월, 보라색은 연간 누계입니다.</p></div><span class="opx-chip">${workers.length}명 · 12개월</span></div>
-            <div class="opx-staff-matrix-wrap"><table class="opx-staff-matrix"><thead><tr><th>직원명</th>${Array.from({length:12},(_,i)=>`<th class="${i+1===month?'current':''}">${i+1}월</th>`).join('')}<th>연간 누계</th></tr></thead><tbody>${staffMonthlyMatrix}</tbody></table></div>
-            <div class="opx-staff-matrix-note"><span>※ 각 월 숫자는 1월부터 해당 월까지 누적된 <b>종합실적</b>입니다.</span><span>선택월: <b>${month}월</b></span></div>
+          <section class="opx-panel opx-main-matrix opx-mixed-staff-panel">
+            <div class="opx-head"><div><h3>직원별 월별 누계 · 선택월 세부 실적</h3><p>${year}년 1월부터 선택월까지의 누계실적과 ${month}월 직원별 세부 실적을 한 화면에서 통합 확인합니다.</p></div><span class="opx-chip">${workers.length}명 · 통합</span></div>
+            <div class="opx-staff-matrix-wrap opx-mixed-table-wrap">
+              <table class="opx-staff-matrix opx-mixed-staff-table">
+                <thead>
+                  <tr>
+                    <th rowspan="2">직원명</th>
+                    <th colspan="12">직원별 월별 누계 실적</th>
+                    <th rowspan="2">연간 누계</th>
+                    <th colspan="5" class="detail-group-head">${month}월 세부 실적</th>
+                  </tr>
+                  <tr>
+                    ${Array.from({length:12},(_,i)=>`<th class="${i+1===month?'current':''}">${i+1}월</th>`).join('')}
+                    <th>정규업무</th><th>근무편성 인정</th><th>업무지시</th><th>종합실적</th><th>달성률</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${workers.map(w=>{
+                    let cumulative=0;
+                    const monthCells=Array.from({length:12},(_,i)=>{
+                      const mo=year+'-'+String(i+1).padStart(2,'0');
+                      const p=dashboardStaffMonth(w.id,mo);
+                      const v=Number(p.total||0);
+                      cumulative+=v;
+                      const cls=(i+1===month?' current':'')+(cumulative?' has':' zero');
+                      return `<td class="month-cell${cls}">${cumulative}<span class="unit">건</span></td>`;
+                    }).join('');
+                    const p=dashboardStaffMonth(w.id,year+'-'+String(month).padStart(2,'0'));
+                    const target=Number(p.basicTarget||10);
+                    const rr=target?Math.min(100,Math.round(Number(p.basic||0)/target*100)):0;
+                    return `<tr><td class="staff-name-cell">${xEsc(w.name)}</td>${monthCells}<td class="cum">${cumulative}<span class="unit">건</span></td><td class="detail-blue">${Number(p.basic||0)}</td><td class="detail-green">${Number(p.auto||0)}<small> (${Number(p.autoUnits||0)}회)</small></td><td class="detail-orange">${Number(p.issueDone||0)}</td><td class="detail-total">${Number(p.total||0)}</td><td class="detail-rate">${rr}%</td></tr>`;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+            <div class="opx-staff-matrix-note"><span>※ 월별 숫자는 1월부터 해당 월까지 누적된 <b>종합실적</b>입니다. 오른쪽은 선택월의 세부 실적입니다.</span><span>선택월: <b>${month}월</b></span></div>
           </section>
 
-          <section class="opx-secondary-grid">
-            <div class="opx-panel">
-              <div class="opx-head"><div><h3>선택월 직원별 세부 실적</h3><p>${year}년 ${month}월 · 정규업무·근무편성 인정·업무지시·종합실적</p></div><span class="opx-chip">${workers.length}명</span></div>
-              <div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성 인정</th><th>업무지시</th><th>종합실적</th><th>달성률</th></tr></thead><tbody>${tableRows}</tbody></table></div>
-            </div>
-            <div class="opx-panel">
-              <div class="opx-rule-title"><b>📘 실적 산정 기준</b><span>관리자 안내서</span></div>
-              <div class="opx-rule">
-                <div class="opx-rule-box blue"><b>① 정규업무 실적</b><strong>기본업무 10개 완료 = 1실적</strong><span>실제 근무일에 수행하는 기본업무를 기준으로 합니다. 기존 기본업무 산정방식은 변경하지 않습니다.</span></div>
-                <div class="opx-rule-box green"><b>② 근무편성 인정실적</b><strong>쉬는 날 10회 = 1실적</strong><span>휴무·주휴일·연가·공가·대휴 등 근무편성상 인정되는 일수를 자동 집계합니다.</span></div>
-                <div class="opx-rule-box orange"><b>③ 업무지시 수행실적</b><strong>업무지시 건별 반영</strong><span>근무일·휴무일 여부와 관계없이 실제 지시사항을 수행한 직원에게 건별 반영합니다.</span></div>
-                <div class="opx-rule-box purple"><b>④ 종합 업무실적</b><strong>정규업무 + 근무편성 인정 + 업무지시</strong><span>서로 다른 세 가지 실적을 분리 관리한 뒤 최종 합계에서만 합산합니다.</span></div>
-              </div>
+          <section class="opx-panel opx-rule-panel-merged">
+            <div class="opx-rule-title"><b>📘 실적 산정 기준</b><span>관리자 안내서</span></div>
+            <div class="opx-rule">
+              <div class="opx-rule-box blue"><b>① 정규업무 실적</b><strong>기본업무 10개 완료 = 1실적</strong><span>실제 근무일에 수행하는 기본업무를 기준으로 합니다. 기존 기본업무 산정방식은 변경하지 않습니다.</span></div>
+              <div class="opx-rule-box green"><b>② 근무편성 인정실적</b><strong>쉬는 날 10회 = 1실적</strong><span>휴무·주휴일·연가·공가·대휴 등 근무편성상 인정되는 일수를 자동 집계합니다.</span></div>
+              <div class="opx-rule-box orange"><b>③ 업무지시 수행실적</b><strong>업무지시 건별 반영</strong><span>근무일·휴무일 여부와 관계없이 실제 지시사항을 수행한 직원에게 건별 반영합니다.</span></div>
+              <div class="opx-rule-box purple"><b>④ 종합 업무실적</b><strong>정규업무 + 근무편성 인정 + 업무지시</strong><span>서로 다른 세 가지 실적을 분리 관리한 뒤 최종 합계에서만 합산합니다.</span></div>
             </div>
           </section>
           <section class="opx-board opx-board-v7">
@@ -5442,6 +5469,18 @@ a[data-page="digitalTwin"],
             </div>
 
             <style>
+              .opx-mixed-staff-panel{overflow:hidden}
+              .opx-mixed-table-wrap{overflow-x:auto}
+              .opx-mixed-staff-table{min-width:1500px}
+              .opx-mixed-staff-table th,.opx-mixed-staff-table td{white-space:nowrap}
+              .opx-mixed-staff-table .detail-group-head{background:#eef4fb;border-left:2px solid #d6e2f0}
+              .opx-mixed-staff-table .detail-blue,.opx-mixed-staff-table .detail-green,.opx-mixed-staff-table .detail-orange,.opx-mixed-staff-table .detail-total,.opx-mixed-staff-table .detail-rate{font-weight:700;text-align:center}
+              .opx-mixed-staff-table .detail-blue{border-left:2px solid #d6e2f0}
+              .opx-mixed-staff-table .staff-name-cell{font-weight:700}
+              .opx-mixed-staff-table small{font-size:11px;font-weight:500}
+              .opx-rule-panel-merged{margin-top:12px}
+              .opx-rule-panel-merged .opx-rule{grid-template-columns:repeat(4,minmax(0,1fr))}
+              @media(max-width:1100px){.opx-rule-panel-merged .opx-rule{grid-template-columns:repeat(2,minmax(0,1fr))}}
               .qrx-management-summary-v9{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
               .qrx-mgmt-card{min-height:126px;padding:18px 20px;border:1px solid #dbe4ee;border-radius:16px;background:#fff;box-sizing:border-box;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(15,23,42,.05)}
               .qrx-mgmt-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#2563eb}.qrx-mgmt-card.green:before{background:#16a34a}.qrx-mgmt-card.orange:before{background:#f59e0b}.qrx-mgmt-card.status:before{background:#16a34a}
@@ -22516,5 +22555,112 @@ cleanupDuplicateOnly();
 .employee-section .opx-annual-panel .opx-table td{
   padding-top:6px!important;
   padding-bottom:6px!important;
+}
+</style>
+
+<style id="EMPLOYEE_V30_MERGED_TABLE_WIDTH_FONT">
+/* V30: 직원별 월별 누계 + 선택월 세부 실적 통합표의 가로폭 축소 및 가독성 확대
+   기존 기능/데이터/연동/버튼/계산 로직은 변경하지 않음. */
+.employee-section .opx-mixed-table-wrap{
+  overflow-x:hidden!important;
+  width:100%!important;
+}
+.employee-section .opx-mixed-staff-table{
+  width:100%!important;
+  min-width:0!important;
+  table-layout:fixed!important;
+}
+.employee-section .opx-mixed-staff-table th,
+.employee-section .opx-mixed-staff-table td{
+  padding:7px 3px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+  vertical-align:middle!important;
+}
+.employee-section .opx-mixed-staff-table thead th{
+  font-size:15px!important;
+  font-weight:1000!important;
+  line-height:1.15!important;
+  height:42px!important;
+}
+.employee-section .opx-mixed-staff-table tbody td{
+  font-size:17px!important;
+  font-weight:950!important;
+  height:46px!important;
+  line-height:1.1!important;
+}
+.employee-section .opx-mixed-staff-table .staff-name-cell{
+  width:68px!important;
+  font-size:19px!important;
+  font-weight:1000!important;
+  text-align:center!important;
+  padding-left:2px!important;
+  padding-right:2px!important;
+}
+/* 12개월 칸을 균등하고 좁게 */
+.employee-section .opx-mixed-staff-table thead tr:nth-child(2) th:not(.detail-group-head){
+  width:54px!important;
+}
+.employee-section .opx-mixed-staff-table tbody .month-cell{
+  width:54px!important;
+  font-size:17px!important;
+}
+/* 연간 누계는 기존 기능을 유지하되 폭만 축소 */
+.employee-section .opx-mixed-staff-table th:nth-child(14),
+.employee-section .opx-mixed-staff-table td:nth-child(14){
+  width:66px!important;
+}
+.employee-section .opx-mixed-staff-table .cum{
+  width:66px!important;
+  font-size:18px!important;
+  font-weight:1000!important;
+}
+/* 선택월 세부 실적 5개 열 */
+.employee-section .opx-mixed-staff-table .detail-blue,
+.employee-section .opx-mixed-staff-table .detail-green,
+.employee-section .opx-mixed-staff-table .detail-orange,
+.employee-section .opx-mixed-staff-table .detail-total,
+.employee-section .opx-mixed-staff-table .detail-rate{
+  width:72px!important;
+  font-size:16px!important;
+  font-weight:1000!important;
+  text-align:center!important;
+}
+.employee-section .opx-mixed-staff-table small{
+  font-size:12px!important;
+  font-weight:900!important;
+}
+.employee-section .opx-mixed-staff-table .unit{
+  font-size:11px!important;
+  font-weight:900!important;
+  margin-left:1px!important;
+}
+.employee-section .opx-mixed-staff-table .detail-group-head{
+  font-size:14px!important;
+  font-weight:1000!important;
+}
+.employee-section .opx-mixed-staff-panel .opx-head h3{
+  font-size:25px!important;
+  font-weight:1000!important;
+}
+.employee-section .opx-mixed-staff-panel .opx-head p{
+  font-size:13px!important;
+  font-weight:800!important;
+}
+.employee-section .opx-mixed-staff-panel .opx-chip{
+  font-size:14px!important;
+  font-weight:1000!important;
+}
+@media(max-width:1100px){
+  .employee-section .opx-mixed-staff-table thead tr:nth-child(2) th:not(.detail-group-head),
+  .employee-section .opx-mixed-staff-table tbody .month-cell{width:48px!important}
+  .employee-section .opx-mixed-staff-table .detail-blue,
+  .employee-section .opx-mixed-staff-table .detail-green,
+  .employee-section .opx-mixed-staff-table .detail-orange,
+  .employee-section .opx-mixed-staff-table .detail-total,
+  .employee-section .opx-mixed-staff-table .detail-rate{width:65px!important}
+  .employee-section .opx-mixed-staff-table th,
+  .employee-section .opx-mixed-staff-table td{padding-left:2px!important;padding-right:2px!important}
 }
 </style>
