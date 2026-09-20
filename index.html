@@ -4340,63 +4340,6 @@ a[data-page="digitalTwin"],
 }
 </style>
 
-
-<style id="JGB_LR_V23_COMPACT_HISTORY">
-/* V23: 유지관리 이력 폭 축소 + 글씨 확대/강조 */
-.jgb-lr-v54-detail{
-  grid-template-columns:minmax(0,65fr) minmax(0,35fr)!important;
-  column-gap:0!important;
-}
-.jgb-lr-v54-card{
-  padding:8px!important;
-  border-right:2px solid #9fb3c1!important;
-}
-.jgb-lr-v54-history{
-  width:100%!important;
-  min-width:0!important;
-}
-.jgb-lr-v54-historyhead{
-  font-size:16px!important;
-  font-weight:1000!important;
-  padding:8px 9px!important;
-}
-.jgb-lr-v54-historyhead span:last-child{
-  font-size:15px!important;
-  font-weight:1000!important;
-}
-.jgb-lr-v54-historyscroll{
-  overflow-x:hidden!important;
-}
-.jgb-lr-v54-history table{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  table-layout:fixed!important;
-  font-size:13px!important;
-}
-.jgb-lr-v54-history th,.jgb-lr-v54-history td{
-  font-size:13px!important;
-  font-weight:900!important;
-  line-height:1.2!important;
-  padding:7px 3px!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-}
-.jgb-lr-v54-history td.history-content{
-  font-weight:900!important;
-}
-.jgb-lr-v54-history th:nth-child(1),.jgb-lr-v54-history td:nth-child(1){width:17%!important}
-.jgb-lr-v54-history th:nth-child(2),.jgb-lr-v54-history td:nth-child(2){width:15%!important}
-.jgb-lr-v54-history th:nth-child(3),.jgb-lr-v54-history td:nth-child(3){width:14%!important}
-.jgb-lr-v54-history th:nth-child(4),.jgb-lr-v54-history td:nth-child(4){width:15%!important}
-.jgb-lr-v54-history th:nth-child(5),.jgb-lr-v54-history td:nth-child(5){width:25%!important}
-.jgb-lr-v54-history th:nth-child(6),.jgb-lr-v54-history td:nth-child(6){width:14%!important}
-.jgb-lr-v54-history .jgb-lr-v54-empty{font-size:13px!important;font-weight:900!important}
-@media(max-width:1050px){
-  .jgb-lr-v54-detail{grid-template-columns:65fr 35fr!important}
-}
-</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -15897,32 +15840,44 @@ body {
     const lc={정상:0,수리예정:0,수리중:0},rc={정상:0,수리예정:0,수리중:0};
     assets.forEach(x=>{if(lc[x.light]!==undefined)lc[x.light]++;if(rc[x.reel]!==undefined)rc[x.reel]++;});
     const statusBox=(icon,label,count,cls)=>`<div class="jgb-lr-v54-head-status ${cls}"><span class="status-icon">${icon}</span><span class="status-copy"><b>${label}</b><strong>${count}</strong></span></div>`;
-    const group=(icon,label,c,type)=>{
-      return `<div class="jgb-lr-v54-status-group"><div class="group-title"><span>${icon}</span>${label}</div><div class="group-items">${statusBox('🟢','정상',c.정상,'normal')}${statusBox('🟡','수리예정',c.수리예정,'planned')}${statusBox('🔴','수리중',c.수리중,'repair')}</div></div>`;
-    };
-    const years=Array.from({length:10},(_,i)=>2026+i);
-    const monthlyStats=(type,year)=>{
-      const rows=Array.from({length:12},(_,i)=>({month:i+1,self:0,external:0,parts:0}));
+    const maintenanceHeaderCounts=(type)=>{
+      let external=0,self=0;
       assets.forEach(a=>{
         const hist=type==='light'?(a.lightHistory||[]):(a.reelHistory||[]);
         hist.forEach(r=>{
-          const date=String(r?.[0]||'');
-          const m=date.match(/^(\d{4})-(\d{1,2})/);
-          if(!m || Number(m[1])!==Number(year)) return;
-          const row=rows[Number(m[2])-1];
-          if(!row) return;
           const method=String(r?.[1]||'');
-          const text=String(r?.[2]||'');
-          if(method.includes('외주')) row.external++;
-          if(method.includes('자체')) row.self++;
-          if(/교체/.test(text)) row.parts++;
+          if(method.includes('외주')) external++;
+          if(method.includes('자체')) self++;
         });
       });
-      return rows;
+      return {external,self};
+    };
+    const group=(icon,label,c,type)=>{
+      const m=maintenanceHeaderCounts(type);
+      return `<div class="jgb-lr-v54-status-group"><div class="group-title"><span>${icon}</span>${label}</div><div class="group-items">${statusBox('🟢','정상',c.정상,'normal')}${statusBox('🟡','수리예정',c.수리예정,'planned')}${statusBox('🔴','수리중',c.수리중,'repair')}${statusBox('🔧','자체정비',m.self,'self')}${statusBox('🛠️','외주정비',m.external,'external')}</div></div>`;
+    };
+    const years=Array.from({length:10},(_,i)=>2026+i);
+    const annualStats=(type,year)=>{
+      let external=0,self=0,total=0,parts=0;
+      assets.forEach(a=>{
+        const hist=type==='light'?(a.lightHistory||[]):(a.reelHistory||[]);
+        hist.forEach(r=>{
+          const date=String(r[0]||'');
+          if(!date.startsWith(String(year))) return;
+          total++;
+          const method=String(r[1]||'');
+          const text=String(r[2]||'');
+          if(method.includes('외주')) external++;
+          if(method.includes('자체')) self++;
+          if(/고장/.test(text)) fail++;
+          if(/교체/.test(text)) parts++;
+        });
+      });
+      return {external,self,total,parts};
     };
     const annualTable=(type,year)=>{
-      const rows=monthlyStats(type,year);
-      return `<div class="jgb-lr-v54-annual-card"><div class="jgb-lr-v54-annual-head"><strong>${type==='light'?'💡 조명 유지관리 실적':'🔌 릴선 유지관리 실적'}</strong><div class="jgb-lr-v54-year-control"><span>연도 선택</span><button type="button" onclick="window.jgbLRAnnualYear('${type}',-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="window.jgbLRAnnualYear('${type}',1)" aria-label="다음 연도">›</button></div></div><table><thead><tr><th>월</th><th>자체정비 건수</th><th>외주정비 건수</th><th>부품 교체 건수</th></tr></thead><tbody>${rows.map(r=>`<tr><th>${r.month}월</th><td>${r.self}건</td><td>${r.external}건</td><td>${r.parts}건</td></tr>`).join('')}</tbody></table><p class="jgb-lr-v54-annual-note">※ 선택한 연도의 월별 실적을 표시합니다.</p></div>`;
+      const s=annualStats(type,year);
+      return `<div class="jgb-lr-v54-annual-card"><div class="jgb-lr-v54-annual-head"><strong>${type==='light'?'💡 조명 유지관리 실적':'🔌 릴선 유지관리 실적'}</strong><div class="jgb-lr-v54-year-control"><span>연도 선택</span><button type="button" onclick="window.jgbLRAnnualYear('${type}',-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="window.jgbLRAnnualYear('${type}',1)" aria-label="다음 연도">›</button></div></div><table><thead><tr><th>연도</th><th>자체정비 건수</th><th>외주정비 건수</th><th>부품 교체 건수</th></tr></thead><tbody><tr><th>${year}년</th><td>${s.self}건</td><td>${s.external}건</td><td>${s.parts}건</td></tr></tbody></table><p class="jgb-lr-v54-annual-note">※ 선택한 연도의 실적만 표시됩니다.</p></div>`;
     };
     return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc,'light')}${group('🔌','릴선',rc,'reel')}</div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
   }
@@ -17204,17 +17159,6 @@ document.addEventListener('click',handle,true);
   border-bottom:1px solid #9ab5c7!important;
   font-weight:800!important;
 }
-</style>
-
-<style id="JGB_LR_V59_HEADER_MONTHLY">
-/* v59: 상단 자체/외주 정비 박스 제거, 상태 3종만 한 줄 표시 */
-.jgb-lr-v54-head-statuses{gap:8px!important}
-.jgb-lr-v54-status-group{padding:6px 7px!important}
-.jgb-lr-v54-status-group .group-items{display:flex!important;flex-wrap:nowrap!important;gap:4px!important}
-.jgb-lr-v54-head-status{min-width:58px!important;height:44px!important}
-.jgb-lr-v54-annual-card table th,.jgb-lr-v54-annual-card table td{font-size:12px!important;font-weight:800!important}
-.jgb-lr-v54-annual-card table thead th{font-size:12px!important;font-weight:950!important}
-.jgb-lr-v54-annual-note{font-size:10px!important;font-weight:700!important}
 </style>
 </body>
 
