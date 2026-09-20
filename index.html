@@ -4476,16 +4476,17 @@ a[data-page="digitalTwin"],
     window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";if(page==="digitalTwin")page="dashboard";render()})
     window.render=render;
     function body(){
-     const s=stats();
       if(page==="lighting")return (typeof window.jgbLightReelPageMarkup==="function"?window.jgbLightReelPageMarkup():"<div></div>");
       if(page==="digitalTwin")return digitalTwinPage();
-      if(page==="dashboard2")return dashboard2();
+    if(page==="dashboard2")return dashboard2();
       if(page==="process")return processPage();
-      if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
-      if(page==="opsboard")return dashboard(s);
-      if(page==="workers")return workerPage();
-      if(page==="pending")return pendingPage();
-      return dashboard(s);
+     if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
+     if(page==="opsboard")return dashboard(s);
+
+     if(page==="workers")return workerPage();
+     if(page==="pending")return pendingPage();
+     const s=stats();
+     return dashboard(s);
     }
     function eamDashboardSummary(){
      const A=Array.isArray(window.__eamA)?window.__eamA:[];
@@ -16742,7 +16743,7 @@ document.addEventListener('click',handle,true);
   .jgb-v170-head{height:88px!important;min-height:88px!important;max-height:88px!important;}
 }
 </style>
-</body>
+\n<style id="JGB_LIGHT_REEL_FINAL_V8">\n/* 조명·릴선 최종 상태 표시: 정상/수리예정/수리중 */\n.jgb-lr-status-normal{border-color:#20a36a!important;color:#168454!important;background:#eefaf4!important}\n.jgb-lr-status-scheduled{border-color:#e2b52b!important;color:#9a7410!important;background:#fff9df!important}\n.jgb-lr-status-repairing{border-color:#e05252!important;color:#b52f2f!important;background:#fff1f1!important}\n.jgb-lr-status-count{font-size:24px!important;font-weight:1000!important}\n.jgb-lr-status-label{font-size:15px!important;font-weight:1000!important}\n</style>\n<script>\n(function(){\n  // 상태명 정규화: 기존 상태값을 최종 3단계로 연결\n  window.jgbNormalizeLRStatus=function(v){\n    v=String(v||'').trim();\n    if(v==='수리예정'||v==='예정') return '수리예정';\n    if(v==='수리중'||v==='수리') return '수리중';\n    return '정상';\n  };\n})();\n</script>\n</body>
 
 <style id="v19-court-position-final">
 /* v19: 코트 세로 크기는 유지하고 전체 코트 묶음만 아래로 소폭 이동.
