@@ -4465,7 +4465,7 @@ a[data-page="digitalTwin"],
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태">🔒 디지털트윈</span>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v8</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">📊 직원 업무실적</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 운영게시판</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태">🔒 디지털트윈</span>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v10</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">📊 직원 업무실적</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 운영게시판</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      }catch(err){
        console.error("화면 렌더링 오류",err);
        app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
@@ -4474,6 +4474,7 @@ a[data-page="digitalTwin"],
     function nav(p,t){return `<a class="jgb-link ${page===p?"on":""}" href="?page=${encodeURIComponent(p)}" data-page="${p}">${t}</a>`}
     function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
     function go(p){if(!p||p==="digitalTwin")return;page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
+    window.go=go;
     window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";if(page==="digitalTwin")page="dashboard";render()})
     window.render=render;
     function body(){
@@ -4732,8 +4733,8 @@ a[data-page="digitalTwin"],
       const month=(selectedMonth>=1&&selectedMonth<=12)?selectedMonth:Number(baseYm.slice(5,7));
       const ym=year+'-'+String(month).padStart(2,'0');
 
-      const md=workerdata.map(w=>({...w,p:dashboardStaffMonth(w.id,ym)}));
-      const ys=workerdata.map(w=>({...w,p:dashboardStaffYear(w.id,year)}));
+      const md=workers.map(w=>({...w,p:dashboardStaffMonth(w.id,ym)}));
+      const ys=workers.map(w=>({...w,p:dashboardStaffYear(w.id,year)}));
 
       const sum=md.reduce((a,x)=>{
         a.basic+=x.p.basic.complete;
@@ -4748,8 +4749,8 @@ a[data-page="digitalTwin"],
 
       const monthly=Array.from({length:12},(_,i)=>{
         const mo=year+'-'+String(i+1).padStart(2,'0');
-        const vals=workerdata.map(w=>dashboardStaffMonth(w.id,mo));
-        return {m:i+1,basic:valdata.reduce((n,p)=>n+p.basic.complete,0),auto:valdata.reduce((n,p)=>n+p.auto.performance,0),issue:valdata.reduce((n,p)=>n+p.qr.done,0),total:valdata.reduce((n,p)=>n+p.total,0)};
+        const vals=workers.map(w=>dashboardStaffMonth(w.id,mo));
+        return {m:i+1,basic:vals.reduce((n,p)=>n+p.basic.complete,0),auto:vals.reduce((n,p)=>n+p.auto.performance,0),issue:vals.reduce((n,p)=>n+p.qr.done,0),total:vals.reduce((n,p)=>n+p.total,0)};
       });
 
       const customerAll=Array.isArray(db.issues)?db.issues:[];
@@ -4965,7 +4966,7 @@ a[data-page="digitalTwin"],
             <div class="opx-sub">실제 수행한 정규업무와 업무지시 실적, 근무편성에 따른 인정실적을 <b>서로 분리하여 확인하고 최종 종합 실적만 자동 합산</b>합니다.</div>
             <div class="opx-hero-stats">
               <div class="opx-hero-stat"><span>기준월</span><strong>${year}년 ${month}월</strong></div>
-              <div class="opx-hero-stat"><span>직원 수</span><strong>${workerdata.length}명</strong></div>
+              <div class="opx-hero-stat"><span>직원 수</span><strong>${workers.length}명</strong></div>
               <div class="opx-hero-stat"><span>월 종합실적</span><strong>${sum.total}<small>실적</small></strong></div>
               <div class="opx-hero-stat"><span>정규업무</span><strong>${sum.basic}<small>건</small></strong></div>
               <div class="opx-hero-stat"><span>업무지시</span><strong>${sum.issue}<small>건</small></strong></div>
@@ -4989,7 +4990,7 @@ a[data-page="digitalTwin"],
           </section>
           <section class="opx-grid">
             <div class="opx-panel">
-              <div class="opx-head"><div><h3>직원별 월별 실적</h3><p>${year}년 ${month}월 · 정규업무·근무편성 인정·업무지시·종합실적</p></div><span class="opx-chip">${workerdata.length}명</span></div>
+              <div class="opx-head"><div><h3>직원별 월별 실적</h3><p>${year}년 ${month}월 · 정규업무·근무편성 인정·업무지시·종합실적</p></div><span class="opx-chip">${workers.length}명</span></div>
               <div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성 인정</th><th>업무지시</th><th>종합실적</th><th>달성률</th></tr></thead><tbody>${tableRows}</tbody></table></div>
             </div>
             <div class="opx-panel">
