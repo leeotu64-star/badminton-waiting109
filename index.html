@@ -5437,24 +5437,24 @@ a[data-page="digitalTwin"],
 
       return `
       <div class="opx-dash opx-clean-layout">
-        <section class="opx-hero opx-hero-final employee-hero employee-hero-icon-layout">
+        <section class="opx-hero opx-hero-final employee-hero">
           <div class="opx-hero-main">
             <div class="opx-eyebrow">JANGGUNBONG SPORTS CENTER · STAFF OPERATION</div>
             <div class="opx-title">직원 업무실적 운영 대시보드</div>
+            <!-- 직원 업무실적 헤더의 중복 설명·요약영역 제거: 본문 실적영역에서 관리 -->
           </div>
-          <div class="employee-header-actions">
-            <button type="button" id="employeeBoardButton" class="employee-board-btn employee-head-board-btn" aria-label="운영게시판 바로가기" onclick="go('opsboard')">📋 운영게시판</button>
-            <div class="employee-head-stats" aria-label="직원 실적 핵심 현황">
-              <div class="employee-head-stat blue"><span class="employee-head-stat-icon">📋</span><div><small>정규업무</small><b>${sum.basic}<em>건</em></b></div></div>
-              <div class="employee-head-stat green"><span class="employee-head-stat-icon">✓</span><div><small>근무편성 인정</small><b>${sum.auto}<em>건</em></b></div></div>
-              <div class="employee-head-stat orange"><span class="employee-head-stat-icon">⚠</span><div><small>QR 조치완료</small><b>${sum.issue}<em>건</em></b></div></div>
-              <div class="employee-head-stat violet"><span class="employee-head-stat-icon">●</span><div><small>종합 업무실적</small><b>${sum.total}<em>건</em></b></div></div>
-            </div>
-          </div>
+          <div class="opx-hero-side employee-hero-side"><div class="employee-hero-actions"><div class="opx-live">● 실시간 직원실적 연동</div><button type="button" id="employeeBoardButton" class="employee-board-btn" aria-label="운영게시판 바로가기" onclick="go('opsboard')">📋 운영게시판</button><div class="employee-customer-performance" aria-label="오늘의 고객실적"><div class="ecp-title">📋 오늘의 고객실적</div><div class="ecp-stats"><span><b>${customerTodayReceived}</b>접수</span><span><b>${customerTodayCompleted}</b>완료</span><span><b>${customerTodayPending}</b>미처리</span></div></div></div><div class="opx-quote">“공정하게 평가하고,<br>투명하게 관리합니다.”<small>장군봉체육관 직원 업무실적 관리 원칙</small></div></div>
         </section>
 
         <section class="opx-major-section employee-section">
           <div class="opx-major-title employee-title"><div class="employee-title-copy"><span>직원 실적</span><small>월간 · 연간 · 직원별 비교</small></div><div class="employee-inline-period">${periodSelector}</div></div>
+          <section class="opx-kpis">
+            <div class="opx-kpi blue"><span>정규업무 실적</span><strong>${sum.basic}<small>건</small></strong><div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.basic/target*100))}%"></i></div><em>기본업무 10개 완료 = 1실적</em></div>
+            <div class="opx-kpi green"><span>근무편성 인정실적</span><strong>${sum.auto}<small>건</small></strong><div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.auto/10*100))}%"></i></div><em>인정 ${md.reduce((n,x)=>n+x.p.auto.units,0)}회 · 10회 단위 환산</em></div>
+            <div class="opx-kpi orange"><span>QR 조치완료 수행실적</span><strong>${sum.issue}<small>건</small></strong><div class="opx-track"><i style="width:${Math.min(100,Math.round(sum.issue/20*100))}%"></i></div><em>QR 조치완료 건별 자동 반영</em></div>
+            <div class="opx-kpi violet"><span>종합 업무실적</span><strong>${sum.total}<small>건</small></strong><div class="opx-track"><i style="width:${rate}%"></i></div><em>세 가지 실적 자동 합산</em></div>
+          </section>
+
           <section class="opx-panel opx-main-matrix">
             <div class="opx-head"><div><h3>직원별 월별 누계 실적</h3><p>${year}년 1월부터 현재 선택월까지 직원별 종합실적을 한눈에 확인합니다. 노란색은 선택월, 보라색은 연간 누계입니다.</p></div><span class="opx-chip">${workers.length}명 · 12개월</span></div>
             <div class="opx-staff-matrix-wrap"><table class="opx-staff-matrix"><colgroup><col style="width:7%">${Array.from({length:12},()=>`<col style="width:4.6%">`).join('')}<col style="width:7%">${Array.from({length:5},()=>`<col style="width:7.6%">`).join('')}</colgroup><thead><tr><th rowspan="2">직원명</th><th colspan="12">직원별 월별 누계 실적</th><th rowspan="2" class="annual-head">연간 누계</th><th colspan="5" class="detail-head">${month}월 세부 실적</th></tr><tr>${Array.from({length:12},(_,i)=>`<th class="${i+1===month?'current':''}">${i+1}월</th>`).join('')}<th class="detail-sub">정규업무</th><th class="detail-sub">근무편성 인정</th><th class="detail-sub">업무지시</th><th class="detail-sub">종합실적</th><th class="detail-sub">달성률</th></tr></thead><tbody>${staffMonthlyMatrix}</tbody></table></div>
@@ -5522,12 +5522,14 @@ a[data-page="digitalTwin"],
       @media(max-width:900px){.qrx-management-summary-v9{grid-template-columns:1fr}}
               @media(max-width:560px){.qrx-management-summary-v9{grid-template-columns:1fr}}
               .qrx-v8-wrap{margin-top:14px;display:grid;gap:14px}
-              .qrx-v8-hero{display:grid;grid-template-columns:1.55fr .75fr;gap:14px}
+              .qrx-v8-hero{display:grid;grid-template-columns:1.55fr .75fr;gap:0;border:1px solid #dbe5f0;border-radius:15px;background:#fff;box-shadow:0 5px 18px rgba(31,64,104,.07);overflow:hidden}
               .qrx-v8-panel{border:1px solid #dbe5f0;border-radius:15px;background:#fff;box-shadow:0 5px 18px rgba(31,64,104,.07);overflow:hidden}
               .qrx-v8-head{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:2px solid #b9cbe2;background:linear-gradient(90deg,#e8f1fb,#f4f8fd);box-shadow:inset 0 1px 0 rgba(255,255,255,.95)}
               .qrx-v8-head b{font-size:15px;color:#102f50}.qrx-v8-head span{font-size:11px;font-weight:800;color:#47627e}
               .qrx-v8-body{padding:14px 16px}
-              .qrx-judgement{min-height:146px;background:linear-gradient(135deg,#fff7f7,#fff,#f7faff);border-left:5px solid #ef4444}
+              .qrx-judgement{min-height:146px;background:linear-gradient(135deg,#fff7f7,#fff,#f7faff);border-left:5px solid #ef4444;border-radius:0;box-shadow:none}
+              .qrx-judgement-combined{display:contents}
+              .qrx-judgement-combined .qrx-alertbox{border-radius:0;border:0;border-left:1px solid #e5eaf1;min-height:146px}
               .qrx-judgement-title{display:flex;align-items:center;gap:8px;font-size:21px;font-weight:950;color:#b42318;margin-bottom:10px}
               .qrx-judgement-title span{margin-left:auto;font-size:11px;padding:6px 10px;border-radius:999px;background:#ef4444;color:#fff}
               .qrx-judgement-main{font-size:20px;font-weight:950;color:#172b4d;margin-bottom:8px}.qrx-judgement ul{margin:0;padding-left:19px;display:grid;gap:5px;color:#334155;font-size:13px;font-weight:700}.qrx-judgement li::marker{color:#ef4444}
@@ -5546,8 +5548,8 @@ a[data-page="digitalTwin"],
             </style>
 
             <div class="qrx-v8-wrap">
-              <div class="qrx-v8-hero">
-                <div class="qrx-v8-panel qrx-judgement"><div class="qrx-v8-body">
+              <div class="qrx-v8-hero qrx-judgement-combined">
+                <div class="qrx-judgement"><div class="qrx-v8-body">
                   <div class="qrx-judgement-title">🚨 오늘 관리자 판단 <span>${qrRiskOverall}</span></div>
                   <div class="qrx-judgement-main">${qrTopInsight?`${xEsc(qrTopInsight.place)} 우선 확인`:'현재 우선 확인 대상 없음'}</div>
                   <ul>
@@ -5557,7 +5559,7 @@ a[data-page="digitalTwin"],
                     <li>${qrTopInsight?xEsc(qrTopInsight.risk.action):'접수 원문을 기준으로 현장 상태를 확인하세요.'}</li>
                   </ul>
                 </div></div>
-                <div class="qrx-v8-panel"><div class="qrx-alertbox"><div><strong>${qrUrgent}</strong><small>긴급 접수 · 즉시 확인 권장</small></div></div></div>
+                <div class="qrx-alertbox"><div><strong>${qrUrgent}</strong><small>긴급 접수 · 즉시 확인 권장</small></div></div>
               </div>
 
               <div class="qrx-v8-grid-3">
@@ -22655,43 +22657,5 @@ cleanupDuplicateOnly();
 .employee-section .opx-annual-panel .opx-table td{
   padding-top:6px!important;
   padding-bottom:6px!important;
-}
-</style>
-
-<style id="JGB_EMPLOYEE_HEADER_ICON_V2">
-/* V2: 직원 실적 KPI를 운영게시판과 동일한 헤더 아이콘 구조로 통합. 기존 데이터/계산 로직은 유지. */
-.employee-hero-icon-layout.opx-hero{
-  height:104px!important;
-  min-height:104px!important;
-  padding:12px 20px!important;
-  grid-template-columns:minmax(0,1fr) auto!important;
-  gap:16px!important;
-  align-items:center!important;
-}
-.employee-hero-icon-layout .opx-hero-main{min-width:0!important}
-.employee-hero-icon-layout .opx-title{font-size:28px!important;line-height:1.05!important;margin:2px 0 0!important}
-.employee-header-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;min-width:0!important}
-.employee-head-board-btn{height:42px!important;padding:0 11px!important;border-radius:10px!important;white-space:nowrap!important;font-size:10px!important}
-.employee-head-stats{display:grid!important;grid-template-columns:repeat(4,minmax(88px,1fr))!important;gap:7px!important;width:430px!important;min-width:0!important}
-.employee-head-stat{min-width:0!important;height:58px!important;display:flex!important;align-items:center!important;gap:7px!important;padding:7px 8px!important;border:1px solid rgba(255,255,255,.28)!important;border-radius:10px!important;background:rgba(255,255,255,.13)!important;color:#fff!important;box-sizing:border-box!important}
-.employee-head-stat-icon{width:31px!important;height:31px!important;flex:0 0 31px!important;display:grid!important;place-items:center!important;border-radius:8px!important;background:rgba(255,255,255,.18)!important;border:1px solid rgba(255,255,255,.28)!important;font-size:17px!important;font-weight:1000!important}
-.employee-head-stat div{min-width:0!important}
-.employee-head-stat small{display:block!important;font-size:9px!important;font-weight:900!important;opacity:.9!important;white-space:nowrap!important}
-.employee-head-stat b{display:block!important;margin-top:1px!important;font-size:19px!important;line-height:1!important;font-weight:1000!important;white-space:nowrap!important}
-.employee-head-stat em{font-style:normal!important;font-size:9px!important;margin-left:2px!important;font-weight:800!important;opacity:.9!important}
-.employee-head-stat.blue .employee-head-stat-icon{background:rgba(38,125,255,.34)!important}
-.employee-head-stat.green .employee-head-stat-icon{background:rgba(20,170,104,.34)!important}
-.employee-head-stat.orange .employee-head-stat-icon{background:rgba(245,139,23,.38)!important}
-.employee-head-stat.violet .employee-head-stat-icon{background:rgba(126,91,218,.36)!important}
-@media(max-width:1050px){
-  .employee-head-stats{width:390px!important;grid-template-columns:repeat(4,minmax(75px,1fr))!important}
-  .employee-head-stat{height:54px!important;padding:6px!important}
-  .employee-head-stat-icon{width:28px!important;height:28px!important;flex-basis:28px!important;font-size:15px!important}
-  .employee-head-stat b{font-size:17px!important}
-}
-@media(max-width:800px){
-  .employee-hero-icon-layout.opx-hero{height:auto!important;min-height:104px!important;grid-template-columns:1fr!important}
-  .employee-header-actions{width:100%!important;justify-content:flex-start!important;flex-wrap:wrap!important}
-  .employee-head-stats{width:100%!important}
 }
 </style>
