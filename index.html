@@ -4,93 +4,171 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리자 판단 · 긴급 접수 50:50</title>
+
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;min-height:100%;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;background:#eef5fa}
-body{padding:20px}
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  font-family:"Noto Sans KR","Malgun Gothic",sans-serif;
+  background:#eef5fa;
+}
+
+body{
+  padding:20px;
+}
+
+/* 전체 테스트 영역 */
 .test-screen{
   width:100%;
   max-width:1400px;
-  min-height:420px;
   margin:0 auto;
   background:#fff;
   border:1px solid #d7e4ef;
   border-radius:14px;
   padding:20px;
 }
+
+/* ★ 핵심: 좌우 정확히 50:50 */
 .half-row{
   display:grid;
   grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   gap:14px;
   width:100%;
+  align-items:stretch;
 }
+
+/* 두 카드 */
 .half{
   min-width:0;
-  width:auto;
-  height:260px;
+  width:100%;
+  height:auto;
+  min-height:230px;
   border:1px solid #cfddea;
   border-radius:12px;
   background:#fff;
   overflow:hidden;
 }
+
+/* 제목 */
 .card-head{
-  height:48px;
+  min-height:48px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 16px;
+  padding:10px 16px;
   border-bottom:1px solid #d9e5ef;
   background:#f5f9fd;
   color:#173b61;
   font-size:16px;
   font-weight:700;
 }
-.card-body{padding:18px}
-.judgement{border-left:4px solid #ff3b45}
-.judgement .card-head{color:#d21f29}
-.judgement-main{font-size:18px;font-weight:700;color:#123b63;margin-bottom:10px}
-.judgement ul{margin:0;padding-left:20px;color:#244766;line-height:1.8;font-size:14px}
-.badge{
-  background:#f4434c;color:#fff;border-radius:999px;
-  padding:6px 11px;font-size:12px;font-weight:700
+
+/* 왼쪽 관리자 판단 */
+.judgement{
+  border-left:4px solid #ff3b45;
 }
+
+.judgement .card-head{
+  color:#d21f29;
+}
+
+.judgement .card-body{
+  padding:18px;
+}
+
+.judgement-main{
+  margin:0 0 10px;
+  color:#123b63;
+  font-size:18px;
+  font-weight:700;
+}
+
+.judgement ul{
+  margin:0;
+  padding-left:20px;
+  color:#244766;
+  font-size:14px;
+  line-height:1.8;
+}
+
+.badge{
+  flex:0 0 auto;
+  background:#f4434c;
+  color:#fff;
+  border-radius:999px;
+  padding:6px 11px;
+  font-size:12px;
+  font-weight:700;
+}
+
+/* 오른쪽 긴급 접수 */
 .emergency{
-  background:#fff8f9;
-  border-color:#f3d2d6;
   display:flex;
   flex-direction:column;
+  background:#fff8f9;
+  border-color:#f3d2d6;
 }
+
 .emergency .card-head{
   background:#fff4f5;
   color:#b91e2a;
 }
+
 .emergency-body{
   flex:1;
+  min-height:181px;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   color:#d21f29;
 }
-.emergency-count{font-size:44px;line-height:1;font-weight:800}
-.emergency-text{margin-top:8px;font-size:14px;font-weight:600}
+
+.emergency-count{
+  font-size:44px;
+  line-height:1;
+  font-weight:800;
+}
+
+.emergency-text{
+  margin-top:8px;
+  font-size:14px;
+  font-weight:600;
+}
+
+/* 좁은 화면에서만 세로 배치 */
 @media(max-width:700px){
-  .half-row{grid-template-columns:minmax(0,1fr)}
+  .half-row{
+    grid-template-columns:minmax(0,1fr);
+  }
 }
 </style>
 </head>
+
 <body>
+
 <main class="test-screen">
+
   <section class="half-row">
 
-    <!-- 왼쪽 50% : 오늘 관리자 판단 -->
+    <!-- 왼쪽 50% -->
     <article class="half judgement">
       <div class="card-head">
         <span>🚨 오늘 관리자 판단</span>
         <span class="badge">일반 관리</span>
       </div>
+
       <div class="card-body">
-        <div class="judgement-main">현재 우선 확인 대상 없음</div>
+        <div class="judgement-main">
+          현재 우선 확인 대상 없음
+        </div>
+
         <ul>
           <li>최근 7일 접수 0건</li>
           <li>반복 접수 장소 없음</li>
@@ -100,19 +178,24 @@ body{padding:20px}
       </div>
     </article>
 
-    <!-- 오른쪽 50% : 긴급 접수 -->
+    <!-- 오른쪽 50% -->
     <article class="half emergency">
       <div class="card-head">
         <span>🚨 긴급 접수</span>
         <span>즉시 확인</span>
       </div>
+
       <div class="emergency-body">
         <div class="emergency-count">0</div>
-        <div class="emergency-text">긴급 접수 · 즉시 확인 권장</div>
+        <div class="emergency-text">
+          긴급 접수 · 즉시 확인 권장
+        </div>
       </div>
     </article>
 
   </section>
+
 </main>
+
 </body>
 </html>
