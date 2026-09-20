@@ -4369,11 +4369,16 @@ a[data-page="digitalTwin"],
 .jgb-lr-v54-yearbox{display:flex!important;align-items:center!important;gap:6px!important}
 .jgb-lr-v54-yearbox label{font-size:12px!important;font-weight:900!important;color:#36596e!important}
 .jgb-lr-v54-yearbox select{font-size:14px!important;font-weight:900!important;padding:5px 9px!important;border:1px solid #9fb9c8!important;border-radius:5px!important;background:#fff!important}
-.jgb-lr-v54-months{display:grid!important;grid-template-columns:repeat(12,minmax(58px,1fr))!important;overflow-x:auto!important}
-.jgb-lr-v54-month{border-right:1px solid #c8d9e3!important;min-width:58px!important;text-align:center!important}
-.jgb-lr-v54-month:last-child{border-right:0!important}
-.jgb-lr-v54-month b{display:block!important;background:#edf5f9!important;border-bottom:1px solid #c8d9e3!important;padding:7px 3px!important;font-size:13px!important;font-weight:1000!important}
-.jgb-lr-v54-month span{display:block!important;padding:8px 3px!important;font-size:13px!important;font-weight:900!important;color:#183d55!important;white-space:nowrap!important}
+.jgb-lr-v54-months{display:block!important;overflow:visible!important}
+.jgb-lr-v54-month{display:grid!important;grid-template-columns:1.05fr 1.4fr 1.4fr 1.4fr!important;border:0!important;min-width:0!important;text-align:center!important}
+.jgb-lr-v54-month b{display:block!important;background:#edf5f9!important;border-right:1px solid #c8d9e3!important;border-bottom:1px solid #c8d9e3!important;padding:8px 6px!important;font-size:14px!important;font-weight:1000!important}
+.jgb-lr-v54-month span{display:contents!important}
+.jgb-lr-v54-annual-table{width:100%!important;border-collapse:collapse!important;table-layout:fixed!important}
+.jgb-lr-v54-annual-table th,.jgb-lr-v54-annual-table td{border:1px solid #c8d9e3!important;text-align:center!important;padding:8px 6px!important;color:#183d55!important;font-size:14px!important;font-weight:900!important}
+.jgb-lr-v54-annual-table th{background:#e5f0f6!important;font-weight:1000!important}
+.jgb-lr-v54-annual-table td{background:#fff!important}
+.jgb-lr-v54-annual-table th:first-child,.jgb-lr-v54-annual-table td:first-child{width:22%!important}
+.jgb-lr-v54-annual-table th:not(:first-child),.jgb-lr-v54-annual-table td:not(:first-child){width:26%!important}
 .jgb-lr-v54-legend{padding:7px 10px!important;font-size:11px!important;font-weight:700!important;color:#60798a!important;border-top:1px solid #d5e2e9!important}
 @media(max-width:1050px){
  .jgb-lr-v54-head{min-height:96px!important;height:auto!important}
@@ -15869,10 +15874,9 @@ body {
     const statusBox=(icon,label,count,cls)=>`<div class="jgb-lr-v54-head-status ${cls}"><span class="status-icon">${icon}</span><span class="status-copy"><b>${label}</b><strong>${count}</strong></span></div>`;
     const group=(icon,label,c)=>`<div class="jgb-lr-v54-status-group"><div class="group-title"><span>${icon}</span>${label}</div><div class="group-items">${statusBox('🟢','정상',c.정상,'normal')}${statusBox('🟡','수리예정',c.수리예정,'planned')}${statusBox('🔴','수리중',c.수리중,'repair')}</div></div>`;
     const selectedYear=window.__jgbLRYear||2026;
-    const months=Array.from({length:12},(_,i)=>i+1);
-    const monthly=(type)=>months.map(m=>{let own=0,ext=0,parts=0;assets.forEach(a=>{const hist=type==='light'?a.lightHistory:a.reelHistory; (Array.isArray(hist)?hist:[]).forEach(r=>{const d=String(r[0]||'');if(Number(d.slice(0,4))!==selectedYear||Number(d.slice(5,7))!==m)return;const method=String(r[1]||'');const text=String(r[2]||'');if(method==='자체정비')own++;if(method==='외주정비')ext++;if(/부품|교체/.test(text))parts++;});});return {own,ext,parts};});
-    const lm=monthly('light'),rm=monthly('reel');
-    const annualBlock=(title,icon,data,type)=>`<section class="jgb-lr-v54-annual"><div class="jgb-lr-v54-annual-head"><div class="jgb-lr-v54-annual-title">${icon} ${title} 유지관리 실적</div><div class="jgb-lr-v54-yearbox"><label>연도 선택</label><select onchange="window.jgbLRYear(this.value)">${Array.from({length:10},(_,i)=>2026+i).map(y=>`<option value="${y}" ${y===selectedYear?'selected':''}>${y}년</option>`).join('')}</select></div></div><div class="jgb-lr-v54-months">${data.map((x,i)=>`<div class="jgb-lr-v54-month"><b>${i+1}월</b><span>자체 ${x.own} · 외주 ${x.ext} · 부품 ${x.parts}</span></div>`).join('')}</div><div class="jgb-lr-v54-legend">선택한 연도의 월별 유지관리 등록 실적입니다.</div></section>`;
+    const annual=(type)=>{let own=0,ext=0,parts=0;assets.forEach(a=>{const hist=type==='light'?a.lightHistory:a.reelHistory;(Array.isArray(hist)?hist:[]).forEach(r=>{const d=String(r[0]||'');if(Number(d.slice(0,4))!==selectedYear)return;const method=String(r[1]||'').trim();const text=String(r[2]||'');if(method==='자체정비')own++;if(method==='외주정비')ext++;if(/부품|교체/.test(text))parts++;});});return {own,ext,parts};};
+    const la=annual('light'),ra=annual('reel');
+    const annualBlock=(title,icon,data,type)=>`<section class="jgb-lr-v54-annual"><div class="jgb-lr-v54-annual-head"><div class="jgb-lr-v54-annual-title">${icon} ${title} 유지관리 실적</div><div class="jgb-lr-v54-yearbox"><label>연도 선택</label><select onchange="window.jgbLRYear(this.value)">${Array.from({length:10},(_,i)=>2026+i).map(y=>`<option value="${y}" ${y===selectedYear?'selected':''}>${y}년</option>`).join('')}</select></div></div><table class="jgb-lr-v54-annual-table"><thead><tr><th>연도</th><th>자체정비 건수</th><th>외주정비 건수</th><th>부품 교체 건수</th></tr></thead><tbody><tr><td>${selectedYear}년</td><td>${data.own}건</td><td>${data.ext}건</td><td>${data.parts}건</td></tr></tbody></table><div class="jgb-lr-v54-legend">※ 선택한 연도의 실적만 표시됩니다.</div></section>`;
     return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>장군봉체육관 · 조명 · 릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc)}${group('🔌','릴선',rc)}</div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><div class="jgb-lr-v54-annual-wrap">${annualBlock('조명','💡',lm,'light')}${annualBlock('릴선','🔌',rm,'reel')}</div></div>`;
   }
   window.jgbLightReelPageMarkup=markup;
