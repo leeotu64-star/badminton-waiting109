@@ -5071,6 +5071,8 @@ a[data-page="digitalTwin"],
 
 /* 3열 카드 높이 통일 */
 .jgb-dashboard-mode.ops .qrx-v8-grid-3 > .qrx-v8-panel{height:220px!important}
+.jgb-dashboard-mode.ops .qrx-v8-grid-3{grid-template-columns:1fr!important}
+.jgb-dashboard-mode.ops .qrx-v8-grid-3 > .qrx-change-panel{grid-column:1/-1!important}
 .jgb-dashboard-mode.ops .qrx-v8-grid > .qrx-v8-panel{height:220px!important}
 .jgb-dashboard-mode.ops .qrx-change-list{gap:5px!important}
 .jgb-dashboard-mode.ops .qrx-change-item{padding:7px 8px!important;min-height:38px!important}
@@ -5115,6 +5117,44 @@ a[data-page="digitalTwin"],
   .jgb-dashboard-mode.ops .qrx-v8-grid-3 > .qrx-v8-panel,
   .jgb-dashboard-mode.ops .qrx-v8-grid > .qrx-v8-panel{height:auto!important;min-height:180px!important}
 }
+</style>
+
+
+<style id="OPSBOARD_WIDTH_FONT_V3">
+/* V3: 상단 3열 기준으로 하단 폭 정렬 + 가독성 개선
+   기능/데이터는 변경하지 않습니다. */
+.jgb-dashboard-mode.ops .qrx-v8-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:12px!important;
+}
+.jgb-dashboard-mode.ops .qrx-v8-grid > .qrx-v8-panel:first-child{
+  grid-column:1 / span 2!important;
+}
+.jgb-dashboard-mode.ops .qrx-v8-grid > .qrx-v8-panel:nth-child(2){
+  grid-column:3!important;
+}
+
+/* 분석 카드 글씨 확대 */
+.jgb-dashboard-mode.ops .qrx-v8-head b{font-size:14px!important}
+.jgb-dashboard-mode.ops .qrx-v8-head span{font-size:10px!important}
+.jgb-dashboard-mode.ops .qrx-v8-body{font-size:12px!important}
+.jgb-dashboard-mode.ops .qrx-change-copy b{font-size:12px!important}
+.jgb-dashboard-mode.ops .qrx-change-copy span{font-size:10px!important}
+.jgb-dashboard-mode.ops .qrx-change-item>strong{font-size:11px!important}
+.jgb-dashboard-mode.ops .qrx-place b{font-size:12px!important}
+.jgb-dashboard-mode.ops .qrx-place small{font-size:10px!important}
+.jgb-dashboard-mode.ops .qrx-score{font-size:13px!important}
+.jgb-dashboard-mode.ops .qrx-score small{font-size:10px!important}
+.jgb-dashboard-mode.ops .qrx-barrow b{font-size:11px!important}
+.jgb-dashboard-mode.ops .qrx-barrow strong{font-size:11px!important}
+.jgb-dashboard-mode.ops .qrx-heat-cell{font-size:12px!important}
+.jgb-dashboard-mode.ops .qrx-heat-cell small{font-size:10px!important}
+.jgb-dashboard-mode.ops .qrx-trend-day b{font-size:11px!important}
+.jgb-dashboard-mode.ops .qrx-trend-day small{font-size:10px!important}
+.jgb-dashboard-mode.ops .qrx-change-reco small{font-size:11px!important}
+.jgb-dashboard-mode.ops .qrx-change-reco b{font-size:14px!important}
+.jgb-dashboard-mode.ops .qrx-change-reco span{font-size:11px!important}
+.jgb-dashboard-mode.ops .qrx-footer{font-size:10px!important}
 </style>
 
 </head><body><div id="app"></div>
@@ -6146,23 +6186,8 @@ a[data-page="digitalTwin"],
                   </div><div class="qrx-change-reco"><small>💡 관리자 추천</small><b>${recommendation?'오늘 확인할 곳 : '+xEsc(recommendation):'오늘은 특별한 변화가 없습니다'}</b><span>${recommendationText}</span></div><div class="qrx-change-foot">최근 7일 데이터를 기준으로 평소와 다른 변화만 표시합니다.</div></div></div>`;
                 })()}
 
-                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📍 반복·집중 장소 TOP 5</b><span>관리 가능성</span></div><div class="qrx-v8-body"><div class="qrx-place-list">
-                  ${qrPlaceInsights.slice(0,5).map((o,i)=>{const m=o.managementScore;const state=m>=80?'관리 양호':m>=60?'관리 주의':'집중 관리';return `<div class="qrx-place"><span class="qrx-rank">${i+1}</span><div><b>${xEsc(o.place)}</b><small>${o.total}건 · ${xEsc(o.topIssue)} · 미조치 ${o.pending} · 반복 ${Math.max(0,o.total-1)}</small></div><div class="qrx-score">${m}<small>${state}</small></div></div>`}).join('')||'<div style="padding:12px;color:#64748b">장소별 데이터 없음</div>'}
-                </div></div></div>
-
-                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>⏰ 시간대별 접수</b><span>발생 밀도</span></div><div class="qrx-v8-body"><div class="qrx-bars">
-                  ${qrHourBandStats.map(o=>`<div class="qrx-barrow"><b>${o.label}</b><div class="qrx-track"><i class="qrx-fill" style="width:${Math.max(o.n?8:0,Math.round(o.n/qrHourMax*100))}%"></i></div><strong>${o.n}</strong></div>`).join('')}
-                </div><div style="margin-top:12px;padding:9px 11px;border-radius:9px;background:#f5f3ff;color:#4c1d95;font-size:11px;font-weight:800">⚡ 집중 시간대 · ${xEsc(peakHourText)}</div></div></div>
               </div>
 
-              <div class="qrx-v8-grid">
-                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📅 요일 × 시간 집중 패턴</b><span>접수 빈도 히트맵</span></div><div class="qrx-v8-body">
-                  <div class="qrx-heat">${weekdayMap.map((d,i)=>{const n=weekdayCount[i]||0;const max=Math.max(1,...weekdayCount);const alpha=Math.min(.9,.12+n/max*.78);return `<div class="qrx-heat-cell" style="background:rgba(59,130,246,${alpha})"><b>${d}</b><small>${n}건</small></div>`}).join('')}</div>
-                  <div style="margin-top:12px;padding:9px 11px;border-radius:9px;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:800">🔥 최다 요일 · ${xEsc(peakWeekdayText)} · 최다 시간 · ${xEsc(peakHourText)}</div>
-                </div></div>
-
-                <div class="qrx-v8-panel"><div class="qrx-v8-head"><b>📈 최근 7일 접수 흐름</b><span>${qrTrendText}</span></div><div class="qrx-v8-body"><div class="qrx-trend">${qrTrend7.map(o=>{const mx=Math.max(1,...qrTrend7.map(v=>v.count));return `<div class="qrx-trend-day"><b>${o.count}</b><div class="qrx-trend-bar" style="height:${Math.max(7,Math.round(o.count/mx*85))}px"></div><small>${xEsc(o.label)}</small></div>`}).join('')}</div><div style="margin-top:8px;text-align:right;font-size:11px;color:#64748b">최근 7일 ${qrNowTrend}건 · 이전 7일 ${qrPrevTrend}건</div></div></div>
-              </div>
 
               <div class="qrx-footer"><b>💡 분석 기준</b> · 고객 QR 접수의 신고내용·장소·접수시각·처리상태를 기준으로 위험도·반복성·최근성·미조치 상태를 함께 분석합니다. <b>직원실적·레벨 산정값은 이 분석에 사용하지 않습니다.</b></div>
             </div>
