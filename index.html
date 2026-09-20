@@ -15770,6 +15770,16 @@ body {
   </header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div></div>`;
 }
 window.jgbLightReelPageMarkup=markup;
+
+  /* 연결 오류만 수정: 헤더의 조명/릴선 아이콘을 각 패널로 연결 */
+  window.jgbLRHeaderSelect=function(type){
+    const panes=document.querySelectorAll('.jgb-lr-v54-pane');
+    const target=type==='light'?panes[0]:panes[1];
+    if(target){
+      target.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  };
+
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
   window.jgbLRCardEdit=function(n,type){
     const a=assets[n-1], isL=type==='light', name=isL?'코트 조명':'릴선', code=(isL?'L-':'RL-')+String(n).padStart(2,'0');
@@ -15807,7 +15817,7 @@ window.jgbLightReelPageMarkup=markup;
     const m=document.getElementById('jgbLRModal');
     if(!m){
       const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';
-      x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label class="jgb-lr-status-label">관리상태<select id="jgbLRStatus"><option value="정상">정상</option><option value="수리중">수리중</option></select></label><textarea id="jgbLRText" placeholder="점검·정비 내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById('jgbLRModal').classList.remove('open')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';
+      x.innerHTML=`<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label class="jgb-lr-status-label">관리상태<select id="jgbLRStatus"><option value="정상">정상</option><option value="수리중">수리중</option></select></label><textarea id="jgbLRText" placeholder="점검·정비 내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById('jgbLRModal').classList.remove('open')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>`;
       document.body.appendChild(x);
     }
     const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;
