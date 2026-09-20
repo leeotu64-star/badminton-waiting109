@@ -5120,92 +5120,110 @@ a[data-page="digitalTwin"],
 </style>
 
 
-<style id="OPSBOARD_WIDTH_FONT_V3">
-/* V3: 상단 3열 기준으로 하단 폭 정렬 + 가독성 개선
-   기능/데이터는 변경하지 않습니다. */
-.jgb-dashboard-mode.ops .qrx-v8-grid{
+
+
+
+
+
+
+
+
+<style id="OPSBOARD_LAYOUT_REBUILT_V8">
+/* 운영게시판 레이아웃 재구축 V8
+   기존 색상/카드 디자인/기능은 유지하고, 레이아웃 기준만 하나의 3열 Grid로 통일합니다. */
+.jgb-dashboard-mode.ops .opx-board{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+/* 상단 접수/관리자 판단: 공통 3등분 기준, 2칸+1칸 */
+.jgb-dashboard-mode.ops .opx-board > div[style*="grid-template-columns"]{
+  display:grid!important;
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
   gap:12px!important;
+  width:100%!important;
+  min-width:0!important;
 }
+.jgb-dashboard-mode.ops .opx-board > div[style*="grid-template-columns"] > .opx-board-panel:first-child{
+  grid-column:1 / span 2!important;
+  min-width:0!important;
+  width:auto!important;
+}
+.jgb-dashboard-mode.ops .opx-board > div[style*="grid-template-columns"] > .opx-board-panel:nth-child(2){
+  grid-column:3!important;
+  min-width:0!important;
+  width:auto!important;
+}
+/* 분석판 전체도 동일한 3열 기준 */
+.jgb-dashboard-mode.ops .qrx-v8-wrap{
+  width:100%!important;
+  max-width:none!important;
+  display:grid!important;
+  gap:12px!important;
+  min-width:0!important;
+}
+.jgb-dashboard-mode.ops .qrx-v8-hero,
+.jgb-dashboard-mode.ops .qrx-v8-grid-3,
+.jgb-dashboard-mode.ops .qrx-v8-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:12px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+/* 2+1 구조 */
+.jgb-dashboard-mode.ops .qrx-v8-hero > .qrx-v8-panel:first-child,
 .jgb-dashboard-mode.ops .qrx-v8-grid > .qrx-v8-panel:first-child{
   grid-column:1 / span 2!important;
+  min-width:0!important;
 }
+.jgb-dashboard-mode.ops .qrx-v8-hero > .qrx-v8-panel:nth-child(2),
 .jgb-dashboard-mode.ops .qrx-v8-grid > .qrx-v8-panel:nth-child(2){
   grid-column:3!important;
+  min-width:0!important;
 }
-
-/* 분석 카드 글씨 확대 */
-.jgb-dashboard-mode.ops .qrx-v8-head b{font-size:14px!important}
-.jgb-dashboard-mode.ops .qrx-v8-head span{font-size:10px!important}
-.jgb-dashboard-mode.ops .qrx-v8-body{font-size:12px!important}
-.jgb-dashboard-mode.ops .qrx-change-copy b{font-size:12px!important}
-.jgb-dashboard-mode.ops .qrx-change-copy span{font-size:10px!important}
-.jgb-dashboard-mode.ops .qrx-change-item>strong{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-place b{font-size:12px!important}
-.jgb-dashboard-mode.ops .qrx-place small{font-size:10px!important}
-.jgb-dashboard-mode.ops .qrx-score{font-size:13px!important}
-.jgb-dashboard-mode.ops .qrx-score small{font-size:10px!important}
-.jgb-dashboard-mode.ops .qrx-barrow b{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-barrow strong{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-heat-cell{font-size:12px!important}
-.jgb-dashboard-mode.ops .qrx-heat-cell small{font-size:10px!important}
-.jgb-dashboard-mode.ops .qrx-trend-day b{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-trend-day small{font-size:10px!important}
-.jgb-dashboard-mode.ops .qrx-change-reco small{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-change-reco b{font-size:14px!important}
-.jgb-dashboard-mode.ops .qrx-change-reco span{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-footer{font-size:10px!important}
-</style>
-
-
-<style id="layout-3col-readable-v6">
-/* 운영게시판 전체 공통 3등분 기준 */
-.jgb-dashboard-mode.ops .opx-board > div[style*="grid-template-columns"] > .opx-board-panel:first-child{grid-column:1 / span 2!important;min-width:0!important}
-.jgb-dashboard-mode.ops .opx-board > div[style*="grid-template-columns"] > .opx-board-panel:nth-child(2){grid-column:3!important;min-width:0!important}
-.jgb-dashboard-mode.ops .qrx-v8-hero{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
-.jgb-dashboard-mode.ops .qrx-v8-hero > .qrx-v8-panel:first-child{grid-column:1 / span 2!important}
-.jgb-dashboard-mode.ops .qrx-v8-hero > .qrx-v8-panel:nth-child(2){grid-column:3!important}
-.jgb-dashboard-mode.ops .qrx-v8-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
-.jgb-dashboard-mode.ops .qrx-v8-grid-3 > .qrx-change-panel{grid-column:1 / -1!important}
-
-/* 가독성 개선: 기존 기능은 유지하고 글씨만 확대 */
+/* 현재 남겨둔 오늘의 변화 카드는 전체 3칸 */
+.jgb-dashboard-mode.ops .qrx-v8-grid-3 > .qrx-change-panel{
+  grid-column:1 / -1!important;
+  min-width:0!important;
+}
+.jgb-dashboard-mode.ops .qrx-v8-panel{
+  width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+/* 기존 디자인의 글씨 크기만 가독성 있게 유지/확대 */
 .jgb-dashboard-mode.ops .opx-board-panel-head b{font-size:14px!important}
 .jgb-dashboard-mode.ops .opx-board-panel-head span{font-size:11px!important}
-.jgb-dashboard-mode.ops .qr-priority-table-v6{font-size:14px!important}
-.jgb-dashboard-mode.ops .qr-priority-table-v6 th{font-size:12px!important;padding:11px!important}
-.jgb-dashboard-mode.ops .qr-priority-table-v6 td{font-size:13px!important;padding:11px!important}
-.jgb-dashboard-mode.ops .qr-priority-table-v6 td small{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-judgement-main b{font-size:15px!important}
-.jgb-dashboard-mode.ops .qrx-judgement-main span{font-size:13px!important}
-.jgb-dashboard-mode.ops .qrx-judgement-badge{font-size:12px!important}
+.jgb-dashboard-mode.ops .qr-priority-table-v6 th{font-size:12px!important}
+.jgb-dashboard-mode.ops .qr-priority-table-v6 td{font-size:13px!important}
 .jgb-dashboard-mode.ops .qrx-v8-head b{font-size:14px!important}
 .jgb-dashboard-mode.ops .qrx-v8-head span{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-change-copy b{font-size:12px!important}
-.jgb-dashboard-mode.ops .qrx-change-copy span{font-size:10px!important}
-.jgb-dashboard-mode.ops .qrx-change-item>strong{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-change-reco small{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-change-reco b{font-size:14px!important}
-.jgb-dashboard-mode.ops .qrx-change-reco span{font-size:11px!important}
-.jgb-dashboard-mode.ops .qrx-change-foot{font-size:10px!important}
+.jgb-dashboard-mode.ops .qrx-judgement-title{font-size:20px!important}
+.jgb-dashboard-mode.ops .qrx-judgement-main{font-size:18px!important}
+.jgb-dashboard-mode.ops .qrx-judgement ul{font-size:12px!important}
+.jgb-dashboard-mode.ops .qrx-alertbox strong{font-size:44px!important}
+.jgb-dashboard-mode.ops .qrx-alertbox small{font-size:12px!important}
+.jgb-dashboard-mode.ops .qrx-change-copy b{font-size:13px!important}
+.jgb-dashboard-mode.ops .qrx-change-copy span{font-size:11px!important}
+.jgb-dashboard-mode.ops .qrx-change-item>strong{font-size:12px!important}
+.jgb-dashboard-mode.ops .qrx-change-reco small{font-size:12px!important}
+.jgb-dashboard-mode.ops .qrx-change-reco b{font-size:15px!important}
+.jgb-dashboard-mode.ops .qrx-change-reco span{font-size:12px!important}
+.jgb-dashboard-mode.ops .qrx-change-foot{font-size:11px!important}
+.jgb-dashboard-mode.ops .qrx-footer{font-size:11px!important}
 @media(max-width:760px){
   .jgb-dashboard-mode.ops .opx-board > div[style*="grid-template-columns"],
   .jgb-dashboard-mode.ops .qrx-v8-hero,
-  .jgb-dashboard-mode.ops .qrx-v8-grid-3{grid-template-columns:1fr!important}
+  .jgb-dashboard-mode.ops .qrx-v8-grid-3,
+  .jgb-dashboard-mode.ops .qrx-v8-grid{grid-template-columns:1fr!important}
   .jgb-dashboard-mode.ops .opx-board > div[style*="grid-template-columns"] > .opx-board-panel:first-child,
   .jgb-dashboard-mode.ops .opx-board > div[style*="grid-template-columns"] > .opx-board-panel:nth-child(2),
   .jgb-dashboard-mode.ops .qrx-v8-hero > .qrx-v8-panel:first-child,
   .jgb-dashboard-mode.ops .qrx-v8-hero > .qrx-v8-panel:nth-child(2),
+  .jgb-dashboard-mode.ops .qrx-v8-grid > .qrx-v8-panel:first-child,
+  .jgb-dashboard-mode.ops .qrx-v8-grid > .qrx-v8-panel:nth-child(2),
   .jgb-dashboard-mode.ops .qrx-v8-grid-3 > .qrx-change-panel{grid-column:1!important}
-}
-</style>
-
-<style id="OPSBOARD_FULL_WIDTH_V7">
-/* V7: 운영게시판을 현재 화면의 본문 영역 전체 폭에 맞춤 */
-.jgb-dashboard-mode.ops .opx-board{
-  width:100%!important;
-  max-width:none!important;
-  margin:14px 0 24px!important;
-  box-sizing:border-box!important;
 }
 </style>
 
