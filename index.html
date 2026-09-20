@@ -15962,8 +15962,7 @@ body {
   };
   window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>관리구분<select id="jgbLRMethod"><option>자체정비</option><option>외주정비</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="점검 내역을 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체정비';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs){rs.value=(current==='수리예정'||current==='수리중'||current==='정상')?current:'수리예정';}}
   window.jgbLRSave=function(){
-    const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim();
-    if(!text)return;
+    const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=(document.getElementById('jgbLRText')?.value||'').trim() || '점검 내역 미입력';
     /* 등록일자는 브라우저의 현지 날짜를 사용합니다. 연도가 바뀌면 새 연도가 자동 적용됩니다. */
     const now=new Date();
     const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
@@ -17607,6 +17606,73 @@ document.addEventListener('click',handle,true);
 .jgb-v136-head-title h3{display:flex!important;align-items:center!important;margin:0!important;padding:0!important;height:100%!important;font-size:18px!important;font-weight:900!important;line-height:1.15!important;letter-spacing:-0.02em!important;white-space:nowrap!important;}
 .jgb-v136-head-title span{display:flex!important;align-items:center!important;margin:0!important;line-height:1.1!important;white-space:nowrap!important;}
 .jgb-history-card .jgb-history-title,.jgb-history-card .jgb-paper-title,.jgb-history-card .jgb-basic-title{display:flex!important;align-items:center!important;line-height:1.15!important;margin:0!important;}
+</style>
+
+<style id="JGB_LR_V21_STATUS_SELECT_CLICK_FIX">
+/* V21: 유지관리 등록창 처리상태 선택상자 클릭/선택 강제 활성화 */
+#jgbLRModal{
+  z-index:9999999!important;
+  pointer-events:auto!important;
+}
+#jgbLRModal .jgb-lr-v54-dialog{
+  position:relative!important;
+  z-index:10000000!important;
+  pointer-events:auto!important;
+}
+#jgbLRModal label,
+#jgbLRModal input,
+#jgbLRModal select,
+#jgbLRModal textarea,
+#jgbLRModal button{
+  pointer-events:auto!important;
+}
+#jgbLRStatusReg{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  position:relative!important;
+  z-index:10000001!important;
+  pointer-events:auto!important;
+  cursor:pointer!important;
+  user-select:auto!important;
+  -webkit-appearance:auto!important;
+  appearance:auto!important;
+}
+</style>
+<script>
+/* V21: 처리상태 선택상자를 열 때 다른 레이어가 가로채지 않도록 명시적으로 활성화 */
+(function(){
+  function fixStatusSelect(){
+    const s=document.getElementById('jgbLRStatusReg');
+    if(!s) return;
+    s.disabled=false;
+    s.readOnly=false;
+    s.removeAttribute('disabled');
+    s.style.pointerEvents='auto';
+    s.style.position='relative';
+    s.style.zIndex='10000001';
+  }
+  document.addEventListener('click',function(e){
+    if(e.target && (e.target.id==='jgbLRStatusReg' || e.target.closest?.('#jgbLRStatusReg'))) fixStatusSelect();
+  },true);
+  document.addEventListener('focusin',function(e){
+    if(e.target && e.target.id==='jgbLRStatusReg') fixStatusSelect();
+  },true);
+  const oldMaintenance=window.jgbLRMaintenance;
+  if(typeof oldMaintenance==='function'){
+    window.jgbLRMaintenance=function(n,type){
+      oldMaintenance(n,type);
+      setTimeout(fixStatusSelect,0);
+    };
+  }
+})();
+</script>
+
+<style id="JGB_V22_SAVE_BUTTON_CLICK_FIX">
+/* V22: 유지관리 등록창 저장버튼 클릭 강제 활성화 */
+#jgbLRModal .jgb-lr-v54-dialog .row{position:relative!important;z-index:10000010!important;pointer-events:auto!important;display:flex!important;}
+#jgbLRModal .jgb-lr-v54-dialog .row button{position:relative!important;z-index:10000011!important;pointer-events:auto!important;visibility:visible!important;opacity:1!important;cursor:pointer!important;}
+#jgbLRModal .jgb-lr-v54-dialog .row button:last-child{background:#edf6fb!important;color:#17384e!important;border:1px solid #829aaa!important;}
 </style>
 </body>
 
@@ -22722,5 +22788,38 @@ cleanupDuplicateOnly();
   overflow:hidden!important;
   text-overflow:ellipsis!important;
   box-sizing:border-box!important;
+}
+</style>
+
+<style id="JGB_LR_V23_RATIO_45_55_NO_SLIDER">
+/* V23: 이력카드 45% / 유지관리 이력 55%, 유지관리 가로 슬라이더 제거 */
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild{
+  grid-template-columns:45fr 55fr!important;
+}
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history > .jgb-lr-rebuild-historyscroll,
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history > .jgb-lr-v54-historyscroll{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  scrollbar-width:none!important;
+}
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history > .jgb-lr-rebuild-historyscroll::-webkit-scrollbar,
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history > .jgb-lr-v54-historyscroll::-webkit-scrollbar{
+  height:0!important;
+  display:none!important;
+}
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history table{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  table-layout:fixed!important;
+}
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history table th,
+.jgb-lr-v54-detail.jgb-lr-v54-rebuild > .jgb-lr-v54-history table td{
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
 }
 </style>
