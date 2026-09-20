@@ -15762,8 +15762,8 @@ body {
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   function ordered(){return Array.from({length:36},(_,i)=>i+1);}
   function cell(n,type){const a=assets[n-1],st=type==='light'?a.light:a.reel,sel=type==='light'?selectedLight===n:selectedReel===n;return `<button type="button" class="jgb-lr-v54-cell ${statusClass[st]} ${sel?'sel':''}" onclick="window.jgbLRSelect(${n},'${type}')" title="${n}번 ${type==='light'?'조명':'릴선'}">${n}</button>`}
-  function historyRows(hist){return hist.length?hist.map(r=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=r[4]||'';return `<tr><td>${esc(date)}</td><td>${esc(method)}</td><td>${esc(text)}</td><td>${esc(manager)}</td></tr>`}).join(''):`<tr><td colspan="4" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
-  function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>점검·정비 내용</th><th>담당자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
+  function historyRows(hist){return hist.length?hist.map(r=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=r[4]||'';return `<tr><td>${esc(date)}</td><td>${esc(method)}</td><td>${esc(status)}</td><td class="maintenance-text">${esc(text)}</td><td>${esc(manager)}</td></tr>`}).join(''):`<tr><td colspan="5" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
+  function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>처리상태</th><th>정비내용 및 조치결과</th><th>담당자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span class="jgb-lr-state-summary"><b class="ok">● 정상 ${counts.정상}</b><b class="planned">● 수리예정 ${counts.수리예정}</b><b class="repair">● 수리중 ${counts.수리중}</b></span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
   function markup(){
     const lc={정상:0,수리예정:0,수리중:0},rc={정상:0,수리예정:0,수리중:0};
@@ -16793,6 +16793,46 @@ document.addEventListener('click',handle,true);
   .jgb-v170-head{height:88px!important;min-height:88px!important;max-height:88px!important;}
 }
 </style>
+
+<style id="JGB_LR_V14_STATUS_FILL">
+/* V14: 이상상태는 테두리만이 아니라 코트 버튼 전체를 상태색으로 표시하고 번호는 흰색 */
+.jgb-lr-v54-cell.warn{
+  background:linear-gradient(145deg,#f4c62f 0%,#dda600 100%)!important;
+  border:2px solid #c58f00!important;
+  color:#fff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 3px 7px rgba(150,100,0,.25)!important;
+}
+.jgb-lr-v54-cell.repair{
+  background:linear-gradient(145deg,#f0525c 0%,#d82f3c 100%)!important;
+  border:2px solid #b9232e!important;
+  color:#fff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 3px 7px rgba(150,30,40,.25)!important;
+}
+.jgb-lr-v54-cell.warn span,.jgb-lr-v54-cell.repair span{
+  color:#fff!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.28)!important;
+}
+.jgb-lr-v54-cell.warn:hover{
+  background:linear-gradient(145deg,#f7cf49 0%,#e3ad12 100%)!important;
+  border-color:#b98200!important;
+}
+.jgb-lr-v54-cell.repair:hover{
+  background:linear-gradient(145deg,#f5636b 0%,#df3542 100%)!important;
+  border-color:#a91d28!important;
+}
+.jgb-lr-v54-cell.sel.warn{
+  background:linear-gradient(145deg,#f4c62f 0%,#dda600 100%)!important;
+  border:3px solid #b98200!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 2px rgba(255,193,7,.22),0 4px 9px rgba(150,100,0,.25)!important;
+}
+.jgb-lr-v54-cell.sel.repair{
+  background:linear-gradient(145deg,#f0525c 0%,#d82f3c 100%)!important;
+  border:3px solid #a91d28!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 2px rgba(220,47,60,.22),0 4px 9px rgba(150,30,40,.25)!important;
+}
+.jgb-lr-v54-cell.sel.warn span,.jgb-lr-v54-cell.sel.repair span{color:#fff!important;}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -20430,4 +20470,17 @@ cleanupDuplicateOnly();
 .jgb-lr-v54-cell.sel.normal{border:3px solid #18a957!important;box-shadow:inset 0 0 0 1px #fff,0 0 0 1px rgba(24,169,87,.18)!important;background:#edfff5!important}
 .jgb-lr-v54-cell.sel.warn{border:3px solid #e0ad00!important;box-shadow:inset 0 0 0 1px #fff,0 0 0 1px rgba(224,173,0,.18)!important;background:#fff7dc!important}
 .jgb-lr-v54-cell.sel.repair{border:3px solid #ed3d45!important;box-shadow:inset 0 0 0 1px #fff,0 0 0 1px rgba(237,61,69,.18)!important;background:#ffe8eb!important}
+</style>
+
+<style id="JGB_LR_V15_HISTORY_SYNC">
+/* V15: 등록창과 유지관리 이력의 항목을 동일하게 표시 */
+.jgb-lr-v54-historyscroll{overflow-x:auto!important;overflow-y:auto!important}
+.jgb-lr-v54-history table{min-width:620px!important;width:100%!important;table-layout:fixed!important}
+.jgb-lr-v54-history th,.jgb-lr-v54-history td{font-size:13px!important;font-weight:800!important;padding:8px 7px!important;vertical-align:middle!important;box-sizing:border-box!important}
+.jgb-lr-v54-history th:nth-child(1),.jgb-lr-v54-history td:nth-child(1){width:105px!important}
+.jgb-lr-v54-history th:nth-child(2),.jgb-lr-v54-history td:nth-child(2){width:100px!important}
+.jgb-lr-v54-history th:nth-child(3),.jgb-lr-v54-history td:nth-child(3){width:90px!important}
+.jgb-lr-v54-history th:nth-child(4),.jgb-lr-v54-history td:nth-child(4){width:230px!important}
+.jgb-lr-v54-history th:nth-child(5),.jgb-lr-v54-history td:nth-child(5){width:95px!important}
+.jgb-lr-v54-history td.maintenance-text{white-space:pre-wrap!important;word-break:break-word!important;overflow-wrap:anywhere!important;text-align:left!important;color:#17384e!important}
 </style>
