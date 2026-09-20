@@ -15734,7 +15734,10 @@ body {
 (function(){
   const statusColors={정상:'#16a957',수리예정:'#e7ae00',수리중:'#ed3d45'};
   const statusClass={정상:'',수리예정:'warn',수리중:'repair'};
-  const assets=Array.from({length:36},(_,i)=>({id:i+1,light:i===4?'수리예정':'정상',reel:i===17?'수리중':'정상',lightHistory:i===4?[['2026-09-18','정기점검','점검 필요','김']]:[],reelHistory:i===17?[['2026-09-18','수리','작동 확인 필요','이']]:[]}));
+  const LR_STORE='jgb_lr_v10';
+  const defaultAssets=Array.from({length:36},(_,i)=>({id:i+1,light:i===4?'수리예정':'정상',reel:i===17?'수리중':'정상',lightHistory:i===4?[['2026-09-18','정기점검','점검 필요','김']]:[],reelHistory:i===17?[['2026-09-18','수리','작동 확인 필요','이']]:[]}));
+  let assets=(()=>{try{const saved=JSON.parse(localStorage.getItem(LR_STORE)||'null');if(Array.isArray(saved)&&saved.length===36)return saved;}catch(e){}return defaultAssets;})();
+  function persist(){try{localStorage.setItem(LR_STORE,JSON.stringify(assets));}catch(e){console.warn('조명·릴선 저장 실패',e)}}
   let selectedLight=1,selectedReel=1;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   function ordered(){return Array.from({length:36},(_,i)=>i+1);}
@@ -15769,15 +15772,16 @@ body {
     a.model=document.getElementById('jgbLRModel').value.trim()|| (isL?'LED 코트 조명':'CSI-7 릴선');
     a.equipment=document.getElementById('jgbLREquipment').value.trim()|| (isL?'코트 조명':'릴선');
     a[isL?'light':'reel']=document.getElementById('jgbLRStatus').value;
+    persist();
     document.getElementById('jgbLRCardEditModal')?.remove();
     window.jgbLRSelect(n,type);
   };
   window.jgbLRPhoto=function(n,type){document.getElementById(`jgbLRPhotoInput_${n}_${type}`)?.click();};
   window.jgbLRPhotoSave=function(input,n,type){
     const file=input.files&&input.files[0]; if(!file)return;
-    const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
+    const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;persist();window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
-  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>관리구분<select id="jgbLRMethod"><option>자체정비</option><option>외주정비</option></select></label><textarea id="jgbLRText" placeholder="정비내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체정비';}
+  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>관리구분<select id="jgbLRMethod"><option>자체정비</option><option>외주정비</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><textarea id="jgbLRText" placeholder="정비내용 및 조치결과를 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체정비';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value=current==='정상'?'수리예정':current;}
   window.jgbLRSave=function(){
     const m=document.getElementById('jgbLRModal'),n=+m.dataset.n,type=m.dataset.type,text=document.getElementById('jgbLRText').value.trim();
     if(!text)return;
@@ -15786,9 +15790,9 @@ body {
     const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     const picked=document.getElementById('jgbLRDate')?.value||today;
     const y=Number(String(picked).slice(0,4));
-    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager];
-    if(type==='light')assets[n-1].lightHistory.unshift(row);else assets[n-1].reelHistory.unshift(row);
-    m.classList.remove('open');window.jgbLRSelect(n,type);
+    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const nextStatus=document.getElementById('jgbLRStatusReg')?.value||'수리예정'; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager];
+    if(type==='light'){assets[n-1].lightHistory.unshift(row);assets[n-1].light=nextStatus;}else{assets[n-1].reelHistory.unshift(row);assets[n-1].reel=nextStatus;}
+    persist();m.classList.remove('open');window.jgbLRSelect(n,type);
   };
   /* 최초 렌더 시 이 스크립트가 뒤늦게 정의되는 경우에도 조명·릴선 화면을 즉시 다시 그립니다. */
   setTimeout(function(){
