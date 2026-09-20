@@ -4487,6 +4487,19 @@ a[data-page="digitalTwin"],
 .employee-section .opx-annual-panel .opx-table td{font-size:15px!important;font-weight:850!important}
 </style>
 
+
+<style id="JGB_V13_ANNUAL_COMPACT">
+.employee-section .opx-annual-panel{margin-top:8px!important;padding:10px!important;border-radius:13px!important}
+.employee-section .opx-annual-panel .opx-head{min-height:34px!important;padding:0 0 6px!important;margin-bottom:6px!important;align-items:center!important}
+.employee-section .opx-annual-panel .opx-head h3{font-size:18px!important;line-height:1.1!important;margin:0!important}
+.employee-section .opx-annual-panel .opx-head p{font-size:9px!important;margin-top:3px!important}
+.employee-section .opx-annual-panel .opx-table th{font-size:11px!important;padding:7px 6px!important}
+.employee-section .opx-annual-panel .opx-table td{font-size:13px!important;padding:7px 6px!important}
+.opx-annual-year-select{display:flex!important;align-items:center!important;gap:5px!important;flex:0 0 auto!important}
+.opx-annual-year-select span{font-size:12px!important;font-weight:900!important;color:#17324d!important;margin-right:2px!important}
+.opx-annual-year-select button{width:28px!important;height:28px!important;padding:0!important;border:1px solid #bcd1e1!important;border-radius:6px!important;background:#fff!important;color:#17324d!important;font-size:20px!important;font-weight:900!important;line-height:24px!important;cursor:pointer!important}
+.opx-annual-year-select b{min-width:64px!important;height:28px!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0 8px!important;border:1px solid #bcd1e1!important;border-radius:6px!important;background:#fff!important;color:#17324d!important;font-size:12px!important;font-weight:900!important}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -5053,6 +5066,16 @@ a[data-page="digitalTwin"],
     window.addEventListener('pointerup',()=>{jgbTrendScrollDragging=false;});
     window.jgbTrendScrollInit=jgbTrendScrollInit;
     setTimeout(jgbTrendScrollInit,0);
+      window.jgbAnnualYearStep=function(delta){
+        const raw=String(localStorage.getItem('JGB_OPX_PERIOD')||'');
+        const m=raw.match(/^(\d{4})-(\d{2})$/);
+        let y=m?Number(m[1]):new Date().getFullYear();
+        const mo=m?m[2]:'01';
+        y=Math.max(2026,Math.min(2030,y+Number(delta||0)));
+        localStorage.setItem('JGB_OPX_PERIOD',y+'-'+mo);
+        render();
+      };
+
 
     function dashboardFull(s){
       const baseYm=monthKey();
@@ -5348,7 +5371,7 @@ a[data-page="digitalTwin"],
             </div>
           </section>
 
-          <section class="opx-panel opx-table-panel opx-annual-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><span class="opx-chip">연간</span></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
+          <section class="opx-panel opx-table-panel opx-annual-panel"><div class="opx-head"><div><h3>${year}년 연간 실적</h3><p>선택한 연도의 연간 누계만 표시합니다.</p></div><div class="opx-annual-year-select"><span>연도 선택</span><button type="button" onclick="jgbAnnualYearStep(-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="jgbAnnualYearStep(1)" aria-label="다음 연도">›</button></div></div><div class="opx-table-wrap"><table class="opx-table"><thead><tr><th>직원명</th><th>정규업무</th><th>근무편성</th><th>업무지시</th><th>종합실적</th></tr></thead><tbody>${annualRows}</tbody></table></div></section>
           <section class="opx-board opx-board-v7">
             <div class="opx-board-head">
               <div><span class="opx-board-kicker">QR CUSTOMER OPERATION INTELLIGENCE</span><h3>운영게시판</h3><p>직원실적·레벨은 그대로 두고, 고객 QR 접수 내용만으로 위험도·주의도·반복·빈번시간·요일·처리우선순위를 상세 분석합니다.</p></div>
