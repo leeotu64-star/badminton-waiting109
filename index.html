@@ -4514,21 +4514,12 @@ a[data-page="digitalTwin"],
 .opx-annual-year-select b{min-width:64px!important;height:28px!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0 8px!important;border:1px solid #bcd1e1!important;border-radius:6px!important;background:#fff!important;color:#17324d!important;font-size:12px!important;font-weight:900!important}
 </style>
 
-<style id="EMPLOYEE_V19_OPERATION_BOARD_BUTTON">
-/* V19: 직원업무실적 헤더의 QR 리버스 옆에 운영게시판 바로가기 추가 */
-.employee-board-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;height:32px!important;padding:0 12px!important;border:1px solid rgba(255,255,255,.72)!important;border-radius:8px!important;background:#eaf6ff!important;color:#13527a!important;font-size:12px!important;font-weight:1000!important;white-space:nowrap!important;cursor:pointer!important;box-shadow:0 2px 7px rgba(0,35,65,.18)!important;visibility:visible!important;opacity:1!important}
-.employee-board-btn:hover{background:#fff!important;border-color:#fff!important;transform:translateY(-1px)!important}
-@media(max-width:650px){.employee-board-btn{height:30px!important;font-size:11px!important;padding:0 10px!important}}
-</style>
-
-<style id="V23_OPERATION_BOARD_BUTTON_VISIBLE">
-/* V23: 헤더 운영게시판 바로가기 버튼 가시성만 보강. 기존 기능·디자인은 유지. */
-.employee-hero .employee-hero-actions{position:relative!important;z-index:20!important;display:flex!important;align-items:center!important;gap:8px!important;}
-.employee-hero .employee-board-btn{position:relative!important;z-index:21!important;display:inline-flex!important;visibility:visible!important;opacity:1!important;}
-</style>
-
-<style id="JGB_V22_CUSTOMER_PERFORMANCE">
-.employee-customer-performance{min-width:235px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);box-sizing:border-box;color:#fff}.employee-customer-performance .ecp-title{font-size:12px;font-weight:900;margin-bottom:6px;white-space:nowrap}.employee-customer-performance .ecp-stats{display:flex;gap:14px;align-items:center;justify-content:flex-end}.employee-customer-performance .ecp-stats span{font-size:11px;font-weight:800;white-space:nowrap}.employee-customer-performance .ecp-stats b{font-size:19px;margin-right:2px}
+<style>
+/* V21: 헤더 우측 기존 기조문구 제거, 아이콘으로 대체 */
+.employee-header-icon{width:46px;height:46px;margin-top:2px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);align-self:flex-end}
+.employee-header-icon span{font-size:24px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.12))}
+.employee-hero .opx-quote{display:none!important}
+@media(max-width:650px){.employee-header-icon{width:40px;height:40px;border-radius:12px}.employee-header-icon span{font-size:21px}}
 </style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -4733,15 +4724,14 @@ a[data-page="digitalTwin"],
     function body(){
       if(page==="lighting")return (typeof window.jgbLightReelPageMarkup==="function"?window.jgbLightReelPageMarkup():"<div></div>");
       if(page==="digitalTwin")return digitalTwinPage();
-    if(page==="dashboard2")return dashboard2();
+      if(page==="dashboard2")return dashboard2();
       if(page==="process")return processPage();
-     if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
-     const s=stats();
-     if(page==="opsboard")return dashboard(s);
-
-     if(page==="workers")return workerPage();
-     if(page==="pending")return pendingPage();
-     return dashboard(s);
+      if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
+      const s=stats();
+      if(page==="opsboard")return dashboard(s);
+      if(page==="workers")return workerPage();
+      if(page==="pending")return pendingPage();
+      return dashboard(s);
     }
     function eamDashboardSummary(){
      const A=Array.isArray(window.__eamA)?window.__eamA:[];
@@ -5142,11 +5132,6 @@ a[data-page="digitalTwin"],
       const customerReceived=customerMonth.length;
       const customerCompleted=customerMonth.filter(x=>x?.status==='완료').length;
       const customerPending=customerMonth.filter(x=>x?.status!=='완료').length;
-       const selectedDayKey=String(selectedDate||'').slice(0,10);
-       const customerToday=customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===selectedDayKey);
-       const customerTodayReceived=customerToday.length;
-       const customerTodayCompleted=customerToday.filter(x=>x?.status==='완료').length;
-       const customerTodayPending=customerToday.filter(x=>x?.status!=='완료').length;
       const customerRate=customerReceived?Math.round(customerCompleted/customerReceived*100):0;
       const gymStatus=customerReceived===0?'자료 집계중':(customerCompleted>=customerPending?'원활':'관리 필요');
       const gymStatusClass=customerReceived===0?'neutral':(customerCompleted>=customerPending?'good':'warn');
@@ -5367,7 +5352,7 @@ a[data-page="digitalTwin"],
             <div class="opx-title">직원 업무실적 운영 대시보드</div>
             <!-- 직원 업무실적 헤더의 중복 설명·요약영역 제거: 본문 실적영역에서 관리 -->
           </div>
-          <div class="opx-hero-side employee-hero-side"><div class="employee-hero-actions"><div class="opx-live">● 실시간 직원실적 연동</div><button type="button" id="employeeBoardButton" class="employee-board-btn" aria-label="운영게시판 바로가기" onclick="go('opsboard')">📋 운영게시판</button><div class="employee-customer-performance" aria-label="오늘의 고객실적"><div class="ecp-title">📋 오늘의 고객실적</div><div class="ecp-stats"><span><b>${customerTodayReceived}</b>접수</span><span><b>${customerTodayCompleted}</b>완료</span><span><b>${customerTodayPending}</b>미처리</span></div></div></div><div class="opx-quote">“공정하게 평가하고,<br>투명하게 관리합니다.”<small>장군봉체육관 직원 업무실적 관리 원칙</small></div></div>
+          <div class="opx-hero-side employee-hero-side"><div class="employee-hero-actions"><div class="opx-live">● 실시간 직원실적 연동</div><button type="button" class="employee-qr-reverse" onclick="window.location.href='https://leeotu64-star.github.io/badminton-waiting109/'">📱 QR 리버스</button></div><div class="employee-header-icon" aria-label="직원 업무실적"><span>📊</span></div></div>
         </section>
 
         <section class="opx-major-section employee-section">
