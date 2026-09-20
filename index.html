@@ -15753,7 +15753,7 @@ body {
 <script id="jgb-lr-v54-script">
 (function(){
   const statusColors={정상:'#16a957',수리예정:'#e7ae00',수리중:'#ed3d45'};
-  const statusClass={정상:'',수리예정:'warn',수리중:'repair'};
+  const statusClass={정상:'normal',수리예정:'warn',수리중:'repair'};
   const LR_STORE='jgb_lr_v10';
   const defaultAssets=Array.from({length:36},(_,i)=>({id:i+1,light:i===4?'수리예정':'정상',reel:i===17?'수리중':'정상',lightHistory:i===4?[['2026-09-18','정기점검','점검 필요','김']]:[],reelHistory:i===17?[['2026-09-18','수리','작동 확인 필요','이']]:[]}));
   let assets=(()=>{try{const saved=JSON.parse(localStorage.getItem(LR_STORE)||'null');if(Array.isArray(saved)&&saved.length===36)return saved;}catch(e){}return defaultAssets;})();
@@ -15762,7 +15762,7 @@ body {
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   function ordered(){return Array.from({length:36},(_,i)=>i+1);}
   function cell(n,type){const a=assets[n-1],st=type==='light'?a.light:a.reel,sel=type==='light'?selectedLight===n:selectedReel===n;return `<button type="button" class="jgb-lr-v54-cell ${statusClass[st]} ${sel?'sel':''}" onclick="window.jgbLRSelect(${n},'${type}')" title="${n}번 ${type==='light'?'조명':'릴선'}">${n}</button>`}
-  function historyRows(hist){return hist.length?hist.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join(''):`<tr><td colspan="4" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
+  function historyRows(hist){return hist.length?hist.map(r=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=r[4]||'';return `<tr><td>${esc(date)}</td><td>${esc(method)}</td><td>${esc(text)}</td><td>${esc(manager)}</td></tr>`}).join(''):`<tr><td colspan="4" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
   function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>점검·정비 내용</th><th>담당자</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span class="jgb-lr-state-summary"><b class="ok">● 정상 ${counts.정상}</b><b class="planned">● 수리예정 ${counts.수리예정}</b><b class="repair">● 수리중 ${counts.수리중}</b></span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
   function markup(){
@@ -15816,8 +15816,9 @@ body {
     const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     const picked=document.getElementById('jgbLRDate')?.value||today;
     const y=Number(String(picked).slice(0,4));
-    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const nextStatus=document.getElementById('jgbLRStatusReg')?.value||'수리예정'; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager];
-    if(type==='light'){assets[n-1].lightHistory.unshift(row);assets[n-1].light=nextStatus;}else{assets[n-1].reelHistory.unshift(row);assets[n-1].reel=nextStatus;}
+    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const nextStatus=document.getElementById('jgbLRStatusReg')?.value||'수리예정'; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager,nextStatus];
+    /* 등록한 이력을 반드시 현재 선택 자산의 조명/릴선 이력카드와 상태에 동시에 반영 */
+    if(type==='light'){assets[n-1].lightHistory=Array.isArray(assets[n-1].lightHistory)?assets[n-1].lightHistory:[];assets[n-1].lightHistory.unshift(row);assets[n-1].light=nextStatus;}else{assets[n-1].reelHistory=Array.isArray(assets[n-1].reelHistory)?assets[n-1].reelHistory:[];assets[n-1].reelHistory.unshift(row);assets[n-1].reel=nextStatus;}
     persist();m.classList.remove('open');window.jgbLRSelect(n,type);
   };
   /* 최초 렌더 시 이 스크립트가 뒤늦게 정의되는 경우에도 조명·릴선 화면을 즉시 다시 그립니다. */
@@ -15829,6 +15830,14 @@ body {
 })();
 </script>
 
+<style id="JGB_LR_V58_HISTORY_APPLY">
+/* V12: 조명·릴선 유지관리 등록값을 이력카드와 상태에 확실하게 동기화 */
+.jgb-lr-v54-card .jgb-lr-v54-field strong[style*="color:#16a957"]{font-weight:1000!important}
+.jgb-lr-v54-card .jgb-lr-v54-field strong[style*="color:#e7ae00"]{font-weight:1000!important}
+.jgb-lr-v54-card .jgb-lr-v54-field strong[style*="color:#ed3d45"]{font-weight:1000!important}
+.jgb-lr-v54-history table{width:100%!important;border-collapse:collapse!important}
+.jgb-lr-v54-history th,.jgb-lr-v54-history td{white-space:nowrap!important;vertical-align:middle!important}
+</style>
 <style id="JGB_LR_V56_HEADER_COLOR">
 .jgb-lr-v54-head{background:#eaf4fa!important;border:2px solid #1d78b7!important;border-top:5px solid #1477b8!important}
 .jgb-lr-v54-panehead{background:#dbeaf3!important;color:#173b55!important;border-top:2px solid #1c5d7c!important}
@@ -20406,4 +20415,19 @@ cleanupDuplicateOnly();
   font-weight:800!important;
   color:#17384d!important;
 }
+</style>
+
+<style id="JGB_LR_V13_STATUS_BORDER">
+/* V13: 배치도 아래 상태 나열 제거 + 코트 버튼 테두리에 현재 상태 반영 */
+.jgb-lr-v54-maptitle .jgb-lr-state-summary{display:none!important}
+.jgb-lr-v54-cell.normal{background:#f7fff9!important;border:2px solid #18a957!important;color:#173c58!important}
+.jgb-lr-v54-cell.warn{background:#fffaf0!important;border:2px solid #e0ad00!important;color:#173c58!important}
+.jgb-lr-v54-cell.repair{background:#fff2f3!important;border:2px solid #ed3d45!important;color:#173c58!important}
+.jgb-lr-v54-cell.normal:hover{background:#edfff5!important;border-color:#0c9148!important}
+.jgb-lr-v54-cell.warn:hover{background:#fff7dc!important;border-color:#c99500!important}
+.jgb-lr-v54-cell.repair:hover{background:#ffe8eb!important;border-color:#d52d38!important}
+/* 선택된 코트도 상태색 테두리를 우선 표시하되 선택 상태는 굵기로 구분 */
+.jgb-lr-v54-cell.sel.normal{border:3px solid #18a957!important;box-shadow:inset 0 0 0 1px #fff,0 0 0 1px rgba(24,169,87,.18)!important;background:#edfff5!important}
+.jgb-lr-v54-cell.sel.warn{border:3px solid #e0ad00!important;box-shadow:inset 0 0 0 1px #fff,0 0 0 1px rgba(224,173,0,.18)!important;background:#fff7dc!important}
+.jgb-lr-v54-cell.sel.repair{border:3px solid #ed3d45!important;box-shadow:inset 0 0 0 1px #fff,0 0 0 1px rgba(237,61,69,.18)!important;background:#ffe8eb!important}
 </style>
