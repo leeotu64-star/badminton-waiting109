@@ -5111,6 +5111,45 @@ a[data-page="digitalTwin"],
 }
 </style>
 
+
+<style id="repair-target-v3">
+.ca-repair-head{
+  display:grid;grid-template-columns:14% 18% 38% 30%;
+  padding:9px 12px;background:#f1f6fa;border-top:1px solid #dbe6ee;border-bottom:1px solid #dbe6ee;
+  color:#567086;font-size:12px;font-weight:900
+}
+.ca-repair-head span{padding:0 7px}
+.ca-repair-list{display:flex;flex-direction:column}
+.ca-repair-row{
+  display:grid;grid-template-columns:14% 18% 38% 30%;align-items:stretch;
+  min-height:78px;border-bottom:1px solid #e2eaf0;background:#fff
+}
+.ca-repair-row>div{padding:11px 12px;border-right:1px solid #e2eaf0;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.ca-repair-row>div:last-child{border-right:0}
+.ca-repair-no b{font-size:13px;color:#163a57}
+.ca-repair-no small{margin-top:4px;color:#8092a0;font-size:10px}
+.ca-repair-place b{font-size:13px;color:#183d5b}
+.ca-repair-place span{margin-top:4px;display:inline-block;width:max-content;padding:3px 7px;border-radius:999px;background:#edf5fa;color:#537086;font-size:10px;font-weight:900}
+.ca-repair-content strong{font-size:10px;color:#7a8e9d;margin-bottom:4px}
+.ca-repair-content span{font-size:12px;color:#243f56;font-weight:800;overflow-wrap:anywhere}
+.ca-repair-work{display:grid!important;grid-template-columns:minmax(105px,1fr) auto auto;gap:7px;align-items:center!important}
+.ca-repair-work select{height:34px;border:1px solid #bccdd8;border-radius:6px;background:#fff;padding:0 8px;font-size:11px;font-weight:800;min-width:0}
+.ca-repair-work .ca-status{white-space:nowrap;font-size:11px}
+.ca-repair-work .ca-complete{height:34px;border:1px solid #176fc0;border-radius:6px;background:#176fc0;color:#fff;padding:0 11px;font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap}
+.ca-repair-work .ca-need{font-size:10px;color:#a36a00;font-weight:900;white-space:nowrap}
+@media(max-width:900px){
+  .ca-repair-head{grid-template-columns:18% 22% 60%;}.ca-repair-head span:nth-child(4){display:none}
+  .ca-repair-row{grid-template-columns:18% 22% 60%}
+  .ca-repair-row>div:nth-child(4){grid-column:1/-1;border-top:1px solid #e2eaf0;border-right:0;display:grid;grid-template-columns:1fr auto auto}
+}
+@media(max-width:650px){
+  .ca-repair-head{display:none}
+  .ca-repair-row{display:block;padding:4px 0}
+  .ca-repair-row>div{border-right:0;border-bottom:1px solid #edf1f4;min-height:0}
+  .ca-repair-work{display:grid!important}
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -5317,7 +5356,7 @@ a[data-page="digitalTwin"],
       if(page==="digitalTwin")return digitalTwinPage();
     if(page==="dashboard2")return dashboard2();
       if(page==="process")return processPage();
-     if(page==="repair")return repairTargetPage();
+      if(page==="repair")return repairTargetPage();
      if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
      const s=stats();
      if(page==="opsboard")return dashboard(s);
@@ -6424,88 +6463,19 @@ a[data-page="digitalTwin"],
       await syncFromSupabase(); window.__newCustSelId=id; render();
     }
     function newCustomerTypeOf(x){const s=String(x?.category||'')+' '+String(x?.content||'');if(/안전/.test(s))return '안전신고';if(/시설|고장|파손|조명|릴선/.test(s))return '시설고장';if(/이용|불편|환경|청소|온도|냄새/.test(s))return '이용불편';return '기타접수'}
-    function newCustomerMapPos(x){
-      const t=String(x?.place||'').trim();
-      if(/1코트|1번/.test(t))return [15,62];
-      if(/2코트|2번/.test(t))return [32,62];
-      if(/3코트|3번/.test(t))return [49,62];
-      if(/4코트|4번/.test(t))return [66,62];
-      if(/5코트|5번/.test(t))return [83,62];
-      if(/남자\s*화장실/.test(t))return [12,20];
-      if(/여자\s*화장실/.test(t))return [28,20];
-      if(/남자\s*샤워실/.test(t))return [44,20];
-      if(/여자\s*샤워실/.test(t))return [60,20];
-      if(/남자\s*탈의실/.test(t))return [76,20];
-      if(/여자\s*탈의실/.test(t))return [92,20];
-      if(/휴게실|휴게공간/.test(t))return [90,46];
-      if(/복도/.test(t))return [50,88];
-      return [50,88];
-    }
+    function newCustomerMapPos(x){const t=String(x?.place||'');if(/1코트|1번/.test(t))return [15,62];if(/2코트|2번/.test(t))return [32,62];if(/3코트|3번/.test(t))return [49,62];if(/4코트|4번/.test(t))return [66,62];if(/5코트|5번/.test(t))return [83,62];if(/화장실|샤워/.test(t))return [89,25];if(/사무실|관리/.test(t))return [10,22];return [50,25]}
     function newCustomerMapMarkers(items){return items.map(x=>{const [left,top]=newCustomerMapPos(x),sel=String(window.__newCustSelId||'')===String(x.id);return `<button type="button" class="jgb-crm-marker ${sel?'selected':''}" style="left:${left}%;top:${top}%" onclick='window.__newCustSelId=${JSON.stringify(String(x.id))};window.__newCustType=${JSON.stringify(newCustomerTypeOf(x))};render()' title="${xEsc(x.place||'접수 위치')}"><span>●</span><b>${xEsc(x.place||'접수')}</b></button>`}).join('')}
 
     function repairTargetPage(){
-      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
-      const active=stored.filter(x=>x.status!=='완료');
-      const placeLabel=(p)=>String(p||'장소 미기록');
-      const state=(x)=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
-      const stateClass=(x)=>state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
-      const safe=(x)=>cleanIssueContent(x)||'접수 내용 없음';
+ const all=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+ const active=all.filter(x=>x.status!=="완료");
+ const state=x=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
+ return `<style id="repair-target-page-v1">
+ .repair-page{max-width:1500px;margin:0 auto;padding:8px 6px 50px;color:#16364e}.repair-head{height:100px;padding:18px 24px;border-radius:12px;background:linear-gradient(135deg,#124b7a,#0b6f9d);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px}.repair-head h1{margin:0;font-size:27px}.repair-head p{margin:6px 0 0;font-size:12px;font-weight:700;opacity:.88}.repair-count{min-width:95px;text-align:center;padding:12px;border-radius:9px;background:#fff;color:#1268a0;font-weight:950}.repair-box{background:#fff;border:1px solid #d5e1eb;border-radius:12px;overflow:hidden;box-shadow:0 5px 18px rgba(23,68,110,.06)}.repair-title{padding:18px 20px;border-bottom:1px solid #dfe8ef}.repair-title h2{margin:0;font-size:21px}.repair-title p{margin:5px 0 0;color:#7b8d9d;font-size:12px;font-weight:700}.repair-list{display:flex;flex-direction:column}.repair-row{display:grid;grid-template-columns:150px 190px minmax(220px,1fr) 270px 120px;min-height:78px;border-bottom:1px solid #e3ebf1;align-items:stretch}.repair-row>div{padding:12px 14px;border-right:1px solid #e3ebf1;display:flex;flex-direction:column;justify-content:center;min-width:0}.repair-row>div:last-child{border-right:0}.repair-label{font-size:10px;color:#8092a1;font-weight:900;margin-bottom:5px}.repair-value{font-size:13px;font-weight:900;overflow-wrap:anywhere}.repair-place small{display:inline-block;margin-top:5px;width:max-content;padding:3px 7px;border-radius:999px;background:#edf5fa;color:#587086;font-size:10px;font-weight:900}.repair-work{display:grid!important;grid-template-columns:1fr auto;gap:7px;align-items:center!important}.repair-work select{width:100%;height:34px;border:1px solid #c3d2de;border-radius:7px;background:#fff;padding:0 8px;font-size:11px;font-weight:800}.repair-work button{height:34px;border:0;border-radius:7px;background:#176fc0;color:#fff;padding:0 10px;font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap}.repair-status{font-size:11px;font-weight:950;white-space:nowrap}.repair-status.new{color:#a66a00}.repair-status.assigned{color:#176fc0}.repair-status.run{color:#7a45b5}.repair-empty{text-align:center;padding:70px 20px;color:#8092a1}.repair-empty strong{display:block;color:#1d3d57;font-size:18px;margin-bottom:7px}@media(max-width:1000px){.repair-row{grid-template-columns:120px 150px 1fr 230px 100px}}@media(max-width:760px){.repair-head{height:auto;min-height:90px}.repair-row{display:block;padding:4px 0}.repair-row>div{border-right:0;border-bottom:1px solid #edf2f5;min-height:52px}.repair-work{display:grid!important;grid-template-columns:1fr auto!important}}
+ </style><div class="repair-page"><header class="repair-head"><div><h1>수리 대상 품목</h1><p>고객 접수 내용을 담당 직원이 확인하고 처리완료까지 간단하게 관리합니다.</p></div><div class="repair-count">${active.length}<small style="display:block;font-size:10px">현재 접수</small></div></header><section class="repair-box"><div class="repair-title"><h2>접수·수리 처리 목록</h2><p>접수 → 담당 직원 → 처리완료 순서로 일자형 관리</p></div>${active.length?`<div class="repair-list"><div class="repair-row" style="background:#f4f8fb;min-height:40px;font-size:11px;font-weight:950;color:#6d8191"><div>접수번호</div><div>접수장소·유형</div><div>접수내용</div><div>직원 처리</div><div>상태</div></div>${active.map(x=>{const st=state(x), cls=st==='조치 진행'?'run':st==='담당 지정'?'assigned':'new';return `<div class="repair-row"><div><span class="repair-label">접수번호</span><span class="repair-value">${xEsc(x.id)}</span><small style="margin-top:4px;color:#8a9aa8;font-size:10px">${time(x.createdAt)}</small></div><div class="repair-place"><span class="repair-label">발생 장소</span><span class="repair-value">${xEsc(x.place||'장소 미기록')}</span><small>${xEsc(newCustomerTypeOf(x)||x.category||'기타')}</small></div><div><span class="repair-label">접수내용</span><span class="repair-value">${xEsc(cleanIssueContent(x)||'접수 내용 없음')}</span></div><div class="repair-work"><select onchange="assign('${x.id}',this.value)"><option value="">담당 직원</option>${workers.map(w=>`<option value="${xEsc(w.id)}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select>${x.handlerId?`<button onclick="completeIssue('${x.id}')">✓ 처리완료</button>`:`<span style="font-size:10px;color:#a66a00;font-weight:900">담당 지정 필요</span>`}</div><div><span class="repair-label">처리상태</span><span class="repair-status ${cls}">● ${xEsc(st)}</span></div></div>`}).join('')}</div>`:`<div class="repair-empty"><strong>현재 수리 대상 품목이 없습니다.</strong>새로운 고객 QR 접수가 들어오면 이곳에 표시됩니다.</div>`}</section></div>`;
+}
 
-      return `<style id="repair-target-page-style">
-      .jgb-repair-target{max-width:1500px;margin:0 auto;padding:8px 6px 48px;color:#102a43}
-      .jgb-repair-target *{box-sizing:border-box}
-      .jgb-repair-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 20px;border-radius:12px;background:linear-gradient(100deg,#0d3554,#146b94,#0d4669);color:#fff;box-shadow:0 4px 12px rgba(10,35,55,.18);margin-bottom:12px}
-      .jgb-repair-head h2{margin:0 0 4px;font-size:27px;font-weight:950}
-      .jgb-repair-head p{margin:0;color:#d9edf8;font-size:12px;font-weight:700}
-      .jgb-repair-count{min-width:92px;text-align:center;background:#fff;color:#1268e3;border-radius:10px;padding:10px 12px;font-weight:900}
-      .jgb-repair-count b{display:block;font-size:22px;line-height:1.1}
-      .jgb-repair-card{background:#fff;border:1px solid #d5e1ec;border-radius:12px;box-shadow:0 4px 14px rgba(20,50,75,.06);overflow:hidden}
-      .jgb-repair-title{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #dbe7f3;background:#f7fbfe}
-      .jgb-repair-title strong{font-size:18px}
-      .jgb-repair-title span{font-size:11px;color:#71839a}
-      .jgb-repair-empty{padding:70px 20px;text-align:center;color:#71839a}
-      .jgb-repair-empty b{display:block;font-size:19px;color:#173d5a;margin-bottom:8px}
-      .jgb-repair-list{display:grid;gap:8px;padding:10px}
-      .jgb-repair-row{display:grid;grid-template-columns:95px 160px minmax(0,1fr) 100px 105px;align-items:stretch;border:1px solid #dce7f0;border-radius:9px;overflow:hidden;background:#fff}
-      .jgb-repair-row>div{padding:12px;border-right:1px solid #e2ebf2;min-width:0}
-      .jgb-repair-row>div:last-child{border-right:0}
-      .jgb-repair-time{font-size:12px;font-weight:900;color:#173d5a}
-      .jgb-repair-time small{display:block;margin-top:3px;color:#8797a6;font-size:10px}
-      .jgb-repair-place b{display:block;font-size:15px;overflow-wrap:anywhere}
-      .jgb-repair-place span{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#edf5fb;color:#27709a;font-size:10px;font-weight:800}
-      .jgb-repair-content{font-size:13px;line-height:1.5;overflow-wrap:anywhere;word-break:break-word}
-      .jgb-repair-status{display:flex;align-items:center;justify-content:center}
-      .jgb-repair-badge{display:inline-block;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:900;background:#fff4d8;color:#a36a00}
-      .jgb-repair-badge.assigned{background:#e9f2ff;color:#1769c1}
-      .jgb-repair-badge.run{background:#eee9ff;color:#5b43a8}
-      .jgb-repair-action{display:flex;align-items:center;justify-content:center}
-      .jgb-repair-action button{border:1px solid #1268e3;background:#fff;color:#1268e3;border-radius:8px;padding:8px 10px;font-weight:900;cursor:pointer}
-      @media(max-width:900px){
-        .jgb-repair-row{grid-template-columns:1fr 1fr}
-        .jgb-repair-row>div:nth-child(3){grid-column:1/-1}
-      }
-      </style>
-      <div class="jgb-repair-target">
-        <section class="jgb-repair-head">
-          <div><h2>수리 대상 품목</h2><p>고객접수관리에서 접수된 미처리 시설 이상을 수리 대상으로 관리합니다.</p></div>
-          <div class="jgb-repair-count"><b>${active.length}</b>현재 접수</div>
-        </section>
-        <section class="jgb-repair-card">
-          <div class="jgb-repair-title"><strong>접수·수리 처리 목록</strong><span>고객 QR 접수 → 담당 지정 → 조치완료</span></div>
-          ${active.length?`<div class="jgb-repair-list">${active.map(x=>`
-            <div class="jgb-repair-row">
-              <div class="jgb-repair-time">${time(x.createdAt)}<small>접수</small></div>
-              <div class="jgb-repair-place"><b>${xEsc(placeLabel(x.place))}</b><span>${xEsc(x.category||'시설')}</span></div>
-              <div class="jgb-repair-content">${xEsc(safe(x))}</div>
-              <div class="jgb-repair-status"><span class="jgb-repair-badge ${stateClass(x)}">${xEsc(state(x))}</span></div>
-              <div class="jgb-repair-action"><button type="button" onclick="go('process')">접수 처리</button></div>
-            </div>`).join('')}</div>`:
-            `<div class="jgb-repair-empty"><b>현재 수리 대상 품목이 없습니다.</b>새로운 고객 QR 접수가 들어오면 이곳에 자동으로 표시됩니다.</div>`}
-        </section>
-      </div>`;
-    }
-
-    function processPage(){
+function processPage(){
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
      const active=stored.filter(x=>x.status!=='완료');
      const completed=stored.filter(x=>x.status==='완료'&&new Date(x.completedAt||x.createdAt||0)>=new Date(Date.now()-30*24*60*60*1000));
@@ -6544,7 +6514,7 @@ a[data-page="digitalTwin"],
      .jgb-crm-new-head{width:100%;min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:13px 16px;border:2px solid #173d5a;border-radius:10px;background:linear-gradient(100deg,#0d3554 0%,#14648d 55%,#0d4669 100%);box-shadow:0 3px 8px rgba(10,35,55,.18);color:#fff}
      .jgb-crm-brand{display:flex;align-items:center;gap:11px;min-width:0}.jgb-crm-brandico{width:43px;height:43px;display:flex;align-items:center;justify-content:center;font-size:31px;flex:0 0 43px}.jgb-crm-brand h2{margin:0 0 2px;font-size:23px;font-weight:950;letter-spacing:-.04em;color:#fff}.jgb-crm-brand p{margin:0;font-size:11px;font-weight:800;color:#d9edf8}.jgb-crm-head-stat{width:74px;min-height:52px;border:1px solid rgba(255,255,255,.5);border-radius:9px;background:#fff;color:#173c58;text-align:center;display:flex;flex-direction:column;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,.16)}.jgb-crm-head-stat b{font-size:21px;line-height:20px}.jgb-crm-head-stat small{font-size:9px;font-weight:900;margin-top:3px}
      .jgb-crm-new-body{height:720px;margin-top:10px;display:grid;grid-template-rows:40% 35% 25%;min-height:0}.jgb-crm-top{min-height:0;display:grid;grid-template-columns:7fr 3fr;gap:10px}.jgb-crm-map-panel,.jgb-crm-judge,.jgb-crm-history,.jgb-crm-bottom{min-width:0;min-height:0;border:2px solid #7894a8;border-radius:9px;background:#fff;overflow:hidden}.jgb-crm-panel-head{height:39px;padding:7px 11px;background:#e8f2f7;border-bottom:2px solid #7894a8;display:flex;align-items:center;justify-content:space-between}.jgb-crm-panel-head b{font-size:17px;font-weight:950}.jgb-crm-panel-head span{font-size:10px;color:#58758b;font-weight:900}
-     .jgb-crm-map{position:relative;height:calc(100% - 39px);background:#f3f7fa;overflow:hidden}.jgb-crm-map-title{height:24px;padding:4px 8px;background:#fff;border-bottom:1px solid #cbd9e2;font-size:10px;font-weight:950;color:#48647a}.jgb-crm-courts{position:absolute;left:4%;right:4%;top:31%;height:46%;display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.jgb-crm-court{border:2px solid #7895aa;background:#fff;display:flex;align-items:flex-start;justify-content:center;padding-top:5px;font-size:12px;color:#173c58;box-shadow:inset 0 0 0 2px #edf4f8}.jgb-crm-map-zone{position:absolute;min-width:72px;text-align:center;border:1px solid #9fb7c7;background:#eef5f9;color:#35576d;font-size:9px;font-weight:900;padding:5px 7px;border-radius:5px;box-shadow:0 1px 2px rgba(30,60,80,.06)}.z-mtoilet{left:4%;top:7%}.z-ftoilet{left:20%;top:7%}.z-mshower{left:36%;top:7%}.z-fshower{left:52%;top:7%}.z-mchange{left:68%;top:7%}.z-fchange{right:4%;top:7%}.z-lounge{right:4%;top:45%}.z-other{left:40%;bottom:4%}.jgb-crm-map-zone.other{background:#fff8e8;border-color:#e3bd6b;color:#795b22}.jgb-crm-map-zone.lounge{background:#eefaf3;border-color:#9bc9ac;color:#35664a}
+     .jgb-crm-map{position:relative;height:calc(100% - 39px);background:#f3f7fa;overflow:hidden}.jgb-crm-map-title{height:24px;padding:4px 8px;background:#fff;border-bottom:1px solid #cbd9e2;font-size:10px;font-weight:950;color:#48647a}.jgb-crm-courts{position:absolute;left:4%;right:4%;top:31%;height:46%;display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.jgb-crm-court{border:2px solid #7895aa;background:#fff;display:flex;align-items:flex-start;justify-content:center;padding-top:5px;font-size:12px;color:#173c58;box-shadow:inset 0 0 0 2px #edf4f8}.jgb-crm-map-zone{position:absolute;border:1px dashed #a9bdc9;background:#eaf2f6;color:#5a7283;font-size:9px;font-weight:900;padding:5px;border-radius:5px}.z-office{left:4%;top:9%}.z-lounge{left:36%;top:9%}.z-toilet{right:4%;top:9%}
      .jgb-crm-marker{position:absolute;transform:translate(-50%,-50%);z-index:5;border:2px solid #e53935;background:#fff;border-radius:999px;padding:3px 6px;display:flex;align-items:center;gap:4px;color:#b42318;font-size:8px;font-weight:950;cursor:pointer;box-shadow:0 2px 5px rgba(120,30,30,.22);white-space:nowrap}.jgb-crm-marker span{font-size:11px}.jgb-crm-marker.selected{border-color:#1268e3;background:#eaf5ff;color:#1268e3;box-shadow:0 0 0 3px rgba(18,104,227,.18),0 3px 7px rgba(18,104,227,.22)}.jgb-crm-map-legend{position:absolute;left:8px;right:8px;bottom:5px;display:flex;gap:12px;font-size:8px;font-weight:900;color:#5d7181}.jgb-crm-map-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e53935;margin-right:3px}.jgb-crm-map-legend .sel i{background:#1268e3}
      .jgb-crm-judge{display:grid;grid-template-rows:auto 1fr}.jgb-crm-judge-body{padding:11px;display:flex;flex-direction:column;justify-content:space-between}.jgb-crm-judge-main{padding:12px;border:1px solid #d7e4ed;border-radius:8px;background:#f7fbfd}.jgb-crm-judge-main strong{display:block;font-size:17px;font-weight:950;color:#173c58}.jgb-crm-judge-main small{display:block;margin-top:7px;font-size:10px;line-height:1.5;color:#6f8494;font-weight:800}.jgb-crm-judge-list{display:grid;gap:6px;margin-top:10px}.jgb-crm-judge-list div{display:flex;justify-content:space-between;padding:9px 10px;border:1px solid #e0e9ef;border-radius:7px;background:#fff;font-size:10px;font-weight:900}.jgb-crm-judge-list span{font-size:16px;color:#1268e3}
      .jgb-crm-history{margin-top:10px;display:grid;grid-template-rows:39px 1fr}.jgb-crm-history-head{padding:7px 11px;background:#e8f2f7;border-bottom:2px solid #7894a8;display:flex;align-items:center;justify-content:space-between}.jgb-crm-history-head strong{font-size:17px;font-weight:950}.jgb-crm-history-head span{font-size:10px;color:#58758b;font-weight:900}.jgb-crm-history-grid{min-height:0;display:grid;grid-template-columns:20fr 25fr 55fr;gap:7px;padding:7px;background:#f4f8fb}.jgb-crm-card{min-width:0;border:1px solid #d5e0ea;border-radius:7px;background:#fff;overflow:hidden}.jgb-crm-card h4{height:30px;margin:0;padding:7px 9px;background:#edf4f9;border-bottom:1px solid #d9e4ed;color:#183b59;font-size:11px;font-weight:950}.jgb-crm-type-list{padding:5px;display:grid;grid-template-columns:1fr 1fr;gap:4px}.jgb-crm-type-list button{border:1px solid #d7e3eb;border-radius:5px;background:#fff;padding:6px 5px;font-size:9px;font-weight:900;color:#36536a;cursor:pointer}.jgb-crm-type-list button span{float:right;color:#1268e3}.jgb-crm-type-list button.on{background:#eaf5ff;border-color:#1268e3;color:#1268e3}.jgb-crm-detail-grid{padding:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px}.jgb-crm-detail-grid>div{min-width:0;border:1px solid #e3eaf0;padding:5px 6px;border-radius:4px}.jgb-crm-detail-grid>div.full{grid-column:1/-1}.jgb-crm-detail-grid small{display:block;color:#7b8e9e;font-size:8px;font-weight:850}.jgb-crm-detail-grid b{display:block;margin-top:2px;color:#1b344d;font-size:10px;font-weight:900;overflow-wrap:anywhere}.jgb-crm-empty{padding:20px;text-align:center;color:#8193a1;font-size:10px;font-weight:800}.jgb-crm-work{display:flex;flex-direction:column}.jgb-crm-workline{display:grid;grid-template-columns:130px minmax(0,1fr) 62px 78px;gap:5px;align-items:center;padding:10px}.jgb-crm-workline select,.jgb-crm-workline input{height:31px;border:1px solid #b9cbd7;border-radius:5px;background:#fff;padding:0 7px;font:inherit;font-size:10px;font-weight:800;min-width:0}.jgb-crm-workline button{height:31px;border:1px solid #9eb1bf;border-radius:5px;font-size:9px;font-weight:950;cursor:pointer}.jgb-crm-workline .accept{background:#edf6fb;color:#176fc0}.jgb-crm-workline .complete{background:#176fc0;color:#fff;border-color:#176fc0}.jgb-crm-workstatus{margin:0 10px;padding:7px 8px;border-top:1px solid #e5edf2;color:#71839a;font-size:9px;font-weight:850}.jgb-crm-bottom{margin-top:10px}.jgb-crm-bottom-head{height:30px;padding:6px 10px;background:#f1f6f9;border-bottom:1px solid #d8e4eb;display:flex;justify-content:space-between}.jgb-crm-bottom-head b{font-size:11px}.jgb-crm-bottom-head span{font-size:9px;color:#71839a;font-weight:800}.jgb-crm-bottom-body{height:calc(100% - 30px);display:flex;align-items:center;justify-content:space-around;gap:8px;padding:10px;font-size:10px;font-weight:900;color:#536c7d}.jgb-crm-bottom-body span{padding:8px 11px;border:1px solid #dce7ee;border-radius:999px;background:#fff}
@@ -6554,7 +6524,45 @@ a[data-page="digitalTwin"],
       <section class="ca-hero"><div><div class="ca-eyebrow">JANGGUNBONG SPORTS CENTER · CUSTOMER SERVICE</div><h2 class="ca-title">고객접수관리</h2><p class="ca-sub">고객 QR 접수부터 담당 지정과 조치완료까지 한눈에 관리합니다.</p></div><div class="ca-tools"><span class="ca-pill live">실시간 접수</span><span class="ca-pill">오늘 ${today}건</span><button class="ca-refresh" onclick="syncFromSupabase()">↻ 새로고침</button></div></section>
       <section class="ca-kpis"><div class="ca-kpi"><span class="icon">📥</span><div class="label">전체 접수</div><div class="num">${active.length}<small>건</small></div><div class="desc">현재 처리 중인 고객 접수</div></div><div class="ca-kpi"><span class="icon">⏳</span><div class="label">접수 대기</div><div class="num">${waiting}<small>건</small></div><div class="desc">담당 직원 지정 필요</div></div><div class="ca-kpi"><span class="icon">🛠️</span><div class="label">처리 진행</div><div class="num">${running}<small>건</small></div><div class="desc">담당자가 처리 중인 접수</div></div><div class="ca-kpi"><span class="icon">✓</span><div class="label">최근 처리완료</div><div class="num">${completed.length}<small>건</small></div><div class="desc">최근 1개월 보관 기록</div></div><div class="ca-kpi"><span class="icon">🗂️</span><div class="label">오늘 접수</div><div class="num">${today}<small>건</small></div><div class="desc">금일 들어온 고객 접수</div></div></section>
       <div class="ca-banner"><div><strong>신속한 고객 응대, 깔끔한 접수관리</strong><br><span>접수된 민원은 담당 직원을 지정하고 조치가 끝나면 <b>조치완료</b>만 누르면 됩니다.</span></div><div class="chips"><span class="ca-chip">📱 QR 접수</span><span class="ca-chip">👤 담당 지정</span><span class="ca-chip">✓ 완료 처리</span></div></div>
-      <section class="ca-section"><div class="ca-section-head"><div><h3>접수된 고객 민원</h3><p>현재 처리해야 할 접수만 표시됩니다. 완료하면 아래 보관기록으로 이동합니다.</p></div><span class="ca-count">현재 ${active.length}건</span></div>${active.length?`<div class="ca-table-head"><span>접수일시</span><span>접수장소</span><span>신고 내용</span><span>담당 직원</span><span>처리 상태</span><span>관리</span></div><div>${active.map(x=>{const st=state(x);return `<div class="ca-row"><div class="ca-time">${time(x.createdAt)}<small>접수</small></div><div class="ca-place"><b>${xEsc(x.place||'장소 미기록')}</b><span>${xEsc(x.category||'기타')}</span></div><div class="ca-content"><span class="ca-label">고객 신고</span>${xEsc(safe(x))}${x.photo_url?`<br><button class="ca-refresh" style="margin-top:8px" onclick="window.open('${x.photo_url}','_blank')">📷 사진 보기</button>`:''}</div><div class="ca-assign"><select onchange="assign('${x.id}',this.value)"><option value="">담당 직원 선택</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select><div class="ca-handler">현재 담당: <b>${xEsc(x.handlerName||'미지정')}</b></div></div><div><span class="ca-status ${stateClass(x)}">● ${xEsc(st)}</span></div><div class="ca-actions">${x.handlerId?`<button class="ca-complete" onclick="completeIssue('${x.id}')">✓ 조치완료</button>`:'<div class="ca-need">담당 직원<br>지정 필요</div>'}<button class="ca-delete" onclick="deleteProcessRequest('${x.id}')">삭제</button></div></div>`}).join('')}</div>`:'<div class="ca-empty"><strong>현재 접수된 고객 민원이 없습니다.</strong>새로운 QR 접수가 들어오면 이곳에 바로 표시됩니다.</div>'}</section>
+      <section class="ca-section ca-repair-target">
+  <div class="ca-section-head">
+    <div>
+      <h3>수리 대상 품목</h3>
+      <p>고객 QR 접수 내용을 수리 대상별로 관리합니다. 접수 → 담당 직원 → 처리완료를 한 줄에서 처리합니다.</p>
+    </div>
+    <span class="ca-count">현재 ${active.length}건</span>
+  </div>
+  ${active.length ? `
+    <div class="ca-repair-head">
+      <span>접수번호</span><span>접수장소·유형</span><span>접수내용</span><span>직원 처리</span>
+    </div>
+    <div class="ca-repair-list">
+      ${active.map(x=>{
+        const st=state(x);
+        return `<div class="ca-repair-row">
+          <div class="ca-repair-no"><b>${xEsc(x.id)}</b><small>${time(x.createdAt)}</small></div>
+          <div class="ca-repair-place"><b>${xEsc(x.place||'장소 미기록')}</b><span>${xEsc(newCustomerTypeOf(x)||x.category||'기타')}</span></div>
+          <div class="ca-repair-content"><strong>접수내용</strong><span>${xEsc(safe(x))}</span></div>
+          <div class="ca-repair-work">
+            <select onchange="assign('${x.id}',this.value)">
+              <option value="">담당 직원</option>
+              ${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}
+            </select>
+            <span class="ca-status ${stateClass(x)}">● ${xEsc(st)}</span>
+            ${x.handlerId
+              ? `<button class="ca-complete" onclick="completeIssue('${x.id}')">✓ 처리완료</button>`
+              : `<span class="ca-need">담당 지정 필요</span>`}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  ` : `
+    <div class="ca-empty">
+      <strong>현재 수리 대상 품목이 없습니다.</strong>
+      새로운 QR 접수가 들어오면 이곳에 바로 표시됩니다.
+    </div>
+  `}
+</section>
       <section class="ca-section ca-history"><div class="ca-section-head"><div><h3>최근 처리완료</h3><p>조치완료된 접수는 최근 1개월 동안 이곳에 기록으로 남습니다.</p></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ca-count">${completed.length}건 보관</span><button class="ca-delete" onclick="resetAllCustomerReceipts()">전체 삭제</button></div></div>${completed.length?`<div class="cc-wrap">${completed.map(completedCard).join('')}</div>`:'<div class="ca-empty">최근 1개월 내 처리완료 기록이 없습니다.</div>'}<div class="ca-note">ⓘ 처리완료 기록은 운영대시보드의 직원실적·장소별 기록에 활용할 수 있도록 별도로 보관합니다.</div></section>
       <section class="jgb-new-history-wrap">
        <div class="jgb-new-history-head"><strong>📋 주요 접수 이력카드</strong><span>고객접수관리 · 이력관리</span></div>
@@ -6580,7 +6588,7 @@ a[data-page="digitalTwin"],
           <header class="jgb-crm-new-head"><div class="jgb-crm-brand"><span class="jgb-crm-brandico">📋</span><div><h2>민원 접수·처리관리</h2><p>시설 자산 배치도 · 관리자 판단 · 주요 접수 이력카드</p></div></div><div class="jgb-crm-head-stat"><b>${active.length}</b><small>현재 접수</small></div></header>
           <div class="jgb-crm-new-body">
             <section class="jgb-crm-top">
-              <div class="jgb-crm-map-panel"><div class="jgb-crm-panel-head"><b>시설 자산 배치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-crm-map"><div class="jgb-crm-map-title">장군봉체육관 1층 시설 배치 · QR 접수 위치 연동</div><div class="jgb-crm-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>`<div class="jgb-crm-court"><b>${c}</b></div>`).join('')}</div><div class="jgb-crm-map-zone z-mtoilet">남자 화장실</div><div class="jgb-crm-map-zone z-ftoilet">여자 화장실</div><div class="jgb-crm-map-zone z-mshower">남자 샤워실</div><div class="jgb-crm-map-zone z-fshower">여자 샤워실</div><div class="jgb-crm-map-zone z-mchange">남자 탈의실</div><div class="jgb-crm-map-zone z-fchange">여자 탈의실</div><div class="jgb-crm-map-zone z-lounge lounge">휴게공간</div><div class="jgb-crm-map-zone z-other other">기타장소</div>${newCustomerMapMarkers(active.slice(0,30))}<div class="jgb-crm-map-legend"><span><i></i> QR 접수 위치</span><span class="sel"><i></i> 선택 접수</span></div></div></div>
+              <div class="jgb-crm-map-panel"><div class="jgb-crm-panel-head"><b>시설 자산 배치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-crm-map"><div class="jgb-crm-map-title">장군봉체육관 1층 시설 배치</div><div class="jgb-crm-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>`<div class="jgb-crm-court"><b>${c}</b></div>`).join('')}</div><div class="jgb-crm-map-zone z-office">관리사무실</div><div class="jgb-crm-map-zone z-lounge">휴게공간</div><div class="jgb-crm-map-zone z-toilet">화장실·샤워실</div>${newCustomerMapMarkers(active.slice(0,30))}<div class="jgb-crm-map-legend"><span><i></i> 접수 위치</span><span class="sel"><i></i> 선택 접수</span></div></div></div>
               <aside class="jgb-crm-judge"><div class="jgb-crm-panel-head"><b>관리자 판단</b><span>현재 접수 기준</span></div><div class="jgb-crm-judge-body"><div class="jgb-crm-judge-main"><strong>${active.length?'처리 필요 접수 '+active.length+'건':'현재 미처리 접수 없음'}</strong><small>${active.length?'배치도에서 위치를 선택하여 접수 내용을 확인합니다.':'새로운 QR 접수를 기다립니다.'}</small></div><div class="jgb-crm-judge-list"><div><b>미담당</b><span>${active.filter(x=>!x.handlerId).length}건</span></div><div><b>담당 지정</b><span>${active.filter(x=>x.handlerId).length}건</span></div><div><b>오늘 접수</b><span>${active.filter(x=>new Date(x.createdAt||0).toDateString()===new Date().toDateString()).length}건</span></div></div></div></aside>
             </section>
             <section class="jgb-crm-history"><div class="jgb-crm-history-head"><strong>주요 접수 이력카드</strong><span>${selected?'선택 접수: '+xEsc(selected.id):'접수 건을 선택하세요'}</span></div><div class="jgb-crm-history-grid">
