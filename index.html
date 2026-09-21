@@ -4710,7 +4710,7 @@ a[data-page="digitalTwin"],
     if(!document.getElementById('CUSTOMER_NEW_CSS')){const st=document.createElement('style');st.id='CUSTOMER_NEW_CSS';st.textContent=CUSTOMER_NEW_CSS;document.head.appendChild(st);}
     window.__cnewType=window.__cnewType||'전체';
     function customerNewPage(){
-      const all=Array.isArray(db.issues)?db.issues.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0):[]);
+      const all=Array.isArray(db.issues)?db.issues.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)):[];
       const active=all.filter(x=>x.status!=='완료'), done=all.filter(x=>x.status==='완료');
       const typeMap={'이용불편':'UI-001','시설고장':'FM-001','안전신고':'SA-001','기타접수':'ET-001'};
       const catKey=x=>{const c=String(x.category||'');if(/이용|불편/.test(c))return '이용불편';if(/고장|시설/.test(c))return '시설고장';if(/안전/.test(c))return '안전신고';return '기타접수'};
