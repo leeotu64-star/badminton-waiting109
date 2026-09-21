@@ -78,31 +78,37 @@ function showForm(){
   const picker=document.getElementById("placePicker");
   const selectBtn=document.getElementById("placeSelect");
   const placeText=document.getElementById("placeText");
+
   selectBtn.addEventListener("click",()=>{
     const open=picker.classList.toggle("open");
     selectBtn.setAttribute("aria-expanded",open);
   });
+
   document.querySelectorAll(".place").forEach(btn=>{
     btn.addEventListener("click",()=>{
       selectedPlace=btn.dataset.place;
       placeText.textContent=selectedPlace;
       selectBtn.classList.remove("placeholder");
+
       document.querySelectorAll(".place").forEach(b=>{
         b.classList.remove("selected");
         b.querySelector(".place-check").hidden=true;
       });
+
       btn.classList.add("selected");
       btn.querySelector(".place-check").hidden=false;
       picker.classList.remove("open");
       selectBtn.setAttribute("aria-expanded","false");
     });
   });
+
   document.addEventListener("click",e=>{
     if(!picker.contains(e.target)){
       picker.classList.remove("open");
       selectBtn.setAttribute("aria-expanded","false");
     }
   });
+
   document.getElementById("submit").addEventListener("click",submitIssue);
 }
 
@@ -131,6 +137,7 @@ async function submitIssue(){
     btn.textContent="접수하기";
     return;
   }
+
   showDone();
 }
 
