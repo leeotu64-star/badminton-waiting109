@@ -1,4 +1,3 @@
-```
 <!-- JGB V3: slider + operation insight + photo delete hardening -->
     <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
@@ -5219,53 +5218,61 @@ a[data-page="digitalTwin"],
   }
 }
 </style>
-\n<style id="JGB_LAYOUT_ONLY_V19">\n/* 원본 기능/JS/데이터는 유지하고 화면 배치만 수정 */\n/* ① 상단 2개 메인 패널 확대 */\n.jgb-repair-top{\n  height:500px!important;\n  min-height:500px!important;\n  max-height:500px!important;\n  overflow:hidden!important;\n}\n.jgb-repair-map-panel,.jgb-repair-recent{\n  height:100%!important;\n  min-height:0!important;\n  max-height:100%!important;\n}\n.jgb-repair-recent-body{\n  overflow-y:hidden!important;\n  overflow-x:hidden!important;\n  scrollbar-width:none!important;\n}\n.jgb-repair-recent-body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}\n\n/* ② 하단 접수목록 내부 가로·세로 스크롤 제거 */\n.jgb-repair-list-wrap{\n  overflow:hidden!important;\n}\n.jgb-repair-split{\n  min-width:0!important;\n}\n.jgb-repair-pane{\n  min-width:0!important;\n  overflow:hidden!important;\n}\n.jgb-repair-scroll{\n  height:auto!important;\n  max-height:none!important;\n  overflow:hidden!important;\n  min-width:0!important;\n  scrollbar-width:none!important;\n}\n.jgb-repair-scroll::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}\n.jgb-repair-mini-head,.jgb-repair-mini-row{\n  min-width:0!important;\n  width:100%!important;\n  grid-template-columns:62px 62px minmax(0,1fr) 105px 70px 62px!important;\n}\n.jgb-repair-mini-row>div{min-width:0!important;overflow:hidden!important}\n\n/* ③ 하단 통계 내부 스크롤 제거 */\n.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head){\n  overflow:hidden!important;\n  scrollbar-width:none!important;\n}\n.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar{\n  display:none!important;width:0!important;height:0!important;\n}\n\n/* 좁은 화면에서도 상단 크기 유지 */\n@media(max-width:1050px){\n  .jgb-repair-top{\n    height:500px!important;\n    min-height:500px!important;\n    max-height:500px!important;\n  }\n}\n</style>\n
-<style id="jgb-final-layout-fix">
-/* 상단 현황 영역을 더 크게 */
-.jgb-repair-top{
-  min-height:360px !important;
-  align-items:stretch !important;
-}
-.jgb-repair-map-panel,
-.jgb-repair-side-panel{
-  min-height:360px !important;
-}
 
-/* 하단 표의 가로 스크롤 제거 */
-.jgb-repair-scroll{
-  min-width:0 !important;
-  width:100% !important;
-  overflow-x:hidden !important;
+<style id="JGB_THREE_HEADERS_FINAL">
+/* 3개 큰 파란색 헤더 공통 규격 */
+.jgb-repair-head .jgb-repair-brandico{
+  width:52px !important;
+  height:52px !important;
+  flex:0 0 52px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:36px !important;
 }
+.jgb-repair-head .jgb-repair-brand h2{
+  font-size:28px !important;
+  margin:0 0 4px !important;
+}
+.jgb-repair-head .jgb-repair-brand p{
+  font-size:14px !important;
+  margin:0 !important;
+}
+.jgb-repair-head .jgb-repair-brand{
+  text-align:left !important;
+}
+</style>
 
-/* 하단 영역은 화면 폭 안에서 표시 */
-.jgb-repair-list-wrap{
-  width:100% !important;
-  min-width:0 !important;
-}
 
-/* 표 자체가 부모보다 커지지 않도록 */
-.jgb-repair-list-wrap table{
-  width:100% !important;
-  table-layout:fixed !important;
+<style id="JGB_BASIC_LAYOUT_ONLY_V1">
+/* 기능은 수정하지 않고 오늘의 기본업무 화면 배치만 수정 */
+.basic-v5-worker-tabs{
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  width:100%!important;
+  margin:0 0 12px!important;
 }
-
-/* 불필요한 세로 스크롤 제거 */
-.jgb-repair-list-wrap .jgb-repair-scroll,
-.jgb-complaint-stats-grid,
-.jgb-complaint-stat-card{
-  scrollbar-width:none !important;
+.basic-v5-worker-tab{
+  display:flex!important;
+  flex:0 0 auto!important;
+  width:76px!important;
+  min-width:76px!important;
+  min-height:40px!important;
 }
-.jgb-repair-list-wrap .jgb-repair-scroll::-webkit-scrollbar,
-.jgb-complaint-stats-grid::-webkit-scrollbar,
-.jgb-complaint-stat-card::-webkit-scrollbar{
-  display:none !important;
+/* 사용자가 삭제 요청한 하단 이미지 배너만 화면에서 제거 */
+.basic-v5-bottom-banner{
+  display:none!important;
 }
-
-/* 하단 영역을 상단과 확실히 분리 */
-.jgb-repair-page > section:nth-of-type(2),
-.jgb-repair-page > section:nth-of-type(3){
-  margin-top:22px !important;
+/* 직원 4명 선택 영역이 왼쪽 세로로 떨어지지 않도록 상단 가로 배치 */
+.basic-v5-page-nav{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  width:100%!important;
 }
 </style>
 
@@ -5430,22 +5437,58 @@ a[data-page="digitalTwin"],
      }catch(e){console.warn("기본업무 동기화 실패",e)}
     }
     function issuesForMonth(){return (db.issues||[]).filter(x=>String(x?.createdAt||"").slice(0,7)===monthKey())}
+    window.__basicWorkerPage = Number.isInteger(window.__basicWorkerPage) ? window.__basicWorkerPage : 0;
+    window.basicPageWorkerNav=function(delta){
+      const tw=Array.isArray(todayWorkers())?todayWorkers():workers.map(w=>({...w,status:w.shift||"편성없음",working:false,start:"",end:""}));
+      const max=Math.max(0,tw.length-1);
+      window.__basicWorkerPage=Math.min(max,Math.max(0,(Number(window.__basicWorkerPage)||0)+Number(delta||0)));
+      render();
+    };
+    window.basicPageWorkerSelect=function(index){
+      window.__basicWorkerPage=Math.max(0,Number(index)||0);
+      render();
+    };
+    window.basicTaskIcon=function(t){
+      const s=String(t||'');
+      if(/화장실/.test(s))return '🚻';
+      if(/샤워/.test(s))return '🚿';
+      if(/코트|배드민턴/.test(s))return '🏸';
+      if(/탈의/.test(s))return '🚪';
+      if(/복도|계단/.test(s))return '🪜';
+      if(/출입구|출입/.test(s))return '🚪';
+      if(/시설물/.test(s))return '🏢';
+      if(/조명|전등/.test(s))return '💡';
+      if(/청소|청결/.test(s))return '🧹';
+      if(/안전|위험/.test(s))return '⚠️';
+      return '📋';
+    };
+    window.basicTaskTone=function(i){return ['blue','teal','green','orange','violet','navy','cyan','amber','mint','red'][i%10]};
     window.basicPage=function basicPage(){
-     const tw=Array.isArray(todayWorkers())?todayWorkers():workers.map(w=>({...w,status:w.shift||"편성없음",working:false,start:"",end:""}));
-     return `<div class="basic-v5">
-      <div class="basic-v5-head"><div><h2 class="basic-v5-title">오늘의 기본업무</h2><div class="basic-v5-sub">${selectedDate} · 근무자별 10개 업무를 실제 실시한 항목만 완료 처리</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div>
-      <div class="basic-v5-grid">${tw.map(w=>{
-        const d=tasksFor(w.id)||{done:[],updatedAt:null}; const isHoliday=/휴일\s*근무/.test(String(w.status||''));
-        const isOff=!w.working || offWords.some(x=>(w.status||'').includes(x));
-        const done=isHoliday?10:Array.isArray(d.done)?d.done.length:0;
-        const state=isOff?'대상 제외':isHoliday?'자동완료':'직접 실시';
-        return `<article class="basic-v5-card">
-          <div class="head"><div><div class="name">${w.name}</div><div class="shift">${w.shift||w.status||''}${w.start?` · ${w.start}~${w.end}`:''}</div></div><span class="state ${done===10&&!isOff?'done':''}">${state} · ${isOff?'-':done+'/10'}</span></div>
-          <div class="bar"><i style="width:${isOff?0:done*10}%"></i></div>
-          <div class="basic-v5-tasks">${tasks.map((t,i)=>{const checked=isHoliday||(Array.isArray(d.done)&&d.done.includes(t));return `<button type="button" class="basic-v5-task ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${t.replace(/'/g,"\\'")}')"><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`}).join('')}</div>
-          <div class="basic-v5-foot"><span>${isOff?'기본업무 대상 아님':isHoliday?'휴일근무 · 기본업무 1건 자동완료':done===10?'오늘 기본업무 완료':'실시한 항목만 실적 반영'}</span><b>${isOff?'':done+'/10'}</b></div>
-        </article>`}).join('')}</div>
-     </div>`;
+      const tw=Array.isArray(todayWorkers())?todayWorkers():workers.map(w=>({...w,status:w.shift||"편성없음",working:false,start:"",end:""}));
+      if(!tw.length)return `<div class="basic-v5"><div class="basic-v5-head"><div><h2 class="basic-v5-title">오늘의 기본업무</h2><div class="basic-v5-sub">${selectedDate} · 근무자별 10개 업무를 실제 실시한 항목만 완료 처리</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div><div style="padding:30px;text-align:center;color:#718096">오늘 편성된 근무자가 없습니다.</div></div>`;
+      const max=Math.max(0,tw.length-1);
+      const idx=Math.min(max,Math.max(0,Number(window.__basicWorkerPage)||0));
+      window.__basicWorkerPage=idx;
+      const w=tw[idx];
+      const d=tasksFor(w.id)||{done:[],updatedAt:null};
+      const isHoliday=/휴일\s*근무/.test(String(w.status||''));
+      const isOff=!w.working || offWords.some(x=>(w.status||'').includes(x));
+      const done=isHoliday?10:Array.isArray(d.done)?d.done.length:0;
+      const state=isOff?'대상 제외':isHoliday?'자동완료':'직접 실시';
+      const tabs=tw.map((x,i)=>`<button type="button" class="basic-v5-worker-tab ${i===idx?'on':''}" onclick="basicPageWorkerSelect(${i})"><span>${x.name}</span><small>${i+1}</small></button>`).join('');
+      const tasksHtml=tasks.map((t,i)=>{const checked=isHoliday||(Array.isArray(d.done)&&d.done.includes(t));return `<button type="button" class="basic-v5-task basic-tone-${basicTaskTone(i)} ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${t.replace(/'/g,"\\'")}')"><span class="task-icon" aria-hidden="true">${basicTaskIcon(t)}</span><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`}).join('');
+      return `<div class="basic-v5 basic-book-layout">
+       <div class="basic-v5-head"><div><h2 class="basic-v5-title">오늘의 기본업무</h2><div class="basic-v5-sub">${selectedDate} · 근무자별 10개 업무를 실제 실시한 항목만 완료 처리</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div>
+       <div class="basic-v5-page-nav"><button type="button" class="basic-v5-nav-btn" ${idx===0?'disabled':''} onclick="basicPageWorkerNav(-1)">‹ 이전 직원</button><div class="basic-v5-page-center"><strong>${w.name}</strong><span>${idx+1} / ${tw.length}</span></div><button type="button" class="basic-v5-nav-btn next" ${idx===max?'disabled':''} onclick="basicPageWorkerNav(1)">다음 직원 ›</button></div>
+       <div class="basic-v5-worker-tabs">${tabs}</div>
+       <div class="basic-v5-single"><article class="basic-v5-card">
+         <div class="head"><div><div class="name">${w.name}</div><div class="shift">${w.shift||w.status||''}${w.start?` · ${w.start}~${w.end}`:''}</div></div><span class="state ${done===10&&!isOff?'done':''}">${state} · ${isOff?'-':done+'/10'}</span></div>
+         <div class="bar"><i style="width:${isOff?0:done*10}%"></i></div>
+         <div class="basic-v5-tasks">${tasksHtml}</div>
+         <div class="basic-v5-foot"><span>${isOff?'기본업무 대상 아님':isHoliday?'휴일근무 · 기본업무 1건 자동완료':done===10?'오늘 기본업무 완료':'실시한 항목만 실적 반영'}</span><b>${isOff?'':done+'/10'}</b></div>
+       </article></div>
+       <div class="basic-v5-bottom-banner"><img src="오늘의_기본업무_하단안내배너.webp" alt="실시한 항목만 실적에 반영됩니다. 오늘도 안전하고 즐거운 배드민턴!"></div>
+      </div>`;
     }
     function stats(){
       const is=issuesForMonth(), done=is.filter(x=>x.status==="완료"), pending=is.filter(x=>x.status!=="완료");
@@ -24244,5 +24287,40 @@ cleanupDuplicateOnly();
   background:#f5f1e8!important;border-bottom:2px solid #c9b98d!important;
 }
 
+
+/* BASIC WORK BOOK V2 — 배치/가독성/아이콘/색상만 보강, 기능은 기존 로직 유지 */
+.basic-book-layout{background:#f4f7fb!important;padding:20px!important;border-radius:22px!important}
+.basic-book-layout .basic-v5-head{margin-bottom:12px!important}
+.basic-book-layout .basic-v5-page-nav{margin:0 0 10px!important;padding:8px 0!important}
+.basic-v5-page-center{display:flex;align-items:center;justify-content:center;gap:12px;min-width:180px}
+.basic-v5-page-center strong{font-size:21px;color:#163b60}
+.basic-v5-page-center span{font-size:14px;font-weight:900;color:#5d7187;background:#eaf2f9;border-radius:999px;padding:6px 11px}
+.basic-v5-nav-btn{min-width:118px!important;min-height:44px!important;font-size:14px!important;background:#fff!important;border:1px solid #b9cddd!important;box-shadow:0 3px 8px rgba(20,60,95,.07)!important}
+.basic-v5-nav-btn.next{background:#1769c1!important;color:#fff!important;border-color:#1769c1!important}
+.basic-v5-worker-tabs{justify-content:center!important;gap:8px!important;margin:0 0 12px!important}
+.basic-v5-worker-tab{min-width:76px!important;min-height:40px!important;padding:7px 12px!important;font-size:14px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important}
+.basic-v5-worker-tab small{font-size:10px!important;opacity:.72}
+.basic-v5-worker-tab.on{background:#123f69!important;border-color:#123f69!important;box-shadow:0 4px 10px rgba(18,63,105,.18)!important}
+.basic-book-layout .basic-v5-card{padding:16px!important;border-radius:18px!important;border-color:#cbd9e6!important;box-shadow:0 8px 22px rgba(20,55,85,.08)!important}
+.basic-book-layout .basic-v5-card .head{min-height:66px!important;margin-bottom:9px!important}
+.basic-book-layout .basic-v5-card .name{font-size:30px!important;color:#123b61!important;line-height:1.15!important}
+.basic-book-layout .basic-v5-card .shift{font-size:13px!important;padding:7px 10px!important;margin-top:5px!important}
+.basic-book-layout .basic-v5-card .state{font-size:13px!important;padding:8px 11px!important}
+.basic-book-layout .basic-v5-card .bar{height:9px!important;margin:8px 0 14px!important}
+.basic-book-layout .basic-v5-tasks{grid-template-columns:1fr 1fr!important;gap:10px!important}
+.basic-book-layout .basic-v5-task{min-height:68px!important;padding:8px 12px!important;gap:8px!important;border-radius:13px!important;box-shadow:0 2px 6px rgba(25,55,85,.04)!important}
+.basic-book-layout .basic-v5-task .task-icon{width:34px!important;height:34px!important;display:grid!important;place-items:center!important;border-radius:10px!important;font-size:21px!important;flex:none!important;background:#eef5fb!important}
+.basic-book-layout .basic-v5-task .no{font-size:12px!important;width:22px!important;color:#71839a!important;flex:none!important}
+.basic-book-layout .basic-v5-task .txt{font-size:17px!important;font-weight:900!important;line-height:1.25!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+.basic-book-layout .basic-v5-task .action{font-size:13px!important;min-width:48px!important;font-weight:1000!important}
+.basic-book-layout .basic-v5-task.is-done{background:#edf9f2!important;border-color:#9bd3b0!important}
+.basic-book-layout .basic-v5-task.is-done .task-icon{background:#d9f2e2!important}
+.basic-book-layout .basic-v5-task:hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(30,80,120,.10)!important}
+.basic-book-layout .basic-v5-task:disabled{opacity:.78!important}
+.basic-tone-blue{border-left:5px solid #2f80ed!important}.basic-tone-teal{border-left:5px solid #159a8a!important}.basic-tone-green{border-left:5px solid #27a35b!important}.basic-tone-orange{border-left:5px solid #f08a24!important}.basic-tone-violet{border-left:5px solid #7956d8!important}.basic-tone-navy{border-left:5px solid #315b8a!important}.basic-tone-cyan{border-left:5px solid #1999c6!important}.basic-tone-amber{border-left:5px solid #d99a1d!important}.basic-tone-mint{border-left:5px solid #35a77a!important}.basic-tone-red{border-left:5px solid #d9534f!important}
+.basic-book-layout .basic-v5-foot{font-size:13px!important;padding-top:11px!important;margin-top:12px!important}.basic-book-layout .basic-v5-foot b{font-size:16px!important;color:#1769c1!important}
+.basic-v5-bottom-banner{margin-top:14px!important;border-radius:14px!important;overflow:hidden!important;background:#eaf4ff!important;border:1px solid #c8ddec!important;line-height:0!important}
+.basic-v5-bottom-banner img{display:block!important;width:100%!important;height:auto!important;max-height:92px!important;object-fit:cover!important}
+@media(max-width:700px){.basic-book-layout{padding:12px!important}.basic-v5-page-center{min-width:130px}.basic-v5-page-center strong{font-size:18px}.basic-v5-tasks{grid-template-columns:1fr!important}.basic-book-layout .basic-v5-task .txt{font-size:16px!important}.basic-v5-bottom-banner img{max-height:110px!important}}
+
 </style>
-```
