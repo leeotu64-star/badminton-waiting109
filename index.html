@@ -1,9 +1,3 @@
-<!--
-SOURCE_FILE_ID: CUSTOMER-20260921-084330
-SOURCE_VERSION: V2
-MODIFICATION_SCOPE: 기존 고객 민원 게시판을 수리 대상 품목 세로 목록으로 변경
-DO_NOT_MIX_WITH_OTHER_FILES: TRUE
--->
 <!-- JGB V3: slider + operation insight + photo delete hardening -->
     <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
@@ -5117,6 +5111,45 @@ a[data-page="digitalTwin"],
 }
 </style>
 
+
+<style id="repair-target-v3">
+.ca-repair-head{
+  display:grid;grid-template-columns:14% 18% 38% 30%;
+  padding:9px 12px;background:#f1f6fa;border-top:1px solid #dbe6ee;border-bottom:1px solid #dbe6ee;
+  color:#567086;font-size:12px;font-weight:900
+}
+.ca-repair-head span{padding:0 7px}
+.ca-repair-list{display:flex;flex-direction:column}
+.ca-repair-row{
+  display:grid;grid-template-columns:14% 18% 38% 30%;align-items:stretch;
+  min-height:78px;border-bottom:1px solid #e2eaf0;background:#fff
+}
+.ca-repair-row>div{padding:11px 12px;border-right:1px solid #e2eaf0;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.ca-repair-row>div:last-child{border-right:0}
+.ca-repair-no b{font-size:13px;color:#163a57}
+.ca-repair-no small{margin-top:4px;color:#8092a0;font-size:10px}
+.ca-repair-place b{font-size:13px;color:#183d5b}
+.ca-repair-place span{margin-top:4px;display:inline-block;width:max-content;padding:3px 7px;border-radius:999px;background:#edf5fa;color:#537086;font-size:10px;font-weight:900}
+.ca-repair-content strong{font-size:10px;color:#7a8e9d;margin-bottom:4px}
+.ca-repair-content span{font-size:12px;color:#243f56;font-weight:800;overflow-wrap:anywhere}
+.ca-repair-work{display:grid!important;grid-template-columns:minmax(105px,1fr) auto auto;gap:7px;align-items:center!important}
+.ca-repair-work select{height:34px;border:1px solid #bccdd8;border-radius:6px;background:#fff;padding:0 8px;font-size:11px;font-weight:800;min-width:0}
+.ca-repair-work .ca-status{white-space:nowrap;font-size:11px}
+.ca-repair-work .ca-complete{height:34px;border:1px solid #176fc0;border-radius:6px;background:#176fc0;color:#fff;padding:0 11px;font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap}
+.ca-repair-work .ca-need{font-size:10px;color:#a36a00;font-weight:900;white-space:nowrap}
+@media(max-width:900px){
+  .ca-repair-head{grid-template-columns:18% 22% 60%;}.ca-repair-head span:nth-child(4){display:none}
+  .ca-repair-row{grid-template-columns:18% 22% 60%}
+  .ca-repair-row>div:nth-child(4){grid-column:1/-1;border-top:1px solid #e2eaf0;border-right:0;display:grid;grid-template-columns:1fr auto auto}
+}
+@media(max-width:650px){
+  .ca-repair-head{display:none}
+  .ca-repair-row{display:block;padding:4px 0}
+  .ca-repair-row>div{border-right:0;border-bottom:1px solid #edf1f4;min-height:0}
+  .ca-repair-work{display:grid!important}
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -6456,9 +6489,6 @@ a[data-page="digitalTwin"],
      @media(max-width:980px){.cc-wrap{grid-template-columns:1fr}.ca-hero{align-items:flex-start;flex-direction:column}.ca-tools{justify-content:flex-start}.ca-kpis{grid-template-columns:1fr 1fr}.ca-table-head{display:none}.ca-row{grid-template-columns:1fr 1fr}.ca-row>div,.ca-row>.ca-actions{border-right:0;border-bottom:1px solid #edf1f5}.ca-row .ca-time{grid-column:1}.ca-row .ca-place{grid-column:2}.ca-row .ca-content{grid-column:1/-1}.ca-row .ca-assign{grid-column:1/-1}.ca-row .ca-status{grid-column:1}.ca-row .ca-actions{grid-column:2;flex-direction:row}.cc-row{grid-template-columns:100px 1fr 90px}.cc-content{grid-column:1/-1;grid-row:2}.cc-worker{grid-column:2}.cc-done{grid-column:3;grid-row:2}}
      @media(max-width:620px){.cc-wrap{grid-template-columns:1fr}.cust-admin{padding:3px}.ca-title{font-size:29px}.ca-sub{font-size:13px}.ca-kpis{grid-template-columns:1fr}.ca-banner{align-items:flex-start;flex-direction:column}.ca-row{grid-template-columns:1fr}.ca-row .ca-time,.ca-row .ca-place,.ca-row .ca-content,.ca-row .ca-assign,.ca-row .ca-status,.ca-row .ca-actions{grid-column:auto}.ca-actions{flex-direction:row!important}.ca-actions button{flex:1}.cc-row{grid-template-columns:1fr 1fr}.cc-content{grid-column:1/-1}.cc-worker{grid-column:1}.cc-done{grid-column:2;grid-row:3}}
 
-     /* 수리 대상 품목: 기존 고객 민원 게시판을 대체하는 세로 목록 */
-     .ca-repair-target{overflow:hidden}.ca-repair-list{padding:8px 10px;display:flex;flex-direction:column;gap:6px;max-height:285px;overflow:auto}.ca-repair-row{border:1px solid #d7e3eb;border-radius:8px;background:#fff;padding:7px 9px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}.ca-repair-main{min-width:0;display:grid;grid-template-columns:120px 150px minmax(0,1fr);gap:9px;align-items:center}.ca-repair-no{font-size:10px;font-weight:950;color:#183b59}.ca-repair-no small{display:block;margin-top:2px;color:#7b8e9e;font-size:8px;font-weight:800}.ca-repair-place{min-width:0}.ca-repair-place b{display:block;font-size:11px;font-weight:950;color:#183b59;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ca-repair-place span{display:inline-block;margin-top:3px;padding:2px 5px;border-radius:999px;background:#edf5fa;color:#58758b;font-size:8px;font-weight:900}.ca-repair-content{min-width:0;display:flex;gap:6px;align-items:center}.ca-repair-content strong{flex:0 0 auto;color:#7b8e9e;font-size:8px}.ca-repair-content span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#29455c;font-size:10px;font-weight:800}.ca-repair-process{display:flex;align-items:center;gap:5px;white-space:nowrap}.ca-repair-process select{height:29px;border:1px solid #b9cbd7;border-radius:5px;background:#fff;padding:0 6px;font:inherit;font-size:9px;font-weight:850}.ca-repair-process button{height:29px;border-radius:5px;font-size:9px;font-weight:950;cursor:pointer}.ca-repair-process .ca-complete{padding:0 9px;border:1px solid #176fc0;background:#176fc0;color:#fff}.ca-repair-process .ca-delete{padding:0 8px;border:1px solid #f0a4a4;background:#fff;color:#c53d3d}.ca-repair-process .ca-need{padding:6px 7px;border-radius:5px;background:#fff6df;color:#a66b00;font-size:8px;font-weight:900}.ca-repair-process .ca-status{font-size:9px!important;padding:5px 7px!important;white-space:nowrap}.ca-repair-target .ca-empty{min-height:105px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-
      /* 신규 고객접수 이력카드: 조명·릴선 화면의 컴팩트한 헤더/카드 비율을 기준으로 구성 */
      .jgb-new-history-wrap{margin-top:18px;border:1px solid #cbd8e5;border-radius:10px;background:#fff;overflow:hidden;box-shadow:0 4px 12px rgba(31,56,85,.06)}
      .jgb-new-history-head{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:linear-gradient(90deg,#0c68a8,#1687c1);color:#fff}
@@ -6484,7 +6514,45 @@ a[data-page="digitalTwin"],
       <section class="ca-hero"><div><div class="ca-eyebrow">JANGGUNBONG SPORTS CENTER · CUSTOMER SERVICE</div><h2 class="ca-title">고객접수관리</h2><p class="ca-sub">고객 QR 접수부터 담당 지정과 조치완료까지 한눈에 관리합니다.</p></div><div class="ca-tools"><span class="ca-pill live">실시간 접수</span><span class="ca-pill">오늘 ${today}건</span><button class="ca-refresh" onclick="syncFromSupabase()">↻ 새로고침</button></div></section>
       <section class="ca-kpis"><div class="ca-kpi"><span class="icon">📥</span><div class="label">전체 접수</div><div class="num">${active.length}<small>건</small></div><div class="desc">현재 처리 중인 고객 접수</div></div><div class="ca-kpi"><span class="icon">⏳</span><div class="label">접수 대기</div><div class="num">${waiting}<small>건</small></div><div class="desc">담당 직원 지정 필요</div></div><div class="ca-kpi"><span class="icon">🛠️</span><div class="label">처리 진행</div><div class="num">${running}<small>건</small></div><div class="desc">담당자가 처리 중인 접수</div></div><div class="ca-kpi"><span class="icon">✓</span><div class="label">최근 처리완료</div><div class="num">${completed.length}<small>건</small></div><div class="desc">최근 1개월 보관 기록</div></div><div class="ca-kpi"><span class="icon">🗂️</span><div class="label">오늘 접수</div><div class="num">${today}<small>건</small></div><div class="desc">금일 들어온 고객 접수</div></div></section>
       <div class="ca-banner"><div><strong>신속한 고객 응대, 깔끔한 접수관리</strong><br><span>접수된 민원은 담당 직원을 지정하고 조치가 끝나면 <b>조치완료</b>만 누르면 됩니다.</span></div><div class="chips"><span class="ca-chip">📱 QR 접수</span><span class="ca-chip">👤 담당 지정</span><span class="ca-chip">✓ 완료 처리</span></div></div>
-      <section class="ca-section ca-repair-target"><div class="ca-section-head"><div><h3>수리 대상 품목</h3><p>고객 QR 접수 내용을 수리 대상별로 세로 목록으로 관리합니다. 접수 → 담당 직원 → 처리완료를 한 줄에서 처리합니다.</p></div><span class="ca-count">현재 ${active.length}건</span></div>${active.length?`<div class="ca-repair-list">${active.map(x=>{const st=state(x);return `<div class="ca-repair-row"><div class="ca-repair-main"><div class="ca-repair-no">${xEsc(x.id)}<small>${time(x.createdAt)}</small></div><div class="ca-repair-place"><b>${xEsc(x.place||'장소 미기록')}</b><span>${xEsc(newCustomerTypeOf(x)||x.category||'기타')}</span></div><div class="ca-repair-content"><strong>접수내용</strong><span>${xEsc(safe(x))}</span></div></div><div class="ca-repair-process"><select onchange="assign('${x.id}',this.value)"><option value="">담당 직원</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select><span class="ca-status ${stateClass(x)}">● ${xEsc(st)}</span>${x.handlerId?`<button class="ca-complete" onclick="completeIssue('${x.id}')">✓ 처리완료</button>`:'<span class="ca-need">담당 지정 필요</span>'}<button class="ca-delete" onclick="deleteProcessRequest('${x.id}')">삭제</button></div></div>`}).join('')}</div>`:'<div class="ca-empty"><strong>현재 수리 대상 품목이 없습니다.</strong>새로운 QR 접수가 들어오면 이곳에 바로 표시됩니다.</div>'}</section>
+      <section class="ca-section ca-repair-target">
+  <div class="ca-section-head">
+    <div>
+      <h3>수리 대상 품목</h3>
+      <p>고객 QR 접수 내용을 수리 대상별로 관리합니다. 접수 → 담당 직원 → 처리완료를 한 줄에서 처리합니다.</p>
+    </div>
+    <span class="ca-count">현재 ${active.length}건</span>
+  </div>
+  ${active.length ? `
+    <div class="ca-repair-head">
+      <span>접수번호</span><span>접수장소·유형</span><span>접수내용</span><span>직원 처리</span>
+    </div>
+    <div class="ca-repair-list">
+      ${active.map(x=>{
+        const st=state(x);
+        return `<div class="ca-repair-row">
+          <div class="ca-repair-no"><b>${xEsc(x.id)}</b><small>${time(x.createdAt)}</small></div>
+          <div class="ca-repair-place"><b>${xEsc(x.place||'장소 미기록')}</b><span>${xEsc(newCustomerTypeOf(x)||x.category||'기타')}</span></div>
+          <div class="ca-repair-content"><strong>접수내용</strong><span>${xEsc(safe(x))}</span></div>
+          <div class="ca-repair-work">
+            <select onchange="assign('${x.id}',this.value)">
+              <option value="">담당 직원</option>
+              ${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}
+            </select>
+            <span class="ca-status ${stateClass(x)}">● ${xEsc(st)}</span>
+            ${x.handlerId
+              ? `<button class="ca-complete" onclick="completeIssue('${x.id}')">✓ 처리완료</button>`
+              : `<span class="ca-need">담당 지정 필요</span>`}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  ` : `
+    <div class="ca-empty">
+      <strong>현재 수리 대상 품목이 없습니다.</strong>
+      새로운 QR 접수가 들어오면 이곳에 바로 표시됩니다.
+    </div>
+  `}
+</section>
       <section class="ca-section ca-history"><div class="ca-section-head"><div><h3>최근 처리완료</h3><p>조치완료된 접수는 최근 1개월 동안 이곳에 기록으로 남습니다.</p></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ca-count">${completed.length}건 보관</span><button class="ca-delete" onclick="resetAllCustomerReceipts()">전체 삭제</button></div></div>${completed.length?`<div class="cc-wrap">${completed.map(completedCard).join('')}</div>`:'<div class="ca-empty">최근 1개월 내 처리완료 기록이 없습니다.</div>'}<div class="ca-note">ⓘ 처리완료 기록은 운영대시보드의 직원실적·장소별 기록에 활용할 수 있도록 별도로 보관합니다.</div></section>
       <section class="jgb-new-history-wrap">
        <div class="jgb-new-history-head"><strong>📋 주요 접수 이력카드</strong><span>고객접수관리 · 이력관리</span></div>
