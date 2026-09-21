@@ -5219,7 +5219,57 @@ a[data-page="digitalTwin"],
   }
 }
 </style>
-\n<style id="JGB_LAYOUT_ONLY_V19">\n/* 원본 기능/JS/데이터는 유지하고 화면 배치만 수정 */\n/* ① 상단 2개 메인 패널 확대 */\n.jgb-repair-top{\n  height:500px!important;\n  min-height:500px!important;\n  max-height:500px!important;\n  overflow:hidden!important;\n}\n.jgb-repair-map-panel,.jgb-repair-recent{\n  height:100%!important;\n  min-height:0!important;\n  max-height:100%!important;\n}\n.jgb-repair-recent-body{\n  overflow-y:hidden!important;\n  overflow-x:hidden!important;\n  scrollbar-width:none!important;\n}\n.jgb-repair-recent-body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}\n\n/* ② 하단 접수목록 내부 가로·세로 스크롤 제거 */\n.jgb-repair-list-wrap{\n  overflow:hidden!important;\n}\n.jgb-repair-split{\n  min-width:0!important;\n}\n.jgb-repair-pane{\n  min-width:0!important;\n  overflow:hidden!important;\n}\n.jgb-repair-scroll{\n  height:auto!important;\n  max-height:none!important;\n  overflow:hidden!important;\n  min-width:0!important;\n  scrollbar-width:none!important;\n}\n.jgb-repair-scroll::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}\n.jgb-repair-mini-head,.jgb-repair-mini-row{\n  min-width:0!important;\n  width:100%!important;\n  grid-template-columns:62px 62px minmax(0,1fr) 105px 70px 62px!important;\n}\n.jgb-repair-mini-row>div{min-width:0!important;overflow:hidden!important}\n\n/* ③ 하단 통계 내부 스크롤 제거 */\n.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head){\n  overflow:hidden!important;\n  scrollbar-width:none!important;\n}\n.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar{\n  display:none!important;width:0!important;height:0!important;\n}\n\n/* 좁은 화면에서도 상단 크기 유지 */\n@media(max-width:1050px){\n  .jgb-repair-top{\n    height:500px!important;\n    min-height:500px!important;\n    max-height:500px!important;\n  }\n}\n</style>\n</head><body><div id="app"></div>
+\n<style id="JGB_LAYOUT_ONLY_V19">\n/* 원본 기능/JS/데이터는 유지하고 화면 배치만 수정 */\n/* ① 상단 2개 메인 패널 확대 */\n.jgb-repair-top{\n  height:500px!important;\n  min-height:500px!important;\n  max-height:500px!important;\n  overflow:hidden!important;\n}\n.jgb-repair-map-panel,.jgb-repair-recent{\n  height:100%!important;\n  min-height:0!important;\n  max-height:100%!important;\n}\n.jgb-repair-recent-body{\n  overflow-y:hidden!important;\n  overflow-x:hidden!important;\n  scrollbar-width:none!important;\n}\n.jgb-repair-recent-body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}\n\n/* ② 하단 접수목록 내부 가로·세로 스크롤 제거 */\n.jgb-repair-list-wrap{\n  overflow:hidden!important;\n}\n.jgb-repair-split{\n  min-width:0!important;\n}\n.jgb-repair-pane{\n  min-width:0!important;\n  overflow:hidden!important;\n}\n.jgb-repair-scroll{\n  height:auto!important;\n  max-height:none!important;\n  overflow:hidden!important;\n  min-width:0!important;\n  scrollbar-width:none!important;\n}\n.jgb-repair-scroll::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}\n.jgb-repair-mini-head,.jgb-repair-mini-row{\n  min-width:0!important;\n  width:100%!important;\n  grid-template-columns:62px 62px minmax(0,1fr) 105px 70px 62px!important;\n}\n.jgb-repair-mini-row>div{min-width:0!important;overflow:hidden!important}\n\n/* ③ 하단 통계 내부 스크롤 제거 */\n.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head){\n  overflow:hidden!important;\n  scrollbar-width:none!important;\n}\n.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar{\n  display:none!important;width:0!important;height:0!important;\n}\n\n/* 좁은 화면에서도 상단 크기 유지 */\n@media(max-width:1050px){\n  .jgb-repair-top{\n    height:500px!important;\n    min-height:500px!important;\n    max-height:500px!important;\n  }\n}\n</style>\n
+<style id="jgb-final-layout-fix">
+/* 상단 현황 영역을 더 크게 */
+.jgb-repair-top{
+  min-height:360px !important;
+  align-items:stretch !important;
+}
+.jgb-repair-map-panel,
+.jgb-repair-side-panel{
+  min-height:360px !important;
+}
+
+/* 하단 표의 가로 스크롤 제거 */
+.jgb-repair-scroll{
+  min-width:0 !important;
+  width:100% !important;
+  overflow-x:hidden !important;
+}
+
+/* 하단 영역은 화면 폭 안에서 표시 */
+.jgb-repair-list-wrap{
+  width:100% !important;
+  min-width:0 !important;
+}
+
+/* 표 자체가 부모보다 커지지 않도록 */
+.jgb-repair-list-wrap table{
+  width:100% !important;
+  table-layout:fixed !important;
+}
+
+/* 불필요한 세로 스크롤 제거 */
+.jgb-repair-list-wrap .jgb-repair-scroll,
+.jgb-complaint-stats-grid,
+.jgb-complaint-stat-card{
+  scrollbar-width:none !important;
+}
+.jgb-repair-list-wrap .jgb-repair-scroll::-webkit-scrollbar,
+.jgb-complaint-stats-grid::-webkit-scrollbar,
+.jgb-complaint-stat-card::-webkit-scrollbar{
+  display:none !important;
+}
+
+/* 하단 영역을 상단과 확실히 분리 */
+.jgb-repair-page > section:nth-of-type(2),
+.jgb-repair-page > section:nth-of-type(3){
+  margin-top:22px !important;
+}
+</style>
+
+</head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style id="WOW_DASHBOARD_CSS">
