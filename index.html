@@ -6405,31 +6405,6 @@ a[data-page="digitalTwin"],
     function withActionMarker(content,type){const base=String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').trim();return type?base+' [[처리구분:'+type+']]':base}
     function withWorkMarkers(content,type,note){let base=cleanReporterContent(String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim());if(type)base+=' [[처리구분:'+type+']]';if(note)base+=' [[조치내용:'+String(note).replace(/\]\]/g,'')+']]';return base}
     function actionTypeFromIssue(x){if(x&&ACTION_TYPES.includes(x.actionType))return x.actionType;const m=String(x?.content||'').match(/\[\[처리구분:(자체조치|외부용역)\]\]/);return m?m[1]:''}
-
-<style id="JGB_CUSTOMER_NEW_HISTORY_CARD_V1">
-/* 조명·릴선 원본의 헤더/카드 톤을 기준으로 고객접수관리 하단에 추가한 신규 이력카드 */
-.jgb-customer-new-card{width:100%;box-sizing:border-box;margin-top:18px;border:2px solid #7894a8;border-radius:9px;background:#fff;overflow:hidden;color:#16364e}
-.jgb-customer-new-head{min-height:92px;box-sizing:border-box;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(90deg,#0d557d,#167aa5);color:#fff}
-.jgb-customer-new-brand{display:flex;align-items:center;gap:12px;min-width:0}
-.jgb-customer-new-icon{width:42px;height:42px;border-radius:9px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:21px;flex:0 0 auto}
-.jgb-customer-new-brand h3{margin:0;font-size:25px;font-weight:1000;letter-spacing:-.5px}
-.jgb-customer-new-brand p{margin:4px 0 0;font-size:12px;font-weight:900;opacity:.92}
-.jgb-customer-new-badge{padding:8px 12px;border:1px solid rgba(255,255,255,.42);border-radius:9px;background:rgba(255,255,255,.13);font-size:12px;font-weight:950;white-space:nowrap}
-.jgb-customer-new-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px;background:#eef4f7;box-sizing:border-box}
-.jgb-customer-new-panel{min-width:0;border:2px solid #7894a8;border-radius:9px;background:#fff;overflow:hidden;box-sizing:border-box}
-.jgb-customer-new-title{padding:10px 13px;background:#e9f3f8;border-bottom:2px solid #7894a8;font-size:17px;font-weight:950;color:#173b55}
-.jgb-customer-new-fields{display:grid;grid-template-columns:1fr 1fr;gap:0}
-.jgb-customer-new-fields>div{min-width:0;min-height:54px;padding:8px 10px;border-bottom:1px solid #dce7ed;border-right:1px solid #dce7ed;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px}
-.jgb-customer-new-fields>div:nth-child(2n){border-right:0}
-.jgb-customer-new-fields>div.wide{grid-column:1/-1;border-right:0;min-height:68px}
-.jgb-customer-new-fields small{font-size:10px;font-weight:950;color:#6d8292}
-.jgb-customer-new-fields span,.jgb-customer-new-fields b{font-size:13px;font-weight:900;line-height:1.35;overflow-wrap:anywhere}
-.jgb-customer-new-fields b{color:#17649a}
-.jgb-customer-status-wait{display:inline-block;width:max-content;padding:4px 8px;border-radius:7px;background:#fff2d9;color:#9a6200!important}
-@media(max-width:1050px){.jgb-customer-new-grid{grid-template-columns:1fr}.jgb-customer-new-fields>div:nth-child(2n){border-right:1px solid #dce7ed}.jgb-customer-new-fields>div:nth-child(odd){border-right:0}}
-@media(max-width:650px){.jgb-customer-new-head{align-items:flex-start;flex-direction:column}.jgb-customer-new-brand h3{font-size:21px}.jgb-customer-new-fields{grid-template-columns:1fr}.jgb-customer-new-fields>div,.jgb-customer-new-fields>div:nth-child(2n),.jgb-customer-new-fields>div:nth-child(odd){border-right:0}.jgb-customer-new-fields>div.wide{grid-column:auto}}
-</style>
-
     function processPage(){
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
      const active=stored.filter(x=>x.status!=='완료');
@@ -6453,6 +6428,16 @@ a[data-page="digitalTwin"],
      .ca-section{max-width:100%;overflow:hidden}.ca-table-head,.ca-row{width:100%;max-width:100%}
      @media(max-width:980px){.cc-wrap{grid-template-columns:1fr}.ca-hero{align-items:flex-start;flex-direction:column}.ca-tools{justify-content:flex-start}.ca-kpis{grid-template-columns:1fr 1fr}.ca-table-head{display:none}.ca-row{grid-template-columns:1fr 1fr}.ca-row>div,.ca-row>.ca-actions{border-right:0;border-bottom:1px solid #edf1f5}.ca-row .ca-time{grid-column:1}.ca-row .ca-place{grid-column:2}.ca-row .ca-content{grid-column:1/-1}.ca-row .ca-assign{grid-column:1/-1}.ca-row .ca-status{grid-column:1}.ca-row .ca-actions{grid-column:2;flex-direction:row}.cc-row{grid-template-columns:100px 1fr 90px}.cc-content{grid-column:1/-1;grid-row:2}.cc-worker{grid-column:2}.cc-done{grid-column:3;grid-row:2}}
      @media(max-width:620px){.cc-wrap{grid-template-columns:1fr}.cust-admin{padding:3px}.ca-title{font-size:29px}.ca-sub{font-size:13px}.ca-kpis{grid-template-columns:1fr}.ca-banner{align-items:flex-start;flex-direction:column}.ca-row{grid-template-columns:1fr}.ca-row .ca-time,.ca-row .ca-place,.ca-row .ca-content,.ca-row .ca-assign,.ca-row .ca-status,.ca-row .ca-actions{grid-column:auto}.ca-actions{flex-direction:row!important}.ca-actions button{flex:1}.cc-row{grid-template-columns:1fr 1fr}.cc-content{grid-column:1/-1}.cc-worker{grid-column:1}.cc-done{grid-column:2;grid-row:3}}
+
+     /* 신규 고객접수 이력카드: 조명·릴선 화면의 컴팩트한 헤더/카드 비율을 기준으로 구성 */
+     .jgb-new-history-wrap{margin-top:18px;border:1px solid #cbd8e5;border-radius:10px;background:#fff;overflow:hidden;box-shadow:0 4px 12px rgba(31,56,85,.06)}
+     .jgb-new-history-head{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:linear-gradient(90deg,#0c68a8,#1687c1);color:#fff}
+     .jgb-new-history-head strong{font-size:14px;font-weight:950}.jgb-new-history-head span{font-size:10px;font-weight:800;opacity:.9}
+     .jgb-new-history-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:9px;background:#f4f8fb}
+     .jgb-new-history-card{min-width:0;border:1px solid #d5e0ea;border-radius:8px;background:#fff;overflow:hidden}
+     .jgb-new-history-card h4{margin:0;padding:9px 10px;background:#edf4f9;border-bottom:1px solid #d9e4ed;color:#183b59;font-size:12px;font-weight:950}
+     .jgb-new-history-body{padding:9px}.jgb-new-history-row{display:grid;grid-template-columns:76px minmax(0,1fr);min-height:30px;border-bottom:1px solid #edf1f5;align-items:center}.jgb-new-history-row:last-child{border-bottom:0}.jgb-new-history-row span{font-size:9px;color:#71839a;font-weight:850}.jgb-new-history-row b{font-size:10px;color:#1b344d;font-weight:850;overflow-wrap:anywhere}
+     @media(max-width:900px){.jgb-new-history-grid{grid-template-columns:1fr}.jgb-new-history-head{height:auto;min-height:48px;padding:9px 12px}}
      </style>
      <div class="cust-admin">
       <section class="ca-hero"><div><div class="ca-eyebrow">JANGGUNBONG SPORTS CENTER · CUSTOMER SERVICE</div><h2 class="ca-title">고객접수관리</h2><p class="ca-sub">고객 QR 접수부터 담당 지정과 조치완료까지 한눈에 관리합니다.</p></div><div class="ca-tools"><span class="ca-pill live">실시간 접수</span><span class="ca-pill">오늘 ${today}건</span><button class="ca-refresh" onclick="syncFromSupabase()">↻ 새로고침</button></div></section>
@@ -6460,50 +6445,28 @@ a[data-page="digitalTwin"],
       <div class="ca-banner"><div><strong>신속한 고객 응대, 깔끔한 접수관리</strong><br><span>접수된 민원은 담당 직원을 지정하고 조치가 끝나면 <b>조치완료</b>만 누르면 됩니다.</span></div><div class="chips"><span class="ca-chip">📱 QR 접수</span><span class="ca-chip">👤 담당 지정</span><span class="ca-chip">✓ 완료 처리</span></div></div>
       <section class="ca-section"><div class="ca-section-head"><div><h3>접수된 고객 민원</h3><p>현재 처리해야 할 접수만 표시됩니다. 완료하면 아래 보관기록으로 이동합니다.</p></div><span class="ca-count">현재 ${active.length}건</span></div>${active.length?`<div class="ca-table-head"><span>접수일시</span><span>접수장소</span><span>신고 내용</span><span>담당 직원</span><span>처리 상태</span><span>관리</span></div><div>${active.map(x=>{const st=state(x);return `<div class="ca-row"><div class="ca-time">${time(x.createdAt)}<small>접수</small></div><div class="ca-place"><b>${xEsc(x.place||'장소 미기록')}</b><span>${xEsc(x.category||'기타')}</span></div><div class="ca-content"><span class="ca-label">고객 신고</span>${xEsc(safe(x))}${x.photo_url?`<br><button class="ca-refresh" style="margin-top:8px" onclick="window.open('${x.photo_url}','_blank')">📷 사진 보기</button>`:''}</div><div class="ca-assign"><select onchange="assign('${x.id}',this.value)"><option value="">담당 직원 선택</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select><div class="ca-handler">현재 담당: <b>${xEsc(x.handlerName||'미지정')}</b></div></div><div><span class="ca-status ${stateClass(x)}">● ${xEsc(st)}</span></div><div class="ca-actions">${x.handlerId?`<button class="ca-complete" onclick="completeIssue('${x.id}')">✓ 조치완료</button>`:'<div class="ca-need">담당 직원<br>지정 필요</div>'}<button class="ca-delete" onclick="deleteProcessRequest('${x.id}')">삭제</button></div></div>`}).join('')}</div>`:'<div class="ca-empty"><strong>현재 접수된 고객 민원이 없습니다.</strong>새로운 QR 접수가 들어오면 이곳에 바로 표시됩니다.</div>'}</section>
       <section class="ca-section ca-history"><div class="ca-section-head"><div><h3>최근 처리완료</h3><p>조치완료된 접수는 최근 1개월 동안 이곳에 기록으로 남습니다.</p></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ca-count">${completed.length}건 보관</span><button class="ca-delete" onclick="resetAllCustomerReceipts()">전체 삭제</button></div></div>${completed.length?`<div class="cc-wrap">${completed.map(completedCard).join('')}</div>`:'<div class="ca-empty">최근 1개월 내 처리완료 기록이 없습니다.</div>'}<div class="ca-note">ⓘ 처리완료 기록은 운영대시보드의 직원실적·장소별 기록에 활용할 수 있도록 별도로 보관합니다.</div></section>
-
-      <section class="jgb-customer-new-card">
-        <header class="jgb-customer-new-head">
-          <div class="jgb-customer-new-brand">
-            <span class="jgb-customer-new-icon">📋</span>
-            <div>
-              <h3>주요 접수 이력카드</h3>
-              <p>고객접수관리 이력정보를 동일한 기준으로 관리합니다.</p>
-            </div>
-          </div>
-          <div class="jgb-customer-new-badge">고객접수 이력</div>
-        </header>
-        <div class="jgb-customer-new-grid">
-          <article class="jgb-customer-new-panel">
-            <div class="jgb-customer-new-title">접수 기본정보</div>
-            <div class="jgb-customer-new-fields">
-              <div><small>접수유형</small><b>이용불편 · UI-001</b></div>
-              <div><small>접수번호</small><span>UI-2025-0028</span></div>
-              <div><small>접수일시</small><span>2025-09-20 14:22</span></div>
-              <div><small>접수장소</small><span>1코트</span></div>
-              <div class="wide"><small>접수내용</small><span>네트가 낮아 내려와 경기 진행에 지장이 있습니다.</span></div>
-            </div>
-          </article>
-          <article class="jgb-customer-new-panel">
-            <div class="jgb-customer-new-title">담당·처리정보</div>
-            <div class="jgb-customer-new-fields">
-              <div><small>담당자</small><span>미지정</span></div>
-              <div><small>처리일시</small><span>-</span></div>
-              <div><small>처리상태</small><b class="jgb-customer-status-wait">접수대기</b></div>
-              <div><small>처리구분</small><span>시설 확인</span></div>
-              <div class="wide"><small>상세내용</small><span>현장 확인 후 조치내용을 기록합니다.</span></div>
-            </div>
-          </article>
-          <article class="jgb-customer-new-panel">
-            <div class="jgb-customer-new-title">조치·완료정보</div>
-            <div class="jgb-customer-new-fields">
-              <div><small>조치구분</small><span>자체조치</span></div>
-              <div><small>완료일시</small><span>-</span></div>
-              <div><small>조치결과</small><span>처리 전</span></div>
-              <div><small>확인방법</small><span>현장 확인</span></div>
-              <div class="wide"><small>조치내용</small><span>담당자 지정 후 현장 확인 및 조치 결과를 등록합니다.</span></div>
-            </div>
-          </article>
-        </div>
+      <section class="jgb-new-history-wrap">
+       <div class="jgb-new-history-head"><strong>📋 주요 접수 이력카드</strong><span>고객접수관리 · 이력관리</span></div>
+       <div class="jgb-new-history-grid">
+        <article class="jgb-new-history-card"><h4>① 접수 기본정보</h4><div class="jgb-new-history-body">
+         <div class="jgb-new-history-row"><span>접수번호</span><b>${xEsc(stored[0]?.id||'미등록')}</b></div>
+         <div class="jgb-new-history-row"><span>접수일시</span><b>${stored[0]?.createdAt?time(stored[0].createdAt):'미등록'}</b></div>
+         <div class="jgb-new-history-row"><span>접수유형</span><b>${xEsc(stored[0]?.category||'미등록')}</b></div>
+         <div class="jgb-new-history-row"><span>접수장소</span><b>${xEsc(stored[0]?.place||'미등록')}</b></div>
+        </div></article>
+        <article class="jgb-new-history-card"><h4>② 처리정보</h4><div class="jgb-new-history-body">
+         <div class="jgb-new-history-row"><span>담당자</span><b>${xEsc(stored[0]?.handlerName||'미지정')}</b></div>
+         <div class="jgb-new-history-row"><span>처리상태</span><b>${xEsc(stored[0]?.status||'접수')}</b></div>
+         <div class="jgb-new-history-row"><span>처리구분</span><b>${xEsc(actionTypeFromIssue(stored[0])||'미지정')}</b></div>
+         <div class="jgb-new-history-row"><span>처리일시</span><b>${stored[0]?.completedAt?time(stored[0].completedAt):'미완료'}</b></div>
+        </div></article>
+        <article class="jgb-new-history-card"><h4>③ 조치내용</h4><div class="jgb-new-history-body">
+         <div class="jgb-new-history-row"><span>접수사항</span><b>${xEsc(safe(stored[0]||{}))}</b></div>
+         <div class="jgb-new-history-row"><span>조치결과</span><b>${xEsc(stored[0]?.completedAt?'조치완료':'처리 중')}</b></div>
+         <div class="jgb-new-history-row"><span>비고</span><b>사진 영역 제외</b></div>
+         <div class="jgb-new-history-row"><span>기록상태</span><b>이력카드 보관</b></div>
+        </div></article>
+       </div>
       </section>
      </div>`;
     }
