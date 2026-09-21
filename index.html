@@ -5111,6 +5111,15 @@ a[data-page="digitalTwin"],
 }
 </style>
 
+
+<style id="customer-history-new-33">
+.customer-history-new{width:100%;margin-top:0;background:#fff;border:1px solid #d8e4ef;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(21,35,58,.06)}
+.customer-history-head{min-height:72px;padding:14px 18px;background:linear-gradient(90deg,#07558d,#0e83b7);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.customer-history-kicker{display:block;font-size:9px;letter-spacing:1.1px;font-weight:900;opacity:.82;margin-bottom:3px}.customer-history-head h2{margin:0;font-size:20px;font-weight:900}.customer-history-head p{margin:3px 0 0;font-size:11px;opacity:.9}.customer-history-status{font-size:11px;border:1px solid rgba(255,255,255,.35);border-radius:18px;padding:8px 12px;white-space:nowrap}.customer-history-status b{margin-left:5px}
+.customer-history-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:12px;background:#eef4f8}
+.customer-history-col{min-width:0;background:#fff;border:1px solid #cbdbe8;border-radius:6px;overflow:hidden}.customer-history-col-head{height:38px;display:flex;align-items:center;padding:0 12px;background:#eaf3f9;color:#174663;border-bottom:1px solid #cbdbe8;font-size:13px;font-weight:900}.customer-history-row{display:grid;grid-template-columns:82px minmax(0,1fr);min-height:42px;border-bottom:1px solid #e2e9ef}.customer-history-row:last-child{border-bottom:0}.customer-history-row span{display:flex;align-items:center;padding:8px 9px;background:#f7fafc;color:#61778b;font-size:11px;font-weight:800;border-right:1px solid #e2e9ef}.customer-history-row b{display:flex;align-items:center;padding:8px 10px;color:#203b50;font-size:12px;line-height:1.35;overflow-wrap:anywhere}.customer-state-wait{color:#e67b00!important}
+@media(max-width:850px){.customer-history-head{align-items:flex-start;flex-direction:column}.customer-history-grid{grid-template-columns:1fr}.customer-history-status{align-self:flex-start}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -5316,7 +5325,35 @@ a[data-page="digitalTwin"],
       if(page==="lighting")return (typeof window.jgbLightReelPageMarkup==="function"?window.jgbLightReelPageMarkup():"<div></div>");
       if(page==="digitalTwin")return digitalTwinPage();
     if(page==="dashboard2")return dashboard2();
-      if(page==="process")return processPage(); if(page==="customer")return `<div class="panel" style="padding:28px"><h2 style="margin:0 0 8px">고객접수</h2><p style="margin:0;color:#5f7892">고객접수 화면을 새로 만드는 자리입니다.</p></div>`;
+      if(page==="process")return processPage(); if(page==="customer")return `<section class="customer-history-new">
+  <div class="customer-history-head">
+    <div><span class="customer-history-kicker">CUSTOMER SERVICE · RECEPTION RECORD</span><h2>주요 접수 이력카드</h2><p>고객 접수 내용을 접수·민원·처리 정보로 구분하여 관리합니다.</p></div>
+    <div class="customer-history-status">접수번호 <b>UI-2025-0001</b></div>
+  </div>
+  <div class="customer-history-grid">
+    <article class="customer-history-col">
+      <div class="customer-history-col-head">① 접수 기본정보</div>
+      <div class="customer-history-row"><span>접수유형</span><b>시설고장</b></div>
+      <div class="customer-history-row"><span>접수번호</span><b>UI-2025-0001</b></div>
+      <div class="customer-history-row"><span>접수일시</span><b>2025-09-21 14:22</b></div>
+      <div class="customer-history-row"><span>접수위치</span><b>체육관 내 지정 위치</b></div>
+    </article>
+    <article class="customer-history-col">
+      <div class="customer-history-col-head">② 민원 내용</div>
+      <div class="customer-history-row"><span>접수내용</span><b>시설 이상 접수</b></div>
+      <div class="customer-history-row"><span>상세내용</span><b>현장에서 확인이 필요한 사항입니다.</b></div>
+      <div class="customer-history-row"><span>접수방법</span><b>고객 QR 접수</b></div>
+      <div class="customer-history-row"><span>요청사항</span><b>현장 확인 및 조치 요청</b></div>
+    </article>
+    <article class="customer-history-col">
+      <div class="customer-history-col-head">③ 처리정보</div>
+      <div class="customer-history-row"><span>처리상태</span><b class="customer-state-wait">접수대기</b></div>
+      <div class="customer-history-row"><span>담당자</span><b>미지정</b></div>
+      <div class="customer-history-row"><span>처리일시</span><b>-</b></div>
+      <div class="customer-history-row"><span>조치내용</span><b>-</b></div>
+    </article>
+  </div>
+</section>`;
      if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
      const s=stats();
      if(page==="opsboard")return dashboard(s);
