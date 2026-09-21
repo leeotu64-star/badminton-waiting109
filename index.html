@@ -6443,9 +6443,9 @@ a[data-page="digitalTwin"],
     function cleanIssueContent(x){return String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').trim()}
     function cleanReporterContent(text){return String(text||'').replace(/\s*\[\[신고자:[^\]]+\]\]/g,'').trim()}
     function cleanWorkContent(x){return cleanReporterContent(String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim())}
-    function registerPage(){const defaultCat="시설";const places=PLACE_GROUPS[defaultCat]||PLACE_OPTIONS;const presets=ISSUE_PRESETS[defaultCat]||[];return `<div class="pagebar"><h1>시설·환경·안전 접수</h1><button class="btn gray" onclick="go('dashboard')">종합 대시보드</button></div><div class="notice">구분과 장소를 선택하면 해당 시설에 맞는 장소·접수사항이 자동으로 표시됩니다. 등록자 이름은 저장하지 않습니다.</div><div class="panel"><div class="formgrid"><div class="field"><label>민원 유형</label><select id="cat">${COMPLAINT_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('')}</select></div><div class="field"><label>접수 장소</label><select id="place"><option value="">장소를 선택하세요</option>${places.map(p=>`<option value="${p}">${p}</option>`).join("")}</select></div><div class="field full"><label>시설·접수사항 선택</label><select id="issuePreset" onchange="applyIssuePreset()"><option value="">내용을 선택하세요</option>${presets.map(v=>`<option value="${v}">${v}</option>`).join("")}<option value="직접입력">직접입력</option></select></div><div class="field full"><label>상세 내용</label><textarea id="content" rows="3" placeholder="위 목록에서 선택하거나 필요한 경우 상세 내용을 입력하세요"></textarea></div><div class="field full"><label>사진(선택)</label><input id="photo" type="file" accept="image/*"></div></div><button class="btn" style="margin-top:10px" onclick="addIssue()">접수 등록</button></div><div class="panel" style="margin-top:10px"><h2>최근 접수</h2>${db.issues.slice(-8).reverse().map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수 ${time(x.createdAt)}</div></div><div class="status ${x.status==="완료"?"green":"red"}">${x.status}</div></div>`).join("")||"<div class='small'>접수된 사항이 없습니다.</div>"}</div>`}
+    function registerPage(){const defaultCat="시설";const places=PLACE_GROUPS[defaultCat]||PLACE_OPTIONS;const presets=ISSUE_PRESETS[defaultCat]||[];return `<div class="pagebar"><h1>시설·환경·안전 접수</h1><button class="btn gray" onclick="go('dashboard')">종합 대시보드</button></div><div class="notice">구분과 장소를 선택하면 해당 시설에 맞는 장소·접수사항이 자동으로 표시됩니다. 등록자 이름은 저장하지 않습니다.</div><div class="panel"><div class="formgrid"><div class="field"><label>민원 유형</label><select id="cat">${COMPLAINT_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('')}</select></div><div class="field"><label>접수 장소</label><select id="place"><option value="">장소를 선택하세요</option>${places.map(p=>`<option value="${p}">${p}</option>`).join("")}</select></div><div class="field full"><label>민원 상세 선택</label><select id="issuePreset" onchange="applyIssuePreset()"><option value="">시설 이상 내용을 선택하세요</option>${presets.map(v=>`<option value="${v}">${v}</option>`).join("")}<option value="직접입력">직접입력</option></select></div><div class="field full"><label>민원 내용</label><textarea id="content" rows="3" placeholder="예 : 시설에 이상이 있습니다. 상세 내용을 입력해 주세요."></textarea></div><div class="field full"><label>사진(선택)</label><input id="photo" type="file" accept="image/*"></div></div><button class="btn" style="margin-top:10px" onclick="addIssue()">접수 등록</button></div><div class="panel" style="margin-top:10px"><h2>최근 접수</h2>${db.issues.slice(-8).reverse().map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수 ${time(x.createdAt)}</div></div><div class="status ${x.status==="완료"?"green":"red"}">${x.status}</div></div>`).join("")||"<div class='small'>접수된 사항이 없습니다.</div>"}</div>`}
     async function setActionType(id,type){const x=(db.issues||[]).find(i=>i.id===id);if(!x||!type)return;x.actionType=type;x.content=withActionMarker(x.content,type);if(x.remoteId){const r=await SUPA.from('requests').update({content:x.content}).eq('id',x.remoteId);if(r.error){alert('처리구분 저장에 실패했습니다.');return}}await syncFromSupabase()}
-    function updateRegisterOptions(){const cat=document.getElementById("cat")?.value||"시설",place=document.getElementById("place"),preset=document.getElementById("issuePreset");if(place){const arr=PLACE_GROUPS[cat]||PLACE_OPTIONS;place.innerHTML='<option value="">장소를 선택하세요</option>'+arr.map(p=>`<option value="${p}">${p}</option>`).join("")}if(preset){const arr=ISSUE_PRESETS[cat]||[];preset.innerHTML='<option value="">내용을 선택하세요</option>'+arr.map(v=>`<option value="${v}">${v}</option>`).join("")+ '<option value="직접입력">직접입력</option>';preset.value=""}}
+    function updateRegisterOptions(){const cat=document.getElementById("cat")?.value||"시설",place=document.getElementById("place"),preset=document.getElementById("issuePreset");if(place){const arr=PLACE_GROUPS[cat]||PLACE_OPTIONS;place.innerHTML='<option value="">장소를 선택하세요</option>'+arr.map(p=>`<option value="${p}">${p}</option>`).join("")}if(preset){const arr=ISSUE_PRESETS[cat]||[];preset.innerHTML='<option value="">시설 이상 내용을 선택하세요</option>'+arr.map(v=>`<option value="${v}">${v}</option>`).join("")+ '<option value="직접입력">직접입력</option>';preset.value=""}}
     function withActionMarker(content,type){const base=String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').trim();return type?base+' [[처리구분:'+type+']]':base}
     function withWorkMarkers(content,type,note){let base=cleanReporterContent(String(content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim());if(type)base+=' [[처리구분:'+type+']]';if(note)base+=' [[조치내용:'+String(note).replace(/\]\]/g,'')+']]';return base}
     function actionTypeFromIssue(x){if(x&&ACTION_TYPES.includes(x.actionType))return x.actionType;const m=String(x?.content||'').match(/\[\[처리구분:(자체조치|외부용역)\]\]/);return m?m[1]:''}
@@ -6516,7 +6516,10 @@ a[data-page="digitalTwin"],
       const locMap={},typeMap={};
       all.forEach(x=>{
         const place=String(x?.place||'기타').trim()||'기타';
-        const type=String(x?.category||'기타').trim()||'기타';
+        let type=String(x?.category||'기타').trim()||'기타';
+        if(type==='시설') type='시설 고장';
+        else if(type==='환경') type='청소 불량';
+        else if(type==='안전') type='안전 관련';
         locMap[place]=(locMap[place]||0)+1;
         typeMap[type]=(typeMap[type]||0)+1;
       });
@@ -6551,9 +6554,9 @@ a[data-page="digitalTwin"],
         <main class="jgb-mobile-complaint-card" aria-label="장군봉체육관 스마트폰 민원 접수">
           <div class="jgb-mobile-brand"><h1>장군봉체육관</h1><p>스마트폰 간편 민원 접수</p></div>
           <div class="jgb-mobile-field">
-            <label class="jgb-mobile-label" for="jgbMobilePlace">발생 장소를 선택해 주세요</label>
+            <label class="jgb-mobile-label" for="jgbMobilePlace">민원 발생 장소를 선택해 주세요</label>
             <select id="jgbMobilePlace" class="jgb-mobile-select" onchange="this.classList.toggle('has-value',!!this.value)">
-              <option value="">발생 장소를 선택해 주세요</option>${places.map(p=>`<option value="${xEsc(p)}">${xEsc(p)}</option>`).join('')}
+              <option value="">민원 발생 장소를 선택해 주세요</option>${places.map(p=>`<option value="${xEsc(p)}">${xEsc(p)}</option>`).join('')}
             </select>
           </div>
           <div class="jgb-mobile-field">
@@ -6564,7 +6567,7 @@ a[data-page="digitalTwin"],
           </div>
           <div class="jgb-mobile-field">
             <label class="jgb-mobile-label" for="jgbMobileContent">민원 내용을 입력해 주세요</label>
-            <textarea id="jgbMobileContent" class="jgb-mobile-textarea" maxlength="500" placeholder="예 : 샤워실에서 물이 새고 있습니다."></textarea>
+            <textarea id="jgbMobileContent" class="jgb-mobile-textarea" maxlength="500" placeholder="예 : 시설에 이상이 있습니다. 상세 내용을 입력해 주세요."></textarea>
             <div class="jgb-mobile-count"><span id="jgbMobileCount">0</span>/500</div>
           </div>
           <button id="jgbMobileSubmit" type="button" class="jgb-mobile-submit" onclick="submitMobileComplaint()">접수하기</button>
@@ -6577,7 +6580,7 @@ a[data-page="digitalTwin"],
       const place=document.getElementById('jgbMobilePlace')?.value||'';
       const type=document.getElementById('jgbMobileType')?.value||'';
       const content=document.getElementById('jgbMobileContent')?.value.trim()||'';
-      if(!place){alert('발생 장소를 선택해 주세요.');return}
+      if(!place){alert('민원 발생 장소를 선택해 주세요.');return}
       if(!type){alert('민원 유형을 선택해 주세요.');return}
       if(!content){alert('민원 내용을 입력해 주세요.');return}
       if(!SUPA){alert('접수 서버 연결이 확인되지 않습니다.');return}
