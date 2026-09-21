@@ -6462,7 +6462,7 @@ a[data-page="digitalTwin"],
       await syncFromSupabase(); window.__newCustSelId=id; render();
     }
     function newCustomerTypeOf(x){const s=String(x?.category||'')+' '+String(x?.content||'');if(/안전/.test(s))return '안전신고';if(/시설|고장|파손|조명|릴선/.test(s))return '시설고장';if(/이용|불편|환경|청소|온도|냄새/.test(s))return '이용불편';return '기타접수'}
-    function newCustomerMapPos(x){const t=String(x?.place||'');if(/1코트|1번/.test(t))return [15,62];if(/2코트|2번/.test(t))return [32,62];if(/3코트|3번/.test(t))return [49,62];if(/4코트|4번/.test(t))return [66,62];if(/5코트|5번/.test(t))return [83,62];if(/화장실|샤워/.test(t))return [89,25];if(/사무실|관리/.test(t))return [10,22];return [50,25]}
+    function newCustomerMapPos(x){const t=String(x?.place||'');if(/1코트|1번/.test(t))return [12,80];if(/2코트|2번/.test(t))return [31,80];if(/3코트|3번/.test(t))return [50,80];if(/4코트|4번/.test(t))return [69,80];if(/5코트|5번/.test(t))return [88,80];if(/남자.*화장실|화장실.*남자/.test(t))return [10,30];if(/여자.*화장실|화장실.*여자/.test(t))return [30,30];if(/남자.*샤워|샤워.*남자/.test(t))return [50,30];if(/여자.*샤워|샤워.*여자/.test(t))return [70,30];if(/남자.*탈의|탈의.*남자/.test(t))return [90,30];if(/여자.*탈의|탈의.*여자/.test(t))return [90,50];if(/복도/.test(t))return [20,50];if(/휴게/.test(t))return [45,50];if(/사무실|관리/.test(t))return [65,50];return [80,50]}
     function newCustomerMapMarkers(items){return items.map(x=>{const [left,top]=newCustomerMapPos(x),sel=String(window.__newCustSelId||'')===String(x.id);return `<button type="button" class="jgb-crm-marker ${sel?'selected':''}" style="left:${left}%;top:${top}%" onclick='window.__newCustSelId=${JSON.stringify(String(x.id))};window.__newCustType=${JSON.stringify(newCustomerTypeOf(x))};render()' title="${xEsc(x.place||'접수 위치')}"><span>●</span><b>${xEsc(x.place||'접수')}</b></button>`}).join('')}
 
     function processPage(){
@@ -6484,11 +6484,27 @@ a[data-page="digitalTwin"],
       @media(max-width:1050px){.jgb-repair-top{grid-template-columns:1fr}.jgb-repair-map-panel,.jgb-repair-judge{min-height:280px}.jgb-repair-table-head,.jgb-repair-row{grid-template-columns:95px 145px minmax(160px,1fr) 190px}}
       @media(max-width:760px){.jgb-repair-table-head{display:none}.jgb-repair-row{grid-template-columns:1fr 1fr}.jgb-repair-row>div{border-right:0;border-bottom:1px solid #edf1f5}.jgb-repair-row .jgb-repair-content{grid-column:1/-1}.jgb-repair-row .jgb-repair-work{grid-column:1/-1}.jgb-repair-brand h2{font-size:18px}}
       @media(max-width:900px){.jgb-repair-split{grid-template-columns:1fr}.jgb-repair-pane:first-child{border-right:0;border-bottom:1px solid #cbd9e2}.jgb-repair-scroll{height:270px}}
-     </style>
+     
+      /* 배치도 최종 정렬: 남녀 시설을 분리하고 공용·기타를 별도 구역으로 구성. 문/출입구/관람석/안내데스크 표시는 없음. */
+      .jgb-repair-map{height:320px;background:#f3f7fa;overflow:hidden}
+      .jgb-facility-layout{position:absolute;left:3%;right:3%;top:12%;height:49%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+      .jgb-facility-group{border:1px solid #a9bdc9;border-radius:6px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+      .jgb-facility-group-title{height:22px;display:flex;align-items:center;justify-content:center;background:#eaf2f6;color:#244b66;font-size:10px;font-weight:950;border-bottom:1px solid #c9d8e1}
+      .jgb-facility-group.female .jgb-facility-group-title{background:#fff0f4;color:#70475b}
+      .jgb-facility-group.common .jgb-facility-group-title{background:#f2f4f5;color:#526674}
+      .jgb-facility-items{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:5px}
+      .jgb-facility-items.common-items{grid-template-columns:repeat(3,1fr)}
+      .jgb-facility-zone{display:flex;align-items:center;justify-content:center;text-align:center;border:1px dashed #afc1cc;border-radius:5px;background:#f8fbfc;color:#294b61;font-size:9px;font-weight:900;padding:3px;min-width:0}
+      .jgb-facility-group.female .jgb-facility-zone{background:#fff8fa;color:#694858}
+      .jgb-facility-group.common .jgb-facility-zone{background:#fafafa;color:#586c79}
+      .jgb-repair-courts{left:3%;right:3%;top:66%;height:25%;gap:5px}
+      .jgb-repair-court{padding-top:4px;font-size:11px}
+      .jgb-repair-map .jgb-crm-marker{z-index:10}
+</style>
      <div class="jgb-repair-page">
        <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico">🛠️</span><div><h2>수리 대상 품목</h2><p>스마트폰 QR 접수로 들어온 미처리 시설 이상을 수리 대상으로 관리합니다.</p></div></div><div class="jgb-repair-stat"><b>${active.length}</b><small>현재 접수</small></div></header>
        <section class="jgb-repair-top">
-         <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 자산 배치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설 배치 · QR 접수 위치 연동</div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>`<div class="jgb-repair-court"><b>${c}</b></div>`).join('')}</div><div class="jgb-repair-map-zone z-office">관리사무실</div><div class="jgb-repair-map-zone z-lounge">휴게공간</div><div class="jgb-repair-map-zone z-toilet">화장실·샤워실</div>${newCustomerMapMarkers(active.slice(0,30))}<div class="jgb-repair-legend"><span><i></i> 접수 위치</span><span class="sel"><i></i> 선택 접수</span></div></div></div>
+         <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 자산 배치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone" data-place="남자 화장실">남자 화장실</div><div class="jgb-facility-zone" data-place="남자 샤워실">남자 샤워실</div><div class="jgb-facility-zone" data-place="남자 탈의실">남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone" data-place="여자 화장실">여자 화장실</div><div class="jgb-facility-zone" data-place="여자 샤워실">여자 샤워실</div><div class="jgb-facility-zone" data-place="여자 탈의실">여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone" data-place="복도">복도</div><div class="jgb-facility-zone" data-place="휴게실">휴게실</div><div class="jgb-facility-zone" data-place="기타">기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>`<div class="jgb-repair-court"><b>${c}</b></div>`).join('')}</div>${newCustomerMapMarkers(active.slice(0,30))}<div class="jgb-repair-legend"><span><i></i> 접수 위치</span><span class="sel"><i></i> 선택 접수</span></div></div></div>
          <aside class="jgb-repair-judge"><div class="jgb-repair-panel-head"><b>관리자 판단</b><span>현재 수리 접수 기준</span></div><div class="jgb-repair-judge-body"><div class="jgb-repair-judge-main"><strong>${active.length?'처리 필요 수리 접수 '+active.length+'건':'현재 수리 대상 품목 없음'}</strong><small>${active.length?'배치도에서 접수 위치를 확인하고 담당 직원을 지정합니다.':'새로운 고객 QR 접수가 들어오면 이곳에 표시됩니다.'}</small></div><div class="jgb-repair-judge-list"><div><b>미담당</b><span>${active.filter(x=>!x.handlerId).length}건</span></div><div><b>담당 지정</b><span>${active.filter(x=>x.handlerId).length}건</span></div><div><b>오늘 접수</b><span>${today}건</span></div></div></div></aside>
        </section>
        ${(()=>{
