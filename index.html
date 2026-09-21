@@ -5276,6 +5276,162 @@ a[data-page="digitalTwin"],
 }
 </style>
 
+
+<style id="JGB_REPAIR_HEADER_VIEW_SWITCH_V1">
+/* 민원관리: 헤더의 민원 통계·분석 버튼 */
+.jgb-repair-stats-trigger{
+  min-width:128px;height:64px;padding:7px 10px;border:1px solid rgba(255,255,255,.55);
+  border-radius:9px;background:#fff;color:#123f67;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;cursor:pointer;font-weight:950;
+  box-shadow:0 2px 5px rgba(0,0,0,.16);white-space:nowrap;
+}
+.jgb-repair-stats-trigger:hover{background:#eaf5ff}
+.jgb-repair-stats-trigger[aria-expanded="true"]{background:#e8f4ff;box-shadow:inset 0 0 0 2px #1769c1,0 2px 5px rgba(0,0,0,.16)}
+.jgb-repair-stats-trigger-icon{font-size:21px;line-height:20px;color:#1769c1}
+.jgb-repair-stats-trigger span:last-child{font-size:11px}
+
+/* 클릭하면 나타나는 3개 화면전환 메뉴 */
+.jgb-repair-view-menu{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:10px 0 10px;
+}
+.jgb-repair-view-menu[hidden]{display:none!important}
+.jgb-repair-view-btn{
+  min-height:70px;border:1px solid #c9d9e6;border-radius:10px;background:#fff;
+  display:grid;grid-template-columns:42px minmax(0,1fr) 18px;grid-template-rows:auto auto;
+  align-items:center;text-align:left;padding:9px 12px;cursor:pointer;box-shadow:0 2px 7px rgba(17,56,84,.08);color:#163d60;
+}
+.jgb-repair-view-btn>span{grid-row:1/3;display:grid;place-items:center;width:34px;height:34px;border-radius:8px;background:#e8f2fb;color:#1769c1;font-size:20px}
+.jgb-repair-view-btn b{font-size:14px;line-height:1.1}
+.jgb-repair-view-btn small{font-size:9px;color:#7890a3;font-weight:800;margin-top:2px}
+.jgb-repair-view-btn i{grid-column:3;grid-row:1/3;font-size:26px;font-style:normal;color:#7890a3;text-align:right}
+.jgb-repair-view-btn.active{border:2px solid #1769c1;background:#eef7ff}
+.jgb-repair-view-btn.active>span{background:#1769c1;color:#fff}
+.jgb-repair-view-btn.active i{color:#1769c1}
+
+/* 화면 전환: 기존 DOM/기능은 그대로 두고 표시 영역만 바꾼다 */
+.jgb-repair-page[data-repair-view="map"] .jgb-repair-list-wrap,
+.jgb-repair-page[data-repair-view="map"] .jgb-complaint-stats{display:none!important}
+.jgb-repair-page[data-repair-view="list"] .jgb-repair-top,
+.jgb-repair-page[data-repair-view="list"] .jgb-complaint-stats{display:none!important}
+.jgb-repair-page[data-repair-view="stats"] .jgb-repair-top,
+.jgb-repair-page[data-repair-view="stats"] .jgb-repair-list-wrap{display:none!important}
+
+/* 화면 전체와 내부 스크롤바는 숨기되 기존 스크롤 동작은 유지 */
+html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
+html,body,*{scrollbar-width:none!important}
+.jgb-repair-scroll,.jgb-live-body{scrollbar-width:none!important;overflow-y:auto!important;overflow-x:hidden!important}
+
+@media(max-width:1050px){
+  .jgb-repair-stats-trigger{min-width:112px}
+  .jgb-repair-view-menu{grid-template-columns:1fr}
+}
+</style>
+<script>
+function toggleRepairViewMenu(){
+  const menu=document.getElementById('jgbRepairViewMenu');
+  const btn=document.querySelector('.jgb-repair-stats-trigger');
+  if(!menu)return;
+  const willOpen=menu.hasAttribute('hidden');
+  if(willOpen){
+    menu.removeAttribute('hidden');
+  }else{
+    menu.setAttribute('hidden','');
+  }
+  if(btn)btn.setAttribute('aria-expanded',String(willOpen));
+}
+function setRepairView(view){
+  const page=document.querySelector('.jgb-repair-page');
+  if(!page)return;
+  const v=['map','list','stats'].includes(view)?view:'map';
+  page.dataset.repairView=v;
+  document.querySelectorAll('.jgb-repair-view-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+  const labels={map:'시설 민원 위치도',list:'접수·민원 처리',stats:'민원 통계·분석'};
+  const menu=document.getElementById('jgbRepairViewMenu');
+  const trigger=document.querySelector('.jgb-repair-stats-trigger');
+  if(menu){menu.removeAttribute('hidden');}
+  if(trigger){trigger.setAttribute('aria-expanded','true');}
+  const target=v==='map'?document.querySelector('.jgb-repair-top'):v==='list'?document.querySelector('.jgb-repair-list-wrap'):document.querySelector('.jgb-complaint-stats');
+  if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+
+<style id="JGB_FINAL_COMPLAINT_HEADER_STATS_V3">
+/* 민원관리 헤더: 기존 4개 요약 + 통계 아이콘 버튼을 한 줄에 정확히 배치 */
+.jgb-repair-head .jgb-repair-header-summary{
+  grid-template-columns:minmax(92px,auto) minmax(118px,auto) minmax(118px,auto) 82px 118px !important;
+  gap:6px !important;
+  align-items:stretch !important;
+}
+.jgb-repair-head .jgb-repair-stats-trigger{
+  width:118px !important;
+  min-width:118px !important;
+  height:64px !important;
+  min-height:64px !important;
+  margin:0 !important;
+  align-self:stretch !important;
+  box-sizing:border-box !important;
+}
+.jgb-repair-head .jgb-repair-stats-trigger-icon{
+  font-size:21px !important;
+  line-height:20px !important;
+}
+.jgb-repair-head .jgb-repair-stats-trigger span:last-child{
+  font-size:11px !important;
+  line-height:1.1 !important;
+}
+
+/* 클릭 후 표시되는 3개 화면 전환 버튼 */
+.jgb-repair-view-menu{
+  width:100% !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:9px !important;
+  margin:10px 0 !important;
+}
+.jgb-repair-view-btn{
+  min-width:0 !important;
+  width:100% !important;
+}
+
+/* 화면의 보이는 스크롤바만 제거 — 기존 스크롤 동작은 유지 */
+html, body, .jgb-repair-page{
+  scrollbar-width:none !important;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.jgb-repair-page::-webkit-scrollbar,
+.jgb-repair-scroll::-webkit-scrollbar,
+.jgb-repair-recent-body::-webkit-scrollbar,
+.jgb-live-body::-webkit-scrollbar{
+  width:0 !important;
+  height:0 !important;
+  display:none !important;
+}
+.jgb-repair-scroll,
+.jgb-repair-recent-body,
+.jgb-live-body{
+  scrollbar-width:none !important;
+}
+
+/* 데스크톱에서 헤더 버튼이 아래 줄로 떨어지지 않게 */
+@media(min-width:1201px){
+  .jgb-repair-head .jgb-repair-header-summary{
+    grid-template-columns:92px 132px 132px 82px 118px !important;
+  }
+}
+
+/* 좁은 화면에서는 헤더의 기존 반응형 구조를 유지 */
+@media(max-width:1200px){
+  .jgb-repair-head .jgb-repair-header-summary{
+    grid-template-columns:auto auto 82px 118px !important;
+  }
+}
+@media(max-width:850px){
+  .jgb-repair-head .jgb-repair-header-summary{
+    display:none !important;
+  }
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -7083,8 +7239,13 @@ a[data-page="digitalTwin"],
 .jgb-repair-scroll{min-width:0!important;}
 
 </style>
-     <div class="jgb-repair-page">
-       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><div class="jgb-repair-year-box"><b>2026년 기준</b><strong>${header2026Total.toLocaleString()}건</strong><small>총 민원</small></div><div class="jgb-repair-trend-box ${headerMonthDiff<0?'good':headerMonthDiff>0?'bad':''}"><b>${headerM1+1}월 ${headerPrev.toLocaleString()}건 → ${headerM2+1}월 ${headerCurr.toLocaleString()}건</b><small>${headerMonthText}</small></div><div class="jgb-repair-trend-box ${headerYearDiff<0?'good':headerYearDiff>0?'bad':''}"><b>2025년 0건 → 2026년 ${header2026Total.toLocaleString()}건</b><small>${headerYearText}</small></div><div class="jgb-repair-stat"><b>${active.length}</b><small>현재 접수</small></div></div></header>
+     <div class="jgb-repair-page" data-repair-view="map">
+       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><div class="jgb-repair-year-box"><b>2026년 기준</b><strong>${header2026Total.toLocaleString()}건</strong><small>총 민원</small></div><div class="jgb-repair-trend-box ${headerMonthDiff<0?'good':headerMonthDiff>0?'bad':''}"><b>${headerM1+1}월 ${headerPrev.toLocaleString()}건 → ${headerM2+1}월 ${headerCurr.toLocaleString()}건</b><small>${headerMonthText}</small></div><div class="jgb-repair-trend-box ${headerYearDiff<0?'good':headerYearDiff>0?'bad':''}"><b>2025년 0건 → 2026년 ${header2026Total.toLocaleString()}건</b><small>${headerYearText}</small></div><div class="jgb-repair-stat"><b>${active.length}</b><small>현재 접수</small></div><button type="button" class="jgb-repair-stats-trigger" onclick="toggleRepairViewMenu()" aria-expanded="false" title="민원 통계·분석 메뉴"><span class="jgb-repair-stats-trigger-icon">▥</span><span>민원 통계·분석</span></button></div></header>
+       <nav id="jgbRepairViewMenu" class="jgb-repair-view-menu" aria-label="민원 화면 전환 메뉴" hidden>
+         <button type="button" class="jgb-repair-view-btn active" data-view="map" onclick="setRepairView('map')"><span>📍</span><b>시설 민원 위치도</b><small>현재 화면</small><i>›</i></button>
+         <button type="button" class="jgb-repair-view-btn" data-view="list" onclick="setRepairView('list')"><span>▤</span><b>접수·민원 처리</b><small>접수 목록 및 처리 업무</small><i>›</i></button>
+         <button type="button" class="jgb-repair-view-btn" data-view="stats" onclick="setRepairView('stats')"><span>▥</span><b>민원 통계·분석</b><small>월별·유형별·TOP 5</small><i>›</i></button>
+       </nav>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["남자 화장실"]?'has-complaint':''}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["여자 화장실"]?'has-complaint':''}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${mapComplaintCounts["복도"]?'has-complaint':''}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${mapComplaintCounts["휴게실"]?'has-complaint':''}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${mapComplaintCounts["기타"]?'has-complaint':''}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${n?'has-complaint':''}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
          ${liveComplaintActionPanel(active)}
