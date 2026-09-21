@@ -5301,7 +5301,7 @@ a[data-page="digitalTwin"],
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태">🔒 디지털트윈</span>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v66</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">📊 직원 업무실적</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 운영게시판</button><button type="button" class="jgb-reverse-btn" onclick="go('process')">📱 QR 리버스</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("process","📋 고객접수관리")}${nav("repair","🛠 수리 대상 품목")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태">🔒 디지털트윈</span>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v66</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">📊 직원 업무실적</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 운영게시판</button><button type="button" class="jgb-reverse-btn" onclick="go('process')">📱 QR 리버스</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      }catch(err){
        console.error("화면 렌더링 오류",err);
        app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
@@ -5317,6 +5317,7 @@ a[data-page="digitalTwin"],
       if(page==="digitalTwin")return digitalTwinPage();
     if(page==="dashboard2")return dashboard2();
       if(page==="process")return processPage();
+     if(page==="repair")return repairTargetPage();
      if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
      const s=stats();
      if(page==="opsboard")return dashboard(s);
@@ -6441,6 +6442,68 @@ a[data-page="digitalTwin"],
       return [50,88];
     }
     function newCustomerMapMarkers(items){return items.map(x=>{const [left,top]=newCustomerMapPos(x),sel=String(window.__newCustSelId||'')===String(x.id);return `<button type="button" class="jgb-crm-marker ${sel?'selected':''}" style="left:${left}%;top:${top}%" onclick='window.__newCustSelId=${JSON.stringify(String(x.id))};window.__newCustType=${JSON.stringify(newCustomerTypeOf(x))};render()' title="${xEsc(x.place||'접수 위치')}"><span>●</span><b>${xEsc(x.place||'접수')}</b></button>`}).join('')}
+
+    function repairTargetPage(){
+      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+      const active=stored.filter(x=>x.status!=='완료');
+      const placeLabel=(p)=>String(p||'장소 미기록');
+      const state=(x)=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
+      const stateClass=(x)=>state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
+      const safe=(x)=>cleanIssueContent(x)||'접수 내용 없음';
+
+      return `<style id="repair-target-page-style">
+      .jgb-repair-target{max-width:1500px;margin:0 auto;padding:8px 6px 48px;color:#102a43}
+      .jgb-repair-target *{box-sizing:border-box}
+      .jgb-repair-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 20px;border-radius:12px;background:linear-gradient(100deg,#0d3554,#146b94,#0d4669);color:#fff;box-shadow:0 4px 12px rgba(10,35,55,.18);margin-bottom:12px}
+      .jgb-repair-head h2{margin:0 0 4px;font-size:27px;font-weight:950}
+      .jgb-repair-head p{margin:0;color:#d9edf8;font-size:12px;font-weight:700}
+      .jgb-repair-count{min-width:92px;text-align:center;background:#fff;color:#1268e3;border-radius:10px;padding:10px 12px;font-weight:900}
+      .jgb-repair-count b{display:block;font-size:22px;line-height:1.1}
+      .jgb-repair-card{background:#fff;border:1px solid #d5e1ec;border-radius:12px;box-shadow:0 4px 14px rgba(20,50,75,.06);overflow:hidden}
+      .jgb-repair-title{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #dbe7f3;background:#f7fbfe}
+      .jgb-repair-title strong{font-size:18px}
+      .jgb-repair-title span{font-size:11px;color:#71839a}
+      .jgb-repair-empty{padding:70px 20px;text-align:center;color:#71839a}
+      .jgb-repair-empty b{display:block;font-size:19px;color:#173d5a;margin-bottom:8px}
+      .jgb-repair-list{display:grid;gap:8px;padding:10px}
+      .jgb-repair-row{display:grid;grid-template-columns:95px 160px minmax(0,1fr) 100px 105px;align-items:stretch;border:1px solid #dce7f0;border-radius:9px;overflow:hidden;background:#fff}
+      .jgb-repair-row>div{padding:12px;border-right:1px solid #e2ebf2;min-width:0}
+      .jgb-repair-row>div:last-child{border-right:0}
+      .jgb-repair-time{font-size:12px;font-weight:900;color:#173d5a}
+      .jgb-repair-time small{display:block;margin-top:3px;color:#8797a6;font-size:10px}
+      .jgb-repair-place b{display:block;font-size:15px;overflow-wrap:anywhere}
+      .jgb-repair-place span{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#edf5fb;color:#27709a;font-size:10px;font-weight:800}
+      .jgb-repair-content{font-size:13px;line-height:1.5;overflow-wrap:anywhere;word-break:break-word}
+      .jgb-repair-status{display:flex;align-items:center;justify-content:center}
+      .jgb-repair-badge{display:inline-block;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:900;background:#fff4d8;color:#a36a00}
+      .jgb-repair-badge.assigned{background:#e9f2ff;color:#1769c1}
+      .jgb-repair-badge.run{background:#eee9ff;color:#5b43a8}
+      .jgb-repair-action{display:flex;align-items:center;justify-content:center}
+      .jgb-repair-action button{border:1px solid #1268e3;background:#fff;color:#1268e3;border-radius:8px;padding:8px 10px;font-weight:900;cursor:pointer}
+      @media(max-width:900px){
+        .jgb-repair-row{grid-template-columns:1fr 1fr}
+        .jgb-repair-row>div:nth-child(3){grid-column:1/-1}
+      }
+      </style>
+      <div class="jgb-repair-target">
+        <section class="jgb-repair-head">
+          <div><h2>수리 대상 품목</h2><p>고객접수관리에서 접수된 미처리 시설 이상을 수리 대상으로 관리합니다.</p></div>
+          <div class="jgb-repair-count"><b>${active.length}</b>현재 접수</div>
+        </section>
+        <section class="jgb-repair-card">
+          <div class="jgb-repair-title"><strong>접수·수리 처리 목록</strong><span>고객 QR 접수 → 담당 지정 → 조치완료</span></div>
+          ${active.length?`<div class="jgb-repair-list">${active.map(x=>`
+            <div class="jgb-repair-row">
+              <div class="jgb-repair-time">${time(x.createdAt)}<small>접수</small></div>
+              <div class="jgb-repair-place"><b>${xEsc(placeLabel(x.place))}</b><span>${xEsc(x.category||'시설')}</span></div>
+              <div class="jgb-repair-content">${xEsc(safe(x))}</div>
+              <div class="jgb-repair-status"><span class="jgb-repair-badge ${stateClass(x)}">${xEsc(state(x))}</span></div>
+              <div class="jgb-repair-action"><button type="button" onclick="go('process')">접수 처리</button></div>
+            </div>`).join('')}</div>`:
+            `<div class="jgb-repair-empty"><b>현재 수리 대상 품목이 없습니다.</b>새로운 고객 QR 접수가 들어오면 이곳에 자동으로 표시됩니다.</div>`}
+        </section>
+      </div>`;
+    }
 
     function processPage(){
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
