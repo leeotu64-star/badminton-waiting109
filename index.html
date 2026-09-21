@@ -6537,7 +6537,7 @@ a[data-page="digitalTwin"],
           </section>
           <section class="jgb-complaint-stat-card">
             <div class="jgb-complaint-stat-card-head"><b>민원 다발 발생 위치 TOP 5</b><span>단위 : 건</span></div>
-            <div>${locRows}</div>
+            <div class="jgb-stat-rank-list">${locRows}</div>
           </section>
           <section class="jgb-complaint-stat-card">
             <div class="jgb-complaint-stat-card-head"><b>민원 유형별 현황</b><span>단위 : 건</span></div>
@@ -6675,6 +6675,21 @@ a[data-page="digitalTwin"],
       .jgb-type-grid{display:grid;grid-template-columns:1fr 1fr}.jgb-type-cell{min-height:28px;padding:5px 9px;border-bottom:1px solid #e5edf3;display:flex;justify-content:space-between;gap:8px;align-items:center}.jgb-type-cell:nth-child(odd){border-right:1px solid #e5edf3}
       .jgb-type-name{font-size:10px;color:#28465d;font-weight:900;white-space:nowrap}.jgb-type-count{font-size:12px;color:#1268e3;font-weight:950}
       @media(max-width:1050px){.jgb-complaint-stats-grid{grid-template-columns:1fr}.jgb-type-cell:nth-child(odd){border-right:0}.jgb-type-cell{border-right:0!important}}
+
+/* 하단 민원 통계판 높이 통일 · 빈 공간 최소화 · 내용 초과 시 내부 스크롤 */
+.jgb-complaint-stats-grid{align-items:stretch}
+.jgb-complaint-stat-card{height:185px;min-height:185px;display:flex;flex-direction:column;overflow:hidden}
+.jgb-complaint-stat-card-head{flex:0 0 40px;box-sizing:border-box}
+.jgb-complaint-stat-card>#jgbComplaintMonthlyBody,
+.jgb-complaint-stat-card>.jgb-type-grid,
+.jgb-complaint-stat-card>.jgb-stat-rank-list{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#9fb5c5 #edf3f7}
+.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head){min-height:0}
+.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar{width:8px}
+.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar-track{background:#edf3f7;border-left:1px solid #d6e2ea}
+.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar-thumb{background:#9fb5c5;border-radius:8px}
+.jgb-month-table{margin:0}
+.jgb-type-cell{min-height:28px;box-sizing:border-box}
+
 </style>
      <div class="jgb-repair-page">
        <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><div class="jgb-repair-year-box"><b>2026년 기준</b><strong>${header2026Total.toLocaleString()}건</strong><small>총 민원</small></div><div class="jgb-repair-trend-box ${headerMonthDiff<0?'good':headerMonthDiff>0?'bad':''}"><b>${headerM1+1}월 ${headerPrev.toLocaleString()}건 → ${headerM2+1}월 ${headerCurr.toLocaleString()}건</b><small>${headerMonthText}</small></div><div class="jgb-repair-trend-box ${headerYearDiff<0?'good':headerYearDiff>0?'bad':''}"><b>2025년 0건 → 2026년 ${header2026Total.toLocaleString()}건</b><small>${headerYearText}</small></div><div class="jgb-repair-stat"><b>${active.length}</b><small>현재 접수</small></div></div></header>
