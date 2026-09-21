@@ -5193,6 +5193,20 @@ a[data-page="digitalTwin"],
   }
 }
 </style>
+
+<style id="jgb-final-header-only">
+/* 민원 접수·처리 관리 큰 헤더만 통일 */
+.jgb-repair-head .jgb-repair-brand h2{
+  font-size:28px !important;
+}
+.jgb-repair-head .jgb-repair-brand p{
+  font-size:14px !important;
+}
+.jgb-repair-head .jgb-repair-brandico{
+  /* 기존 위치/크기 유지 */
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -6072,7 +6086,7 @@ a[data-page="digitalTwin"],
                     const p=dashboardStaffMonth(w.id,year+'-'+String(month).padStart(2,'0'));
                     const target=Number(p.basicTarget||10);
                     const rr=target?Math.min(100,Math.round(Number(p.basic||0)/target*100)):0;
-                    return `<tr><td class="staff-name-cell">${xEsc(w.name)}</td>${monthCells}<td class="cum">${cumulative}<span class="unit">건</span></td><td class="detail-blue">${Number(p.basic?.complete||0)}</td><td class="detail-green">${Number(p.auto?.performance||0)}<small> (${Number(p.auto?.units||0)}회)</small></td><td class="detail-orange">${Number(p.qr?.done||0)}</td><td class="detail-total">${Number(p.total||0)}</td><td class="detail-rate">${rr}%</td></tr>`;
+                    return `<tr><td class="staff-name-cell">${xEsc(w.name)}</td>${monthCells}<td class="cum">${cumulative}<span class="unit">건</span></td><td class="detail-blue">${Number(p.basic||0)}</td><td class="detail-green">${Number(p.auto||0)}<small> (${Number(p.autoUnits||0)}회)</small></td><td class="detail-orange">${Number(p.issueDone||0)}</td><td class="detail-total">${Number(p.total||0)}</td><td class="detail-rate">${rr}%</td></tr>`;
                   }).join('')}
                 </tbody>
               </table>
