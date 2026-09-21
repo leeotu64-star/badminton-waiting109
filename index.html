@@ -382,6 +382,32 @@
     .employee-hero .opx-quote{font-size:14px!important;line-height:1.15!important;}
     .employee-hero .opx-quote small{font-size:8px!important;margin-top:2px!important;}
 
+
+/* 실시간 오늘의 변화 및 관리조치 패널: 기존 최근 민원 현황 영역 대체 */
+.jgb-repair-realtime-panel{min-width:0;min-height:0;border:2px solid #7894a8;border-radius:9px;background:#fff;overflow:hidden;display:grid;grid-template-rows:auto 1fr}
+.jgb-repair-realtime-panel .jgb-live-head{height:39px!important;padding:7px 11px!important;background:#e7f0fb!important;border-bottom:2px solid #7894a8!important}
+.jgb-live-head b{font-size:17px!important;font-weight:1000!important;color:#123f67!important}
+.jgb-live-head span{font-size:10px!important;color:#58758b!important;font-weight:900!important;white-space:nowrap}
+.jgb-live-head em{font-style:normal;color:#fff;background:#ef4444;border-radius:12px;padding:4px 8px;font-weight:1000}
+.jgb-live-body{min-height:0;overflow-y:auto;overflow-x:hidden;padding:8px;background:#f7fbfe;scrollbar-width:thin;scrollbar-color:#7897aa #edf3f7}
+.jgb-live-body::-webkit-scrollbar{width:8px}.jgb-live-body::-webkit-scrollbar-track{background:#edf3f7}.jgb-live-body::-webkit-scrollbar-thumb{background:#7897aa;border-radius:6px}
+.jgb-live-action-row,.jgb-live-empty{display:grid;grid-template-columns:42px minmax(125px,1.05fr) 62px minmax(145px,1fr);align-items:center;gap:8px;min-height:55px;margin-bottom:6px;padding:6px 8px;border:1px solid #cbd9e5;border-radius:9px;background:#fff;box-sizing:border-box}
+.jgb-live-action-row:last-child{margin-bottom:0}
+.jgb-live-action-row.warn{background:#fff2f2;border-color:#f4c1c1}.jgb-live-action-row.check{background:#fff8e8;border-color:#f2d49a}.jgb-live-action-row.observe{background:#eef6ff;border-color:#c5dbee}
+.jgb-live-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1d8a4a;color:#fff;font-size:18px;font-weight:1000}
+.jgb-live-action-row.warn .jgb-live-icon{background:#ef233c}.jgb-live-action-row.check .jgb-live-icon{background:#f0a400}.jgb-live-action-row.observe .jgb-live-icon{background:#2f80ed}
+.jgb-live-main,.jgb-live-action{min-width:0;display:flex;flex-direction:column;gap:2px}
+.jgb-live-main b{font-size:13px;color:#163d60;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jgb-live-main span,.jgb-live-action span{font-size:9px;color:#6b7f90;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jgb-live-main strong{color:#ef233c;font-weight:1000}
+.jgb-live-status{justify-self:center;min-width:48px;padding:7px 7px;border-radius:16px;text-align:center;background:#159447;color:#fff;font-size:11px;font-weight:1000}
+.jgb-live-status.warn{background:#ef233c}.jgb-live-status.check{background:#f0a400}.jgb-live-status.observe{background:#2f80ed}
+.jgb-live-action b{font-size:12px;color:#18834a;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.jgb-live-action-row.warn .jgb-live-action b{color:#d82d2d}.jgb-live-action-row.check .jgb-live-action b{color:#c77b00}.jgb-live-action-row.observe .jgb-live-action b{color:#1268c5}
+.jgb-live-empty{margin:0;min-height:120px;background:#eefaf3;border-color:#bce6cc}
+.jgb-live-empty .jgb-live-icon{background:#159447}.jgb-live-empty>div:nth-child(2){min-width:0;display:flex;flex-direction:column;gap:3px}.jgb-live-empty b{font-size:12px;color:#18834a}.jgb-live-empty span{font-size:9px;color:#668276;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jgb-live-status.stable{background:#159447}.jgb-live-empty .jgb-live-action b{color:#18834a}
+@media(max-width:1050px){.jgb-repair-realtime-panel{min-height:280px}}
+
 </style></style>
     <style id="EMPLOYEE_OVERVIEW_STYLE">
     .eov-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
@@ -6643,6 +6669,45 @@ a[data-page="digitalTwin"],
       finally{if(btn)btn.disabled=false}
     }
 
+    function liveComplaintActionPanel(active){
+      const items=Array.isArray(active)?active:[];
+      const groups={};
+      items.forEach(x=>{
+        const place=String(x?.place||'기타').trim()||'기타';
+        if(!groups[place]) groups[place]={count:0,items:[]};
+        groups[place].count++;
+        groups[place].items.push(x);
+      });
+      const rows=Object.entries(groups)
+        .sort((a,b)=>b[1].count-a[1].count||a[0].localeCompare(b[0],'ko'))
+        .slice(0,5);
+      const actionOf=(name,group)=>{
+        const text=(name+' '+group.items.map(x=>String(x?.category||'')+' '+String(x?.content||'')).join(' '));
+        if(/화장실|샤워실|탈의실|청소|환경|냄새/.test(text)) return ['청소 상태 집중 점검','청결 상태 및 소모품 확인','clean'];
+        if(/냉.?난방|온도/.test(text)) return ['냉·난방 설비 점검','온도 설정 및 작동 상태 확인','observe'];
+        if(/조명|전등|릴선/.test(text)) return ['조명 시설 점검','조명 및 전기 상태 확인','check'];
+        if(/안전|미끄|파손|위험/.test(text)) return ['안전 상태 집중 점검','현장 위험요소 확인','warn'];
+        if(/시설|고장|설비|누수|배수|수도/.test(text)) return ['시설 상태 점검','설비 작동 및 이상 여부 확인','check'];
+        return ['현장 상태 점검','접수 내용 확인 및 조치 여부 판단','observe'];
+      };
+      const statusOf=count=>count>=3?['주의','warn']:count===2?['확인','check']:['관찰','observe'];
+      const iconOf=kind=>kind==='clean'?'↗':kind==='warn'?'!':kind==='check'?'＋':'−';
+      const rowsHtml=rows.length?rows.map(([place,g])=>{
+        const [action,detail,kind]=actionOf(place,g);
+        const [status,statusKind]=statusOf(g.count);
+        return `<div class="jgb-live-action-row ${statusKind}">
+          <div class="jgb-live-icon">${iconOf(kind)}</div>
+          <div class="jgb-live-main"><b>${xEsc(place)}</b><span>현재 미처리 <strong>${g.count.toLocaleString()}건</strong> · 실시간 접수 기준</span></div>
+          <div class="jgb-live-status ${statusKind}">${status}</div>
+          <div class="jgb-live-action"><b>${xEsc(action)}</b><span>${xEsc(detail)}</span></div>
+        </div>`;
+      }).join(''):`<div class="jgb-live-empty"><div class="jgb-live-icon stable">✓</div><div><b>현재 미처리 민원이 없습니다.</b><span>새로운 접수가 발생하면 실시간으로 관리조치가 표시됩니다.</span></div><div class="jgb-live-status stable">안정</div><div class="jgb-live-action"><b>현재 상태 양호</b><span>지속적인 민원 접수 현황을 확인합니다.</span></div></div>`;
+      return `<aside class="jgb-repair-realtime-panel">
+        <div class="jgb-repair-panel-head jgb-live-head"><b>📊 오늘의 변화 및 관리조치</b><span><em>실시간 분석</em> · 방금 갱신</span></div>
+        <div class="jgb-live-body">${rowsHtml}</div>
+      </aside>`;
+    }
+
     function processPage(){
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
      const active=stored.filter(x=>x.status!=='완료');
@@ -6704,7 +6769,7 @@ a[data-page="digitalTwin"],
       .jgb-complaint-stats{margin-top:10px;border:2px solid #7894a8;border-radius:9px;background:#fff;overflow:hidden}
       .jgb-complaint-stats-head{height:43px;padding:8px 11px;background:#e8f2f7;border-bottom:2px solid #7894a8;display:flex;align-items:center;justify-content:space-between}
       .jgb-complaint-stats-head b{font-size:17px;font-weight:950;color:#173c58}.jgb-complaint-stats-head span{font-size:10px;color:#58758b;font-weight:900}
-      .jgb-complaint-stats-grid{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:8px;padding:9px}
+      .jgb-complaint-stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:9px}
       .jgb-complaint-stat-card{border:1px solid #cbd9e2;border-radius:8px;background:#fff;overflow:hidden;min-width:0}
 /* 하단 3개 통계판 높이 통일: TOP 5도 동일한 내부 스크롤 영역 */
 .jgb-complaint-stat-card{height:190px;display:flex;flex-direction:column}
@@ -6929,7 +6994,7 @@ a[data-page="digitalTwin"],
        <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><div class="jgb-repair-year-box"><b>2026년 기준</b><strong>${header2026Total.toLocaleString()}건</strong><small>총 민원</small></div><div class="jgb-repair-trend-box ${headerMonthDiff<0?'good':headerMonthDiff>0?'bad':''}"><b>${headerM1+1}월 ${headerPrev.toLocaleString()}건 → ${headerM2+1}월 ${headerCurr.toLocaleString()}건</b><small>${headerMonthText}</small></div><div class="jgb-repair-trend-box ${headerYearDiff<0?'good':headerYearDiff>0?'bad':''}"><b>2025년 0건 → 2026년 ${header2026Total.toLocaleString()}건</b><small>${headerYearText}</small></div><div class="jgb-repair-stat"><b>${active.length}</b><small>현재 접수</small></div></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["남자 화장실"]?'has-complaint':''}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["여자 화장실"]?'has-complaint':''}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${mapComplaintCounts["복도"]?'has-complaint':''}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${mapComplaintCounts["휴게실"]?'has-complaint':''}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${mapComplaintCounts["기타"]?'has-complaint':''}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${n?'has-complaint':''}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
-         <aside class="jgb-repair-recent"><div class="jgb-repair-panel-head"><b>최근 민원 접수 현황</b><span>최신 접수 순</span></div><div class="jgb-repair-recent-colhead"><span>번호</span><span>접수시간</span><span>민원 유형</span><span>발생 장소</span></div><div class="jgb-repair-recent-body">${active.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,15).map((x,i)=>`<div class="jgb-repair-recent-row"><div class="jgb-repair-recent-no">${String(i+1).padStart(2,'0')}</div><div class="jgb-repair-recent-time">${time(x.createdAt)}</div><div class="jgb-repair-recent-type">${xEsc(x.category||'기타 민원')}</div><div class="jgb-repair-recent-content">${xEsc(x.place||'기타')} · ${xEsc(safe(x))}</div></div>`).join('')||'<div class="jgb-repair-recent-empty">현재 접수된 민원이 없습니다.</div>'}</div></aside>
+         ${liveComplaintActionPanel(active)}
        </section>
        ${(()=>{
          const latest=active.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,12);
