@@ -6435,6 +6435,60 @@ a[data-page="digitalTwin"],
       <div class="ca-banner"><div><strong>신속한 고객 응대, 깔끔한 접수관리</strong><br><span>접수된 민원은 담당 직원을 지정하고 조치가 끝나면 <b>조치완료</b>만 누르면 됩니다.</span></div><div class="chips"><span class="ca-chip">📱 QR 접수</span><span class="ca-chip">👤 담당 지정</span><span class="ca-chip">✓ 완료 처리</span></div></div>
       <section class="ca-section"><div class="ca-section-head"><div><h3>접수된 고객 민원</h3><p>현재 처리해야 할 접수만 표시됩니다. 완료하면 아래 보관기록으로 이동합니다.</p></div><span class="ca-count">현재 ${active.length}건</span></div>${active.length?`<div class="ca-table-head"><span>접수일시</span><span>접수장소</span><span>신고 내용</span><span>담당 직원</span><span>처리 상태</span><span>관리</span></div><div>${active.map(x=>{const st=state(x);return `<div class="ca-row"><div class="ca-time">${time(x.createdAt)}<small>접수</small></div><div class="ca-place"><b>${xEsc(x.place||'장소 미기록')}</b><span>${xEsc(x.category||'기타')}</span></div><div class="ca-content"><span class="ca-label">고객 신고</span>${xEsc(safe(x))}${x.photo_url?`<br><button class="ca-refresh" style="margin-top:8px" onclick="window.open('${x.photo_url}','_blank')">📷 사진 보기</button>`:''}</div><div class="ca-assign"><select onchange="assign('${x.id}',this.value)"><option value="">담당 직원 선택</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select><div class="ca-handler">현재 담당: <b>${xEsc(x.handlerName||'미지정')}</b></div></div><div><span class="ca-status ${stateClass(x)}">● ${xEsc(st)}</span></div><div class="ca-actions">${x.handlerId?`<button class="ca-complete" onclick="completeIssue('${x.id}')">✓ 조치완료</button>`:'<div class="ca-need">담당 직원<br>지정 필요</div>'}<button class="ca-delete" onclick="deleteProcessRequest('${x.id}')">삭제</button></div></div>`}).join('')}</div>`:'<div class="ca-empty"><strong>현재 접수된 고객 민원이 없습니다.</strong>새로운 QR 접수가 들어오면 이곳에 바로 표시됩니다.</div>'}</section>
       <section class="ca-section ca-history"><div class="ca-section-head"><div><h3>최근 처리완료</h3><p>조치완료된 접수는 최근 1개월 동안 이곳에 기록으로 남습니다.</p></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ca-count">${completed.length}건 보관</span><button class="ca-delete" onclick="resetAllCustomerReceipts()">전체 삭제</button></div></div>${completed.length?`<div class="cc-wrap">${completed.map(completedCard).join('')}</div>`:'<div class="ca-empty">최근 1개월 내 처리완료 기록이 없습니다.</div>'}<div class="ca-note">ⓘ 처리완료 기록은 운영대시보드의 직원실적·장소별 기록에 활용할 수 있도록 별도로 보관합니다.</div></section>
+      <section class="jgb-new-customer-card" id="jgbNewCustomerCard">
+        <style>
+          .jgb-new-customer-card{width:100%;margin:14px 0 0;color:#16364e;font-family:inherit;box-sizing:border-box}
+          .jgb-new-customer-card *{box-sizing:border-box}
+          .jgb-new-customer-head{width:100%;height:100px;min-height:100px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:20px;color:#fff;background:linear-gradient(105deg,#0b3558 0%,#12648d 55%,#0b5279 100%);border:2px solid #163f5d;border-top:4px solid #1677b5;border-radius:10px;box-shadow:0 5px 14px rgba(8,35,55,.24)}
+          .jgb-new-customer-title{display:flex;align-items:center;gap:12px;min-width:0}.jgb-new-customer-title .ico{font-size:31px;line-height:1}.jgb-new-customer-title h2{margin:0;color:#fff;font-size:24px;font-weight:950;letter-spacing:-.03em;white-space:nowrap}.jgb-new-customer-title p{margin:5px 0 0;color:rgba(255,255,255,.82);font-size:11px;font-weight:750;white-space:nowrap}
+          .jgb-new-customer-actions{display:flex;align-items:center;gap:7px;flex:0 0 auto}.jgb-new-customer-actions button{height:42px;padding:0 14px;border:1px solid rgba(255,255,255,.45);border-radius:8px;background:rgba(255,255,255,.14);color:#fff;font-size:12px;font-weight:900}
+          .jgb-new-customer-grid{width:100%;margin-top:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:stretch}
+          .jgb-new-customer-col{min-width:0;border:1px solid #cfdde8;border-radius:8px;background:#fff;overflow:hidden;box-shadow:0 3px 9px rgba(20,60,90,.08)}
+          .jgb-new-customer-col-head{height:42px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;background:#eaf4fa;border-bottom:1px solid #cbdde9;color:#173b55}.jgb-new-customer-col-head strong{font-size:14px;font-weight:950}.jgb-new-customer-col-head span{font-size:10px;color:#668096;font-weight:800}
+          .jgb-new-customer-fields{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:7px}.jgb-new-customer-field{min-width:0;min-height:55px;padding:7px 9px;border:1px solid #d9e4ec;border-radius:6px;background:#fbfdff}.jgb-new-customer-field.wide{grid-column:1/-1}.jgb-new-customer-field label{display:block;margin-bottom:4px;color:#71879a;font-size:10px;font-weight:900}.jgb-new-customer-field strong{display:block;color:#183b56;font-size:13px;font-weight:900;line-height:1.35;overflow-wrap:anywhere}
+          .jgb-new-customer-type-list{padding:10px;display:grid;gap:7px}.jgb-new-customer-type{min-height:52px;display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #d5e1ea;border-radius:7px;background:#f8fbfd}.jgb-new-customer-type.active{border-color:#2c8ac4;background:#eaf5fc;box-shadow:inset 0 0 0 1px #8fc4e2}.jgb-new-customer-type .ico{width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#fff;font-size:17px}.jgb-new-customer-type b{display:block;font-size:13px;font-weight:950}.jgb-new-customer-type small{display:block;margin-top:2px;font-size:10px;color:#71889a;font-weight:800}
+          .jgb-new-customer-status{display:inline-flex;align-items:center;justify-content:center;min-width:68px;padding:5px 9px;border-radius:6px;background:#fff1d8;color:#a66a00;font-size:11px;font-weight:950}.jgb-new-customer-status.done{background:#e9f8ef;color:#16834c}.jgb-new-customer-action{margin:10px;min-height:40px;width:calc(100% - 20px);border:0;border-radius:7px;background:#10a765;color:#fff;font-size:12px;font-weight:950}
+          @media(max-width:900px){.jgb-new-customer-grid{grid-template-columns:1fr}.jgb-new-customer-head{height:auto;min-height:100px}.jgb-new-customer-title h2{white-space:normal}.jgb-new-customer-title p{white-space:normal}}
+        </style>
+
+        <header class="jgb-new-customer-head">
+          <div class="jgb-new-customer-title"><span class="ico">📋</span><div><h2>주요 접수 이력카드 (이용불편)</h2><p>고객 접수사항 및 처리현황을 관리합니다.</p></div></div>
+          <div class="jgb-new-customer-actions"><button type="button">🗑 삭제</button><button type="button">‹ 이전</button><button type="button">다음 ›</button></div>
+        </header>
+
+        <div class="jgb-new-customer-grid">
+          <section class="jgb-new-customer-col">
+            <div class="jgb-new-customer-col-head"><strong>접수 기본정보</strong><span>33%</span></div>
+            <div class="jgb-new-customer-fields">
+              <div class="jgb-new-customer-field"><label>접수번호</label><strong>UI-2025-0028</strong></div>
+              <div class="jgb-new-customer-field"><label>접수일시</label><strong>2025-09-20 14:22</strong></div>
+              <div class="jgb-new-customer-field"><label>접수유형</label><strong>이용불편 · UI-001</strong></div>
+              <div class="jgb-new-customer-field"><label>접수장소</label><strong>1코트</strong></div>
+              <div class="jgb-new-customer-field wide"><label>접수자</label><strong>고객 QR 접수</strong></div>
+            </div>
+          </section>
+
+          <section class="jgb-new-customer-col">
+            <div class="jgb-new-customer-col-head"><strong>접수내용 · 조치내용</strong><span>33%</span></div>
+            <div class="jgb-new-customer-fields">
+              <div class="jgb-new-customer-field wide"><label>접수내용</label><strong>네트가 낮아 내려와 경기 진행에 지장이 있습니다.</strong></div>
+              <div class="jgb-new-customer-field wide"><label>상세내용</label><strong>현장 확인 후 조치가 필요한 사항입니다.</strong></div>
+              <div class="jgb-new-customer-field wide"><label>조치내용</label><strong>-</strong></div>
+            </div>
+          </section>
+
+          <section class="jgb-new-customer-col">
+            <div class="jgb-new-customer-col-head"><strong>처리정보</strong><span>33%</span></div>
+            <div class="jgb-new-customer-fields">
+              <div class="jgb-new-customer-field"><label>담당자</label><strong>미지정</strong></div>
+              <div class="jgb-new-customer-field"><label>처리일시</label><strong>-</strong></div>
+              <div class="jgb-new-customer-field"><label>처리상태</label><strong><span class="jgb-new-customer-status">미완료</span></strong></div>
+              <div class="jgb-new-customer-field"><label>확인여부</label><strong>미확인</strong></div>
+            </div>
+            <button type="button" class="jgb-new-customer-action">✓ 처리완료</button>
+          </section>
+        </div>
+      </section>
      </div>`;
     }
 
