@@ -20069,6 +20069,79 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
   .eh-main{grid-template-columns:1fr!important;}
 }
 </style>
+
+
+<!-- JGB EAM V32: 헤더 숫자 초기화 아이콘 -->
+<style id="JGB_EAM_HEADER_NUMBER_RESET_V1">
+.eh-head .eh-number-reset-btn{
+  width:42px!important;
+  height:42px!important;
+  min-width:42px!important;
+  padding:0!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:1px solid rgba(255,255,255,.45)!important;
+  background:rgba(255,255,255,.10)!important;
+  color:#fff!important;
+  border-radius:9px!important;
+  font-size:19px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  cursor:pointer!important;
+  box-sizing:border-box!important;
+}
+.eh-head .eh-number-reset-btn:hover{background:rgba(255,255,255,.18)!important}
+.eh-head .eh-number-reset-btn:active{transform:translateY(1px)}
+</style>
+<script id="JGB_EAM_HEADER_NUMBER_RESET_V1_SCRIPT">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_HEADER_NUMBER_RESET_V1)return;
+  window.__JGB_EAM_HEADER_NUMBER_RESET_V1=true;
+
+  function cleanHeaderButtons(head){
+    if(!head)return;
+    head.querySelectorAll('button').forEach(function(btn){
+      const t=String(btn.textContent||'').replace(/\s+/g,' ').trim();
+      if(/아이콘\s*삭제/.test(t) || /^기존\s*EAM$/.test(t)) btn.remove();
+    });
+  }
+
+  window.jgbEamResetHeaderNumbers=function(){
+    const head=document.querySelector('.eh-head');
+    if(!head)return;
+    const stats=head.querySelectorAll('.eh-stat b');
+    stats.forEach(function(el){el.textContent='0';});
+  };
+
+  function ensureButton(){
+    const head=document.querySelector('.eh-head');
+    if(!head)return;
+    cleanHeaderButtons(head);
+    if(head.querySelector('.eh-number-reset-btn'))return;
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='eh-number-reset-btn';
+    btn.title='숫자 초기화';
+    btn.setAttribute('aria-label','숫자 초기화');
+    btn.innerHTML='↻';
+    btn.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      window.jgbEamResetHeaderNumbers();
+    });
+    head.appendChild(btn);
+  }
+
+  function run(){ensureButton();}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});
+  else run();
+
+  const mo=new MutationObserver(function(){ensureButton();});
+  mo.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 </html><style>
 /* v184: LIVE 표 가로 스크롤바를 컨테이너 폭에 맞춰 표시 */
 .jgb-v176-live-card .jgb-v178-live-table{
