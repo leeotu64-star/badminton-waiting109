@@ -5372,6 +5372,12 @@ a[data-page="digitalTwin"],
   }
 }
 </style>
+
+<style id="JGB_LEAK_V12_LIVE_REMOVED">
+/* LIVE 화면 삭제 후 기존 배치도만 전체 영역 사용 */
+.jgb-v170-grid{grid-template-columns:1fr!important;grid-template-rows:auto!important;width:100%!important;}
+.jgb-v170-grid > .jgb-v170-mapcard{grid-column:1!important;grid-row:1!important;width:100%!important;min-width:0!important;}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -8203,23 +8209,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   </div>
   ${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}
 </div></div></div><div class="jgb-v170-note">LK 아이콘 클릭 → 해당 LK의 방수공사 이력으로 이동 · 삭제·초기화는 상단 「LK 삭제·초기화」에서 선택</div></section>
-          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>AUTO LK</b><span>LK 등록 연동</span></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>LK</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.lk||'')}</b></td><td>${esc(x.content||'')}</td><td>${esc(x.status||'수리중')}</td><td class="jgb-v187-date">${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v182-live-edit" data-v47-action="edit-live" data-live-lk="${esc(x.lk||'')}">입력</button></td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.lk||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v187-empty"><div class="jgb-v187-empty-visual"><span>👷</span><i>✓</i></div><b>현재 진행 중인 수리내역이 없습니다.</b><span>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</span><em>🌱 작은 불편도 놓치지 않고, 쾌적한 시설을 위해 항상 노력하겠습니다.</em></div>`}</div>
-          <section class="jgb-v189-live-notebook" aria-label="실시간 수리 안내 수첩">
-            <div class="jgb-v189-book-head"><span>📒 수리관리 안내 수첩</span><small>실시간 수리 화면에서 필요한 내용을 확인하세요.</small></div>
-            <div class="jgb-v188-book jgb-v189-book">
-              <div class="jgb-v188-cover"><div class="book-drop">💧</div><b>장군봉체육관<br>누수관리 수첩</b><span>작은 누수도 소중히<br>꼼꼼하게 관리합니다.</span></div>
-              <div class="jgb-v188-rings" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-              <div class="jgb-v188-page-wrap">
-                <div class="jgb-v188-page" id="jgbV188BookPage">
-                  <div class="jgb-v188-page-lines"></div><div class="jgb-v188-note">마우스 클릭으로 페이지를 넘겨보세요</div>
-                  <div class="jgb-v188-page-content" id="jgbV188BookContent"></div>
-                  <div class="jgb-v188-tabs" id="jgbV188BookTabs"></div>
-                  <div class="jgb-v188-bottom"><button class="jgb-v188-nav" type="button" data-v188-book="prev" aria-label="이전 페이지">‹</button><span class="jgb-v188-count" id="jgbV188BookCount">1 / 5</span><button class="jgb-v188-nav" type="button" data-v188-book="next" aria-label="다음 페이지">›</button></div>
-                </div>
-              </div>
-            </div>
-          </section>
-          <div class="jgb-v176-live-footer"><span>● LK 자동 등록</span><span>완료 전까지 LIVE 유지</span></div></section>
+          
         </div>
       </div>`;
     }
