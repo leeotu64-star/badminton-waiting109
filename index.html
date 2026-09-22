@@ -21629,40 +21629,73 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 }
 </style>
 
-<style id="JGB_EAM_V22_RATIO_15_30_55">
-/* V22: EAM 현황 배치도 세로 비율만 조정
-   2F(옥상·창고) 15% / 코트 30% / 1F 나머지 시설 55%
-   기존 데이터·기능·가로폭·아이콘·LIVE 영역은 변경하지 않음. */
+<style id="JGB_EAM_V23_RATIO_15_30_55_EXACT">
+/* V23: 배치도 부모(.eh-map) 기준 세로비율을 직접 고정
+   2F(옥상·창고) 15% / 코트 30% / 나머지 시설 55%
+   기존 가로폭·자산·아이콘·기능은 변경하지 않음. */
+
+/* 부모 .eh-map = 100%
+   1F = 코트 30% + 시설 55% = 85%
+   2F = 15% */
+.eh-map{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:6px!important;
+  min-height:0!important;
+}
+
 .eh-floor-1f{
   flex:0 0 85%!important;
+  min-height:0!important;
+  position:relative!important;
 }
+
 .eh-floor-2f{
   flex:0 0 15%!important;
+  min-height:0!important;
 }
-/* 전체 배치도 기준 코트 30% = 1F(85%) 기준 약 35.3% */
+
+/* 1F 85% 안에서
+   코트 30/85 = 35.2941176%
+   시설 55/85 = 64.7058824% */
 .eh-floor-1f .eh-courts{
   left:8%!important;
   right:8%!important;
   top:0!important;
-  height:35.3%!important;
+  height:35.2941176%!important;
 }
+
 .eh-floor-1f .eh-court{
   margin-top:14px!important;
   min-height:0!important;
 }
-/* 전체 배치도 기준 나머지 시설 55% */
+
 .eh-floor-1f .eh-facility{
   left:1.5%!important;
   right:1.5%!important;
-  top:35.3%!important;
+  top:35.2941176%!important;
   bottom:2%!important;
 }
-/* 모바일에서도 동일한 15 : 30 : 55 비율 유지 */
+
+/* 2F 내부 옥상/창고 영역은 기존 구조 유지 */
+.eh-floor-2f .eh-second-grid{
+  position:absolute!important;
+  inset:32px 1.5% 8px 1.5%!important;
+}
+
+/* 모바일에서도 동일한 전체 기준 15:30:55 유지 */
 @media(max-width:700px){
-  .eh-floor-1f{flex-basis:85%!important}
-  .eh-floor-2f{flex-basis:15%!important}
-  .eh-floor-1f .eh-courts{left:5%!important;right:5%!important;top:0!important;height:35.3%!important}
-  .eh-floor-1f .eh-facility{top:35.3%!important}
+  .eh-floor-1f{flex:0 0 85%!important;flex-basis:85%!important}
+  .eh-floor-2f{flex:0 0 15%!important;flex-basis:15%!important}
+  .eh-floor-1f .eh-courts{
+    left:5%!important;
+    right:5%!important;
+    top:0!important;
+    height:35.2941176%!important;
+  }
+  .eh-floor-1f .eh-facility{
+    top:35.2941176%!important;
+  }
 }
 </style>
 
