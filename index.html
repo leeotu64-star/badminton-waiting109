@@ -25676,3 +25676,65 @@ cleanupDuplicateOnly();
 }
 </style>
 
+
+
+<style id="JGB_EAM_MAP_HEIGHT_BALANCE_V2">
+/*
+  V2 세로비율 조정
+  - 코트 크기 유지
+  - 샤워실/화장실 영역: 축소
+  - 복도: 축소
+  - 휴게실/유수/사무실 영역: 축소
+  - 그중 통합 유수장치실을 가장 크게 축소
+  - 옥상 자체 디자인은 유지
+*/
+
+/* 샤워실·화장실 영역 */
+.eh-floor-1f .eh-facility{
+  top:calc(22.2222222% + var(--GAP_COURT_FACILITY))!important;
+  height:calc(77.7777778% - var(--GAP_COURT_FACILITY) - var(--GAP_FACILITY_ROOF))!important;
+}
+
+/* 시설 영역 내부에서 아래 3개 구간의 높이를 직접 재분배 */
+.eh-floor-1f .eh-facility{
+  display:flex!important;
+  flex-direction:column!important;
+}
+
+/* 샤워실·화장실: 기존보다 축소 */
+.eh-floor-1f .eh-facility > .eh-wet-area{
+  flex:0 0 27%!important;
+  height:27%!important;
+}
+
+/* 복도: 축소 */
+.eh-floor-1f .eh-facility > .eh-corridor{
+  flex:0 0 8%!important;
+  height:8%!important;
+}
+
+/* 휴게실·유수장치실·사무실 영역 */
+.eh-floor-1f .eh-facility > .eh-lower-area{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+}
+
+/* 유수장치실을 가장 크게 축소 */
+.eh-floor-1f .eh-lower-area .eh-utility{
+  flex:0 0 58%!important;
+}
+
+/* 좌우 휴게실/사무실은 유수 축소분만큼 공간 확보 */
+.eh-floor-1f .eh-lower-area .eh-rest,
+.eh-floor-1f .eh-lower-area .eh-office{
+  flex:1 1 auto!important;
+  min-height:0!important;
+}
+
+/* 옥상과 시설 사이 간격은 기존 변수로 유지 */
+.eh-floor-2f{
+  top:calc(90% + var(--GAP_FACILITY_ROOF))!important;
+  height:calc(10% - var(--GAP_FACILITY_ROOF))!important;
+}
+</style>
