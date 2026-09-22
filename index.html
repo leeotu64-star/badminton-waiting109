@@ -25780,3 +25780,120 @@ cleanupDuplicateOnly();
   }
 }
 </style>
+
+<style id="JGB_EAM_MAP_BALANCE_V4_USER_REQUEST">
+/*
+  V4 최종 조정
+  - 전체 배치도 외곽 틀 유지
+  - 코트 크기 유지
+  - 2F 옥상/창고 위치 및 높이 유지
+  - 1F 중간 시설 블록만 아래쪽으로 확장
+  - 아래쪽 큰 빈 공간 제거
+  - 시설 블록 내부는 샤워/화장실 + 복도 + 하부시설로 통째로 채움
+  - 하부시설 안에서 유수장치실은 상대적으로 작게 유지
+*/
+
+/* 1F / 2F 전체 틀은 그대로 */
+.eh-floor-1f{
+  top:0!important;
+  height:90%!important;
+  bottom:auto!important;
+}
+.eh-floor-2f{
+  top:90%!important;
+  height:10%!important;
+  bottom:auto!important;
+}
+
+/* 코트는 현재 크기 그대로 */
+.eh-floor-1f .eh-courts{
+  left:5%!important;
+  right:5%!important;
+  top:9px!important;
+  height:calc(22.2222222% - 18px)!important;
+  gap:9px!important;
+}
+
+/*
+  핵심:
+  현재 64%에서 약 67.8%까지 시설 블록을 확장.
+  2F 옥상은 건드리지 않고,
+  시설 아래의 큰 빈 공간만 대부분 제거.
+  마지막 12px 정도만 시각적 여백으로 남김.
+*/
+.eh-floor-1f .eh-facility{
+  left:1.5%!important;
+  right:1.5%!important;
+  top:calc(22.2222222% + 9px)!important;
+  height:calc(67.7777778% - 21px)!important;
+  bottom:auto!important;
+  display:grid!important;
+  grid-template-rows:40% 10% 50%!important;
+  row-gap:0!important;
+  box-sizing:border-box!important;
+}
+
+/* 샤워실·화장실 */
+.eh-floor-1f .eh-row{
+  min-height:0!important;
+  height:auto!important;
+  box-sizing:border-box!important;
+}
+
+/* 복도 */
+.eh-floor-1f .eh-corridor{
+  min-height:0!important;
+  height:auto!important;
+  box-sizing:border-box!important;
+}
+
+/* 휴게실·유수장치실·사무실 */
+.eh-floor-1f .eh-bottom{
+  min-height:0!important;
+  height:auto!important;
+  display:grid!important;
+  grid-template-columns:1fr 1.45fr 1fr!important;
+  gap:3px!important;
+  box-sizing:border-box!important;
+}
+
+/* 유수장치실은 하부 3칸 중 상대적으로 작게 보이도록 내부 패딩/폰트만 유지 */
+.eh-floor-1f .eh-bottom .water{
+  min-height:0!important;
+}
+
+/* 옥상/창고는 기존 영역 그대로 */
+.eh-floor-2f .eh-second-grid{
+  left:0!important;
+  right:0!important;
+  top:32px!important;
+  bottom:0!important;
+  height:auto!important;
+  gap:9px!important;
+}
+
+/* 모바일도 같은 방향 */
+@media(max-width:700px){
+  .eh-floor-1f{
+    top:0!important;
+    height:90%!important;
+  }
+  .eh-floor-2f{
+    top:90%!important;
+    height:10%!important;
+  }
+  .eh-floor-1f .eh-courts{
+    left:5%!important;
+    right:5%!important;
+    top:9px!important;
+    height:calc(22.2222222% - 18px)!important;
+    gap:8px!important;
+  }
+  .eh-floor-1f .eh-facility{
+    top:calc(22.2222222% + 9px)!important;
+    height:calc(67.7777778% - 21px)!important;
+    grid-template-rows:40% 10% 50%!important;
+  }
+}
+</style>
+
