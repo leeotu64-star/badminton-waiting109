@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>누수현황</title>
+</head>
+<body>
 <!-- JGB V3: slider + operation insight + photo delete hardening -->
     <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
@@ -25418,49 +25426,34 @@ cleanupDuplicateOnly();
 }
 </style>
 
-<style id="JGB_LEAK_FINAL_FLEX_7030_V1">
-/* =========================================================
-   누수현황 최종 수정 V1
-   - 배치도 70% : LIVE 30%
-   - 반드시 가로 한 줄
-   - LIVE 절대 아래 행으로 이동하지 않음
-   - 배치도와 LIVE 상단/하단 동일
-   - 기존 누수 배치도 내부 위치는 변경하지 않음
-   ========================================================= */
-
+<style id="JGB_LEAK_FINAL_DIRECT_FLEX">
+/* 누수현황 최종: 배치도와 LIVE를 같은 행에 직접 고정 */
 .jgb-v170-grid{
   display:flex!important;
   flex-direction:row!important;
   flex-wrap:nowrap!important;
-
-  width:100%!important;
-  height:750px!important;
-  min-width:0!important;
-  min-height:0!important;
-
+  align-items:stretch!important;
   gap:14px!important;
 
-  align-items:stretch!important;
-  justify-content:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  height:var(--jgb-shared-main-height,750px)!important;
+  min-height:0!important;
+  max-height:none!important;
 
-  overflow:hidden!important;
   box-sizing:border-box!important;
+  overflow:hidden!important;
 
-  /* 기존 Grid 규칙 무력화 */
+  /* 기존 Grid 속성 무력화 */
   grid-template-columns:none!important;
   grid-template-rows:none!important;
   grid-auto-flow:initial!important;
 }
 
-/* 왼쪽 : 누수 배치도 70% */
 .jgb-v170-grid > .jgb-v170-mapcard{
-  display:flex!important;
-  flex-direction:column!important;
-
-  flex:0 0 calc((100% - 14px) * 0.7)!important;
-
-  width:calc((100% - 14px) * 0.7)!important;
-  max-width:calc((100% - 14px) * 0.7)!important;
+  flex:0 0 calc((100% - 14px) * 0.70)!important;
+  width:calc((100% - 14px) * 0.70)!important;
+  max-width:calc((100% - 14px) * 0.70)!important;
   min-width:0!important;
 
   height:100%!important;
@@ -25468,26 +25461,16 @@ cleanupDuplicateOnly();
   max-height:none!important;
 
   margin:0!important;
-  padding:16px!important;
-
   box-sizing:border-box!important;
 
   grid-column:auto!important;
   grid-row:auto!important;
-
-  align-self:stretch!important;
-  justify-self:auto!important;
 }
 
-/* 오른쪽 : LIVE 30% */
 .jgb-v170-grid > .jgb-v170-live{
-  display:flex!important;
-  flex-direction:column!important;
-
-  flex:0 0 calc((100% - 14px) * 0.3)!important;
-
-  width:calc((100% - 14px) * 0.3)!important;
-  max-width:calc((100% - 14px) * 0.3)!important;
+  flex:0 0 calc((100% - 14px) * 0.30)!important;
+  width:calc((100% - 14px) * 0.30)!important;
+  max-width:calc((100% - 14px) * 0.30)!important;
   min-width:0!important;
 
   height:100%!important;
@@ -25495,91 +25478,17 @@ cleanupDuplicateOnly();
   max-height:none!important;
 
   margin:0!important;
-  padding:0!important;
-
   box-sizing:border-box!important;
 
   grid-column:auto!important;
   grid-row:auto!important;
-
-  align-self:stretch!important;
-  justify-self:auto!important;
 
   overflow:hidden!important;
 }
 
-/* LIVE 외부 카드도 배치도와 같은 상·하단 */
-.jgb-v170-grid > .jgb-v170-live .jgb-v176-live-card{
-  width:100%!important;
-  height:100%!important;
-
-  min-width:0!important;
-  min-height:0!important;
-
-  max-width:none!important;
-  max-height:none!important;
-
-  margin:0!important;
-
-  box-sizing:border-box!important;
-}
-
-/* LIVE 내부 영역 */
-.jgb-v170-grid > .jgb-v170-live .jgb-v178-live-register,
 .jgb-v170-grid > .jgb-v170-live .jgb-v178-live-table{
-  width:100%!important;
-  min-width:0!important;
   min-height:0!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-}
-
-/* LIVE 표 영역만 내부 스크롤 */
-.jgb-v170-grid > .jgb-v170-live .jgb-v178-live-table{
   overflow:auto!important;
-}
-
-/* 화면 폭이 줄어도 절대 1열로 전환하지 않음 */
-@media(max-width:1000px){
-  .jgb-v170-grid{
-    display:flex!important;
-    flex-direction:row!important;
-    flex-wrap:nowrap!important;
-
-    grid-template-columns:none!important;
-    grid-template-rows:none!important;
-
-    width:100%!important;
-    height:750px!important;
-
-    gap:14px!important;
-  }
-
-  .jgb-v170-grid > .jgb-v170-mapcard{
-    flex:0 0 calc((100% - 14px) * 0.7)!important;
-    width:calc((100% - 14px) * 0.7)!important;
-  }
-
-  .jgb-v170-grid > .jgb-v170-live{
-    flex:0 0 calc((100% - 14px) * 0.3)!important;
-    width:calc((100% - 14px) * 0.3)!important;
-  }
-}
-
-@media(max-width:700px){
-  .jgb-v170-grid{
-    display:flex!important;
-    flex-direction:row!important;
-    flex-wrap:nowrap!important;
-
-    grid-template-columns:none!important;
-    grid-template-rows:none!important;
-
-    width:100%!important;
-    height:750px!important;
-
-    gap:14px!important;
-  }
 }
 </style>
 
