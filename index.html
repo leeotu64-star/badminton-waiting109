@@ -6893,72 +6893,6 @@ a[data-page="digitalTwin"],
             <div class="jgb-type-grid">${typeRows}</div>
           </section>
         </div>
-
-        <section class="jgb-complaint-analysis-slider-wrap" aria-label="민원 집중 분석">
-          <div class="jgb-complaint-analysis-slider">
-            <article class="jgb-complaint-analysis-slide">
-              <div class="jgb-complaint-analysis-head">
-                <b>시간대별 집중 패턴</b>
-                <span>접수 빈도 기준</span>
-              </div>
-              <div class="jgb-complaint-analysis-body">
-                ${(()=>{
-                  const bands=[
-                    ['06~09시',6,9],['09~12시',9,12],['12~15시',12,15],
-                    ['15~18시',15,18],['18~21시',18,21],['21~24시',21,24]
-                  ];
-                  const rows=bands.map(([label,s,e])=>[label,all.filter(x=>{
-                    const d=new Date(x?.createdAt||'');
-                    return Number.isFinite(d.getTime()) && d.getHours()>=s && d.getHours()<e;
-                  }).length]);
-                  const max=Math.max(1,...rows.map(x=>x[1]));
-                  const peak=rows.reduce((a,b)=>b[1]>a[1]?b:a,rows[0]);
-                  return rows.map(([label,n])=>`
-                    <div class="jgb-analysis-hour-row">
-                      <span>${label}</span>
-                      <i><em style="width:${n?Math.max(8,Math.round(n/max*100)):0}%"></em></i>
-                      <b>${n}</b>
-                    </div>`).join('')+
-                    `<div class="jgb-analysis-note">집중 시간대 · ${peak[0]}</div>`;
-                })()}
-              </div>
-            </article>
-
-            <article class="jgb-complaint-analysis-slide">
-              <div class="jgb-complaint-analysis-head">
-                <b>요일 × 시간 집중 패턴</b>
-                <span>접수 빈도 히트맵</span>
-              </div>
-              <div class="jgb-complaint-analysis-body">
-                ${(()=>{
-                  const days=['일','월','화','수','목','금','토'];
-                  const bands=[
-                    ['06~09시',6,9],['09~12시',9,12],['12~15시',12,15],
-                    ['15~18시',15,18],['18~21시',18,21],['21~24시',21,24]
-                  ];
-                  const matrix=days.map((day,di)=>bands.map(([label,s,e])=>all.filter(x=>{
-                    const d=new Date(x?.createdAt||'');
-                    return Number.isFinite(d.getTime()) && d.getDay()===di && d.getHours()>=s && d.getHours()<e;
-                  }).length));
-                  const max=Math.max(1,...matrix.flat());
-                  let peakDay=0, peakBand=0, peakCount=-1;
-                  matrix.forEach((row,di)=>row.forEach((n,bi)=>{if(n>peakCount){peakCount=n;peakDay=di;peakBand=bi;}}));
-                  return `<div class="jgb-analysis-heatmap">
-                    <div class="jgb-analysis-heat-row jgb-analysis-heat-labels">
-                      <span></span>${bands.map(b=>`<b>${b[0]}</b>`).join('')}
-                    </div>
-                    ${days.map((day,di)=>`<div class="jgb-analysis-heat-row">
-                      <strong>${day}</strong>
-                      ${matrix[di].map(n=>`<span style="--heat:${n?Math.min(.92,.12+n/max*.8):.04}">${n}</span>`).join('')}
-                    </div>`).join('')}
-                  </div>
-                  <div class="jgb-analysis-note">최다 요일 · ${days[peakDay]}요일 · 최다 시간 · ${bands[peakBand][0]}</div>`;
-                })()}
-              </div>
-            </article>
-          </div>
-          <div class="jgb-complaint-analysis-scroll-hint">좌우로 밀어서 분석 항목을 확인하세요.</div>
-        </section>
       </section>`;
     }
 
@@ -25847,130 +25781,122 @@ cleanupDuplicateOnly();
 }
 </style>
 
-<style id="JGB_COMPLAINT_DETAIL_ANALYSIS_SLIDER_V1">
-/* 민원 통계 상세보기 안의 추가 분석 2종 - 가로 슬라이더 */
-.jgb-complaint-analysis-slider-wrap{
-  margin-top:10px;
-  min-width:0;
-}
-.jgb-complaint-analysis-slider{
-  display:flex!important;
-  gap:10px!important;
+<style id="JGB_EAM_MAP_FINAL_SPACE30_V1">
+/*
+  최종 재조정
+  - 각 영역의 세로 크기 유지: 코트 25% / 중간 시설 30% / 옥상·창고 15%
+  - 남는 30%는 시설과 옥상 사이의 간격으로 사용
+  - 배치도 전체 폭 100% 유지
+  - 코트 자체 크기와 내부 비율은 건드리지 않음
+  - 중간 시설 3칸(휴게실/유수/사무실)의 가로 크기 유지
+*/
+
+.eh-map{
+  position:relative!important;
   width:100%!important;
-  overflow-x:auto!important;
-  overflow-y:hidden!important;
-  padding:2px 2px 8px!important;
-  scroll-snap-type:x mandatory!important;
-  scroll-behavior:smooth!important;
-  scrollbar-width:thin!important;
-  scrollbar-color:#9db5c8 #edf3f7!important;
-}
-.jgb-complaint-analysis-slider::-webkit-scrollbar{height:7px}
-.jgb-complaint-analysis-slider::-webkit-scrollbar-track{background:#edf3f7;border-radius:99px}
-.jgb-complaint-analysis-slider::-webkit-scrollbar-thumb{background:#9db5c8;border-radius:99px}
-.jgb-complaint-analysis-slide{
-  flex:0 0 78%!important;
-  min-width:78%!important;
-  scroll-snap-align:start!important;
-  border:1px solid #cbd9e2!important;
-  border-radius:8px!important;
-  background:#fff!important;
+  height:100%!important;
+  min-height:0!important;
   overflow:hidden!important;
+}
+
+/* 1F/2F는 서로 독립 */
+.eh-floor-1f,
+.eh-floor-2f{
+  position:static!important;
+  width:100%!important;
+  height:0!important;
+  min-height:0!important;
+  flex:none!important;
+  overflow:visible!important;
+  background:transparent!important;
+  border:0!important;
+}
+
+/* 코트 = 배치도 전체 높이 25%, 가로 폭은 기존 전체폭 기준 유지 */
+.eh-floor-1f .eh-courts{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:0!important;
+  width:100%!important;
+  height:25%!important;
+  margin:0!important;
   box-sizing:border-box!important;
 }
-.jgb-complaint-analysis-head{
-  height:40px;
-  padding:0 12px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  background:#eaf3f9;
-  border-bottom:1px solid #cbd9e2;
-  color:#173c58;
+
+/* 코트 각각의 크기/간격은 기존 규칙을 유지 */
+.eh-floor-1f .eh-court{
+  height:100%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
 }
-.jgb-complaint-analysis-head b{font-size:13px;font-weight:950}
-.jgb-complaint-analysis-head span{font-size:9px;color:#60798b;font-weight:800}
-.jgb-complaint-analysis-body{padding:12px}
-.jgb-analysis-hour-row{
-  display:grid;
-  grid-template-columns:58px minmax(0,1fr) 28px;
-  align-items:center;
-  gap:8px;
-  height:25px;
-  font-size:10px;
-  color:#294b63;
+
+/* 중간 시설 = 배치도 전체 높이 30% */
+.eh-floor-1f .eh-facility{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:25%!important;
+  width:100%!important;
+  height:30%!important;
+  margin:0!important;
+  bottom:auto!important;
+  box-sizing:border-box!important;
 }
-.jgb-analysis-hour-row>i{
-  display:block;
-  height:6px;
-  background:#e8eef3;
-  border-radius:99px;
-  overflow:hidden;
+
+/* 샤워/화장실, 복도, 하부시설 내부 크기는 건드리지 않음 */
+.eh-floor-1f .eh-row,
+.eh-floor-1f .eh-corridor,
+.eh-floor-1f .eh-bottom{
+  box-sizing:border-box!important;
 }
-.jgb-analysis-hour-row>i em{
-  display:block;
-  height:100%;
-  background:#8fb3ce;
-  border-radius:99px;
+
+/*
+  30% 공간:
+  중간 시설 하단(55%)부터 옥상 시작(85%)까지.
+  즉, 전체 배치도 높이의 정확히 30%를 비워서
+  서로 겹치지 않는 독립 간격으로 사용.
+*/
+
+/* 옥상·창고 = 배치도 전체 높이 15%, 85% 위치 */
+.eh-floor-2f{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:85%!important;
+  width:100%!important;
+  height:15%!important;
+  bottom:auto!important;
+  box-sizing:border-box!important;
 }
-.jgb-analysis-hour-row>b{text-align:right;color:#173c58;font-size:10px}
-.jgb-analysis-note{
-  margin-top:8px;
-  padding:8px 10px;
-  border-radius:8px;
-  background:#f5f3ff;
-  color:#4c1d95;
-  font-size:10px;
-  font-weight:900;
+
+/* 옥상/창고 내부 폭도 전체폭 */
+.eh-floor-2f .eh-second-grid{
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  box-sizing:border-box!important;
 }
-.jgb-analysis-heatmap{display:flex;flex-direction:column;gap:4px}
-.jgb-analysis-heat-row{
-  display:grid;
-  grid-template-columns:34px repeat(6,minmax(58px,1fr));
-  gap:4px;
-  align-items:center;
-}
-.jgb-analysis-heat-row>*{
-  min-height:25px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:1px solid #d7e2ea;
-  border-radius:4px;
-  font-size:9px;
-  box-sizing:border-box;
-}
-.jgb-analysis-heat-labels>*{
-  min-height:22px;
-  background:#f3f7fa;
-  color:#62788a;
-  font-size:8px;
-  white-space:nowrap;
-}
-.jgb-analysis-heat-row>strong{
-  background:#f3f7fa;
-  color:#31536c;
-}
-.jgb-analysis-heat-row>span{
-  background:rgba(59,130,246,var(--heat));
-  color:#173c58;
-  font-weight:900;
-}
-.jgb-complaint-analysis-scroll-hint{
-  text-align:right;
-  padding:1px 4px 0;
-  color:#7a8d9d;
-  font-size:9px;
-  font-weight:800;
-}
-@media(max-width:850px){
-  .jgb-complaint-analysis-slide{
-    flex-basis:92%!important;
-    min-width:92%!important;
+
+/* 모바일에서도 같은 25/30/30/15 비율 */
+@media(max-width:700px){
+  .eh-floor-1f .eh-courts{
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    top:0!important;
+    height:25%!important;
   }
-  .jgb-analysis-heat-row{
-    grid-template-columns:30px repeat(6,minmax(50px,1fr));
+  .eh-floor-1f .eh-facility{
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    top:25%!important;
+    height:30%!important;
+  }
+  .eh-floor-2f{
+    top:85%!important;
+    height:15%!important;
   }
 }
 </style>
