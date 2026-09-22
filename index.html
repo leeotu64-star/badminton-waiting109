@@ -5504,7 +5504,7 @@ a[data-page="digitalTwin"],
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("repair","📋 민원 접수·처리 관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태">🔒 디지털트윈</span>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v66</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">📊 직원 업무실적</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 운영게시판</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 QR 리버스</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">운영</div>${nav("dashboard","🏠 운영 대시보드")}${nav("repair","📋 민원 접수·처리 관리")}<div class="jgb-group">EAM</div>${nav("eam","🏢 자산 EAM 관리")}${nav("dashboard2","📊 EAM 현황")}<div class="jgb-group">누수·방수</div>${nav("leakage","💧 누수관리 현황")}${nav("waterproof","🛡 방수관리 이력")}<div class="jgb-group">직원</div>${nav("basic","🧹 기본업무")}${nav("schedule","📅 근무편성")}<div class="jgb-group">관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태">🔒 디지털트윈</span>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>장군봉체육관 시설관리 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>고객 접수 → 접수 처리 → 조치완료</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">📊 직원 업무실적</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 운영게시판</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 QR 리버스</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      const mobileContent=document.getElementById('jgbMobileContent');
      if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
@@ -6709,6 +6709,23 @@ a[data-page="digitalTwin"],
       </section>`;
     }
 
+    function openComplaintStatsDetail(){
+      closeComplaintStatsDetail();
+      const modal=document.createElement('div');
+      modal.id='jgbComplaintStatsDetailModal';
+      modal.className='jgb-complaint-stats-detail-modal';
+      modal.innerHTML=`<div class="jgb-complaint-stats-detail-card" role="dialog" aria-modal="true" aria-label="민원 통계 및 분석 상세보기">
+        <div class="jgb-complaint-stats-detail-head"><strong>민원 통계 및 분석 상세보기</strong><button type="button" class="jgb-complaint-stats-detail-close" onclick="closeComplaintStatsDetail()">×</button></div>
+        <div class="jgb-complaint-stats-detail-body">${complaintStatsPanel()}</div>
+      </div>`;
+      modal.addEventListener('click',e=>{if(e.target===modal)closeComplaintStatsDetail()});
+      document.body.appendChild(modal);
+    }
+    function closeComplaintStatsDetail(){
+      const m=document.getElementById('jgbComplaintStatsDetailModal');
+      if(m)m.remove();
+    }
+
     function customerComplaintPage(){
       const places=PLACE_OPTIONS;
       const types=COMPLAINT_TYPES;
@@ -6865,11 +6882,20 @@ a[data-page="digitalTwin"],
       .jgb-complaint-stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:9px}
       .jgb-complaint-stat-card{border:1px solid #cbd9e2;border-radius:8px;background:#fff;overflow:hidden;min-width:0}
 /* 하단 3개 통계판 높이 통일: TOP 5도 동일한 내부 스크롤 영역 */
-.jgb-complaint-stat-card{height:190px;display:flex;flex-direction:column}
-.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head){flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#9fb5c5 #edf3f7}
-.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar{width:8px}
-.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar-track{background:#edf3f7;border-left:1px solid #d6e2ea}
-.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar-thumb{background:#9fb5c5;border-radius:8px}
+.jgb-complaint-stat-card{height:auto;min-height:190px;display:flex;flex-direction:column}
+.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head){flex:0 0 auto;min-height:0;overflow:visible!important;overflow-y:visible!important;overflow-x:visible!important;scrollbar-width:none}
+.jgb-complaint-stat-card>div:not(.jgb-complaint-stat-card-head)::-webkit-scrollbar{display:none;width:0;height:0}
+.jgb-complaint-stats-detail-modal{position:fixed;inset:0;z-index:99999;background:rgba(10,30,45,.58);display:flex;align-items:center;justify-content:center;padding:20px}
+.jgb-complaint-stats-detail-card{width:min(1280px,96vw);max-height:92vh;overflow:auto;background:#fff;border:2px solid #173d5a;border-radius:12px;box-shadow:0 18px 60px rgba(0,0,0,.28)}
+.jgb-complaint-stats-detail-head{height:54px;padding:0 14px;background:linear-gradient(100deg,#0d3554 0%,#14648d 55%,#0d4669 100%);color:#fff;display:flex;align-items:center;justify-content:space-between}
+.jgb-complaint-stats-detail-head strong{font-size:18px;font-weight:950}
+.jgb-complaint-stats-detail-close{width:34px;height:34px;border:1px solid rgba(255,255,255,.55);border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-size:22px;font-weight:900;cursor:pointer}
+.jgb-complaint-stats-detail-body{padding:10px}
+.jgb-complaint-stats-detail-body .jgb-complaint-stats{margin-top:0}
+.jgb-complaint-stats-detail-body .jgb-complaint-stat-card{height:auto;min-height:190px}
+.jgb-repair-detail-btn{height:64px;padding:0 16px;border:1px solid #fff;border-radius:9px;background:#fff;color:#173c58;font-size:13px;font-weight:950;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.16);white-space:nowrap}
+.jgb-repair-detail-btn:hover{background:#eef7ff}
+@media(max-width:850px){.jgb-repair-detail-btn{height:48px;padding:0 12px;font-size:11px}.jgb-complaint-stats-detail-modal{padding:8px}.jgb-complaint-stats-detail-card{width:100%;max-height:96vh}}
       .jgb-complaint-stat-card-head{min-height:35px;padding:6px 9px;background:#f4f8fb;border-bottom:1px solid #dbe5ed;display:flex;align-items:center;justify-content:space-between;gap:7px}
       .jgb-complaint-stat-card-head b{font-size:13px;color:#183b59;font-weight:950;white-space:nowrap}.jgb-complaint-stat-card-head span{font-size:9px;color:#71849a;font-weight:900;white-space:nowrap}
       .jgb-month-year{height:25px;border:1px solid #bcd0df;border-radius:6px;background:#fff;color:#17466b;font-size:11px;font-weight:950;padding:0 7px;cursor:pointer}
@@ -7084,7 +7110,7 @@ a[data-page="digitalTwin"],
 
 </style>
      <div class="jgb-repair-page">
-       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><div class="jgb-repair-year-box"><b>2026년 기준</b><strong>${header2026Total.toLocaleString()}건</strong><small>총 민원</small></div><div class="jgb-repair-trend-box ${headerMonthDiff<0?'good':headerMonthDiff>0?'bad':''}"><b>${headerM1+1}월 ${headerPrev.toLocaleString()}건 → ${headerM2+1}월 ${headerCurr.toLocaleString()}건</b><small>${headerMonthText}</small></div><div class="jgb-repair-trend-box ${headerYearDiff<0?'good':headerYearDiff>0?'bad':''}"><b>2025년 0건 → 2026년 ${header2026Total.toLocaleString()}건</b><small>${headerYearText}</small></div><div class="jgb-repair-stat"><b>${active.length}</b><small>현재 접수</small></div></div></header>
+       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><div class="jgb-repair-year-box"><b>2026년 기준</b><strong>${header2026Total.toLocaleString()}건</strong><small>총 민원</small></div><div class="jgb-repair-trend-box ${headerMonthDiff<0?'good':headerMonthDiff>0?'bad':''}"><b>${headerM1+1}월 ${headerPrev.toLocaleString()}건 → ${headerM2+1}월 ${headerCurr.toLocaleString()}건</b><small>${headerMonthText}</small></div><div class="jgb-repair-trend-box ${headerYearDiff<0?'good':headerYearDiff>0?'bad':''}"><b>2025년 0건 → 2026년 ${header2026Total.toLocaleString()}건</b><small>${headerYearText}</small></div><div class="jgb-repair-stat"><b>${active.length}</b><small>현재 접수</small></div><button type="button" class="jgb-repair-detail-btn" onclick="openComplaintStatsDetail()">상세보기</button></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["남자 화장실"]?'has-complaint':''}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["여자 화장실"]?'has-complaint':''}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${mapComplaintCounts["복도"]?'has-complaint':''}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${mapComplaintCounts["휴게실"]?'has-complaint':''}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${mapComplaintCounts["기타"]?'has-complaint':''}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${n?'has-complaint':''}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
          ${liveComplaintActionPanel(active)}
@@ -7112,7 +7138,6 @@ a[data-page="digitalTwin"],
            </div>
            <div class="jgb-repair-note">ⓘ 스마트폰 QR 접수와 동일한 접수 데이터를 사용합니다. 상세는 고객이 입력한 민원내용만 팝업으로 확인하며, 담당자 지정 및 처리완료는 기존 기능을 그대로 사용합니다.</div></section>`;
        })()}
-       ${complaintStatsPanel()}
      </div>`;
     }
 
