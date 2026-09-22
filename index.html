@@ -19430,37 +19430,6 @@ document.addEventListener('click',handle,true);
   .eh-map-card{min-height:640px!important;}
 }
 </style>
-
-<!-- EAM 현황 전용 최종 세로폭 확대: 다른 화면/기능에는 적용하지 않음 -->
-<style id="JGB_EAM_HYUN_FINAL_VERTICAL_ONLY_V1">
-/* EAM 현황 전체 높이를 확보하고 배치도/우측 영역을 동일 높이로 확장 */
-.eh-page{
-  height:auto!important;
-  min-height:0!important;
-  overflow:visible!important;
-}
-.eh-main{
-  height:780px!important;
-  min-height:780px!important;
-  max-height:780px!important;
-  flex:0 0 780px!important;
-  align-items:stretch!important;
-}
-.eh-map-card,
-.eh-right{
-  height:780px!important;
-  min-height:780px!important;
-  max-height:780px!important;
-}
-.eh-map-wrap{
-  min-height:0!important;
-  height:auto!important;
-}
-.eh-map{
-  min-height:0!important;
-  height:100%!important;
-}
-</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -24910,4 +24879,89 @@ cleanupDuplicateOnly();
 .basic-v5-bottom-banner img{display:block!important;width:100%!important;height:auto!important;max-height:92px!important;object-fit:cover!important}
 @media(max-width:700px){.basic-book-layout{padding:12px!important}.basic-v5-page-center{min-width:130px}.basic-v5-page-center strong{font-size:18px}.basic-v5-tasks{grid-template-columns:1fr!important}.basic-book-layout .basic-v5-task .txt{font-size:16px!important}.basic-v5-bottom-banner img{max-height:110px!important}}
 
+</style>
+
+
+<style id="JGB_EAM_MAP_VERTICAL_FINAL_V1">
+/*
+  EAM 현황 - 시설 자산 배치도 세로폭 최종 보정
+  원본 기능/데이터/아이콘/클릭/자산연동은 수정하지 않고
+  현재 EAM 배치도 영역의 세로 레이아웃만 정상화한다.
+  수리 LIVE / 기타 추가 영역은 현재 화면에서 제거된 상태를 그대로 유지한다.
+*/
+.eh-page{
+  height:calc(100vh - 24px)!important;
+  min-height:760px!important;
+  overflow:hidden!important;
+}
+
+.eh-main{
+  display:block!important;
+  width:100%!important;
+  height:calc(100vh - 120px)!important;
+  min-height:700px!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+
+.eh-map-card{
+  display:flex!important;
+  flex-direction:column!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:700px!important;
+  max-height:none!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+
+.eh-map-wrap{
+  flex:1 1 auto!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:8px!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+
+.eh-map{
+  position:relative!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+}
+
+/* 1층/2층 비율은 기존 배치도 구성 그대로 유지 */
+.eh-map .eh-floor-1f{
+  flex:0 0 70%!important;
+  min-height:0!important;
+}
+
+.eh-map .eh-floor-2f{
+  flex:1 1 30%!important;
+  min-height:0!important;
+}
+
+/* 현재 EAM 화면에서는 우측 영역을 표시하지 않는다. */
+.eh-right,
+.eh-live-card,
+.eh-extra-card-v20{
+  display:none!important;
+}
+
+@media(max-width:1000px){
+  .eh-page{
+    min-height:700px!important;
+    overflow:auto!important;
+  }
+  .eh-main{
+    height:calc(100vh - 100px)!important;
+    min-height:640px!important;
+  }
+  .eh-map-card{
+    min-height:640px!important;
+  }
+}
 </style>
