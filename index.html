@@ -5309,6 +5309,40 @@ a[data-page="digitalTwin"],
 @media(max-width:1100px){.employee-v2-staff-list{grid-template-columns:1fr}.employee-v2-staff{grid-template-columns:minmax(120px,1.2fr) repeat(3,1fr) 72px}.employee-v2-detail-grid.two{grid-template-columns:1fr}}
 @media(max-width:700px){.employee-v2-head{align-items:flex-start;flex-direction:column}.employee-v2-main{min-height:auto;grid-template-rows:auto auto}.employee-v2-staff{grid-template-columns:1fr 1fr}.employee-v2-name{grid-column:1/-1}.employee-v2-detail-btn{grid-column:1/-1}.employee-v2-guide{display:none}.employee-v2-detail-kpis{grid-template-columns:1fr 1fr}.employee-v2-detail-rules{grid-template-columns:1fr}.employee-v2-detail-grid.two{grid-template-columns:1fr}}
 </style>
+
+<style id="JGB_EAM_MAPONLY_V29_SPACING">
+/* 배치도 내부 구역 간격 및 경계선만 보강 */
+.eh-floor-1f .eh-courts{
+  height:35.294%!important;
+}
+/* 코트와 시설 사이에 명확한 간격 */
+.eh-floor-1f .eh-facility{
+  top:calc(35.294% + 8px)!important;
+  bottom:0!important;
+}
+/* 시설 6개 구역을 붙이지 않고 각각 경계가 보이도록 */
+.eh-floor-1f .eh-row{
+  gap:3px!important;
+  border-left:0!important;
+}
+.eh-floor-1f .eh-row .eh-zone{
+  border:1px solid #7f98a7!important;
+  box-sizing:border-box!important;
+}
+/* 복도와 하부 시설도 경계선 명확화 */
+.eh-floor-1f .eh-corridor{
+  border:1px solid #7f98a7!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-1f .eh-bottom{
+  gap:3px!important;
+  border-left:0!important;
+}
+.eh-floor-1f .eh-bottom>div{
+  border:1px solid #7f98a7!important;
+  box-sizing:border-box!important;
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -24820,5 +24854,55 @@ cleanupDuplicateOnly();
   .eh-floor-2f{flex-basis:calc(15% - 3px)!important}
   .eh-floor-1f .eh-courts{left:5%!important;right:5%!important;top:0!important;height:35.294%!important}
   .eh-floor-1f .eh-facility{top:35.294%!important}
+}
+</style>
+<style id="JGB_EAM_MAP_ONLY_V30_RATIO">
+/* v30: 배치도 비율만 조정
+   가로: 배치도 70% / 우측 여백 30%
+   세로: 옥상·창고 15% / 코트 25% / 시설 35% / 잔여공간 25%
+*/
+.eh-main{
+  grid-template-columns:1fr!important;
+  grid-template-rows:minmax(0,1fr)!important;
+}
+.eh-map-card{
+  width:70%!important;
+  max-width:70%!important;
+  min-width:0!important;
+  justify-self:start!important;
+  box-sizing:border-box!important;
+}
+.eh-map-wrap,.eh-map{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-1f{
+  flex:0 0 85%!important;
+  position:relative!important;
+}
+.eh-floor-2f{
+  flex:0 0 15%!important;
+}
+/* 1층 85% 안에서: 코트 25%, 시설 35%, 잔여공간 25%
+   전체 기준으로 각각 25%, 35%, 25%가 되도록 환산 */
+.eh-floor-1f .eh-courts{
+  top:0!important;
+  height:29.4118%!important;
+}
+.eh-floor-1f .eh-court{
+  margin-top:0!important;
+}
+.eh-floor-1f .eh-facility{
+  top:29.4118%!important;
+  height:41.1765%!important;
+  bottom:auto!important;
+}
+/* 남는 25%는 시설 아래 빈 공간으로 유지 */
+@media(max-width:700px){
+  .eh-map-card{width:70%!important;max-width:70%!important}
+  .eh-floor-1f{flex-basis:85%!important}
+  .eh-floor-2f{flex-basis:15%!important}
+  .eh-floor-1f .eh-courts{top:0!important;height:29.4118%!important}
+  .eh-floor-1f .eh-facility{top:29.4118%!important;height:41.1765%!important;bottom:auto!important}
 }
 </style>
