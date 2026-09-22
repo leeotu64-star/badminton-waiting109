@@ -6542,126 +6542,246 @@ a[data-page="digitalTwin"],
     }
 
     function dashboard2(){
-      /* EAM 현황 재구축 V1
-         - 기존 EAM 현황 화면을 새로 구성
-         - 시설 자산 배치도 : 수리 LIVE = 70 : 30
-         - 이미지 없이 CSS 배치도
-         - 기존 EAM 데이터/상태값/수리 LIVE 데이터는 그대로 사용
+      /* EAM 현황 독립 화면 V4
+         - 기존 EAM 자산등록과 완전 분리
+         - 신규 아이콘은 배치도 전용 저장소에만 생성
+         - 영문 분야코드는 시스템이 선택하고 숫자만 사용자가 입력
+         - 신규 아이콘 삭제도 배치도 저장소만 삭제
       */
       const A=Array.isArray(window.__eamA)?window.__eamA:[];
       const V=s=>String(s??'').trim();
       const esc=s=>typeof xEsc==='function'?xEsc(s):String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
       const codeOf=a=>V(a?.asset_code||a?.code||'');
-      const meta=(()=>{try{const x=JSON.parse(localStorage.getItem('JGB_EAM_ASSET_META_V40')||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}})();
-      const deleted=(()=>{try{const x=JSON.parse(localStorage.getItem('JGB_EAM_DELETED_CODES')||'[]');return new Set((Array.isArray(x)?x:[]).map(v=>V(v).toUpperCase()))}catch(_){return new Set()}})();
-      const statusOf=a=>{
-        const c=codeOf(a);
-        const m=meta[c]||meta[c.toUpperCase()]||{};
-        return V(m.status||a.status||'정상');
-      };
-      const live=(Array.isArray(window.__eamRepairLive)?window.__eamRepairLive:[])
-        .filter(x=>V(x?.status||'수리중')!=='완료');
+      const historyMeta=(()=>{try{const x=JSON.parse(localStorage.getItem('JGB_EAM_ASSET_META_V40')||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}})();
+      const deletedCodes=(()=>{try{
+        const a=JSON.parse(localStorage.getItem('JGB_EAM_DELETED_CODES')||'[]');
+        return new Set((Array.isArray(a)?a:[]).map(v=>V(v).toUpperCase()));
+      }catch(_){return new Set()}})();
       const assets=A.filter(a=>{
         const c=codeOf(a).toUpperCase();
-        return c && !deleted.has(c) && statusOf(a)!=='폐기';
+        return !deletedCodes.has(c) && V(historyMeta[c]?.status||historyMeta[codeOf(a)]?.status||a.status||'정상')!=='폐기';
       });
-      const posStore=(()=>{try{
-        const x=JSON.parse(localStorage.getItem('JGB_EAM_MAP_POSITIONS')||localStorage.getItem('JGB_EAM_MAP_POS_V1')||'{}');
-        return x&&typeof x==='object'?x:{};
-      }catch(_){return {}}})();
-      const fallback=[
-        [12,27],[24,38],[38,29],[52,42],[67,30],[81,44],[18,67],[34,74],
-        [51,63],[68,73],[83,66],[29,88],[57,87],[76,88]
-      ];
-      const posFor=(a,i)=>{
-        const c=codeOf(a), p=posStore[c]||posStore[c.toUpperCase()];
-        if(Array.isArray(p)) return [Number(p[0])||50,Number(p[1])||50];
-        if(p&&typeof p==='object') return [Number(p.x)||50,Number(p.y)||50];
-        return fallback[i%fallback.length];
-      };
-      const stClass=st=>{
-        if(st==='점검')return 'check';
-        if(st==='조치필요')return 'action';
-        if(st==='수리중')return 'repair';
-        if(st==='부품대기')return 'parts';
+      const statusOf=a=>{
+        const c=codeOf(a);
+        /* 이력카드 META를 최우선으로 사용한다.
+           일부 기존 자산은 저장 당시 원본코드/asset_code가 달라질 수 있으므로
+           코드와 asset_code 양쪽을 확인하고, 그래도 없으면 DB 상태를 사용한다. */
+        let m=historyMeta[c]||{};
+        if(!m || !m.status){
+          const keys=Object.keys(historyMeta);
+          const hit=keys.find(k=>{
+            const x=historyMeta[k]||{};
+            return V(x.asset_code||x.code||'')===c;
+          });
+          if(hit)m=historyMeta[hit]||{};
+        }
+        let s=V(m.status||a?.status||'정상');
+        s=s.replace('점검필요','점검').replace('수리예정','수리중').replace('수리 진행','수리중').replace('교체예정','부품대기');
+        if(s==='재조치 필요'||s==='재조치필요')return 'action';
+        if(s==='정상')return 'normal';
+        if(s==='점검')return 'check';
+        if(s==='조치필요')return 'action';
+        if(s==='수리중'||/수리/.test(s))return 'repair';
+        if(s==='부품대기'||/부품\s*대기/.test(s))return 'parts';
         return 'normal';
       };
-      const counts={정상:0,점검:0,조치필요:0,수리중:0,부품대기:0};
-      assets.forEach(a=>{const st=statusOf(a);if(counts[st]!=null)counts[st]++});
-      const markers=assets.map((a,i)=>{
-        const c=codeOf(a),p=posFor(a,i),st=statusOf(a);
-        return `<button type="button" class="eam-v1-marker ${stClass(st)}" data-code="${esc(c)}"
-          style="left:${p[0]}%;top:${p[1]}%" title="${esc(c)} · ${esc(st)}"
-          onclick="window.eamHyunMarkerClick&&window.eamHyunMarkerClick('${esc(c)}')">
-          <strong>${esc(c)}</strong><small>${esc(st)}</small>
-        </button>`;
-      }).join('');
-      const liveRows=live.length?live.map(x=>`<tr>
-        <td><b>${esc(x.asset_code||'-')}</b></td>
-        <td>${esc(x.content||x.work||'-')}</td>
-        <td><span class="eam-v1-live-state">${esc(x.status||'수리중')}</span></td>
-        <td>${esc(x.scheduled||x.date||'-')}</td>
-        <td>${esc(x.manager||x.handler||'-')}</td>
-        <td><button class="eam-v1-mini" onclick="window.eamManualLiveEdit&&window.eamManualLiveEdit('${esc(x.asset_code||'')}')">입력</button></td>
-        <td><button class="eam-v1-mini done" onclick="window.eamManualLiveComplete&&window.eamManualLiveComplete('${esc(x.asset_code||'')}')">완료</button></td>
-      </tr>`).join(''):`<tr><td colspan="7" class="eam-v1-empty">현재 수리 LIVE 등록 건이 없습니다.</td></tr>`;
-      const statusCards=[
-        ['정상',counts.정상,'normal'],['점검',counts.점검,'check'],['조치필요',counts.조치필요,'action'],
-        ['수리중',counts.수리중,'repair'],['부품대기',counts.부품대기,'parts']
-      ].map(x=>`<div class="eam-v1-stat ${x[2]}"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
-      return `<style id="EAM_REBUILD_V1">
-        .eam-v1{height:calc(100vh - 24px);min-height:720px;display:flex;flex-direction:column;gap:10px;background:#eef3f7;color:#17344d;overflow:hidden}
-        .eam-v1-head{height:92px;flex:0 0 92px;background:linear-gradient(135deg,#06457d,#075da0,#077db3);border-radius:13px;color:#fff;display:flex;align-items:center;padding:0 18px;gap:16px;box-shadow:0 8px 22px rgba(15,55,85,.16)}
-        .eam-v1-title{min-width:250px}.eam-v1-title h1{margin:0;font-size:24px}.eam-v1-title p{margin:5px 0 0;font-size:10px;color:#d8edf9}
-        .eam-v1-stats{margin-left:auto;display:flex;gap:6px}.eam-v1-stat{width:65px;height:52px;border-radius:8px;border:1px solid rgba(255,255,255,.3);display:flex;flex-direction:column;align-items:center;justify-content:center}.eam-v1-stat b{font-size:18px}.eam-v1-stat span{font-size:9px;margin-top:2px}
-        .eam-v1-stat.normal{background:#168b55}.eam-v1-stat.check{background:#d89a00}.eam-v1-stat.action{background:#087f91}.eam-v1-stat.repair{background:#c8233c}.eam-v1-stat.parts{background:#6532a5}
-        .eam-v1-actions{display:flex;gap:6px}.eam-v1-btn{border:0;border-radius:8px;padding:10px 12px;font-weight:900;cursor:pointer}.eam-v1-btn.white{background:#fff;color:#075b91}.eam-v1-btn.dark{background:#083e69;color:#fff;border:1px solid rgba(255,255,255,.3)}
-        .eam-v1-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;width:100%}
-        .eam-v1-card{background:#fff;border:1px solid #cbd9e3;border-radius:12px;overflow:hidden;min-width:0;min-height:0;box-shadow:0 3px 12px rgba(22,54,78,.07)}
-        .eam-v1-card-head{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;border-bottom:1px solid #d7e3eb;background:#f8fbfd}.eam-v1-card-head h2{font-size:15px;margin:0}.eam-v1-card-head small{font-size:10px;color:#71889a}
-        .eam-v1-map{display:flex;flex-direction:column}.eam-v1-map-body{flex:1;min-height:0;padding:8px;background:#eaf1f5}.eam-v1-plan{position:relative;width:100%;height:100%;border:2px solid #334f63;background:#f8fbfc;overflow:hidden;box-shadow:inset 0 0 0 4px #fff}
-        .eam-v1-courts{position:absolute;left:7%;right:7%;top:4%;height:20%;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.eam-v1-courts-label{position:absolute;left:0;right:0;top:-1px;text-align:center;font-size:9px;font-weight:900;color:#526b7b}
-        .eam-v1-court{margin-top:16px;border:2px solid #6e8797;background:linear-gradient(145deg,#eaf3f6,#d5e3e9);border-radius:5px;display:flex;align-items:center;justify-content:center;color:#284d64;font-size:15px;font-weight:1000;box-shadow:inset 0 2px 2px #fff}
-        .eam-v1-building{position:absolute;left:2%;right:2%;top:27%;bottom:3%;border:2px solid #91a7b6;background:#fff;display:grid;grid-template-rows:30% 12% 58%}
-        .eam-v1-row{display:grid;grid-template-columns:repeat(6,1fr)}.eam-v1-zone{border-right:1px solid #a9bac5;border-bottom:1px solid #a9bac5;background:#f4f8fa;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.eam-v1-zone.pink{background:#fff1f5}.eam-v1-zone.water{background:#fff4d1;align-self:center;height:10%;min-height:34px;box-sizing:border-box;border:1px solid #a9bac5;border-radius:4px}.eam-v1-zone b{font-size:10px}.eam-v1-zone small{font-size:7px;color:#718797;margin-top:2px}
-        .eam-v1-corridor{border-bottom:1px solid #a9bac5;background:#f4eddb;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#526577}
-        .eam-v1-bottom{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,10%) minmax(0,1fr)}
-        .eam-v1-marker{position:absolute;z-index:20;transform:translate(-50%,-50%);min-width:62px;padding:5px 7px;border-radius:18px;border:2px solid;cursor:pointer;box-shadow:0 5px 12px rgba(20,55,70,.24);font-weight:900;background:#fff}.eam-v1-marker strong{display:block;font-size:10px}.eam-v1-marker small{display:block;font-size:8px;margin-top:1px}
-        .eam-v1-marker.normal{border-color:#159447;background:#e9fff2;color:#08743f}.eam-v1-marker.check{border-color:#d49a00;background:#fff7d6;color:#8a6200}.eam-v1-marker.action{border-color:#159fb3;background:#e8fbff;color:#08788b}.eam-v1-marker.repair{border-color:#d9364b;background:#fff0f2;color:#b51f35}.eam-v1-marker.parts{border-color:#7b4bb7;background:#f3eaff;color:#63339d}
-        .eam-v1-live{display:flex;flex-direction:column}.eam-v1-live-body{flex:1;min-height:0;overflow:auto}.eam-v1-live table{width:100%;border-collapse:collapse;font-size:10px}.eam-v1-live th,.eam-v1-live td{padding:8px 6px;border-bottom:1px solid #e2eaf0;text-align:center;white-space:nowrap}.eam-v1-live th{position:sticky;top:0;background:#edf4f8;z-index:2}.eam-v1-live td:nth-child(2){text-align:left;white-space:normal}.eam-v1-live-state{color:#d9364b;font-weight:900}.eam-v1-mini{border:1px solid #cbd7df;background:#fff;border-radius:5px;padding:4px 7px;font-size:9px;font-weight:900;cursor:pointer}.eam-v1-mini.done{color:#138a42}.eam-v1-empty{height:300px;color:#91a2ae;text-align:center}
-        @media(max-width:1000px){.eam-v1{overflow:auto}.eam-v1-main{grid-template-columns:1fr;min-height:1200px}.eam-v1-stats{display:none}}
-      .eam-v1-live{display:none!important}
-      .eam-v1-main{grid-template-columns:minmax(0,1fr)!important}
-      </style>
-      <div class="eam-v1">
-        <header class="eam-v1-head">
-          <div class="eam-v1-title"><h1>EAM 현황</h1><p>시설 자산 배치도를 하나의 기준으로 관리합니다.</p></div>
-          <div class="eam-v1-stats">${statusCards}</div>
-          <div class="eam-v1-actions">
-            <button type="button" class="eam-v1-btn white" onclick="window.eamHyunOpenIconAdd&&window.eamHyunOpenIconAdd()">＋ 배치도 아이콘 추가</button>
+      const catDefs=[['AC','에어컨','❄️'],['BO','보일러','♨️'],['FI','소방설비','🚒'],['EL','전기설비','⚡'],['DO','문·창호','🚪'],['SA','위생설비','🚻'],['OT','기타설비','🔧']];
+      const catMap={AC:'에어컨',BO:'보일러',FI:'소방설비',EL:'전기설비',DO:'문·창호',SA:'위생설비',OT:'기타설비'};
+      const posKey='JGB_EAM_HYUNHWANG_MAP_V1';
+      const iconKey='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+      const readObj=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'?x:{}}catch(_){return {}}};
+      const writeObj=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x))}catch(_){} };
+      const positions=readObj(posKey);
+      const mapOnly=readObj(iconKey);
+      /* 배치도 전용 삭제표시: 기존 EAM 자산 자체는 삭제하지 않고
+         EAM 현황 배치도에서만 숨김 처리한다. */
+      const mapHiddenKey='JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1';
+      const mapHidden=readObj(mapHiddenKey);
+      const defaultPos={'AC-01':[86,8],'AC-02':[68,8],'AC-03':[50,8],'AC-04':[32,8],'AC-05':[14,8],'AC-06':[7,30]};
+      const getPos=a=>{const c=codeOf(a);return positions[c]||defaultPos[c]||null};
+      const placeName=a=>V(a?.place||a?.location||a?.zone||a?.area||'미지정');
+      const attr=s=>esc(V(s)).replace(/\n/g,' ');
+      /* EAM 수리 LIVE는 EAM 자산/누수(LK)와 분리된 수기 입력 영역 */
+      const liveKey='JGB_EAM_MANUAL_REPAIR_LIVE_V1';
+      const readLive=()=>{try{const x=JSON.parse(localStorage.getItem(liveKey)||'[]');return Array.isArray(x)?x:[]}catch(_){return []}};
+      const liveRows=readLive();
+      const headerStatsReset=localStorage.getItem('JGB_EAM_HEADER_STATS_RESET_V1')==='1';
+      const normal=headerStatsReset?0:assets.filter(a=>statusOf(a)==='normal').length;
+      const check=headerStatsReset?0:assets.filter(a=>statusOf(a)==='check').length;
+      const action=headerStatsReset?0:assets.filter(a=>statusOf(a)==='action').length;
+      const repair=headerStatsReset?0:assets.filter(a=>statusOf(a)==='repair').length;
+      const parts=headerStatsReset?0:assets.filter(a=>statusOf(a)==='parts').length;
 
+      window.eamManualLiveSave=rows=>{try{localStorage.setItem(liveKey,JSON.stringify(Array.isArray(rows)?rows:[]))}catch(_){} };
+      window.eamManualLiveOpen=()=>{
+        document.getElementById('eamManualLiveModal')?.remove();
+        const m=document.createElement('div');m.id='eamManualLiveModal';m.className='eh-modal';
+        const cats=[['AC','에어컨','❄️'],['BO','보일러','♨️'],['FI','소방설비','🧯'],['EL','전기설비','⚡'],['DO','문·창호','🚪'],['SA','위생설비','🚻'],['OT','기타설비','🔧']];
+        m.innerHTML=`<div class="eh-modal-box eh-icon-create" style="width:min(620px,95vw)">
+          <div class="eh-modal-head"><div><small>REPAIR LIVE</small><h3>수리 LIVE 등록</h3><p>자산 분류를 선택한 후 번호만 입력하면 자산코드가 자동 생성됩니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div>
+          <div style="padding:14px 16px 6px"><div style="font-size:12px;font-weight:900;color:#405c72;margin-bottom:8px">자산 분류 선택</div>
+            <div id="eamLiveCatGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">${cats.map((c,i)=>`<button type="button" data-cat="${c[0]}" style="border:1px solid #c9d9e5;border-radius:9px;background:${i===0?'#eaf5ff':'#fff'};padding:9px 3px;cursor:pointer;box-shadow:0 3px 8px rgba(20,55,75,.10)"><span style="display:block;font-size:20px">${c[2]}</span><b style="display:block;font-size:12px;color:#176da0">${c[0]}</b><small style="display:block;font-size:8px;color:#718797;margin-top:2px">${c[1]}</small></button>`).join('')}</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:8px 16px 14px;background:#f3f8fb;border-top:1px solid #dbe6ed;border-bottom:1px solid #dbe6ed">
+            <label style="font-size:12px;font-weight:900;color:#405c72">자산번호 입력<input id="eamLiveNumber" inputmode="numeric" maxlength="3" placeholder="예: 01" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px;font-size:16px;font-weight:900"></label>
+            <label style="font-size:12px;font-weight:900;color:#405c72">생성 자산코드<input id="eamLiveCodePreview" type="text" value="AC-" readonly style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px;background:#fff;font-size:16px;font-weight:900;color:#126db0"></label>
           </div>
-        </header>
-        <main class="eam-v1-main">
-          <section class="eam-v1-card eam-v1-map">
-            <div class="eam-v1-card-head"><h2>🗺 시설 자산 배치도</h2><small>배치도 100%</small></div>
-            <div class="eam-v1-map-body"><div class="eam-v1-plan">
-              <div class="eam-v1-courts"><span class="eam-v1-courts-label">코트 구역</span>${[5,4,3,2,1].map(n=>`<div class="eam-v1-court">${n}</div>`).join('')}</div>
-              <div class="eam-v1-building">
-                <div class="eam-v1-row">
-                  <div class="eam-v1-zone"><b>샤워실(남)</b><small>남자 샤워실</small></div><div class="eam-v1-zone"><b>화장실(남)</b><small>남자 화장실</small></div><div class="eam-v1-zone"><b>탈의실(남)</b><small>남자 탈의실</small></div>
-                  <div class="eam-v1-zone pink"><b>샤워실(여)</b><small>여자 샤워실</small></div><div class="eam-v1-zone pink"><b>탈의실(여)</b><small>여자 탈의실</small></div><div class="eam-v1-zone pink"><b>화장실(여)</b><small>여자 화장실</small></div>
-                </div>
-                <div class="eam-v1-corridor">복도</div>
-                <div class="eam-v1-bottom">
-                  <div class="eam-v1-zone"><b>휴게실</b><small>휴게공간</small></div><div class="eam-v1-zone water"><b>통합 유수장치실</b><small>소방 · 유수 설비</small></div><div class="eam-v1-zone"><b>사무실</b><small>관리 · 운영</small></div>
-                </div>
-              </div>
-              ${markers||'<div class="eam-v1-empty-map">등록된 시설 자산이 없습니다.</div>'}
-            </div></div>
-          </section>
-        </main>
-      </div>`;
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px">
+            <label style="font-size:12px;font-weight:900;color:#405c72">수리상태<select id="eamLiveStatus" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px;background:#fff"><option>수리예정</option><option selected>수리중</option><option>재조치 필요</option></select></label>
+            <label style="font-size:12px;font-weight:900;color:#405c72">예정일<input id="eamLiveDate" type="date" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label>
+            <label style="grid-column:1/-1;font-size:12px;font-weight:900;color:#405c72">작업내용 *<input id="eamLiveContent" type="text" placeholder="예: 냉방 불량 점검 및 수리" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label>
+            <label style="grid-column:1/-1;font-size:12px;font-weight:900;color:#405c72">담당<input id="eamLiveManager" type="text" placeholder="담당자 입력" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label>
+          </div>
+          <div class="eh-modal-foot"><button type="button" class="gray" onclick="this.closest('.eh-modal').remove()">취소</button><button type="button" class="primary" id="eamLiveSaveBtn">수리 LIVE 등록</button></div>
+        </div>`;
+        document.body.appendChild(m);
+        let prefix='AC';
+        const grid=m.querySelector('#eamLiveCatGrid'), preview=m.querySelector('#eamLiveCodePreview'), num=m.querySelector('#eamLiveNumber');
+        grid.querySelectorAll('[data-cat]').forEach(btn=>btn.onclick=()=>{prefix=btn.dataset.cat;grid.querySelectorAll('[data-cat]').forEach(x=>{x.style.background=x===btn?'#eaf5ff':'#fff';x.style.border=x===btn?'2px solid #1675c2':'1px solid #c9d9e5'});preview.value=prefix+'-'+String(num.value||'').padStart(2,'0')});
+        num.oninput=()=>{num.value=num.value.replace(/\D/g,'').slice(0,3);preview.value=prefix+'-'+String(num.value||'').padStart(2,'0')};
+        m.querySelector('#eamLiveSaveBtn').onclick=()=>{
+          const n=(num.value||'').trim(), code=prefix+'-'+String(n).padStart(2,'0');
+          const content=(m.querySelector('#eamLiveContent')?.value||'').trim();
+          const status=m.querySelector('#eamLiveStatus')?.value||'수리중';
+          const scheduled=m.querySelector('#eamLiveDate')?.value||'';
+          const manager=(m.querySelector('#eamLiveManager')?.value||'').trim();
+          if(!n){alert('자산번호를 입력하세요.');num.focus();return}
+          if(!content){alert('작업내용을 입력하세요.');return}
+          const rows=readLive();
+          if(rows.some(x=>String(x.asset_code||'').trim().toUpperCase()===code)){alert('같은 자산코드가 이미 수리 LIVE에 등록되어 있습니다.');return}
+          rows.push({id:'EL-'+Date.now(),asset_code:code,content,status,scheduled,manager,createdAt:new Date().toISOString()});
+          window.eamManualLiveSave(rows);m.remove();render();
+        };
+        num.focus();
+      };
+      window.eamManualLiveEdit=code=>{
+        const rows=readLive();const t=rows.find(x=>String(x.asset_code||'').trim().toUpperCase()===String(code||'').trim().toUpperCase());
+        if(!t){alert('수리 LIVE 등록 건을 찾을 수 없습니다.');return}
+        document.getElementById('eamManualLiveModal')?.remove();
+        const m=document.createElement('div');m.id='eamManualLiveModal';m.className='eh-modal';
+        const q=v=>xEsc(v==null?'':String(v));
+        m.innerHTML=`<div class="eh-modal-box eh-icon-create" style="width:min(520px,94vw)"><div class="eh-modal-head"><div><small>REPAIR LIVE</small><h3>수리 LIVE 수정</h3><p>수리 LIVE 내용만 수정합니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px"><label style="font-size:12px;font-weight:900;color:#405c72">자산코드<input value="${q(t.asset_code)}" disabled style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px;background:#f3f6f8;font-weight:800"></label><label style="font-size:12px;font-weight:900;color:#405c72">수리상태<select id="eamEditStatus" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px;background:#fff"><option ${t.status==='수리예정'?'selected':''}>수리예정</option><option ${t.status==='수리중'?'selected':''}>수리중</option><option ${t.status==='재조치 필요'?'selected':''}>재조치 필요</option></select></label><label style="grid-column:1/-1;font-size:12px;font-weight:900;color:#405c72">작업내용 *<input id="eamEditContent" value="${q(t.content)}" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label><label style="font-size:12px;font-weight:900;color:#405c72">예정일<input id="eamEditDate" type="date" value="${q(t.scheduled)}" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label><label style="font-size:12px;font-weight:900;color:#405c72">담당<input id="eamEditManager" value="${q(t.manager)}" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #cbd9e4;border-radius:8px"></label></div><div class="eh-modal-foot"><button type="button" class="gray" onclick="this.closest('.eh-modal').remove()">취소</button><button type="button" class="primary" id="eamEditSave">저장</button></div></div>`;
+        document.body.appendChild(m);
+        m.querySelector('#eamEditSave').onclick=()=>{const content=m.querySelector('#eamEditContent').value.trim();if(!content){alert('작업내용을 입력하세요.');return}window.eamManualLiveSave(rows.map(x=>String(x.asset_code||'').trim().toUpperCase()===String(t.asset_code||'').trim().toUpperCase()?{...x,content,status:m.querySelector('#eamEditStatus').value,scheduled:m.querySelector('#eamEditDate').value,manager:m.querySelector('#eamEditManager').value.trim()}:x));m.remove();render()};
+      };
+      window.eamManualLiveComplete=code=>{const c=String(code||'').trim().toUpperCase();if(!c)return;if(!confirm(c+'의 수리 LIVE를 완료 처리할까요?'))return;window.eamManualLiveSave(readLive().filter(x=>String(x.asset_code||'').trim().toUpperCase()!==c));render()};
+
+      window.eamHyunOpenIconAdd=()=>{
+        document.getElementById('eamHyunIconModal')?.remove();
+        const m=document.createElement('div');m.id='eamHyunIconModal';m.className='eh-modal';
+        m.innerHTML=`<div class="eh-modal-box eh-icon-create"><div class="eh-modal-head"><div><small>EAM MAP ONLY</small><h3>배치도 아이콘 생성</h3><p>자산등록과 무관합니다. 영문 분야코드는 시스템이 선택하고 숫자는 직접 입력합니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div>
+          <div class="eh-cat-grid">${catDefs.map(([p,n,ic],i)=>`<button type="button" class="eh-cat ${i===0?'active':''}" data-prefix="${p}" onclick="document.querySelectorAll('.eh-cat').forEach(x=>x.classList.remove('active'));this.classList.add('active');document.getElementById('ehIconPrefix').value='${p}';document.getElementById('ehIconName').textContent='${n}'"><b>${ic} ${p}</b><small>${n}</small></button>`).join('')}</div>
+          <div class="eh-code-line"><strong id="ehIconName">에어컨</strong><span>●</span><input id="ehIconPrefix" value="AC" readonly><b>-</b><input id="ehIconNumber" inputmode="numeric" maxlength="2" placeholder="숫자 1~99"><strong id="ehCodePreview">AC-01</strong></div>
+          <div class="eh-map-only-note">※ 생성된 아이콘은 <b>배치도에만 표시</b>됩니다. 기존 EAM 자산 목록·자산등록·수리 LIVE에는 생성되지 않습니다.</div>
+          <div class="eh-modal-foot"><button type="button" class="gray" onclick="this.closest('.eh-modal').remove()">취소</button><button type="button" class="primary" onclick="window.eamHyunCreateMapIcon()">배치도 아이콘 생성</button></div></div>`;
+        document.body.appendChild(m);
+        const inp=document.getElementById('ehIconNumber'), prev=document.getElementById('ehCodePreview'), pre=document.getElementById('ehIconPrefix');
+        const update=()=>{let n=V(inp.value).replace(/\D/g,'').slice(0,2);inp.value=n;prev.textContent=pre.value+'-'+(n?String(Number(n)).padStart(2,'0'):'01')};
+        inp.addEventListener('input',update);inp.focus();
+      };
+      window.eamHyunCreateMapIcon=()=>{
+        const pre=V(document.getElementById('ehIconPrefix')?.value||'');let n=V(document.getElementById('ehIconNumber')?.value||'').replace(/\D/g,'');
+        if(!pre||!n){alert('숫자를 입력해주세요.');return} n=String(Math.max(1,Math.min(99,Number(n)))).padStart(2,'0');
+        const code=pre+'-'+n;const p=readObj(iconKey);
+        if(p[code]){alert('이미 배치도에 등록된 아이콘입니다.\n다른 숫자를 입력해주세요.');return}
+        p[code]={code,prefix:pre,number:n,name:catMap[pre]||'기타설비',x:50,y:50,createdAt:new Date().toISOString()};writeObj(iconKey,p);
+        document.getElementById('eamHyunIconModal')?.remove();render();
+      };
+      /* 배치도 아이콘 삭제: 기존 EAM 자산 + 배치도 전용 아이콘을 모두 관리한다.
+         어떤 삭제도 기존 EAM 자산등록 데이터에는 영향을 주지 않는다. */
+      window.eamHyunOpenIconDelete=()=>{
+        document.getElementById('eamHyunIconDeleteModal')?.remove();
+        const only=readObj(iconKey);
+        const hidden=readObj(mapHiddenKey);
+        const assetRows=assets.filter(a=>{const c=codeOf(a);return !!getPos(a)&&!hidden[c]}).map(a=>({code:codeOf(a),name:placeName(a)||'EAM 자산',kind:'asset'}));
+        const onlyRows=Object.values(only).filter(x=>x&&x.code).map(x=>({code:V(x.code),name:V(x.name)||'배치도 전용 아이콘',kind:'map-only'}));
+        const rows=[...assetRows,...onlyRows];
+        const m=document.createElement('div');m.id='eamHyunIconDeleteModal';m.className='eh-modal';
+        const icons=rows.map(x=>{
+          const a=assetRows.find(y=>y.code===x.code);
+          const o=onlyRows.find(y=>y.code===x.code);
+          const pos=a?getPos(assets.find(y=>codeOf(y)===x.code)):o?only[x.code]:null;
+          return pos?`<span class="mini-icon ${x.kind==='asset'?'asset-mini':''}" style="left:${Number(pos[0]??pos.x??50)}%;top:${Number(pos[1]??pos.y??50)}%">${esc(x.code)}</span>`:'';
+        }).join('');
+        const list=rows.length?rows.map(x=>`<div data-delete-row="${attr(x.code)}"><span class="code">${esc(x.code)}</span><span class="name">${esc(x.name)}${x.kind==='asset'?' · 기존 EAM 자산':' · 배치도 전용'}</span><button type="button" onclick="window.eamHyunDeleteMapIcon('${attr(x.code)}','${x.kind}')">삭제</button></div>`).join(''):'<div class="eh-empty">현재 배치도에 표시된 아이콘이 없습니다.</div>';
+        m.innerHTML=`<div class="eh-modal-box"><div class="eh-modal-head"><div><small>EAM MAP ONLY</small><h3>배치도 아이콘 삭제</h3><p>배치도에서만 아이콘을 삭제합니다. 기존 EAM 자산등록 정보와 수리 LIVE 정보는 유지됩니다.</p></div><button type="button" onclick="this.closest('.eh-modal').remove()">×</button></div><div class="eh-delete-map-preview"><div class="mini-map"><div class="mini-court" style="left:8%;width:15%">5</div><div class="mini-court" style="left:25%;width:15%">4</div><div class="mini-court" style="left:42%;width:15%">3</div><div class="mini-court" style="left:59%;width:15%">2</div><div class="mini-court" style="left:76%;width:15%">1</div><div class="mini-fac"></div>${icons}</div></div><div class="eh-delete-map-label">현재 배치도에 표시된 아이콘 ${rows.length}개</div><div class="eh-delete-list-v10">${list}</div></div>`;
+        document.body.appendChild(m);
+      };
+      window.eamHyunDeleteMapIcon=(code,kind)=>{
+        const c=V(code); if(!c)return;
+        if(!confirm(c+' 배치도 아이콘만 삭제할까요?\nEAM 자산등록 정보와 수리 LIVE 정보는 삭제되지 않습니다.'))return;
+        if(kind==='asset'){
+          const hidden=readObj(mapHiddenKey); hidden[c]=true;
+          writeObj(mapHiddenKey,hidden);
+        }else{
+          const p=readObj(iconKey); delete p[c]; writeObj(iconKey,p);
+        }
+        document.getElementById('eamHyunIconDeleteModal')?.remove();
+        render();
+      };
+
+      /* 현재 배치도에 표시되는 기존 EAM 자산만 렌더링한다.
+         삭제된 자산은 EAM DB에는 남아 있지만 현황 배치도에서는 숨긴다. */
+      const markerAssets=assets.filter(a=>{const c=codeOf(a);return !!getPos(a)&&!mapHidden[c]});
+      const assetCodeSet=new Set(markerAssets.map(codeOf));
+      const markerStyle={
+        normal:'--st-border:#159447;--st-bg:#e9fff2;--st-text:#08743f;',
+        check:'--st-border:#d49a00;--st-bg:#fff7d6;--st-text:#8a6200;',
+        action:'--st-border:#159fb3;--st-bg:#e8fbff;--st-text:#08788b;',
+        repair:'--st-border:#d9364b;--st-bg:#fff0f2;--st-text:#b51f35;',
+        parts:'--st-border:#7b4bb7;--st-bg:#f3eaff;--st-text:#63339d;'
+      };
+      const markers=markerAssets.map(a=>{
+        const p=getPos(a),st=statusOf(a),c=codeOf(a);
+        return `<button type="button" class="eh-marker ${st}" data-code="${attr(c)}" style="left:${Number(p[0])}%;top:${Number(p[1])}%;${markerStyle[st]||markerStyle.normal}" title="${attr(c)}"><b>${esc(c)}</b></button>`;
+      }).join('');
+      /* 같은 자산코드가 기존 EAM 자산과 배치도 전용 아이콘에 동시에 있으면
+         기존 EAM 아이콘 하나만 표시한다. 이것이 중복 아이콘/엉뚱한 클릭의 직접 원인이다. */
+      const mapOnlyMarkers=Object.values(mapOnly)
+        .filter(x=>{const c=V(x?.code);return c&&!assetCodeSet.has(c)})
+        .map(x=>{
+          const c=V(x.code);
+          const realAsset=assets.find(a=>codeOf(a)===c);
+          /* 실제 자산이 존재하면 map-only 상태를 없애고 동일 자산코드의 EAM 아이콘으로 취급 */
+          const cls=realAsset?'eh-marker':'eh-marker map-only';
+          return `<button type="button" class="${cls}" data-map-only="${realAsset?'':'1'}" data-code="${attr(c)}" style="left:${Number(x.x)}%;top:${Number(x.y)}%" title="${realAsset?'EAM 자산 '+attr(c):'배치도 전용 '+attr(c)}"><b>${esc(c)}</b></button>`;
+        }).join('');
+      const zone=(label,sub,cls='')=>`<div class="eh-zone ${cls}"><b>${esc(label)}</b><small>${esc(sub)}</small></div>`;
+      const map=`<div class="eh-map">
+  <section class="eh-floor eh-floor-1f">
+    <div class="eh-courts"><b>코트 구역</b>${[5,4,3,2,1].map(n=>`<div class="eh-court eh-court-3d" data-court="${n}"><div class="eh-court-surface"><span class="eh-court-net"></span><b>${n}</b></div></div>`).join('')}</div>
+    <div class="eh-facility">
+      <div class="eh-row">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div>
+      <div class="eh-corridor">복도</div>
+      <div class="eh-bottom">${zone('휴게실','휴게공간')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영')}</div>
+    </div>
+  </section>
+  <section class="eh-floor eh-floor-2f">
+    <div class="eh-second-grid">
+      <div class="eh-second-zone roof2"><b>옥상</b><small>2층 옥상</small></div>
+      <div class="eh-second-zone store2"><b>창고</b><small>2층 창고</small></div>
+    </div>
+  </section>
+  ${markers}${mapOnlyMarkers}${!markers&&!mapOnlyMarkers?'<div class="eh-empty-map">배치된 자산·아이콘이 없습니다.</div>':''}
+</div>`;
+      const liveHtml=liveRows.length?`<div class="eh-live-scroll"><table><thead><tr><th>자산코드</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${liveRows.map(x=>`<tr><td>${esc(x.asset_code||'-')}</td><td class="left">${esc(x.content||'-')}</td><td class="eh-live-state">${esc(x.status||'수리중')}</td><td>${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button class="eh-done eh-live-edit-btn" onclick="window.eamManualLiveEdit('${attr(x.asset_code||'')}')">입력</button></td><td><button class="eh-done" onclick="window.eamManualLiveComplete('${attr(x.asset_code||'')}')">완료</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="eh-empty">현재 수리 LIVE 등록 건이 없습니다.</div>';
+      return `<style id="EAM_HYUNHWANG_MAPONLY_V4">.eh-page{height:calc(100vh - 24px);min-height:720px;display:flex;flex-direction:column;gap:10px;background:#eef4f8;color:#17344d;box-sizing:border-box;overflow:hidden}.eh-head{height:82px;flex:0 0 82px;background:linear-gradient(135deg,#0d4266,#176b98);color:#fff;border-radius:13px;padding:0 16px;display:flex;align-items:center;gap:8px;box-sizing:border-box;box-shadow:0 8px 22px rgba(20,60,85,.18)}.eh-head h1{margin:0;font-size:23px}.eh-head small{display:block;color:#d9edf8;margin-top:4px;font-size:10px}.eh-head-stats{margin-left:auto;display:flex;gap:5px}.eh-stat{min-width:62px;height:51px;border:1px solid rgba(255,255,255,.25);border-radius:8px;background:rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center}.eh-stat b{font-size:18px}.eh-stat small{font-size:8px;margin:2px 0 0;color:#fff}.eh-stat.normal{background:linear-gradient(180deg,#20b96b,#07884a)!important;border-color:#62e4a1!important}.eh-stat.check{background:linear-gradient(180deg,#f7c928,#d89a00)!important;border-color:#ffe37b!important}.eh-stat.action{background:linear-gradient(180deg,#18b7c9,#087f91)!important;border-color:#73e5ed!important}.eh-stat.repair{background:linear-gradient(180deg,#f04b61,#c8233c)!important;border-color:#ff8b9a!important}.eh-stat.parts{background:linear-gradient(180deg,#8f5bd0,#6532a5)!important;border-color:#c9a5f4!important}.eh-stat.normal b,.eh-stat.check b,.eh-stat.action b,.eh-stat.repair b,.eh-stat.parts b{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.22)}.eh-head button{border:1px solid rgba(255,255,255,.4);background:#fff;color:#075b91;border-radius:8px;padding:10px 12px;font-weight:900;cursor:pointer;white-space:nowrap}.eh-head button.mapdel{background:transparent;color:#fff}.eh-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,3fr) minmax(390px,2fr);gap:10px}.eh-card{background:#fff;border:1px solid #cbd9e3;border-radius:12px;overflow:hidden;box-shadow:0 3px 12px rgba(22,54,78,.07);min-height:0}.eh-map-card{display:flex;flex-direction:column}.eh-card-head{height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid #d7e3eb;background:#fbfdfe}.eh-card-head h2{font-size:16px;margin:0}.eh-card-head small{font-size:9px;color:#71889a}.eh-map-wrap{flex:1;min-height:0;padding:7px;background:#edf4f7}.eh-map{position:relative;width:100%;height:100%;border:2px solid #334f63;background:#f4f8fa;overflow:hidden;box-shadow:inset 0 0 0 4px #fff}.eh-courts{position:absolute;left:7%;right:7%;top:2%;height:21%;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.eh-courts>b{position:absolute;top:0;left:0;right:0;text-align:center;font-size:9px}.eh-court{margin-top:14px;border:1px solid #678092;background:#e6eef2;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#24475f}.eh-facility{position:absolute;left:1.5%;right:1.5%;top:25%;bottom:1.5%;display:grid;grid-template-rows:10% 34% 9% 47%}.eh-roof,.eh-row,.eh-bottom{display:grid}.eh-roof{grid-template-columns:1fr 2fr 2fr 1fr;border:1px solid #9bafbd;background:#f2f6f8}.eh-roof span{display:flex;align-items:center;justify-content:center;border-right:1px solid #aabac5;font-size:10px;font-weight:900}.eh-row{grid-template-columns:repeat(6,1fr);border-left:1px solid #9bafbd}.eh-zone{border-right:1px solid #9bafbd;border-bottom:1px solid #9bafbd;background:#f5f9fa;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.eh-zone.pink{background:#fff1f5}.eh-zone b{font-size:11px}.eh-zone small{font-size:7px;color:#718797;margin-top:2px}.eh-corridor{border:1px solid #9bafbd;background:#f6efdf;display:flex;align-items:center;justify-content:center;font-weight:900;color:#425d70}.eh-bottom{grid-template-columns:2fr 3fr 1fr;border-left:1px solid #9bafbd}.eh-bottom .water{background:#fff4d1}.eh-marker{position:absolute;z-index:20;transform:translate(-50%,-50%);border:2px solid var(--st-border,#159447)!important;background:var(--st-bg,#e9fff2)!important;color:var(--st-text,#08743f)!important;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:950;cursor:pointer;box-shadow:0 5px 12px rgba(20,55,70,.24),inset 0 1px 1px rgba(255,255,255,.95);white-space:nowrap}.eh-marker.check,.eh-marker.action,.eh-marker.repair,.eh-marker.parts{border-color:var(--st-border)!important;background:var(--st-bg)!important;color:var(--st-text)!important}.eh-marker.map-only{border-color:#176db0!important;background:#eaf5ff!important;color:#075b91!important}.eh-empty-map{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8297a5;font-size:11px}.eh-right{min-width:0;min-height:0;display:block}.eh-live-card{height:100%;display:flex;flex-direction:column}.eh-live-card .eh-card-body{flex:1;min-height:0;overflow:hidden}.eh-live-scroll{height:100%;overflow-y:scroll;overflow-x:auto;scrollbar-gutter:stable both-edges}.eh-live-card table{width:max-content;min-width:760px;border-collapse:collapse;font-size:10px}.eh-live-card th,.eh-live-card td{padding:7px 12px;border-bottom:1px solid #e2eaf0;text-align:center;white-space:nowrap;height:34px}.eh-live-card th{background:#edf4f8;position:sticky;top:0;z-index:2}.eh-live-card td.left{text-align:left}.eh-live-state{color:#dd4444;font-weight:900}.eh-done{border:1px solid #cbd7df;background:#fff;border-radius:5px;padding:4px 7px;font-size:8px;font-weight:900;cursor:pointer}.eh-empty{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#91a2ae;font-size:11px;padding:20px;text-align:center}.eh-modal{position:fixed;inset:0;background:rgba(8,31,48,.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px}.eh-modal-box{width:min(620px,95vw);max-height:88vh;overflow:auto;background:#fff;border-radius:13px;box-shadow:0 25px 60px rgba(0,0,0,.28)}.eh-modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:15px 17px;background:linear-gradient(135deg,#103f61,#16658f);color:#fff}.eh-modal-head h3{margin:3px 0;font-size:18px}.eh-modal-head p{margin:4px 0 0;font-size:9px;color:#d8ebf5}.eh-modal-head button{border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:6px;width:30px;height:30px;font-size:20px;cursor:pointer}.eh-cat-grid{padding:12px 12px 5px;display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.eh-cat{border:1px solid #d5e0e7;background:#fff;border-radius:7px;padding:8px 3px;cursor:pointer}.eh-cat.active{border:2px solid #1675c2;background:#eef7ff}.eh-cat b{display:block;font-size:11px}.eh-cat small{display:block;font-size:8px;color:#718797;margin-top:2px}.eh-code-line{display:flex;align-items:center;justify-content:center;gap:8px;padding:18px 12px;background:#f3f8fb;border-top:1px solid #dbe6ed;border-bottom:1px solid #dbe6ed}.eh-code-line strong:first-child{font-size:13px;color:#176da0}.eh-code-line input{width:74px;height:38px;border:1px solid #b8ccdc;border-radius:7px;text-align:center;font-size:16px;font-weight:900;color:#17344d}.eh-code-line input[readonly]{width:58px;background:#f8fbfd}.eh-code-line>span{font-size:8px;color:#18a66c}.eh-code-line>strong:last-child{font-size:18px;color:#126db0}.eh-map-only-note{padding:12px 17px;color:#6f8496;font-size:10px;line-height:1.55}.eh-modal-foot{display:flex;justify-content:flex-end;gap:7px;padding:12px 17px;border-top:1px solid #e2e9ef}.eh-modal-foot button{border:0;border-radius:7px;padding:10px 14px;font-weight:900;cursor:pointer}.eh-modal-foot .gray{background:#edf2f5;color:#526b7e}.eh-modal-foot .primary{background:#1675c2;color:#fff}.eh-delete-list{padding:12px;display:grid;gap:6px}.eh-delete-list>div{display:grid;grid-template-columns:90px 1fr 58px;align-items:center;gap:8px;padding:10px;border:1px solid #dbe4eb;border-radius:7px}.eh-delete-list b{color:#176db0}.eh-delete-list span{font-weight:800}.eh-delete-list button{border:1px solid #efc8c8;background:#fff;color:#d64747;border-radius:6px;padding:6px;font-weight:900;cursor:pointer}@media(max-width:1000px){.eh-main{grid-template-columns:1fr}.eh-right{min-height:650px}.eh-page{overflow:auto}.eh-map-card{min-height:650px}}@media(max-width:700px){.eh-head-stats{display:none}.eh-head h1{font-size:18px}.eh-head button{font-size:9px;padding:8px}.eh-cat-grid{grid-template-columns:repeat(4,1fr)}} </style><div class="eh-page"><header class="eh-head"><div><h1>🏢 EAM 현황</h1><small>기존 EAM 자산관리와 분리된 시설 자산 현황 화면</small></div><div class="eh-head-stats"><div class="eh-stat normal"><b>${normal}</b><small>정상</small></div><div class="eh-stat check"><b>${check}</b><small>점검</small></div><div class="eh-stat action"><b>${action}</b><small>조치필요</small></div><div class="eh-stat repair"><b>${repair}</b><small>수리중</small></div><div class="eh-stat parts"><b>${parts}</b><small>부품대기</small></div></div><button type="button" onclick="window.eamHyunOpenIconAdd()">＋ 배치도 아이콘 추가</button></header><main class="eh-main"><section class="eh-card eh-map-card"><div class="eh-card-head"><h2>🗺 시설 자산 배치도</h2></div><div class="eh-map-wrap">${map}</div></section><aside class="eh-right eh-right-v20">
+<section class="eh-card eh-live-card eh-live-card-v20">
+  <div class="eh-card-head">
+    <h2>🔧 수리 LIVE</h2>
+    <button type="button" onclick="window.eamManualLiveOpen()">＋ 직접입력</button>
+  </div>
+  <div class="eh-card-body">${liveHtml}</div>
+</section>
+<section class="eh-card eh-extra-card-v20">
+  <div class="eh-card-head">
+    <h2>＋ 추가 관리영역</h2>
+    <small>추후 기능 추가</small>
+  </div>
+  <div class="eh-extra-body-v20">
+    <div class="eh-extra-empty-v20">추가할 관리 기능을 이 영역에 배치합니다.</div>
+  </div>
+</section>
+</aside></main></div>`;
     }
 
     function compareRows(s){return `<div class="compareline">접수 <b>${s.is.length}건</b></div><div class="compareline">조치완료 <b>${s.done.length}건</b></div><div class="compareline">미조치 <b class="red">${s.pending.length}건</b></div>`}
