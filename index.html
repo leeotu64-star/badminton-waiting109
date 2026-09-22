@@ -5309,6 +5309,57 @@ a[data-page="digitalTwin"],
 @media(max-width:1100px){.employee-v2-staff-list{grid-template-columns:1fr}.employee-v2-staff{grid-template-columns:minmax(120px,1.2fr) repeat(3,1fr) 72px}.employee-v2-detail-grid.two{grid-template-columns:1fr}}
 @media(max-width:700px){.employee-v2-head{align-items:flex-start;flex-direction:column}.employee-v2-main{min-height:auto;grid-template-rows:auto auto}.employee-v2-staff{grid-template-columns:1fr 1fr}.employee-v2-name{grid-column:1/-1}.employee-v2-detail-btn{grid-column:1/-1}.employee-v2-guide{display:none}.employee-v2-detail-kpis{grid-template-columns:1fr 1fr}.employee-v2-detail-rules{grid-template-columns:1fr}.employee-v2-detail-grid.two{grid-template-columns:1fr}}
 </style>
+
+<style id="JGB_EAM_MAPONLY_V29_SPACING">
+/* 배치도 내부 구역 간격 및 경계선만 보강 */
+.eh-floor-1f .eh-courts{
+  height:35.294%!important;
+}
+/* 코트와 시설 사이에 명확한 간격 */
+.eh-floor-1f .eh-facility{
+  top:calc(35.294% + 8px)!important;
+  bottom:0!important;
+}
+/* 시설 6개 구역을 붙이지 않고 각각 경계가 보이도록 */
+.eh-floor-1f .eh-row{
+  gap:3px!important;
+  border-left:0!important;
+}
+.eh-floor-1f .eh-row .eh-zone{
+  border:1px solid #7f98a7!important;
+  box-sizing:border-box!important;
+}
+/* 복도와 하부 시설도 경계선 명확화 */
+.eh-floor-1f .eh-corridor{
+  border:1px solid #7f98a7!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-1f .eh-bottom{
+  gap:3px!important;
+  border-left:0!important;
+}
+.eh-floor-1f .eh-bottom>div{
+  border:1px solid #7f98a7!important;
+  box-sizing:border-box!important;
+}
+</style>
+
+<style id="JGB_EAM_FINAL_RATIO_V36">
+/* 헤더 제외, 배치도 영역 기준 최종 독립 비율 */
+.eh-main{grid-template-columns:1fr!important;grid-template-rows:minmax(0,1fr)!important;}
+.eh-map-card{width:70%!important;max-width:70%!important;min-width:0!important;justify-self:start!important;height:100%!important;}
+.eh-map-wrap{width:100%!important;height:100%!important;min-height:0!important;}
+.eh-map{position:relative!important;width:100%!important;height:70%!important;min-height:0!important;display:block!important;overflow:hidden!important;}
+.eh-floor-1f,.eh-floor-2f{position:static!important;flex:none!important;width:100%!important;height:0!important;min-height:0!important;border:0!important;overflow:visible!important;}
+/* 전체 배치도 100%: 코트20 / 화장실·샤워30 / 유수·사무실·휴게35 / 복도5 / 옥상·창고10 */
+.eh-floor-1f .eh-courts{position:absolute!important;left:8%!important;right:8%!important;top:0!important;height:20%!important;margin:0!important;}
+.eh-floor-1f .eh-court{height:100%!important;margin-top:0!important;box-sizing:border-box!important;}
+.eh-floor-1f .eh-facility{position:absolute!important;left:1.5%!important;right:1.5%!important;top:20%!important;height:65%!important;bottom:auto!important;margin:0!important;}
+.eh-floor-2f{position:absolute!important;left:0!important;right:0!important;top:85%!important;height:10%!important;box-sizing:border-box!important;border:1px solid #91a5b3!important;border-radius:6px!important;background:#f7fafc!important;overflow:hidden!important;}
+.eh-floor-2f .eh-second-grid{position:absolute!important;left:1.5%!important;right:1.5%!important;top:32px!important;bottom:8px!important;height:auto!important;}
+/* 시설 내부: 상부 화장실·샤워실 30%, 중앙 복도 5%, 하부 유수·사무실·휴게실 35% */
+.eh-floor-1f .eh-facility{display:grid!important;grid-template-rows:30fr 5fr 35fr!important;row-gap:0!important;}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -19320,140 +19371,216 @@ document.addEventListener('click',handle,true);
 </script>
 
 
-<style id="EAM_MAP_ONLY_TALL_V2">
-/* EAM 현황 화면 전용: 배치도 우선 세로 확대 / 수리 LIVE·추가 관리영역은 표시하지 않음.
-   기존 수리 LIVE/추가관리 JS 및 데이터는 삭제·변경하지 않고 화면에서만 숨긴다. */
-.eh-page{
-  height:calc(100vh - 24px)!important;
-  min-height:0!important;
-  overflow:hidden!important;
-}
-.eh-main{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr)!important;
-  grid-template-rows:minmax(0,1fr)!important;
-  gap:0!important;
-  flex:1 1 auto!important;
-  min-height:0!important;
-}
+<style id="JGB_EAM_MAP_ONLY_V32_RATIO_FIX">
+/* v32: 배치도 자체의 세로 사용량을 70%로 제한.
+   하단 30%는 배치도 밖의 빈 여백으로 남김.
+   배치도 내부는 옥상·창고 15% / 코트 25% / 시설 30% / 내부 잔여 0%로 사용.
+   가로는 배치도 70% / 우측 여백 30%. */
 .eh-map-card{
-  grid-column:1!important;
-  grid-row:1!important;
-  width:100%!important;
-  height:100%!important;
+  width:70%!important;
+  max-width:70%!important;
+  height:70%!important;
   min-height:0!important;
-}
-.eh-map-card .eh-card-head{
-  height:48px!important;
-  flex:0 0 48px!important;
-}
-.eh-map-card .eh-card-head h2{
-  font-size:18px!important;
-  font-weight:1000!important;
-}
-.eh-map-card .eh-card-head small{
-  font-size:11px!important;
+  align-self:flex-start!important;
 }
 .eh-map-wrap{
-  flex:1 1 auto!important;
-  height:auto!important;
-  min-height:0!important;
-  padding:8px!important;
-  overflow:hidden!important;
-}
-.eh-map{
-  width:100%!important;
   height:100%!important;
   min-height:0!important;
-  box-sizing:border-box!important;
 }
-/* 수리 LIVE와 기타 추가영역은 EAM 현황 화면에서만 비표시. 기능 코드는 보존. */
-.eh-right{
-  display:none!important;
+.eh-map{
+  height:100%!important;
+  min-height:0!important;
 }
-.eh-live-card,.eh-extra-card-v20{
-  display:none!important;
+.eh-floor-1f{
+  flex:0 0 85%!important;
+  min-height:0!important;
 }
-@media(max-width:1000px){
-  .eh-page{
-    height:calc(100vh - 16px)!important;
-    min-height:0!important;
-    overflow:hidden!important;
-  }
-  .eh-main{
-    grid-template-columns:minmax(0,1fr)!important;
-    grid-template-rows:minmax(0,1fr)!important;
-  }
+.eh-floor-2f{
+  flex:0 0 15%!important;
+  min-height:0!important;
+}
+/* 전체 배치도 기준 코트 25% = 1F의 25/85 */
+.eh-floor-1f .eh-courts{
+  top:0!important;
+  height:29.4118%!important;
+}
+.eh-floor-1f .eh-court{
+  margin-top:0!important;
+}
+/* 전체 배치도 기준 시설 30% = 1F의 30/85 */
+.eh-floor-1f .eh-facility{
+  top:29.4118%!important;
+  height:35.2941%!important;
+  bottom:auto!important;
+}
+@media(max-width:700px){
+  .eh-map-card{width:70%!important;max-width:70%!important;height:70%!important}
+  .eh-floor-1f{flex-basis:85%!important}
+  .eh-floor-2f{flex-basis:15%!important}
+  .eh-floor-1f .eh-courts{top:0!important;height:29.4118%!important}
+  .eh-floor-1f .eh-facility{top:29.4118%!important;height:35.2941%!important;bottom:auto!important}
 }
 </style>
 
-<style id="EAM_MAP_ONLY_HEIGHT_FINAL">
-/* EAM 현황 전용 최종 세로 확대: 다른 화면에는 적용하지 않음 */
-.eh-page{
-  height:calc(100vh - 24px)!important;
-  min-height:760px!important;
-  overflow:hidden!important;
-}
-.eh-main{
-  display:block!important;
+
+<style id="JGB_EAM_MAP_INDEPENDENT_RATIO_V33">
+/* v33: 각 영역을 서로 독립된 화면 비율로 배치. 한 영역의 높이를 바꿔도 다른 영역의 위치/크기가 따라 움직이지 않음. */
+.eh-map{position:relative!important;overflow:hidden!important;}
+/* 1F/2F 부모는 서로의 flex 비율에 종속되지 않게 정적 컨테이너로 전환 */
+.eh-floor-1f,.eh-floor-2f{
+  position:static!important;
+  flex:none!important;
   width:100%!important;
-  height:calc(100vh - 120px)!important;
-  min-height:700px!important;
-  overflow:hidden!important;
+  height:0!important;
+  min-height:0!important;
+  border:0!important;
+  overflow:visible!important;
+  background:transparent!important;
 }
-.eh-map-card{
-  display:flex!important;
-  width:100%!important;
-  height:100%!important;
-  min-height:700px!important;
+/* 1F 제목 */
+.eh-floor-1f .eh-floor-title{
+  position:absolute!important;left:0!important;top:0!important;z-index:20!important;
+}
+/* 코트: 배치도 전체 높이의 독립 25% */
+.eh-floor-1f .eh-courts{
+  position:absolute!important;
+  left:8%!important;right:8%!important;top:0!important;height:25%!important;
   margin:0!important;
 }
-.eh-map-wrap{
-  flex:1 1 auto!important;
-  width:100%!important;
-  height:auto!important;
-  min-height:0!important;
-  padding:8px!important;
+.eh-floor-1f .eh-court{margin-top:0!important;height:100%!important;min-height:0!important;box-sizing:border-box!important;}
+/* 나머지 1F 시설: 배치도 전체 높이의 독립 30%, 코트와 별개로 직접 위치 */
+.eh-floor-1f .eh-facility{
+  position:absolute!important;
+  left:1.5%!important;right:1.5%!important;top:25%!important;height:30%!important;
+  bottom:auto!important;margin:0!important;
+}
+/* 2F: 배치도 전체 높이의 독립 15%, 1F 높이 변경과 무관 */
+.eh-floor-2f{
+  position:absolute!important;
+  left:0!important;right:0!important;top:55%!important;height:15%!important;
+  box-sizing:border-box!important;
+  border:1px solid #91a5b3!important;
+  border-radius:6px!important;
+  background:#f7fafc!important;
   overflow:hidden!important;
 }
-.eh-map{
-  width:100%!important;
-  height:100%!important;
-  min-height:0!important;
+.eh-floor-2f .eh-floor-title{position:absolute!important;left:0!important;top:0!important;z-index:20!important;}
+.eh-floor-2f .eh-second-grid{
+  position:absolute!important;
+  left:1.5%!important;right:1.5%!important;top:32px!important;bottom:8px!important;
+  height:auto!important;
 }
-.eh-right,.eh-live-card,.eh-extra-card-v20{
-  display:none!important;
-}
-@media(max-width:1000px){
-  .eh-page{min-height:700px!important;}
-  .eh-main{height:calc(100vh - 100px)!important;min-height:640px!important;}
-  .eh-map-card{min-height:640px!important;}
+/* 아래 30%는 의도적으로 사용하지 않는 배치도 외부 여백 */
+@media(max-width:700px){
+  .eh-floor-1f .eh-courts{left:8%!important;right:8%!important;top:0!important;height:25%!important;}
+  .eh-floor-1f .eh-facility{left:1.5%!important;right:1.5%!important;top:25%!important;height:30%!important;}
+  .eh-floor-2f{top:55%!important;height:15%!important;}
 }
 </style>
 
-<style id="JGB_ORIGINAL_100PX_FACILITY_ROWS_V4">
-/* V4: 원본 기준. 시설 배치도 상부·복도·하부 폭을 각각 100px로 통일.
-   기존 가로폭, 코트, 경계선, 기능은 변경하지 않음. */
-.jgb-v190-facilities{
-  grid-template-rows:100px 100px 100px!important;
+<style id="JGB_EAM_MAP_FINAL_V34">
+/* 최종 배치도 비율: 전체 100% 기준 / 각 영역 독립 배치
+   2F 15% + 코트 30% + 시설 55%(18.333% x 3) */
+.eh-map{position:relative!important;overflow:hidden!important;}
+/* 1F와 2F를 flex 비율이 아닌 전체 배치도 기준으로 독립 배치 */
+.eh-floor-1f{position:absolute!important;left:0!important;right:0!important;top:0!important;height:85%!important;min-height:0!important;flex:none!important;}
+.eh-floor-2f{position:absolute!important;left:0!important;right:0!important;top:85%!important;height:15%!important;min-height:0!important;flex:none!important;}
+/* 코트 = 전체 배치도 30% = 1F 높이의 35.294% */
+.eh-floor-1f .eh-courts{position:absolute!important;left:8%!important;right:8%!important;top:0!important;height:35.2941176%!important;margin:0!important;}
+/* 나머지 시설 55%를 3등분: 각각 전체 배치도 18.333% */
+.eh-floor-1f .eh-facility{position:absolute!important;left:1.5%!important;right:1.5%!important;top:35.2941176%!important;height:64.7058824%!important;bottom:auto!important;display:grid!important;grid-template-rows:33.3333333% 33.3333333% 33.3333333%!important;}
+.eh-floor-1f .eh-row,.eh-floor-1f .eh-corridor,.eh-floor-1f .eh-bottom{min-height:0!important;height:auto!important;}
+/* 2F 내부만 15% 영역을 사용 */
+.eh-floor-2f .eh-second-grid{position:absolute!important;left:1.5%!important;right:1.5%!important;top:32px!important;bottom:8px!important;height:auto!important;}
+/* 화면 하단의 남는 공간은 배치도 밖에만 존재하도록 함 */
+</style>
+
+<style id="JGB_EAM_MAP_FINAL_V39_RATIO">
+/* v39 최종 비율
+   헤더 유지 / 헤더 아래 배치도 90% / 하단 빈 공간 10%
+   전체 배치도 100% 기준:
+   코트 20 / 화장실·샤워실 30 / 옥상·창고 15 /
+   유수·사무실·휴게실 20 / 복도 5
+*/
+.eh-map-card{
+  height:90%!important;
+  min-height:0!important;
+  max-height:90%!important;
+  flex:0 0 90%!important;
+  align-self:flex-start!important;
 }
-.jgb-v190-corridor{
-  height:100px!important;
-  min-height:100px!important;
-  max-height:100px!important;
-  box-sizing:border-box!important;
+.eh-map-wrap{height:100%!important;min-height:0!important;flex:1 1 auto!important}
+.eh-map{height:100%!important;min-height:0!important;box-sizing:border-box!important}
+
+/* 배치도 전체 100% 중 1F = 75%, 2F = 15%, 하단 빈 공간 = 10% */
+.eh-floor-1f{
+  position:absolute!important;
+  left:0!important;right:0!important;top:0!important;
+  bottom:auto!important;height:75%!important;
+  flex:none!important;box-sizing:border-box!important;
 }
-.jgb-v190-male,.jgb-v190-female,.jgb-v190-office{
-  height:100px!important;
-  min-height:100px!important;
-  max-height:100px!important;
-  box-sizing:border-box!important;
+.eh-floor-2f{
+  position:absolute!important;
+  left:0!important;right:0!important;top:75%!important;
+  bottom:auto!important;height:15%!important;
+  flex:none!important;box-sizing:border-box!important;
+  border:1px solid #8fa5b5!important;
+  border-radius:6px!important;
+  background:#f7fafc!important;
+  overflow:hidden!important;
 }
-.jgb-v200-rooftop{
-  height:300px!important;
-  min-height:300px!important;
-  max-height:300px!important;
+
+/* 전체 배치도 100% 기준 코트 = 20% */
+.eh-floor-1f .eh-courts{
+  position:absolute!important;
+  left:5%!important;right:5%!important;top:0!important;
+  height:26.6666667%!important;
   box-sizing:border-box!important;
+  margin:0!important;
+  padding-bottom:10px!important;
+}
+.eh-floor-1f .eh-court{margin-top:0!important}
+
+/* 전체 100% 기준 나머지 1F 시설 = 55%
+   화장실·샤워실 30 / 복도 5 / 유수·사무실·휴게실 20 */
+.eh-floor-1f .eh-facility{
+  position:absolute!important;
+  left:0!important;right:0!important;
+  top:calc(26.6666667% + 10px)!important;
+  height:calc(73.3333333% - 10px)!important;
+  bottom:auto!important;
+  display:grid!important;
+  grid-template-rows:54.5454545% 9.0909091% 36.3636364%!important;
+  box-sizing:border-box!important;
+  border:1px solid #8fa5b5!important;
+  background:#fff!important;
+}
+
+/* 코트 ↔ 시설 사이 간격 */
+.eh-floor-1f::after{
+  content:""!important;
+  position:absolute!important;
+  left:0!important;right:0!important;
+  top:26.6666667%!important;
+  height:10px!important;
+  background:#f4f8fa!important;
+  z-index:30!important;
+  pointer-events:none!important;
+}
+
+/* 시설 내부 경계선 명확화 */
+.eh-floor-1f .eh-row,
+.eh-floor-1f .eh-corridor,
+.eh-floor-1f .eh-bottom{box-sizing:border-box!important;border-color:#7f96a6!important}
+.eh-floor-1f .eh-corridor{border-top:1px solid #7f96a6!important;border-bottom:1px solid #7f96a6!important}
+
+@media(max-width:700px){
+  .eh-map-card{height:90%!important;max-height:90%!important;flex-basis:90%!important}
+  .eh-floor-1f{top:0!important;height:75%!important}
+  .eh-floor-2f{top:75%!important;height:15%!important}
+  .eh-floor-1f .eh-courts{left:5%!important;right:5%!important;top:0!important;height:26.6666667%!important;padding-bottom:10px!important}
+  .eh-floor-1f .eh-facility{top:calc(26.6666667% + 10px)!important;height:calc(73.3333333% - 10px)!important;grid-template-rows:54.5454545% 9.0909091% 36.3636364%!important}
+  .eh-floor-1f::after{top:26.6666667%!important;height:10px!important}
 }
 </style>
 </body>
@@ -21492,10 +21619,11 @@ window.eamHyunDeleteMapIcon=function(code,kind){
   overflow:hidden!important;
 }
 .eh-floor-1f{
-  flex:0 0 70%!important;
+  flex:0 0 calc(85% - 3px)!important;
+  min-height:0!important;
 }
 .eh-floor-2f{
-  flex:1 1 30%!important;
+  flex:0 0 calc(15% - 3px)!important;
   min-height:0!important;
   background:#f7fafc!important;
 }
@@ -21519,13 +21647,13 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 .eh-floor-1f .eh-courts{
   left:8%!important;
   right:8%!important;
-  top:10%!important;
-  height:35%!important;
+  top:0!important;
+  height:35.294%!important;
   perspective:none!important;
 }
 .eh-floor-1f .eh-court{
   transform:none!important;
-  margin-top:12px!important;
+  margin-top:0!important;
   border:1px solid #587789!important;
   box-shadow:none!important;
   border-radius:3px!important;
@@ -21557,8 +21685,8 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 .eh-floor-1f .eh-facility{
   left:1.5%!important;
   right:1.5%!important;
-  top:50%!important;
-  bottom:2%!important;
+  top:35.294%!important;
+  bottom:0!important;
   display:grid!important;
   grid-template-rows:42% 12% 46%!important;
 }
@@ -24905,47 +25033,290 @@ cleanupDuplicateOnly();
 .basic-v5-bottom-banner img{display:block!important;width:100%!important;height:auto!important;max-height:92px!important;object-fit:cover!important}
 @media(max-width:700px){.basic-book-layout{padding:12px!important}.basic-v5-page-center{min-width:130px}.basic-v5-page-center strong{font-size:18px}.basic-v5-tasks{grid-template-columns:1fr!important}.basic-book-layout .basic-v5-task .txt{font-size:16px!important}.basic-v5-bottom-banner img{max-height:110px!important}}
 
-</style><style id="EAM_HYUNHWANG_MAPONLY_V5_FIX">
-/* V5: 전체 배치도 축소 방지. 기존 가로폭/코트 폭은 유지하고 세로 공간만 확대 */
-.eh-page{
-  height:auto!important;
-  min-height:720px!important;
-  overflow:visible!important;
-}
+</style><style id="JGB_EAM_MAP_ONLY_V28">
+/* v28: EAM 현황에서 수리 LIVE / 추가 관리영역 제거. 배치도만 전체 세로영역 사용 */
 .eh-main{
-  min-height:650px!important;
+  grid-template-columns:1fr!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  gap:0!important;
 }
 .eh-map-card{
-  min-height:650px!important;
+  grid-column:1!important;
+  grid-row:1!important;
+  height:100%!important;
+  min-height:0!important;
 }
+.eh-right{
+  display:none!important;
+}
+/* 배치도 부모가 확보한 전체 높이를 그대로 사용 */
 .eh-map-wrap{
-  min-height:610px!important;
-  overflow:visible!important;
+  height:100%!important;
+  min-height:0!important;
 }
 .eh-map{
-  min-height:594px!important;
-  height:594px!important;
+  height:100%!important;
+  min-height:0!important;
 }
-/* 1F는 기존 코트/시설 가로 배치를 그대로 두고 세로만 확보 */
+/* 전체 배치도 기준: 옥상·창고 15%, 코트 30%, 나머지 시설 55% */
 .eh-floor-1f{
-  flex:0 0 70%!important;
-  min-height:410px!important;
+  flex:0 0 calc(85% - 3px)!important;
 }
 .eh-floor-2f{
-  flex:1 1 30%!important;
-  min-height:170px!important;
+  flex:0 0 calc(15% - 3px)!important;
 }
-/* 코트 위·아래 공간과 복도 높이를 넉넉하게 확보 */
 .eh-floor-1f .eh-courts{
-  top:4%!important;
-  height:31%!important;
+  top:0!important;
+  height:35.294%!important;
+}
+.eh-floor-1f .eh-court{
+  margin-top:0!important;
 }
 .eh-floor-1f .eh-facility{
-  top:43%!important;
-  bottom:2%!important;
-  grid-template-rows:36% 12% 52%!important;
+  top:35.294%!important;
+  bottom:0!important;
 }
-.eh-floor-2f .eh-second-grid{
-  inset:32px 1.5% 8px 1.5%!important;
+@media(max-width:1000px){
+  .eh-main{grid-template-columns:1fr!important;grid-template-rows:minmax(0,1fr)!important;}
+}
+@media(max-width:700px){
+  .eh-floor-1f{flex-basis:calc(85% - 3px)!important}
+  .eh-floor-2f{flex-basis:calc(15% - 3px)!important}
+  .eh-floor-1f .eh-courts{left:5%!important;right:5%!important;top:0!important;height:35.294%!important}
+  .eh-floor-1f .eh-facility{top:35.294%!important}
+}
+</style>
+<style id="JGB_EAM_MAP_ONLY_V35_INDEPENDENT_RATIO">
+/* v35: 배치도 전체 100%를 직접 기준으로 각 영역을 독립 배치
+   2F(옥상·창고) 15% / 코트 30% / 1F 나머지 시설 55%
+   오른쪽 30%는 배치도 바깥 여백. 1F 내부에 별도 빈 30%를 만들지 않음. */
+.eh-main{
+  grid-template-columns:1fr!important;
+  grid-template-rows:minmax(0,1fr)!important;
+}
+.eh-map-card{
+  width:70%!important;
+  max-width:70%!important;
+  min-width:0!important;
+  justify-self:start!important;
+  box-sizing:border-box!important;
+}
+.eh-map-wrap{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+}
+.eh-map{
+  position:relative!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  display:block!important;
+  box-sizing:border-box!important;
+}
+/* 1F와 2F는 부모 flex 비율로 서로 밀지 않고 전체 배치도 좌표로 독립 지정 */
+.eh-floor-1f{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:0!important;
+  bottom:15%!important;
+  height:85%!important;
+  flex:none!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-2f{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  top:auto!important;
+  height:15%!important;
+  flex:none!important;
+  box-sizing:border-box!important;
+}
+/* 전체 배치도 100% 기준: 코트 30%, 시설 55%, 2F 15% */
+.eh-floor-1f .eh-courts{
+  position:absolute!important;
+  left:5%!important;
+  right:5%!important;
+  top:0!important;
+  height:35.2941176%!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-1f .eh-court{
+  margin-top:0!important;
+}
+.eh-floor-1f .eh-facility{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:35.2941176%!important;
+  height:64.7058824%!important;
+  bottom:auto!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:700px){
+  .eh-map-card{width:70%!important;max-width:70%!important}
+  .eh-floor-1f{top:0!important;bottom:15%!important;height:85%!important}
+  .eh-floor-2f{top:auto!important;bottom:0!important;height:15%!important}
+  .eh-floor-1f .eh-courts{left:5%!important;right:5%!important;top:0!important;height:35.2941176%!important}
+  .eh-floor-1f .eh-facility{top:35.2941176%!important;height:64.7058824%!important}
+}
+</style>
+
+<style id="JGB_EAM_MAP_FINAL_V37_BOTTOM_30">
+/* v37 최종: 헤더 아래 전체 세로영역 중 배치도는 70%만 사용하고 하단 30%는 비워둠.
+   배치도 내부 100%는 코트20 / 화장실·샤워실30 / 옥상·창고10 / 유수·사무실·휴게실35 / 복도5. */
+.eh-map-card{
+  height:70%!important;
+  min-height:0!important;
+  max-height:70%!important;
+  flex:none!important;
+  align-self:flex-start!important;
+}
+.eh-map-wrap{
+  height:100%!important;
+  min-height:0!important;
+  flex:1 1 auto!important;
+}
+.eh-map{
+  height:100%!important;
+  min-height:0!important;
+}
+/* 70% 배치도 안에서 지정 비율이 정확히 보이도록 1F/2F 독립 유지 */
+.eh-floor-1f{
+  top:0!important;
+  bottom:10%!important;
+  height:90%!important;
+}
+.eh-floor-2f{
+  top:90%!important;
+  bottom:auto!important;
+  height:10%!important;
+}
+/* 1F 내부에서 코트 20%, 화장실·샤워실30%, 복도5%, 유수·사무실·휴게실35% */
+.eh-floor-1f .eh-courts{
+  top:0!important;
+  height:22.2222222%!important;
+}
+.eh-floor-1f .eh-facility{
+  top:22.2222222%!important;
+  height:77.7777778%!important;
+}
+</style>
+
+<style id="JGB_EAM_MAP_FINAL_V38_BOTTOM20_GAP">
+/* v38 최종 보정
+   헤더 유지 / 헤더 아래 배치도 80% 사용 / 하단 빈 공간 20%
+   배치도 내부: 코트20 / 화장실·샤워실30 / 옥상·창고10 /
+   유수·사무실·휴게실35 / 복도5
+   코트와 1층 시설 사이에 명확한 시각적 간격 8px 적용
+*/
+.eh-map-card{
+  height:80%!important;
+  min-height:0!important;
+  max-height:80%!important;
+  flex:none!important;
+  align-self:flex-start!important;
+}
+.eh-map-wrap{
+  height:100%!important;
+  min-height:0!important;
+}
+.eh-map{
+  height:100%!important;
+  min-height:0!important;
+  background:#f4f8fa!important;
+}
+
+/* 2F 옥상·창고 = 배치도 전체의 10% */
+.eh-floor-2f{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:90%!important;
+  bottom:auto!important;
+  height:10%!important;
+  box-sizing:border-box!important;
+  border:1px solid #8fa5b5!important;
+  border-radius:6px!important;
+  background:#f7fafc!important;
+  overflow:hidden!important;
+}
+
+/* 1F = 배치도 전체의 90% */
+.eh-floor-1f{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:0!important;
+  bottom:auto!important;
+  height:90%!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+}
+
+/* 코트 슬롯 20% 유지. 실제 코트 박스 아래에 8px 간격 확보 */
+.eh-floor-1f .eh-courts{
+  position:absolute!important;
+  left:5%!important;
+  right:5%!important;
+  top:0!important;
+  height:22.2222222%!important;
+  box-sizing:border-box!important;
+  padding-bottom:8px!important;
+  margin:0!important;
+  border-bottom:0!important;
+}
+
+/* 코트와 시설 사이에 확실한 흰색 간격 + 시설 경계선 */
+.eh-floor-1f .eh-facility{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:calc(22.2222222% + 8px)!important;
+  height:calc(77.7777778% - 8px)!important;
+  bottom:auto!important;
+  box-sizing:border-box!important;
+  border:1px solid #8fa5b5!important;
+  background:#fff!important;
+}
+
+/* 코트와 시설 사이의 간격을 배경색으로 명확하게 표시 */
+.eh-floor-1f::after{
+  content:""!important;
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:22.2222222%!important;
+  height:8px!important;
+  background:#f4f8fa!important;
+  z-index:30!important;
+  pointer-events:none!important;
+}
+
+@media(max-width:700px){
+  .eh-map-card{height:80%!important;max-height:80%!important}
+  .eh-floor-1f{top:0!important;height:90%!important}
+  .eh-floor-2f{top:90%!important;height:10%!important}
+  .eh-floor-1f .eh-courts{left:5%!important;right:5%!important;top:0!important;height:22.2222222%!important;padding-bottom:8px!important}
+  .eh-floor-1f .eh-facility{top:calc(22.2222222% + 8px)!important;height:calc(77.7777778% - 8px)!important}
+  .eh-floor-1f::after{top:22.2222222%!important;height:8px!important}
+}
+</style>
+
+<style id="JGB_EAM_MAP_V39_TOP_GAP_10PX">
+/* v39: 1F 운영시설 상단과 코트 사이 10px 간격 */
+.eh-floor-1f .eh-courts{
+  top:10px!important;
+  height:calc(22.2222222% - 10px)!important;
+}
+@media(max-width:700px){
+  .eh-floor-1f .eh-courts{
+    top:10px!important;
+    height:calc(22.2222222% - 10px)!important;
+  }
 }
 </style>
