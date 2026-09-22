@@ -25678,63 +25678,105 @@ cleanupDuplicateOnly();
 
 
 
-<style id="JGB_EAM_MAP_HEIGHT_BALANCE_V2">
-/*
-  V2 세로비율 조정
-  - 코트 크기 유지
-  - 샤워실/화장실 영역: 축소
-  - 복도: 축소
-  - 휴게실/유수/사무실 영역: 축소
-  - 그중 통합 유수장치실을 가장 크게 축소
-  - 옥상 자체 디자인은 유지
+<style id="JGB_EAM_MAP_BALANCE_V3_CORRECT">
+/* V3: 실제 배치도 클래스 기준 수정
+   - 전체 배치도 틀/코트 크기 유지
+   - 샤워·화장실 / 복도 / 하부시설 영역을 함께 축소
+   - 하부시설(유수 포함) 영역을 가장 크게 축소
+   - 시설과 옥상 사이 빈 공간 확보
 */
 
-/* 샤워실·화장실 영역 */
+/* 전체 틀과 코트는 V1 기준 유지 */
+.eh-floor-1f{
+  top:0!important;
+  height:90%!important;
+  bottom:auto!important;
+}
+.eh-floor-2f{
+  top:90%!important;
+  height:10%!important;
+  bottom:auto!important;
+}
+
+/* 코트: 크기 그대로 유지 */
+.eh-floor-1f .eh-courts{
+  left:5%!important;
+  right:5%!important;
+  top:9px!important;
+  height:calc(22.2222222% - 18px)!important;
+  gap:9px!important;
+}
+
+/* 코트와 시설 사이 9px */
 .eh-floor-1f .eh-facility{
-  top:calc(22.2222222% + var(--GAP_COURT_FACILITY))!important;
-  height:calc(77.7777778% - var(--GAP_COURT_FACILITY) - var(--GAP_FACILITY_ROOF))!important;
+  top:calc(22.2222222% + 9px)!important;
+
+  /* 시설 전체 높이를 줄여 옥상 위에 여유 공간 확보 */
+  height:calc(64% - 9px)!important;
+
+  display:grid!important;
+
+  /* 샤워/화장실 ↓
+     복도 ↓
+     하부(유수/휴게/사무실) ↓↓↓ 가장 크게 축소 */
+  grid-template-rows:34% 8% 58%!important;
+
+  box-sizing:border-box!important;
 }
 
-/* 시설 영역 내부에서 아래 3개 구간의 높이를 직접 재분배 */
-.eh-floor-1f .eh-facility{
-  display:flex!important;
-  flex-direction:column!important;
-}
-
-/* 샤워실·화장실: 기존보다 축소 */
-.eh-floor-1f .eh-facility > .eh-wet-area{
-  flex:0 0 27%!important;
-  height:27%!important;
-}
-
-/* 복도: 축소 */
-.eh-floor-1f .eh-facility > .eh-corridor{
-  flex:0 0 8%!important;
-  height:8%!important;
-}
-
-/* 휴게실·유수장치실·사무실 영역 */
-.eh-floor-1f .eh-facility > .eh-lower-area{
-  flex:1 1 auto!important;
+/* 하부 영역 내부 3칸은 가로 구조 유지 */
+.eh-floor-1f .eh-bottom{
   min-height:0!important;
   height:auto!important;
+  display:grid!important;
+  grid-template-columns:1fr 1.45fr 1fr!important;
+  gap:3px!important;
+  box-sizing:border-box!important;
 }
 
-/* 유수장치실을 가장 크게 축소 */
-.eh-floor-1f .eh-lower-area .eh-utility{
-  flex:0 0 58%!important;
-}
-
-/* 좌우 휴게실/사무실은 유수 축소분만큼 공간 확보 */
-.eh-floor-1f .eh-lower-area .eh-rest,
-.eh-floor-1f .eh-lower-area .eh-office{
-  flex:1 1 auto!important;
+.eh-floor-1f .eh-row,
+.eh-floor-1f .eh-corridor,
+.eh-floor-1f .eh-bottom{
   min-height:0!important;
+  box-sizing:border-box!important;
 }
 
-/* 옥상과 시설 사이 간격은 기존 변수로 유지 */
+/* 옥상은 기존 전체 틀 유지 */
 .eh-floor-2f{
-  top:calc(90% + var(--GAP_FACILITY_ROOF))!important;
-  height:calc(10% - var(--GAP_FACILITY_ROOF))!important;
+  box-sizing:border-box!important;
+  padding:0 1.5% 9px!important;
+}
+
+.eh-floor-2f .eh-second-grid{
+  left:0!important;
+  right:0!important;
+  top:32px!important;
+  bottom:0!important;
+  height:auto!important;
+  gap:9px!important;
+}
+
+/* 모바일 */
+@media(max-width:700px){
+  .eh-floor-1f{
+    top:0!important;
+    height:90%!important;
+  }
+  .eh-floor-2f{
+    top:90%!important;
+    height:10%!important;
+  }
+  .eh-floor-1f .eh-courts{
+    left:5%!important;
+    right:5%!important;
+    top:9px!important;
+    height:calc(22.2222222% - 18px)!important;
+    gap:8px!important;
+  }
+  .eh-floor-1f .eh-facility{
+    top:calc(22.2222222% + 9px)!important;
+    height:calc(64% - 9px)!important;
+    grid-template-rows:34% 8% 58%!important;
+  }
 }
 </style>
