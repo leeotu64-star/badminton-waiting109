@@ -8152,7 +8152,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         <div class="jgb-v170-grid">
           <section class="jgb-v170-card jgb-v170-mapcard"><div class="jgb-v170-title"><div><h2>🗺 코트 배치도 <span style="font-size:11px;color:#7a91a4;font-weight:800">· LK 위치 관리</span></h2><p>코트 위치와 번호는 고정됩니다. LK 아이콘만 드래그하여 위치를 조정할 수 있습니다.</p></div><div class="jgb-v170-legend jgb-v186-summary"><button type="button" data-v47-action="filter-lk-status" data-filter-status="조치필요"${statusFilter==='조치필요'?' class="active"':''}><i style="background:#ef5b52"></i>조치필요 <b>${leaks.filter(x=>String(x.status||'').trim()==='조치필요'||String(x.status||'').trim()==='보수필요').length}</b></button><button type="button" data-v47-action="filter-lk-status" data-filter-status="점검요청"${statusFilter==='점검요청'?' class="active"':''}><i style="background:#e0b62f"></i>점검요청 <b>${leaks.filter(x=>String(x.status||'').trim()==='점검요청'||String(x.status||'').trim()==='점검필요').length}</b></button><button type="button" data-v47-action="filter-lk-status" data-filter-status="정상"${statusFilter==='정상'?' class="active"':''}><i style="background:#3d8fe4"></i>정상 <b>${leaks.filter(x=>String(x.status||'').trim()==='정상'||!x.status).length}</b></button><button type="button" data-v47-action="filter-lk-status" data-filter-status="자체정비"${statusFilter==='자체정비'?' class="active"':''}><i style="background:#38a169"></i>자체정비 <b>${leaks.filter(x=>String(x.maintenanceMethod||'').trim()==='자체정비').length}</b></button><button type="button" data-v47-action="filter-lk-status" data-filter-status="외주정비"${statusFilter==='외주정비'?' class="active"':''}><i style="background:#d88928"></i>외주정비 <b>${leaks.filter(x=>String(x.maintenanceMethod||'').trim()==='외주정비').length}</b></button></div></div><div class="jgb-v170-map"><div class="jgb-v170-plan jgb-v190-plan jgb-v200-plan jgb-leak-plan-v1">
   <div class="jgb-leak-roof-panel">
-    <div class="jgb-leak-roof-title"><b>2F 옥상 (지붕)</b><span>상부 누수 발생 구역</span></div>
+    
     <div class="jgb-leak-rain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="jgb-leak-roof-drain">옥상 배수로</div>
     <div class="jgb-leak-roof-building left"><span>창고</span></div>
@@ -19625,6 +19625,143 @@ document.addEventListener('click',handle,true);
 .eh-main{grid-template-columns:minmax(0,55fr) minmax(0,45fr)!important;gap:8px!important;}
 @media(max-width:1000px){.eh-main{grid-template-columns:1fr!important;}}
 </style>
+
+<style id="JGB_FINAL_7030_LOCK_V1">
+/*
+  최종 강제 레이아웃
+  - EAM: 배치도 70 : LIVE 30
+  - 누수: 배치도 70 : LIVE 30
+  - 중앙 간격 14px
+  - 세로는 왼쪽 배치도 행을 기준으로 양쪽 상·하단 동일
+  - 배치도 내부 크기/시설 위치는 변경하지 않음
+*/
+
+/* 공통 box sizing */
+.eh-main,
+.eh-main *,
+.jgb-v170-grid,
+.jgb-v170-grid *{
+  box-sizing:border-box;
+}
+
+/* =========================
+   EAM
+   ========================= */
+.eh-main{
+  display:grid!important;
+  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+  grid-template-rows:auto!important;
+  column-gap:14px!important;
+  row-gap:0!important;
+  width:100%!important;
+  align-items:stretch!important;
+  justify-items:stretch!important;
+}
+
+.eh-map-card{
+  grid-column:1!important;
+  grid-row:1!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:auto!important;
+  align-self:stretch!important;
+}
+
+.eh-right{
+  grid-column:2!important;
+  grid-row:1!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  max-height:none!important;
+  margin:0!important;
+  align-self:stretch!important;
+  overflow:hidden!important;
+}
+
+.eh-right .eh-live-card,
+.eh-right .jgb-eam-live-reference{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  overflow:hidden!important;
+}
+
+/* =========================
+   누수현황
+   ========================= */
+.jgb-v170-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+  grid-template-rows:auto!important;
+  column-gap:14px!important;
+  row-gap:0!important;
+  width:100%!important;
+  min-width:0!important;
+  align-items:stretch!important;
+  justify-items:stretch!important;
+}
+
+.jgb-v170-mapcard{
+  grid-column:1!important;
+  grid-row:1!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:auto!important;
+  align-self:stretch!important;
+}
+
+.jgb-v170-live{
+  grid-column:2!important;
+  grid-row:1!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  max-height:none!important;
+  margin:0!important;
+  align-self:stretch!important;
+  overflow:hidden!important;
+}
+
+/* LIVE 내부가 배치도 높이를 넘어가서 전체 행을 늘리지 않도록 함 */
+.jgb-v170-live .jgb-v178-live-table,
+.jgb-v170-live .jgb-v189-live-notebook{
+  min-height:0!important;
+  max-height:none!important;
+}
+
+.jgb-v170-live .jgb-v178-live-table{
+  overflow:auto!important;
+}
+
+/* 기존 모바일 1열/별도 높이 강제 규칙도 최종적으로 70:30 유지 */
+@media(max-width:1000px){
+  .eh-main{
+    grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+    grid-template-rows:auto!important;
+    column-gap:14px!important;
+  }
+  .eh-map-card{grid-column:1!important;grid-row:1!important;}
+  .eh-right{grid-column:2!important;grid-row:1!important;}
+}
+
+@media(max-width:900px){
+  .jgb-v170-grid{
+    grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+    grid-template-rows:auto!important;
+    column-gap:14px!important;
+  }
+  .jgb-v170-mapcard{grid-column:1!important;grid-row:1!important;}
+  .jgb-v170-live{grid-column:2!important;grid-row:1!important;}
+}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
