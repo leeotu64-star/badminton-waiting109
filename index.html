@@ -20326,6 +20326,69 @@ document.addEventListener('click',handle,true);
 .eh-live-card .eh-live-scroll::-webkit-scrollbar-track{background:#eef3f6!important}
 .eh-live-card .eh-live-scroll::-webkit-scrollbar-thumb{background:#9db2c1!important;border-radius:8px!important}
 </style>
+
+<!-- USER REQUEST: 딱 2가지 수정만 적용
+  1) 접수·민원 처리 목록을 스프링 노트 느낌으로 시각 보강
+  2) 최신 접수 / 미처리 접수에 민원 6개 행이 보이도록 높이 확보
+  기능/데이터/JS/다른 레이아웃은 변경하지 않음
+-->
+<style id="user-two-changes-only">
+/* 1. 접수·민원 처리 목록 = 스프링 노트 느낌 */
+.jgb-repair-page .jgb-repair-list-wrap{
+  position:relative!important;
+  border:2px solid #6f8da0!important;
+  border-radius:10px!important;
+  background:#fbfdff!important;
+  box-shadow:0 3px 10px rgba(23,59,87,.08)!important;
+}
+.jgb-repair-page .jgb-repair-pane{
+  position:relative!important;
+  background:repeating-linear-gradient(to bottom,#ffffff 0,#ffffff 39px,#e7eef4 40px)!important;
+}
+.jgb-repair-page .jgb-repair-pane-head{
+  position:relative!important;
+  z-index:3!important;
+  padding-top:9px!important;
+}
+/* 파란 스프링 */
+.jgb-repair-page .jgb-repair-pane:first-child .jgb-repair-pane-head::before{
+  content:""!important;
+  position:absolute!important;
+  left:10px!important;right:10px!important;top:-9px!important;
+  height:15px!important;
+  background:
+    radial-gradient(circle at 7px 7px,#fff 0 2px,#2788c8 2.5px 4px,transparent 4.5px)
+    repeat-x!important;
+  background-size:50px 15px!important;
+  pointer-events:none!important;
+}
+/* 초록 스프링 */
+.jgb-repair-page .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head::before{
+  content:""!important;
+  position:absolute!important;
+  left:10px!important;right:10px!important;top:-9px!important;
+  height:15px!important;
+  background:
+    radial-gradient(circle at 7px 7px,#fff 0 2px,#27a57f 2.5px 4px,transparent 4.5px)
+    repeat-x!important;
+  background-size:50px 15px!important;
+  pointer-events:none!important;
+}
+.jgb-repair-page .jgb-repair-scroll{
+  background:repeating-linear-gradient(to bottom,#fff 0,#fff 39px,#e7eef4 40px)!important;
+}
+
+/* 2. 최신 접수 / 미처리 접수 = 민원 6개 행이 보이도록 고정
+   표 머리글 32px + 행 6개 × 40px = 272px */
+@media (min-width:1051px){
+  .jgb-repair-page .jgb-repair-scroll{
+    height:272px!important;
+    min-height:272px!important;
+    max-height:272px!important;
+    flex:0 0 272px!important;
+  }
+}
+</style>
 </body>
 
 <style id="v19-court-position-final">
