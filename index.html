@@ -21072,8 +21072,8 @@ body {
     const annual=host.querySelector('.jgb-lr-v54-annual-grid');
     const btn=host.querySelector('.jgb-lr-performance-btn');
     const showing=annual && getComputedStyle(annual).display!=='none';
-    if(panes) panes.style.display=showing?'grid':'none';
-    if(annual) annual.style.display=showing?'none':'grid';
+    if(panes) panes.style.setProperty('display',showing?'grid':'none','important');
+    if(annual) annual.style.setProperty('display',showing?'none':'grid','important');
     if(btn){btn.classList.toggle('active',!showing);btn.textContent=showing?'📊 유지관리 실적':'↩ 시설관리 화면';}
   };
   window.jgbLRAnnualYear=function(type,delta){
@@ -30419,3 +30419,45 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
 
 ```
 ````
+<style id="JGB_LR_FINAL_REQUEST_FIX">
+/* 최종 요청사항: 평소에는 시설관리만 표시하고, 헤더의 유지관리 실적 버튼을 눌렀을 때만 실적 표시 */
+.jgb-lr-v54 .jgb-lr-v54-annual-grid{
+  display:none!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-panes{
+  display:grid!important;
+}
+
+/* 헤더 아이콘과 제목을 확실히 크게 */
+.jgb-lr-v54 .jgb-lr-v54-brand{
+  gap:16px!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-brandico{
+  width:54px!important;
+  height:54px!important;
+  min-width:54px!important;
+  flex:0 0 54px!important;
+  font-size:31px!important;
+  border-radius:12px!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-brand h2{
+  font-size:30px!important;
+  line-height:1.15!important;
+  font-weight:1000!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-brand p{
+  margin-top:6px!important;
+  font-size:13px!important;
+  line-height:1.35!important;
+  font-weight:900!important;
+}
+
+/* 이력카드와 유지관리 이력 사이 경계선 */
+.jgb-lr-v54 .jgb-lr-v54-detail{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-history{
+  border-left:2px solid #7899ad!important;
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.8)!important;
+}
+</style>
