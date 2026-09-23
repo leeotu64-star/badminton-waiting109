@@ -7797,7 +7797,7 @@ table tbody td{
 
 </style>
      <div class="jgb-repair-page">
-       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button><button type="button" class="jgb-repair-text-btn jgb-help-btn" onclick="openJgbComplaintGuide()"><span aria-hidden="true">📘</span> 사용설명서</button></div></header>
+       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["남자 화장실"]?'has-complaint':''}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["여자 화장실"]?'has-complaint':''}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${mapComplaintCounts["복도"]?'has-complaint':''}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${mapComplaintCounts["휴게실"]?'has-complaint':''}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${mapComplaintCounts["기타"]?'has-complaint':''}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${n?'has-complaint':''}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
          ${liveComplaintActionPanel(active)}
@@ -20543,71 +20543,6 @@ document.addEventListener('click',handle,true);
   color:#496577!important;
 }
 </style>
-
-<style id="JGB_COMPLAINT_USER_GUIDE">
-/* 민원 사용설명서: 헤더 아이콘 버튼 + 공공기관형 간결 안내 */
-.jgb-help-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important}
-.jgb-help-btn span{font-size:17px!important;line-height:1!important}
-.jgb-user-guide-modal{position:fixed;inset:0;z-index:100000;background:rgba(9,29,45,.58);display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
-.jgb-user-guide-modal.show{display:flex}
-.jgb-user-guide-box{width:min(920px,96vw);max-height:min(760px,92vh);background:#fff;border:1px solid #b9cddd;border-radius:12px;box-shadow:0 22px 60px rgba(0,0,0,.28);overflow:hidden;display:flex;flex-direction:column}
-.jgb-user-guide-head{height:62px;flex:0 0 62px;padding:0 18px;background:linear-gradient(100deg,#0d4f73,#17658c);color:#fff;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box}
-.jgb-user-guide-head-title{display:flex;align-items:center;gap:10px}.jgb-user-guide-head-title .ico{font-size:25px}.jgb-user-guide-head-title strong{font-size:19px;font-weight:950}.jgb-user-guide-head-title small{display:block;font-size:10px;font-weight:700;opacity:.9;margin-top:2px}
-.jgb-user-guide-close{width:34px;height:34px;border:1px solid rgba(255,255,255,.55);border-radius:7px;background:rgba(255,255,255,.10);color:#fff;font-size:21px;font-weight:900;cursor:pointer}
-.jgb-user-guide-body{padding:12px;overflow:auto;background:#f6f9fb}
-.jgb-user-guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.jgb-guide-item{border:1px solid #d3e0e9;border-radius:8px;background:#fff;overflow:hidden}
-.jgb-guide-item button{width:100%;border:0;background:#fff;display:flex;align-items:center;gap:9px;text-align:left;padding:11px 12px;cursor:pointer;color:#173c58}
-.jgb-guide-item button:hover{background:#f3f8fc}.jgb-guide-icon{width:29px;height:29px;flex:0 0 29px;border-radius:7px;background:#eaf4fb;display:grid;place-items:center;font-size:16px}.jgb-guide-title{font-size:13px;font-weight:950}.jgb-guide-arrow{margin-left:auto;font-size:12px;color:#6e8799;font-weight:900}.jgb-guide-detail{display:none;border-top:1px solid #e5edf2;padding:9px 12px 10px 50px;background:#fbfdfe;color:#4e6576;font-size:10.5px;line-height:1.55;font-weight:700}.jgb-guide-item.open .jgb-guide-detail{display:block}.jgb-guide-item.open .jgb-guide-arrow{transform:rotate(180deg)}
-.jgb-guide-rule{grid-column:1/-1;border:1px solid #cbdce8;border-radius:8px;background:#f0f7fc;padding:10px 13px}.jgb-guide-rule strong{display:block;font-size:12px;color:#173c58;margin-bottom:5px}.jgb-guide-rule p{margin:0;font-size:10.5px;color:#536b7c;font-weight:750;line-height:1.5}.jgb-guide-rule b{color:#173c58}
-@media(max-width:700px){.jgb-user-guide-grid{grid-template-columns:1fr}.jgb-guide-rule{grid-column:auto}.jgb-user-guide-modal{padding:8px}.jgb-user-guide-head{height:56px;flex-basis:56px}.jgb-user-guide-head-title strong{font-size:16px}.jgb-repair-header-summary{gap:4px!important}.jgb-repair-text-btn{min-width:76px!important;padding:0 9px!important}}
-</style>
-<div id="jgbComplaintUserGuide" class="jgb-user-guide-modal" aria-hidden="true">
-  <div class="jgb-user-guide-box" role="dialog" aria-modal="true" aria-labelledby="jgbGuideTitle">
-    <div class="jgb-user-guide-head">
-      <div class="jgb-user-guide-head-title"><span class="ico" aria-hidden="true">📘</span><div><strong id="jgbGuideTitle">민원 접수·처리 관리 사용설명서</strong><small>주요 기능을 선택하면 상세 안내가 표시됩니다.</small></div></div>
-      <button type="button" class="jgb-user-guide-close" onclick="closeJgbComplaintGuide()" aria-label="사용설명서 닫기">×</button>
-    </div>
-    <div class="jgb-user-guide-body">
-      <div class="jgb-user-guide-grid">
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">📱</span><span class="jgb-guide-title">민원 접수</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail">고객이 스마트폰으로 시설 불편사항을 접수합니다. 접수된 내용은 관리자 화면의 접수 목록과 민원 집계에 반영됩니다.</div></div>
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">📋</span><span class="jgb-guide-title">최신 접수</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail">최근 접수된 민원을 확인합니다. 담당자 지정, 처리완료, 상세보기 기능을 사용할 수 있습니다.</div></div>
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">🕐</span><span class="jgb-guide-title">미처리 접수</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail">처리가 완료되지 않은 민원을 확인합니다. 미담당 또는 조치가 필요한 민원을 우선 확인합니다.</div></div>
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">👤</span><span class="jgb-guide-title">담당자 지정</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail">접수된 민원의 처리 담당 직원을 지정합니다. 지정 후 현장 확인 및 조치를 진행합니다.</div></div>
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">✅</span><span class="jgb-guide-title">처리완료</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail">필요한 현장 조치가 완료되면 처리완료로 변경합니다. 완료된 민원은 미처리 현황에서 제외됩니다.</div></div>
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">🔎</span><span class="jgb-guide-title">상세보기</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail">접수번호, 접수시간, 발생장소, 민원유형, 민원내용 등 해당 민원의 상세정보를 확인합니다.</div></div>
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">📊</span><span class="jgb-guide-title">오늘의 변화 및 관리조치</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail">당일 미처리 민원 변화와 관리상태를 확인합니다. <b>0건 정상 · 1~2건 관찰 · 3~4건 유의 · 5건 이상 집중관리</b> 기준으로 상태를 확인합니다.</div></div>
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">📈</span><span class="jgb-guide-title">민원 통계·분석</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail">월별 접수 현황, 민원 다발 발생 위치, 민원 유형별 현황, 요일·시간대별 접수 현황을 확인합니다.</div></div>
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">🔢</span><span class="jgb-guide-title">오늘 접수·월 누계·연 누계</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail"><b>오늘 접수:</b> 06:00부터 다음 날 05:59까지의 접수 건수입니다. <b>월 누계:</b> 해당 월 누계입니다. <b>연 누계:</b> 해당 연도 누계입니다.</div></div>
-        <div class="jgb-guide-item"><button type="button" onclick="toggleJgbGuide(this)"><span class="jgb-guide-icon">🔄</span><span class="jgb-guide-title">숫자 초기화</span><span class="jgb-guide-arrow">▼</span></button><div class="jgb-guide-detail">연습 운영 시 오늘·월·연 및 민원 통계의 집계 숫자를 초기화합니다. 초기화 후 새로 접수되는 민원부터 다시 집계합니다.</div></div>
-        <div class="jgb-guide-rule"><strong>📌 운영 기준</strong><p>민원은 <b>접수 → 담당자 지정 → 현장 조치 → 처리완료</b> 순으로 관리합니다. 집계 숫자는 민원 접수 건수를 기준으로 표시합니다.</p></div>
-      </div>
-    </div>
-  </div>
-</div>
-<script>
-function openJgbComplaintGuide(){
-  const m=document.getElementById('jgbComplaintUserGuide');
-  if(!m)return;
-  m.classList.add('show'); m.setAttribute('aria-hidden','false');
-  document.body.style.overflow='hidden';
-}
-function closeJgbComplaintGuide(){
-  const m=document.getElementById('jgbComplaintUserGuide');
-  if(!m)return;
-  m.classList.remove('show'); m.setAttribute('aria-hidden','true');
-  document.body.style.overflow='';
-}
-function toggleJgbGuide(btn){
-  const item=btn.closest('.jgb-guide-item');
-  if(item)item.classList.toggle('open');
-}
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeJgbComplaintGuide();});
-document.addEventListener('click',function(e){
-  const m=document.getElementById('jgbComplaintUserGuide');
-  if(m && e.target===m)closeJgbComplaintGuide();
-});
-</script>
 </body>
 
 <style id="v19-court-position-final">
@@ -26613,4 +26548,18 @@ cleanupDuplicateOnly();
 .jgb-complaint-stats-detail-body .jgb-complaint-stats-grid{align-items:start!important;grid-auto-rows:max-content!important;overflow-x:hidden!important}
 .jgb-complaint-stats-detail-body .jgb-complaint-stat-card{height:auto!important;min-height:0!important;align-self:start!important}
 .jgb-complaint-stats-detail-body{overflow-x:hidden!important}
+</style>
+
+<style id="JGB_REPAIR_REMOVE_NOTEBOOK_SPRINGS">
+/* 접수·민원 처리 목록의 노트 스프링 장식만 제거 */
+.jgb-repair-page .jgb-repair-list-wrap::after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+}
+.jgb-repair-page .jgb-repair-pane-head::before{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+}
 </style>
