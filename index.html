@@ -5828,6 +5828,15 @@ table tbody td{
   font-weight:1000!important;
 }
 </style>
+
+<style id="eam-five-rows-fix">
+/* 최신접수 / 미처리접수: 한 화면에 5건이 온전히 보이도록 행 높이 조정 */
+.jgb-repair-mini-head{height:32px!important;min-height:32px!important;}
+.jgb-repair-mini-row{height:34px!important;min-height:34px!important;}
+.jgb-repair-mini-row>div{height:34px!important;padding:2px 6px!important;}
+.jgb-repair-mini-actions button{height:26px!important;min-height:26px!important;padding:2px!important;}
+.jgb-repair-mini-work select{height:26px!important;}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -26331,4 +26340,108 @@ cleanupDuplicateOnly();
 .jgb-complaint-stats-detail-body .jgb-complaint-stats-grid{align-items:start!important;grid-auto-rows:max-content!important;overflow-x:hidden!important}
 .jgb-complaint-stats-detail-body .jgb-complaint-stat-card{height:auto!important;min-height:0!important;align-self:start!important}
 .jgb-complaint-stats-detail-body{overflow-x:hidden!important}
+</style>
+
+<style>
+/* FINAL 6:4 — 배치도/오늘의 변화 60% : 접수·민원 처리 40%
+   기존 기능·데이터·JS는 변경하지 않음 */
+@media (min-width:1051px){
+  body:has(.jgb-repair-page){
+    overflow:hidden!important;
+  }
+  .jgb-repair-page{
+    height:100vh!important;
+    max-height:100vh!important;
+    min-height:0!important;
+    padding:0 6px 8px!important;
+    display:grid!important;
+    grid-template-rows:104px minmax(0,6fr) minmax(0,4fr)!important;
+    gap:10px!important;
+    overflow:hidden!important;
+  }
+  .jgb-repair-head{
+    grid-row:1!important;
+    min-height:0!important;
+    height:100%!important;
+  }
+  .jgb-repair-top{
+    grid-row:2!important;
+    min-height:0!important;
+    height:100%!important;
+    margin:0!important;
+    overflow:hidden!important;
+  }
+  .jgb-repair-list-wrap{
+    grid-row:3!important;
+    min-height:0!important;
+    height:100%!important;
+    margin:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+  }
+  .jgb-repair-split{
+    min-height:0!important;
+    flex:1 1 auto!important;
+    overflow:hidden!important;
+  }
+  .jgb-repair-pane{
+    min-height:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .jgb-repair-pane-head{flex:0 0 41px!important;}
+  .jgb-repair-scroll{
+    height:auto!important;
+    min-height:0!important;
+    flex:1 1 auto!important;
+    overflow-y:auto!important;
+    overflow-x:auto!important;
+  }
+  .jgb-repair-note{flex:0 0 auto!important;}
+
+  /* 통계 화면은 별도 화면으로 유지하고 현재 6:4 화면에서는 공간을 차지하지 않게 함 */
+  .jgb-repair-page > .jgb-complaint-stats{
+    display:none!important;
+  }
+}
+
+/* 헤더 색상 명확한 3단 구분 */
+.jgb-repair-page .jgb-repair-top > .jgb-repair-map-panel > .jgb-repair-panel-head{
+  background:#d8eaf7!important;
+  border-bottom:3px solid #176a9d!important;
+  color:#123f60!important;
+}
+.jgb-repair-page .jgb-repair-top > .jgb-repair-recent > .jgb-repair-panel-head{
+  background:#dff2ea!important;
+  border-bottom:3px solid #238466!important;
+  color:#145a49!important;
+}
+.jgb-repair-page .jgb-repair-list-head{
+  background:#c9e0ef!important;
+  border-bottom:3px solid #15577f!important;
+  color:#103f60!important;
+}
+.jgb-repair-page .jgb-repair-pane:first-child .jgb-repair-pane-head{
+  background:#e7f2fa!important;
+  border-bottom:2px solid #5f94b5!important;
+}
+.jgb-repair-page .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head{
+  background:#e7f5ee!important;
+  border-bottom:2px solid #65a487!important;
+}
+.jgb-repair-page .jgb-repair-panel-head b,
+.jgb-repair-page .jgb-repair-list-head b{
+  font-size:20px!important;
+  font-weight:1000!important;
+}
+.jgb-repair-page .jgb-repair-pane-head b{
+  font-size:16px!important;
+  font-weight:1000!important;
+}
+.jgb-repair-page .jgb-repair-panel-head span,
+.jgb-repair-page .jgb-repair-list-head span,
+.jgb-repair-page .jgb-repair-pane-head span{
+  font-weight:950!important;
+}
 </style>
