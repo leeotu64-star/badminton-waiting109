@@ -20053,6 +20053,127 @@ document.addEventListener('click',handle,true);
   .eh-main{grid-template-columns:1fr!important;}
 }
 </style>
+
+<style id="EAM_CLEAN_LAYOUT_V14">
+/* EAM 배치도 전면 재정렬: 겹친 기존 override를 마지막 규칙으로 정리 */
+.eh-floor-1f{
+  position:relative!important;
+  flex:0 0 82%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-2f{
+  flex:0 0 18%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+}
+
+/* ① 코트: 균등 폭 + 충분한 좌우 간격 */
+.eh-floor-1f .eh-courts{
+  position:absolute!important;
+  left:4%!important;
+  right:4%!important;
+  top:2%!important;
+  height:25%!important;
+  margin:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:14px!important;
+  box-sizing:border-box!important;
+  perspective:none!important;
+}
+.eh-floor-1f .eh-court{
+  width:auto!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  transform:none!important;
+  box-sizing:border-box!important;
+  border:1px solid #587789!important;
+  border-radius:4px!important;
+  box-shadow:none!important;
+}
+
+/* ② 시설영역: 하나의 정돈된 2단 구조 */
+.eh-floor-1f .eh-facility{
+  position:absolute!important;
+  left:2%!important;
+  right:2%!important;
+  top:30%!important;
+  bottom:3%!important;
+  height:auto!important;
+  display:grid!important;
+  grid-template-rows:38% 1fr!important;
+  row-gap:18px!important;
+  box-sizing:border-box!important;
+}
+
+/* 상부 6개 시설 */
+.eh-floor-1f .eh-row{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  gap:14px!important;
+  border:0!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-1f .eh-row .eh-zone{
+  min-width:0!important;
+  min-height:0!important;
+  width:100%!important;
+  height:100%!important;
+  border:1px solid #91a5b3!important;
+  box-sizing:border-box!important;
+  box-shadow:none!important;
+}
+
+/* 하부 3개 시설: 유수장치실은 휴게실보다 넓되 과도하게 크지 않게 */
+.eh-floor-1f .eh-bottom{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  display:grid!important;
+  grid-template-columns:2.35fr 2.7fr 1.15fr!important;
+  gap:14px!important;
+  border:0!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-1f .eh-bottom .eh-zone{
+  min-width:0!important;
+  min-height:0!important;
+  width:100%!important;
+  height:100%!important;
+  border:1px solid #91a5b3!important;
+  box-sizing:border-box!important;
+  box-shadow:none!important;
+}
+
+/* 복도는 구조에서 완전 제거 */
+.eh-floor-1f .eh-corridor{display:none!important;width:0!important;height:0!important;border:0!important;padding:0!important;margin:0!important}
+
+/* 코트 ↔ 시설 경계가 붙어 보이지 않도록 */
+.eh-floor-1f .eh-courts + .eh-facility{margin-top:0!important}
+
+/* ③ 2층도 동일한 외곽선 기준 */
+.eh-floor-2f .eh-second-grid{
+  gap:14px!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-2f .eh-second-zone{
+  border:1px solid #91a5b3!important;
+  box-sizing:border-box!important;
+}
+
+/* 작은 화면에서도 선과 간격 유지 */
+@media(max-width:1100px){
+  .eh-floor-1f .eh-courts{gap:10px!important;left:3%!important;right:3%!important}
+  .eh-floor-1f .eh-row,.eh-floor-1f .eh-bottom{gap:10px!important}
+}
+</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -26287,5 +26408,51 @@ cleanupDuplicateOnly();
 }
 .eh-floor-1f .eh-corridor{
   display:none!important; height:0!important; margin:0!important; padding:0!important; border:0!important;
+}
+</style>
+<style id="JGB_EAM_LAYOUT_V13_VERTICAL_GAP">
+/* V13: 가로폭은 유지하고 세로 간격을 확실히 확보. 전체 높이는 증가시키지 않음. */
+.eh-floor-1f .eh-facility{
+  top:29%!important;
+  bottom:1.5%!important;
+  grid-template-rows:minmax(0,34fr) minmax(0,50fr)!important;
+  row-gap:22px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+
+/* 상부 6개 시설은 높이를 낮추고 동일 높이로 정렬 */
+.eh-floor-1f .eh-row{
+  height:100%!important;
+  min-height:0!important;
+  gap:14px!important;
+  align-items:stretch!important;
+}
+.eh-floor-1f .eh-row .eh-zone{
+  height:100%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+}
+
+/* 하부 3개 시설은 같은 세로 높이 */
+.eh-floor-1f .eh-bottom{
+  height:100%!important;
+  min-height:0!important;
+  grid-template-columns:1.8fr 2.2fr 1fr!important;
+  gap:14px!important;
+  align-items:stretch!important;
+}
+.eh-floor-1f .eh-bottom .eh-zone,
+.eh-floor-1f .eh-bottom .eh-zone:nth-child(2){
+  height:100%!important;
+  min-height:0!important;
+  align-self:stretch!important;
+  box-sizing:border-box!important;
+}
+
+/* 유수장치실만 따로 세로로 늘어나지 않도록 강제 */
+.eh-floor-1f .eh-bottom .eh-zone:nth-child(2){
+  height:100%!important;
+  align-self:stretch!important;
 }
 </style>
