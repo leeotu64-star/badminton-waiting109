@@ -7219,11 +7219,11 @@ html,body{background:#eef5f9!important}
   min-width:0!important;
 }
 .jgb-lr-v54-brandico{
-  width:46px!important;
-  height:46px!important;
-  min-width:46px!important;
-  flex:0 0 46px!important;
-  font-size:28px!important;
+  width:var(--fp-icon-box)!important;
+  height:var(--fp-icon-box)!important;
+  min-width:var(--fp-icon-box)!important;
+  flex:0 0 var(--fp-icon-box)!important;
+  font-size:22px!important;
   border-radius:10px!important;
   background:linear-gradient(145deg,#ffffff 0%,#e1edf5 52%,#b7cfdf 100%)!important;
   border:1px solid rgba(255,255,255,.9)!important;
@@ -7238,7 +7238,7 @@ html,body{background:#eef5f9!important}
 .jgb-repair-page .jgb-repair-brand h2,
 .jgb-v170-head h1,
 .jgb-lr-v54-brand h2{
-  font-size:29px!important;
+  font-size:var(--fp-head-title)!important;
   line-height:1.2!important;
   font-weight:900!important;
   letter-spacing:-.035em!important;
@@ -7248,7 +7248,7 @@ html,body{background:#eef5f9!important}
 .jgb-repair-page .jgb-repair-brand p,
 .jgb-v170-head p,
 .jgb-lr-v54-brand p{
-  font-size:13px!important;
+  font-size:var(--fp-head-desc)!important;
   line-height:1.4!important;
   margin-top:5px!important;
 }
@@ -10069,7 +10069,14 @@ html,body{
     }
 
     function complaintStatsPanel(){
-      const all=(db.issues||[]).slice();
+      /* 숫자 초기화 시점 이후의 민원만 통계에 반영한다.
+         기존 접수 데이터는 삭제하지 않고 화면 집계에서만 제외한다. */
+      const resetAt=jgbNumericResetAt();
+      const all=(db.issues||[]).slice().filter(x=>{
+        if(!resetAt)return true;
+        const t=new Date(x?.createdAt||'').getTime();
+        return !Number.isNaN(t) && t>=resetAt;
+      });
       const years=Array.from({length:12},(_,i)=>2024+i);
       const nowYear=new Date().getFullYear();
       const defaultYear=years.includes(nowYear)?nowYear:2026;
@@ -10085,6 +10092,7 @@ html,body{
       });
       const topLocations=Object.entries(locMap).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ko')).slice(0,5);
       const topTypes=COMPLAINT_TYPES.map(name=>[name,typeMap[name]||0]);
+      const resetFilteredYearIssues=year=>complaintYearIssues(year);
       const yearOptions=years.map(y=>`<option value="${y}" ${y===defaultYear?'selected':''}>${y}년</option>`).join('');
       const locRows=topLocations.length?topLocations.map(([name,count],i)=>`<div class="jgb-stat-rank-row"><span class="jgb-stat-rank">${i+1}</span><span class="jgb-stat-rank-name">${xEsc(name)}</span><b class="jgb-stat-rank-count">${count.toLocaleString()}건</b></div>`).join(''):`<div class="jgb-stat-rank-row"><span class="jgb-stat-rank-name">접수 데이터 없음</span><b class="jgb-stat-rank-count">0건</b></div>`;
       const typeRows=topTypes.length?topTypes.map(([name,count])=>`<div class="jgb-type-cell"><span class="jgb-type-name">${xEsc(name)}</span><b class="jgb-type-count">${count.toLocaleString()}건</b></div>`).join(''):`<div class="jgb-type-cell"><span class="jgb-type-name">접수 데이터 없음</span><b class="jgb-type-count">0건</b></div>`;
@@ -10122,7 +10130,7 @@ html,body{
           <div><span>2026년 총 민원</span><b>${header2026Total.toLocaleString()}건</b></div>
           <div><span>월간 변화</span><b>${headerM1+1}월 ${headerPrev.toLocaleString()}건 → ${headerM2+1}월 ${headerCurr.toLocaleString()}건</b><small>${headerMonthText}</small></div>
           <div><span>전년 대비</span><b>2025년 0건 → 2026년 ${header2026Total.toLocaleString()}건</b><small>${headerYearText}</small></div>
-          <div><span>현재 접수</span><b>${active.length}건</b></div>
+          <div><span>현재 접수</span><b>${(resetAt?countActive:active).length}건</b></div>
         </div>
       </div>`;
       modal.addEventListener('click',e=>{if(e.target===modal)closeComplaintSummary()});
@@ -21061,21 +21069,10 @@ body {
       const s=annualStats(type,year);
       return `<div class="jgb-lr-v54-annual-card"><div class="jgb-lr-v54-annual-head"><strong>${type==='light'?'💡 조명 유지관리 실적':'🔌 릴선 유지관리 실적'}</strong><div class="jgb-lr-v54-year-control"><span>연도 선택</span><button type="button" onclick="window.jgbLRAnnualYear('${type}',-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="window.jgbLRAnnualYear('${type}',1)" aria-label="다음 연도">›</button></div></div><table><thead><tr><th>연도</th><th>자체정비 건수</th><th>외주정비 건수</th><th>부품 교체 건수</th></tr></thead><tbody><tr><th>${year}년</th><td>${s.self}건</td><td>${s.external}건</td><td>${s.parts}건</td></tr></tbody></table><p class="jgb-lr-v54-annual-note">※ 선택한 연도의 실적만 표시됩니다.</p></div>`;
     };
-    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>조명·릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc,'light')}${group('🔌','릴선',rc,'reel')}<button type="button" class="jgb-lr-performance-btn" onclick="window.jgbLRTogglePerformance()">📊 유지관리 실적</button></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid" style="display:none">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
+    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>조명·릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc,'light')}${group('🔌','릴선',rc,'reel')}</div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
   }
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
-  window.jgbLRTogglePerformance=function(){
-    const host=document.querySelector('.jgb-lr-v54');
-    if(!host)return;
-    const panes=host.querySelector('.jgb-lr-v54-panes');
-    const annual=host.querySelector('.jgb-lr-v54-annual-grid');
-    const btn=host.querySelector('.jgb-lr-performance-btn');
-    const showing=annual && getComputedStyle(annual).display!=='none';
-    if(panes) panes.style.setProperty('display',showing?'grid':'none','important');
-    if(annual) annual.style.setProperty('display',showing?'none':'grid','important');
-    if(btn){btn.classList.toggle('active',!showing);btn.textContent=showing?'📊 유지관리 실적':'↩ 시설관리 화면';}
-  };
   window.jgbLRAnnualYear=function(type,delta){
     if(type==='light') annualLightYear=Math.min(2035,Math.max(2026,annualLightYear+delta));
     else annualReelYear=Math.min(2035,Math.max(2026,annualReelYear+delta));
@@ -23518,106 +23515,6 @@ document.addEventListener('click',handle,true);
 .jgb-history-card small{
   color:#3c5668!important;
 }
-</style>
-
-
-<style id="JGB_LR_REQUESTS_FINAL_ONLY">
-/* 이번 요청사항만 최종 적용: 기존 기능/데이터/이벤트는 유지 */
-.jgb-lr-v54-brandico{
-  width:58px!important;height:58px!important;min-width:58px!important;flex:0 0 58px!important;
-  font-size:42px!important;border-radius:14px!important;
-}
-.jgb-lr-v54-brand h2{font-size:30px!important;line-height:1.15!important;font-weight:1000!important}
-.jgb-lr-v54-brand p{font-size:13px!important;line-height:1.35!important;font-weight:950!important}
-.jgb-lr-v54-brand{gap:15px!important}
-.jgb-lr-v54-head{min-height:88px!important}
-.jgb-lr-performance-btn{
-  height:46px!important;min-width:126px!important;padding:0 14px!important;
-  border:2px solid rgba(255,255,255,.85)!important;border-radius:8px!important;
-  background:#fff!important;color:#14527a!important;font-size:13px!important;font-weight:1000!important;
-  cursor:pointer!important;box-shadow:0 2px 5px rgba(0,0,0,.18)!important;white-space:nowrap!important;
-}
-.jgb-lr-performance-btn:hover,.jgb-lr-performance-btn.active{background:#eaf6ff!important;border-color:#fff!important}
-.jgb-lr-v54-annual-grid{margin-top:0!important}
-.jgb-lr-v54-annual-card{border:2px solid #7894a8!important}
-.jgb-lr-v54-detail{grid-template-columns:minmax(0,50fr) minmax(0,50fr)!important}
-.jgb-lr-v54-card{border-right:3px solid #7894a8!important}
-.jgb-lr-v54-history{border-left:0!important}
-@media(max-width:900px){
-  .jgb-lr-v54-brandico{width:48px!important;height:48px!important;min-width:48px!important;flex-basis:48px!important;font-size:34px!important}
-  .jgb-lr-v54-brand h2{font-size:25px!important}.jgb-lr-v54-brand p{font-size:12px!important}
-}
-</style>
-
-<style id="JGB_LR_DETAIL_LAYOUT_REPAIR">
-/* 이력카드/유지관리 이력 가로 잘림 방지 - 기존 50:50 유지 */
-.jgb-lr-v54 .jgb-lr-v54-panes{
-  width:100%!important;
-  min-width:0!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-  gap:10px!important;
-  overflow:hidden!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-pane{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  overflow:hidden!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-detail{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-  overflow:hidden!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-card{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  overflow:hidden!important;
-  border-right:2px solid #7894a8!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-cardtitle{
-  width:100%!important;
-  min-width:0!important;
-  box-sizing:border-box!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-info{
-  width:100%!important;
-  min-width:0!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-history{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  overflow:hidden!important;
-  border-left:0!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-historyscroll{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  overflow-x:auto!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-history table{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  table-layout:fixed!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-history th,
-.jgb-lr-v54 .jgb-lr-v54-history td{
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(1){width:24%!important}
-.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(2){width:21%!important}
-.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(3){width:35%!important}
-.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(4){width:20%!important}
 </style>
 
 </body>
@@ -30491,131 +30388,3 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
 
 ```
 ````
-<style id="JGB_LR_FINAL_REQUEST_FIX">
-/* 최종 요청사항: 평소에는 시설관리만 표시하고, 헤더의 유지관리 실적 버튼을 눌렀을 때만 실적 표시 */
-.jgb-lr-v54 .jgb-lr-v54-annual-grid{
-  display:none!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-panes{
-  display:grid!important;
-}
-
-/* 헤더 아이콘과 제목을 확실히 크게 */
-.jgb-lr-v54 .jgb-lr-v54-brand{
-  gap:16px!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-brandico{
-  width:54px!important;
-  height:54px!important;
-  min-width:54px!important;
-  flex:0 0 54px!important;
-  font-size:31px!important;
-  border-radius:12px!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-brand h2{
-  font-size:30px!important;
-  line-height:1.15!important;
-  font-weight:1000!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-brand p{
-  margin-top:6px!important;
-  font-size:13px!important;
-  line-height:1.35!important;
-  font-weight:900!important;
-}
-
-/* 이력카드와 유지관리 이력 사이 경계선 */
-.jgb-lr-v54 .jgb-lr-v54-detail{
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-history{
-  border-left:2px solid #7899ad!important;
-  box-shadow:inset 1px 0 0 rgba(255,255,255,.8)!important;
-}
-
-
-/* ===== 시설 민원 통계·분석 화면 최종 보정 ===== */
-.jgb-complaint-stats{
-  height:auto!important;
-  max-height:none!important;
-  overflow:hidden!important;
-}
-.jgb-complaint-stats-grid{
-  align-items:start!important;
-  grid-auto-rows:max-content!important;
-  padding:8px!important;
-  gap:8px!important;
-}
-.jgb-complaint-stat-card{
-  height:auto!important;
-  min-height:0!important;
-  max-height:none!important;
-  align-self:start!important;
-  overflow:hidden!important;
-}
-.jgb-complaint-stat-card-head{
-  height:40px!important;
-  min-height:40px!important;
-  padding:6px 9px!important;
-}
-.jgb-stat-rank-row{
-  min-height:28px!important;
-  height:28px!important;
-  padding:4px 7px!important;
-}
-.jgb-type-cell{
-  min-height:28px!important;
-  height:28px!important;
-  padding:4px 8px!important;
-}
-.jgb-month-table th{
-  height:27px!important;
-  padding:4px!important;
-}
-.jgb-month-table td{
-  height:29px!important;
-  padding:4px!important;
-}
-.jgb-week-time-table th,
-.jgb-week-time-table td{
-  height:27px!important;
-  padding:3px 5px!important;
-}
-.jgb-complaint-stats-detail-modal{
-  padding:12px!important;
-}
-.jgb-complaint-stats-detail-card{
-  max-height:calc(100vh - 90px)!important;
-  height:auto!important;
-  overflow:auto!important;
-}
-.jgb-complaint-stats-detail-body{
-  padding:8px!important;
-  overflow:visible!important;
-}
-.jgb-complaint-stats-detail-body .jgb-complaint-stats{
-  margin:0!important;
-}
-.jgb-complaint-stats-detail-body .jgb-complaint-stat-card{
-  height:auto!important;
-  min-height:0!important;
-}
-.jgb-stat-rank-count,
-.jgb-type-count,
-.jgb-month-table td,
-.jgb-week-time-table td{
-  font-family:"Malgun Gothic","맑은 고딕",Arial,sans-serif!important;
-  font-variant-numeric:tabular-nums!important;
-  font-style:normal!important;
-  text-decoration:none!important;
-  white-space:nowrap!important;
-  transform:none!important;
-  user-select:none!important;
-}
-.jgb-stat-rank-count::before,
-.jgb-stat-rank-count::after,
-.jgb-type-count::before,
-.jgb-type-count::after{
-  content:none!important;
-}
-</style>
