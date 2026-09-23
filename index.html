@@ -6311,7 +6311,8 @@ html, body {
       render();
     };
     window.basicPageWorkerSelect=function(index){
-      window.__basicWorkerPage=Math.max(0,Number(index)||0);
+      const i=Math.max(0,Number(index)||0);
+      window.__basicWorkerPage=Math.floor(i/2)*2;
       render();
     };
     window.basicTaskIcon=function(t){
@@ -6332,50 +6333,35 @@ html, body {
     window.basicPage=function basicPage(){
       const tw=Array.isArray(todayWorkers())?todayWorkers():workers.map(w=>({...w,status:w.shift||"편성없음",working:false,start:"",end:""}));
       if(!tw.length)return `<div class="basic-v5"><div class="basic-v5-head"><div><h2 class="basic-v5-title">오늘의 기본업무</h2><div class="basic-v5-sub">${selectedDate} · 시설 이용환경을 꼼꼼히 확인해 주세요. · 전체 약 40분 소요 · 차근차근 점검해 주세요.</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div><div style="padding:30px;text-align:center;color:#718096">오늘 편성된 근무자가 없습니다.</div></div>`;
-
-      /* 직원 2명 단위 페이지: 0,2,4... */
       const pageCount=Math.max(1,Math.ceil(tw.length/2));
-      let pageIdx=Math.min(pageCount-1,Math.max(0,Number(window.__basicWorkerPage)||0));
-      pageIdx=Math.floor(pageIdx);
-      window.__basicWorkerPage=pageIdx;
-      const pageWorkers=tw.slice(pageIdx*2,pageIdx*2+2);
-      const firstIndex=pageIdx*2;
-      const tabs=tw.map((x,i)=>`<button type="button" class="basic-v5-worker-tab ${i>=firstIndex&&i<firstIndex+2?'on':''}" onclick="basicPageWorkerSelect(${Math.floor(i/2)*2})"><span>${x.name}</span><small>${i+1}</small></button>`).join('');
-
-      const cardHtml=(w,slot)=>{
-        if(!w)return `<article class="basic-v5-card basic-v5-empty-card"><div class="basic-empty-note">직원 배정 없음</div></article>`;
+      let pageIndex=Math.floor((Number(window.__basicWorkerPage)||0)/2);
+      pageIndex=Math.min(pageCount-1,Math.max(0,pageIndex));
+      const startIndex=pageIndex*2;
+      window.__basicWorkerPage=startIndex;
+      const visible=tw.slice(startIndex,startIndex+2);
+      const tasksCard=(w)=>{
         const d=tasksFor(w.id)||{done:[],updatedAt:null};
         const isHoliday=/휴일\s*근무/.test(String(w.status||''));
         const isOff=!w.working || offWords.some(x=>(w.status||'').includes(x));
         const done=isHoliday?10:Array.isArray(d.done)?d.done.length:0;
         const state=isOff?'대상 제외':isHoliday?'자동완료':'직접 실시';
-        const tasksHtml=tasks.map((t,i)=>{
-          const checked=isHoliday||(Array.isArray(d.done)&&d.done.includes(t));
-          return `<button type="button" class="basic-v5-task basic-tone-${basicTaskTone(i)} ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${t.replace(/'/g,"\\'")}')"><span class="task-icon" aria-hidden="true">${basicTaskIcon(t)}</span><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`;
-        }).join('');
-        return `<article class="basic-v5-card basic-v5-staff-card" data-slot="${slot}">
-          <div class="head">
-            <div class="staff-heading">
-              <div class="name">${w.name}</div>
-              <div class="shift"><b>${w.shift||w.status||''}</b>${w.start?` <span>· ${w.start}~${w.end}</span>`:''}</div>
-            </div>
-            <span class="state ${done===10&&!isOff?'done':''}">${state} · ${isOff?'-':done+'/10'}</span>
-          </div>
+        const tasksHtml=tasks.map((t,i)=>{const checked=isHoliday||(Array.isArray(d.done)&&d.done.includes(t));return `<button type="button" class="basic-v5-task basic-tone-${basicTaskTone(i)} ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${t.replace(/'/g,"\\'")}')"><span class="task-icon" aria-hidden="true">${basicTaskIcon(t)}</span><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`}).join('');
+        return `<article class="basic-v5-card">
+          <div class="head"><div><div class="name">${w.name}</div><div class="shift">${w.shift||w.status||''}${w.start?` · ${w.start}~${w.end}`:''}</div></div><span class="state ${done===10&&!isOff?'done':''}">${state} · ${isOff?'-':done+'/10'}</span></div>
           <div class="bar"><i style="width:${isOff?0:done*10}%"></i></div>
           <div class="basic-v5-tasks">${tasksHtml}</div>
           <div class="basic-v5-foot"><span>${isOff?'기본업무 대상 아님':isHoliday?'휴일근무 · 기본업무 1건 자동완료':done===10?'오늘 기본업무 완료':'실시한 항목만 실적 반영'}</span><b>${isOff?'':done+'/10'}</b></div>
         </article>`;
       };
-
+      const tabs=tw.map((x,i)=>`<button type="button" class="basic-v5-worker-tab ${i===startIndex||i===startIndex+1?'on':''}" onclick="basicPageWorkerSelect(${i})"><span>${x.name}</span><small>${i+1}</small></button>`).join('');
       return `<div class="basic-v5 basic-book-layout">
-        <div class="basic-v5-head"><div><h2 class="basic-v5-title">오늘의 기본업무</h2><div class="basic-v5-sub">${selectedDate} · 시설 이용환경을 꼼꼼히 확인해 주세요. · 전체 약 40분 소요 · 차근차근 점검해 주세요.</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div>
-        <div class="basic-v5-page-nav"><button type="button" class="basic-v5-nav-btn" ${pageIdx===0?'disabled':''} onclick="basicPageWorkerNav(-1)">‹ 이전 2명</button><div class="basic-v5-page-center"><strong>${pageWorkers.map(x=>x.name).join(' · ')}</strong><span>${pageIdx+1} / ${pageCount}</span></div><button type="button" class="basic-v5-nav-btn next" ${pageIdx===pageCount-1?'disabled':''} onclick="basicPageWorkerNav(1)">다음 2명 ›</button></div>
-        <div class="basic-v5-worker-tabs">${tabs}</div>
-        <div class="basic-v5-grid basic-v5-two-staff-grid">${pageWorkers.map((w,i)=>cardHtml(w,i)).join('')}${pageWorkers.length===1?cardHtml(null,1):''}</div>
-        <div class="basic-v5-bottom-banner"><img src="오늘의_기본업무_하단안내배너.webp" alt="실시한 항목만 실적에 반영됩니다. 오늘도 안전하고 즐거운 배드민턴!"></div>
+       <div class="basic-v5-head"><div><h2 class="basic-v5-title">오늘의 기본업무</h2><div class="basic-v5-sub">${selectedDate} · 시설 이용환경을 꼼꼼히 확인해 주세요. · 전체 약 40분 소요 · 차근차근 점검해 주세요.</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div>
+       <div class="basic-v5-page-nav"><button type="button" class="basic-v5-nav-btn" ${pageIndex===0?'disabled':''} onclick="basicPageWorkerNav(-2)">‹ 이전 2명</button><div class="basic-v5-page-center"><strong>${visible.map(x=>x.name).join(' · ')}</strong><span>${pageIndex+1} / ${pageCount}</span></div><button type="button" class="basic-v5-nav-btn next" ${pageIndex===pageCount-1?'disabled':''} onclick="basicPageWorkerNav(2)">다음 2명 ›</button></div>
+       <div class="basic-v5-worker-tabs">${tabs}</div>
+       <div class="basic-v5-grid">${visible.map(tasksCard).join('')}</div>
+       <div class="basic-v5-bottom-banner"><img src="오늘의_기본업무_하단안내배너.webp" alt="실시한 항목만 실적에 반영됩니다. 오늘도 안전하고 즐거운 배드민턴!"></div>
       </div>`;
     }
-
     function stats(){
       const is=issuesForMonth(), done=is.filter(x=>x.status==="완료"), pending=is.filter(x=>x.status!=="완료");
       let completedDays=0, targetDays=0;
@@ -20862,77 +20848,6 @@ document.addEventListener('click',handle,true);
   color:#496577!important;
 }
 </style>
-
-<style id="JGB_BASIC_WORK_TWO_STAFF_FINAL">
-/* 2명씩 표시: 좌우 50:50 강제 */
-.basic-book-layout .basic-v5-two-staff-grid{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-  gap:18px!important;
-  width:100%!important;
-  align-items:stretch!important;
-}
-.basic-book-layout .basic-v5-staff-card{
-  min-width:0!important;
-  width:100%!important;
-  position:relative!important;
-  overflow:visible!important;
-  background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%)!important;
-  border:1px solid #c9d9e5!important;
-  border-radius:16px!important;
-  box-shadow:0 10px 24px rgba(30,65,90,.10), inset 0 1px 0 rgba(255,255,255,.95)!important;
-  transform:translateZ(0);
-}
-/* 큰 스프링: 각 수첩 위쪽에만 표시 */
-.basic-book-layout .basic-v5-staff-card::before{
-  content:"";
-  position:absolute!important;
-  z-index:8!important;
-  left:18px!important;
-  right:18px!important;
-  top:-12px!important;
-  height:24px!important;
-  pointer-events:none!important;
-  background:radial-gradient(ellipse 9px 5px at 10px 50%,#f9fcff 34%,#6c8292 40%,#536b7c 61%,transparent 66%) 0 0/46px 24px repeat-x!important;
-  filter:drop-shadow(0 2px 2px rgba(25,50,70,.25));
-}
-.basic-book-layout .basic-v5-staff-card::after{
-  content:"";position:absolute!important;left:16px;right:16px;top:5px;height:2px;
-  background:linear-gradient(90deg,#d9e4eb,#fff,#d9e4eb)!important;
-  pointer-events:none!important;
-}
-/* 이름·근무시간·상태 한 줄 구조로 정돈 */
-.basic-book-layout .basic-v5-staff-card .head{
-  display:flex!important;align-items:center!important;justify-content:space-between!important;
-  gap:12px!important;min-height:70px!important;margin-bottom:10px!important;
-  padding:2px 2px 8px!important;border-bottom:1px solid #e2eaf0!important;
-}
-.basic-book-layout .basic-v5-staff-card .staff-heading{min-width:0!important;display:flex!important;flex-direction:column!important;gap:5px!important}
-.basic-book-layout .basic-v5-staff-card .name{font-size:30px!important;font-weight:1000!important;color:#123b61!important;line-height:1.05!important;letter-spacing:-.04em!important}
-.basic-book-layout .basic-v5-staff-card .shift{font-size:13px!important;font-weight:800!important;color:#607589!important;white-space:nowrap!important}
-.basic-book-layout .basic-v5-staff-card .shift b{color:#315a78!important}
-.basic-book-layout .basic-v5-staff-card .state{flex:0 0 auto!important;font-size:13px!important;font-weight:1000!important;padding:8px 11px!important;border-radius:10px!important;background:#edf3f8!important;color:#49667d!important;border:1px solid #d3e0e9!important}
-.basic-book-layout .basic-v5-staff-card .state.done{background:#eaf7ef!important;color:#177447!important;border-color:#b6dcc5!important}
-/* 완료 항목은 연하게, 완료 표시만 진하게 */
-.basic-book-layout .basic-v5-staff-card .basic-v5-task.is-done{
-  background:#f3faf6!important;border-color:#b9dfc7!important;color:#426b55!important;
-}
-.basic-book-layout .basic-v5-staff-card .basic-v5-task.is-done .task-icon{background:#e4f4ea!important;color:#27744a!important}
-.basic-book-layout .basic-v5-staff-card .basic-v5-task.is-done .action{color:#08753f!important;font-weight:1000!important;text-shadow:0 1px 0 #fff}
-/* 종이/버튼의 은은한 3D */
-.basic-book-layout .basic-v5-staff-card .basic-v5-task{
-  box-shadow:0 3px 8px rgba(35,65,85,.07),inset 0 1px 0 rgba(255,255,255,.92)!important;
-  transition:transform .16s ease,box-shadow .16s ease!important;
-}
-.basic-book-layout .basic-v5-staff-card .basic-v5-task:hover{transform:translateY(-2px)!important;box-shadow:0 7px 14px rgba(30,70,100,.12),inset 0 1px 0 #fff!important}
-.basic-book-layout .basic-v5-staff-card .bar{box-shadow:inset 0 1px 2px rgba(30,55,75,.10)!important}
-.basic-book-layout .basic-v5-staff-card .foot{border-top:1px solid #e3ebf1!important}
-.basic-v5-empty-card{display:flex!important;align-items:center!important;justify-content:center!important;min-height:300px!important;background:linear-gradient(180deg,#fbfdff,#f4f8fb)!important}
-.basic-empty-note{font-size:16px;font-weight:900;color:#91a1af}
-@media(max-width:900px){
-  .basic-book-layout .basic-v5-two-staff-grid{grid-template-columns:1fr!important}
-}
-</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -26971,102 +26886,73 @@ cleanupDuplicateOnly();
 .jgb-manual-desc{display:none;padding:9px 12px 11px;color:#526d7d;font-size:12px;line-height:1.65;background:#fff}
 .jgb-manual-item.open .jgb-manual-desc{display:block}
 </style>
-<style id="JGB_BASIC_WORK_NOTE_20_80_V2">
-/* ===== 오늘의 기본업무 : 헤더 제외 / 20:80 작업수첩 ===== */
+
+
+<style id="JGB_BASIC_TWO_NOTE_FIX_V1">
+/* 헤더는 그대로 두고, 본문만 두 권의 수첩으로 강제 분할 */
 .basic-book-layout{
   position:relative!important;
   display:block!important;
   box-sizing:border-box!important;
-  padding-left:20%!important;
-  padding-right:0!important;
-  background:#ffffff!important;
-  border:1px solid #d9e2e9!important;
-  border-radius:16px!important;
-  box-shadow:0 5px 16px rgba(35,65,85,.07)!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
   overflow:visible!important;
 }
-
-/* 왼쪽 20% 제본 영역 */
-.basic-book-layout::before{
-  content:"";
-  position:absolute!important;
-  left:0!important;
-  top:0!important;
-  bottom:0!important;
-  width:20%!important;
-  z-index:4!important;
-  pointer-events:none!important;
-  background:
-    radial-gradient(circle at 50% 24px,#ffffff 0 6px,#718595 6.5px 8px,transparent 8.5px) 0 0/100% 48px repeat-y,
-    linear-gradient(90deg,#f5f8fa 0%,#eef3f6 78%,#d9e2e8 100%)!important;
-  border-right:1px solid #d3dde4!important;
-  box-shadow:inset -5px 0 10px rgba(40,70,90,.05)!important;
-}
-
-/* 상단 가로 스프링 */
-.basic-book-layout::after{
-  content:"";
-  position:absolute!important;
-  left:20%!important;
-  right:14px!important;
-  top:-10px!important;
-  height:24px!important;
-  z-index:8!important;
-  pointer-events:none!important;
-  background:
-    radial-gradient(ellipse 7px 3.5px at 8px 50%,#fff 38%,#718595 42%,#718595 61%,transparent 64%) 0 0/44px 24px repeat-x!important;
-  filter:drop-shadow(0 1px 1px rgba(30,55,75,.18));
-}
-
-/* 오른쪽 80% 실제 업무 영역 */
-.basic-book-layout > *{
-  position:relative!important;
-  z-index:5!important;
-}
-.basic-book-layout .basic-v5-head,
-.basic-book-layout .basic-v5-grid,
+.basic-book-layout::before,.basic-book-layout::after{display:none!important;}
+.basic-book-layout .basic-v5-head{position:relative!important;z-index:10!important;}
 .basic-book-layout .basic-v5-page-nav,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-bottom-banner{
+.basic-book-layout .basic-v5-worker-tabs{position:relative!important;z-index:10!important;}
+.basic-book-layout .basic-v5-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:18px!important;
   width:100%!important;
+  margin-top:26px!important;
+  background:transparent!important;
 }
-
-/* 헤더 영역은 건드리지 않고 본문 진한 배경만 제거 */
-.basic-book-layout .basic-v5:not(.basic-book-layout),
-.basic-book-layout .basic-v5-card,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-page-nav{
-  background:#ffffff!important;
-}
-
-/* 기존 진한 카드/판 배경 강제 제거 */
-.basic-book-layout .basic-v5-card .head,
-.basic-book-layout .basic-v5-card .body,
-.basic-book-layout .basic-v5-card .content{
-  background:#ffffff!important;
-}
-
-/* 본문 영역은 깨끗한 종이 느낌 */
 .basic-book-layout .basic-v5-card{
-  border-color:#d7e1e8!important;
-  box-shadow:0 3px 10px rgba(35,65,85,.055)!important;
+  position:relative!important;
+  min-width:0!important;
+  background:#fffdf8!important;
+  border:1px solid #d9ccb5!important;
+  border-radius:15px!important;
+  padding:16px!important;
+  box-shadow:0 10px 20px rgba(83,67,43,.13), inset 0 0 18px rgba(177,151,110,.07)!important;
+  overflow:visible!important;
 }
-
-/* 왼쪽 제본 영역 때문에 제목/본문이 겹치지 않도록 */
-.basic-book-layout .basic-v5-head,
-.basic-book-layout .basic-v5-page-nav,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-bottom-banner{
-  margin-left:0!important;
+/* 수첩별 스프링: 두 수첩에 각각 독립적으로 표시 */
+.basic-book-layout .basic-v5-card::before{
+  content:"";
+  position:absolute!important;
+  left:18px!important;
+  right:18px!important;
+  top:-24px!important;
+  height:28px!important;
+  z-index:20!important;
+  pointer-events:none!important;
+  background:radial-gradient(ellipse 6px 12px at 7px 50%,transparent 44%,#596773 46%,#596773 58%,#c9d1d5 61%,transparent 65%) 0 0/48px 28px repeat-x!important;
+  filter:drop-shadow(0 2px 1px rgba(20,30,35,.25));
 }
-
+.basic-book-layout .basic-v5-card .head{
+  min-height:74px!important;
+  align-items:center!important;
+  margin-bottom:10px!important;
+}
+.basic-book-layout .basic-v5-card .name{font-size:29px!important;font-weight:950!important;color:#173f5c!important;}
+.basic-book-layout .basic-v5-card .shift{font-size:12px!important;font-weight:850!important;}
+.basic-book-layout .basic-v5-card .state{font-size:12px!important;font-weight:950!important;}
+/* 완료색은 기존보다 연하게, 완료 글씨는 조금 진하게 */
+.basic-book-layout .basic-v5-task.is-done{background:#eef8f1!important;border-color:#b9dfc8!important;}
+.basic-book-layout .basic-v5-task.is-done .action{font-weight:1000!important;color:#08753e!important;}
+/* 아이콘 정리 */
+.basic-book-layout .basic-v5-task .task-icon{width:34px!important;height:34px!important;font-size:21px!important;display:grid!important;place-items:center!important;}
 @media(max-width:900px){
-  .basic-book-layout{padding-left:20%!important}
+  .basic-book-layout .basic-v5-grid{grid-template-columns:1fr!important;}
 }
 </style>
-
 <script>
 (function(){
 function initManual(){
