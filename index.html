@@ -7970,34 +7970,47 @@ html,body{background:#eef5f9!important}
 </style>
 
 
-<style id="JGB_SIDEBAR_TITLE_EMPHASIS_V1">
-/* 좌측 기관명: 얇고 흐린 기본 글씨 대신 진하고 선명하게 */
-.jgb-brand,
-.jgb-sidebar .jgb-brand,
-.jgb-side-title,
-.jgb-sidebar-title{
-  color:#f7fbff!important;
-  font-family:"Noto Sans KR","Malgun Gothic",sans-serif!important;
-  font-size:18px!important;
-  font-weight:900!important;
-  letter-spacing:-0.04em!important;
-  line-height:1.25!important;
-  text-shadow:0 1px 1px rgba(0,0,0,.28)!important;
+<style id="JGB_SIDEBAR_BOTTOM_FIX_V2">
+/* 좌측 사이드바가 짧게 끝나면서 아래에 노출되는 잔여 문자 영역 방지 */
+.jgb-shell{
+  min-height:100vh!important;
+  align-items:stretch!important;
+}
+.jgb-nav{
+  min-height:100vh!important;
+  height:100vh!important;
+  max-height:100vh!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  position:relative!important;
+  background:linear-gradient(180deg,#092542 0%,#071c33 100%)!important;
 }
 
-/* 기관명 주변의 아이콘도 글씨와 균형 */
-.jgb-brand svg,
-.jgb-brand .icon,
-.jgb-sidebar .jgb-brand .icon{
-  color:#dcecff!important;
-  width:18px!important;
-  height:18px!important;
+/* 제작자 표기: 하단 여백에 깔끔하게 배치 */
+.jgb-maker{
+  display:block!important;
+  margin:0 8px 18px!important;
+  padding:7px 9px!important;
+  border:1px solid rgba(160,205,235,.22)!important;
+  border-radius:7px!important;
+  background:rgba(255,255,255,.06)!important;
+  color:#b9d8ee!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  line-height:1.35!important;
+  letter-spacing:-.02em!important;
+  text-align:left!important;
 }
 
-/* 좌측 상단 구분선은 너무 튀지 않게 */
-.jgb-sidebar .jgb-brand + hr,
-.jgb-sidebar .jgb-brand-line{
-  border-color:rgba(220,236,255,.22)!important;
+/* 혹시 남아 있는 정확한 stray text는 보이지 않게 처리 */
+.jgb-nav + .jgb-stray,
+.jgb-stray{
+  display:none!important;
+}
+
+/* 하단에 남는 화면 잔여 영역은 본문 배경과 동일하게 */
+html,body{
+  background:#eef4fa!important;
 }
 </style>
 
@@ -8259,7 +8272,7 @@ html,body{background:#eef5f9!important}
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-maker">시설관리 업무포털 · 제작 김영택</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      const mobileContent=document.getElementById('jgbMobileContent');
      if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
