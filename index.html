@@ -27233,3 +27233,109 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
   .basic-book-layout .basic-v5-task:nth-child(odd){border-right:0!important}
 }
 </style>
+
+<style id="JGB_WORK_NOTE_HEADER_HARD_SEPARATION_FINAL">
+/* =========================================================
+   최종 강제 분리
+   - 업무 수행현황 헤더는 수첩 배경/제본/스프링이 절대 침범하지 않음
+   - 헤더 아래 본문만 수첩 영역
+   - 수첩 본문은 좌우 50:50 영역을 사용할 수 있도록 고정
+   ========================================================= */
+
+/* 전체 업무 화면: 헤더와 본문을 서로 다른 stacking context로 분리 */
+.basic-book-layout{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:visible!important;
+  background:transparent!important;
+  padding:0!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+
+/* 헤더는 최상단 독립 영역 */
+.basic-book-layout > .basic-v5-head{
+  position:relative!important;
+  z-index:1000!important;
+  isolation:isolate!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+  background:linear-gradient(135deg,#0b5b8f 0%,#0879a8 100%)!important;
+  color:#fff!important;
+  border:0!important;
+  border-radius:14px!important;
+  padding:18px 22px!important;
+  min-height:72px!important;
+  box-shadow:0 8px 20px rgba(25,70,100,.16)!important;
+}
+.basic-book-layout > .basic-v5-head::before,
+.basic-book-layout > .basic-v5-head::after{
+  z-index:-1!important;
+}
+.basic-book-layout > .basic-v5-head .basic-v5-title,
+.basic-book-layout > .basic-v5-head .basic-v5-sub{
+  position:relative!important;
+  z-index:1001!important;
+  color:#fff!important;
+}
+.basic-book-layout > .basic-v5-head .basic-v5-title{font-size:28px!important;font-weight:950!important}
+.basic-book-layout > .basic-v5-head .basic-v5-sub{font-size:12px!important;color:#e8f5fb!important}
+.basic-book-layout > .basic-v5-head .basic-v5-date{
+  position:relative!important;
+  z-index:1002!important;
+}
+
+/* 헤더 아래 내용만 수첩 배경 */
+.basic-book-layout > .basic-v5-page-nav,
+.basic-book-layout > .basic-v5-worker-tabs,
+.basic-book-layout > .basic-v5-single,
+.basic-book-layout > .basic-v5-bottom-banner{
+  position:relative!important;
+  z-index:10!important;
+}
+
+/* 기존 제본 pseudo-element가 헤더 영역으로 올라가지 못하게 함 */
+.basic-book-layout::before{
+  top:86px!important;
+  z-index:2!important;
+  pointer-events:none!important;
+}
+.basic-book-layout::after{display:none!important;content:none!important}
+
+/* 본문 수첩 영역 자체의 배경 */
+.basic-book-layout > .basic-v5-page-nav,
+.basic-book-layout > .basic-v5-worker-tabs,
+.basic-book-layout > .basic-v5-single{
+  background:#fffdf8!important;
+}
+
+/* 헤더와 본문 사이에 확실한 간격 */
+.basic-book-layout > .basic-v5-page-nav{margin-top:12px!important}
+
+/* 좌우 작업수첩을 사용할 경우 정확히 50:50 */
+.basic-book-layout .basic-v5-two-books,
+.basic-book-layout .basic-v5-book-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:16px!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+
+/* 각각의 수첩은 자기 영역 안에서만 그림 */
+.basic-book-layout .basic-v5-two-books > *,
+.basic-book-layout .basic-v5-book-grid > *{
+  min-width:0!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  position:relative!important;
+}
+
+@media(max-width:900px){
+  .basic-book-layout .basic-v5-two-books,
+  .basic-book-layout .basic-v5-book-grid{
+    grid-template-columns:1fr!important;
+  }
+}
+</style>
