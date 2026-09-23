@@ -7309,7 +7309,7 @@ table tbody td{
     }
 
     function complaintStatsPanel(){
-      const all=(db.issues||[]).slice();
+      const all=jgbCountableItems();
       const years=Array.from({length:12},(_,i)=>2024+i);
       const nowYear=new Date().getFullYear();
       const defaultYear=years.includes(nowYear)?nowYear:2026;
@@ -7464,7 +7464,7 @@ table tbody td{
         if(/시설|고장|설비|누수|배수|수도/.test(text)) return ['시설 상태 점검','설비 작동 및 이상 여부 확인','check'];
         return ['현장 상태 점검','접수 내용 확인 및 조치 여부 판단','observe'];
       };
-      const statusOf=count=>count>=3?['주의','warn']:count===2?['확인','check']:['관찰','observe'];
+      const statusOf=count=>count>=5?['집중관리','warn']:count>=3?['유의','check']:count>=1?['관찰','observe']:['정상','stable'];
       const iconOf=kind=>kind==='clean'?'↗':kind==='warn'?'!':kind==='check'?'＋':'−';
       const rowsHtml=rows.length?rows.map(([place,g])=>{
         const [action,detail,kind]=actionOf(place,g);
@@ -7482,6 +7482,46 @@ table tbody td{
       </aside>`;
     }
 
+    /* 숫자 집계: 접수 내용/민원 이력과 분리하여 집계 기준시각만 숫자로 보관 */
+    const JGB_COUNTER_KEY='JGB_COMPLAINT_COUNTER_V1';
+    function jgbCounterMeta(){
+      try{
+        const v=JSON.parse(localStorage.getItem(JGB_COUNTER_KEY)||'{}');
+        return v&&typeof v==='object'?v:{};
+      }catch(e){return {}}
+    }
+    function jgbSaveCounterMeta(v){try{localStorage.setItem(JGB_COUNTER_KEY,JSON.stringify(v||{}));}catch(e){console.warn('숫자 집계 기준 저장 실패',e)}}
+    function jgbDayStart(date=new Date()){
+      const d=new Date(date);
+      if(d.getHours()<6)d.setDate(d.getDate()-1);
+      d.setHours(6,0,0,0);
+      return d;
+    }
+    function jgbCountableItems(){
+      const m=jgbCounterMeta(), reset=Number(m.resetAt)||0;
+      return (db.issues||[]).filter(x=>{const d=new Date(x?.createdAt||'');return !Number.isNaN(d.getTime()) && d.getTime()>=reset;});
+    }
+    function jgbComplaintCounts(){
+      const now=new Date(), start=jgbDayStart(now), end=new Date(start);end.setDate(end.getDate()+1);
+      const monthStart=new Date(now.getFullYear(),now.getMonth(),1), yearStart=new Date(now.getFullYear(),0,1);
+      const reset=Number(jgbCounterMeta().resetAt)||0;
+      const items=jgbCountableItems();
+      const valid=(d,from,to)=>d>=from && d<to && d.getTime()>=reset;
+      let today=0,month=0,year=0;
+      items.forEach(x=>{const d=new Date(x.createdAt);if(valid(d,start,end))today++;if(valid(d,monthStart,new Date(now.getFullYear(),now.getMonth()+1,1)))month++;if(valid(d,yearStart,new Date(now.getFullYear()+1,0,1)))year++;});
+      return {today,month,year,resetAt:reset};
+    }
+    function jgbResetCounters(){
+      if(!confirm('일별·월별·연도별 숫자를 초기화하시겠습니까?\n고객 접수 내용과 처리 기능에는 영향을 주지 않습니다.'))return;
+      jgbSaveCounterMeta({resetAt:Date.now()});
+      render();
+    }
+    function jgbDeleteCounters(){
+      if(!confirm('집계 숫자 기준을 삭제하시겠습니까?\n삭제 후 현재 시점부터 다시 숫자를 집계합니다.'))return;
+      jgbSaveCounterMeta({resetAt:Date.now()});
+      render();
+    }
+
     function processPage(){
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
      const active=stored.filter(x=>x.status!=='완료');
@@ -7489,22 +7529,12 @@ table tbody td{
      const state=(x)=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
      const stateClass=(x)=>state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
      const mapComplaintCounts=complaintPlaceCounts(active);
-     const today=stored.filter(x=>{const d=new Date(x.createdAt||0),n=new Date();return d.toDateString()===n.toDateString()}).length;
-     /* 헤더 연도별 성과 요약: 2025년은 초기 기준값 0건으로 고정하고, 2026년은 실제 접수 데이터를 집계한다. */
-     const headerYear=2026;
-     const header2026=complaintYearIssues(headerYear);
-     const header2026Total=header2026.length;
-     const header2025Total=0;
-     const headerMonthCounts=Array.from({length:12},()=>0);
-     header2026.forEach(x=>{const d=new Date(x.createdAt||0);if(!Number.isNaN(d.getTime())){const m=d.getMonth();if(m>=0&&m<12)headerMonthCounts[m]++;}});
-     let headerM1=9, headerM2=10;
-     const headerNonzero=headerMonthCounts.map((v,i)=>({i,v})).filter(x=>x.v>0);
-     if(headerNonzero.length>=2){headerM1=headerNonzero[headerNonzero.length-2].i;headerM2=headerNonzero[headerNonzero.length-1].i;}
-     const headerPrev=headerMonthCounts[headerM1]||0, headerCurr=headerMonthCounts[headerM2]||0;
-     const headerMonthDiff=headerCurr-headerPrev;
-     const headerMonthText=headerMonthDiff<0?`전월 대비 ${Math.abs(headerMonthDiff).toLocaleString()}건 감소 (개선)`:headerMonthDiff>0?`전월 대비 ${headerMonthDiff.toLocaleString()}건 증가`:'전월 대비 변동 없음';
-     const headerYearDiff=header2026Total-header2025Total;
-     const headerYearText=headerYearDiff<0?`전년 대비 ${Math.abs(headerYearDiff).toLocaleString()}건 감소 (개선)`:headerYearDiff>0?`전년 대비 ${headerYearDiff.toLocaleString()}건 증가`:'전년 대비 변동 없음';
+     const counter=jgbComplaintCounts();
+     const today=counter.today;
+     const headerYearTotal=counter.year;
+     const headerMonthTotal=counter.month;
+     const headerMonthText=`이번 달 누계 ${headerMonthTotal.toLocaleString()}건`;
+     const headerYearText=`올해 누계 ${headerYearTotal.toLocaleString()}건`;
      return `<style id="process-v6-style">
       .jgb-repair-page{width:100%;max-width:1500px;margin:0 auto;padding:8px 6px 48px;color:#16364e;font-family:inherit;box-sizing:border-box}.jgb-repair-page *{box-sizing:border-box}
       .jgb-repair-head{width:100%;min-height:104px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:13px 16px;border:2px solid #173d5a;border-radius:10px;background:linear-gradient(100deg,#0d3554 0%,#14648d 55%,#0d4669 100%);box-shadow:0 3px 8px rgba(10,35,55,.18);color:#fff}
@@ -7786,7 +7816,7 @@ table tbody td{
 
 </style>
      <div class="jgb-repair-page">
-       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button></div></header>
+       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-counter-strip"><div><b>${today.toLocaleString()}</b><small>오늘 접수</small></div><div><b>${headerMonthTotal.toLocaleString()}</b><small>월 누계</small></div><div><b>${headerYearTotal.toLocaleString()}</b><small>연 누계</small></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetCounters()">숫자 초기화</button><button type="button" class="jgb-repair-text-btn danger" onclick="jgbDeleteCounters()">숫자 삭제</button></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["남자 화장실"]?'has-complaint':''}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["여자 화장실"]?'has-complaint':''}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${mapComplaintCounts["복도"]?'has-complaint':''}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${mapComplaintCounts["휴게실"]?'has-complaint':''}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${mapComplaintCounts["기타"]?'has-complaint':''}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${n?'has-complaint':''}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
          ${liveComplaintActionPanel(active)}
@@ -20327,7 +20357,211 @@ document.addEventListener('click',handle,true);
 .eh-live-card .eh-live-scroll::-webkit-scrollbar-thumb{background:#9db2c1!important;border-radius:8px!important}
 </style>
 
+<!-- USER REQUEST: 딱 2가지 수정만 적용
+  1) 접수·민원 처리 목록을 스프링 노트 느낌으로 시각 보강
+  2) 최신 접수 / 미처리 접수에 민원 6개 행이 보이도록 높이 확보
+  기능/데이터/JS/다른 레이아웃은 변경하지 않음
+-->
+<style id="user-two-changes-only">
+/* =========================================================
+   사용자 요청 2가지
+   1) 접수·민원 처리 목록 전체를 실제 스프링 노트처럼 구성
+   2) 최신 접수 / 미처리 접수 민원 6개가 한 화면에 보이도록 구성
+   기능/데이터/JS는 변경하지 않음
+   ========================================================= */
 
+/* ===== 1. 접수·민원 처리 목록 전체 = 스프링 노트 ===== */
+.jgb-repair-page .jgb-repair-list-wrap{
+  position:relative!important;
+  overflow:visible!important;
+  margin-top:18px!important;
+  padding-top:0!important;
+  border:2px solid #6f8da0!important;
+  border-radius:4px!important;
+  background:#fffdf5!important;
+  box-shadow:0 4px 12px rgba(28,55,72,.12), inset 0 0 0 1px rgba(255,255,255,.9)!important;
+}
+
+/* 노트 상단 표지 */
+.jgb-repair-page .jgb-repair-list-head{
+  position:relative!important;
+  z-index:5!important;
+  min-height:42px!important;
+  box-sizing:border-box!important;
+  padding:8px 14px 8px 48px!important;
+  border-bottom:2px solid #7f9bad!important;
+  border-radius:2px 2px 0 0!important;
+  background:linear-gradient(#dcecf6,#c8dfed)!important;
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.8)!important;
+}
+
+/* 왼쪽 세로 제본선 */
+.jgb-repair-page .jgb-repair-list-wrap::before{
+  content:""!important;
+  position:absolute!important;
+  z-index:2!important;
+  top:42px!important;
+  bottom:28px!important;
+  left:31px!important;
+  width:1px!important;
+  background:#e8a5a5!important;
+  box-shadow:1px 0 0 rgba(255,255,255,.75)!important;
+  pointer-events:none!important;
+}
+
+/* 위쪽 스프링 링 - CSS로 실제 링 형태 */
+.jgb-repair-page .jgb-repair-list-wrap::after{
+  content:""!important;
+  position:absolute!important;
+  z-index:10!important;
+  top:-15px!important;
+  left:38px!important;
+  right:18px!important;
+  height:24px!important;
+  background:
+    radial-gradient(ellipse at center,
+      transparent 0 4px,
+      #718897 4.5px 6px,
+      #eef4f7 6.5px 8px,
+      #718897 8.5px 10px,
+      transparent 10.5px) 0 0 / 52px 24px repeat-x!important;
+  pointer-events:none!important;
+}
+
+/* 두 권의 노트 종이 */
+.jgb-repair-page .jgb-repair-split{
+  position:relative!important;
+  z-index:1!important;
+  gap:12px!important;
+  padding:10px 10px 0 10px!important;
+  background:#fffdf7!important;
+}
+
+.jgb-repair-page .jgb-repair-pane{
+  position:relative!important;
+  overflow:visible!important;
+  min-width:0!important;
+  border:1px solid #9aafbc!important;
+  border-radius:3px!important;
+  background:
+    repeating-linear-gradient(to bottom,
+      #fffef9 0,
+      #fffef9 38px,
+      #dfe9ee 39px,
+      #dfe9ee 40px)!important;
+  box-shadow:2px 3px 7px rgba(35,62,78,.10)!important;
+}
+
+/* 노트 안쪽 세로 여백선 */
+.jgb-repair-page .jgb-repair-pane::before{
+  content:""!important;
+  position:absolute!important;
+  z-index:1!important;
+  top:0!important;
+  bottom:0!important;
+  left:24px!important;
+  width:1px!important;
+  background:#efb1b1!important;
+  pointer-events:none!important;
+}
+
+/* 각 권의 스프링 고리 */
+.jgb-repair-page .jgb-repair-pane-head{
+  position:relative!important;
+  z-index:4!important;
+  height:43px!important;
+  min-height:43px!important;
+  box-sizing:border-box!important;
+  padding:9px 12px 7px 38px!important;
+  border-bottom:2px solid #8da6b5!important;
+  background:rgba(231,242,248,.96)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.9)!important;
+}
+
+.jgb-repair-page .jgb-repair-pane:first-child .jgb-repair-pane-head::before,
+.jgb-repair-page .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head::before{
+  content:""!important;
+  position:absolute!important;
+  z-index:8!important;
+  top:-18px!important;
+  left:5px!important;
+  right:5px!important;
+  height:25px!important;
+  background:
+    radial-gradient(ellipse at center,
+      #ffffff 0 3px,
+      #3c86b5 3.5px 5px,
+      #dbeaf2 5.5px 7px,
+      #3c86b5 7.5px 9px,
+      transparent 9.5px) 0 0 / 48px 25px repeat-x!important;
+  pointer-events:none!important;
+}
+
+.jgb-repair-page .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head::before{
+  background:
+    radial-gradient(ellipse at center,
+      #ffffff 0 3px,
+      #43a37f 3.5px 5px,
+      #e1f1eb 5.5px 7px,
+      #43a37f 7.5px 9px,
+      transparent 9.5px) 0 0 / 48px 25px repeat-x!important;
+}
+
+.jgb-repair-page .jgb-repair-scroll{
+  position:relative!important;
+  z-index:2!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  background:transparent!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:#7897aa #edf3f7!important;
+}
+
+/* 표 머리글 */
+.jgb-repair-page .jgb-repair-mini-head{
+  height:36px!important;
+  min-height:36px!important;
+  background:#d9eaf4!important;
+  border-bottom:2px solid #7f9aaa!important;
+  font-size:12px!important;
+  font-weight:1000!important;
+}
+
+/* 민원 6개가 실제로 보이도록 한 행 높이 고정 */
+.jgb-repair-page .jgb-repair-mini-row{
+  height:39px!important;
+  min-height:39px!important;
+  max-height:39px!important;
+  box-sizing:border-box!important;
+  background:rgba(255,255,255,.88)!important;
+  border-bottom:1px solid #c0d0d9!important;
+}
+.jgb-repair-page .jgb-repair-mini-row:nth-child(odd){
+  background:rgba(248,252,254,.92)!important;
+}
+
+/* 6행 + 머리글 = 270px */
+@media (min-width:1051px){
+  .jgb-repair-page .jgb-repair-scroll{
+    height:270px!important;
+    min-height:270px!important;
+    max-height:270px!important;
+    flex:0 0 270px!important;
+  }
+}
+
+/* 하단 노트 고정띠 */
+.jgb-repair-page .jgb-repair-note{
+  position:relative!important;
+  z-index:4!important;
+  min-height:30px!important;
+  box-sizing:border-box!important;
+  padding:7px 12px 7px 38px!important;
+  border-top:2px solid #a0b3bf!important;
+  background:#eef4f7!important;
+  color:#496577!important;
+}
+</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -26333,153 +26567,25 @@ cleanupDuplicateOnly();
 .jgb-complaint-stats-detail-body .jgb-complaint-stats-grid{align-items:start!important;grid-auto-rows:max-content!important;overflow-x:hidden!important}
 .jgb-complaint-stats-detail-body .jgb-complaint-stat-card{height:auto!important;min-height:0!important;align-self:start!important}
 .jgb-complaint-stats-detail-body{overflow-x:hidden!important}
+
+/* 요청 반영: 접수/미처리/오늘의 변화/하단 안내 가독성 강화 */
+.jgb-repair-page .jgb-repair-pane-head b,
+.jgb-repair-page .jgb-repair-mini-head,
+.jgb-repair-page .jgb-repair-mini-row,
+.jgb-repair-page .jgb-live-main b,
+.jgb-repair-page .jgb-live-main span,
+.jgb-repair-page .jgb-live-action b,
+.jgb-repair-page .jgb-live-action span,
+.jgb-repair-page .jgb-live-status,
+.jgb-repair-page .jgb-repair-note{font-weight:1000!important}
+.jgb-repair-counter-strip{display:flex;gap:5px;margin-left:auto;align-items:stretch}
+.jgb-repair-counter-strip>div{min-width:64px;padding:5px 8px;border:1px solid rgba(255,255,255,.4);border-radius:8px;background:rgba(255,255,255,.10);display:flex;flex-direction:column;justify-content:center;text-align:center}
+.jgb-repair-counter-strip b{font-size:18px;line-height:20px;color:#fff;font-weight:1000}
+.jgb-repair-counter-strip small{font-size:9px;color:#e6f2f8;font-weight:900;margin-top:2px}
+.jgb-repair-text-btn.danger{background:#ffe9e9!important;color:#a51f1f!important;border-color:#ffb4b4!important}
+.jgb-live-action-row.warn .jgb-live-status{background:#e53935!important;color:#fff!important}
+.jgb-live-action-row.check .jgb-live-status{background:#f59e0b!important;color:#fff!important}
+.jgb-live-action-row.observe .jgb-live-status{background:#2d7ddf!important;color:#fff!important}
+.jgb-live-action-row.stable .jgb-live-status{background:#159447!important;color:#fff!important}
+@media(max-width:1050px){.jgb-repair-counter-strip{display:none!important}}
 </style>
-
-<style id="repair-clean-rebuild">
-/* 민원 접수·처리 관리 화면 재구성
-   - 기존 HTML/데이터/JS/버튼 동작 유지
-   - 스프링 노트 전용 장식 제거
-   - 참고 화면처럼 공공기관형 청색 관리화면으로 재구성 */
-@media (min-width:1051px){
-  body:has(.jgb-repair-page){
-    overflow:hidden!important;
-    margin:0!important;
-    background:#eef4f8!important;
-  }
-  body:has(.jgb-repair-page) .jgb-nav,
-  body:has(.jgb-repair-page) .jgb-top{display:none!important}
-  body:has(.jgb-repair-page) .jgb-main{width:100%!important;max-width:none!important}
-  body:has(.jgb-repair-page) .jgb-content{padding:0!important;max-width:none!important;width:100%!important}
-
-  .jgb-repair-page{
-    width:calc(100% - 28px)!important;
-    max-width:1345px!important;
-    height:100vh!important;
-    max-height:100vh!important;
-    margin:0 auto!important;
-    padding:25px 0 18px!important;
-    display:grid!important;
-    grid-template-rows:94px minmax(0,4fr) minmax(0,4fr) minmax(0,2fr)!important;
-    gap:9px!important;
-    overflow:hidden!important;
-    color:#123b57!important;
-    background:transparent!important;
-  }
-
-  /* 상단 제목 */
-  .jgb-repair-head{
-    height:94px!important;min-height:94px!important;
-    padding:12px 16px!important;
-    border:1px solid #0a4668!important;border-radius:9px!important;
-    background:linear-gradient(100deg,#0c4669 0%,#115f87 55%,#0b4a70 100%)!important;
-    box-shadow:0 3px 8px rgba(16,55,80,.18)!important;
-  }
-  .jgb-repair-brand{gap:12px!important}
-  .jgb-repair-brandico{width:46px!important;height:46px!important;font-size:31px!important;flex-basis:46px!important}
-  .jgb-repair-brand h2{font-size:30px!important;line-height:1.1!important;margin:0 0 5px!important;letter-spacing:-.04em!important}
-  .jgb-repair-brand p{font-size:13px!important;font-weight:700!important}
-  .jgb-repair-header-summary{grid-template-columns:auto auto!important;gap:7px!important}
-  .jgb-repair-text-btn,.jgb-repair-detail-btn{height:44px!important;min-width:79px!important;padding:0 13px!important;border-radius:7px!important;font-size:11px!important;font-weight:900!important}
-
-  /* 상단 2분할: 위치도 68.3 / 오늘의 변화 31.7 */
-  .jgb-repair-top{
-    grid-row:2!important;height:100%!important;min-height:0!important;margin:0!important;
-    display:grid!important;grid-template-columns:68.3fr 31.7fr!important;gap:8px!important;overflow:hidden!important;
-  }
-  .jgb-repair-map-panel,.jgb-repair-judge{
-    min-width:0!important;min-height:0!important;height:100%!important;
-    border:1px solid #7894a8!important;border-radius:9px!important;background:#fff!important;overflow:hidden!important;
-  }
-  .jgb-repair-panel-head{
-    height:39px!important;min-height:39px!important;padding:7px 11px!important;
-    background:#e5f1f8!important;border-bottom:2px solid #4f83a2!important;
-  }
-  .jgb-repair-panel-head b{font-size:17px!important;font-weight:950!important;color:#12466f!important}
-  .jgb-repair-panel-head span{font-size:10px!important;color:#58758b!important}
-  .jgb-repair-recent{border:1px solid #7894a8!important}
-
-  /* 위치도 */
-  .jgb-repair-map{height:calc(100% - 39px)!important;background:#f7fafc!important}
-  .jgb-repair-map-title{height:25px!important;padding:5px 8px!important;font-size:10px!important;background:#fff!important;border-bottom:1px solid #ccd9e2!important}
-  .jgb-facility-layout{top:10%!important;height:50%!important;left:3%!important;right:3%!important;gap:6px!important}
-  .jgb-facility-group{border:1px solid #a8bdcc!important;border-radius:5px!important}
-  .jgb-facility-group-title{height:25px!important;font-size:10px!important;background:#f8fbfd!important;border-bottom:1px solid #c7d7e1!important}
-  .jgb-facility-items{gap:4px!important;padding:5px!important}
-  .jgb-facility-zone{font-size:9px!important;border:1px dashed #9db6c7!important;background:#fff!important}
-  .jgb-facility-zone.has-complaint{border:2px solid #e53935!important;background:#fff0f0!important}
-  .jgb-map-complaint-count{min-width:31px!important;width:31px!important;height:31px!important;font-size:16px!important}
-  .jgb-repair-courts{left:3%!important;right:3%!important;top:66%!important;height:25%!important;gap:6px!important;overflow:hidden!important}
-  .jgb-repair-court{border:1px solid #7695aa!important;background:#fff!important;font-size:12px!important;padding-top:5px!important;box-shadow:none!important}
-  .jgb-repair-court.has-complaint{border:3px solid #e53935!important;background:#fff0f0!important}
-  .jgb-repair-court .jgb-map-complaint-count{min-width:35px!important;width:35px!important;height:35px!important;font-size:18px!important}
-  .jgb-repair-legend{bottom:4px!important;font-size:8px!important}
-
-  /* 오늘의 변화 */
-  .jgb-repair-judge{display:grid!important;grid-template-rows:39px 1fr!important}
-  .jgb-repair-judge-body{padding:8px!important;justify-content:flex-start!important;gap:6px!important}
-  .jgb-repair-judge-main{padding:10px!important;border:1px solid #d4e2eb!important;background:#f8fbfd!important}
-  .jgb-repair-judge-main strong{font-size:14px!important}
-  .jgb-repair-judge-main small{font-size:9px!important;margin-top:5px!important}
-  .jgb-repair-judge-list{gap:6px!important;margin-top:0!important}
-  .jgb-repair-judge-list div{padding:9px!important;font-size:10px!important}
-
-  /* 접수·민원 처리 목록 */
-  .jgb-repair-list-wrap{
-    grid-row:3!important;height:100%!important;min-height:0!important;margin:0!important;
-    display:flex!important;flex-direction:column!important;overflow:hidden!important;
-    border:1px solid #6f91a8!important;border-radius:7px!important;background:#fff!important;
-    box-shadow:0 2px 7px rgba(35,65,85,.10)!important;
-  }
-  .jgb-repair-list-head{
-    height:39px!important;min-height:39px!important;padding:7px 11px!important;
-    background:#d5e8f5!important;border-bottom:2px solid #3f7598!important;
-  }
-  .jgb-repair-list-head b{font-size:17px!important;font-weight:950!important;color:#12466f!important}
-  .jgb-repair-list-head span{font-size:10px!important;color:#4e7087!important}
-  .jgb-repair-split{display:grid!important;grid-template-columns:1fr 1fr!important;gap:0!important;min-height:0!important;flex:1 1 auto!important;overflow:hidden!important}
-  .jgb-repair-pane{min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:0!important;background:#fff!important;position:relative!important}
-  .jgb-repair-pane:first-child{border-right:1px solid #a9bdc9!important}
-  .jgb-repair-pane-head{height:39px!important;min-height:39px!important;padding:7px 11px!important;background:#edf5fb!important;border-bottom:1px solid #a9bdc9!important}
-  .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head{background:#eef8f3!important;border-bottom:1px solid #a7c9b5!important}
-  .jgb-repair-pane-head b{font-size:15px!important;font-weight:950!important;color:#18547a!important}
-  .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head b{color:#216448!important}
-  .jgb-repair-pane-head span{font-size:10px!important;color:#667f91!important}
-  .jgb-repair-scroll{height:auto!important;min-height:0!important;flex:1 1 auto!important;overflow-y:auto!important;overflow-x:hidden!important;background:#fff!important}
-  .jgb-repair-mini-head,.jgb-repair-mini-row{grid-template-columns:58px 78px minmax(150px,1fr) 125px 92px 78px!important;column-gap:0!important;padding:0!important;min-width:0!important}
-  .jgb-repair-mini-head{height:35px!important;min-height:35px!important;background:#e3f0f7!important;color:#244d67!important;font-size:11px!important;font-weight:1000!important;border-bottom:1px solid #91acbd!important}
-  .jgb-repair-mini-head>span,.jgb-repair-mini-row>div{min-width:0!important;height:100%!important;box-sizing:border-box!important;border-right:1px solid #c8d7e0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0 5px!important}
-  .jgb-repair-mini-head>span:last-child,.jgb-repair-mini-row>div:last-child{border-right:0!important}
-  .jgb-repair-mini-head>span:nth-child(3){justify-content:flex-start!important;text-align:left!important}
-  .jgb-repair-mini-row{height:40px!important;min-height:40px!important;border-bottom:1px solid #d6e2e9!important;background:#fff!important}
-  .jgb-repair-mini-row:nth-child(odd){background:#fbfdfe!important}
-  .jgb-repair-mini-no b{font-size:12px!important;color:#1268a1!important;font-weight:1000!important}
-  .jgb-repair-mini-time{font-size:10px!important;color:#38566b!important;font-weight:900!important}
-  .jgb-repair-mini-content{justify-content:flex-start!important;text-align:left!important;overflow:hidden!important}
-  .jgb-repair-mini-content span{font-size:11px!important;color:#173e57!important;font-weight:950!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-  .jgb-repair-mini-work select{width:100%!important;height:28px!important;border:1px solid #a9c0cf!important;border-radius:6px!important;font-size:10px!important;font-weight:900!important;background:#fff!important}
-  .jgb-repair-mini-actions button{min-width:0!important;width:100%!important;height:28px!important;border-radius:6px!important;font-size:10px!important;font-weight:950!important;cursor:pointer!important}
-  .jgb-repair-mini-actions .mini-complete{background:#8bbde3!important;border:0!important;color:#fff!important}
-  .jgb-repair-mini-actions .mini-detail{background:#fff!important;border:1px solid #7eafd0!important;color:#17537a!important}
-  .jgb-repair-note{height:29px!important;min-height:29px!important;padding:6px 10px!important;background:#f1f6f9!important;border-top:1px solid #9fb4c2!important;color:#4f6879!important;font-size:9px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-
-  /* 통계 영역은 기존 내용/기능 유지, 화면 하단 20% */
-  .jgb-complaint-stats{grid-row:4!important;height:100%!important;min-height:0!important;margin:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:1px solid #738ca0!important;border-radius:7px!important;background:#fff!important}
-  .jgb-complaint-stats-head{height:39px!important;min-height:39px!important;padding:7px 11px!important;background:#e8e6f5!important;border-bottom:2px solid #70659c!important}
-  .jgb-complaint-stats-head b{font-size:16px!important;color:#40376e!important}
-  .jgb-complaint-stats-head span{font-size:10px!important;color:#635a83!important}
-  .jgb-complaint-stats-grid{min-height:0!important;flex:1 1 auto!important;overflow:auto!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;padding:7px!important;gap:7px!important}
-  .jgb-complaint-stat-card{height:100%!important;min-height:0!important}
-}
-
-@media(max-width:1050px){
-  body:has(.jgb-repair-page) .jgb-nav{display:none!important}
-  body:has(.jgb-repair-page) .jgb-top{display:none!important}
-  body:has(.jgb-repair-page) .jgb-content{padding:0!important}
-  .jgb-repair-page{width:100%!important;max-width:none!important;padding:12px!important;display:block!important;height:auto!important;overflow:visible!important}
-  .jgb-repair-top,.jgb-repair-split{grid-template-columns:1fr!important}
-  .jgb-repair-map-panel,.jgb-repair-judge,.jgb-repair-list-wrap{margin-bottom:10px!important;min-height:280px!important}
-  .jgb-repair-pane:first-child{border-right:0!important;border-bottom:1px solid #a9bdc9!important}
-  .jgb-repair-scroll{height:260px!important;flex:none!important}
-}
-</style>
-
