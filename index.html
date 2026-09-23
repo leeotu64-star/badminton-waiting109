@@ -5390,37 +5390,50 @@ a[data-page="digitalTwin"],
 }
 </style>
 
-<style id="JGB_EAM_LIVE_MATCH_MAP_FINAL_V4">
+<style id="JGB_EAM_LIVE_MATCH_MAP_HEIGHT_V5">
 /* =========================================================
-   EAM 최종 정렬
-   - 좌측 배치도: 원본 그대로
-   - 우측 LIVE: 배치도의 전체 기준 상부 25% / 하부 75%
+   EAM 상·하단 정확 정렬
+   - 좌측 배치도는 현재 원본의 70% 높이 유지
+   - 우측 수리 LIVE도 동일하게 70% 높이
+   - 두 영역의 상단/하단을 동일 선상에 맞춤
+   - LIVE 내부 50:50 분할은 적용하지 않음
    ========================================================= */
 
-/* 우측 수리 LIVE 상·하부만 변경 */
-.eh-right-v20{
-  display:grid!important;
-  grid-template-rows:25fr 75fr!important;
-  gap:10px!important;
-  height:100%!important;
+.eh-main{
+  align-items:start!important;
   min-height:0!important;
-  overflow:hidden!important;
 }
 
-.eam228-right-split{
-  display:grid!important;
-  grid-template-rows:25fr 75fr!important;
-  gap:9px!important;
-  height:100%!important;
+/* 우측 wrapper가 display:contents로 바뀌었던 이전 규칙 무력화 */
+.eh-main > .eh-right{
+  display:block!important;
+  min-width:0!important;
   min-height:0!important;
-  overflow:hidden!important;
+  height:100%!important;
+  align-self:start!important;
 }
 
-/* LIVE 내부 카드가 각 영역을 정확히 채우도록 */
-.eh-right-v20 > *,
-.eam228-right-split > *{
+/* 좌측 배치도와 우측 LIVE의 외곽 높이를 동일하게 */
+.eh-main > .eh-map-card{
+  height:70%!important;
+  max-height:70%!important;
   min-height:0!important;
-  height:100%!important;
+  align-self:start!important;
+  box-sizing:border-box!important;
+}
+
+.eh-main > .eh-right > .eh-live-card{
+  height:70%!important;
+  max-height:70%!important;
+  min-height:0!important;
+  align-self:start!important;
+  box-sizing:border-box!important;
+}
+
+/* LIVE 자체는 한 장의 카드로 배치도와 같은 상·하단을 사용 */
+.eh-main > .eh-right > .eh-live-card .eh-card-body{
+  min-height:0!important;
+  overflow:hidden!important;
 }
 </style>
 
