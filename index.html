@@ -21061,10 +21061,21 @@ body {
       const s=annualStats(type,year);
       return `<div class="jgb-lr-v54-annual-card"><div class="jgb-lr-v54-annual-head"><strong>${type==='light'?'💡 조명 유지관리 실적':'🔌 릴선 유지관리 실적'}</strong><div class="jgb-lr-v54-year-control"><span>연도 선택</span><button type="button" onclick="window.jgbLRAnnualYear('${type}',-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="window.jgbLRAnnualYear('${type}',1)" aria-label="다음 연도">›</button></div></div><table><thead><tr><th>연도</th><th>자체정비 건수</th><th>외주정비 건수</th><th>부품 교체 건수</th></tr></thead><tbody><tr><th>${year}년</th><td>${s.self}건</td><td>${s.external}건</td><td>${s.parts}건</td></tr></tbody></table><p class="jgb-lr-v54-annual-note">※ 선택한 연도의 실적만 표시됩니다.</p></div>`;
     };
-    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>조명·릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc,'light')}${group('🔌','릴선',rc,'reel')}</div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
+    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>조명·릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc,'light')}${group('🔌','릴선',rc,'reel')}<button type="button" class="jgb-lr-performance-btn" onclick="window.jgbLRTogglePerformance()">📊 유지관리 실적</button></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid" style="display:none">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
   }
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
+  window.jgbLRTogglePerformance=function(){
+    const host=document.querySelector('.jgb-lr-v54');
+    if(!host)return;
+    const panes=host.querySelector('.jgb-lr-v54-panes');
+    const annual=host.querySelector('.jgb-lr-v54-annual-grid');
+    const btn=host.querySelector('.jgb-lr-performance-btn');
+    const showing=annual && getComputedStyle(annual).display!=='none';
+    if(panes) panes.style.display=showing?'grid':'none';
+    if(annual) annual.style.display=showing?'none':'grid';
+    if(btn){btn.classList.toggle('active',!showing);btn.textContent=showing?'📊 유지관리 실적':'↩ 시설관리 화면';}
+  };
   window.jgbLRAnnualYear=function(type,delta){
     if(type==='light') annualLightYear=Math.min(2035,Math.max(2026,annualLightYear+delta));
     else annualReelYear=Math.min(2035,Math.max(2026,annualReelYear+delta));
@@ -23509,6 +23520,34 @@ document.addEventListener('click',handle,true);
 }
 </style>
 
+
+<style id="JGB_LR_REQUESTS_FINAL_ONLY">
+/* 이번 요청사항만 최종 적용: 기존 기능/데이터/이벤트는 유지 */
+.jgb-lr-v54-brandico{
+  width:58px!important;height:58px!important;min-width:58px!important;flex:0 0 58px!important;
+  font-size:42px!important;border-radius:14px!important;
+}
+.jgb-lr-v54-brand h2{font-size:30px!important;line-height:1.15!important;font-weight:1000!important}
+.jgb-lr-v54-brand p{font-size:13px!important;line-height:1.35!important;font-weight:950!important}
+.jgb-lr-v54-brand{gap:15px!important}
+.jgb-lr-v54-head{min-height:88px!important}
+.jgb-lr-performance-btn{
+  height:46px!important;min-width:126px!important;padding:0 14px!important;
+  border:2px solid rgba(255,255,255,.85)!important;border-radius:8px!important;
+  background:#fff!important;color:#14527a!important;font-size:13px!important;font-weight:1000!important;
+  cursor:pointer!important;box-shadow:0 2px 5px rgba(0,0,0,.18)!important;white-space:nowrap!important;
+}
+.jgb-lr-performance-btn:hover,.jgb-lr-performance-btn.active{background:#eaf6ff!important;border-color:#fff!important}
+.jgb-lr-v54-annual-grid{margin-top:0!important}
+.jgb-lr-v54-annual-card{border:2px solid #7894a8!important}
+.jgb-lr-v54-detail{grid-template-columns:minmax(0,50fr) minmax(0,50fr)!important}
+.jgb-lr-v54-card{border-right:3px solid #7894a8!important}
+.jgb-lr-v54-history{border-left:0!important}
+@media(max-width:900px){
+  .jgb-lr-v54-brandico{width:48px!important;height:48px!important;min-width:48px!important;flex-basis:48px!important;font-size:34px!important}
+  .jgb-lr-v54-brand h2{font-size:25px!important}.jgb-lr-v54-brand p{font-size:12px!important}
+}
+</style>
 </body>
 
 <style id="v19-court-position-final">
