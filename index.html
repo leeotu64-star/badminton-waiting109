@@ -6369,6 +6369,108 @@ html,body{background:#eef5f9!important}
 }
 </style>
 
+
+<style id="facility-portal-sidebar-unified-v2">
+/* 좌측 업무 메뉴 통일: 아이콘 폭·텍스트 시작점·행 높이·그룹 간격을 동일하게 */
+.jgb-nav{
+  width:220px!important;
+  box-sizing:border-box!important;
+  padding:20px 12px!important;
+}
+.jgb-brand{
+  height:48px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:0 10px!important;
+  margin:0 4px 18px!important;
+  border-bottom:1px solid #31506e!important;
+  font-size:17px!important;
+  line-height:1!important;
+}
+.jgb-group{
+  height:26px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  margin:13px 8px 4px!important;
+  padding:0!important;
+  color:#a9bdd2!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  letter-spacing:-.02em!important;
+  border:0!important;
+}
+.jgb-link{
+  width:100%!important;
+  height:42px!important;
+  min-height:42px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  margin:3px 0!important;
+  padding:0 11px!important;
+  border-radius:9px!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+.jgb-nav-icon{
+  width:26px!important;
+  min-width:26px!important;
+  height:26px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  border-radius:7px!important;
+  background:#173b5f!important;
+  color:#d9eaff!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:-.05em!important;
+  line-height:1!important;
+}
+.jgb-link.on .jgb-nav-icon{
+  background:#fff!important;
+  color:#1769c1!important;
+}
+.jgb-link:hover .jgb-nav-icon{
+  background:#fff!important;
+  color:#1769c1!important;
+}
+.jgb-nav-label{
+  min-width:0!important;
+  flex:1!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.jgb-dt-locked{
+  color:#9fb3c9!important;
+  cursor:default!important;
+}
+.jgb-dt-locked .jgb-nav-icon{
+  color:#9fb3c9!important;
+  background:#153451!important;
+}
+@media(max-width:900px){
+  .jgb-nav{width:76px!important;padding:12px 7px!important}
+  .jgb-brand{justify-content:center!important;margin:0 0 12px!important;padding:0!important;font-size:0!important}
+  .jgb-brand::first-letter{font-size:25px!important}
+  .jgb-group{display:none!important}
+  .jgb-link{
+    width:100%!important;
+    justify-content:center!important;
+    padding:0!important;
+  }
+  .jgb-nav-icon{width:28px!important;min-width:28px!important}
+  .jgb-nav-label{display:none!important}
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -6627,7 +6729,7 @@ html,body{background:#eef5f9!important}
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("dashboard","🏠 시설 종합현황")}${nav("repair","📋 시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","🏢 시설물 EAM 관리")}${nav("dashboard2","📊 시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","💧 시설 누수·수리 관리현황")}${nav("waterproof","🛡 보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("basic","🧹 금일 업무현황")}${nav("schedule","📅 업무 일정관리")}<div class="jgb-group">시설관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태">🔒 디지털트윈</span>${nav("lighting","💡 조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">📊 유지관리 실적</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 업무관리</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("dashboard","시설 종합현황")}${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">📊 유지관리 실적</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 업무관리</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      const mobileContent=document.getElementById('jgbMobileContent');
      if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
@@ -6635,7 +6737,21 @@ html,body{background:#eef5f9!important}
        app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
      }
     }
-    function nav(p,t){return `<a class="jgb-link ${page===p?"on":""}" href="?page=${encodeURIComponent(p)}" data-page="${p}">${t}</a>`}
+    function nav(p,t){
+      const icons={
+        dashboard:"⌂",
+        repair:"▤",
+        eam:"EAM",
+        dashboard2:"현황",
+        leakage:"LK",
+        waterproof:"WP",
+        basic:"업무",
+        schedule:"일정",
+        lighting:"조명"
+      };
+      const icon=icons[p]||"•";
+      return `<a class="jgb-link ${page===p?"on":""}" href="?page=${encodeURIComponent(p)}" data-page="${p}"><span class="jgb-nav-icon">${icon}</span><span class="jgb-nav-label">${t}</span></a>`
+    }
     function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
     function go(p){if(!p||p==="digitalTwin")return;page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
     window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";if(page==="digitalTwin")page="dashboard";render()})
