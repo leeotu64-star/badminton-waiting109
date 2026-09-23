@@ -7904,6 +7904,61 @@ html,body{background:#eef5f9!important}
 }
 </style>
 
+
+<style id="JGB_EAM_USER_REQUEST_ROOF_REDUCE_STORE_V1">
+/* 사용자 요청:
+   1) 상단 옥상/코트 헤더 영역을 조금 줄임
+   2) 줄인 공간은 시설 영역으로 자연스럽게 연결
+   3) 하단 오른쪽 끝에 창고 1개 추가
+   4) 기존 기능/자산 데이터/클릭 로직은 변경하지 않음
+*/
+
+/* 상단 코트 헤더 높이 축소 */
+.eh-floor-1f .eh-courts{
+  top:0!important;
+  height:30%!important;
+}
+
+/* 축소된 상단 영역 바로 아래부터 시설이 시작되도록 */
+.eh-floor-1f .eh-facility{
+  top:30%!important;
+  height:70%!important;
+  bottom:auto!important;
+}
+
+/* 하단 시설은 3칸 → 4칸 균등 배치 */
+.eh-floor-1f .eh-bottom{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:4px!important;
+}
+
+/* 새 창고 */
+.eh-floor-1f .eh-bottom .eh-zone:last-child{
+  background:#f2f5f7!important;
+}
+
+/* 기존 2F의 별도 창고 표시는 숨겨 중복을 만들지 않음 */
+.eh-floor-2f .store2{
+  display:none!important;
+}
+
+/* 모바일에서도 동일한 구조 유지 */
+@media(max-width:700px){
+  .eh-floor-1f .eh-courts{
+    top:0!important;
+    height:30%!important;
+  }
+  .eh-floor-1f .eh-facility{
+    top:30%!important;
+    height:70%!important;
+  }
+  .eh-floor-1f .eh-bottom{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -9312,7 +9367,7 @@ html,body{background:#eef5f9!important}
     <div class="eh-facility">
       <div class="eh-row">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div>
       <div class="eh-corridor">복도</div>
-      <div class="eh-bottom">${zone('휴게실','휴게공간')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영')}</div>
+      <div class="eh-bottom">${zone('휴게실','휴게공간')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영')}${zone('창고','시설물품 보관')}</div>
     </div>
   </section>
   <section class="eh-floor eh-floor-2f">
