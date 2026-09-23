@@ -6063,315 +6063,207 @@ table tbody td{
 </style>
 
 
-<style id="JGB_BASIC_WORK_NOTE_BACKGROUND_REMOVE">
-/* 본문 바탕 제거: 헤더는 유지하고 바깥 배경/판만 투명 처리 */
-html, body {
-  background:#fff !important;
-}
-.basic-book-layout {
-  background:transparent !important;
-  border:0 !important;
-  border-radius:0 !important;
-  box-shadow:none !important;
-}
-</style>
-
-<style id="JGB_BASIC_WORK_NOTE_REAL_20_80">
-/* 실제 적용: 헤더는 그대로 두고 업무 본문만 20:80 작업수첩 */
-.basic-book-layout::after{display:none!important;content:none!important;}
-
-/* 기존 전체 업무 카드의 빈 여백을 없애고, 업무영역만 20:80으로 분할 */
-.basic-book-layout .basic-v5-single{
-  position:relative!important;
+<style id="BASIC_WORKBOOK_ALIGNMENT_ADDON">
+/* 원본 유지: 글자·아이콘 정렬만 추가 */
+.basic-book-layout .basic-v5-task{
   display:grid!important;
-  grid-template-columns:20% minmax(0,80%)!important;
-  gap:0!important;
-  width:100%!important;
-  margin:0!important;
-  padding:0!important;
-  box-sizing:border-box!important;
-  background:#fff!important;
+  grid-template-columns:40px 30px minmax(0,1fr) 64px!important;
+  align-items:center!important;
+  column-gap:8px!important;
+  text-align:left!important;
 }
-
-/* 왼쪽 20% 세로 제본 */
-.basic-book-layout .basic-v5-single::before{
-  content:""!important;
-  display:block!important;
-  grid-column:1!important;
-  grid-row:1!important;
-  min-height:100%!important;
-  background:
-    radial-gradient(circle at 50% 18px,#fff 0 5px,#8293a0 5.5px 7px,transparent 7.5px) center top/100% 42px repeat-y,
-    linear-gradient(90deg,#f4f7f8 0%,#eef2f4 82%,#d5dee4 100%)!important;
-  border-right:1px solid #d2dce2!important;
-  box-sizing:border-box!important;
+.basic-book-layout .basic-v5-task .task-icon{
+  width:34px!important;
+  height:34px!important;
+  margin:0 auto!important;
+  justify-self:center!important;
+  align-self:center!important;
 }
-
-/* 오른쪽 80%가 실제 작업수첩 */
-.basic-book-layout .basic-v5-single .basic-v5-card{
-  grid-column:2!important;
-  grid-row:1!important;
-  width:100%!important;
+.basic-book-layout .basic-v5-task .no{
+  width:auto!important;
   min-width:0!important;
   margin:0!important;
-  box-sizing:border-box!important;
-  border:1px solid #d7e0e6!important;
-  border-left:0!important;
-  border-radius:0 12px 12px 0!important;
-  background:#fff!important;
-  box-shadow:none!important;
+  text-align:center!important;
+  justify-self:center!important;
+  align-self:center!important;
+  line-height:1!important;
 }
-
-/* 카드 안쪽은 종이처럼 정리 */
-.basic-book-layout .basic-v5-single .basic-v5-card > .head{
-  background:#fff!important;
-  border-bottom:1px solid #e1e7eb!important;
-  border-radius:0!important;
+.basic-book-layout .basic-v5-task .txt{
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:left!important;
+  align-self:center!important;
+  line-height:1.35!important;
 }
-.basic-book-layout .basic-v5-single .basic-v5-tasks{
-  background:#fff!important;
+.basic-book-layout .basic-v5-task .action{
+  min-width:0!important;
+  width:64px!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:center!important;
+  justify-self:end!important;
+  align-self:center!important;
+  white-space:nowrap!important;
 }
-
-/* 왼쪽 제본 영역에는 기존 업무내용이 들어가지 않게 유지 */
-.basic-book-layout .basic-v5-single .basic-v5-card .head,
-.basic-book-layout .basic-v5-single .basic-v5-card .bar,
-.basic-book-layout .basic-v5-single .basic-v5-card .basic-v5-tasks,
-.basic-book-layout .basic-v5-single .basic-v5-card .basic-v5-foot{
-  position:relative!important;
+.basic-book-layout .basic-v5-head{
+  display:flex!important;
+  align-items:center!important;
 }
-
-@media(max-width:900px){
-  .basic-book-layout .basic-v5-single{grid-template-columns:20% minmax(0,80%)!important;}
+.basic-book-layout .basic-v5-head>div:first-child{
+  min-width:0!important;
+  text-align:left!important;
+}
+.basic-book-layout .basic-v5-sub{
+  text-align:left!important;
+  line-height:1.5!important;
+}
+.basic-book-layout .basic-v5-worker-tabs{
+  align-items:center!important;
+}
+.basic-book-layout .basic-v5-worker-tab{
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+@media(max-width:700px){
+  .basic-book-layout .basic-v5-task{
+    grid-template-columns:36px 26px minmax(0,1fr) 56px!important;
+    column-gap:6px!important;
+  }
+  .basic-book-layout .basic-v5-task .task-icon{width:32px!important;height:32px!important}
+  .basic-book-layout .basic-v5-task .action{width:56px!important}
 }
 </style>
 
-<style id="JGB_BASIC_WORK_NOTE_FINAL_V1">
-/* =========================================================
-   오늘의 기본업무 최종 작업수첩 디자인
-   - 헤더는 기존 기능/구조 유지
-   - 헤더 아래 업무영역만 20:80
-   - 왼쪽 20% = 실제 세로 스프링 제본
-   - 오른쪽 80% = 종이 작업면
-   - 기존 JS/업무번호/완료기능 변경 없음
-   ========================================================= */
-
-/* 바깥은 깨끗한 작업수첩을 받치는 연한 바탕 */
+<style id="JGB_BASIC_WORK_NOTE_FINAL_V2">
+/* 최종 작업수첩 재구성: 헤더 아래 본문만 20:80 / 왼쪽 제본 + 오른쪽 종이 */
 .basic-book-layout{
-  position:relative!important;
-  display:block!important;
-  box-sizing:border-box!important;
-  padding:0!important;
-  margin:0!important;
   background:transparent!important;
   border:0!important;
   border-radius:0!important;
   box-shadow:none!important;
+  padding:0!important;
   overflow:visible!important;
 }
 
-/* 헤더는 기존 그대로 보이게 */
-.basic-book-layout > .basic-v5-head{
+/* 직원 선택/페이지 영역은 기존 기능과 위치 유지 */
+.basic-book-layout .basic-v5-page-nav,
+.basic-book-layout .basic-v5-worker-tabs{
   position:relative!important;
-  z-index:20!important;
+  z-index:5!important;
 }
 
-/* 직원 이동/탭 영역은 헤더 아래에 기존 기능 그대로 유지 */
-.basic-book-layout > .basic-v5-page-nav,
-.basic-book-layout > .basic-v5-worker-tabs{
-  position:relative!important;
-  z-index:20!important;
-}
-
-/* 실제 수첩 본문 */
+/* 실제 수첩 본체: 왼쪽 20% 제본 / 오른쪽 80% 작업지 */
 .basic-book-layout .basic-v5-single{
   position:relative!important;
   display:grid!important;
-  grid-template-columns:20% minmax(0,80%)!important;
+  grid-template-columns:20% 80%!important;
   gap:0!important;
   width:100%!important;
-  min-height:500px!important;
   margin:0!important;
-  padding:0!important;
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
+  min-height:430px!important;
+  align-items:stretch!important;
   overflow:visible!important;
-  box-sizing:border-box!important;
 }
 
-/* 왼쪽 20% : 스프링 수첩 표지/제본 */
+/* 왼쪽 제본판 */
 .basic-book-layout .basic-v5-single::before{
-  content:""!important;
+  content:"";
   grid-column:1!important;
   grid-row:1!important;
-  display:block!important;
+  min-width:0!important;
   min-height:100%!important;
-  box-sizing:border-box!important;
-  background:
-    radial-gradient(ellipse 8px 15px at 50% 28px,
-      #ffffff 0 32%,
-      #26343c 36% 48%,
-      #71808a 50% 60%,
-      transparent 63%) center top/100% 56px repeat-y,
-    linear-gradient(90deg,#efe5d2 0%,#f7f0e3 72%,#e2d6c2 100%)!important;
-  border:1px solid #d7c9b2!important;
+  border:1px solid #d7dde2!important;
   border-right:0!important;
-  border-radius:12px 0 0 12px!important;
-  box-shadow:inset -7px 0 12px rgba(86,67,43,.08)!important;
+  border-radius:16px 0 0 16px!important;
+  background:
+    linear-gradient(90deg,#f1f4f6 0%,#e5eaee 48%,#f8fafb 100%)!important;
+  box-shadow:inset -8px 0 12px rgba(80,95,108,.10)!important;
 }
 
-/* 오른쪽 80% : 실제 종이 */
-.basic-book-layout .basic-v5-single .basic-v5-card{
+/* 왼쪽 스프링: 구멍이 아니라 실제 제본 링처럼 보이도록 */
+.basic-book-layout .basic-v5-single::after{
+  content:"";
+  position:absolute!important;
+  z-index:4!important;
+  left:10%!important;
+  top:18px!important;
+  bottom:18px!important;
+  width:80%!important;
+  pointer-events:none!important;
+  background:
+    radial-gradient(ellipse 7px 12px at 50% 50%,
+      #ffffff 0 34%,
+      #a8b2bb 35% 47%,
+      #687681 48% 54%,
+      #dfe5e9 55% 66%,
+      transparent 67%)
+    center top / 100% 48px repeat-y!important;
+  filter:drop-shadow(1px 1px 1px rgba(40,55,65,.22))!important;
+}
+
+/* 오른쪽 80% 종이 */
+.basic-book-layout .basic-v5-single > .basic-v5-card{
   grid-column:2!important;
   grid-row:1!important;
   width:100%!important;
   min-width:0!important;
   min-height:100%!important;
   margin:0!important;
-  padding:24px 28px 18px!important;
-  box-sizing:border-box!important;
-  border:1px solid #d8d0c3!important;
+  padding:18px 20px 14px!important;
+  background:
+    repeating-linear-gradient(to bottom,
+      #fffdf8 0,
+      #fffdf8 31px,
+      #e9e2d7 32px,
+      #fffdf8 33px)!important;
+  border:1px solid #d7cfc3!important;
   border-left:0!important;
-  border-radius:0 12px 12px 0!important;
-  background-color:#fffdf8!important;
-  background-image:repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 39px,
-    rgba(96,137,169,.13) 40px,
-    transparent 41px
-  )!important;
-  box-shadow:0 5px 18px rgba(60,73,82,.08)!important;
+  border-radius:0 16px 16px 0!important;
+  box-shadow:0 5px 15px rgba(60,55,45,.07)!important;
 }
 
-/* 종이 안쪽 여백/구분 */
-.basic-book-layout .basic-v5-single .basic-v5-card > .head{
-  min-height:72px!important;
-  margin:0 0 14px!important;
-  padding:0 0 14px!important;
-  background:transparent!important;
-  border:0!important;
-  border-bottom:1px solid #d9dfe2!important;
-  border-radius:0!important;
+/* 종이 상단 */
+.basic-book-layout .basic-v5-card > .head{
+  min-height:58px!important;
+  padding-bottom:8px!important;
+  border-bottom:1px solid #ded6ca!important;
 }
 
-.basic-book-layout .basic-v5-single .basic-v5-card .name{
-  font-size:30px!important;
-  font-weight:1000!important;
-  color:#143f63!important;
-}
-
-.basic-book-layout .basic-v5-single .basic-v5-card .shift{
-  font-size:13px!important;
-  font-weight:900!important;
-}
-
-.basic-book-layout .basic-v5-single .basic-v5-card .state{
-  font-size:13px!important;
-  font-weight:1000!important;
-}
-
-.basic-book-layout .basic-v5-single .basic-v5-card .bar{
-  height:6px!important;
-  margin:0 0 13px!important;
-  background:#e9eef1!important;
-}
-
-/* 업무 목록은 종이 위 체크리스트 */
-.basic-book-layout .basic-v5-single .basic-v5-tasks{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:9px!important;
-  padding:0!important;
-  background:transparent!important;
-}
-
-.basic-book-layout .basic-v5-single .basic-v5-task{
-  min-height:62px!important;
-  box-sizing:border-box!important;
-  border:1px solid #d8d3ca!important;
-  border-left:3px solid #9bb7ca!important;
-  border-radius:7px!important;
-  background:rgba(255,255,255,.78)!important;
-  box-shadow:0 1px 3px rgba(60,70,75,.035)!important;
-}
-
-.basic-book-layout .basic-v5-single .basic-v5-task .task-icon{
-  width:32px!important;
-  height:32px!important;
-  display:grid!important;
-  place-items:center!important;
-  flex:none!important;
+/* 업무 카드들은 종이 위 체크리스트처럼 */
+.basic-book-layout .basic-v5-task{
+  background:rgba(255,255,255,.88)!important;
+  border:1px solid #d7cfc3!important;
   border-radius:8px!important;
-  background:#f0f4f5!important;
-  font-size:19px!important;
+  box-shadow:0 1px 2px rgba(70,60,50,.04)!important;
+}
+.basic-book-layout .basic-v5-task:hover{
+  background:#fff!important;
+  border-color:#b8c8d4!important;
 }
 
-.basic-book-layout .basic-v5-single .basic-v5-task .no{
-  font-size:12px!important;
-  font-weight:900!important;
-  color:#71808b!important;
-}
-
-.basic-book-layout .basic-v5-single .basic-v5-task .txt{
-  font-size:16px!important;
-  font-weight:1000!important;
-  color:#173b59!important;
-}
-
-.basic-book-layout .basic-v5-single .basic-v5-task .action{
-  font-size:12px!important;
-  font-weight:1000!important;
-}
-
-.basic-book-layout .basic-v5-single .basic-v5-task.is-done{
+/* 완료색은 기존 기능 유지하되 종이 톤으로 정리 */
+.basic-book-layout .basic-v5-task.is-done{
   background:#edf8f1!important;
-  border-color:#9ed5b3!important;
+  border-color:#9fd8b7!important;
 }
 
-/* 완료/진행 하단 기록 */
-.basic-book-layout .basic-v5-single .basic-v5-foot{
-  margin-top:12px!important;
-  padding-top:10px!important;
-  border-top:1px solid #dfe4e7!important;
-  background:transparent!important;
-  font-size:12px!important;
+/* 하단 실적선 */
+.basic-book-layout .basic-v5-foot{
+  background:rgba(255,253,248,.85)!important;
 }
 
-.basic-book-layout .basic-v5-single .basic-v5-foot b{
-  font-size:16px!important;
-  font-weight:1000!important;
-}
-
-/* 기존 10가지 색상 테두리는 작업수첩에서는 약하게 통일 */
-.basic-book-layout .basic-v5-single .basic-tone-blue,
-.basic-book-layout .basic-v5-single .basic-tone-teal,
-.basic-book-layout .basic-v5-single .basic-tone-green,
-.basic-book-layout .basic-v5-single .basic-tone-orange,
-.basic-book-layout .basic-v5-single .basic-tone-violet,
-.basic-book-layout .basic-v5-single .basic-tone-navy,
-.basic-book-layout .basic-v5-single .basic-tone-cyan,
-.basic-book-layout .basic-v5-single .basic-tone-amber,
-.basic-book-layout .basic-v5-single .basic-tone-mint,
-.basic-book-layout .basic-v5-single .basic-tone-red{
-  border-left-color:#9bb7ca!important;
-}
-
-/* 헤더 아래 불필요한 하단 배너는 숨김 유지 */
-.basic-book-layout .basic-v5-bottom-banner{
-  display:none!important;
+/* 바깥 배경은 작업수첩 본체와 분리 */
+.basic-book-layout .basic-v5-single,
+.basic-book-layout .basic-v5-single::before,
+.basic-book-layout .basic-v5-single > .basic-v5-card{
+  box-sizing:border-box!important;
 }
 
 @media(max-width:900px){
-  .basic-book-layout .basic-v5-single{
-    grid-template-columns:20% minmax(0,80%)!important;
-  }
-  .basic-book-layout .basic-v5-single .basic-v5-card{
-    padding:18px 16px 14px!important;
-  }
-  .basic-book-layout .basic-v5-single .basic-v5-tasks{
-    grid-template-columns:1fr!important;
-  }
+  .basic-book-layout .basic-v5-single{grid-template-columns:20% 80%!important;min-height:390px!important}
+  .basic-book-layout .basic-v5-card{padding-left:12px!important;padding-right:12px!important}
 }
 </style>
 
@@ -27113,102 +27005,6 @@ cleanupDuplicateOnly();
 .jgb-manual-desc{display:none;padding:9px 12px 11px;color:#526d7d;font-size:12px;line-height:1.65;background:#fff}
 .jgb-manual-item.open .jgb-manual-desc{display:block}
 </style>
-<style id="JGB_BASIC_WORK_NOTE_20_80_V2">
-/* ===== 오늘의 기본업무 : 헤더 제외 / 20:80 작업수첩 ===== */
-.basic-book-layout{
-  position:relative!important;
-  display:block!important;
-  box-sizing:border-box!important;
-  padding-left:20%!important;
-  padding-right:0!important;
-  background:#ffffff!important;
-  border:1px solid #d9e2e9!important;
-  border-radius:16px!important;
-  box-shadow:0 5px 16px rgba(35,65,85,.07)!important;
-  overflow:visible!important;
-}
-
-/* 왼쪽 20% 제본 영역 */
-.basic-book-layout::before{
-  content:"";
-  position:absolute!important;
-  left:0!important;
-  top:0!important;
-  bottom:0!important;
-  width:20%!important;
-  z-index:4!important;
-  pointer-events:none!important;
-  background:
-    radial-gradient(circle at 50% 24px,#ffffff 0 6px,#718595 6.5px 8px,transparent 8.5px) 0 0/100% 48px repeat-y,
-    linear-gradient(90deg,#f5f8fa 0%,#eef3f6 78%,#d9e2e8 100%)!important;
-  border-right:1px solid #d3dde4!important;
-  box-shadow:inset -5px 0 10px rgba(40,70,90,.05)!important;
-}
-
-/* 상단 가로 스프링 */
-.basic-book-layout::after{
-  content:"";
-  position:absolute!important;
-  left:20%!important;
-  right:14px!important;
-  top:-10px!important;
-  height:24px!important;
-  z-index:8!important;
-  pointer-events:none!important;
-  background:
-    radial-gradient(ellipse 7px 3.5px at 8px 50%,#fff 38%,#718595 42%,#718595 61%,transparent 64%) 0 0/44px 24px repeat-x!important;
-  filter:drop-shadow(0 1px 1px rgba(30,55,75,.18));
-}
-
-/* 오른쪽 80% 실제 업무 영역 */
-.basic-book-layout > *{
-  position:relative!important;
-  z-index:5!important;
-}
-.basic-book-layout .basic-v5-head,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-page-nav,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-bottom-banner{
-  width:100%!important;
-}
-
-/* 헤더 영역은 건드리지 않고 본문 진한 배경만 제거 */
-.basic-book-layout .basic-v5:not(.basic-book-layout),
-.basic-book-layout .basic-v5-card,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-page-nav{
-  background:#ffffff!important;
-}
-
-/* 기존 진한 카드/판 배경 강제 제거 */
-.basic-book-layout .basic-v5-card .head,
-.basic-book-layout .basic-v5-card .body,
-.basic-book-layout .basic-v5-card .content{
-  background:#ffffff!important;
-}
-
-/* 본문 영역은 깨끗한 종이 느낌 */
-.basic-book-layout .basic-v5-card{
-  border-color:#d7e1e8!important;
-  box-shadow:0 3px 10px rgba(35,65,85,.055)!important;
-}
-
-/* 왼쪽 제본 영역 때문에 제목/본문이 겹치지 않도록 */
-.basic-book-layout .basic-v5-head,
-.basic-book-layout .basic-v5-page-nav,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-bottom-banner{
-  margin-left:0!important;
-}
-
-@media(max-width:900px){
-  .basic-book-layout{padding-left:20%!important}
-}
-</style>
-
 <script>
 (function(){
 function initManual(){
