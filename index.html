@@ -20435,15 +20435,8 @@ document.addEventListener('click',handle,true);
 
 /* 노트 안쪽 세로 여백선 */
 .jgb-repair-page .jgb-repair-pane::before{
-  content:""!important;
-  position:absolute!important;
-  z-index:1!important;
-  top:0!important;
-  bottom:0!important;
-  left:24px!important;
-  width:1px!important;
-  background:#efb1b1!important;
-  pointer-events:none!important;
+  content:none!important;
+  display:none!important;
 }
 
 /* 각 권의 스프링 고리 */
@@ -26550,16 +26543,67 @@ cleanupDuplicateOnly();
 .jgb-complaint-stats-detail-body{overflow-x:hidden!important}
 </style>
 
-<style id="JGB_REPAIR_REMOVE_NOTEBOOK_SPRINGS">
-/* 접수·민원 처리 목록의 노트 스프링 장식만 제거 */
-.jgb-repair-page .jgb-repair-list-wrap::after{
-  content:none!important;
-  display:none!important;
-  background:none!important;
+
+<style id="JGB_USER_MANUAL_BUTTON_FINAL">
+.jgb-manual-btn{
+  display:inline-flex!important;align-items:center!important;gap:6px!important;
+  border:1px solid #c7d9e6!important;border-radius:7px!important;
+  background:#fff!important;color:#245b7e!important;
+  padding:7px 11px!important;font-weight:900!important;font-size:12px!important;
+  cursor:pointer!important;box-shadow:0 2px 5px rgba(20,55,80,.08)!important;
 }
-.jgb-repair-page .jgb-repair-pane-head::before{
-  content:none!important;
-  display:none!important;
-  background:none!important;
+.jgb-manual-btn:hover{background:#eef7fc!important}
+.jgb-manual-overlay{
+  position:fixed!important;inset:0!important;z-index:2147483000!important;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(20,45,65,.38)!important;
 }
+.jgb-manual-overlay.open{display:flex!important}
+.jgb-manual-box{
+  width:min(820px,92vw)!important;max-height:82vh!important;overflow:auto!important;
+  background:#fff!important;border:1px solid #cbd9e4!important;border-radius:12px!important;
+  box-shadow:0 18px 50px rgba(20,50,70,.24)!important;padding:20px!important;
+  font-family:"Malgun Gothic",sans-serif!important;
+}
+.jgb-manual-head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #dbe7ef;padding-bottom:10px;margin-bottom:12px}
+.jgb-manual-head strong{font-size:20px;color:#173f5c}
+.jgb-manual-close{border:0;background:#edf4f8;border-radius:7px;padding:6px 10px;font-weight:900;cursor:pointer}
+.jgb-manual-item{border:1px solid #dce7ee;border-radius:8px;margin:7px 0;overflow:hidden}
+.jgb-manual-title{padding:10px 12px;font-weight:950;color:#1d5578;cursor:pointer;background:#f7fbfd}
+.jgb-manual-desc{display:none;padding:9px 12px 11px;color:#526d7d;font-size:12px;line-height:1.65;background:#fff}
+.jgb-manual-item.open .jgb-manual-desc{display:block}
 </style>
+<script>
+(function(){
+function initManual(){
+  if(document.getElementById('jgbManualOverlay')) return;
+  var btn=document.createElement('button');
+  btn.className='jgb-manual-btn'; btn.type='button'; btn.innerHTML='📘 사용설명서';
+  btn.onclick=function(){document.getElementById('jgbManualOverlay').classList.add('open');};
+  var heads=document.querySelectorAll('header button, header .btn, header [role="button"], .header button');
+  var target=heads.length?heads[heads.length-1]:document.querySelector('header');
+  if(target && target.parentNode) target.parentNode.appendChild(btn);
+  else document.body.insertBefore(btn,document.body.firstChild);
+
+  var ov=document.createElement('div'); ov.id='jgbManualOverlay'; ov.className='jgb-manual-overlay';
+  ov.innerHTML='<div class="jgb-manual-box"><div class="jgb-manual-head"><strong>📘 민원 접수·처리 시스템 사용설명서</strong><button class="jgb-manual-close">닫기</button></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">📱 민원 접수</div><div class="jgb-manual-desc">고객이 시설 이용 중 발생한 불편사항을 접수합니다. 발생 장소와 민원 내용을 확인합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">📋 최신 접수</div><div class="jgb-manual-desc">최근 접수된 민원을 확인합니다. 접수 내용과 처리상태를 확인합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">🕐 미처리 접수</div><div class="jgb-manual-desc">처리가 완료되지 않은 민원을 확인하고 조치 여부를 관리합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">👤 담당자 지정</div><div class="jgb-manual-desc">민원 처리를 담당할 직원을 지정합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">✅ 처리완료</div><div class="jgb-manual-desc">필요한 조치가 완료된 민원을 처리완료 상태로 변경합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">🔎 상세보기</div><div class="jgb-manual-desc">접수시간·발생장소·민원유형·민원내용 등 상세정보를 확인합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">📊 오늘의 변화 및 관리조치</div><div class="jgb-manual-desc">당일 민원 변화와 필요한 관리조치를 확인합니다. 관리상태는 미처리 민원 건수를 기준으로 표시합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">🔢 민원 집계</div><div class="jgb-manual-desc">오늘 접수: 06:00~다음 날 05:59 / 월 누계: 해당 월 누계 / 연 누계: 해당 연도 누계로 표시합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">🔄 숫자 초기화</div><div class="jgb-manual-desc">연습 운영 시 오늘·월·연 및 민원 통계의 집계 숫자를 초기화합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">📈 민원 통계·분석</div><div class="jgb-manual-desc">월별·위치별·유형별·요일·시간대별 민원 발생 현황을 확인합니다.</div></div>'+
+  '<div class="jgb-manual-item"><div class="jgb-manual-title">🏷️ 관리상태 기준</div><div class="jgb-manual-desc"><b>0건 정상 · 1~2건 관찰 · 3~4건 유의 · 5건 이상 집중관리</b><br>판정 기준: 미처리 민원 건수를 기준으로 관리상태를 표시합니다.</div></div>'+
+  '</div>';
+  document.body.appendChild(ov);
+  ov.querySelector('.jgb-manual-close').onclick=function(){ov.classList.remove('open');};
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('open');});
+  ov.querySelectorAll('.jgb-manual-title').forEach(function(t){t.onclick=function(){t.parentElement.classList.toggle('open');};});
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initManual); else initManual();
+})();
+</script>
