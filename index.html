@@ -6942,6 +6942,25 @@ a[data-page="digitalTwin"],
       const n=complaintYearIssues(Number(year)).length;
       if(total)total.textContent=`연간 ${n.toLocaleString()}건`;
     }
+    function complaintWeekTimeRows(items){
+      const dayNames=['일','월','화','수','목','금','토'];
+      const bins=[
+        ['06~09시',6,9],['09~12시',9,12],['12~15시',12,15],
+        ['15~18시',15,18],['18~21시',18,21],['21~24시',21,24]
+      ];
+      const counts=Array.from({length:7},()=>Array(bins.length).fill(0));
+      (items||[]).forEach(x=>{
+        const d=new Date(x?.createdAt||'');
+        if(Number.isNaN(d.getTime()))return;
+        const day=d.getDay(), h=d.getHours();
+        const bi=bins.findIndex(([,a,b])=>h>=a&&h<b);
+        if(bi>=0)counts[day][bi]++;
+      });
+      const head=bins.map(([label])=>`<th>${label}</th>`).join('');
+      const body=dayNames.map((name,di)=>`<tr><th>${name}</th>${counts[di].map(v=>`<td>${v.toLocaleString()}</td>`).join('')}</tr>`).join('');
+      return `<table class="jgb-week-time-table"><thead><tr><th>요일</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
+    }
+
     function complaintStatsPanel(){
       const all=(db.issues||[]).slice();
       const years=Array.from({length:12},(_,i)=>2024+i);
@@ -6976,6 +6995,10 @@ a[data-page="digitalTwin"],
           <section class="jgb-complaint-stat-card">
             <div class="jgb-complaint-stat-card-head"><b>민원 유형별 현황</b><span>단위 : 건</span></div>
             <div class="jgb-type-grid">${typeRows}</div>
+          </section>
+          <section class="jgb-complaint-stat-card jgb-week-time-card">
+            <div class="jgb-complaint-stat-card-head"><b>요일·시간대별 민원 접수 상세</b><span>단위 : 건</span></div>
+            <div class="jgb-week-time-wrap">${complaintWeekTimeRows(all)}</div>
           </section>
         </div>
       </section>`;
@@ -7174,6 +7197,18 @@ a[data-page="digitalTwin"],
       .jgb-complaint-stats-head{height:43px;padding:8px 11px;background:#e8f2f7;border-bottom:2px solid #7894a8;display:flex;align-items:center;justify-content:space-between}
       .jgb-complaint-stats-head b{font-size:17px;font-weight:950;color:#173c58}.jgb-complaint-stats-head span{font-size:10px;color:#58758b;font-weight:900}
       .jgb-complaint-stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:9px}
+.jgb-complaint-stats-grid{align-items:start!important;grid-auto-rows:max-content!important;overflow-x:hidden!important}
+.jgb-complaint-stats-grid>.jgb-complaint-stat-card{height:auto!important;min-height:0!important;align-self:start!important}
+.jgb-week-time-card{grid-column:1 / -1!important}
+.jgb-week-time-wrap{width:100%;overflow-x:hidden!important;overflow-y:visible!important}
+.jgb-week-time-table{width:100%;table-layout:fixed;border-collapse:collapse}
+.jgb-week-time-table th,.jgb-week-time-table td{height:30px;padding:4px 5px;box-sizing:border-box;border-right:1px solid #d5e1e9;border-bottom:1px solid #d5e1e9;text-align:center;font-size:10px;color:#28465d}
+.jgb-week-time-table thead th{background:#f4f8fb;color:#527087;font-weight:950}
+.jgb-week-time-table tbody th{background:#f8fbfd;font-weight:950}
+.jgb-week-time-table td{font-size:11px;font-weight:900;color:#173c58}
+.jgb-week-time-table th:last-child,.jgb-week-time-table td:last-child{border-right:0}
+.jgb-week-time-table tbody tr:last-child th,.jgb-week-time-table tbody tr:last-child td{border-bottom:0}
+@media(max-width:1050px){.jgb-complaint-stats-grid{grid-template-columns:1fr!important}.jgb-week-time-card{grid-column:1!important}}
       .jgb-complaint-stat-card{border:1px solid #cbd9e2;border-radius:8px;background:#fff;overflow:hidden;min-width:0}
 /* 하단 3개 통계판 높이 통일: TOP 5도 동일한 내부 스크롤 영역 */
 .jgb-complaint-stat-card{height:auto;min-height:190px;display:flex;flex-direction:column}
@@ -25945,4 +25980,8 @@ cleanupDuplicateOnly();
 .jgb-v170-grid>.jgb-v170-mapcard{display:flex!important;grid-column:1!important;grid-row:1!important;width:100%!important;min-width:0!important;height:100%!important;margin:0!important;box-sizing:border-box!important;}
 .jgb-v170-grid>.jgb-v170-live{display:flex!important;flex-direction:column!important;grid-column:2!important;grid-row:1!important;width:100%!important;min-width:0!important;height:100%!important;min-height:0!important;margin:0!important;box-sizing:border-box!important;overflow:hidden!important;}
 .jgb-v170-grid>.jgb-v170-live .jgb-v178-live-table{width:100%!important;min-width:0!important;min-height:0!important;overflow:auto!important;box-sizing:border-box!important;}
+/* V21: 통계 상세 카드가 부모 높이를 강제로 채우지 않도록 */
+.jgb-complaint-stats-detail-body .jgb-complaint-stats-grid{align-items:start!important;grid-auto-rows:max-content!important;overflow-x:hidden!important}
+.jgb-complaint-stats-detail-body .jgb-complaint-stat-card{height:auto!important;min-height:0!important;align-self:start!important}
+.jgb-complaint-stats-detail-body{overflow-x:hidden!important}
 </style>
