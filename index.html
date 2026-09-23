@@ -7379,6 +7379,119 @@ html,body{background:#eef5f9!important}
 }
 </style>
 
+
+<style id="facility-portal-staff-screen-final-v9">
+/* 직원 업무수행 현황 - 직원 업무 영역에 배치된 공기업형 화면 */
+.jgb-link[data-page="dashboard"] .jgb-nav-icon{
+  font-size:9px!important;
+  font-weight:900!important;
+  letter-spacing:-.4px!important;
+}
+
+/* 직원 실적 헤더도 전체 포털 헤더와 같은 좌측 기준선 사용 */
+.jgb-dashboard-mode.staff .employee-hero{
+  min-height:108px!important;
+  height:108px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  padding:16px 18px!important;
+  position:relative!important;
+  overflow:hidden!important;
+}
+
+.jgb-dashboard-mode.staff .employee-hero-main,
+.jgb-dashboard-mode.staff .opx-hero-main{
+  min-width:0!important;
+  flex:1 1 auto!important;
+  position:relative!important;
+  padding-left:52px!important;
+  text-align:left!important;
+}
+
+.jgb-dashboard-mode.staff .opx-hero-main::before{
+  content:"👥"!important;
+  position:absolute!important;
+  left:0!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  width:40px!important;
+  height:40px!important;
+  border-radius:10px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  background:linear-gradient(145deg,#ffffff 0%,#e1edf5 52%,#b7cfdf 100%)!important;
+  border:1px solid rgba(255,255,255,.9)!important;
+  box-shadow:inset 0 2px 2px rgba(255,255,255,.95),0 3px 0 rgba(5,48,75,.30),0 5px 9px rgba(0,0,0,.18)!important;
+  font-size:21px!important;
+  line-height:1!important;
+}
+
+.jgb-dashboard-mode.staff .opx-eyebrow{
+  margin:0 0 4px!important;
+  text-align:left!important;
+  font-size:9px!important;
+  line-height:1.2!important;
+  letter-spacing:1.2px!important;
+}
+
+.jgb-dashboard-mode.staff .opx-title{
+  margin:0!important;
+  text-align:left!important;
+  font-size:28px!important;
+  line-height:1.15!important;
+  font-weight:950!important;
+  letter-spacing:-.035em!important;
+}
+
+.jgb-dashboard-mode.staff .opx-subtitle{
+  margin:5px 0 0!important;
+  text-align:left!important;
+  font-size:11px!important;
+  line-height:1.35!important;
+  font-weight:700!important;
+  color:#dcecf7!important;
+}
+
+.jgb-dashboard-mode.staff .employee-hero-side{
+  flex:0 0 auto!important;
+  margin-left:20px!important;
+}
+
+.jgb-dashboard-mode.staff .employee-v2-title{
+  font-size:22px!important;
+  line-height:1.2!important;
+  font-weight:950!important;
+}
+
+.jgb-dashboard-mode.staff .employee-v2-sub{
+  font-size:12px!important;
+  line-height:1.45!important;
+}
+
+@media(max-width:900px){
+  .jgb-dashboard-mode.staff .employee-hero{
+    height:auto!important;
+    min-height:96px!important;
+    padding:12px 14px!important;
+  }
+  .jgb-dashboard-mode.staff .opx-hero-main{
+    padding-left:44px!important;
+  }
+  .jgb-dashboard-mode.staff .opx-hero-main::before{
+    width:34px!important;
+    height:34px!important;
+    font-size:18px!important;
+  }
+  .jgb-dashboard-mode.staff .opx-title{
+    font-size:23px!important;
+  }
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -7637,7 +7750,7 @@ html,body{background:#eef5f9!important}
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("dashboard","시설 종합현황")}${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">📊 유지관리 실적</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 업무관리</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 업무관리</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      const mobileContent=document.getElementById('jgbMobileContent');
      if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
@@ -7647,7 +7760,7 @@ html,body{background:#eef5f9!important}
     }
     function nav(p,t){
       const icons={
-        dashboard:"⌂",
+        dashboard:"직원",
         repair:"▤",
         eam:"EAM",
         dashboard2:"현황",
@@ -8347,8 +8460,9 @@ html,body{background:#eef5f9!important}
       <div class="opx-dash opx-clean-layout">
         <section class="opx-hero opx-hero-final employee-hero">
           <div class="opx-hero-main">
-            <div class="opx-eyebrow">JANGGUNBONG SPORTS CENTER · STAFF OPERATION</div>
-            <div class="opx-title">유지관리 실적 운영 대시보드</div>
+            <div class="opx-eyebrow">STAFF WORK PERFORMANCE · FACILITY MANAGEMENT</div>
+            <div class="opx-title">직원 업무수행 현황</div>
+            <div class="opx-subtitle">직원별 시설관리 업무수행 및 처리실적을 확인합니다.</div>
             <!-- 유지관리 실적 헤더의 중복 설명·요약영역 제거: 본문 실적영역에서 관리 -->
           </div>
           <div class="opx-hero-side employee-hero-side"><div class="employee-hero-actions"><div class="opx-live">● 실시간 직원실적 연동</div><button type="button" id="employeeBoardButton" class="employee-board-btn" aria-label="업무관리 바로가기" onclick="go('opsboard')">📋 업무관리</button><div class="employee-header-kpis" aria-label="직원 실적 요약"><div class="employee-header-kpi blue"><span class="eh-icon">📋</span><span class="eh-label">정규업무 실적</span><strong>${sum.basic}<small>건</small></strong></div><div class="employee-header-kpi green"><span class="eh-icon">📅</span><span class="eh-label">근무편성 인정실적</span><strong>${sum.auto}<small>건</small></strong></div><div class="employee-header-kpi orange"><span class="eh-icon">⚠</span><span class="eh-label">QR 조치완료</span><strong>${sum.issue}<small>건</small></strong></div><div class="employee-header-kpi violet"><span class="eh-icon">●</span><span class="eh-label">종합 업무실적</span><strong>${sum.total}<small>건</small></strong></div></div></div></div>
@@ -8357,8 +8471,8 @@ html,body{background:#eef5f9!important}
         <section class="opx-major-section employee-section employee-performance-v2">
           <div class="employee-v2-head">
             <div>
-              <div class="employee-v2-kicker">STAFF PERFORMANCE MANAGEMENT</div>
-              <div class="employee-v2-title">유지관리 실적 현황</div>
+              <div class="employee-v2-kicker">STAFF WORK PERFORMANCE</div>
+              <div class="employee-v2-title">직원별 업무수행 현황</div>
               <div class="employee-v2-sub">직원별 당월 실적과 연간 누계를 확인하고, 필요한 직원의 실적내역을 선택하여 월별·연간 평가를 확인합니다.</div>
             </div>
             <div class="employee-inline-period">${periodSelector}</div>
