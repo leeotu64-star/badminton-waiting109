@@ -8502,6 +8502,45 @@ html,body{
 }
 .jgb-nav .jgb-group:first-of-type{margin-top:18px!important}
 </style>
+
+<style id="JGB_FINAL_COMPLAINT_LAYOUT_V2">
+/* 헤더 높이 축소 + 제목/본문 가독성 강화 */
+.jgb-repair-head{
+  min-height:82px!important;
+  height:82px!important;
+  padding:9px 14px!important;
+  gap:14px!important;
+}
+.jgb-repair-brand{gap:11px!important}
+.jgb-repair-brandico{width:44px!important;height:44px!important;flex:0 0 44px!important;font-size:30px!important}
+.jgb-repair-brand h2{font-size:24px!important;line-height:1.15!important;margin:0 0 3px!important;font-weight:1000!important}
+.jgb-repair-brand p{font-size:12px!important;line-height:1.3!important;font-weight:800!important}
+.jgb-repair-text-btn{height:40px!important;min-width:82px!important;font-size:12px!important;font-weight:950!important}
+
+/* 섹션 헤더 */
+.jgb-repair-panel-head,.jgb-repair-list-head{height:40px!important;padding:6px 11px!important}
+.jgb-repair-panel-head b,.jgb-repair-list-head b{font-size:18px!important;font-weight:1000!important}
+.jgb-repair-panel-head span,.jgb-repair-list-head span{font-size:11px!important;font-weight:900!important}
+.jgb-repair-map-title{font-size:14px!important;font-weight:1000!important}
+.jgb-repair-map-zone{font-size:11px!important;font-weight:950!important}
+.jgb-repair-court{font-size:15px!important;font-weight:1000!important}
+.jgb-repair-legend{font-size:10px!important;font-weight:900!important}
+
+/* 하단 접수/처리 영역 글씨 강화 */
+.jgb-repair-pane-head b{font-size:14px!important;font-weight:1000!important}
+.jgb-repair-pane-head span{font-size:11px!important;font-weight:900!important}
+.jgb-repair-mini-head{font-size:12px!important;font-weight:1000!important}
+.jgb-repair-mini-no b{font-size:14px!important}
+.jgb-repair-mini-time{font-size:12px!important}
+.jgb-repair-mini-content span{font-size:13px!important;font-weight:950!important}
+.jgb-repair-mini-work select,.jgb-repair-mini-actions button{font-size:12px!important;font-weight:950!important}
+
+/* 통계 상세 헤더/표 */
+.jgb-complaint-stats-head,.jgb-complaint-stats-detail-head{font-size:16px!important;font-weight:1000!important}
+.jgb-stat-rank-name,.jgb-stat-rank-count{font-size:13px!important;font-weight:950!important}
+.jgb-month-table th,.jgb-month-table td{font-size:12px!important;font-weight:900!important}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -9983,9 +10022,10 @@ html,body{
 
     function complaintYearIssues(year){
       const y=Number(year);
+      const resetAt=jgbNumericResetAt();
       return (db.issues||[]).filter(x=>{
         const d=new Date(x?.createdAt||'');
-        return !Number.isNaN(d.getTime()) && d.getFullYear()===y;
+        return !Number.isNaN(d.getTime()) && d.getFullYear()===y && (!resetAt || d.getTime()>=resetAt);
       });
     }
     function complaintMonthlyRows(year){
@@ -10204,6 +10244,9 @@ html,body{
       if(!confirm('집계 숫자를 초기화하시겠습니까?\n고객 접수 내용과 처리 기능에는 영향을 주지 않습니다.'))return;
       try{localStorage.setItem('JGB_NUMERIC_RESET_AT',String(Date.now()));}catch(e){}
       render();
+      requestAnimationFrame(()=>{
+        document.querySelectorAll('.jgb-repair-stat b,.jgb-repair-year-box strong').forEach(el=>{el.textContent='0';});
+      });
     }
 
     function jgbNumericResetAt(){
@@ -10214,10 +10257,11 @@ html,body{
      const resetAt=jgbNumericResetAt();
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
      const active=stored.filter(x=>x.status!=='완료');
+     const countActive=resetAt?[]:active;
      const safe=(x)=>cleanIssueContent(x)||'접수 내용 없음';
      const state=(x)=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
      const stateClass=(x)=>state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
-     const mapComplaintCounts=complaintPlaceCounts(active);
+     const mapComplaintCounts=complaintPlaceCounts(countActive);
      const today=stored.filter(x=>{const d=new Date(x.createdAt||0),n=new Date();return d.getTime()>=resetAt && d.toDateString()===n.toDateString()}).length;
      /* 헤더 연도별 성과 요약: 2025년은 초기 기준값 0건으로 고정하고, 2026년은 실제 접수 데이터를 집계한다. */
      const headerYear=2026;
@@ -10518,12 +10562,12 @@ html,body{
        <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>시설민원 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["남자 화장실"]?'has-complaint':''}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["여자 화장실"]?'has-complaint':''}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${mapComplaintCounts["복도"]?'has-complaint':''}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${mapComplaintCounts["휴게실"]?'has-complaint':''}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${mapComplaintCounts["기타"]?'has-complaint':''}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${n?'has-complaint':''}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
-         ${liveComplaintActionPanel(active)}
+         ${liveComplaintActionPanel(countActive)}
        </section>
        ${(()=>{
-         const latest=active.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,12);
+         const latest=active.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,5);
          const priorityRank=(x)=>!x.handlerId?0:(String(x.status||'').includes('조치중')||String(x.status||'').includes('진행')?1:2);
-         const pending=active.slice().sort((a,b)=>priorityRank(a)-priorityRank(b)||new Date(a.createdAt||0)-new Date(b.createdAt||0)).slice(0,12);
+         const pending=active.slice().sort((a,b)=>priorityRank(a)-priorityRank(b)||new Date(a.createdAt||0)-new Date(b.createdAt||0)).slice(0,5);
          const miniRows=(items)=>items.length?items.map((x,i)=>{
            const st=state(x);
            return `<div class="jgb-repair-mini-row">
