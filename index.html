@@ -7959,6 +7959,16 @@ html,body{background:#eef5f9!important}
 }
 </style>
 
+
+<style id="REMOVE_LEGACY_OPSBOARD_LINK_V1">
+/* 예전 QR 업무관리 화면은 직원 업무수행 화면과 완전히 분리.
+   기존 데이터/직원실적 집계/QR 데이터 자체는 삭제하지 않고 화면 연동만 차단. */
+#employeeBoardButton,
+.employee-board-btn{
+  display:none!important;
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -8088,7 +8098,7 @@ html,body{background:#eef5f9!important}
       };
      }catch(e){return{issues:[],tasks:{},schedule:{}}}
     }
-    let db=load(); let page=new URLSearchParams(location.search).get("page")||"dashboard"; if(page==="digitalTwin")page="dashboard"; let selectedDate=new Date().toISOString().slice(0,10);
+    let db=load(); let page=new URLSearchParams(location.search).get("page")||"dashboard"; if(page==="digitalTwin"||page==="opsboard")page="dashboard"; let selectedDate=new Date().toISOString().slice(0,10);
     function save(){localStorage.setItem(KEY,JSON.stringify(db));if(window.BroadcastChannel){new BroadcastChannel("JGB_LIVE").postMessage("update")}}
     window.addEventListener("storage",()=>{db=load();render()});
     let bc;try{bc=new BroadcastChannel("JGB_LIVE");bc.onmessage=()=>{db=load();render()}}catch(e){}
@@ -8217,7 +8227,7 @@ html,body{background:#eef5f9!important}
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${(page==='dashboard'||page==='opsboard')?`<button type="button" class="jgb-reverse-btn ${page==='dashboard'?'active':''}" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn ${page==='opsboard'?'active':''}" onclick="go('opsboard')">📋 업무관리</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      const mobileContent=document.getElementById('jgbMobileContent');
      if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
@@ -8241,8 +8251,8 @@ html,body{background:#eef5f9!important}
       return `<a class="jgb-link ${page===p?"on":""}" href="?page=${encodeURIComponent(p)}" data-page="${p}"><span class="jgb-nav-icon">${icon}</span><span class="jgb-nav-label">${t}</span></a>`
     }
     function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
-    function go(p){if(!p||p==="digitalTwin")return;page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
-    window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";if(page==="digitalTwin")page="dashboard";render()})
+    function go(p){if(!p||p==="digitalTwin")return;if(p==="opsboard")p="dashboard";page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
+    window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";if(page==="digitalTwin"||page==="opsboard")page="dashboard";render()})
     window.render=render;
     function body(){
       if(page==="lighting")return (typeof window.jgbLightReelPageMarkup==="function"?window.jgbLightReelPageMarkup():"<div></div>");
@@ -8252,7 +8262,6 @@ html,body{background:#eef5f9!important}
      if(page==="repair")return processPage();
      if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
      const s=stats();
-     if(page==="opsboard")return dashboard(s);
 
      if(page==="workers")return workerPage();
      if(page==="pending")return pendingPage();
@@ -8932,7 +8941,7 @@ html,body{background:#eef5f9!important}
             <div class="opx-subtitle">직원별 시설관리 업무수행 및 처리실적을 확인합니다.</div>
             <!-- 유지관리 실적 헤더의 중복 설명·요약영역 제거: 본문 실적영역에서 관리 -->
           </div>
-          <div class="opx-hero-side employee-hero-side"><div class="employee-hero-actions"><div class="opx-live">● 실시간 직원실적 연동</div><button type="button" id="employeeBoardButton" class="employee-board-btn" aria-label="업무관리 바로가기" onclick="go('opsboard')">📋 업무관리</button><div class="employee-header-kpis" aria-label="직원 실적 요약"><div class="employee-header-kpi blue"><span class="eh-icon">📋</span><span class="eh-label">정규업무 실적</span><strong>${sum.basic}<small>건</small></strong></div><div class="employee-header-kpi green"><span class="eh-icon">📅</span><span class="eh-label">근무편성 인정실적</span><strong>${sum.auto}<small>건</small></strong></div><div class="employee-header-kpi orange"><span class="eh-icon">⚠</span><span class="eh-label">QR 조치완료</span><strong>${sum.issue}<small>건</small></strong></div><div class="employee-header-kpi violet"><span class="eh-icon">●</span><span class="eh-label">종합 업무실적</span><strong>${sum.total}<small>건</small></strong></div></div></div></div>
+          <div class="opx-hero-side employee-hero-side"><div class="employee-hero-actions"><div class="opx-live">● 실시간 직원실적 연동</div><div class="employee-header-kpis" aria-label="직원 실적 요약"><div class="employee-header-kpi blue"><span class="eh-icon">📋</span><span class="eh-label">정규업무 실적</span><strong>${sum.basic}<small>건</small></strong></div><div class="employee-header-kpi green"><span class="eh-icon">📅</span><span class="eh-label">근무편성 인정실적</span><strong>${sum.auto}<small>건</small></strong></div><div class="employee-header-kpi orange"><span class="eh-icon">⚠</span><span class="eh-label">QR 조치완료</span><strong>${sum.issue}<small>건</small></strong></div><div class="employee-header-kpi violet"><span class="eh-icon">●</span><span class="eh-label">종합 업무실적</span><strong>${sum.total}<small>건</small></strong></div></div></div></div>
         </section>
 
         <section class="opx-major-section employee-section employee-performance-v2">
@@ -9152,7 +9161,7 @@ html,body{background:#eef5f9!important}
        상단 헤더의 양방향 이동 버튼으로 서로 오갈 수 있도록 구성합니다. */
     function dashboard(s){
       const full=dashboardFull(s);
-      const mode=page==='opsboard'?'ops':'staff';
+      const mode='staff';
       return `<div class="jgb-dashboard-mode ${mode}">${full}</div>`;
     }
 
