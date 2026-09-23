@@ -26395,3 +26395,115 @@ cleanupDuplicateOnly();
 .jgb-complaint-stats-detail-body .jgb-complaint-stat-card{height:auto!important;min-height:0!important;align-self:start!important}
 .jgb-complaint-stats-detail-body{overflow-x:hidden!important}
 </style>
+
+<style id="ONLY_TWO_REQUESTS_FINAL">
+/* =========================================================
+   사용자 요청 1 : 접수·민원 처리 목록을 스프링 노트처럼 보이게
+   사용자 요청 2 : 최신/미처리 민원 6개 행이 한 화면에 보이게
+   ※ 기능/데이터/JS/상단 배치도/오늘의 변화/다른 화면은 건드리지 않음
+   ========================================================= */
+
+/* 1) 스프링 노트 외형 - 이미지 없이 CSS로 구현 */
+.jgb-repair-page .jgb-repair-list-wrap{
+  position:relative!important;
+  border:2px solid #7895aa!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  box-shadow:0 4px 12px rgba(23,59,87,.10)!important;
+  overflow:hidden!important;
+}
+
+.jgb-repair-page .jgb-repair-split{
+  position:relative!important;
+  background:#fff!important;
+}
+
+.jgb-repair-page .jgb-repair-pane{
+  position:relative!important;
+  overflow:visible!important;
+  background:#fff!important;
+}
+
+/* 실제 공책의 스프링 고리 */
+.jgb-repair-page .jgb-repair-pane-head{
+  position:relative!important;
+  z-index:4!important;
+  background:#f7fbfe!important;
+  border-top:1px solid #d2e0e9!important;
+}
+
+.jgb-repair-page .jgb-repair-pane-head::before{
+  content:""!important;
+  position:absolute!important;
+  left:8px!important;
+  right:8px!important;
+  top:-13px!important;
+  height:18px!important;
+  pointer-events:none!important;
+  z-index:8!important;
+  background-repeat:repeat-x!important;
+  background-size:48px 18px!important;
+}
+
+.jgb-repair-page .jgb-repair-pane:first-child .jgb-repair-pane-head::before{
+  background-image:
+    radial-gradient(ellipse 7px 9px at 8px 9px,
+      transparent 0 4px,
+      #2789c7 4.3px 5.7px,
+      transparent 6px),
+    linear-gradient(#2789c7,#2789c7)!important;
+  background-size:48px 18px,48px 2px!important;
+  background-position:0 0,0 8px!important;
+  background-repeat:repeat-x!important;
+}
+
+.jgb-repair-page .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head::before{
+  background-image:
+    radial-gradient(ellipse 7px 9px at 8px 9px,
+      transparent 0 4px,
+      #25a47d 4.3px 5.7px,
+      transparent 6px),
+    linear-gradient(#25a47d,#25a47d)!important;
+  background-size:48px 18px,48px 2px!important;
+  background-position:0 0,0 8px!important;
+  background-repeat:repeat-x!important;
+}
+
+/* 종이 줄 */
+.jgb-repair-page .jgb-repair-scroll{
+  position:relative!important;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #ffffff 0,
+      #ffffff 37px,
+      #e5edf3 38px,
+      #e5edf3 39px
+    )!important;
+}
+
+.jgb-repair-page .jgb-repair-mini-row{
+  background:rgba(255,255,255,.94)!important;
+}
+
+/* 2) 민원 6개 행 표시 - 머리글 포함 높이를 정확히 확보 */
+@media (min-width:901px){
+  .jgb-repair-page .jgb-repair-scroll{
+    height:263px!important;
+    min-height:263px!important;
+    max-height:263px!important;
+    flex:0 0 263px!important;
+  }
+
+  .jgb-repair-page .jgb-repair-mini-row,
+  .jgb-repair-page .jgb-repair-mini-row>div{
+    height:38px!important;
+    min-height:38px!important;
+  }
+
+  .jgb-repair-page .jgb-repair-mini-head{
+    height:35px!important;
+    min-height:35px!important;
+  }
+}
+</style>
