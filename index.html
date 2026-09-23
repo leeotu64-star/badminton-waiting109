@@ -20378,21 +20378,13 @@ document.addEventListener('click',handle,true);
 
 /* 왼쪽 세로 제본선 */
 .jgb-repair-page .jgb-repair-list-wrap::before{
-  content:""!important;
-  position:absolute!important;
-  z-index:2!important;
-  top:42px!important;
-  bottom:28px!important;
-  left:31px!important;
-  width:1px!important;
-  background:#e8a5a5!important;
-  box-shadow:1px 0 0 rgba(255,255,255,.75)!important;
-  pointer-events:none!important;
+  content:none!important;
+  display:none!important;
 }
 
 /* 위쪽 스프링 링 - CSS로 실제 링 형태 */
 .jgb-repair-page .jgb-repair-list-wrap::after{
-  content:""!important;
+  content:none!important;
   position:absolute!important;
   z-index:10!important;
   top:-15px!important;
@@ -20454,7 +20446,7 @@ document.addEventListener('click',handle,true);
 
 .jgb-repair-page .jgb-repair-pane:first-child .jgb-repair-pane-head::before,
 .jgb-repair-page .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head::before{
-  content:""!important;
+  content:none!important;
   position:absolute!important;
   z-index:8!important;
   top:-18px!important;
@@ -26545,6 +26537,7 @@ cleanupDuplicateOnly();
 
 
 <style id="JGB_USER_MANUAL_BUTTON_FINAL">
+.jgb-top-right .jgb-manual-btn{margin-left:6px!important}
 .jgb-manual-btn{
   display:inline-flex!important;align-items:center!important;gap:6px!important;
   border:1px solid #c7d9e6!important;border-radius:7px!important;
@@ -26580,10 +26573,14 @@ function initManual(){
   var btn=document.createElement('button');
   btn.className='jgb-manual-btn'; btn.type='button'; btn.innerHTML='📘 사용설명서';
   btn.onclick=function(){document.getElementById('jgbManualOverlay').classList.add('open');};
-  var heads=document.querySelectorAll('header button, header .btn, header [role="button"], .header button');
-  var target=heads.length?heads[heads.length-1]:document.querySelector('header');
-  if(target && target.parentNode) target.parentNode.appendChild(btn);
-  else document.body.insertBefore(btn,document.body.firstChild);
+  var target=document.querySelector('.jgb-top-right .jgb-top-switch');
+  if(target){
+    target.appendChild(btn);
+  }else{
+    var top=document.querySelector('.jgb-top-right');
+    if(top) top.insertBefore(btn, top.firstChild);
+    else document.body.insertBefore(btn,document.body.firstChild);
+  }
 
   var ov=document.createElement('div'); ov.id='jgbManualOverlay'; ov.className='jgb-manual-overlay';
   ov.innerHTML='<div class="jgb-manual-box"><div class="jgb-manual-head"><strong>📘 민원 접수·처리 시스템 사용설명서</strong><button class="jgb-manual-close">닫기</button></div>'+
