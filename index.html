@@ -6075,6 +6075,75 @@ html, body {
   box-shadow:none !important;
 }
 </style>
+
+<style id="JGB_BASIC_WORK_NOTE_REAL_20_80">
+/* 실제 적용: 헤더는 그대로 두고 업무 본문만 20:80 작업수첩 */
+.basic-book-layout::after{display:none!important;content:none!important;}
+
+/* 기존 전체 업무 카드의 빈 여백을 없애고, 업무영역만 20:80으로 분할 */
+.basic-book-layout .basic-v5-single{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:20% minmax(0,80%)!important;
+  gap:0!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+}
+
+/* 왼쪽 20% 세로 제본 */
+.basic-book-layout .basic-v5-single::before{
+  content:""!important;
+  display:block!important;
+  grid-column:1!important;
+  grid-row:1!important;
+  min-height:100%!important;
+  background:
+    radial-gradient(circle at 50% 18px,#fff 0 5px,#8293a0 5.5px 7px,transparent 7.5px) center top/100% 42px repeat-y,
+    linear-gradient(90deg,#f4f7f8 0%,#eef2f4 82%,#d5dee4 100%)!important;
+  border-right:1px solid #d2dce2!important;
+  box-sizing:border-box!important;
+}
+
+/* 오른쪽 80%가 실제 작업수첩 */
+.basic-book-layout .basic-v5-single .basic-v5-card{
+  grid-column:2!important;
+  grid-row:1!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  border:1px solid #d7e0e6!important;
+  border-left:0!important;
+  border-radius:0 12px 12px 0!important;
+  background:#fff!important;
+  box-shadow:none!important;
+}
+
+/* 카드 안쪽은 종이처럼 정리 */
+.basic-book-layout .basic-v5-single .basic-v5-card > .head{
+  background:#fff!important;
+  border-bottom:1px solid #e1e7eb!important;
+  border-radius:0!important;
+}
+.basic-book-layout .basic-v5-single .basic-v5-tasks{
+  background:#fff!important;
+}
+
+/* 왼쪽 제본 영역에는 기존 업무내용이 들어가지 않게 유지 */
+.basic-book-layout .basic-v5-single .basic-v5-card .head,
+.basic-book-layout .basic-v5-single .basic-v5-card .bar,
+.basic-book-layout .basic-v5-single .basic-v5-card .basic-v5-tasks,
+.basic-book-layout .basic-v5-single .basic-v5-card .basic-v5-foot{
+  position:relative!important;
+}
+
+@media(max-width:900px){
+  .basic-book-layout .basic-v5-single{grid-template-columns:20% minmax(0,80%)!important;}
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -26947,84 +27016,3 @@ function initManual(){
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initManual); else initManual();
 })();
 </script>
-
-
-<style id="JGB_BASIC_WORK_NOTE_FINAL_20_80">
-/* ===== 최종 2차 검토: 헤더 아래 업무영역만 20:80 / 왼쪽 세로 스프링 ===== */
-.basic-book-layout{
-  position:relative!important;
-  display:block!important;
-  box-sizing:border-box!important;
-  width:100%!important;
-  padding:0 14px 14px 20%!important;
-  margin:0!important;
-  background:#fff!important;
-  border:1px solid #d7e1e8!important;
-  border-radius:16px!important;
-  box-shadow:0 4px 14px rgba(30,60,80,.06)!important;
-  overflow:visible!important;
-}
-
-/* 왼쪽 20% 제본판 + 세로 스프링 */
-.basic-book-layout::before{
-  content:""!important;
-  position:absolute!important;
-  left:0!important;
-  top:0!important;
-  bottom:0!important;
-  width:20%!important;
-  z-index:4!important;
-  pointer-events:none!important;
-  box-sizing:border-box!important;
-  border-right:1px solid #d4dee6!important;
-  background:
-    radial-gradient(ellipse 7px 4px at 50% 12px,#fff 42%,#718697 48%,#718697 62%,transparent 66%) 50% 0/100% 48px repeat-y,
-    linear-gradient(90deg,#f5f8fa 0%,#eef3f6 76%,#dbe4e9 100%)!important;
-  box-shadow:inset -5px 0 10px rgba(40,70,90,.05)!important;
-}
-
-/* 위쪽 가로 스프링은 완전 제거 */
-.basic-book-layout::after{
-  content:none!important;
-  display:none!important;
-}
-
-/* 오른쪽 80%에 기존 업무 화면이 그대로 들어가도록 */
-.basic-book-layout > *{
-  position:relative!important;
-  z-index:5!important;
-  width:100%!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-}
-
-/* 기존 1열/2열 업무 기능과 버튼 구조는 유지 */
-.basic-book-layout .basic-v5-tasks{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:10px!important;
-}
-
-/* 업무 본문은 흰 종이 느낌으로만 정리 */
-.basic-book-layout .basic-v5-card,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-page-nav{
-  background:#fff!important;
-}
-
-/* 직원 업무 카드의 진한 배경 제거 */
-.basic-book-layout .basic-v5-card .head{
-  background:#fff!important;
-}
-
-@media(max-width:700px){
-  .basic-book-layout{
-    padding-left:20%!important;
-    padding-right:8px!important;
-  }
-  .basic-book-layout .basic-v5-tasks{
-    grid-template-columns:1fr!important;
-  }
-}
-</style>
