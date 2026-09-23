@@ -5245,7 +5245,7 @@ a[data-page="digitalTwin"],
 
 
 <style id="JGB_BASIC_LAYOUT_ONLY_V1">
-/* 기능은 수정하지 않고 업무 수행현황 화면 배치만 수정 */
+/* 기능은 수정하지 않고 오늘의 기본업무 화면 배치만 수정 */
 .basic-v5-worker-tabs{
   display:flex!important;
   flex-direction:row!important;
@@ -5341,856 +5341,6 @@ a[data-page="digitalTwin"],
 .eh-floor-1f .eh-bottom>div{
   border:1px solid #7f98a7!important;
   box-sizing:border-box!important;
-}
-</style>
-
-<style id="JGB_LEAK_HORIZONTAL_68_32_V8">
-/* 누수현황: 기존 기능/디자인 유지, 좌 68% / 우 32% */
-.jgb-v170-grid{
-  display:grid!important;
-  grid-template-columns:minmax(0,68%) minmax(0,32%)!important;
-  grid-template-rows:1fr!important;
-  width:100%!important;
-  min-width:0!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-grid > .jgb-v170-mapcard{
-  grid-column:1!important; grid-row:1!important;
-  width:100%!important; min-width:0!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-grid > .jgb-v170-live{
-  grid-column:2!important; grid-row:1!important;
-  width:100%!important; min-width:0!important;
-  box-sizing:border-box!important;
-}
-@media(max-width:1000px){
-  .jgb-v170-grid{
-    grid-template-columns:minmax(0,68%) minmax(0,32%)!important;
-    grid-template-rows:1fr!important;
-  }
-}
-</style>
-
-<style id="JGB_LEAK_REMOVE_LIVE_V14">
-/* LIVE 및 수리관리 안내 수첩 삭제 후 배치도만 전체폭 유지 */
-.jgb-v170-grid{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr)!important;
-  grid-template-rows:auto!important;
-  width:100%!important;
-  min-width:0!important;
-}
-.jgb-v170-grid > .jgb-v170-mapcard{
-  grid-column:1!important;
-  grid-row:1!important;
-  width:100%!important;
-  min-width:0!important;
-}
-</style>
-
-<style id="JGB_EAM_LIVE_MATCH_MAP_HEIGHT_V5">
-/* =========================================================
-   EAM 상·하단 정확 정렬
-   - 좌측 배치도는 현재 원본의 70% 높이 유지
-   - 우측 수리 LIVE도 동일하게 70% 높이
-   - 두 영역의 상단/하단을 동일 선상에 맞춤
-   - LIVE 내부 50:50 분할은 적용하지 않음
-   ========================================================= */
-
-.eh-main{
-  align-items:start!important;
-  min-height:0!important;
-}
-
-/* 우측 wrapper가 display:contents로 바뀌었던 이전 규칙 무력화 */
-.eh-main > .eh-right{
-  display:block!important;
-  min-width:0!important;
-  min-height:0!important;
-  height:100%!important;
-  align-self:start!important;
-}
-
-/* 좌측 배치도와 우측 LIVE의 외곽 높이를 동일하게 */
-.eh-main > .eh-map-card{
-  height:70%!important;
-  max-height:70%!important;
-  min-height:0!important;
-  align-self:start!important;
-  box-sizing:border-box!important;
-}
-
-.eh-main > .eh-right > .eh-live-card{
-  height:70%!important;
-  max-height:70%!important;
-  min-height:0!important;
-  align-self:start!important;
-  box-sizing:border-box!important;
-}
-
-/* LIVE 자체는 한 장의 카드로 배치도와 같은 상·하단을 사용 */
-.eh-main > .eh-right > .eh-live-card .eh-card-body{
-  min-height:0!important;
-  overflow:hidden!important;
-}
-</style>
-
-
-<style id="JGB_EAM_REMOVE_EXTRA_MANAGEMENT_V6">
-/* 추가 관리영역 삭제: 수리 LIVE만 표시 */
-.eh-extra-card-v20{display:none!important;}
-</style>
-
-<style id="JGB_EAM_MAP_LIVE_SLIGHTLY_LARGER_V7">
-/* 배치도 + 수리 LIVE를 동시에 조금 확대 */
-.eh-main > .eh-map-card{
-  height:78%!important;
-  max-height:78%!important;
-}
-
-.eh-main > .eh-right > .eh-live-card{
-  height:78%!important;
-  max-height:78%!important;
-}
-
-/* 두 영역이 같은 높이로 정확히 유지 */
-.eh-main{
-  align-items:start!important;
-}
-</style>
-
-
-<style id="JGB_EAM_VERTICAL_EXPAND_V8">
-/* 가로폭은 그대로, 배치도와 수리 LIVE의 세로만 확대 */
-.eh-main > .eh-map-card{
-  height:85%!important;
-  max-height:85%!important;
-  width:auto!important;
-  max-width:none!important;
-}
-
-.eh-main > .eh-right > .eh-live-card{
-  height:85%!important;
-  max-height:85%!important;
-}
-
-.eh-main{
-  align-items:start!important;
-}
-</style>
-
-
-<style id="EAM_REPAIR_LIVE_FIXED_COLUMNS_V23">
-/* 수리 LIVE 7개 열 고정: 자산코드/작업내용/수리상태/예정일/담당/입력/처리 */
-.jgb-v178-live-table{
-  width:100%!important;
-  max-width:100%!important;
-  min-width:0!important;
-  overflow-x:hidden!important;
-  box-sizing:border-box!important;
-}
-.jgb-v178-live-table table{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  table-layout:fixed!important;
-  border-collapse:collapse!important;
-  border-spacing:0!important;
-}
-.jgb-v178-live-table th,.jgb-v178-live-table td{
-  box-sizing:border-box!important;
-  overflow:hidden!important;
-  white-space:nowrap!important;
-  text-overflow:ellipsis!important;
-  vertical-align:middle!important;
-}
-.jgb-v178-live-table th:nth-child(1),.jgb-v178-live-table td:nth-child(1){width:13%!important;}
-.jgb-v178-live-table th:nth-child(2),.jgb-v178-live-table td:nth-child(2){width:29%!important;text-align:left!important;}
-.jgb-v178-live-table th:nth-child(3),.jgb-v178-live-table td:nth-child(3){width:16%!important;}
-.jgb-v178-live-table th:nth-child(4),.jgb-v178-live-table td:nth-child(4){width:13%!important;}
-.jgb-v178-live-table th:nth-child(5),.jgb-v178-live-table td:nth-child(5){width:11%!important;}
-.jgb-v178-live-table th:nth-child(6),.jgb-v178-live-table td:nth-child(6){width:9%!important;padding-left:3px!important;padding-right:3px!important;}
-.jgb-v178-live-table th:nth-child(7),.jgb-v178-live-table td:nth-child(7){width:9%!important;padding-left:3px!important;padding-right:3px!important;}
-.jgb-v178-live-table td:nth-child(6) button,.jgb-v178-live-table td:nth-child(7) button{
-  width:100%!important;min-width:0!important;box-sizing:border-box!important;margin:0!important;
-}
-</style>
-
-<style id="EAM_REPAIR_LIVE_FIXED_COLUMNS_FINAL_V24">
-/* 시설물 유지관리 현황 - 공기업형 헤더/표 정렬 최종 보정 */
-.eh-live-card-v20 .eh-card-head{
-  min-height:52px!important;
-  height:52px!important;
-  padding:0 14px!important;
-  background:linear-gradient(180deg,#eaf3fa 0%,#d9e9f5 100%)!important;
-  border-bottom:2px solid #8eabc0!important;
-  color:#173c57!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-}
-.eh-live-card-v20 .eh-card-head h2{
-  margin:0!important;
-  color:#123b58!important;
-  font-size:20px!important;
-  font-weight:950!important;
-  letter-spacing:-.5px!important;
-  line-height:1!important;
-  white-space:nowrap!important;
-}
-.eh-live-card-v20 .eh-card-head button{
-  margin-left:auto!important;
-  flex:0 0 auto!important;
-  font-size:12px!important;
-  font-weight:900!important;
-  min-width:78px!important;
-  height:32px!important;
-}
-.eh-live-card-v20 .eh-card-body{
-  min-width:0!important;
-  min-height:0!important;
-  overflow:hidden!important;
-  display:flex!important;
-  flex-direction:column!important;
-}
-.eh-live-card-v20 .eh-live-scroll{
-  flex:1 1 auto!important;
-  width:100%!important;
-  min-width:0!important;
-  min-height:0!important;
-  overflow-x:auto!important;
-  overflow-y:auto!important;
-  scrollbar-gutter:stable!important;
-  overscroll-behavior:contain!important;
-}
-.eh-live-card-v20 table{
-  width:900px!important;
-  min-width:900px!important;
-  max-width:none!important;
-  table-layout:fixed!important;
-  border-collapse:collapse!important;
-  font-size:12px!important;
-}
-.eh-live-card-v20 table th,
-.eh-live-card-v20 table td{
-  box-sizing:border-box!important;
-  height:40px!important;
-  padding:7px 8px!important;
-  border-right:1px solid #cbd9e4!important;
-  border-bottom:1px solid #cbd9e4!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-  text-align:center!important;
-  vertical-align:middle!important;
-}
-.eh-live-card-v20 table th{
-  position:sticky!important;
-  top:0!important;
-  z-index:3!important;
-  background:#dceaf4!important;
-  color:#173c57!important;
-  font-size:12px!important;
-  font-weight:950!important;
-  border-top:1px solid #9fb8ca!important;
-}
-.eh-live-card-v20 table th:nth-child(1),
-.eh-live-card-v20 table td:nth-child(1){width:90px!important;min-width:90px!important}
-.eh-live-card-v20 table th:nth-child(2),
-.eh-live-card-v20 table td:nth-child(2){width:210px!important;min-width:210px!important;text-align:left!important}
-.eh-live-card-v20 table th:nth-child(3),
-.eh-live-card-v20 table td:nth-child(3){width:110px!important;min-width:110px!important}
-.eh-live-card-v20 table th:nth-child(4),
-.eh-live-card-v20 table td:nth-child(4){width:110px!important;min-width:110px!important}
-.eh-live-card-v20 table th:nth-child(5),
-.eh-live-card-v20 table td:nth-child(5){width:100px!important;min-width:100px!important}
-.eh-live-card-v20 table th:nth-child(6),
-.eh-live-card-v20 table td:nth-child(6){width:100px!important;min-width:100px!important}
-.eh-live-card-v20 table th:nth-child(7),
-.eh-live-card-v20 table td:nth-child(7){width:100px!important;min-width:100px!important}
-.eh-live-card-v20 table td:first-child{
-  color:#155b87!important;
-  font-weight:950!important;
-}
-.eh-live-card-v20 table td.left{
-  text-align:left!important;
-  font-weight:700!important;
-}
-.eh-live-card-v20 .eh-live-state{
-  color:#e13b46!important;
-  font-weight:950!important;
-}
-.eh-live-card-v20 .eh-done,
-.eh-live-card-v20 .eh-live-edit-btn{
-  min-width:62px!important;
-  height:28px!important;
-  padding:3px 8px!important;
-  font-size:11px!important;
-  font-weight:900!important;
-  white-space:nowrap!important;
-}
-.eh-live-card-v20 .eh-live-edit-btn{
-  background:#edf6ff!important;
-  color:#1769bd!important;
-  border:1px solid #a9cbe6!important;
-}
-.eh-live-card-v20 .eh-live-scroll::-webkit-scrollbar{
-  width:11px!important;
-  height:11px!important;
-}
-.eh-live-card-v20 .eh-live-scroll::-webkit-scrollbar-track{
-  background:#edf3f7!important;
-  border:1px solid #d1dee7!important;
-}
-.eh-live-card-v20 .eh-live-scroll::-webkit-scrollbar-thumb{
-  background:#8ba9bc!important;
-  border-radius:8px!important;
-  border:2px solid #edf3f7!important;
-}
-</style>
-
-<style id="JGB_FINAL_60_40_READABILITY">
-/* 최신 원본 최종 수정: 화면 기준 상단 60% / 하단 40% */
-@media (min-width:1051px){
-  body:has(.jgb-repair-page){
-    overflow:hidden!important;
-    margin:0!important;
-  }
-  .jgb-repair-page{
-    width:100%!important;
-    max-width:none!important;
-    height:100vh!important;
-    min-height:0!important;
-    max-height:none!important;
-    margin:0!important;
-    padding:8px 6px 8px!important;
-    display:grid!important;
-    grid-template-rows:104px minmax(0,calc(60vh - 124px)) minmax(0,calc(40vh - 16px))!important;
-    gap:10px!important;
-    overflow:hidden!important;
-  }
-  .jgb-repair-head{grid-row:1!important;height:100%!important;min-height:0!important;margin:0!important}
-  .jgb-repair-top{
-    grid-row:2!important;
-    height:100%!important;
-    min-height:0!important;
-    margin:0!important;
-    overflow:hidden!important;
-  }
-  .jgb-repair-list-wrap{
-    grid-row:3!important;
-    height:100%!important;
-    min-height:0!important;
-    margin:0!important;
-    display:flex!important;
-    flex-direction:column!important;
-    overflow:hidden!important;
-  }
-  .jgb-repair-split{min-height:0!important;flex:1 1 auto!important;overflow:hidden!important}
-  .jgb-repair-pane{min-height:0!important;display:flex!important;flex-direction:column!important}
-  .jgb-repair-scroll{height:auto!important;min-height:0!important;flex:1 1 auto!important;overflow-y:auto!important;overflow-x:auto!important}
-  .jgb-repair-note{flex:0 0 auto!important}
-
-  /* 배치도 글씨: 모든 시설/코트 = 아래 중앙 */
-  .jgb-facility-zone{
-    align-items:flex-end!important;
-    justify-content:center!important;
-    text-align:center!important;
-    padding:0 4px 10px!important;
-    font-size:16px!important;
-    font-weight:1000!important;
-  }
-  .jgb-repair-court{
-    align-items:flex-end!important;
-    justify-content:center!important;
-    text-align:center!important;
-    padding:0 4px 12px!important;
-    font-size:18px!important;
-    font-weight:1000!important;
-  }
-  /* 숫자: 박스 정중앙 */
-  .jgb-map-complaint-count,
-  .jgb-repair-court .jgb-map-complaint-count{
-    position:absolute!important;
-    left:50%!important;
-    top:50%!important;
-    right:auto!important;
-    transform:translate(-50%,-50%)!important;
-    margin:0!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    min-width:40px!important;
-    width:40px!important;
-    height:40px!important;
-    padding:0!important;
-    font-size:22px!important;
-    line-height:1!important;
-    font-weight:1000!important;
-    z-index:5!important;
-  }
-
-  /* 상단/하단 제목과 표 글씨도 화면에서 읽히게 확대 */
-  .jgb-repair-panel-head b,.jgb-repair-list-head b{font-size:20px!important;font-weight:1000!important}
-  .jgb-repair-panel-head span,.jgb-repair-list-head span{font-size:12px!important}
-  .jgb-repair-pane-head b{font-size:15px!important;font-weight:1000!important}
-  .jgb-repair-pane-head span{font-size:11px!important}
-  .jgb-repair-mini-head{font-size:12px!important}
-  .jgb-repair-mini-no b{font-size:12px!important}
-  .jgb-repair-mini-time{font-size:11px!important}
-  .jgb-repair-mini-content span{font-size:12px!important;font-weight:900!important}
-  .jgb-repair-mini-work select{font-size:11px!important}
-  .jgb-repair-mini-actions button{font-size:11px!important}
-  .jgb-repair-note{font-size:11px!important}
-}
-</style>
-
-<style id="final-readable-ui">
-/* 최종 가독성 통일: 헤더는 진한색+흰글씨, 본문은 진하고 크게 */
-body{font-family:"Malgun Gothic",Arial,sans-serif;color:#17324d;}
-
-/* 주요 섹션 헤더 */
-.jgb-repair-panel-head,
-.jgb-repair-list-head,
-.jgb-repair-pane-head{
-  background:#0b4f75!important;
-  color:#fff!important;
-  border-color:#083d5b!important;
-  font-weight:900!important;
-}
-.jgb-repair-panel-head b,
-.jgb-repair-list-head b,
-.jgb-repair-pane-head b{
-  color:#fff!important;
-  font-size:20px!important;
-  font-weight:1000!important;
-  letter-spacing:-.2px!important;
-}
-.jgb-repair-panel-head span,
-.jgb-repair-list-head span,
-.jgb-repair-pane-head span{
-  color:#fff!important;
-  font-size:12px!important;
-  font-weight:800!important;
-}
-
-/* 배치도 내부 시설명: 아래 중앙 유지, 진하고 크게 */
-.jgb-facility-zone{
-  color:#102b45!important;
-  font-size:16px!important;
-  font-weight:1000!important;
-  text-shadow:0 .3px 0 rgba(0,0,0,.18)!important;
-}
-.jgb-repair-court{
-  color:#102b45!important;
-  font-size:18px!important;
-  font-weight:1000!important;
-  text-shadow:0 .3px 0 rgba(0,0,0,.18)!important;
-}
-
-/* 배치도 그룹 제목 */
-.jgb-facility-group-title,
-.jgb-repair-group-title{
-  color:#0b3f60!important;
-  font-size:15px!important;
-  font-weight:1000!important;
-}
-
-/* 표 제목/헤더 */
-.jgb-repair-table th,
-.jgb-repair-table thead th,
-table thead th{
-  color:#123a59!important;
-  font-size:13px!important;
-  font-weight:1000!important;
-}
-.jgb-repair-table td,
-table tbody td{
-  color:#17324d!important;
-  font-size:13px!important;
-  font-weight:700!important;
-}
-
-/* 빨간 숫자: 정중앙, 흰색 굵은 숫자 */
-.jgb-map-complaint-count,
-.jgb-repair-court .jgb-map-complaint-count{
-  color:#fff!important;
-  font-size:22px!important;
-  font-weight:1000!important;
-  text-shadow:0 1px 1px rgba(0,0,0,.25)!important;
-}
-
-/* 오늘의 변화 카드 제목도 가독성 강화 */
-.jgb-change-title,
-.jgb-change-card b,
-.jgb-alert-title{
-  font-weight:1000!important;
-}
-</style>
-
-<style id="JGB_BASIC_WORKBOOK_STRONG_OVERRIDE">
-/* 업무 수행현황 본문만 작업수첩형으로 재정렬 / 헤더는 기존 스타일 유지 */
-.basic-v5:not(.basic-v5-head){
-  background:#f7f3ea!important;
-  border:1px solid #ddd3c3!important;
-  border-radius:14px!important;
-  padding:12px!important;
-  box-shadow:none!important;
-}
-.basic-v5-page-nav{
-  margin:0 0 6px!important;
-  min-height:44px!important;
-  padding:5px 8px!important;
-  background:#fffdf8!important;
-  border:1px solid #d9d0c1!important;
-  border-radius:9px!important;
-}
-.basic-v5-nav-btn{
-  min-height:36px!important;
-  padding:0 13px!important;
-  font-size:14px!important;
-  font-weight:1000!important;
-}
-.basic-v5-page-center strong{
-  font-size:22px!important;
-  font-weight:1000!important;
-  color:#182b3b!important;
-}
-.basic-v5-page-center span{
-  font-size:13px!important;
-  font-weight:950!important;
-}
-.basic-v5-worker-tabs{
-  gap:5px!important;
-  margin:0 0 7px!important;
-}
-.basic-v5-worker-tab{
-  width:72px!important;
-  min-width:72px!important;
-  min-height:36px!important;
-  border-radius:8px!important;
-  font-size:14px!important;
-  font-weight:1000!important;
-}
-.basic-v5-single{margin:0!important}
-.basic-v5-card{
-  background:#fffdf8!important;
-  border:1px solid #d8cfbf!important;
-  border-radius:11px!important;
-  padding:11px!important;
-  box-shadow:0 2px 7px rgba(80,65,40,.07)!important;
-}
-.basic-v5-card .head{
-  margin-bottom:6px!important;
-}
-.basic-v5-card .name{
-  font-size:24px!important;
-  font-weight:1000!important;
-  color:#172b3d!important;
-}
-.basic-v5-card .shift{
-  font-size:12px!important;
-  font-weight:950!important;
-  padding:4px 8px!important;
-}
-.basic-v5-card .state{
-  font-size:14px!important;
-  font-weight:1000!important;
-  padding:5px 9px!important;
-}
-.basic-v5-card .bar{
-  height:8px!important;
-  margin:5px 0 8px!important;
-}
-.basic-v5-tasks{
-  gap:6px!important;
-}
-.basic-v5-task{
-  min-height:48px!important;
-  border:1px solid #d6cec0!important;
-  border-radius:8px!important;
-  background:#fff!important;
-  padding:0 10px!important;
-  gap:8px!important;
-}
-.basic-v5-task .task-icon{
-  font-size:17px!important;
-  width:20px!important;
-  flex:0 0 20px!important;
-}
-.basic-v5-task .no{
-  font-size:13px!important;
-  font-weight:1000!important;
-  width:22px!important;
-  color:#596a79!important;
-}
-.basic-v5-task .txt{
-  font-size:16px!important;
-  font-weight:1000!important;
-  line-height:1.25!important;
-  color:#172b3d!important;
-}
-.basic-v5-task .action{
-  font-size:14px!important;
-  font-weight:1000!important;
-  min-width:43px!important;
-  text-align:center!important;
-}
-.basic-v5-task.is-done .txt{
-  font-weight:1000!important;
-}
-.basic-v5-foot{
-  margin-top:7px!important;
-  padding-top:7px!important;
-  font-size:13px!important;
-  font-weight:950!important;
-  color:#526575!important;
-}
-.basic-v5-foot b{
-  font-size:16px!important;
-  font-weight:1000!important;
-  color:#203b52!important;
-}
-/* 빈 공간을 줄여 업무수첩 한 장처럼 보이게 */
-.basic-v5-grid{gap:8px!important}
-.basic-v5-single{min-height:0!important}
-</style>
-
-<style id="JGB_BASIC_WORK_NOTE_ADD_V1">
-/* 원본 유지 + 디자인만 추가: 작업수첩 배경/스프링/가독성 강화 */
-.basic-book-layout{
-  position:relative!important;
-  overflow:visible!important;
-  background:#f8fbfd!important;
-  border:1px solid #c9d9e5!important;
-  border-radius:16px!important;
-  padding:34px 18px 18px!important;
-  box-shadow:0 8px 20px rgba(32,70,98,.08)!important;
-}
-/* 상단 스프링 작업노트 */
-.basic-book-layout::before{
-  content:"";
-  position:absolute!important;
-  z-index:3!important;
-  left:18px!important;
-  right:18px!important;
-  top:-13px!important;
-  height:27px!important;
-  pointer-events:none!important;
-  background:
-    radial-gradient(ellipse 7px 4px at 9px 50%, #f7fbfd 45%, #6f8798 49%, #6f8798 62%, transparent 65%) 0 0/48px 27px repeat-x;
-  filter:drop-shadow(0 1px 1px rgba(30,55,75,.22));
-}
-.basic-book-layout::after{
-  content:"";
-  position:absolute!important;
-  z-index:2!important;
-  left:16px!important;
-  right:16px!important;
-  top:5px!important;
-  height:1px!important;
-  background:#d6e2ea!important;
-  pointer-events:none!important;
-}
-/* 작업수첩 종이 영역 */
-.basic-book-layout .basic-v5-card{
-  background:#fff!important;
-  border:1px solid #c7d7e2!important;
-  border-radius:12px!important;
-  box-shadow:0 4px 12px rgba(30,65,90,.06)!important;
-}
-/* 화면 바깥 배경 */
-.basic-book-layout,
-.basic-book-layout *{box-sizing:border-box!important}
-/* 40분 안내를 확실히 보이게 */
-.basic-book-layout .basic-v5-sub{
-  font-size:17px!important;
-  line-height:1.5!important;
-  font-weight:900!important;
-  color:#eaf5ff!important;
-  letter-spacing:-.15px!important;
-}
-/* 직원명/페이지 표시 */
-.basic-book-layout .basic-v5-page-center strong{
-  font-size:24px!important;
-  font-weight:1000!important;
-  color:#123b61!important;
-}
-.basic-book-layout .basic-v5-page-center span{
-  font-size:15px!important;
-  font-weight:1000!important;
-}
-/* 직원 업무판 제목 */
-.basic-book-layout .basic-v5-card .name{
-  font-size:32px!important;
-  font-weight:1000!important;
-  color:#143f63!important;
-}
-.basic-book-layout .basic-v5-card .shift{
-  font-size:14px!important;
-  font-weight:900!important;
-}
-.basic-book-layout .basic-v5-card .state{
-  font-size:15px!important;
-  font-weight:1000!important;
-}
-/* 업무 글씨 강제 확대/굵게 */
-.basic-book-layout .basic-v5-task .no{
-  font-size:14px!important;
-  font-weight:900!important;
-}
-.basic-book-layout .basic-v5-task .txt{
-  font-size:19px!important;
-  font-weight:1000!important;
-  color:#173b59!important;
-}
-.basic-book-layout .basic-v5-task .action{
-  font-size:15px!important;
-  font-weight:1000!important;
-}
-.basic-book-layout .basic-v5-foot{
-  font-size:14px!important;
-  font-weight:800!important;
-}
-.basic-book-layout .basic-v5-foot b{
-  font-size:18px!important;
-  font-weight:1000!important;
-}
-/* 바깥쪽 여백을 줄여 작업수첩 밀도 강화 */
-.basic-book-layout .basic-v5-page-nav{margin-bottom:7px!important;padding:5px 0!important}
-.basic-book-layout .basic-v5-worker-tabs{margin-bottom:10px!important}
-</style>
-
-
-<style id="JGB_BASIC_WORK_NOTE_BACKGROUND_REMOVE">
-/* 본문 바탕 제거: 헤더는 유지하고 바깥 배경/판만 투명 처리 */
-html, body {
-  background:#fff !important;
-}
-.basic-book-layout {
-  background:transparent !important;
-  border:0 !important;
-  border-radius:0 !important;
-  box-shadow:none !important;
-}
-</style>
-
-<style id="JGB_WORK_NOTE_CORRECT_5050">
-/* 최종 정리: 헤더는 기존 스타일 유지, 헤더 아래만 50:50 양쪽 스프링 수첩 */
-.basic-book-layout{
-  padding:0 0 14px 0!important;
-  margin:0!important;
-  background:transparent!important;
-  border:0!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  overflow:visible!important;
-}
-/* 이전 세로 제본 제거 */
-.basic-book-layout::before,
-.basic-book-layout::after{content:none!important;display:none!important}
-
-/* 헤더 자체는 원래 파란 헤더로 복원 */
-.basic-book-layout .basic-v5-head{
-  background:linear-gradient(135deg,#124b7a 0%,#0b6f9d 100%)!important;
-  border:1px solid #1769aa!important;
-  border-radius:12px!important;
-  color:#fff!important;
-}
-.basic-book-layout .basic-v5-head .basic-v5-title{color:#fff!important}
-.basic-book-layout .basic-v5-head .basic-v5-sub{color:rgba(255,255,255,.86)!important}
-
-/* 직원 선택/페이지 영역은 헤더 아래 원래 구조 유지 */
-.basic-book-layout .basic-v5-page-nav,
-.basic-book-layout .basic-v5-worker-tabs{
-  background:transparent!important;
-}
-
-/* 실제 작업수첩 본문: 화면 가로 50:50 */
-.basic-book-layout .basic-v5-card{
-  position:relative!important;
-  background:#fffdf8!important;
-  border:1px solid #d8d0c5!important;
-  border-radius:10px!important;
-  box-shadow:0 3px 10px rgba(60,50,40,.08)!important;
-  padding:18px 16px 14px!important;
-}
-
-/* 업무명/근무정보는 한 장의 수첩 상단 */
-.basic-book-layout .basic-v5-card .head{
-  background:transparent!important;
-  border-bottom:1px solid #ddd6cc!important;
-  padding-bottom:10px!important;
-  margin-bottom:14px!important;
-}
-
-/* 10개 업무를 5행 × 2열, 정확히 좌우 50:50 */
-.basic-book-layout .basic-v5-tasks{
-  position:relative!important;
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  column-gap:12px!important;
-  row-gap:8px!important;
-  border:0!important;
-  padding:24px 0 0!important;
-  overflow:visible!important;
-}
-
-/* 왼쪽/오른쪽 각각 한 권의 종이 */
-.basic-book-layout .basic-v5-tasks::before,
-.basic-book-layout .basic-v5-tasks::after{
-  content:""!important;
-  position:absolute!important;
-  top:0!important;
-  bottom:0!important;
-  width:calc(50% - 6px)!important;
-  background:#fffdf8!important;
-  border:1px solid #d8d0c5!important;
-  border-radius:8px!important;
-  box-shadow:0 2px 8px rgba(60,50,40,.06)!important;
-  z-index:0!important;
-  pointer-events:none!important;
-}
-.basic-book-layout .basic-v5-tasks::before{left:0!important}
-.basic-book-layout .basic-v5-tasks::after{right:0!important}
-
-/* 각 수첩 위쪽에만 스프링 고리 */
-.basic-book-layout .basic-v5-tasks::before{
-  background:
-    radial-gradient(ellipse 7px 9px at 9px 0,#fffdf8 0 42%,#66727a 46% 56%,#30383d 59% 66%,transparent 69%) 0 0/42px 20px repeat-x,
-    #fffdf8!important;
-}
-.basic-book-layout .basic-v5-tasks::after{
-  background:
-    radial-gradient(ellipse 7px 9px at 9px 0,#fffdf8 0 42%,#66727a 46% 56%,#30383d 59% 66%,transparent 69%) 0 0/42px 20px repeat-x,
-    #fffdf8!important;
-}
-
-/* 실제 업무행은 종이 위에 표시 */
-.basic-book-layout .basic-v5-task{
-  position:relative!important;
-  z-index:1!important;
-  min-height:54px!important;
-  margin:0!important;
-  border:0!important;
-  border-bottom:1px solid #e4ddd3!important;
-  border-radius:0!important;
-  background:transparent!important;
-  padding:0 12px!important;
-  box-shadow:none!important;
-}
-.basic-book-layout .basic-v5-task:nth-child(odd){border-right:0!important}
-.basic-book-layout .basic-v5-task:hover{background:#faf5e9!important}
-.basic-book-layout .basic-v5-task.is-done{background:#f1f7f1!important}
-
-/* 바깥쪽 기존 바탕 제거 */
-html,body{background:#eef5f9!important}
-
-@media(max-width:900px){
-  .basic-book-layout .basic-v5-tasks{grid-template-columns:1fr!important}
-  .basic-book-layout .basic-v5-tasks::after{display:none!important}
-  .basic-book-layout .basic-v5-tasks::before{width:100%!important}
 }
 </style>
 </head><body><div id="app"></div>
@@ -6357,13 +5507,12 @@ html,body{background:#eef5f9!important}
     window.__basicWorkerPage = Number.isInteger(window.__basicWorkerPage) ? window.__basicWorkerPage : 0;
     window.basicPageWorkerNav=function(delta){
       const tw=Array.isArray(todayWorkers())?todayWorkers():workers.map(w=>({...w,status:w.shift||"편성없음",working:false,start:"",end:""}));
-      const max=Math.max(0,Math.ceil(tw.length/2)-1);
+      const max=Math.max(0,tw.length-1);
       window.__basicWorkerPage=Math.min(max,Math.max(0,(Number(window.__basicWorkerPage)||0)+Number(delta||0)));
       render();
     };
     window.basicPageWorkerSelect=function(index){
-      const i=Math.max(0,Number(index)||0);
-      window.__basicWorkerPage=Math.floor(i/2);
+      window.__basicWorkerPage=Math.max(0,Number(index)||0);
       render();
     };
     window.basicTaskIcon=function(t){
@@ -6381,60 +5530,31 @@ html,body{background:#eef5f9!important}
       return '📋';
     };
     window.basicTaskTone=function(i){return ['blue','teal','green','orange','violet','navy','cyan','amber','mint','red'][i%10]};
-    function basicNotebookHtml(w, notebookNo){
-      if(!w) return `<article class="work-notebook work-notebook-empty"><div class="work-notebook-spring">${Array.from({length:12},()=>'<i></i>').join('')}</div><div class="empty-note">업무수첩</div></article>`;
+    window.basicPage=function basicPage(){
+      const tw=Array.isArray(todayWorkers())?todayWorkers():workers.map(w=>({...w,status:w.shift||"편성없음",working:false,start:"",end:""}));
+      if(!tw.length)return `<div class="basic-v5"><div class="basic-v5-head"><div><h2 class="basic-v5-title">오늘의 기본업무</h2><div class="basic-v5-sub">${selectedDate} · 근무자별 10개 업무를 실제 실시한 항목만 완료 처리</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div><div style="padding:30px;text-align:center;color:#718096">오늘 편성된 근무자가 없습니다.</div></div>`;
+      const max=Math.max(0,tw.length-1);
+      const idx=Math.min(max,Math.max(0,Number(window.__basicWorkerPage)||0));
+      window.__basicWorkerPage=idx;
+      const w=tw[idx];
       const d=tasksFor(w.id)||{done:[],updatedAt:null};
       const isHoliday=/휴일\s*근무/.test(String(w.status||''));
       const isOff=!w.working || offWords.some(x=>(w.status||'').includes(x));
       const done=isHoliday?10:Array.isArray(d.done)?d.done.length:0;
       const state=isOff?'대상 제외':isHoliday?'자동완료':'직접 실시';
-      const tasksHtml=tasks.map((t,i)=>{
-        const checked=isHoliday||(Array.isArray(d.done)&&d.done.includes(t));
-        const safe=t.replace(/'/g,"\\'");
-        return `<button type="button" class="basic-v5-task basic-tone-${basicTaskTone(i)} ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${safe}')"><span class="task-icon" aria-hidden="true">${basicTaskIcon(t)}</span><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`;
-      }).join('');
-      return `<article class="work-notebook">
-        <div class="work-notebook-spring">${Array.from({length:12},()=>'<i></i>').join('')}</div>
-        <div class="work-paper">
-          <div class="work-paper-head">
-            <div><div class="work-person">${w.name}</div><div class="work-shift">${w.shift||w.status||''}${w.start?` · ${w.start}~${w.end}`:''}</div></div>
-            <span class="work-count ${done===10&&!isOff?'done':''}">${state} · ${isOff?'-':done+'/10'}</span>
-          </div>
-          <div class="work-progress"><i style="width:${isOff?0:done*10}%"></i></div>
-          <div class="basic-v5-tasks">${tasksHtml}</div>
-          <div class="basic-v5-foot"><span>${isOff?'기본업무 대상 아님':isHoliday?'휴일근무 · 기본업무 1건 자동완료':done===10?'오늘 기본업무 완료':'실시한 항목만 실적 반영'}</span><b>${isOff?'':done+'/10'}</b></div>
-        </div>
-      </article>`;
-    }
-
-    window.basicPage=function basicPage(){
-      const tw=Array.isArray(todayWorkers())?todayWorkers():workers.map(w=>({...w,status:w.shift||"편성없음",working:false,start:"",end:""}));
-      if(!tw.length)return `<div class="basic-v5 basic-work-status-wrap"><div class="basic-v5-head"><div><h2 class="basic-v5-title">업무 수행현황</h2><div class="basic-v5-sub">${selectedDate} · 시설 이용환경을 꼼꼼히 확인해 주세요. · 전체 약 40분 소요 · 차근차근 점검해 주세요.</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div><div style="padding:30px;text-align:center;color:#718096">오늘 편성된 근무자가 없습니다.</div></div>`;
-
-      /* 한 화면에 2명씩 표시: 1페이지=김·안, 2페이지=한·이 */
-      const pageCount=Math.max(1,Math.ceil(tw.length/2));
-      const pageIndex=Math.min(pageCount-1,Math.max(0,Number(window.__basicWorkerPage)||0));
-      window.__basicWorkerPage=pageIndex;
-      const firstIndex=pageIndex*2;
-      const visible=tw.slice(firstIndex,firstIndex+2);
-      const first=visible[0]||null;
-      const second=visible[1]||null;
-      const centerName=visible.map(x=>x.name).join(' · ');
-
-      const tabs=tw.map((x,i)=>{
-        const on=i===firstIndex || i===firstIndex+1;
-        return `<button type="button" class="basic-v5-worker-tab ${on?'on':''}" onclick="basicPageWorkerSelect(${i})"><span>${x.name}</span><small>${i+1}</small></button>`;
-      }).join('');
-
-      return `<div class="basic-v5 basic-work-status-wrap">
-        <div class="basic-v5-head"><div><h2 class="basic-v5-title">업무 수행현황</h2><div class="basic-v5-sub">${selectedDate} · 시설 이용환경을 꼼꼼히 확인해 주세요. · 전체 약 40분 소요 · 차근차근 점검해 주세요.</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div>
-        <div class="basic-v5-page-nav">
-          <button type="button" class="basic-v5-nav-btn page-arrow" ${pageIndex===0?'disabled':''} onclick="basicPageWorkerNav(-1)" aria-label="이전 직원 묶음">‹</button>
-          <div class="basic-v5-page-center"><strong>${centerName}</strong><span>${pageIndex+1} / ${pageCount}</span></div>
-          <button type="button" class="basic-v5-nav-btn next page-arrow" ${pageIndex===pageCount-1?'disabled':''} onclick="basicPageWorkerNav(1)" aria-label="다음 직원 묶음">›</button>
-        </div>
-        <div class="basic-v5-worker-tabs">${tabs}</div>
-        <div class="work-notebooks">${first?basicNotebookHtml(first,1):''}${second?basicNotebookHtml(second,2):''}</div>
+      const tabs=tw.map((x,i)=>`<button type="button" class="basic-v5-worker-tab ${i===idx?'on':''}" onclick="basicPageWorkerSelect(${i})"><span>${x.name}</span><small>${i+1}</small></button>`).join('');
+      const tasksHtml=tasks.map((t,i)=>{const checked=isHoliday||(Array.isArray(d.done)&&d.done.includes(t));return `<button type="button" class="basic-v5-task basic-tone-${basicTaskTone(i)} ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${t.replace(/'/g,"\\'")}')"><span class="task-icon" aria-hidden="true">${basicTaskIcon(t)}</span><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`}).join('');
+      return `<div class="basic-v5 basic-book-layout">
+       <div class="basic-v5-head"><div><h2 class="basic-v5-title">오늘의 기본업무</h2><div class="basic-v5-sub">${selectedDate} · 근무자별 10개 업무를 실제 실시한 항목만 완료 처리</div></div><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"></div>
+       <div class="basic-v5-page-nav"><button type="button" class="basic-v5-nav-btn" ${idx===0?'disabled':''} onclick="basicPageWorkerNav(-1)">‹ 이전 직원</button><div class="basic-v5-page-center"><strong>${w.name}</strong><span>${idx+1} / ${tw.length}</span></div><button type="button" class="basic-v5-nav-btn next" ${idx===max?'disabled':''} onclick="basicPageWorkerNav(1)">다음 직원 ›</button></div>
+       <div class="basic-v5-worker-tabs">${tabs}</div>
+       <div class="basic-v5-single"><article class="basic-v5-card">
+         <div class="head"><div><div class="name">${w.name}</div><div class="shift">${w.shift||w.status||''}${w.start?` · ${w.start}~${w.end}`:''}</div></div><span class="state ${done===10&&!isOff?'done':''}">${state} · ${isOff?'-':done+'/10'}</span></div>
+         <div class="bar"><i style="width:${isOff?0:done*10}%"></i></div>
+         <div class="basic-v5-tasks">${tasksHtml}</div>
+         <div class="basic-v5-foot"><span>${isOff?'기본업무 대상 아님':isHoliday?'휴일근무 · 기본업무 1건 자동완료':done===10?'오늘 기본업무 완료':'실시한 항목만 실적 반영'}</span><b>${isOff?'':done+'/10'}</b></div>
+       </article></div>
+       <div class="basic-v5-bottom-banner"><img src="오늘의_기본업무_하단안내배너.webp" alt="실시한 항목만 실적에 반영됩니다. 오늘도 안전하고 즐거운 배드민턴!"></div>
       </div>`;
     }
     function stats(){
@@ -7601,12 +6721,20 @@ html,body{background:#eef5f9!important}
       return `<style id="EAM_HYUNHWANG_MAPONLY_V4">.eh-page{height:calc(100vh - 24px);min-height:720px;display:flex;flex-direction:column;gap:10px;background:#eef4f8;color:#17344d;box-sizing:border-box;overflow:hidden}.eh-head{height:82px;flex:0 0 82px;background:linear-gradient(135deg,#0d4266,#176b98);color:#fff;border-radius:13px;padding:0 16px;display:flex;align-items:center;gap:8px;box-sizing:border-box;box-shadow:0 8px 22px rgba(20,60,85,.18)}.eh-head h1{margin:0;font-size:23px}.eh-head small{display:block;color:#d9edf8;margin-top:4px;font-size:10px}.eh-head-stats{margin-left:auto;display:flex;gap:5px}.eh-stat{min-width:62px;height:51px;border:1px solid rgba(255,255,255,.25);border-radius:8px;background:rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center}.eh-stat b{font-size:18px}.eh-stat small{font-size:8px;margin:2px 0 0;color:#fff}.eh-stat.normal{background:linear-gradient(180deg,#20b96b,#07884a)!important;border-color:#62e4a1!important}.eh-stat.check{background:linear-gradient(180deg,#f7c928,#d89a00)!important;border-color:#ffe37b!important}.eh-stat.action{background:linear-gradient(180deg,#18b7c9,#087f91)!important;border-color:#73e5ed!important}.eh-stat.repair{background:linear-gradient(180deg,#f04b61,#c8233c)!important;border-color:#ff8b9a!important}.eh-stat.parts{background:linear-gradient(180deg,#8f5bd0,#6532a5)!important;border-color:#c9a5f4!important}.eh-stat.normal b,.eh-stat.check b,.eh-stat.action b,.eh-stat.repair b,.eh-stat.parts b{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.22)}.eh-head button{border:1px solid rgba(255,255,255,.4);background:#fff;color:#075b91;border-radius:8px;padding:10px 12px;font-weight:900;cursor:pointer;white-space:nowrap}.eh-head button.mapdel{background:transparent;color:#fff}.eh-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,3fr) minmax(390px,2fr);gap:10px}.eh-card{background:#fff;border:1px solid #cbd9e3;border-radius:12px;overflow:hidden;box-shadow:0 3px 12px rgba(22,54,78,.07);min-height:0}.eh-map-card{display:flex;flex-direction:column}.eh-card-head{height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid #d7e3eb;background:#fbfdfe}.eh-card-head h2{font-size:16px;margin:0}.eh-card-head small{font-size:9px;color:#71889a}.eh-map-wrap{flex:1;min-height:0;padding:7px;background:#edf4f7}.eh-map{position:relative;width:100%;height:100%;border:2px solid #334f63;background:#f4f8fa;overflow:hidden;box-shadow:inset 0 0 0 4px #fff}.eh-courts{position:absolute;left:7%;right:7%;top:2%;height:21%;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.eh-courts>b{position:absolute;top:0;left:0;right:0;text-align:center;font-size:9px}.eh-court{margin-top:14px;border:1px solid #678092;background:#e6eef2;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#24475f}.eh-facility{position:absolute;left:1.5%;right:1.5%;top:25%;bottom:1.5%;display:grid;grid-template-rows:10% 34% 9% 47%}.eh-roof,.eh-row,.eh-bottom{display:grid}.eh-roof{grid-template-columns:1fr 2fr 2fr 1fr;border:1px solid #9bafbd;background:#f2f6f8}.eh-roof span{display:flex;align-items:center;justify-content:center;border-right:1px solid #aabac5;font-size:10px;font-weight:900}.eh-row{grid-template-columns:repeat(6,1fr);border-left:1px solid #9bafbd}.eh-zone{border-right:1px solid #9bafbd;border-bottom:1px solid #9bafbd;background:#f5f9fa;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.eh-zone.pink{background:#fff1f5}.eh-zone b{font-size:11px}.eh-zone small{font-size:7px;color:#718797;margin-top:2px}.eh-corridor{border:1px solid #9bafbd;background:#f6efdf;display:flex;align-items:center;justify-content:center;font-weight:900;color:#425d70}.eh-bottom{grid-template-columns:2fr 3fr 1fr;border-left:1px solid #9bafbd}.eh-bottom .water{background:#fff4d1}.eh-marker{position:absolute;z-index:20;transform:translate(-50%,-50%);border:2px solid var(--st-border,#159447)!important;background:var(--st-bg,#e9fff2)!important;color:var(--st-text,#08743f)!important;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:950;cursor:pointer;box-shadow:0 5px 12px rgba(20,55,70,.24),inset 0 1px 1px rgba(255,255,255,.95);white-space:nowrap}.eh-marker.check,.eh-marker.action,.eh-marker.repair,.eh-marker.parts{border-color:var(--st-border)!important;background:var(--st-bg)!important;color:var(--st-text)!important}.eh-marker.map-only{border-color:#176db0!important;background:#eaf5ff!important;color:#075b91!important}.eh-empty-map{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8297a5;font-size:11px}.eh-right{min-width:0;min-height:0;display:block}.eh-live-card{height:100%;display:flex;flex-direction:column}.eh-live-card .eh-card-body{flex:1;min-height:0;overflow:hidden}.eh-live-scroll{height:100%;overflow-y:scroll;overflow-x:auto;scrollbar-gutter:stable both-edges}.eh-live-card table{width:max-content;min-width:760px;border-collapse:collapse;font-size:10px}.eh-live-card th,.eh-live-card td{padding:7px 12px;border-bottom:1px solid #e2eaf0;text-align:center;white-space:nowrap;height:34px}.eh-live-card th{background:#edf4f8;position:sticky;top:0;z-index:2}.eh-live-card td.left{text-align:left}.eh-live-state{color:#dd4444;font-weight:900}.eh-done{border:1px solid #cbd7df;background:#fff;border-radius:5px;padding:4px 7px;font-size:8px;font-weight:900;cursor:pointer}.eh-empty{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#91a2ae;font-size:11px;padding:20px;text-align:center}.eh-modal{position:fixed;inset:0;background:rgba(8,31,48,.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px}.eh-modal-box{width:min(620px,95vw);max-height:88vh;overflow:auto;background:#fff;border-radius:13px;box-shadow:0 25px 60px rgba(0,0,0,.28)}.eh-modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:15px 17px;background:linear-gradient(135deg,#103f61,#16658f);color:#fff}.eh-modal-head h3{margin:3px 0;font-size:18px}.eh-modal-head p{margin:4px 0 0;font-size:9px;color:#d8ebf5}.eh-modal-head button{border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:6px;width:30px;height:30px;font-size:20px;cursor:pointer}.eh-cat-grid{padding:12px 12px 5px;display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.eh-cat{border:1px solid #d5e0e7;background:#fff;border-radius:7px;padding:8px 3px;cursor:pointer}.eh-cat.active{border:2px solid #1675c2;background:#eef7ff}.eh-cat b{display:block;font-size:11px}.eh-cat small{display:block;font-size:8px;color:#718797;margin-top:2px}.eh-code-line{display:flex;align-items:center;justify-content:center;gap:8px;padding:18px 12px;background:#f3f8fb;border-top:1px solid #dbe6ed;border-bottom:1px solid #dbe6ed}.eh-code-line strong:first-child{font-size:13px;color:#176da0}.eh-code-line input{width:74px;height:38px;border:1px solid #b8ccdc;border-radius:7px;text-align:center;font-size:16px;font-weight:900;color:#17344d}.eh-code-line input[readonly]{width:58px;background:#f8fbfd}.eh-code-line>span{font-size:8px;color:#18a66c}.eh-code-line>strong:last-child{font-size:18px;color:#126db0}.eh-map-only-note{padding:12px 17px;color:#6f8496;font-size:10px;line-height:1.55}.eh-modal-foot{display:flex;justify-content:flex-end;gap:7px;padding:12px 17px;border-top:1px solid #e2e9ef}.eh-modal-foot button{border:0;border-radius:7px;padding:10px 14px;font-weight:900;cursor:pointer}.eh-modal-foot .gray{background:#edf2f5;color:#526b7e}.eh-modal-foot .primary{background:#1675c2;color:#fff}.eh-delete-list{padding:12px;display:grid;gap:6px}.eh-delete-list>div{display:grid;grid-template-columns:90px 1fr 58px;align-items:center;gap:8px;padding:10px;border:1px solid #dbe4eb;border-radius:7px}.eh-delete-list b{color:#176db0}.eh-delete-list span{font-weight:800}.eh-delete-list button{border:1px solid #efc8c8;background:#fff;color:#d64747;border-radius:6px;padding:6px;font-weight:900;cursor:pointer}@media(max-width:1000px){.eh-main{grid-template-columns:1fr}.eh-right{min-height:650px}.eh-page{overflow:auto}.eh-map-card{min-height:650px}}@media(max-width:700px){.eh-head-stats{display:none}.eh-head h1{font-size:18px}.eh-head button{font-size:9px;padding:8px}.eh-cat-grid{grid-template-columns:repeat(4,1fr)}} </style><div class="eh-page"><header class="eh-head"><div><h1>🏢 EAM 현황</h1><small>기존 EAM 자산관리와 분리된 시설 자산 현황 화면</small></div><div class="eh-head-stats"><div class="eh-stat normal"><b>${normal}</b><small>정상</small></div><div class="eh-stat check"><b>${check}</b><small>점검</small></div><div class="eh-stat action"><b>${action}</b><small>조치필요</small></div><div class="eh-stat repair"><b>${repair}</b><small>수리중</small></div><div class="eh-stat parts"><b>${parts}</b><small>부품대기</small></div></div><button type="button" onclick="window.eamHyunOpenIconAdd()">＋ 배치도 아이콘 추가</button></header><main class="eh-main"><section class="eh-card eh-map-card"><div class="eh-card-head"><h2>🗺 시설 자산 배치도</h2></div><div class="eh-map-wrap">${map}</div></section><aside class="eh-right eh-right-v20">
 <section class="eh-card eh-live-card eh-live-card-v20">
   <div class="eh-card-head">
-    <h2>🏢 시설물 유지관리 현황</h2>
+    <h2>🔧 수리 LIVE</h2>
     <button type="button" onclick="window.eamManualLiveOpen()">＋ 직접입력</button>
   </div>
   <div class="eh-card-body">${liveHtml}</div>
 </section>
-
+<section class="eh-card eh-extra-card-v20">
+  <div class="eh-card-head">
+    <h2>＋ 추가 관리영역</h2>
+    <small>추후 기능 추가</small>
+  </div>
+  <div class="eh-extra-body-v20">
+    <div class="eh-extra-empty-v20">추가할 관리 기능을 이 영역에 배치합니다.</div>
+  </div>
+</section>
 </aside></main></div>`;
     }
 
@@ -7684,25 +6812,6 @@ html,body{background:#eef5f9!important}
       const n=complaintYearIssues(Number(year)).length;
       if(total)total.textContent=`연간 ${n.toLocaleString()}건`;
     }
-    function complaintWeekTimeRows(items){
-      const dayNames=['일','월','화','수','목','금','토'];
-      const bins=[
-        ['06~09시',6,9],['09~12시',9,12],['12~15시',12,15],
-        ['15~18시',15,18],['18~21시',18,21],['21~24시',21,24]
-      ];
-      const counts=Array.from({length:7},()=>Array(bins.length).fill(0));
-      (items||[]).forEach(x=>{
-        const d=new Date(x?.createdAt||'');
-        if(Number.isNaN(d.getTime()))return;
-        const day=d.getDay(), h=d.getHours();
-        const bi=bins.findIndex(([,a,b])=>h>=a&&h<b);
-        if(bi>=0)counts[day][bi]++;
-      });
-      const head=bins.map(([label])=>`<th>${label}</th>`).join('');
-      const body=dayNames.map((name,di)=>`<tr><th>${name}</th>${counts[di].map(v=>`<td>${v.toLocaleString()}</td>`).join('')}</tr>`).join('');
-      return `<table class="jgb-week-time-table"><thead><tr><th>요일</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
-    }
-
     function complaintStatsPanel(){
       const all=(db.issues||[]).slice();
       const years=Array.from({length:12},(_,i)=>2024+i);
@@ -7737,10 +6846,6 @@ html,body{background:#eef5f9!important}
           <section class="jgb-complaint-stat-card">
             <div class="jgb-complaint-stat-card-head"><b>민원 유형별 현황</b><span>단위 : 건</span></div>
             <div class="jgb-type-grid">${typeRows}</div>
-          </section>
-          <section class="jgb-complaint-stat-card jgb-week-time-card">
-            <div class="jgb-complaint-stat-card-head"><b>요일·시간대별 민원 접수 상세</b><span>단위 : 건</span></div>
-            <div class="jgb-week-time-wrap">${complaintWeekTimeRows(all)}</div>
           </section>
         </div>
       </section>`;
@@ -7877,25 +6982,14 @@ html,body{background:#eef5f9!important}
       </aside>`;
     }
 
-    function jgbResetNumericCounts(){
-      if(!confirm('집계 숫자를 초기화하시겠습니까?\n고객 접수 내용과 처리 기능에는 영향을 주지 않습니다.'))return;
-      try{localStorage.setItem('JGB_NUMERIC_RESET_AT',String(Date.now()));}catch(e){}
-      render();
-    }
-
-    function jgbNumericResetAt(){
-      try{return Number(localStorage.getItem('JGB_NUMERIC_RESET_AT')||0)||0;}catch(e){return 0}
-    }
-
     function processPage(){
-     const resetAt=jgbNumericResetAt();
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
      const active=stored.filter(x=>x.status!=='완료');
      const safe=(x)=>cleanIssueContent(x)||'접수 내용 없음';
      const state=(x)=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
      const stateClass=(x)=>state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
      const mapComplaintCounts=complaintPlaceCounts(active);
-     const today=stored.filter(x=>{const d=new Date(x.createdAt||0),n=new Date();return d.getTime()>=resetAt && d.toDateString()===n.toDateString()}).length;
+     const today=stored.filter(x=>{const d=new Date(x.createdAt||0),n=new Date();return d.toDateString()===n.toDateString()}).length;
      /* 헤더 연도별 성과 요약: 2025년은 초기 기준값 0건으로 고정하고, 2026년은 실제 접수 데이터를 집계한다. */
      const headerYear=2026;
      const header2026=complaintYearIssues(headerYear);
@@ -7950,18 +7044,6 @@ html,body{background:#eef5f9!important}
       .jgb-complaint-stats-head{height:43px;padding:8px 11px;background:#e8f2f7;border-bottom:2px solid #7894a8;display:flex;align-items:center;justify-content:space-between}
       .jgb-complaint-stats-head b{font-size:17px;font-weight:950;color:#173c58}.jgb-complaint-stats-head span{font-size:10px;color:#58758b;font-weight:900}
       .jgb-complaint-stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:9px}
-.jgb-complaint-stats-grid{align-items:start!important;grid-auto-rows:max-content!important;overflow-x:hidden!important}
-.jgb-complaint-stats-grid>.jgb-complaint-stat-card{height:auto!important;min-height:0!important;align-self:start!important}
-.jgb-week-time-card{grid-column:1 / -1!important}
-.jgb-week-time-wrap{width:100%;overflow-x:hidden!important;overflow-y:visible!important}
-.jgb-week-time-table{width:100%;table-layout:fixed;border-collapse:collapse}
-.jgb-week-time-table th,.jgb-week-time-table td{height:30px;padding:4px 5px;box-sizing:border-box;border-right:1px solid #d5e1e9;border-bottom:1px solid #d5e1e9;text-align:center;font-size:10px;color:#28465d}
-.jgb-week-time-table thead th{background:#f4f8fb;color:#527087;font-weight:950}
-.jgb-week-time-table tbody th{background:#f8fbfd;font-weight:950}
-.jgb-week-time-table td{font-size:11px;font-weight:900;color:#173c58}
-.jgb-week-time-table th:last-child,.jgb-week-time-table td:last-child{border-right:0}
-.jgb-week-time-table tbody tr:last-child th,.jgb-week-time-table tbody tr:last-child td{border-bottom:0}
-@media(max-width:1050px){.jgb-complaint-stats-grid{grid-template-columns:1fr!important}.jgb-week-time-card{grid-column:1!important}}
       .jgb-complaint-stat-card{border:1px solid #cbd9e2;border-radius:8px;background:#fff;overflow:hidden;min-width:0}
 /* 하단 3개 통계판 높이 통일: TOP 5도 동일한 내부 스크롤 영역 */
 .jgb-complaint-stat-card{height:auto;min-height:190px;display:flex;flex-direction:column}
@@ -8192,7 +7274,7 @@ html,body{background:#eef5f9!important}
 
 </style>
      <div class="jgb-repair-page">
-       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button></div></header>
+       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>민원 접수·처리 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["남자 화장실"]?'has-complaint':''}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["여자 화장실"]?'has-complaint':''}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${mapComplaintCounts["복도"]?'has-complaint':''}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${mapComplaintCounts["휴게실"]?'has-complaint':''}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${mapComplaintCounts["기타"]?'has-complaint':''}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${n?'has-complaint':''}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
          ${liveComplaintActionPanel(active)}
@@ -9039,7 +8121,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         <div class="jgb-v170-grid">
           <section class="jgb-v170-card jgb-v170-mapcard"><div class="jgb-v170-title"><div><h2>🗺 코트 배치도 <span style="font-size:11px;color:#7a91a4;font-weight:800">· LK 위치 관리</span></h2><p>코트 위치와 번호는 고정됩니다. LK 아이콘만 드래그하여 위치를 조정할 수 있습니다.</p></div><div class="jgb-v170-legend jgb-v186-summary"><button type="button" data-v47-action="filter-lk-status" data-filter-status="조치필요"${statusFilter==='조치필요'?' class="active"':''}><i style="background:#ef5b52"></i>조치필요 <b>${leaks.filter(x=>String(x.status||'').trim()==='조치필요'||String(x.status||'').trim()==='보수필요').length}</b></button><button type="button" data-v47-action="filter-lk-status" data-filter-status="점검요청"${statusFilter==='점검요청'?' class="active"':''}><i style="background:#e0b62f"></i>점검요청 <b>${leaks.filter(x=>String(x.status||'').trim()==='점검요청'||String(x.status||'').trim()==='점검필요').length}</b></button><button type="button" data-v47-action="filter-lk-status" data-filter-status="정상"${statusFilter==='정상'?' class="active"':''}><i style="background:#3d8fe4"></i>정상 <b>${leaks.filter(x=>String(x.status||'').trim()==='정상'||!x.status).length}</b></button><button type="button" data-v47-action="filter-lk-status" data-filter-status="자체정비"${statusFilter==='자체정비'?' class="active"':''}><i style="background:#38a169"></i>자체정비 <b>${leaks.filter(x=>String(x.maintenanceMethod||'').trim()==='자체정비').length}</b></button><button type="button" data-v47-action="filter-lk-status" data-filter-status="외주정비"${statusFilter==='외주정비'?' class="active"':''}><i style="background:#d88928"></i>외주정비 <b>${leaks.filter(x=>String(x.maintenanceMethod||'').trim()==='외주정비').length}</b></button></div></div><div class="jgb-v170-map"><div class="jgb-v170-plan jgb-v190-plan jgb-v200-plan jgb-leak-plan-v1">
   <div class="jgb-leak-roof-panel">
-    <div class="jgb-leak-roof-title"><b>2F 옥상 (지붕)</b><span>상부 누수 발생 구역</span></div>
+    
     <div class="jgb-leak-rain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="jgb-leak-roof-drain">옥상 배수로</div>
     <div class="jgb-leak-roof-building left"><span>창고</span></div>
@@ -9092,7 +8174,23 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
   </div>
   ${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}
 </div></div></div><div class="jgb-v170-note">LK 아이콘 클릭 → 해당 LK의 방수공사 이력으로 이동 · 삭제·초기화는 상단 「LK 삭제·초기화」에서 선택</div></section>
-          
+          <section class="jgb-v170-card jgb-v170-live jgb-v176-live-card"><div class="jgb-v176-live-head"><div><div class="jgb-v176-kicker"><span class="jgb-v176-live-dot"></span> LIVE MONITORING</div><h2>실시간 수리 현황</h2><p>필요한 수리 건만 직접 등록합니다.</p></div><div class="jgb-v176-live-badge"><i></i><b>AUTO LK</b><span>LK 등록 연동</span></div></div><div class="jgb-v178-live-table">${live.length?`<table><thead><tr><th>LK</th><th>작업내용</th><th>수리상태</th><th>예정일</th><th>담당</th><th>입력</th><th>처리</th></tr></thead><tbody>${live.map(x=>`<tr><td><b>${esc(x.lk||'')}</b></td><td>${esc(x.content||'')}</td><td>${esc(x.status||'수리중')}</td><td class="jgb-v187-date">${esc(x.scheduled||'-')}</td><td>${esc(x.manager||'-')}</td><td><button type="button" class="jgb-v182-live-edit" data-v47-action="edit-live" data-live-lk="${esc(x.lk||'')}">입력</button></td><td><button type="button" class="jgb-v180-live-done" data-v47-action="live-complete" data-live-lk="${esc(x.lk||'')}">완료</button></td></tr>`).join('')}</tbody></table>`:`<div class="jgb-v187-empty"><div class="jgb-v187-empty-visual"><span>👷</span><i>✓</i></div><b>현재 진행 중인 수리내역이 없습니다.</b><span>새로운 수리작업이 등록되면<br>이곳에 실시간으로 표시됩니다.</span><em>🌱 작은 불편도 놓치지 않고, 쾌적한 시설을 위해 항상 노력하겠습니다.</em></div>`}</div>
+          <section class="jgb-v189-live-notebook" aria-label="실시간 수리 안내 수첩">
+            <div class="jgb-v189-book-head"><span>📒 수리관리 안내 수첩</span><small>실시간 수리 화면에서 필요한 내용을 확인하세요.</small></div>
+            <div class="jgb-v188-book jgb-v189-book">
+              <div class="jgb-v188-cover"><div class="book-drop">💧</div><b>장군봉체육관<br>누수관리 수첩</b><span>작은 누수도 소중히<br>꼼꼼하게 관리합니다.</span></div>
+              <div class="jgb-v188-rings" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="jgb-v188-page-wrap">
+                <div class="jgb-v188-page" id="jgbV188BookPage">
+                  <div class="jgb-v188-page-lines"></div><div class="jgb-v188-note">마우스 클릭으로 페이지를 넘겨보세요</div>
+                  <div class="jgb-v188-page-content" id="jgbV188BookContent"></div>
+                  <div class="jgb-v188-tabs" id="jgbV188BookTabs"></div>
+                  <div class="jgb-v188-bottom"><button class="jgb-v188-nav" type="button" data-v188-book="prev" aria-label="이전 페이지">‹</button><span class="jgb-v188-count" id="jgbV188BookCount">1 / 5</span><button class="jgb-v188-nav" type="button" data-v188-book="next" aria-label="다음 페이지">›</button></div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <div class="jgb-v176-live-footer"><span>● LK 자동 등록</span><span>완료 전까지 LIVE 유지</span></div></section>
         </div>
       </div>`;
     }
@@ -20493,553 +19591,23 @@ document.addEventListener('click',handle,true);
 <style id="JGB_EAM_V4_FINAL_LAYOUT">
 /* V4 최종: 층수 파란 제목 박스 완전 제거 + 배치도 55 / 수리 LIVE 45 */
 .eh-floor-title{display:none!important;visibility:hidden!important;width:0!important;height:0!important;min-width:0!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;overflow:hidden!important;}
-.eh-main{grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;gap:8px!important;}
+.eh-main{grid-template-columns:minmax(0,55fr) minmax(0,45fr)!important;gap:8px!important;}
 @media(max-width:1000px){.eh-main{grid-template-columns:1fr!important;}}
 </style>
 
-<style id="JGB_LEAK_LIVE_FIRST_V9">
-/* LIVE 우측 32% 고정: 기존 기능/디자인은 유지하고 배치만 고정 */
-.jgb-v170-grid{
-  display:grid!important;
-  grid-template-columns:68% 32%!important;
-  grid-template-rows:1fr!important;
-  gap:0!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-grid > .jgb-v170-mapcard{
-  grid-column:1!important;
-  grid-row:1!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-grid > .jgb-v170-live{
-  grid-column:2!important;
-  grid-row:1!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  height:100%!important;
-  box-sizing:border-box!important;
-  margin:0!important;
-  overflow:hidden!important;
-}
-.jgb-v170-grid > .jgb-v170-live .jgb-v178-live-table{
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-  overflow:auto!important;
-}
-</style>
-
-<style id="JGB_LEAK_V10_HORIZONTAL_FINAL">
-/* 누수현황 최종: 어떤 화면폭/기존 반응형보다 우선하여 가로 68:32 유지 */
-.jgb-v170-grid{
-  display:grid!important;
-  grid-template-columns:minmax(0,68fr) minmax(0,32fr)!important;
-  grid-template-rows:minmax(0,1fr)!important;
-  column-gap:10px!important;
-  row-gap:0!important;
-  width:100%!important;
-  min-width:0!important;
-  align-items:stretch!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-grid > .jgb-v170-mapcard{
-  grid-column:1!important;
-  grid-row:1!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-grid > .jgb-v170-live{
-  display:flex!important;
-  grid-column:2!important;
-  grid-row:1!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  height:100%!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-}
-/* 기존 max-width 반응형의 1열 전환을 무효화 */
-@media(max-width:1200px){
-  .jgb-v170-grid{
-    grid-template-columns:minmax(0,68fr) minmax(0,32fr)!important;
-    grid-template-rows:minmax(0,1fr)!important;
-  }
-  .jgb-v170-grid > .jgb-v170-mapcard{grid-column:1!important;grid-row:1!important;}
-  .jgb-v170-grid > .jgb-v170-live{grid-column:2!important;grid-row:1!important;}
-}
-</style>
-
-<style id="JGB_LEAK_LIVE_50_50_NOTEBOOK_V13">
-/* 누수현황 최종: 배치도 50% / LIVE(수첩 포함) 50% */
-.jgb-v170-grid{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-  grid-template-rows:minmax(0,1fr)!important;
-  gap:10px!important;
-  width:100%!important;
-  min-width:0!important;
-  align-items:stretch!important;
-}
-.jgb-v170-grid > .jgb-v170-mapcard{
-  grid-column:1!important; grid-row:1!important;
-  width:100%!important; min-width:0!important; margin:0!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-grid > .jgb-v170-live{
-  grid-column:2!important; grid-row:1!important;
-  width:100%!important; min-width:0!important; height:100%!important;
-  min-height:0!important; margin:0!important;
-  box-sizing:border-box!important;
-  overflow:hidden!important;
-}
-.jgb-v170-grid > .jgb-v170-live .jgb-v178-live-table{
-  min-width:0!important; max-width:100%!important; overflow:auto!important;
-}
-/* 수첩은 LIVE 영역 내부에 그대로 포함 */
-.jgb-v170-grid > .jgb-v170-live .jgb-v189-live-notebook{
-  display:block!important; width:100%!important; min-width:0!important; box-sizing:border-box!important;
-}
-@media(max-width:1000px){
-  .jgb-v170-grid{
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-    grid-template-rows:minmax(0,1fr)!important;
-  }
-  .jgb-v170-grid > .jgb-v170-mapcard{grid-column:1!important;grid-row:1!important}
-  .jgb-v170-grid > .jgb-v170-live{grid-column:2!important;grid-row:1!important}
-}
-</style>
-
-<style id="JGB_EAM_FINAL_7030_REPAIR_V4">
-/* EAM만 최종 고정: 시설 자산 배치도 70% / 수리 LIVE 30% */
-.eh-main{
-  display:grid!important;
-  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
-  grid-template-rows:minmax(0,1fr)!important;
-  gap:10px!important;
-  width:100%!important;
-  min-width:0!important;
-  min-height:0!important;
-  height:100%!important;
-}
-.eh-main > .eh-map-card{
-  display:flex!important;
-  grid-column:1!important;
-  grid-row:1!important;
-  width:100%!important;
-  max-width:none!important;
-  height:100%!important;
-  min-width:0!important;
-  min-height:0!important;
-  align-self:stretch!important;
-}
-.eh-main > .eh-right{
-  display:block!important;
-  grid-column:2!important;
-  grid-row:1!important;
-  width:100%!important;
-  max-width:none!important;
-  height:100%!important;
-  min-width:0!important;
-  min-height:0!important;
-  align-self:stretch!important;
-  overflow:hidden!important;
-}
-.eh-main > .eh-map-card .eh-map-wrap,
-.eh-main > .eh-map-card .eh-map{
-  width:100%!important;
-  min-width:0!important;
-}
-@media(max-width:1000px){
-  .eh-main{
-    grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
-  }
-}
-</style>
-
-<style id="JGB_EAM_LIVE_NO_HSCROLL_ALIGN_V21">
-/* V21: 수리 LIVE 가로 슬라이더 제거 + 표 가로선 정렬 */
-.eh-live-card .eh-card-body,
-.eh-live-card-v20 .eh-card-body{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  overflow-x:hidden!important;
-  overflow-y:auto!important;
-  scrollbar-gutter:stable!important;
-  box-sizing:border-box!important;
-}
-.eh-live-card .eh-live-scroll{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  height:100%!important;
-  overflow-x:hidden!important;
-  overflow-y:auto!important;
-  scrollbar-gutter:stable!important;
-  box-sizing:border-box!important;
-}
-.eh-live-card .eh-live-scroll table,
-.eh-live-card-v20 .eh-live-scroll table{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  table-layout:fixed!important;
-  border-collapse:collapse!important;
-  border-spacing:0!important;
-  box-sizing:border-box!important;
-}
-.eh-live-card .eh-live-scroll th,
-.eh-live-card .eh-live-scroll td,
-.eh-live-card-v20 .eh-live-scroll th,
-.eh-live-card-v20 .eh-live-scroll td{
-  box-sizing:border-box!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-  border-bottom:1px solid #dce5eb!important;
-  border-top:0!important;
-  vertical-align:middle!important;
-}
-.eh-live-card .eh-live-scroll th:nth-child(1),
-.eh-live-card .eh-live-scroll td:nth-child(1){width:15%!important}
-.eh-live-card .eh-live-scroll th:nth-child(2),
-.eh-live-card .eh-live-scroll td:nth-child(2){width:23%!important}
-.eh-live-card .eh-live-scroll th:nth-child(3),
-.eh-live-card .eh-live-scroll td:nth-child(3){width:15%!important}
-.eh-live-card .eh-live-scroll th:nth-child(4),
-.eh-live-card .eh-live-scroll td:nth-child(4){width:14%!important}
-.eh-live-card .eh-live-scroll th:nth-child(5),
-.eh-live-card .eh-live-scroll td:nth-child(5){width:13%!important}
-.eh-live-card .eh-live-scroll th:nth-child(6),
-.eh-live-card .eh-live-scroll td:nth-child(6){width:10%!important}
-.eh-live-card .eh-live-scroll th:nth-child(7),
-.eh-live-card .eh-live-scroll td:nth-child(7){width:10%!important}
-.eh-live-card .eh-live-scroll::-webkit-scrollbar{
-  width:10px!important;
-  height:0!important;
-}
-.eh-live-card .eh-live-scroll::-webkit-scrollbar-track{background:#eef3f6!important}
-.eh-live-card .eh-live-scroll::-webkit-scrollbar-thumb{background:#9db2c1!important;border-radius:8px!important}
-</style>
-
-<!-- USER REQUEST: 딱 2가지 수정만 적용
-  1) 접수·민원 처리 목록을 스프링 노트 느낌으로 시각 보강
-  2) 최신 접수 / 미처리 접수에 민원 6개 행이 보이도록 높이 확보
-  기능/데이터/JS/다른 레이아웃은 변경하지 않음
--->
-<style id="user-two-changes-only">
-/* =========================================================
-   사용자 요청 2가지
-   1) 접수·민원 처리 목록 전체를 실제 스프링 노트처럼 구성
-   2) 최신 접수 / 미처리 접수 민원 6개가 한 화면에 보이도록 구성
-   기능/데이터/JS는 변경하지 않음
-   ========================================================= */
-
-/* ===== 1. 접수·민원 처리 목록 전체 = 스프링 노트 ===== */
-.jgb-repair-page .jgb-repair-list-wrap{
-  position:relative!important;
-  overflow:visible!important;
-  margin-top:18px!important;
-  padding-top:0!important;
-  border:2px solid #6f8da0!important;
-  border-radius:4px!important;
-  background:#fffdf5!important;
-  box-shadow:0 4px 12px rgba(28,55,72,.12), inset 0 0 0 1px rgba(255,255,255,.9)!important;
-}
-
-/* 노트 상단 표지 */
-.jgb-repair-page .jgb-repair-list-head{
-  position:relative!important;
-  z-index:5!important;
-  min-height:42px!important;
-  box-sizing:border-box!important;
-  padding:8px 14px 8px 48px!important;
-  border-bottom:2px solid #7f9bad!important;
-  border-radius:2px 2px 0 0!important;
-  background:linear-gradient(#dcecf6,#c8dfed)!important;
-  box-shadow:inset 0 -1px 0 rgba(255,255,255,.8)!important;
-}
-
-/* 왼쪽 세로 제본선 */
-.jgb-repair-page .jgb-repair-list-wrap::before{
-  content:none!important;
+<style id="JGB_LEAK_BLUE_TEXT_REMOVE_FINAL">
+/* 요청사항: 누수 배치도의 파란색 '2F 옥상 (지붕) / 상부 누수 발생 구역' 삭제 */
+.jgb-leak-roof-title{
   display:none!important;
 }
-
-/* 위쪽 스프링 링 - CSS로 실제 링 형태 */
-.jgb-repair-page .jgb-repair-list-wrap::after{
-  content:none!important;
-  position:absolute!important;
-  z-index:10!important;
-  top:-15px!important;
-  left:38px!important;
-  right:18px!important;
-  height:24px!important;
-  background:
-    radial-gradient(ellipse at center,
-      transparent 0 4px,
-      #718897 4.5px 6px,
-      #eef4f7 6.5px 8px,
-      #718897 8.5px 10px,
-      transparent 10.5px) 0 0 / 52px 24px repeat-x!important;
-  pointer-events:none!important;
-}
-
-/* 두 권의 노트 종이 */
-.jgb-repair-page .jgb-repair-split{
-  position:relative!important;
-  z-index:1!important;
-  gap:12px!important;
-  padding:10px 10px 0 10px!important;
-  background:#fffdf7!important;
-}
-
-.jgb-repair-page .jgb-repair-pane{
-  position:relative!important;
-  overflow:visible!important;
-  min-width:0!important;
-  border:1px solid #9aafbc!important;
-  border-radius:3px!important;
-  background:
-    repeating-linear-gradient(to bottom,
-      #fffef9 0,
-      #fffef9 38px,
-      #dfe9ee 39px,
-      #dfe9ee 40px)!important;
-  box-shadow:2px 3px 7px rgba(35,62,78,.10)!important;
-}
-
-/* 노트 안쪽 세로 여백선 */
-.jgb-repair-page .jgb-repair-pane::before{
-  content:none!important;
-  display:none!important;
-}
-
-/* 각 권의 스프링 고리 */
-.jgb-repair-page .jgb-repair-pane-head{
-  position:relative!important;
-  z-index:4!important;
-  height:43px!important;
-  min-height:43px!important;
-  box-sizing:border-box!important;
-  padding:9px 12px 7px 38px!important;
-  border-bottom:2px solid #8da6b5!important;
-  background:rgba(231,242,248,.96)!important;
-  box-shadow:0 1px 0 rgba(255,255,255,.9)!important;
-}
-
-.jgb-repair-page .jgb-repair-pane:first-child .jgb-repair-pane-head::before,
-.jgb-repair-page .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head::before{
-  content:none!important;
-  position:absolute!important;
-  z-index:8!important;
-  top:-18px!important;
-  left:5px!important;
-  right:5px!important;
-  height:25px!important;
-  background:
-    radial-gradient(ellipse at center,
-      #ffffff 0 3px,
-      #3c86b5 3.5px 5px,
-      #dbeaf2 5.5px 7px,
-      #3c86b5 7.5px 9px,
-      transparent 9.5px) 0 0 / 48px 25px repeat-x!important;
-  pointer-events:none!important;
-}
-
-.jgb-repair-page .jgb-repair-pane:nth-child(2) .jgb-repair-pane-head::before{
-  background:
-    radial-gradient(ellipse at center,
-      #ffffff 0 3px,
-      #43a37f 3.5px 5px,
-      #e1f1eb 5.5px 7px,
-      #43a37f 7.5px 9px,
-      transparent 9.5px) 0 0 / 48px 25px repeat-x!important;
-}
-
-.jgb-repair-page .jgb-repair-scroll{
-  position:relative!important;
-  z-index:2!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  background:transparent!important;
-  scrollbar-width:thin!important;
-  scrollbar-color:#7897aa #edf3f7!important;
-}
-
-/* 표 머리글 */
-.jgb-repair-page .jgb-repair-mini-head{
-  height:36px!important;
-  min-height:36px!important;
-  background:#d9eaf4!important;
-  border-bottom:2px solid #7f9aaa!important;
-  font-size:12px!important;
-  font-weight:1000!important;
-}
-
-/* 민원 6개가 실제로 보이도록 한 행 높이 고정 */
-.jgb-repair-page .jgb-repair-mini-row{
-  height:39px!important;
-  min-height:39px!important;
-  max-height:39px!important;
-  box-sizing:border-box!important;
-  background:rgba(255,255,255,.88)!important;
-  border-bottom:1px solid #c0d0d9!important;
-}
-.jgb-repair-page .jgb-repair-mini-row:nth-child(odd){
-  background:rgba(248,252,254,.92)!important;
-}
-
-/* 6행 + 머리글 = 270px */
-@media (min-width:1051px){
-  .jgb-repair-page .jgb-repair-scroll{
-    height:270px!important;
-    min-height:270px!important;
-    max-height:270px!important;
-    flex:0 0 270px!important;
-  }
-}
-
-/* 하단 노트 고정띠 */
-.jgb-repair-page .jgb-repair-note{
-  position:relative!important;
-  z-index:4!important;
-  min-height:30px!important;
-  box-sizing:border-box!important;
-  padding:7px 12px 7px 38px!important;
-  border-top:2px solid #a0b3bf!important;
-  background:#eef4f7!important;
-  color:#496577!important;
-}
 </style>
 
-<style id="JGB_WORK_NOTE_50_50_FINAL">
-/* ===== 헤더는 건드리지 않고, 헤더 아래 업무 영역만 50:50 스프링 수첩으로 표시 ===== */
-.basic-book-layout .basic-v5-single{
-  position:relative!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-  margin:18px 0 0!important;
-}
-.basic-book-layout .basic-v5-card{
-  position:relative!important;
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
-  padding:0!important;
-}
 
-/* 직원명/근무시간/진행률 영역은 기존 구조 유지 */
-.basic-book-layout .basic-v5-card > .head{
-  margin-bottom:14px!important;
-  padding-bottom:10px!important;
-}
-
-/* 2개의 수첩을 정확히 50:50으로 배치 */
-.basic-book-layout .basic-v5-tasks{
-  position:relative!important;
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-  column-gap:18px!important;
-  row-gap:0!important;
-  border:0!important;
-  background:transparent!important;
-  padding:22px 0 0!important;
-  overflow:visible!important;
-}
-
-/* 양쪽 수첩 종이 */
-.basic-book-layout .basic-v5-tasks::before,
-.basic-book-layout .basic-v5-tasks::after{
-  content:""!important;
-  position:absolute!important;
-  top:12px!important;
-  bottom:0!important;
-  width:calc(50% - 9px)!important;
-  background:#fffdf7!important;
-  border:1px solid #d8d0c4!important;
-  border-radius:4px!important;
-  box-shadow:0 3px 9px rgba(72,62,50,.10)!important;
-  z-index:0!important;
-  pointer-events:none!important;
-}
-.basic-book-layout .basic-v5-tasks::before{left:0!important}
-.basic-book-layout .basic-v5-tasks::after{right:0!important}
-
-/* 위쪽 가로 스프링 — 각 수첩마다 별도로 */
-.basic-book-layout .basic-v5-tasks::before{
-  background:
-    radial-gradient(ellipse 7px 10px at 14% 7px,#d7d1c7 0 34%,#697277 40% 53%,#343b3f 56% 65%,transparent 68%) 0 0/15% 18px repeat-x,
-    linear-gradient(#fffdf7,#fffdf7)!important;
-  background-size:15% 18px,100% 100%!important;
-  background-repeat:repeat-x,no-repeat!important;
-  padding-top:0!important;
-}
-.basic-book-layout .basic-v5-tasks::after{
-  background:
-    radial-gradient(ellipse 7px 10px at 14% 7px,#d7d1c7 0 34%,#697277 40% 53%,#343b3f 56% 65%,transparent 68%) 0 0/15% 18px repeat-x,
-    linear-gradient(#fffdf7,#fffdf7)!important;
-  background-size:15% 18px,100% 100%!important;
-  background-repeat:repeat-x,no-repeat!important;
-}
-
-/* 업무 행은 두 수첩 종이 위에 올라오게 */
-.basic-book-layout .basic-v5-task{
-  position:relative!important;
-  z-index:2!important;
-  min-height:54px!important;
-  margin:0!important;
-  padding:0 14px!important;
-  border:0!important;
-  border-bottom:1px solid #e4ddd2!important;
-  border-radius:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
-}
-.basic-book-layout .basic-v5-task:nth-child(odd){border-right:0!important}
-.basic-book-layout .basic-v5-task:nth-child(5),
-.basic-book-layout .basic-v5-task:nth-child(6){border-bottom:1px solid #e4ddd2!important}
-.basic-book-layout .basic-v5-task:hover{background:#fbf7ee!important}
-.basic-book-layout .basic-v5-task.is-done{background:#edf7f0!important}
-
-/* 첫 행은 스프링 아래 여백 */
-.basic-book-layout .basic-v5-task:nth-child(-n+2){padding-top:2px!important}
-
-/* 가운데 간격은 실제 수첩 두 권이 붙어 있는 느낌 */
-.basic-book-layout .basic-v5-tasks{isolation:isolate!important}
-
-/* 하단 실적은 두 수첩 아래에 유지 */
-.basic-book-layout .basic-v5-foot{
-  position:relative!important;
-  z-index:3!important;
-  margin-top:14px!important;
-  padding-top:10px!important;
-  border-top:1px solid #d8d0c5!important;
-}
-
-@media(max-width:900px){
-  .basic-book-layout .basic-v5-tasks{
-    grid-template-columns:1fr!important;
-    row-gap:14px!important;
-  }
-  .basic-book-layout .basic-v5-tasks::before,
-  .basic-book-layout .basic-v5-tasks::after{
-    width:100%!important;
-    left:0!important;
-    right:auto!important;
-  }
-  .basic-book-layout .basic-v5-tasks::after{display:none!important}
+<style id="JGB_LEAK_KEEP_MAP_RAIN_REMOVE_BLUE_V9">
+/* 배치도 유지 / 비 오는 배경 유지 / 파란 제목만 삭제 */
+.jgb-leak-roof-title,
+.jgb-leak-roof-title * {
+  display:none!important;
 }
 </style>
 
@@ -21512,7 +20080,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 <style id="JGB_EAM_MAP_LIVE_55_45_V2">
 /* v2: 전체 가로폭 기준 시설 자산 배치도 55% : 수리 LIVE 45% */
 .eh-main{
-  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+  grid-template-columns:minmax(0,55fr) minmax(0,45fr)!important;
   gap:8px!important;
 }
 @media(max-width:1000px){
@@ -26701,7 +25269,24 @@ cleanupDuplicateOnly();
 .jgb-leak-room-grid .corridor{grid-column:1/7!important}
 </style>
 
-
+<style id="JGB_LEAK_REMOVE_LIVE_NOTEBOOK_V4">
+.jgb-v170-live,
+.jgb-v176-live-card,
+.jgb-v178-live-register,
+.jgb-v178-live-table,
+.jgb-v170-grid > .jgb-v170-live{
+  display:none!important;
+}
+.jgb-v170-grid{
+  display:block!important;
+  grid-template-columns:none!important;
+}
+.jgb-v170-grid > .jgb-v170-mapcard{
+  width:100%!important;
+  grid-column:auto!important;
+  grid-row:auto!important;
+}
+</style>
 
 <style id="JGB_LEAK_REMOVE_BLUE_LABELS_V5">
 /* 누수배치도 상단 파란색 구역 문구 2개 삭제 */
@@ -26949,7 +25534,7 @@ cleanupDuplicateOnly();
 /* 최종: 시설 자산 배치도 55% / 우측 관리영역 45% */
 .eh-main{
   display:grid!important;
-  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+  grid-template-columns:minmax(0,55fr) minmax(0,45fr)!important;
   gap:8px!important;
   width:100%!important;
   min-width:0!important;
@@ -26959,956 +25544,95 @@ cleanupDuplicateOnly();
   width:auto!important;
 }
 @media(min-width:1001px){
-  .eh-main{grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;}
+  .eh-main{grid-template-columns:minmax(0,55fr) minmax(0,45fr)!important;}
 }
 @media(max-width:1000px){
   .eh-main{grid-template-columns:1fr!important;}
 }
 </style>
 
-<style id="JGB_EAM_FINAL_7030_GUARD">
-/* EAM 최종 고정: 시설 자산 배치도 70% / 수리 LIVE 30%. 누수 화면에는 적용하지 않음. */
-.eh-main{
-  display:grid!important;
-  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
-  gap:10px!important;
-  width:100%!important;
-  min-width:0!important;
-}
-.eh-map-card,.eh-right{min-width:0!important;width:auto!important;}
-@media(max-width:1000px){.eh-main{grid-template-columns:1fr!important;}}
-</style>
 
-<style id="JGB_LEAK_FINAL_70_30_CLEAN_V5">
-/* 누수현황 최종 구조: 좌측 배치도 70% / 우측 실시간 수리현황 30% */
-.jgb-v170-grid{
-  display:grid!important;
-  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
-  grid-template-rows:minmax(0,1fr)!important;
-  column-gap:10px!important;
-  row-gap:0!important;
-  width:100%!important;
-  min-width:0!important;
-  align-items:stretch!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-grid > .jgb-v170-mapcard{
-  display:flex!important;
-  grid-column:1!important;
-  grid-row:1!important;
-  width:100%!important;
-  min-width:0!important;
-  height:100%!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-grid > .jgb-v170-live{
-  display:flex!important;
-  flex-direction:column!important;
-  grid-column:2!important;
-  grid-row:1!important;
-  width:100%!important;
-  min-width:0!important;
-  height:100%!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-  overflow:hidden!important;
-}
-.jgb-v170-grid > .jgb-v170-live .jgb-v178-live-table{
-  display:block!important;
-  flex:1 1 auto!important;
-  min-width:0!important;
-  min-height:0!important;
-  overflow:auto!important;
-  box-sizing:border-box!important;
-}
-@media(max-width:1000px){
-  .jgb-v170-grid{
-    grid-template-columns:1fr!important;
-    grid-template-rows:auto auto!important;
-    row-gap:10px!important;
-  }
-  .jgb-v170-grid > .jgb-v170-mapcard,
-  .jgb-v170-grid > .jgb-v170-live{
-    grid-column:1!important;
-    grid-row:auto!important;
-    width:100%!important;
-    height:auto!important;
-  }
-}
-</style>
-
-<style id="JGB_LEAK_68_32_LOCK_FINAL">
-/* 최종 우선순위: 누수 배치도 68% / LIVE 32% 가로 1행 */
-.jgb-v170-grid{display:grid!important;grid-template-columns:minmax(0,68fr) minmax(0,32fr)!important;grid-template-rows:minmax(0,1fr)!important;grid-auto-flow:column!important;column-gap:10px!important;row-gap:0!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;align-items:stretch!important;}
-.jgb-v170-grid>.jgb-v170-mapcard{display:flex!important;grid-column:1!important;grid-row:1!important;width:100%!important;min-width:0!important;height:100%!important;margin:0!important;box-sizing:border-box!important;}
-.jgb-v170-grid>.jgb-v170-live{display:flex!important;flex-direction:column!important;grid-column:2!important;grid-row:1!important;width:100%!important;min-width:0!important;height:100%!important;min-height:0!important;margin:0!important;box-sizing:border-box!important;overflow:hidden!important;}
-.jgb-v170-grid>.jgb-v170-live .jgb-v178-live-table{width:100%!important;min-width:0!important;min-height:0!important;overflow:auto!important;box-sizing:border-box!important;}
-/* V21: 통계 상세 카드가 부모 높이를 강제로 채우지 않도록 */
-.jgb-complaint-stats-detail-body .jgb-complaint-stats-grid{align-items:start!important;grid-auto-rows:max-content!important;overflow-x:hidden!important}
-.jgb-complaint-stats-detail-body .jgb-complaint-stat-card{height:auto!important;min-height:0!important;align-self:start!important}
-.jgb-complaint-stats-detail-body{overflow-x:hidden!important}
-</style>
-
-
-<style id="JGB_USER_MANUAL_BUTTON_FINAL">
-.jgb-top-right .jgb-manual-btn{margin-left:6px!important}
-.jgb-manual-btn{
-  display:inline-flex!important;align-items:center!important;gap:6px!important;
-  border:1px solid #c7d9e6!important;border-radius:7px!important;
-  background:#fff!important;color:#245b7e!important;
-  padding:7px 11px!important;font-weight:900!important;font-size:12px!important;
-  cursor:pointer!important;box-shadow:0 2px 5px rgba(20,55,80,.08)!important;
-}
-.jgb-manual-btn:hover{background:#eef7fc!important}
-.jgb-manual-overlay{
-  position:fixed!important;inset:0!important;z-index:2147483000!important;
-  display:none;align-items:center;justify-content:center;
-  background:rgba(20,45,65,.38)!important;
-}
-.jgb-manual-overlay.open{display:flex!important}
-.jgb-manual-box{
-  width:min(820px,92vw)!important;max-height:82vh!important;overflow:auto!important;
-  background:#fff!important;border:1px solid #cbd9e4!important;border-radius:12px!important;
-  box-shadow:0 18px 50px rgba(20,50,70,.24)!important;padding:20px!important;
-  font-family:"Malgun Gothic",sans-serif!important;
-}
-.jgb-manual-head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #dbe7ef;padding-bottom:10px;margin-bottom:12px}
-.jgb-manual-head strong{font-size:20px;color:#173f5c}
-.jgb-manual-close{border:0;background:#edf4f8;border-radius:7px;padding:6px 10px;font-weight:900;cursor:pointer}
-.jgb-manual-item{border:1px solid #dce7ee;border-radius:8px;margin:7px 0;overflow:hidden}
-.jgb-manual-title{padding:10px 12px;font-weight:950;color:#1d5578;cursor:pointer;background:#f7fbfd}
-.jgb-manual-desc{display:none;padding:9px 12px 11px;color:#526d7d;font-size:12px;line-height:1.65;background:#fff}
-.jgb-manual-item.open .jgb-manual-desc{display:block}
-</style>
-<style id="JGB_BASIC_WORK_NOTE_20_80_V2">
-/* ===== 업무 수행현황 : 헤더 제외 / 20:80 작업수첩 ===== */
-.basic-book-layout{
-  position:relative!important;
-  display:block!important;
-  box-sizing:border-box!important;
-  padding-left:20%!important;
-  padding-right:0!important;
-  background:#ffffff!important;
-  border:1px solid #d9e2e9!important;
-  border-radius:16px!important;
-  box-shadow:0 5px 16px rgba(35,65,85,.07)!important;
-  overflow:visible!important;
-}
-
-/* 왼쪽 20% 제본 영역 */
-.basic-book-layout::before{
-  content:"";
-  position:absolute!important;
-  left:0!important;
-  top:0!important;
-  bottom:0!important;
-  width:20%!important;
-  z-index:4!important;
-  pointer-events:none!important;
-  background:
-    radial-gradient(circle at 50% 24px,#ffffff 0 6px,#718595 6.5px 8px,transparent 8.5px) 0 0/100% 48px repeat-y,
-    linear-gradient(90deg,#f5f8fa 0%,#eef3f6 78%,#d9e2e8 100%)!important;
-  border-right:1px solid #d3dde4!important;
-  box-shadow:inset -5px 0 10px rgba(40,70,90,.05)!important;
-}
-
-/* 상단 가로 스프링 */
-.basic-book-layout::after{
-  content:"";
-  position:absolute!important;
-  left:20%!important;
-  right:14px!important;
-  top:-10px!important;
-  height:24px!important;
-  z-index:8!important;
-  pointer-events:none!important;
-  background:
-    radial-gradient(ellipse 7px 3.5px at 8px 50%,#fff 38%,#718595 42%,#718595 61%,transparent 64%) 0 0/44px 24px repeat-x!important;
-  filter:drop-shadow(0 1px 1px rgba(30,55,75,.18));
-}
-
-/* 오른쪽 80% 실제 업무 영역 */
-.basic-book-layout > *{
-  position:relative!important;
-  z-index:5!important;
-}
-.basic-book-layout .basic-v5-head,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-page-nav,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-bottom-banner{
-  width:100%!important;
-}
-
-/* 헤더 영역은 건드리지 않고 본문 진한 배경만 제거 */
-.basic-book-layout .basic-v5:not(.basic-book-layout),
-.basic-book-layout .basic-v5-card,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-page-nav{
-  background:#ffffff!important;
-}
-
-/* 기존 진한 카드/판 배경 강제 제거 */
-.basic-book-layout .basic-v5-card .head,
-.basic-book-layout .basic-v5-card .body,
-.basic-book-layout .basic-v5-card .content{
-  background:#ffffff!important;
-}
-
-/* 본문 영역은 깨끗한 종이 느낌 */
-.basic-book-layout .basic-v5-card{
-  border-color:#d7e1e8!important;
-  box-shadow:0 3px 10px rgba(35,65,85,.055)!important;
-}
-
-/* 왼쪽 제본 영역 때문에 제목/본문이 겹치지 않도록 */
-.basic-book-layout .basic-v5-head,
-.basic-book-layout .basic-v5-page-nav,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-bottom-banner{
-  margin-left:0!important;
-}
-
-@media(max-width:900px){
-  .basic-book-layout{padding-left:20%!important}
-}
-</style>
-
-<script>
-(function(){
-function initManual(){
-  if(document.getElementById('jgbManualOverlay')) return;
-  var btn=document.createElement('button');
-  btn.className='jgb-manual-btn'; btn.type='button'; btn.innerHTML='📘 사용설명서';
-  btn.onclick=function(){document.getElementById('jgbManualOverlay').classList.add('open');};
-  var target=document.querySelector('.jgb-top-right .jgb-top-switch');
-  if(target){
-    target.appendChild(btn);
-  }else{
-    var top=document.querySelector('.jgb-top-right');
-    if(top) top.insertBefore(btn, top.firstChild);
-    else document.body.insertBefore(btn,document.body.firstChild);
-  }
-
-  var ov=document.createElement('div'); ov.id='jgbManualOverlay'; ov.className='jgb-manual-overlay';
-  ov.innerHTML='<div class="jgb-manual-box"><div class="jgb-manual-head"><strong>📘 민원 접수·처리 시스템 사용설명서</strong><button class="jgb-manual-close">닫기</button></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">📱 민원 접수</div><div class="jgb-manual-desc">고객이 시설 이용 중 발생한 불편사항을 접수합니다. 발생 장소와 민원 내용을 확인합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">📋 최신 접수</div><div class="jgb-manual-desc">최근 접수된 민원을 확인합니다. 접수 내용과 처리상태를 확인합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🕐 미처리 접수</div><div class="jgb-manual-desc">처리가 완료되지 않은 민원을 확인하고 조치 여부를 관리합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">👤 담당자 지정</div><div class="jgb-manual-desc">민원 처리를 담당할 직원을 지정합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">✅ 처리완료</div><div class="jgb-manual-desc">필요한 조치가 완료된 민원을 처리완료 상태로 변경합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🔎 상세보기</div><div class="jgb-manual-desc">접수시간·발생장소·민원유형·민원내용 등 상세정보를 확인합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">📊 오늘의 변화 및 관리조치</div><div class="jgb-manual-desc">당일 민원 변화와 필요한 관리조치를 확인합니다. 관리상태는 미처리 민원 건수를 기준으로 표시합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🔢 민원 집계</div><div class="jgb-manual-desc">오늘 접수: 06:00~다음 날 05:59 / 월 누계: 해당 월 누계 / 연 누계: 해당 연도 누계로 표시합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🔄 숫자 초기화</div><div class="jgb-manual-desc">연습 운영 시 오늘·월·연 및 민원 통계의 집계 숫자를 초기화합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">📈 민원 통계·분석</div><div class="jgb-manual-desc">월별·위치별·유형별·요일·시간대별 민원 발생 현황을 확인합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🏷️ 관리상태 기준</div><div class="jgb-manual-desc"><b>0건 정상 · 1~2건 관찰 · 3~4건 유의 · 5건 이상 집중관리</b><br>판정 기준: 미처리 민원 건수를 기준으로 관리상태를 표시합니다.</div></div>'+
-  '</div>';
-  document.body.appendChild(ov);
-  ov.querySelector('.jgb-manual-close').onclick=function(){ov.classList.remove('open');};
-  ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('open');});
-  ov.querySelectorAll('.jgb-manual-title').forEach(function(t){t.onclick=function(){t.parentElement.classList.toggle('open');};});
-}
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initManual); else initManual();
-})();
-</script>
-
-
-<style id="JGB_BASIC_WORK_NOTE_FINAL_20_80">
-/* ===== 최종 2차 검토: 헤더 아래 업무영역만 20:80 / 왼쪽 세로 스프링 ===== */
-.basic-book-layout{
-  position:relative!important;
-  display:block!important;
-  box-sizing:border-box!important;
-  width:100%!important;
-  padding:0 14px 14px 20%!important;
-  margin:0!important;
-  background:#fff!important;
-  border:1px solid #d7e1e8!important;
-  border-radius:16px!important;
-  box-shadow:0 4px 14px rgba(30,60,80,.06)!important;
-  overflow:visible!important;
-}
-
-/* 왼쪽 20% 제본판 + 세로 스프링 */
-.basic-book-layout::before{
-  content:""!important;
-  position:absolute!important;
-  left:0!important;
-  top:0!important;
-  bottom:0!important;
-  width:20%!important;
-  z-index:4!important;
-  pointer-events:none!important;
-  box-sizing:border-box!important;
-  border-right:1px solid #d4dee6!important;
-  background:
-    radial-gradient(ellipse 7px 4px at 50% 12px,#fff 42%,#718697 48%,#718697 62%,transparent 66%) 50% 0/100% 48px repeat-y,
-    linear-gradient(90deg,#f5f8fa 0%,#eef3f6 76%,#dbe4e9 100%)!important;
-  box-shadow:inset -5px 0 10px rgba(40,70,90,.05)!important;
-}
-
-/* 위쪽 가로 스프링은 완전 제거 */
-.basic-book-layout::after{
-  content:none!important;
+<style id="JGB_FINAL_7BOX_DELETE_SHOWER_EXPAND">
+/* 상단 코트 배치도에 있는 7개 안내/장식 박스 제거
+   비 오는 배경과 코트 배치는 유지 */
+.eam228-top-boxes,
+.eam228-top-box,
+.eam228-boxes,
+.eam228-court-top-boxes{
   display:none!important;
 }
 
-/* 오른쪽 80%에 기존 업무 화면이 그대로 들어가도록 */
-.basic-book-layout > *{
-  position:relative!important;
-  z-index:5!important;
-  width:100%!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
+/* 샤워실/시설 영역에 확보된 세로 공간을 배분 */
+.eh-floor-1f .eh-facility{
+  grid-template-rows:38% 10% 49%!important;
 }
 
-/* 기존 1열/2열 업무 기능과 버튼 구조는 유지 */
-.basic-book-layout .basic-v5-tasks{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:10px!important;
-}
-
-/* 업무 본문은 흰 종이 느낌으로만 정리 */
-.basic-book-layout .basic-v5-card,
-.basic-book-layout .basic-v5-grid,
-.basic-book-layout .basic-v5-worker-tabs,
-.basic-book-layout .basic-v5-page-nav{
-  background:#fff!important;
-}
-
-/* 직원 업무 카드의 진한 배경 제거 */
-.basic-book-layout .basic-v5-card .head{
-  background:#fff!important;
-}
-
-@media(max-width:700px){
-  .basic-book-layout{
-    padding-left:20%!important;
-    padding-right:8px!important;
-  }
-  .basic-book-layout .basic-v5-tasks{
-    grid-template-columns:1fr!important;
-  }
-}
-</style>
-
-<style id="USER_WORK_STATUS_TITLE">
-/* 업무 수행현황: 기존 헤더의 크기/위치는 유지하고 제목만 변경 */
-.basic-book-layout .basic-v5-card .name{font-size:32px!important;font-weight:1000!important;}
-</style>
-
-<style id="JGB_WORK_NOTE_FINAL_REBUILD">
-/* 업무 수행현황: 헤더 아래만 실제 스프링 작업수첩 느낌으로 재구성 */
-.basic-book-layout{
-  position:relative!important;
+/* 비 오는 배경은 그대로 유지 */
+.jgb-rain,
+.jgb-rain-bg,
+.rain-background,
+.rain-effect{
   display:block!important;
-  padding:10px 14px 14px 7.5%!important;
-  margin:0!important;
-  background:#e9e5dc!important;
-  border:0!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  overflow:visible!important;
 }
-/* 왼쪽 좁은 제본부: 20%가 아니라 약 7.5% */
-.basic-book-layout::before{
-  content:""!important;
-  position:absolute!important;
-  left:0!important;
-  top:10px!important;
-  bottom:14px!important;
-  width:7.5%!important;
-  z-index:3!important;
-  background:
-    radial-gradient(ellipse 7px 12px at 50% 16px,#c7c0b5 0 38%,#6f777b 42% 52%,#343b3f 56% 64%,transparent 67%) 50% 0/100% 44px repeat-y,
-    linear-gradient(90deg,#d9d4cb,#eeeae2 58%,#c8c1b7)!important;
-  border-right:1px solid #b9b2a8!important;
-  box-shadow:inset -3px 0 5px rgba(60,50,40,.12)!important;
+</style>
+
+
+
+<style id="JGB_EXACT_REMOVE_7_ROOF_BOXES_FINAL">
+/* 상단 7개 박스 정확히 제거: 5개 코트 박스 + 좌우 건물 박스 */
+.jgb-leak-roof-courts,
+.jgb-leak-roof-building{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
   pointer-events:none!important;
 }
-.basic-book-layout::after{content:none!important;display:none!important}
-/* 오른쪽은 한 장의 종이 */
-.basic-book-layout .basic-v5{
-  position:relative!important;
-  z-index:2!important;
-  width:100%!important;
+
+/* 상단 영역 자체의 빈 공간을 줄여 아래 시설 영역을 키움 */
+.jgb-leak-roof{
   min-height:0!important;
-  box-sizing:border-box!important;
-  padding:22px 26px 24px!important;
-  background:#fffdf8!important;
-  border:1px solid #d5cec2!important;
-  border-radius:2px!important;
-  box-shadow:0 3px 12px rgba(70,60,50,.12)!important;
 }
-/* 제목은 수첩 상단 표제처럼 */
-.basic-book-layout .basic-v5-head{
-  display:flex!important;
-  align-items:flex-end!important;
-  justify-content:space-between!important;
-  gap:16px!important;
-  margin:0 0 16px!important;
-  padding:0 0 13px!important;
-  border-bottom:2px solid #bcb4a8!important;
+
+/* 비 오는 배경은 유지 */
+.jgb-leak-roof-bg,
+.jgb-leak-rain,
+.jgb-leak-rain-bg{
+  display:block!important;
 }
-.basic-book-layout .basic-v5-title{
-  color:#29333a!important;
-  font-size:28px!important;
-  font-weight:950!important;
-  letter-spacing:-.7px!important;
-}
-.basic-book-layout .basic-v5-sub{
-  color:#6f756f!important;
-  font-size:12px!important;
-  font-weight:700!important;
-  margin-top:5px!important;
-}
-.basic-book-layout .basic-v5-date{
-  background:#fff!important;
-  border:1px solid #c9c1b6!important;
-  border-radius:3px!important;
-}
-/* 직원/페이지 영역도 종이 인덱스처럼 */
-.basic-book-layout .basic-v5-page-nav,
-.basic-book-layout .basic-v5-worker-tabs{
-  background:transparent!important;
-  border-color:#d8d0c5!important;
-}
-/* 업무 카드 자체는 웹 카드가 아니라 수첩 체크리스트 */
-.basic-book-layout .basic-v5-card{
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
-  border-radius:0!important;
-  padding:0!important;
-}
-.basic-book-layout .basic-v5-card .head{
-  background:transparent!important;
-  border-bottom:1px solid #ddd6cc!important;
-  padding-bottom:9px!important;
-}
-.basic-book-layout .basic-v5-card .name{color:#30383d!important}
-.basic-book-layout .basic-v5-tasks{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:0!important;
-  border-top:1px solid #dcd5cb!important;
-}
-.basic-book-layout .basic-v5-task{
-  min-height:52px!important;
-  border:0!important;
-  border-bottom:1px solid #e0d9cf!important;
-  border-radius:0!important;
-  background:transparent!important;
-  padding:0 10px!important;
-  box-shadow:none!important;
-}
-.basic-book-layout .basic-v5-task:nth-child(odd){border-right:1px solid #e0d9cf!important}
-.basic-book-layout .basic-v5-task:hover{background:#faf5e9!important}
-.basic-book-layout .basic-v5-task .no{color:#9b9184!important;font-size:11px!important}
-.basic-book-layout .basic-v5-task .txt{color:#30383d!important;font-size:14px!important;font-weight:850!important}
-.basic-book-layout .basic-v5-task .action{color:#69766e!important;font-size:11px!important}
-.basic-book-layout .basic-v5-task.is-done{background:#f1f5ed!important}
-.basic-book-layout .basic-v5-foot{
-  border-top:1px solid #d8d0c5!important;
-  color:#706f69!important;
-}
-@media(max-width:900px){
-  .basic-book-layout{padding-left:9%!important}
-  .basic-book-layout::before{width:9%!important}
-  .basic-book-layout .basic-v5{padding:18px 16px!important}
-  .basic-book-layout .basic-v5-tasks{grid-template-columns:1fr!important}
-  .basic-book-layout .basic-v5-task:nth-child(odd){border-right:0!important}
+
+/* 확보된 세로 공간을 아래 시설/샤워실 영역에 배분 */
+.eh-floor-1f .eh-facility{
+  grid-template-rows:36% 9% 53%!important;
 }
 </style>
 
 
-<style id="WORK_NOTE_50_50_FINAL_FIX">
-/* 헤더는 기존 형태/크기를 건드리지 않고, 헤더 아래만 50:50 작업수첩 2장으로 고정 */
-.basic-work-status-wrap{
-  width:100%!important;
-  box-sizing:border-box!important;
-  background:transparent!important;
-  padding:0!important;
-  margin:0!important;
-  border:0!important;
-  box-shadow:none!important;
-  overflow:visible!important;
-}
-.basic-work-status-wrap .basic-v5-head{
-  position:relative!important;
-  z-index:20!important;
-}
-.basic-work-status-wrap .basic-v5-page-nav,
-.basic-work-status-wrap .basic-v5-worker-tabs{
-  position:relative!important;
-  z-index:20!important;
-}
-/* 이전에 화면을 침범하던 왼쪽 세로 제본/가짜 배경 제거 */
-.basic-work-status-wrap .basic-book-layout::before,
-.basic-work-status-wrap .basic-book-layout::after{display:none!important;content:none!important;}
 
-.work-notebooks{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-  gap:18px!important;
-  width:100%!important;
-  min-width:0!important;
-  box-sizing:border-box!important;
-  padding:22px 14px 18px!important;
-  margin:0!important;
-  background:transparent!important;
-}
-.work-notebook{
-  position:relative!important;
-  min-width:0!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-  padding-top:28px!important;
-}
-/* 실제 스프링 수첩처럼 위쪽 고리 12개를 각 수첩 안에서만 표시 */
-.work-notebook-spring{
-  position:absolute!important;
-  left:5%!important;
-  right:5%!important;
-  top:0!important;
-  height:42px!important;
-  display:grid!important;
-  grid-template-columns:repeat(12,minmax(0,1fr))!important;
-  align-items:start!important;
-  z-index:8!important;
+<style id="JGB_ADD_7BOX_REMOVE_SHOWER_EXPAND_FINAL">
+/* 방금 만든 수정 내용 추가: 상단 7개 박스 제거 */
+.jgb-leak-roof-courts,
+.jgb-leak-roof-building{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
   pointer-events:none!important;
 }
-.work-notebook-spring i{
+
+/* 상단 빈 공간 최소화 */
+.jgb-leak-roof{
+  min-height:0!important;
+}
+
+/* 비 오는 배경은 유지 */
+.jgb-leak-roof-bg,
+.jgb-leak-rain,
+.jgb-leak-rain-bg{
   display:block!important;
-  width:15px!important;
-  height:30px!important;
-  margin:0 auto!important;
-  border:4px solid #59636a!important;
-  border-bottom-width:5px!important;
-  border-radius:50%!important;
-  background:linear-gradient(90deg,#e5e9eb 0 25%,#717a80 38% 58%,#f3f5f6 72%)!important;
-  box-shadow:0 2px 3px rgba(30,30,30,.28)!important;
-  box-sizing:border-box!important;
-}
-.work-paper{
-  position:relative!important;
-  z-index:4!important;
-  width:100%!important;
-  min-height:470px!important;
-  box-sizing:border-box!important;
-  padding:30px 18px 16px!important;
-  background:
-    linear-gradient(rgba(255,255,255,.78),rgba(255,255,255,.78)),
-    repeating-linear-gradient(to bottom,#f6f0e3 0,#f6f0e3 30px,#e8dfd0 31px,#f6f0e3 32px)!important;
-  border:1px solid #cdbb9e!important;
-  border-radius:16px!important;
-  box-shadow:0 7px 18px rgba(74,61,42,.18), inset 0 0 0 7px rgba(208,180,133,.20)!important;
-  overflow:hidden!important;
-}
-.work-paper::before{
-  content:""!important;
-  position:absolute!important;
-  inset:0!important;
-  border-radius:16px!important;
-  box-shadow:inset 0 0 25px rgba(128,99,57,.08)!important;
-  pointer-events:none!important;
-}
-.work-paper-head{
-  position:relative!important;
-  z-index:2!important;
-  display:flex!important;
-  align-items:flex-start!important;
-  justify-content:space-between!important;
-  gap:12px!important;
-  padding:0 4px 12px!important;
-  border-bottom:2px solid #b9aa92!important;
-}
-.work-person{
-  font-size:28px!important;
-  line-height:1!important;
-  font-weight:950!important;
-  color:#25343c!important;
-}
-.work-shift{
-  display:inline-block!important;
-  margin-top:9px!important;
-  padding:6px 10px!important;
-  border-radius:999px!important;
-  background:#e8f6ec!important;
-  color:#087b50!important;
-  font-size:12px!important;
-  font-weight:850!important;
-}
-.work-count{
-  flex:none!important;
-  padding:8px 11px!important;
-  border-radius:999px!important;
-  background:#edf4fa!important;
-  color:#27618a!important;
-  font-size:12px!important;
-  font-weight:900!important;
-}
-.work-progress{
-  position:relative!important;
-  z-index:2!important;
-  height:6px!important;
-  margin:12px 0 7px!important;
-  border-radius:999px!important;
-  background:#e5ddd0!important;
-  overflow:hidden!important;
-}
-.work-progress i{
-  display:block!important;
-  height:100%!important;
-  border-radius:inherit!important;
-  background:#2384d6!important;
-}
-.work-paper .basic-v5-tasks{
-  position:relative!important;
-  z-index:2!important;
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:0!important;
-  border-top:1px solid #d7ccbb!important;
-}
-.work-paper .basic-v5-task{
-  min-width:0!important;
-  min-height:56px!important;
-  border:0!important;
-  border-bottom:1px solid #d7ccbb!important;
-  border-radius:0!important;
-  background:rgba(255,252,245,.58)!important;
-  padding:0 8px!important;
-  box-shadow:none!important;
-}
-.work-paper .basic-v5-task:nth-child(odd){border-right:1px solid #d7ccbb!important}
-.work-paper .basic-v5-task.is-done{background:rgba(226,246,232,.75)!important}
-.work-paper .basic-v5-task:hover{background:#fff9eb!important}
-.work-paper .basic-v5-task .txt{font-size:13px!important;color:#293b44!important}
-.work-paper .basic-v5-task .action{font-size:11px!important}
-.work-paper .basic-v5-foot{
-  position:relative!important;
-  z-index:2!important;
-  padding:11px 4px 0!important;
-  border-top:1px solid #cfc2ae!important;
-  color:#6d6a63!important;
-}
-.work-notebook-empty .work-paper{min-height:470px!important}
-.empty-note{display:none!important}
-
-@media(max-width:900px){
-  .work-notebooks{gap:10px!important;padding-left:8px!important;padding-right:8px!important}
-  .work-paper{padding-left:12px!important;padding-right:12px!important}
-  .work-paper .basic-v5-tasks{grid-template-columns:1fr!important}
-  .work-paper .basic-v5-task:nth-child(odd){border-right:0!important}
 }
 
-
-/* =========================================================
-   FINAL PATCH
-   직원 이름·새벽조·시간 한 줄 정렬 + 가독성 확대
-   스프링 노트 3D 입체감 확대
-   기능/데이터/JS 변경 없음
-   ========================================================= */
-
-.work-paper-head{
-  align-items:center!important;
-}
-
-.work-paper-head > div:first-child{
-  display:flex!important;
-  align-items:center!important;
-  flex-wrap:nowrap!important;
-  gap:12px!important;
-  min-width:0!important;
-  white-space:nowrap!important;
-}
-
-.work-person{
-  display:inline-block!important;
-  margin:0!important;
-  font-size:34px!important;
-  line-height:1!important;
-  font-weight:950!important;
-  letter-spacing:-.06em!important;
-  color:#202f37!important;
-  font-family:"Nanum Pen Script","Segoe Print","Comic Sans MS","Malgun Gothic",sans-serif!important;
-  text-shadow:.4px .4px 0 rgba(50,45,35,.22)!important;
-}
-
-.work-shift{
-  display:inline-flex!important;
-  align-items:center!important;
-  margin:0!important;
-  padding:7px 13px!important;
-  border-radius:999px!important;
-  background:#e8f6ec!important;
-  color:#087b50!important;
-  font-size:15px!important;
-  line-height:1.15!important;
-  font-weight:900!important;
-  letter-spacing:-.02em!important;
-  font-family:"Nanum Pen Script","Segoe Print","Malgun Gothic",sans-serif!important;
-}
-
-.work-count{
-  font-size:14px!important;
-  padding:9px 13px!important;
-}
-
-.work-paper .basic-v5-task .txt{
-  font-size:15px!important;
-}
-
-.work-paper .basic-v5-task .action{
-  font-size:12px!important;
-}
-
-/* 스프링: 작고 평면적인 고리 → 굵고 큰 3D 금속 제본 */
-.work-notebook{
-  padding-top:42px!important;
-}
-
-.work-notebook-spring{
-  left:4%!important;
-  right:4%!important;
-  top:0!important;
-  height:52px!important;
-  grid-template-columns:repeat(12,minmax(0,1fr))!important;
-  perspective:180px!important;
-}
-
-.work-notebook-spring i{
-  width:22px!important;
-  height:42px!important;
-  margin:0 auto!important;
-  border:5px solid #4d565c!important;
-  border-bottom-width:7px!important;
-  border-radius:50%!important;
-  background:
-    linear-gradient(90deg,
-      #b9c0c4 0%,
-      #f8fafb 18%,
-      #737d84 37%,
-      #3e474d 52%,
-      #dfe4e7 70%,
-      #7b858b 86%,
-      #eef1f2 100%)!important;
-  box-shadow:
-    inset 3px 0 2px rgba(255,255,255,.72),
-    inset -3px 0 3px rgba(20,25,28,.42),
-    0 3px 0 #343b40,
-    0 5px 8px rgba(25,30,34,.34)!important;
-  transform:rotateX(10deg)!important;
-  transform-origin:top center!important;
-  box-sizing:border-box!important;
-}
-
-/* 종이와 스프링이 실제로 연결된 것처럼 상단 깊이감 추가 */
-.work-paper{
-  padding-top:32px!important;
-  box-shadow:
-    0 9px 20px rgba(74,61,42,.22),
-    0 2px 0 rgba(255,255,255,.8) inset,
-    inset 0 0 0 7px rgba(208,180,133,.20)!important;
-}
-
-/* 좁은 화면에서도 이름/근무정보는 한 줄을 우선 유지 */
-@media(max-width:900px){
-  .work-paper-head > div:first-child{
-    gap:8px!important;
-  }
-  .work-person{
-    font-size:29px!important;
-  }
-  .work-shift{
-    font-size:13px!important;
-    padding:6px 10px!important;
-  }
-  .work-notebook-spring i{
-    width:18px!important;
-    height:36px!important;
-  }
-}
-
-</style>
-
-
-<style>
-/* 직원 선택 색상: 너무 진하지 않으면서 흐리지 않게 */
-.staff-tab.active,
-.staff-tab.selected,
-.staff-selector .active,
-.staff-selector button.active,
-.staff-nav .active,
-.employee-tab.active,
-.employee-tab.selected {
-  background: #b9dcf5 !important;
-  color: #163b5c !important;
-  border-color: #6eaed6 !important;
-  box-shadow: 0 2px 5px rgba(55, 105, 140, .18) !important;
-  font-weight: 900 !important;
-}
-</style>
-
-
-
-<style>
-/* 스프링 크기 축소: 현재 너무 크고 둥근 느낌을 줄이고 얌전한 제본 스프링으로 */
-.work-notebook{
-  padding-top:34px!important;
-}
-
-.work-notebook-spring{
-  height:42px!important;
-  perspective:140px!important;
-}
-
-.work-notebook-spring i{
-  width:15px!important;
-  height:31px!important;
-  border-width:3px!important;
-  border-bottom-width:4px!important;
-  box-shadow:
-    inset 2px 0 2px rgba(255,255,255,.65),
-    inset -2px 0 2px rgba(20,25,28,.32),
-    0 2px 0 #343b40,
-    0 3px 5px rgba(25,30,34,.25)!important;
-  transform:rotateX(8deg)!important;
-}
-</style>
-
-
-
-<style>
-/* 분홍 계열 대신 연한 아이보리/크림 톤 */
-.work-paper,
-.work-notebook,
-.work-paper-head,
-.work-paper-body,
-.work-paper-footer {
-  background-color: #fffaf0 !important;
-}
-
-.work-paper{
-  border-color:#d9c9a9 !important;
-}
-
-.work-paper-head{
-  background:linear-gradient(180deg,#fffdf7 0%,#fff8e9 100%) !important;
-}
-
-.work-paper-body,
-.work-paper-footer{
-  background-color:#fffaf0 !important;
-}
-</style>
-
-
-
-<style id="JGB_BASIC_WORKER_FINAL_2UP">
-/* 직원 이동: 2명 단위 페이지 + 작은 화살표 */
-.basic-v5-page-nav{
-  min-height:40px!important;
-  padding:3px 8px!important;
-  margin:0 0 6px!important;
-}
-.basic-v5-page-center{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:9px!important;
-  min-width:180px!important;
-}
-.basic-v5-page-center strong{
-  font-size:21px!important;
-  letter-spacing:-.04em!important;
-}
-.basic-v5-page-center span{
-  padding:5px 9px!important;
-  border-radius:999px!important;
-  background:#eef5fa!important;
-  color:#4c6d83!important;
-}
-.basic-v5-nav-btn.page-arrow{
-  min-width:38px!important;
-  width:38px!important;
-  height:32px!important;
-  min-height:32px!important;
-  padding:0!important;
-  border-radius:7px!important;
-  font-size:25px!important;
-  line-height:1!important;
-  background:#fffdf8!important;
-  color:#476579!important;
-  border:1px solid #c7d5dd!important;
-  box-shadow:none!important;
-}
-.basic-v5-nav-btn.page-arrow.next{
-  background:#edf5fa!important;
-  color:#245b7b!important;
-  border-color:#aec7d7!important;
-}
-.basic-v5-nav-btn.page-arrow:disabled{
-  opacity:.35!important;
-  background:#fffdf8!important;
-  color:#80909a!important;
-}
-/* 현재 화면에 보이는 두 직원은 함께 선택 상태 */
-.basic-v5-worker-tab.on{
-  background:#b9dcf5!important;
-  color:#163b5c!important;
-  border-color:#6eaed6!important;
-  box-shadow:0 2px 5px rgba(55,105,140,.16)!important;
-}
-/* 이름·근무조·시간은 카드 헤더에서 한 줄로 */
-.work-paper-head > div:first-child{
-  display:flex!important;
-  align-items:center!important;
-  flex-wrap:nowrap!important;
-  gap:10px!important;
-  white-space:nowrap!important;
-}
-.work-person{
-  flex:0 0 auto!important;
-  margin:0!important;
-  font-size:29px!important;
-}
-.work-shift{
-  flex:0 0 auto!important;
-  margin:0!important;
-  font-size:13px!important;
-  padding:5px 9px!important;
-  white-space:nowrap!important;
-}
-</style>
-
-
-
-<style>
-/* 스프링 색상: 짙은 청회색 */
-.work-notebook-spring i{
-  border-color:#465b66 !important;
-  border-bottom-color:#344953 !important;
-  background:
-    linear-gradient(90deg,
-      #71858e 0%,
-      #c4cdd1 18%,
-      #526771 38%,
-      #344953 53%,
-      #9eafb6 72%,
-      #4a606a 88%,
-      #c7d0d4 100%) !important;
-  box-shadow:
-    inset 2px 0 2px rgba(255,255,255,.62),
-    inset -2px 0 2px rgba(15,28,35,.34),
-    0 2px 0 #263b45,
-    0 3px 5px rgba(25,30,34,.25) !important;
+/* 확보된 공간을 샤워실/시설 영역으로 배분 */
+.eh-floor-1f .eh-facility{
+  grid-template-rows:36% 9% 53%!important;
 }
 </style>
 
