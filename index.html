@@ -6062,79 +6062,6 @@ table tbody td{
 .basic-book-layout .basic-v5-worker-tabs{margin-bottom:10px!important}
 </style>
 
-
-<style id="BASIC_WORKBOOK_ALIGNMENT_ADDON">
-/* 원본 유지: 글자·아이콘 정렬만 추가 */
-.basic-book-layout .basic-v5-task{
-  display:grid!important;
-  grid-template-columns:40px 30px minmax(0,1fr) 64px!important;
-  align-items:center!important;
-  column-gap:8px!important;
-  text-align:left!important;
-}
-.basic-book-layout .basic-v5-task .task-icon{
-  width:34px!important;
-  height:34px!important;
-  margin:0 auto!important;
-  justify-self:center!important;
-  align-self:center!important;
-}
-.basic-book-layout .basic-v5-task .no{
-  width:auto!important;
-  min-width:0!important;
-  margin:0!important;
-  text-align:center!important;
-  justify-self:center!important;
-  align-self:center!important;
-  line-height:1!important;
-}
-.basic-book-layout .basic-v5-task .txt{
-  min-width:0!important;
-  margin:0!important;
-  padding:0!important;
-  text-align:left!important;
-  align-self:center!important;
-  line-height:1.35!important;
-}
-.basic-book-layout .basic-v5-task .action{
-  min-width:0!important;
-  width:64px!important;
-  margin:0!important;
-  padding:0!important;
-  text-align:center!important;
-  justify-self:end!important;
-  align-self:center!important;
-  white-space:nowrap!important;
-}
-.basic-book-layout .basic-v5-head{
-  display:flex!important;
-  align-items:center!important;
-}
-.basic-book-layout .basic-v5-head>div:first-child{
-  min-width:0!important;
-  text-align:left!important;
-}
-.basic-book-layout .basic-v5-sub{
-  text-align:left!important;
-  line-height:1.5!important;
-}
-.basic-book-layout .basic-v5-worker-tabs{
-  align-items:center!important;
-}
-.basic-book-layout .basic-v5-worker-tab{
-  align-items:center!important;
-  justify-content:center!important;
-  text-align:center!important;
-}
-@media(max-width:700px){
-  .basic-book-layout .basic-v5-task{
-    grid-template-columns:36px 26px minmax(0,1fr) 56px!important;
-    column-gap:6px!important;
-  }
-  .basic-book-layout .basic-v5-task .task-icon{width:32px!important;height:32px!important}
-  .basic-book-layout .basic-v5-task .action{width:56px!important}
-}
-</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -26873,6 +26800,102 @@ cleanupDuplicateOnly();
 .jgb-manual-desc{display:none;padding:9px 12px 11px;color:#526d7d;font-size:12px;line-height:1.65;background:#fff}
 .jgb-manual-item.open .jgb-manual-desc{display:block}
 </style>
+<style id="JGB_BASIC_WORK_NOTE_20_80_V2">
+/* ===== 오늘의 기본업무 : 헤더 제외 / 20:80 작업수첩 ===== */
+.basic-book-layout{
+  position:relative!important;
+  display:block!important;
+  box-sizing:border-box!important;
+  padding-left:20%!important;
+  padding-right:0!important;
+  background:#ffffff!important;
+  border:1px solid #d9e2e9!important;
+  border-radius:16px!important;
+  box-shadow:0 5px 16px rgba(35,65,85,.07)!important;
+  overflow:visible!important;
+}
+
+/* 왼쪽 20% 제본 영역 */
+.basic-book-layout::before{
+  content:"";
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  bottom:0!important;
+  width:20%!important;
+  z-index:4!important;
+  pointer-events:none!important;
+  background:
+    radial-gradient(circle at 50% 24px,#ffffff 0 6px,#718595 6.5px 8px,transparent 8.5px) 0 0/100% 48px repeat-y,
+    linear-gradient(90deg,#f5f8fa 0%,#eef3f6 78%,#d9e2e8 100%)!important;
+  border-right:1px solid #d3dde4!important;
+  box-shadow:inset -5px 0 10px rgba(40,70,90,.05)!important;
+}
+
+/* 상단 가로 스프링 */
+.basic-book-layout::after{
+  content:"";
+  position:absolute!important;
+  left:20%!important;
+  right:14px!important;
+  top:-10px!important;
+  height:24px!important;
+  z-index:8!important;
+  pointer-events:none!important;
+  background:
+    radial-gradient(ellipse 7px 3.5px at 8px 50%,#fff 38%,#718595 42%,#718595 61%,transparent 64%) 0 0/44px 24px repeat-x!important;
+  filter:drop-shadow(0 1px 1px rgba(30,55,75,.18));
+}
+
+/* 오른쪽 80% 실제 업무 영역 */
+.basic-book-layout > *{
+  position:relative!important;
+  z-index:5!important;
+}
+.basic-book-layout .basic-v5-head,
+.basic-book-layout .basic-v5-grid,
+.basic-book-layout .basic-v5-page-nav,
+.basic-book-layout .basic-v5-worker-tabs,
+.basic-book-layout .basic-v5-bottom-banner{
+  width:100%!important;
+}
+
+/* 헤더 영역은 건드리지 않고 본문 진한 배경만 제거 */
+.basic-book-layout .basic-v5:not(.basic-book-layout),
+.basic-book-layout .basic-v5-card,
+.basic-book-layout .basic-v5-grid,
+.basic-book-layout .basic-v5-worker-tabs,
+.basic-book-layout .basic-v5-page-nav{
+  background:#ffffff!important;
+}
+
+/* 기존 진한 카드/판 배경 강제 제거 */
+.basic-book-layout .basic-v5-card .head,
+.basic-book-layout .basic-v5-card .body,
+.basic-book-layout .basic-v5-card .content{
+  background:#ffffff!important;
+}
+
+/* 본문 영역은 깨끗한 종이 느낌 */
+.basic-book-layout .basic-v5-card{
+  border-color:#d7e1e8!important;
+  box-shadow:0 3px 10px rgba(35,65,85,.055)!important;
+}
+
+/* 왼쪽 제본 영역 때문에 제목/본문이 겹치지 않도록 */
+.basic-book-layout .basic-v5-head,
+.basic-book-layout .basic-v5-page-nav,
+.basic-book-layout .basic-v5-worker-tabs,
+.basic-book-layout .basic-v5-grid,
+.basic-book-layout .basic-v5-bottom-banner{
+  margin-left:0!important;
+}
+
+@media(max-width:900px){
+  .basic-book-layout{padding-left:20%!important}
+}
+</style>
+
 <script>
 (function(){
 function initManual(){
