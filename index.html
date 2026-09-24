@@ -1,3 +1,6 @@
+`````
+````
+```
 <!-- JGB V3: slider + operation insight + photo delete hardening -->
     <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
@@ -8541,54 +8544,6 @@ html,body{
 .jgb-month-table th,.jgb-month-table td{font-size:12px!important;font-weight:900!important}
 </style>
 
-
-<style id="JGB_USER_ONLY_20260924_FIX">
-/* 1) 1번 배치도 글씨 삐뚤어짐 방지: 글자 자체는 회전/기울임 없이 정확히 중앙 정렬 */
-.eh-floor-1f .eh-zone,
-.eh-floor-1f .eh-corridor,
-.eh-floor-1f .eh-bottom .eh-zone,
-.eh-floor-2f .eh-second-zone{
-  text-align:center!important;
-  align-items:center!important;
-  justify-content:center!important;
-  writing-mode:horizontal-tb!important;
-  transform:none!important;
-  font-style:normal!important;
-  line-height:1.2!important;
-  white-space:normal!important;
-  word-break:keep-all!important;
-}
-.eh-floor-1f .eh-zone b,
-.eh-floor-1f .eh-zone small,
-.eh-floor-1f .eh-corridor,
-.eh-floor-2f .eh-second-zone b,
-.eh-floor-2f .eh-second-zone small{
-  display:block!important;
-  transform:none!important;
-  writing-mode:horizontal-tb!important;
-  text-align:center!important;
-}
-.eh-floor-1f .eh-zone b,
-.eh-floor-2f .eh-second-zone b{line-height:1.25!important;margin:0!important}
-.eh-floor-1f .eh-zone small,
-.eh-floor-2f .eh-second-zone small{line-height:1.2!important;margin-top:3px!important}
-
-/* 2) 창고는 1층 하단에서 빼고 2층 옥상 바로 옆으로 이동 */
-.eh-floor-1f .eh-bottom .eh-zone:last-child{display:none!important;}
-.eh-floor-1f .eh-bottom{grid-template-columns:2fr 4fr 1.5fr!important;}
-.eh-floor-2f .store2{display:flex!important;}
-.eh-floor-2f .eh-second-grid{grid-template-columns:2fr 1fr!important;}
-
-/* 유수장치실을 넓게 */
-.eh-floor-1f .eh-bottom .eh-zone.water{
-  min-width:0!important;
-  font-size:1.08em!important;
-}
-.eh-floor-1f .eh-bottom .eh-zone.water b{font-size:15px!important;}
-.eh-floor-1f .eh-bottom .eh-zone.water small{font-size:10px!important;}
-
-/* 3) 숫자 초기화: 현재 화면의 집계 숫자도 즉시 0으로 고정하고 다음 렌더에서도 유지 */
-</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -10290,14 +10245,18 @@ html,body{
 
     function jgbResetNumericCounts(){
       if(!confirm('집계 숫자를 초기화하시겠습니까?\n고객 접수 내용과 처리 기능에는 영향을 주지 않습니다.'))return;
-      try{localStorage.setItem('JGB_NUMERIC_RESET_AT',String(Date.now()));}catch(e){}
+      const stamp=Date.now();
+      try{localStorage.setItem('JGB_NUMERIC_RESET_AT',String(stamp));}catch(e){}
+      window.__JGB_NUMERIC_RESET_AT=stamp;
       render();
       requestAnimationFrame(()=>{
-        document.querySelectorAll('.jgb-repair-stat b,.jgb-repair-year-box strong').forEach(el=>{el.textContent='0';});
+        document.querySelectorAll('.jgb-repair-stat b,.jgb-repair-year-box strong,.jgb-stat-rank-count,.jgb-type-count').forEach(el=>{el.textContent='0건';});
+        document.querySelectorAll('#jgbComplaintMonthlyTotal').forEach(el=>{el.textContent='연간 0건';});
       });
     }
 
     function jgbNumericResetAt(){
+      if(Number(window.__JGB_NUMERIC_RESET_AT||0))return Number(window.__JGB_NUMERIC_RESET_AT);
       try{return Number(localStorage.getItem('JGB_NUMERIC_RESET_AT')||0)||0;}catch(e){return 0}
     }
 
@@ -11916,7 +11875,7 @@ function jgbV47GoWpByLeak(leakCode){
     const photo=(label)=>`<div class="jgb-eam-history-photo" onclick="window.jgbPickWorkPhoto&&jgbPickWorkPhoto('${val(hid)}','${label}')"><span>📷</span><b>${label}</b><small>사진 등록 · 클릭</small></div>`;
     return `<article class="jgb-eam-history-card" data-maint-history-id="${val(hid)}">
       <div class="jgb-eam-history-head">
-        <div class="jgb-eam-history-head-title"><strong>이력 ${i+1}</strong><span>${val(date(h.event_date))} · ${val(type)} · ${val(mtype)}</span></div>
+        <div class="jgb-eam-history-head-title"><strong>이력 ${i+1}</strong><span class="jgb-eam-history-date">${val(date(h.event_date))}</span><span class="jgb-eam-history-meta">${val(type)} · ${val(mtype)}</span></div>
         <div class="jgb-eam-history-actions">
           <button type="button" class="jgb-real-toggle" onclick="event.preventDefault();event.stopPropagation();jgbRealToggleHistory(this)">접기</button>
           
@@ -23843,42 +23802,30 @@ document.addEventListener('click',handle,true);
 }
 </style>
 
-<script id="JGB_USER_NUMERIC_RESET_HARD_FIX_20260924">
-(function(){
-  const KEY='JGB_NUMERIC_RESET_AT';
-  function resetAt(){
-    try{return Number(localStorage.getItem(KEY)||0)||0}catch(e){return 0}
-  }
-  function zeroVisibleCounts(){
-    const selectors=[
-      '.jgb-repair-stat b',
-      '.jgb-repair-year-box strong',
-      '.jgb-month-table td',
-      '.jgb-repair-stat .num',
-      '.jgb-repair-year-box .num'
-    ];
-    document.querySelectorAll(selectors.join(',')).forEach(el=>{
-      if(el.matches('.jgb-month-table td') || /\\d/.test(el.textContent||'')) el.textContent='0';
-    });
-  }
-  window.jgbResetNumericCounts=function(){
-    if(!confirm('집계 숫자를 초기화하시겠습니까?\\n고객 접수 내용과 처리 기능에는 영향을 주지 않습니다.')) return;
-    const now=Date.now();
-    try{localStorage.setItem(KEY,String(now));}catch(e){}
-    window.__JGB_NUMERIC_RESET_AT=now;
-    zeroVisibleCounts();
-    if(typeof window.render==='function'){
-      try{window.render();}catch(e){}
-    }
-    setTimeout(zeroVisibleCounts,0);
-    setTimeout(zeroVisibleCounts,100);
-    setTimeout(zeroVisibleCounts,300);
-  };
-  window.jgbNumericResetAt=function(){
-    return Number(window.__JGB_NUMERIC_RESET_AT||resetAt()||0)||0;
-  };
-})();
-</script>
+<style id="JGB_REQUESTED_20260924_FIX">
+/* 요청사항: 유지관리 이력카드 날짜를 한 줄 기준으로 고정하고 시간은 표시하지 않음 */
+.jgb-eam-history-head-title{
+  display:grid!important;
+  grid-template-columns:70px 110px minmax(0,1fr)!important;
+  align-items:center!important;
+  column-gap:10px!important;
+  min-width:0!important;
+}
+.jgb-eam-history-head-title strong,
+.jgb-eam-history-date,
+.jgb-eam-history-meta{
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.jgb-eam-history-date{
+  display:block!important;
+  width:110px!important;
+  text-align:left!important;
+  font-variant-numeric:tabular-nums!important;
+}
+.jgb-eam-history-meta{display:block!important;text-align:left!important;}
+</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -30878,3 +30825,4 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
   content:none!important;
 }
 </style>
+`````
