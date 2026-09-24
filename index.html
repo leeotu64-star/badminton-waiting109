@@ -11473,14 +11473,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     <div class="jgb-leak-roof-title"><b>2F 옥상 (지붕)</b><span>상부 누수 발생 구역</span></div>
     <div class="jgb-leak-rain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="jgb-leak-roof-drain">옥상 배수로</div>
-    <div class="jgb-leak-roof-building left"><span>창고</span></div>
-    <div class="jgb-leak-roof-building right"><span>창고</span></div>
-    <div class="jgb-leak-roof-courts">
-      <div class="jgb-leak-roof-court"><span>5</span></div>
-      <div class="jgb-leak-roof-court"><span>4</span></div>
-      <div class="jgb-leak-roof-court"><span>3</span></div>
-      <div class="jgb-leak-roof-court"><span>2</span></div>
-      <div class="jgb-leak-roof-court"><span>1</span></div>
+     <div class="jgb-leak-roof-warehouse-final" aria-label="옥상 창고"><span>창고</span></div>
     </div>
       </div>
 
@@ -11505,7 +11498,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     <div class="jgb-leak-left-stack">
       <div><b>지붕</b><small>2층 상부</small></div>
       <div><b>옥상</b><small>2층 옥상</small></div>
-      <div><b>창고</b><small>옥상 창고</small></div>
       <span>▲ 계단</span>
     </div>
     <div class="jgb-leak-room-grid">
@@ -11518,7 +11510,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       <div class="corridor">복도</div>
       <div class="bottom-room"><b>휴게실</b><small>휴게공간</small></div>
       <div class="bottom-room water"><b>통합 유수장치실</b><small>소방·유수 설비</small></div>
-      <div class="bottom-room jgb-leak-bottom-store"><b>창고</b><small>시설물품 보관</small></div>
     </div>
   </div>
   ${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}
@@ -24003,8 +23994,7 @@ document.addEventListener('click',handle,true);
 .jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar{height:11px!important;width:10px!important}
 .jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar-track{background:#edf3f6!important}
 .jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar-thumb{background:#7894a8!important;border-radius:7px!important;border:2px solid #edf3f6!important}
-</style>
-<div class="jgb-leak-roof-building left"><span>창고</span></div><style id="JGB_HEADER_MANUAL_ALL_FINAL_V1">
+</style><style id="JGB_HEADER_MANUAL_ALL_FINAL_V1">
 .jgb-header-manual-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;border:1px solid #b8cfdd!important;background:#fff!important;color:#125b83!important;border-radius:8px!important;padding:8px 12px!important;font-size:12px!important;font-weight:900!important;line-height:1!important;white-space:nowrap!important;cursor:pointer!important;box-shadow:0 2px 5px rgba(20,60,85,.08)!important}
 .jgb-header-manual-btn:hover{background:#edf7fc!important}
 .jgb-header-manual-overlay{position:fixed!important;inset:0!important;z-index:1000005!important;display:none!important;align-items:center!important;justify-content:center!important;background:rgba(8,29,45,.64)!important;padding:14px!important;box-sizing:border-box!important}
@@ -24198,6 +24188,77 @@ document.addEventListener('click',handle,true);
 })();
 </script>
 
+
+<style id="JGB_LEAK_MAP_HARD_FIX_V4">
+/* 누수 배치도: 상단 7개는 DOM에서 제거했으며 혹시 남아도 절대 표시하지 않음 */
+.jgb-leak-plan-v1 .jgb-leak-roof-courts,
+.jgb-leak-plan-v1 .jgb-leak-roof-building{display:none!important;}
+/* 비 오는 옥상 안에 창고 1개만 반듯하게 표시 */
+.jgb-leak-plan-v1 .jgb-leak-roof-warehouse-final{
+ position:absolute!important; z-index:5!important;
+ right:3.2%!important; top:24%!important;
+ width:12%!important; height:48%!important;
+ box-sizing:border-box!important;
+ display:flex!important; align-items:center!important; justify-content:center!important;
+ transform:none!important;
+ border:2px solid #607c8d!important; border-radius:2px!important;
+ background:linear-gradient(180deg,#dce8ee 0%,#c8d8e1 100%)!important;
+ box-shadow:4px 5px 8px rgba(40,70,90,.18)!important;
+ color:#456174!important; font-size:10px!important; font-weight:900!important;
+}
+.jgb-leak-plan-v1 .jgb-leak-roof-warehouse-final span{
+ display:block!important; position:static!important; width:auto!important; height:auto!important;
+ color:#456174!important; font-size:10px!important; font-weight:900!important;
+}
+</style>
+
+<style id="JGB_LEAK_ONLY_ROOF_STORE_FINAL_V5">
+/* 창고는 누수 배치도의 비 오는 옥상 영역에 1개만 둔다 */
+.jgb-leak-plan-v1 .jgb-leak-left-stack>div:has(b) { }
+.jgb-leak-plan-v1 .jgb-leak-left-stack>div:nth-child(3),
+.jgb-leak-plan-v1 .jgb-leak-bottom-store { display:none!important; }
+.jgb-leak-plan-v1 .jgb-leak-roof-courts,
+.jgb-leak-plan-v1 .jgb-leak-roof-building { display:none!important; }
+.jgb-leak-plan-v1 .jgb-leak-roof-warehouse-final {
+  position:absolute!important; z-index:8!important;
+  right:3.5%!important; top:25%!important;
+  width:12%!important; height:46%!important;
+  display:flex!important; align-items:center!important; justify-content:center!important;
+  box-sizing:border-box!important; transform:none!important;
+  border:2px solid #607c8d!important; border-radius:2px!important;
+  background:linear-gradient(180deg,#dfeaf0 0%,#c9d9e2 100%)!important;
+  box-shadow:4px 5px 8px rgba(40,70,90,.18)!important;
+  color:#385565!important; font-size:10px!important; font-weight:900!important;
+}
+.jgb-leak-plan-v1 .jgb-leak-roof-warehouse-final span{
+  display:block!important; width:auto!important; height:auto!important;
+  color:#385565!important; font-size:10px!important; font-weight:900!important;
+}
+/* 남은 하단 시설 2칸은 균등하게 사용 */
+.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room:nth-last-child(3){grid-column:1/4!important;}
+.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room.water{grid-column:4/7!important;}
+</style>
+<script id="JGB_LEAK_ONLY_ROOF_STORE_FINAL_V5_SCRIPT">
+(function(){
+  function finalLeakStoreFix(){
+    document.querySelectorAll('.jgb-leak-plan-v1').forEach(function(plan){
+      plan.querySelectorAll('.jgb-leak-roof-courts,.jgb-leak-roof-building').forEach(function(el){el.remove();});
+      plan.querySelectorAll('.jgb-leak-bottom-store').forEach(function(el){el.remove();});
+      plan.querySelectorAll('.jgb-leak-left-stack>div').forEach(function(el){
+        if((el.textContent||'').replace(/\s/g,'').startsWith('창고')) el.remove();
+      });
+      var roof=plan.querySelector('.jgb-leak-roof-panel');
+      if(roof && !roof.querySelector('.jgb-leak-roof-warehouse-final')){
+        var w=document.createElement('div');
+        w.className='jgb-leak-roof-warehouse-final';
+        w.innerHTML='<span>창고</span>';
+        roof.appendChild(w);
+      }
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',finalLeakStoreFix);else finalLeakStoreFix();
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
