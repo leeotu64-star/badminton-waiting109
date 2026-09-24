@@ -8839,6 +8839,128 @@ html,body{
 @media(max-width:1050px){.schedule-compact-page{width:calc(100vw - 245px);min-width:0}.schedule-compact-table th:first-child{width:62px}}
 @media(max-width:800px){.schedule-compact-page{width:calc(100vw - 24px);min-width:0}.schedule-compact-head{height:84px;padding:14px}.schedule-compact-table{min-width:700px}.schedule-compact-table-wrap{overflow:auto}}
 </style>
+
+<style id="JGB_EAM_MAP_3D_REAL_V24">
+/* V24: 시설 자산 배치도만 3D 건축도면 스타일로 강화
+   - 기존 HTML/JS/자산 데이터/클릭/좌표는 변경하지 않음
+   - 이미지 없이 순수 CSS 3D 효과만 적용 */
+.eh-map{
+  perspective:1400px!important;
+  transform-style:preserve-3d!important;
+  background:
+    radial-gradient(circle at 50% 15%,rgba(255,255,255,.96),transparent 38%),
+    linear-gradient(160deg,#f8fbfd 0%,#e6eef2 55%,#cbd9df 100%)!important;
+  border:3px solid #38596d!important;
+  border-radius:8px!important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.95),
+    inset 0 -28px 45px rgba(35,67,84,.12),
+    0 14px 28px rgba(26,55,72,.25)!important;
+  overflow:hidden!important;
+}
+.eh-map:after{
+  content:"";position:absolute;left:2.2%;right:2.2%;bottom:1.5%;height:7px;
+  background:linear-gradient(90deg,#617b89,#d8e2e7 45%,#607b8a);
+  border-radius:0 0 7px 7px;box-shadow:0 5px 8px rgba(28,55,70,.22);
+  z-index:1;pointer-events:none;
+}
+.eh-floor-1f{
+  transform-style:preserve-3d!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(181,201,211,.16))!important;
+}
+.eh-floor-1f:before{
+  content:"";position:absolute;left:1.2%;right:1.2%;top:.8%;bottom:1.2%;
+  border:2px solid rgba(63,91,106,.55);border-radius:7px;
+  background:linear-gradient(145deg,rgba(255,255,255,.34),rgba(201,217,224,.18));
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.35),inset 0 -16px 28px rgba(43,72,88,.08);
+  pointer-events:none;z-index:0;
+}
+.eh-courts{perspective:1100px!important;filter:drop-shadow(0 13px 12px rgba(25,53,69,.26));z-index:5!important}
+.eh-court-3d{
+  transform:perspective(650px) rotateX(3deg) translateZ(12px)!important;
+  transform-style:preserve-3d!important;
+  border:2px solid #4d6b7d!important;
+  border-radius:6px!important;
+  background:linear-gradient(145deg,#f7fbfd 0%,#d9e6ec 48%,#a9bfca 100%)!important;
+  box-shadow:
+    0 8px 0 #6d8998,
+    0 15px 20px rgba(21,50,66,.30),
+    inset 0 2px 0 rgba(255,255,255,.95),
+    inset 0 -10px 16px rgba(37,69,85,.16)!important;
+}
+.eh-court-surface{
+  border:2px solid #527488!important;
+  border-radius:3px!important;
+  background:linear-gradient(145deg,#f9fcfd 0%,#e2edf2 42%,#c0d1da 100%)!important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.72),
+    inset 0 -12px 18px rgba(39,70,86,.16),
+    0 4px 0 #708c9a!important;
+  transform:translateZ(5px)!important;
+}
+.eh-court-surface:before{
+  background:#5d7b8d!important;
+  box-shadow:0 43px 0 #5d7b8d!important;
+}
+.eh-court-surface:after{background:#6d8797!important}
+.eh-court-net{
+  height:5px!important;
+  background:linear-gradient(180deg,#f8fbfc,#8ca2ae 38%,#405d6c 70%,#eef4f7)!important;
+  border:1px solid #526d7d!important;
+  box-shadow:0 3px 5px rgba(20,45,58,.30)!important;
+}
+.eh-court-surface>b{
+  background:linear-gradient(145deg,#fff,#d9e6ec)!important;
+  border:2px solid #486a7d!important;
+  box-shadow:0 4px 8px rgba(20,55,75,.28),inset 0 1px 0 #fff!important;
+  color:#173b54!important;
+}
+.eh-facility{z-index:5!important;transform-style:preserve-3d!important}
+.eh-row,.eh-corridor,.eh-bottom{transform-style:preserve-3d!important}
+.eh-zone,.eh-corridor,.eh-bottom>div{
+  position:relative!important;
+  border:2px solid #718b9a!important;
+  border-radius:4px!important;
+  background:linear-gradient(145deg,#fbfdfe 0%,#e1ebf0 58%,#b9cbd4 100%)!important;
+  box-shadow:
+    0 5px 0 #839da9,
+    0 9px 13px rgba(27,55,70,.19),
+    inset 0 2px 0 rgba(255,255,255,.92),
+    inset 0 -8px 13px rgba(43,71,86,.11)!important;
+  transform:translateZ(6px)!important;
+  overflow:hidden!important;
+}
+.eh-zone:before,.eh-corridor:before,.eh-bottom>div:before{
+  content:"";position:absolute;inset:5px;border:1px solid rgba(86,112,126,.24);border-radius:2px;pointer-events:none;
+}
+.eh-zone:after,.eh-corridor:after,.eh-bottom>div:after{
+  content:"";position:absolute;left:10%;right:10%;bottom:6px;height:3px;border-radius:50%;
+  background:rgba(43,68,82,.12);filter:blur(2px);pointer-events:none;
+}
+.eh-zone.pink{background:linear-gradient(145deg,#fffafd 0%,#f4e3e9 58%,#dcbfc9 100%)!important}
+.eh-bottom .water{background:linear-gradient(145deg,#fff9df 0%,#f4e1a2 58%,#d4b75e 100%)!important}
+.eh-corridor{background:linear-gradient(180deg,#f7f0df 0%,#e7d7b4 55%,#c6aa78 100%)!important;color:#425d70!important}
+.eh-zone b,.eh-corridor,.eh-bottom>div b{position:relative;z-index:3;text-shadow:0 1px 0 #fff}
+.eh-zone small{position:relative;z-index:3}
+.eh-floor-2f{transform-style:preserve-3d!important}
+.eh-second-grid{transform:translateZ(8px)!important;transform-style:preserve-3d!important}
+.eh-second-zone{
+  position:relative!important;
+  border:2px solid #718894!important;
+  border-radius:5px!important;
+  background:linear-gradient(145deg,#f9fcfd,#dce7ec 55%,#b7c9d2)!important;
+  box-shadow:0 7px 0 #7a939f,0 12px 18px rgba(28,54,69,.22),inset 0 2px 0 rgba(255,255,255,.9)!important;
+  transform:translateZ(7px)!important;
+}
+.eh-second-zone.store2{background:linear-gradient(145deg,#fffaf0,#f2e0ae 55%,#d0b66c)!important}
+.eh-marker{box-shadow:0 7px 13px rgba(20,55,70,.30),inset 0 1px 1px #fff!important;transform:translate(-50%,-50%) translateZ(18px)!important}
+.eh-empty-map{z-index:30!important}
+@media(max-width:700px){
+  .eh-court-3d{transform:perspective(500px) rotateX(2deg) translateZ(8px)!important}
+  .eh-zone,.eh-corridor,.eh-bottom>div,.eh-second-zone{transform:translateZ(4px)!important}
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
