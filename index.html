@@ -410,7 +410,7 @@
 .jgb-live-status.stable{background:#159447}.jgb-live-empty .jgb-live-action b{color:#18834a}
 @media(max-width:1050px){.jgb-repair-realtime-panel{min-height:280px}}
 
-</style></style>
+.jgb-lr-history-action{display:flex;gap:4px;justify-content:center;align-items:center}.jgb-lr-history-delete{border:1px solid #e3a3a3;background:#fff5f5;color:#c62828;border-radius:6px;padding:4px 7px;font-weight:800;cursor:pointer}.jgb-lr-history-edit{border:1px solid #9bbbd4;background:#fff;color:#145a85;border-radius:6px;padding:4px 7px;font-weight:800;cursor:pointer}</style>
     <style id="EMPLOYEE_OVERVIEW_STYLE">
     .eov-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
     .eov-card{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:14px;box-shadow:0 2px 8px #00000008}
@@ -9097,7 +9097,7 @@ html,body{
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}${nav("settings","시스템 설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      const mobileContent=document.getElementById('jgbMobileContent');
      if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
@@ -9115,8 +9115,7 @@ html,body{
         waterproof:"WP",
         basic:"업무",
         schedule:"일정",
-        lighting:"조명",
-        settings:"⚙"
+        lighting:"조명"
       };
       const icon=icons[p]||"•";
       return `<a class="jgb-link ${page===p?"on":""}" href="?page=${encodeURIComponent(p)}" data-page="${p}"><span class="jgb-nav-icon">${icon}</span><span class="jgb-nav-label">${t}</span></a>`
@@ -9131,7 +9130,7 @@ html,body{
     if(page==="dashboard2")return dashboard2();
       if(page==="customer")return customerComplaintPage();
      if(page==="repair")return processPage();
-     if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="settings")return settingsPage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
+     if(page==="basic")return window.basicPage(); if(page==="eam")return (typeof window.eamPage==="function"?window.eamPage():eamPage()); if(page==="leakage")return leakagePage(); if(page==="waterproof")return waterproofPage(); if(page==="schedule")return schedulePage(); if(page==="external")return (typeof window.eamPage==="function"?window.eamPage():eamPage());
      const s=stats();
 
      if(page==="workers")return workerPage();
@@ -10319,10 +10318,11 @@ html,body{
 
     function complaintLevelClass(count){
       const n=Number(count)||0;
-      if(n>=3)return 'complaint-level-3';
+      if(n>=4)return 'complaint-level-4';
+      if(n===3)return 'complaint-level-3';
       if(n===2)return 'complaint-level-2';
       if(n===1)return 'complaint-level-1';
-      return '';
+      return 'complaint-level-0';
     }
 
     function complaintYearIssues(year){
@@ -10528,7 +10528,7 @@ html,body{
         if(/시설|고장|설비|누수|배수|수도/.test(text)) return ['시설 상태 점검','설비 작동 및 이상 여부 확인','check'];
         return ['현장 상태 점검','접수 내용 확인 및 조치 여부 판단','observe'];
       };
-      const statusOf=count=>count>=3?['주의','red']:count===2?['확인','yellow']:['관찰','blue'];
+      const statusOf=count=>count>=4?['집중관리','red']:count===3?['경고','red']:count===2?['주의','yellow']:['관찰','blue'];
       const iconOf=kind=>kind==='clean'?'↗':kind==='warn'?'!':kind==='check'?'＋':'−';
       const rowsHtml=rows.length?rows.map(([place,g])=>{
         const [action,detail,kind]=actionOf(place,g);
@@ -10541,7 +10541,7 @@ html,body{
         </div>`;
       }).join(''):`<div class="jgb-live-empty"><div class="jgb-live-icon stable">✓</div><div><b>현재 미처리 민원이 없습니다.</b><span>새로운 접수가 발생하면 실시간으로 관리조치가 표시됩니다.</span></div><div class="jgb-live-status stable">안정</div><div class="jgb-live-action"><b>현재 상태 양호</b><span>지속적인 민원 접수 현황을 확인합니다.</span></div></div>`;
       return `<aside class="jgb-repair-realtime-panel">
-        <div class="jgb-repair-panel-head jgb-live-head"><b>금일 주요 변동사항</b><span><em>실시간 분석</em> · 방금 갱신</span></div>
+        <div class="jgb-repair-panel-head jgb-live-head"><b>일일 민원 현황 및 주요 변동사항</b><span><em>일일 분석</em> · 방금 갱신</span></div>
         <div class="jgb-live-body">${rowsHtml}</div>
       </aside>`;
     }
@@ -10594,7 +10594,9 @@ html,body{
      const safe=(x)=>cleanIssueContent(x)||'접수 내용 없음';
      const state=(x)=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
      const stateClass=(x)=>state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
-     const mapComplaintCounts=complaintPlaceCounts(countActive);
+     const jgbDailyStart=()=>{const now=new Date(),start=new Date(now);if(now.getHours()<6)start.setDate(start.getDate()-1);start.setHours(6,0,0,0);return start.getTime();};
+     const dailyActive=active.filter(x=>{const t=new Date(x?.createdAt||0).getTime();return Number.isFinite(t)&&t>=jgbDailyStart();});
+     const mapComplaintCounts=complaintPlaceCounts(dailyActive);
      const today=stored.filter(x=>{const d=new Date(x.createdAt||0),n=new Date();return d.getTime()>=resetAt && d.toDateString()===n.toDateString()}).length;
      /* 헤더 연도별 성과 요약: 2025년은 초기 기준값 0건으로 고정하고, 2026년은 실제 접수 데이터를 집계한다. */
      const headerYear=2026;
@@ -10893,7 +10895,7 @@ html,body{
        <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>시설민원 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 화장실"])}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 샤워실"])}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 탈의실"])}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 화장실"])}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 샤워실"])}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 탈의실"])}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["복도"])}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["휴게실"])}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["기타"])}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${complaintLevelClass(n)}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
-         ${liveComplaintActionPanel(countActive)}
+         ${liveComplaintActionPanel(dailyActive)}
        </section>
        ${(()=>{
          const latest=countActive.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,5);
@@ -11195,18 +11197,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     function setStaffPerfMonth(v){selectedDate=String(v)+'-01';render();}
     function workerPage(){return `<div class="pagebar"><h1>근무자별 현황 · ${selectedDate}</h1></div><div class="workergrid">${todayWorkers().map(w=>{const d=tasksFor(w.id), bs=basicWorkerStats(w.id,monthKey()), mine=jgbNumericCountRows((db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey())),p=mine.filter(x=>x.status!=="완료");return `<div class="workerbox"><h3>${w.name}</h3><span class="badge ${w.working?"":"off"}">${w.working?w.shift+" "+w.start+"~"+w.end:w.status}</span><div class="compareline">기본업무 <b>${w.working?`${bs.complete}/${bs.target}일`:"-"}</b></div><div class="compareline">조치완료 <b>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</b></div><div class="compareline">미조치 <b class="${p.length?"red":"green"}">${w.working?p.length:"-"}</b></div><div class="compareline">접수 합계 <b>${mine.length}건</b></div></div>`}).join("")}</div>`}
     function pendingPage(){const p=(db.issues||[]).filter(x=>x.status!=="완료");return `<div class="pagebar"><h1>미조치 현황</h1></div><div class="panel">${p.map(x=>`<div class="issue"><div><b class="red">${x.handlerName||"담당 미지정"}</b><br>${x.category} · ${x.place} · ${x.content}<div class="small">접수시간 ${time(x.createdAt)}</div></div><button class="btn" onclick="go('process')">조치</button></div>`).join("")||"<div class='small'>미조치 사항이 없습니다.</div>"}</div>`}
-    async function resetPracticeAllCounts(){
-  if(!confirm("연습모드에서 입력한 집계와 연습기록을 전체 리셋할까요?\n\n민원 숫자, 직원 실적, EAM 수리 LIVE, 조명·릴선 수리이력/상태, 누수·방수 연습기록을 초기화합니다.\n배치도·자산 기본정보·근무편성은 유지됩니다.")) return;
-  try{
-    localStorage.setItem("JGB_NUMERIC_RESET_V2_AT",String(Date.now()));
-    localStorage.removeItem("JGB_NUMERIC_RESET_AT");
-    if(window.__eamA) window.__eamA=[]; if(window.__eamH) window.__eamH=[]; if(window.__eamI) window.__eamI=[];
-    try{ const lr=JSON.parse(localStorage.getItem("jgb_lr_v10")||"null"); if(lr && Array.isArray(lr.assets)){ lr.assets.forEach(a=>{a.light="정상";a.reel="정상";a.lightHistory=[];a.reelHistory=[];}); localStorage.setItem("jgb_lr_v10",JSON.stringify(lr)); }}catch(e){}
-    ["JGB_V47_LEAKS","JGB_V47_WP_HISTORY","JGB_V178_LIVE_MANUAL","JGB_V180_LIVE_DONE"].forEach(k=>localStorage.removeItem(k));
-    db.tasks={}; save(); render(); alert("연습모드 전체 리셋이 완료되었습니다.");
-  }catch(e){ console.error(e); alert("연습모드 리셋 중 오류가 발생했습니다."); }
-}
-function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><div style="padding:12px 0 6px;color:#60798b;font-size:12px;font-weight:800">연습모드</div><button class="btn red" type="button" onclick="resetPracticeAllCounts()">연습모드 전체 리셋</button><div class="small" style="margin-top:8px">민원·직원 실적·EAM·조명·릴선·누수/방수 연습 집계를 한 번에 초기화합니다. 배치도·자산 기본정보·근무편성은 유지합니다.</div><hr><button class="btn gray" onclick="resetAll()">테스트 데이터 전체 초기화</button></div>`}
+    function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><button class="btn red" onclick="resetAll()">테스트 데이터 전체 초기화</button></div>`}
     async function ensureMainEquipmentAssets(){return;}
     async function eamLoad(){window.__eamA=window.__eamA||[];window.__eamH=window.__eamH||[];window.__eamI=window.__eamI||[];if(!SUPA)return;try{const a=await SUPA.from("assets").select("*").order("name");const h=await SUPA.from("asset_history").select("*").order("event_date",{ascending:false});const i=await SUPA.from("inspections").select("*").order("inspection_date",{ascending:false});window.__eamA=a.data||[];window.__eamH=h.data||[];window.__eamI=i.data||[]}catch(e){console.warn("EAM 동기화 실패",e)}}
     function eamShowLocation(){
@@ -21329,8 +21320,8 @@ body {
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   function ordered(){return Array.from({length:36},(_,i)=>i+1);}
   function cell(n,type){const a=assets[n-1],st=type==='light'?a.light:a.reel,sel=type==='light'?selectedLight===n:selectedReel===n;return `<button type="button" class="jgb-lr-v54-cell ${statusClass[st]} ${sel?'sel':''}" onclick="window.jgbLRSelect(${n},'${type}')" title="${n}번 ${type==='light'?'조명':'릴선'}">${n}</button>`}
-  function historyRows(hist){return hist.length?hist.map((r,i)=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=r[4]||'',completion=r[5]||'';return `<tr><td>${esc(date)}</td><td>${esc(method)}</td><td class="history-status ${status==='정상'?'normal':status==='수리예정'?'planned':status==='수리중'?'repair':''}">${esc(status)}</td><td>${esc(completion||'-')}</td><td class="history-content">${esc(text)}</td><td>${esc(manager||'-')}</td><td class="history-action"><button type="button" class="jgb-lr-history-edit" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button></td></tr>`}).join(''):`<tr><td colspan="7" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
-  function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>관리일자</th><th>관리구분</th><th>처리상태</th><th>완료예정일</th><th>점검 내역</th><th>담당자</th><th>수정</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
+  function historyRows(hist){return hist.length?hist.map((r,i)=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=r[4]||'',completion=r[5]||'';return `<tr><td>${esc(date)}</td><td>${esc(method)}</td><td class="history-status ${status==='정상'?'normal':status==='수리예정'?'planned':status==='수리중'?'repair':''}">${esc(status)}</td><td>${esc(completion||'-')}</td><td class="history-content">${esc(text)}</td><td>${esc(manager||'-')}</td><td class="history-action"><button type="button" class="jgb-lr-history-edit" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button><button type="button" class="jgb-lr-history-delete" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button></td></tr>`}).join(''):`<tr><td colspan="7" class="jgb-lr-v54-empty">등록된 수리이력이 없습니다.</td></tr>`}
+  function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>수리이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll"><table><thead><tr><th>수리일자</th><th>구분</th><th>상태</th><th>완료예정일</th><th>수리내용</th><th>담당자</th><th>수정 / 삭제</th></tr></thead><tbody>${historyRows(hist)}</tbody></table></div></section></div>`}
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span class="jgb-lr-state-summary"><b class="ok">● 정상 ${counts.정상}</b><b class="planned">● 수리예정 ${counts.수리예정}</b><b class="repair">● 수리중 ${counts.수리중}</b></span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
   function markup(){
     const lc={정상:0,수리예정:0,수리중:0},rc={정상:0,수리예정:0,수리중:0};
@@ -21350,11 +21341,13 @@ body {
     };
     const group=(icon,label,c,type)=>{
       const m=maintenanceHeaderCounts(type);
-      return `<div class="jgb-lr-v54-status-group"><div class="group-title"><span>${icon}</span>${label}</div><div class="group-items">${statusBox('🟢','정상',c.정상,'normal')}${statusBox('🟡','수리예정',c.수리예정,'planned')}${statusBox('🔴','수리중',c.수리중,'repair')}${statusBox('🔧','자체정비',m.self,'self')}${statusBox('🛠️','외주정비',m.external,'external')}</div></div>`;
+      return `<div class="jgb-lr-v54-status-group"><div class="group-title"><span>${icon}</span>${label}</div><div class="group-items">${statusBox('🟢','정상',c.정상,'normal')}${statusBox('🟡','수리예정',c.수리예정,'planned')}${statusBox('🔴','수리중',c.수리중,'repair')}${statusBox('🔧','자체',m.self,'self')}${statusBox('🛠️','외주',m.external,'external')}</div></div>`;
     };
     const years=Array.from({length:10},(_,i)=>2026+i);
     const annualStats=(type,year)=>{
-      let external=0,self=0,total=0,parts=0;
+      let external=0,self=0,total=0,monthTotal=0;
+      const now=new Date();
+      const month=now.getMonth()+1;
       assets.forEach(a=>{
         const hist=type==='light'?(a.lightHistory||[]):(a.reelHistory||[]);
         hist.forEach(r=>{
@@ -21362,18 +21355,17 @@ body {
           if(!date.startsWith(String(year))) return;
           total++;
           const method=String(r[1]||'');
-          const text=String(r[2]||'');
+          const mm=Number(date.slice(5,7));
+          if(mm===month) monthTotal++;
           if(method.includes('외주')) external++;
           if(method.includes('자체')) self++;
-          if(/고장/.test(text)) fail++;
-          if(/교체/.test(text)) parts++;
         });
       });
-      return {external,self,total,parts};
+      return {external,self,total,monthTotal,month};
     };
     const annualTable=(type,year)=>{
       const s=annualStats(type,year);
-      return `<div class="jgb-lr-v54-annual-card"><div class="jgb-lr-v54-annual-head"><strong>${type==='light'?'💡 조명 유지관리 실적':'🔌 릴선 유지관리 실적'}</strong><div class="jgb-lr-v54-year-control"><span>연도 선택</span><button type="button" onclick="window.jgbLRAnnualYear('${type}',-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="window.jgbLRAnnualYear('${type}',1)" aria-label="다음 연도">›</button></div></div><table><thead><tr><th>연도</th><th>자체정비 건수</th><th>외주정비 건수</th><th>부품 교체 건수</th></tr></thead><tbody><tr><th>${year}년</th><td>${s.self}건</td><td>${s.external}건</td><td>${s.parts}건</td></tr></tbody></table><p class="jgb-lr-v54-annual-note">※ 선택한 연도의 실적만 표시됩니다.</p></div>`;
+      return `<div class="jgb-lr-v54-annual-card"><div class="jgb-lr-v54-annual-head"><strong>${type==='light'?'💡 조명 유지관리 실적':'🔌 릴선 유지관리 실적'}</strong><div class="jgb-lr-v54-year-control"><span>연도</span><button type="button" onclick="window.jgbLRAnnualYear('${type}',-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="window.jgbLRAnnualYear('${type}',1)" aria-label="다음 연도">›</button></div></div><div class="jgb-lr-v54-stat4"><div><small>${s.month}월 수리 건수</small><strong>${s.monthTotal}건</strong></div><div><small>${year}년 수리 건수</small><strong>${s.total}건</strong></div><div><small>자체 수리 건수</small><strong>${s.self}건</strong></div><div><small>외주 수리 건수</small><strong>${s.external}건</strong></div></div><p class="jgb-lr-v54-annual-note">※ 자체·외주는 각 수리이력에 저장된 구분값만 집계합니다.</p></div>`;
     };
     return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>조명·릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc,'light')}${group('🔌','릴선',rc,'reel')}<button type="button" class="jgb-lr-performance-btn" onclick="window.jgbLRTogglePerformance()">📊 유지관리 실적</button></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid" style="display:none">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
   }
@@ -21429,7 +21421,7 @@ body {
     const file=input.files&&input.files[0]; if(!file)return;
     const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;persist();window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
-  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>유지관리 이력 등록</h3><label class="jgb-lr-date-label">관리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>관리구분<select id="jgbLRMethod"><option>자체정비</option><option>외주정비</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="점검 내역을 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체정비';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value=current==='정상'?'수리예정':current;}
+  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>수리이력 등록</h3><label class="jgb-lr-date-label">수리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>구분<select id="jgbLRMethod"><option value="자체">자체</option><option value="외주">외주</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="수리내용을 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value=current==='정상'?'수리예정':current;}
   window.jgbLRHistoryEdit=function(ev,index){
     ev?.stopPropagation();
     const btn=ev?.currentTarget;
@@ -21444,16 +21436,34 @@ body {
     document.getElementById('jgbLRHistoryEditModal')?.remove();
     const modal=document.createElement('div'); modal.id='jgbLRHistoryEditModal'; modal.className='jgb-lr-v54-modal open';
     modal.innerHTML=`<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog">
-      <h3>유지관리 이력 수정</h3>
+      <h3>수리이력 수정</h3>
       <label>관리일자<input id="jgbLRHEDate" type="date" value="${esc(row[0]||'')}"></label>
       <label>담당자<input id="jgbLRHEManager" type="text" value="${esc(row[3]||'')}"></label>
-      <label>관리구분<select id="jgbLRHEMethod"><option ${row[1]==='자체정비'?'selected':''}>자체정비</option><option ${row[1]==='외주정비'?'selected':''}>외주정비</option></select></label>
+      <label>구분<select id="jgbLRHEMethod"><option value="자체" ${String(row[1]||'').includes('자체')?'selected':''}>자체</option><option value="외주" ${String(row[1]||'').includes('외주')?'selected':''}>외주</option></select></label>
       <label>처리상태<select id="jgbLRHEStatus"><option ${row[4]==='수리예정'?'selected':''}>수리예정</option><option ${row[4]==='수리중'?'selected':''}>수리중</option><option ${row[4]==='정상'?'selected':''}>정상</option></select></label>
       <label>완료예정일<input id="jgbLRHECompletion" type="date" value="${esc(row[5]||'')}"></label>
-      <textarea id="jgbLRHEText" placeholder="점검 내역을 입력하세요.">${esc(row[2]||'')}</textarea>
+      <textarea id="jgbLRHEText" placeholder="수리내용을 입력하세요.">${esc(row[2]||'')}</textarea>
       <div class="row"><button type="button" onclick="document.getElementById('jgbLRHistoryEditModal').remove()">취소</button><button type="button" onclick="window.jgbLRHistorySave(${assetNo},'${type}',${index})">수정 저장</button></div>
     </div>`;
     document.body.appendChild(modal);
+  };
+  window.jgbLRHistoryDelete=function(ev,index){
+    ev?.stopPropagation();
+    const btn=ev?.currentTarget;
+    const pane=btn?.closest('.jgb-lr-v54-pane');
+    const selected=pane?.querySelector('.jgb-lr-v54-cell.sel');
+    const n=Number(selected?.textContent?.trim()) || (pane?.querySelector('.jgb-lr-v54-panehead b')?.textContent?.includes('조명')?selectedLight:selectedReel);
+    const type=selected?.title?.includes('조명')?'light':'reel';
+    const a=assets[n-1];
+    if(!a)return;
+    const hist=type==='light'?(a.lightHistory||[]):(a.reelHistory||[]);
+    const row=hist[index];
+    if(!row)return;
+    if(!confirm(`이 수리이력 1건을 삭제할까요?\n\n수리일자: ${row[0]||'-'}\n구분: ${row[1]||'-'}\n내용: ${row[2]||'-'}`))return;
+    hist.splice(index,1);
+    if(type==='light') a.lightHistory=hist; else a.reelHistory=hist;
+    persist();
+    window.jgbLRSelect(n,type);
   };
   window.jgbLRHistorySave=function(n,type,index){
     const a=assets[n-1]; if(!a)return;
@@ -21461,7 +21471,7 @@ body {
     const text=document.getElementById('jgbLRHEText')?.value.trim()||''; if(!text){alert('점검 내역을 입력하세요.');return;}
     hist[index]=[
       document.getElementById('jgbLRHEDate')?.value||hist[index][0]||'',
-      document.getElementById('jgbLRHEMethod')?.value||hist[index][1]||'자체정비',
+      document.getElementById('jgbLRHEMethod')?.value||hist[index][1]||'자체',
       text,
       document.getElementById('jgbLRHEManager')?.value.trim()||'',
       document.getElementById('jgbLRHEStatus')?.value||hist[index][4]||'수리예정',
@@ -24621,6 +24631,76 @@ document.addEventListener('click',handle,true);
 .jgb-leak-storage3d{transform:none!important;border-radius:3px!important;right:8%!important;top:10%!important;width:12%!important;height:25%!important;background:#fff!important;border:1px solid #777f84!important;box-shadow:0 2px 5px rgba(0,0,0,.10)!important;}
 .jgb-leak-storage3d:before,.jgb-leak-storage3d:after,.jgb-leak-storage-door,.jgb-leak-storage-boxes{display:none!important;}
 .jgb-leak-storage3d b{left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;background:transparent!important;box-shadow:none!important;color:#424a4f!important;font-size:12px!important;white-space:nowrap!important;}
+</style>
+
+<style id="jgb-daily-analysis-final-fix">
+/* 일일 분석: 0 초록 / 1 파랑 / 2 노랑 / 3 빨강 / 4+ 빨강+연한빨강 */
+.jgb-facility-zone.complaint-level-0,.jgb-repair-court.complaint-level-0{background:#fff!important;border:3px solid #1aa260!important;color:#173c58!important}
+.jgb-facility-zone.complaint-level-1,.jgb-repair-court.complaint-level-1,.jgb-facility-group.female .jgb-facility-zone.complaint-level-1,.jgb-facility-group.common .jgb-facility-zone.complaint-level-1{background:#fff!important;border:3px solid #2f80ed!important;color:#1559a6!important}
+.jgb-facility-zone.complaint-level-2,.jgb-repair-court.complaint-level-2,.jgb-facility-group.female .jgb-facility-zone.complaint-level-2,.jgb-facility-group.common .jgb-facility-zone.complaint-level-2{background:#fff!important;border:3px solid #e0b400!important;color:#765e00!important}
+.jgb-facility-zone.complaint-level-3,.jgb-repair-court.complaint-level-3,.jgb-facility-group.female .jgb-facility-zone.complaint-level-3,.jgb-facility-group.common .jgb-facility-zone.complaint-level-3{background:#fff!important;border:3px solid #e5233f!important;color:#a9152b!important}
+.jgb-facility-zone.complaint-level-4,.jgb-repair-court.complaint-level-4,.jgb-facility-group.female .jgb-facility-zone.complaint-level-4,.jgb-facility-group.common .jgb-facility-zone.complaint-level-4{background:#ffe7ea!important;border:3px solid #e5233f!important;color:#a9152b!important;box-shadow:0 0 0 1px rgba(229,35,63,.18)!important}
+.jgb-facility-zone.complaint-level-0 .jgb-map-complaint-count,.jgb-repair-court.complaint-level-0 .jgb-map-complaint-count{background:#1aa260!important}
+.jgb-facility-zone.complaint-level-1 .jgb-map-complaint-count,.jgb-repair-court.complaint-level-1 .jgb-map-complaint-count{background:#2f80ed!important}
+.jgb-facility-zone.complaint-level-2 .jgb-map-complaint-count,.jgb-repair-court.complaint-level-2 .jgb-map-complaint-count{background:#e0b400!important}
+.jgb-facility-zone.complaint-level-3 .jgb-map-complaint-count,.jgb-repair-court.complaint-level-3 .jgb-map-complaint-count,.jgb-facility-zone.complaint-level-4 .jgb-map-complaint-count,.jgb-repair-court.complaint-level-4 .jgb-map-complaint-count{background:#e5233f!important}
+</style>
+
+<style id="JGB_FINAL_REQUEST_20260925">
+/* 시설민원 위치도: 0건도 초록 테두리, 1 파랑, 2 노랑, 3 빨강, 4건 이상 빨강+연한 배경 */
+.jgb-facility-zone.complaint-level-0,
+.jgb-repair-court.complaint-level-0{
+  background:#fff!important;
+  border:3px solid #1aa260!important;
+  color:#173c58!important;
+  box-shadow:none!important;
+}
+.jgb-facility-zone.complaint-level-1,
+.jgb-repair-court.complaint-level-1{
+  background:#fff!important;
+  border:3px solid #2f80ed!important;
+  color:#1559a6!important;
+  box-shadow:none!important;
+}
+.jgb-facility-zone.complaint-level-2,
+.jgb-repair-court.complaint-level-2{
+  background:#fff!important;
+  border:3px solid #e0b400!important;
+  color:#765e00!important;
+  box-shadow:none!important;
+}
+.jgb-facility-zone.complaint-level-3,
+.jgb-repair-court.complaint-level-3{
+  background:#fff!important;
+  border:3px solid #e5233f!important;
+  color:#a9152b!important;
+  box-shadow:none!important;
+}
+.jgb-facility-zone.complaint-level-4,
+.jgb-repair-court.complaint-level-4{
+  background:#ffe7ea!important;
+  border:3px solid #e5233f!important;
+  color:#a9152b!important;
+  box-shadow:0 0 0 1px rgba(229,35,63,.18)!important;
+}
+/* 0건인 여자/공용 시설도 기존 점선 테두리를 덮어씀 */
+.jgb-facility-group.female .jgb-facility-zone.complaint-level-0,
+.jgb-facility-group.common .jgb-facility-zone.complaint-level-0{
+  border:3px solid #1aa260!important;
+  background:#fff!important;
+}
+
+/* 조명·릴선: 수리이력 제목/열 이름을 단순하게 */
+.jgb-lr-v54-historyhead span:first-child{font-size:15px!important;font-weight:1000!important}
+.jgb-lr-v54-history th,.jgb-lr-v54-history td{font-size:11px!important}
+
+/* 유지관리 실적: 월/년도/자체/외주 4개만 한눈에 */
+.jgb-lr-v54-stat4{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;padding:10px!important}
+.jgb-lr-v54-stat4>div{border:1px solid #b9cddd!important;border-radius:8px!important;background:#f7fbfe!important;min-height:72px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;box-sizing:border-box!important}
+.jgb-lr-v54-stat4 small{font-size:10px!important;font-weight:900!important;color:#52718a!important;white-space:nowrap!important}
+.jgb-lr-v54-stat4 strong{font-size:23px!important;font-weight:1000!important;color:#124e73!important;line-height:1!important}
+.jgb-lr-v54-annual-note{margin:0 10px 10px!important;font-size:10px!important;color:#617b8d!important}
+@media(max-width:900px){.jgb-lr-v54-stat4{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 </style>
 </body>
 
