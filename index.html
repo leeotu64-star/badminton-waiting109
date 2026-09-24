@@ -8544,6 +8544,42 @@ html,body{
 .jgb-month-table th,.jgb-month-table td{font-size:12px!important;font-weight:900!important}
 </style>
 
+
+<style id="JGB_20260924_FINAL_REQUESTS">
+/* 요청사항 최종 적용: 스프링 유지 + 분홍색, 이력카드 날짜 정렬 */
+.work-notebook-spring,.basic-book-layout::before{
+  filter:none!important;
+}
+.work-notebook-spring i{
+  border-color:#e58ab0!important;
+  background:linear-gradient(90deg,#f7bfd2 0%,#e58ab0 45%,#f8d5e1 100%)!important;
+  box-shadow:0 2px 3px rgba(196,70,115,.22)!important;
+}
+.basic-book-layout::before{
+  background:radial-gradient(ellipse 7px 4px at 9px 50%,#fff5f8 45%,#e58ab0 49%,#e58ab0 62%,transparent 65%) 0 0/48px 27px repeat-x!important;
+}
+.jgb-eam-history-head-title{
+  display:grid!important;
+  grid-template-columns:76px 110px minmax(0,1fr)!important;
+  align-items:center!important;
+  column-gap:10px!important;
+  min-width:0!important;
+}
+.jgb-eam-history-head-title strong,.jgb-eam-history-date,.jgb-eam-history-meta{
+  display:block!important;
+  min-width:0!important;
+  margin:0!important;
+  white-space:nowrap!important;
+  line-height:1.25!important;
+  text-align:left!important;
+}
+.jgb-eam-history-date{font-variant-numeric:tabular-nums!important;text-align:center!important;}
+.jgb-eam-history-meta{overflow:hidden!important;text-overflow:ellipsis!important;}
+.jgb-eam-history-info>div b{
+  white-space:nowrap!important;
+  font-variant-numeric:tabular-nums!important;
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -10248,11 +10284,19 @@ html,body{
       const stamp=Date.now();
       try{localStorage.setItem('JGB_NUMERIC_RESET_AT',String(stamp));}catch(e){}
       window.__JGB_NUMERIC_RESET_AT=stamp;
+      window.__JGB_NUMERIC_ZERO=true;
+      const forceZero=()=>{
+        document.querySelectorAll('.jgb-repair-stat b,.jgb-repair-year-box strong,.jgb-stat-rank-count,.jgb-type-count,#jgbComplaintMonthlyTotal').forEach(el=>{
+          if(el.id==='jgbComplaintMonthlyTotal') el.textContent='연간 0건';
+          else el.textContent='0건';
+        });
+        document.querySelectorAll('.jgb-repair-stat .num,.jgb-repair-stat .count,.jgb-repair-stat strong').forEach(el=>el.textContent='0');
+      };
       render();
-      requestAnimationFrame(()=>{
-        document.querySelectorAll('.jgb-repair-stat b,.jgb-repair-year-box strong,.jgb-stat-rank-count,.jgb-type-count').forEach(el=>{el.textContent='0건';});
-        document.querySelectorAll('#jgbComplaintMonthlyTotal').forEach(el=>{el.textContent='연간 0건';});
-      });
+      forceZero();
+      setTimeout(forceZero,100);
+      setTimeout(forceZero,400);
+      setTimeout(forceZero,1000);
     }
 
     function jgbNumericResetAt(){
