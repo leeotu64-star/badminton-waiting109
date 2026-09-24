@@ -24004,6 +24004,151 @@ document.addEventListener('click',handle,true);
 .jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar-track{background:#edf3f6!important}
 .jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar-thumb{background:#7894a8!important;border-radius:7px!important;border:2px solid #edf3f6!important}
 </style>
+
+<style id="JGB_HEADER_MANUAL_A4_V1">
+/* 각 주요 헤더별 사용설명서 아이콘 */
+.jgb-header-manual-btn{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  min-height:42px!important;
+  padding:7px 13px!important;
+  margin-left:8px!important;
+  border:1px solid #b8cddd!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  color:#174d6d!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  cursor:pointer!important;
+  box-shadow:0 2px 7px rgba(20,55,80,.10)!important;
+  white-space:nowrap!important;
+  transition:.15s ease!important;
+}
+.jgb-header-manual-btn .jgb-header-manual-icon{
+  font-size:23px!important;
+  line-height:1!important;
+}
+.jgb-header-manual-btn:hover{
+  background:#eef7fc!important;
+  border-color:#7faec9!important;
+  transform:translateY(-1px)!important;
+}
+.jgb-header-manual-btn:active{transform:translateY(0)!important}
+
+/* 기존 최상단 단일 사용설명서 버튼은 중복 방지 */
+.jgb-top-right .jgb-manual-btn{display:none!important}
+
+/* A4 세로 문서형 사용설명서 */
+#jgbManualOverlay .jgb-manual-box{
+  width:794px!important;
+  max-width:calc(100vw - 36px)!important;
+  height:1123px!important;
+  max-height:calc(100vh - 28px)!important;
+  overflow:auto!important;
+  box-sizing:border-box!important;
+  padding:34px 38px!important;
+  border-radius:4px!important;
+  border:1px solid #cbd9e4!important;
+  background:#fff!important;
+}
+#jgbManualOverlay .jgb-manual-head{
+  min-height:58px!important;
+  padding-bottom:14px!important;
+  margin-bottom:18px!important;
+}
+#jgbManualOverlay .jgb-manual-head strong{
+  font-size:24px!important;
+}
+#jgbManualOverlay .jgb-manual-close{
+  font-size:14px!important;
+  padding:8px 13px!important;
+}
+#jgbManualOverlay .jgb-manual-item{margin:9px 0!important}
+#jgbManualOverlay .jgb-manual-title{
+  padding:13px 15px!important;
+  font-size:16px!important;
+}
+#jgbManualOverlay .jgb-manual-desc{
+  padding:11px 15px 13px!important;
+  font-size:14px!important;
+  line-height:1.75!important;
+}
+@media(max-width:900px){
+  .jgb-header-manual-btn{font-size:13px!important;padding:6px 9px!important}
+  .jgb-header-manual-btn .jgb-header-manual-icon{font-size:20px!important}
+}
+</style>
+
+<script id="JGB_HEADER_MANUAL_A4_SCRIPT">
+(function(){
+  function addHeaderManualButtons(){
+    /* 실제 화면의 주요 상단 헤더만 대상으로 함 */
+    var selectors = [
+      '.jgb-v170-head',
+      '.jgb-lr-v54-head',
+      '.employee-hero',
+      '.eam-innovation-head',
+      '.eh-head',
+      '.basic-v5-head',
+      '.jgb-page-title',
+      '.pagebar'
+    ];
+
+    selectors.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(header){
+        if(!header || header.querySelector('.jgb-header-manual-btn')) return;
+
+        var btn=document.createElement('button');
+        btn.type='button';
+        btn.className='jgb-header-manual-btn';
+        btn.title='사용설명서 열기';
+        btn.innerHTML='<span class="jgb-header-manual-icon">📘</span><span>사용설명서</span>';
+        btn.onclick=function(){
+          var ov=document.getElementById('jgbManualOverlay');
+          if(ov) ov.classList.add('open');
+        };
+
+        /* 기존 헤더의 오른쪽 액션 영역이 있으면 그 안에 배치 */
+        var target =
+          header.querySelector('.jgb-v170-head-actions') ||
+          header.querySelector('.jgb-lr-v54-head-statuses') ||
+          header.querySelector('.employee-hero-actions') ||
+          header.querySelector('.eh-head-stats') ||
+          header.querySelector('.eam-manage-top')?.parentElement ||
+          null;
+
+        if(target && target.parentElement === header){
+          target.appendChild(btn);
+        }else{
+          header.appendChild(btn);
+        }
+      });
+    });
+  }
+
+  function start(){
+    addHeaderManualButtons();
+
+    /* 페이지 전환/동적 렌더링으로 새 헤더가 생겨도 자동 추가 */
+    if(window.MutationObserver){
+      var observer=new MutationObserver(function(){
+        addHeaderManualButtons();
+      });
+      observer.observe(document.body,{childList:true,subtree:true});
+    }
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',start);
+  }else{
+    start();
+  }
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
