@@ -5751,13 +5751,17 @@ a[data-page="digitalTwin"],
 </style>
 
 <style id="complaint-level-colors-v1">
-/* 민원 건수 공통 표시: 1 파랑 / 2 노랑 / 3 이상 빨강. 모든 위치도와 금일 주요 변동사항에 동일 적용 */
-.jgb-facility-zone.complaint-level-1,.jgb-repair-court.complaint-level-1{background:#e8f1ff!important;border:3px solid #2f80ed!important;color:#1559a6!important;box-shadow:0 0 0 1px rgba(47,128,237,.18)!important;}
-.jgb-facility-zone.complaint-level-2,.jgb-repair-court.complaint-level-2{background:#fff8cf!important;border:3px solid #e0b400!important;color:#765e00!important;box-shadow:0 0 0 1px rgba(224,180,0,.18)!important;}
-.jgb-facility-zone.complaint-level-3,.jgb-repair-court.complaint-level-3{background:#ffe7ea!important;border:3px solid #e5233f!important;color:#a9152b!important;box-shadow:0 0 0 1px rgba(229,35,63,.18)!important;}
+/* 일일 민원 판단 기준: 0 정상(초록 테두리) / 1 관찰(파랑) / 2 주의(노랑) / 3 경고(빨강) / 4 이상 집중관리(빨강+연한 빨강 바탕) */
+.jgb-facility-zone.complaint-level-0,.jgb-repair-court.complaint-level-0{background:transparent!important;border:3px solid #159447!important;color:inherit!important;box-shadow:none!important;}
+.jgb-facility-zone.complaint-level-1,.jgb-repair-court.complaint-level-1{background:transparent!important;border:3px solid #2f80ed!important;color:#1559a6!important;box-shadow:none!important;}
+.jgb-facility-zone.complaint-level-2,.jgb-repair-court.complaint-level-2{background:transparent!important;border:3px solid #e0b400!important;color:#765e00!important;box-shadow:none!important;}
+.jgb-facility-zone.complaint-level-3,.jgb-repair-court.complaint-level-3{background:transparent!important;border:3px solid #e5233f!important;color:#a9152b!important;box-shadow:none!important;}
+.jgb-facility-zone.complaint-level-4,.jgb-repair-court.complaint-level-4{background:#ffe7ea!important;border:3px solid #e5233f!important;color:#a9152b!important;box-shadow:0 0 0 1px rgba(229,35,63,.18)!important;}
 .jgb-live-status.blue{background:#2f80ed!important;color:#fff!important;}
 .jgb-live-status.yellow{background:#e0b400!important;color:#fff!important;}
 .jgb-live-status.red{background:#e5233f!important;color:#fff!important;}
+.jgb-live-status.stable{background:#159447!important;color:#fff!important;}
+.jgb-live-action-row.stable .jgb-live-action b{color:#159447!important;}
 .jgb-live-action-row.blue .jgb-live-action b{color:#1559a6!important;}
 .jgb-live-action-row.yellow .jgb-live-action b{color:#765e00!important;}
 .jgb-live-action-row.red .jgb-live-action b{color:#a9152b!important;}
@@ -10316,12 +10320,35 @@ html,body{
     }
 
 
+    /* 일일 분석 기준: 한국시간(KST) 06:00 ~ 다음날 05:59 */
+    function jgbDailyWindowKST(nowMs=Date.now()){
+      const now=new Date(nowMs);
+      const kstText=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now);
+      const m=kstText.match(/(\d{2})\/(\d{2})\/(\d{4}),?\s*(\d{2}):(\d{2}):(\d{2})/);
+      if(!m)return {start:nowMs-86400000,end:nowMs};
+      const [,mm,dd,yyyy,hh]=m;
+      const kstHour=Number(hh);
+      const midnight=Date.UTC(Number(yyyy),Number(mm)-1,Number(dd),0,0,0)-9*60*60*1000;
+      const dayStart=kstHour<6?midnight-86400000:midnight;
+      return {start:dayStart+6*60*60*1000,end:dayStart+30*60*60*1000};
+    }
+    function jgbDailyIssues(items,nowMs=Date.now()){
+      const w=jgbDailyWindowKST(nowMs);
+      return (Array.isArray(items)?items:[]).filter(x=>{const t=new Date(x?.createdAt||'').getTime();return Number.isFinite(t)&&t>=w.start&&t<w.end;});
+    }
+    function jgbDailyLabel(nowMs=Date.now()){
+      const w=jgbDailyWindowKST(nowMs);
+      const d=new Date(w.start);
+      return new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric'}).format(d);
+    }
+
     function complaintLevelClass(count){
       const n=Number(count)||0;
-      if(n>=3)return 'complaint-level-3';
+      if(n>=4)return 'complaint-level-4';
+      if(n===3)return 'complaint-level-3';
       if(n===2)return 'complaint-level-2';
       if(n===1)return 'complaint-level-1';
-      return '';
+      return 'complaint-level-0';
     }
 
     function complaintYearIssues(year){
@@ -10506,41 +10533,42 @@ html,body{
       finally{if(btn)btn.disabled=false}
     }
 
-    function liveComplaintActionPanel(active){
-      const items=Array.isArray(active)?active:[];
+    function liveComplaintActionPanel(items){
+      const list=Array.isArray(items)?items:[];
       const groups={};
-      items.forEach(x=>{
+      list.forEach(x=>{
         const place=String(x?.place||'기타').trim()||'기타';
-        if(!groups[place]) groups[place]={count:0,items:[]};
+        if(!groups[place])groups[place]={count:0,active:0,items:[]};
         groups[place].count++;
+        if(x?.status!=='완료')groups[place].active++;
         groups[place].items.push(x);
       });
       const rows=Object.entries(groups)
         .sort((a,b)=>b[1].count-a[1].count||a[0].localeCompare(b[0],'ko'))
-        .slice(0,5);
+        .slice(0,7);
       const actionOf=(name,group)=>{
         const text=(name+' '+group.items.map(x=>String(x?.category||'')+' '+String(x?.content||'')).join(' '));
-        if(/화장실|샤워실|탈의실|청소|환경|냄새/.test(text)) return ['청소 상태 집중 점검','청결 상태 및 소모품 확인','clean'];
-        if(/냉.?난방|온도/.test(text)) return ['냉·난방 설비 점검','온도 설정 및 작동 상태 확인','observe'];
-        if(/조명|전등|릴선/.test(text)) return ['조명 시설 점검','조명 및 전기 상태 확인','check'];
-        if(/안전|미끄|파손|위험/.test(text)) return ['안전 상태 집중 점검','현장 위험요소 확인','warn'];
-        if(/시설|고장|설비|누수|배수|수도/.test(text)) return ['시설 상태 점검','설비 작동 및 이상 여부 확인','check'];
+        if(/화장실|샤워실|탈의실|청소|환경|냄새/.test(text))return ['청소 상태 집중 점검','청결 상태 및 소모품 확인','clean'];
+        if(/냉.?난방|온도/.test(text))return ['냉·난방 설비 점검','온도 설정 및 작동 상태 확인','observe'];
+        if(/조명|전등|릴선/.test(text))return ['조명 시설 점검','조명 및 전기 상태 확인','check'];
+        if(/안전|미끄|파손|위험/.test(text))return ['안전 상태 집중 점검','현장 위험요소 확인','warn'];
+        if(/시설|고장|설비|누수|배수|수도/.test(text))return ['시설 상태 점검','설비 작동 및 이상 여부 확인','check'];
         return ['현장 상태 점검','접수 내용 확인 및 조치 여부 판단','observe'];
       };
-      const statusOf=count=>count>=3?['주의','red']:count===2?['확인','yellow']:['관찰','blue'];
+      const statusOf=count=>count>=4?['집중관리','red']:count===3?['경고','red']:count===2?['주의','yellow']:count===1?['관찰','blue']:['정상','stable'];
       const iconOf=kind=>kind==='clean'?'↗':kind==='warn'?'!':kind==='check'?'＋':'−';
       const rowsHtml=rows.length?rows.map(([place,g])=>{
         const [action,detail,kind]=actionOf(place,g);
         const [status,statusKind]=statusOf(g.count);
         return `<div class="jgb-live-action-row ${statusKind}">
           <div class="jgb-live-icon">${iconOf(kind)}</div>
-          <div class="jgb-live-main"><b>${xEsc(place)}</b><span>현재 미처리 <strong>${g.count.toLocaleString()}건</strong> · 실시간 접수 기준</span></div>
+          <div class="jgb-live-main"><b>${xEsc(place)}</b><span>오늘 접수 <strong>${g.count.toLocaleString()}건</strong> · 미처리 ${g.active.toLocaleString()}건</span></div>
           <div class="jgb-live-status ${statusKind}">${status}</div>
           <div class="jgb-live-action"><b>${xEsc(action)}</b><span>${xEsc(detail)}</span></div>
         </div>`;
-      }).join(''):`<div class="jgb-live-empty"><div class="jgb-live-icon stable">✓</div><div><b>현재 미처리 민원이 없습니다.</b><span>새로운 접수가 발생하면 실시간으로 관리조치가 표시됩니다.</span></div><div class="jgb-live-status stable">안정</div><div class="jgb-live-action"><b>현재 상태 양호</b><span>지속적인 민원 접수 현황을 확인합니다.</span></div></div>`;
+      }).join(''):`<div class="jgb-live-empty"><div class="jgb-live-icon stable">✓</div><div><b>오늘 접수된 민원이 없습니다.</b><span>새로운 접수가 발생하면 일일 분석 기준으로 즉시 반영됩니다.</span></div><div class="jgb-live-status stable">정상</div><div class="jgb-live-action"><b>현재 상태 양호</b><span>오늘 06:00부터 현재까지의 접수 현황을 기준으로 판단합니다.</span></div></div>`;
       return `<aside class="jgb-repair-realtime-panel">
-        <div class="jgb-repair-panel-head jgb-live-head"><b>금일 주요 변동사항</b><span><em>실시간 분석</em> · 방금 갱신</span></div>
+        <div class="jgb-repair-panel-head jgb-live-head"><b>일일 민원 현황 및 주요 변동사항</b><span><em>일일 분석</em> · ${jgbDailyLabel()} 기준</span></div>
         <div class="jgb-live-body">${rowsHtml}</div>
       </aside>`;
     }
@@ -10589,12 +10617,14 @@ html,body{
      const resetAt=jgbNumericResetAt();
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
      const active=stored.filter(x=>x.status!=='완료');
-     const countActive=active.filter(x=>{const t=new Date(x?.createdAt||0).getTime();return !resetAt || (Number.isFinite(t)&&t>=resetAt);});
+     const dailyIssues=jgbDailyIssues(stored);
+     const dailyActive=dailyIssues.filter(x=>x.status!=='완료');
+     const countActive=dailyActive;
      const safe=(x)=>cleanIssueContent(x)||'접수 내용 없음';
      const state=(x)=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
      const stateClass=(x)=>state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
-     const mapComplaintCounts=complaintPlaceCounts(countActive);
-     const today=stored.filter(x=>{const d=new Date(x.createdAt||0),n=new Date();return d.getTime()>=resetAt && d.toDateString()===n.toDateString()}).length;
+     const mapComplaintCounts=complaintPlaceCounts(dailyIssues);
+     const today=dailyIssues.length;
      /* 헤더 연도별 성과 요약: 2025년은 초기 기준값 0건으로 고정하고, 2026년은 실제 접수 데이터를 집계한다. */
      const headerYear=2026;
      const header2026=complaintYearIssues(headerYear);
@@ -10889,10 +10919,10 @@ html,body{
 
 </style>
      <div class="jgb-repair-page">
-       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>시설민원 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button></div></header>
+       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>시설민원 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 화장실"])}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 샤워실"])}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 탈의실"])}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 화장실"])}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 샤워실"])}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 탈의실"])}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["복도"])}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["휴게실"])}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["기타"])}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${complaintLevelClass(n)}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
-         ${liveComplaintActionPanel(countActive)}
+         ${liveComplaintActionPanel(dailyIssues)}
        </section>
        ${(()=>{
          const latest=countActive.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,5);
@@ -21725,6 +21755,8 @@ body {
     };
     requestAnimationFrame(()=>{if(!pick())setTimeout(pick,80);});
   }
+})();
+</script>
 <style id="JGB_V25_ICON_DELETE_FINAL_FIX">
 /* V25: 배치도 아이콘 삭제창의 목록 영역만 안정화 */
 #eamHyunIconDeleteModal .eh-modal-box{width:min(620px,95vw);max-height:88vh;overflow:auto}
@@ -26878,7 +26910,28 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 <!-- 기존 V8 아이콘 이동 엔진 제거 완료: V10 단일 엔진 사용 -->
 
 
-\n<script id="JGB_EAM_DO_EDIT_FIX_V9">\n(function(){\n  const oldEdit=window.eamEditSelectedAsset;\n  if(typeof oldEdit!=='function') return;\n  window.eamEditSelectedAsset=async function(){\n    const shown=String(window.__eamSelCode||'').trim();\n    if(!shown) return oldEdit();\n    try{\n      const rows=typeof sourceRows==='function'?sourceRows():[];\n      const src=rows.find(x=>String(x.code||'').trim()===shown || (typeof window.eamUnifiedCode==='function' && String(window.eamUnifiedCode(x))===shown));\n      if(src && String(src.code)!==shown){\n        window.__eamSelCode=String(src.code);\n        return await oldEdit();\n      }\n      return await oldEdit();\n    }catch(e){\n      console.error(e);\n      alert('문·창호설비 이력카드 수정 대상을 찾을 수 없습니다.\\n'+(e?.message||''));\n    }\n  };\n})();\n</script>\n
+\n<script id="JGB_EAM_DO_EDIT_FIX_V9">
+(function(){
+  const oldEdit=window.eamEditSelectedAsset;
+  if(typeof oldEdit!=='function') return;
+  window.eamEditSelectedAsset=async function(){
+    const shown=String(window.__eamSelCode||'').trim();
+    if(!shown) return oldEdit();
+    try{
+      const rows=typeof sourceRows==='function'?sourceRows():[];
+      const src=rows.find(x=>String(x.code||'').trim()===shown || (typeof window.eamUnifiedCode==='function' && String(window.eamUnifiedCode(x))===shown));
+      if(src && String(src.code)!==shown){
+        window.__eamSelCode=String(src.code);
+        return await oldEdit();
+      }
+      return await oldEdit();
+    }catch(e){
+      console.error(e);
+      alert('문·창호설비 이력카드 수정 대상을 찾을 수 없습니다.\n'+(e?.message||''));
+    }
+  };
+})();
+</script>\n
 
 <style id="JGB_EAM_MAP_ICON_REBUILD_V19_CSS">
 .eh-map .eh-marker{touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important;cursor:grab!important;}
