@@ -8582,16 +8582,89 @@ html,body{
 }
 </style>
 
-<style id="CLEAN_LEAK_MAP_REBUILD">
-.clean-leak-layout{display:grid!important;grid-template-columns:minmax(0,7fr) minmax(230px,3fr)!important;gap:12px!important;align-items:stretch!important;width:100%!important;}
-.clean-leak-map{position:relative;width:100%;height:clamp(430px,68vh,620px);min-height:430px;max-height:620px;overflow:hidden;border:1px solid #aebdc7;border-radius:12px;background:#f7f8f8;box-sizing:border-box;}
-.clean-roof{position:absolute;left:3%;right:3%;top:3%;height:23%;border:2px solid #788b98;border-radius:9px;background:#dce8ec;box-shadow:0 8px 14px rgba(60,80,90,.16);overflow:visible;z-index:3;}
-.clean-roof-title{position:absolute;left:14px;top:10px;background:#edf4f6;border:1px solid #a8bac4;border-radius:7px;padding:7px 10px;color:#405865;z-index:5}.clean-roof-title b{display:block;font-size:15px}.clean-roof-title span{font-size:9px;color:#71838c}.clean-roof-plane{position:absolute;inset:18px 7%;border:1px solid #a8bac4;border-radius:6px;background:linear-gradient(145deg,#edf4f5,#d2e0e5);transform:skewX(-7deg);}.clean-roof-drain{position:absolute;right:8%;bottom:16px;padding:4px 8px;border:1px solid #9eb1bb;border-radius:12px;background:#eef5f6;color:#60747e;font-size:9px;font-weight:800}.clean-storage{position:absolute;right:12%;top:20%;width:13%;height:48%;border:1px solid #879ba5;border-radius:5px;background:#e9eef0;color:#586d77;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:5}.clean-leak-flow{position:absolute;color:#91aebc;font-size:26px;font-weight:900;z-index:8}.clean-leak-flow.f1{left:35%;bottom:-25px}.clean-leak-flow.f2{left:55%;bottom:-25px}.clean-leak-flow.f3{left:72%;bottom:-25px}
-.clean-floor{position:absolute;left:3%;right:3%;top:27%;bottom:3%;border:2px solid #7e919b;border-radius:9px;background:#f4f5f5;box-sizing:border-box;overflow:hidden;box-shadow:0 8px 14px rgba(60,80,90,.10);}
-.clean-floor-title{position:absolute;left:12px;top:9px;color:#4b606b;font-size:14px;font-weight:900;z-index:10}.clean-courts{position:absolute;left:7%;right:7%;top:12%;height:39%;display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.clean-court{position:relative;border:2px solid #91a5ad;border-radius:4px;background:#dcefe9;box-shadow:inset 0 0 0 1px #f9ffff}.clean-court:before{content:"";position:absolute;inset:8%;border:1px solid #9cb1b8}.clean-court:after{content:"";position:absolute;left:8%;right:8%;top:50%;border-top:1px solid #9cb1b8}.clean-court i{position:absolute;top:8%;bottom:8%;left:50%;border-left:1px solid #9cb1b8}.clean-court b{position:absolute;left:0;right:0;top:50%;border-top:3px solid #71868f}.clean-court span{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:9px;color:#5a707a;font-weight:900;white-space:nowrap}.clean-facilities{position:absolute;left:4%;right:4%;bottom:19%;height:25%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr 0.45fr;gap:5px}.clean-facilities div,.clean-bottom-facilities div{border:1px solid #b0bec5;border-radius:4px;background:#edf1f2;color:#667a83;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center}.clean-facilities div:nth-child(1),.clean-facilities div:nth-child(4){background:#e7f1f1}.clean-facilities div:nth-child(2),.clean-facilities div:nth-child(6){background:#f1eaf0}.clean-facilities .wide{grid-column:1/4;background:#e9ecec}.clean-bottom-facilities{position:absolute;left:4%;right:4%;bottom:4%;height:11%;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.clean-bottom-facilities div:nth-child(2){background:#e7f1f5}.clean-bottom-facilities div:nth-child(3){background:#eee9f1}.clean-floor .empty-map{position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);padding:8px 12px;border:1px solid #c3d0d5;border-radius:8px;background:#fff;color:#778991;font-size:10px;font-weight:800}
-.jgb-leak-side30{max-height:none!important;height:100%!important;overflow:auto!important;background:#fafcfc!important}.jgb-leak-note{font-size:10px!important}
-@media(max-width:900px){.clean-leak-layout{grid-template-columns:1fr!important}.jgb-leak-side30{height:auto!important;max-height:220px!important}.clean-leak-map{height:520px}}
+<style id="jgb-leak-clean-3d-v22">
+/* v22: 누수 배치도 재구성 — 기존 위치/기능 유지, 중복 바닥판 제거, 무채색 3D 도면 스타일 */
+.jgb-leak-3d-map{
+  height:620px!important;min-height:620px!important;overflow:hidden!important;
+  background:#f7f8f9!important;border:1px solid #aeb8bf!important;border-radius:10px!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.08)!important;
+}
+.jgb-leak-3d-map:before{display:none!important}
+/* 기존 포개짐을 만들던 배경 바닥판은 완전히 제거 */
+.jgb-leak-ground{display:none!important}
+.jgb-leak-building{
+  left:3%!important;right:3%!important;bottom:20px!important;height:94%!important;
+  transform:none!important;perspective:1200px;transform-style:preserve-3d;
+}
+/* 2층 지붕: 전체의 약 1/4, 회색 단색 3D */
+.jgb-leak-roof-3d{
+  height:25%!important;border:2px solid #4e5961!important;border-radius:7px!important;
+  background:linear-gradient(155deg,#f5f6f7 0%,#c9ced2 38%,#aeb5ba 70%,#e2e5e7 100%)!important;
+  box-shadow:0 10px 16px rgba(0,0,0,.16),inset 0 0 0 3px rgba(255,255,255,.55)!important;
+  transform:perspective(1000px) rotateX(1.5deg)!important;
+}
+.jgb-leak-roof-3d:before{display:block!important;inset:7px!important;
+  background:repeating-linear-gradient(105deg,rgba(255,255,255,.42) 0 1px,transparent 1px 46px)!important;opacity:.7!important;
+}
+.jgb-leak-roof-title3d{
+  left:14px!important;top:11px!important;background:#3f484e!important;color:#fff!important;
+  border-radius:5px!important;padding:7px 11px!important;box-shadow:0 3px 7px rgba(0,0,0,.16)!important;
+}
+.jgb-leak-roof-title3d b{font-size:16px!important}.jgb-leak-roof-title3d span{font-size:9px!important;color:#e5e8ea!important}
+.jgb-leak-rain3d{
+  display:block!important;inset:0!important;opacity:.42!important;
+  background:repeating-linear-gradient(108deg,transparent 0 42px,rgba(90,100,108,.42) 43px 44px,transparent 45px 82px)!important;
+}
+.jgb-leak-roof-ridge{background:#707a81!important;box-shadow:0 2px 4px rgba(0,0,0,.2)!important;height:5px!important}
+.jgb-leak-roof-drain3d{background:#777f84!important;box-shadow:none!important;height:10px!important}
+.jgb-leak-roof-drain3d span{background:#555e64!important;color:#fff!important}
+.jgb-leak-storage3d{
+  background:linear-gradient(145deg,#fafafa,#c8cdd1 48%,#9aa2a7 100%)!important;
+  border-color:#626b71!important;box-shadow:7px 8px 12px rgba(0,0,0,.17)!important;
+}
+.jgb-leak-storage3d:before{background:#d9dde0!important;border-color:#687177!important}
+.jgb-leak-storage3d:after{background:#aeb5ba!important;border-color:#646d72!important}
+.jgb-leak-storage3d b{color:#3e474d!important;background:#fff!important;box-shadow:0 2px 4px rgba(0,0,0,.12)!important}
+.jgb-leak-storage-door{background:#aeb5ba!important;border-color:#626b70!important;box-shadow:none!important}
+.jgb-leak-storage-boxes{background:#c2c2c2!important;border-color:#777!important;box-shadow:none!important}
+/* 옥상과 1층 사이: 빗물이 아래로 내려오는 연결감을 주는 얇은 누수 경로 */
+.jgb-leak-building:after{
+  content:"↓     ↓     ↓     ↓     ↓";
+  position:absolute;left:17%;right:17%;top:24%;height:9%;z-index:20;
+  display:flex;align-items:center;justify-content:space-around;
+  color:#687177;font-size:18px;font-weight:900;letter-spacing:10px;opacity:.72;
+  pointer-events:none;
+  text-shadow:0 1px 0 #fff;
+}
+/* 1층: 색 대신 연회색 구조선 + 입체 바닥 */
+.jgb-leak-floor1{
+  height:71%!important;bottom:0!important;
+  background:linear-gradient(180deg,#f1f2f3 0%,#e5e7e9 100%)!important;
+  border:2px solid #555f66!important;border-top:3px solid #4c565d!important;
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.72),0 8px 13px rgba(0,0,0,.12)!important;
+}
+.jgb-leak-floor1-label{background:#444d53!important;border-radius:5px!important;box-shadow:0 3px 6px rgba(0,0,0,.14)!important}
+.jgb-leak-wall{background:linear-gradient(90deg,#747d83,#e1e4e6 45%,#666f75)!important;box-shadow:0 0 0 1px #4e575c!important}
+/* 코트: 녹색 제거, 실제 도면처럼 회색 바닥과 얇은 선 */
+.jgb-leak-court3d{
+  border:3px solid #697279!important;border-radius:2px!important;
+  background:linear-gradient(145deg,#fafafa,#d9dcde 55%,#c5c9cc)!important;
+  box-shadow:inset 0 0 0 1px #fff,0 5px 8px rgba(0,0,0,.13)!important;
+  transform:perspective(450px) rotateX(2deg)!important;
+}
+.jgb-leak-court3d:before{border:1px solid #6e777d!important}
+.jgb-leak-court3d:after{background:#4f585e!important;box-shadow:none!important}
+.court-centerline{background:#697279!important}.court-net3d{height:4px!important;background:#555e64!important;box-shadow:0 2px 3px rgba(0,0,0,.18)!important}
+.court-num3d{top:-31px!important;background:#555e64!important;border-color:#fff!important;box-shadow:0 3px 6px rgba(0,0,0,.16)!important}
+/* 시설실도 같은 무채색 도면 */
+.jgb-leak-room,.jgb-leak-bottom .jgb-leak-room,.jgb-leak-room.female,.jgb-leak-room.water,.jgb-leak-room.corridor{
+  background:linear-gradient(145deg,#fafafa,#e0e3e5)!important;border:1px solid #8a949a!important;
+  box-shadow:0 3px 6px rgba(0,0,0,.1)!important;color:#424c52!important;
+}
+.jgb-leak-room small{color:#747d82!important}
+/* LK 표시는 기존 기능/색상은 유지 */
 </style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -11420,10 +11493,11 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         .jgb-v171-delete-btn{padding:10px 13px;border:1px solid #d4e0e8;border-radius:8px;background:#fff;color:#d33b36;font-weight:900;cursor:pointer}
 
         /* ===== 3D 누수 배치도 ===== */
-        .jgb-leak-3d-map{position:relative;height:680px;min-height:680px;overflow:hidden;border:1px solid #9fb6c7;border-radius:13px;background:linear-gradient(180deg,#eaf1f5 0%,#f7f9fa 42%,#dfe7eb 100%);box-shadow:inset 0 0 45px rgba(37,70,91,.13),0 10px 26px rgba(29,55,74,.12)}
+        .jgb-leak-3d-map{position:relative;height:680px;min-height:680px;overflow:hidden;border:1px solid #9fb6c7;border-radius:13px;background:linear-gradient(180deg,#dcecf5 0%,#eef5f8 40%,#d8e3e9 100%);box-shadow:inset 0 0 45px rgba(37,70,91,.13),0 10px 26px rgba(29,55,74,.12)}
         .jgb-leak-3d-map:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 18%,rgba(255,255,255,.95),transparent 24%),linear-gradient(120deg,rgba(255,255,255,.34),transparent 42%);pointer-events:none}
+        .jgb-leak-ground{position:absolute;left:2.5%;right:2.5%;bottom:18px;height:48%;border:3px solid #546f80;border-radius:8px;background:linear-gradient(180deg,#f5f8fa,#dbe4e9);box-shadow:0 18px 24px rgba(22,49,66,.18),inset 0 0 0 7px rgba(255,255,255,.6);transform:perspective(900px) rotateX(1.5deg)}
         .jgb-leak-building{position:absolute;left:3.5%;right:3.5%;bottom:38px;height:91%;transform:perspective(1100px) rotateX(0deg);transform-style:preserve-3d}
-        .jgb-leak-roof-3d{position:absolute;left:0;right:0;top:0;height:25%;border:3px solid #344e60;border-radius:8px 8px 12px 12px;background:linear-gradient(145deg,#f2f7fa 0%,#8da7b8 9%,#5d7890 22%,#7f9caf 47%,#4d697e 75%,#a8bcc8 100%);box-shadow:0 16px 22px rgba(24,49,65,.28),inset 0 0 0 5px rgba(255,255,255,.35),inset 0 -14px 30px rgba(15,42,58,.2);overflow:hidden;z-index:8}
+        .jgb-leak-roof-3d{position:absolute;left:0;right:0;top:0;height:30%;border:3px solid #344e60;border-radius:8px 8px 12px 12px;background:linear-gradient(145deg,#f2f7fa 0%,#8da7b8 9%,#5d7890 22%,#7f9caf 47%,#4d697e 75%,#a8bcc8 100%);box-shadow:0 16px 22px rgba(24,49,65,.28),inset 0 0 0 5px rgba(255,255,255,.35),inset 0 -14px 30px rgba(15,42,58,.2);overflow:hidden;z-index:8}
         .jgb-leak-roof-3d:before{content:"";position:absolute;inset:8px;background:repeating-linear-gradient(100deg,rgba(255,255,255,.15) 0 2px,transparent 2px 42px),linear-gradient(180deg,rgba(255,255,255,.12),transparent 40%);opacity:.85}
         .jgb-leak-roof-title3d{position:absolute;left:18px;top:14px;z-index:6;background:rgba(13,57,85,.93);color:#fff;border-radius:9px;padding:9px 14px;box-shadow:0 5px 12px rgba(15,42,58,.28)}
         .jgb-leak-roof-title3d b{display:block;font-size:18px}.jgb-leak-roof-title3d span{display:block;margin-top:2px;font-size:10px;color:#d8edf9}
@@ -11442,7 +11516,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         .jgb-leak-roof-drop{display:none;position:absolute;z-index:6;width:5px;height:54px;background:linear-gradient(180deg,rgba(72,170,235,.1),#58b9ef,rgba(255,255,255,.1));border-radius:5px;box-shadow:0 0 6px rgba(52,161,224,.35)}
         .drop-1{left:29%;top:70%}.drop-2{left:56%;top:60%}.drop-3{left:74%;top:76%}
 
-        .jgb-leak-floor1{position:absolute;left:0;right:0;bottom:0;height:72%;z-index:5;background:linear-gradient(180deg,#d6c5a8 0%,#eadbc1 5%,#c9b18e 100%);border:3px solid #526b7a;border-top-width:6px;box-shadow:inset 0 0 0 5px rgba(255,255,255,.42),inset 0 -22px 30px rgba(90,68,48,.12)}
+        .jgb-leak-floor1{position:absolute;left:0;right:0;bottom:0;height:68%;z-index:5;background:linear-gradient(180deg,#d6c5a8 0%,#eadbc1 5%,#c9b18e 100%);border:3px solid #526b7a;border-top-width:6px;box-shadow:inset 0 0 0 5px rgba(255,255,255,.42),inset 0 -22px 30px rgba(90,68,48,.12)}
         .jgb-leak-floor1-label{position:absolute;left:14px;top:12px;z-index:9;background:rgba(13,57,85,.94);color:#fff;padding:7px 12px;border-radius:8px;font-weight:950;font-size:13px;box-shadow:0 4px 9px rgba(20,45,60,.2)}
         .jgb-leak-courts3d{position:absolute;left:5%;right:5%;top:13%;height:42%;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;z-index:8}
         .jgb-leak-court3d{position:relative;border:4px solid #e7efe7;border-radius:4px;background:linear-gradient(135deg,#178f52,#43c576 42%,#178d4e 100%);box-shadow:inset 0 0 0 2px rgba(5,82,42,.7),inset 0 10px 16px rgba(255,255,255,.16),0 8px 11px rgba(30,65,55,.24);transform:perspective(450px) rotateX(2deg);overflow:hidden}
@@ -11481,53 +11555,62 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
               <button type="button" data-v47-action="filter-lk-status" data-filter-status="외주정비"${statusFilter==='외주정비'?' class="active':''}><i style="background:#d88928"></i>외주정비 <b>${countBy(x=>String(x.maintenanceMethod||'').trim()==='외주정비')}</b></button>
             </div>
           </div>
-
-<!-- CLEAN LEAK LAYOUT: old overlapping map removed -->
-          <div class="jgb-leak-layout73 clean-leak-layout">
+          <div class="jgb-leak-layout73">
             <div class="jgb-leak-main">
-              <div class="clean-leak-map">
-                <div class="clean-roof">
-                  <div class="clean-roof-title"><b>2F 옥상 · 지붕</b><span>상부에서 1F로 누수가 내려오는 구조</span></div>
-                  <div class="clean-roof-plane"></div>
-                  <div class="clean-roof-drain">옥상 배수로</div>
-                  <div class="clean-storage">창고</div>
-                  <div class="clean-leak-flow f1">↓</div>
-                  <div class="clean-leak-flow f2">↓</div>
-                  <div class="clean-leak-flow f3">↓</div>
+          <div class="jgb-leak-3d-map">
+            <div class="jgb-leak-ground"></div>
+            <div class="jgb-leak-building">
+              <div class="jgb-leak-roof-3d">
+                <div class="jgb-leak-roof-title3d"><b>2F 옥상 (지붕)</b><span>비가 오면 누수가 발생할 수 있는 상부 구역</span></div>
+                <div class="jgb-leak-rain3d"></div>
+                <div class="jgb-leak-roof-ridge"></div>
+                <div class="jgb-leak-roof-drain3d"><span>옥상 배수로</span></div>
+                <div class="jgb-leak-storage3d"><b>창고</b><div class="jgb-leak-storage-door"></div><div class="jgb-leak-storage-boxes"></div></div>
+              </div>
+              <div class="jgb-leak-floor1">
+                <div class="jgb-leak-floor1-label">1F 실내 체육관 · 누수 유입 위치</div>
+                <div class="jgb-leak-wall left"></div><div class="jgb-leak-wall right"></div>
+                <div class="jgb-leak-courts3d">
+                  ${[5,4,3,2,1].map(n=>`<div class="jgb-leak-court3d"><span class="court-num3d">코트 ${n}</span><span class="court-centerline"></span><span class="court-net3d"></span></div>`).join('')}
                 </div>
-                <div class="clean-floor">
-                  <div class="clean-floor-title">1F 실내 체육관</div>
-                  <div class="clean-courts">
-                    ${[1,2,3,4,5].map(n=>`<div class="clean-court"><span>코트 ${n}</span><i></i><b></b></div>`).join('')}
-                  </div>
-                  <div class="clean-facilities">
-                    <div>샤워실(남)</div><div>화장실(남)</div><div>탈의실(남)</div>
-                    <div>샤워실(여)</div><div>탈의실(여)</div><div>화장실(여)</div>
-                    <div class="wide">복도</div>
-                  </div>
-                  <div class="clean-bottom-facilities"><div>휴게실</div><div>통합 유수장치실</div><div>사무실</div><div>기타</div></div>
-                  ${markers||'<div class="empty-map">등록된 LK가 없습니다.</div>'}
+                <div class="jgb-leak-room-strip">
+                  <div class="jgb-leak-room"><b>샤워실(남)</b><small>남자 샤워실</small></div>
+                  <div class="jgb-leak-room"><b>화장실(남)</b><small>남자 화장실</small></div>
+                  <div class="jgb-leak-room"><b>탈의실(남)</b><small>남자 탈의실</small></div>
+                  <div class="jgb-leak-room female"><b>샤워실(여)</b><small>여자 샤워실</small></div>
+                  <div class="jgb-leak-room female"><b>탈의실(여)</b><small>여자 탈의실</small></div>
+                  <div class="jgb-leak-room female"><b>화장실(여)</b><small>여자 화장실</small></div>
+                  <div class="jgb-leak-room corridor"><b>복도</b></div>
+                </div>
+                <div class="jgb-leak-bottom">
+                  <div class="jgb-leak-room"><b>휴게실</b><small>휴게공간</small></div>
+                  <div class="jgb-leak-room water"><b>통합 유수장치실</b><small>소방·유수 설비</small></div>
+                  <div class="jgb-leak-room"><b>사무실</b><small>관리·운영</small></div>
+                  <div class="jgb-leak-room"><b>기타</b><small>기타 시설구역</small></div>
                 </div>
               </div>
+              ${markers||'<div class="empty-map" style="position:absolute;left:50%;top:72%;transform:translate(-50%,-50%);z-index:40;padding:12px 18px;background:#fff;border:1px solid #d6e2ea;border-radius:10px;font-weight:900;color:#657b8b">등록된 LK가 없습니다.</div>'}
+            </div>
+          </div>
             </div>
             <aside class="jgb-leak-side30">
               <h3>누수 위치·시설 현황</h3>
-              <div class="side-help">등록된 LK 위치와 상태를 확인합니다.</div>
+              <div class="side-help">실제 등록된 LK만 표시합니다. LK 아이콘을 드래그하면 배치도에서 실제 누수 위치를 바로 조정할 수 있습니다.</div>
               <div class="jgb-leak-side30-list">
                 ${leaks.filter(x=>!x.iconHidden&&matchesFilter(x)).sort((a,b)=>String(a.leakCode||'').localeCompare(String(b.leakCode||''),undefined,{numeric:true})).map(x=>{
                   const lk=String(x.leakCode||'-'); const st=String(x.status||'정상');
-                  const dot=markerClass(lk)==='lk-red'?'#ef9a9a':markerClass(lk)==='lk-yellow'?'#ead48a':markerClass(lk)==='lk-blue'?'#9dbfe0':'#aebbc4';
+                  const dot=markerClass(lk)==='lk-red'?'#ef4e4e':markerClass(lk)==='lk-yellow'?'#e5b82d':markerClass(lk)==='lk-blue'?'#3186df':'#8494a0';
                   return `<div class="jgb-leak-side30-item" data-v47-action="go-wp-by-leak" data-id="${esc(x.id)}"><span class="jgb-leak-side30-dot" style="background:${dot}"></span><div><b>${esc(lk)}</b><small>${esc(x.location||'위치 미지정')}</small></div><span class="jgb-leak-side30-status">${esc(st)}</span></div>`;
                 }).join('') || '<div class="jgb-leak-side30-empty">등록된 LK가 없습니다.</div>'}
               </div>
             </aside>
           </div>
-          <div class="jgb-leak-note">💧 <b>누수 흐름:</b> 2F 지붕에서 1F 실내로 내려오는 구조를 배치도에서 확인합니다.</div>
+          <div class="jgb-leak-note">💧 <b>누수 흐름 표시:</b> 상부 지붕의 누수 발생 구역과 1F 실내 LK 위치를 같은 배치도에서 확인합니다. <b>LK 아이콘 클릭</b> 시 해당 LK의 방수공사 이력으로 이동하며, <b>LK 아이콘 드래그</b>로 실제 발생 위치를 조정할 수 있습니다.</div>
         </div>
-      </div>
+      </div>`;
     }
 
-    function jgbV47GoWpByLeak(leakCode){
+function jgbV47GoWpByLeak(leakCode){
       const code=String(leakCode||'').trim();
       try{localStorage.setItem('JGB_V48_WP_SELECTED_LEAK',code)}catch(e){}
       go('waterproof');
