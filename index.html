@@ -9322,12 +9322,13 @@ html,body{
       });
 
       const customerAll=Array.isArray(db.issues)?db.issues:[];
-      const customerMonth=customerAll.filter(x=>String(x?.createdAt||'').slice(0,7)===ym);
+      const customerCountAll=jgbNumericCountRows(customerAll);
+      const customerMonth=customerCountAll.filter(x=>String(x?.createdAt||'').slice(0,7)===ym);
       const customerReceived=customerMonth.length;
       const customerCompleted=customerMonth.filter(x=>x?.status==='완료').length;
       const customerPending=customerMonth.filter(x=>x?.status!=='완료').length;
        const selectedDayKey=String(selectedDate||'').slice(0,10);
-       const customerToday=customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===selectedDayKey);
+       const customerToday=customerCountAll.filter(x=>String(x?.createdAt||'').slice(0,10)===selectedDayKey);
        const customerTodayReceived=customerToday.length;
        const customerTodayCompleted=customerToday.filter(x=>x?.status==='완료').length;
        const customerTodayPending=customerToday.filter(x=>x?.status!=='완료').length;
@@ -9352,13 +9353,13 @@ html,body{
       const customerMonthOptions=Array.from({length:12},(_,i)=>{const m=i+1;return `<option value="${m}" ${m===month?'selected':''}>${m}월</option>`}).join('');
       const periodSelector=`<div class="opx-period-selector"><span>선택기간</span><select onchange="localStorage.setItem('JGB_OPX_PERIOD',this.value+'-'+String(this.nextElementSibling.value).padStart(2,'0'));render()">${customerPeriodOptions}</select><select onchange="localStorage.setItem('JGB_OPX_PERIOD',this.previousElementSibling.value+'-'+String(this.value).padStart(2,'0'));render()">${customerMonthOptions}</select></div>`;
       const customerMonthlyRows=Array.from({length:12},(_,i)=>{
-        const m=String(i+1).padStart(2,'0'), rows=customerAll.filter(x=>String(x?.createdAt||'').slice(0,7)===`${year}-${m}`);
+        const m=String(i+1).padStart(2,'0'), rows=customerCountAll.filter(x=>String(x?.createdAt||'').slice(0,7)===`${year}-${m}`);
         const done=rows.filter(x=>x?.status==='완료').length;
         return `<tr><td>${i+1}월</td><td>${rows.length}건</td><td>${done}건</td><td>${rows.length?Math.round(done/rows.length*100):0}%</td></tr>`;
       }).join('');
-      const customerYearMonthly=Array.from({length:12},(_,i)=>{const mo=year+'-'+String(i+1).padStart(2,'0');const rows=customerAll.filter(x=>String(x?.createdAt||'').slice(0,7)===mo);return {m:i+1,total:rows.length,done:rows.filter(x=>x?.status==='완료').length,pending:rows.filter(x=>x?.status!=='완료').length};});
+      const customerYearMonthly=Array.from({length:12},(_,i)=>{const mo=year+'-'+String(i+1).padStart(2,'0');const rows=customerCountAll.filter(x=>String(x?.createdAt||'').slice(0,7)===mo);return {m:i+1,total:rows.length,done:rows.filter(x=>x?.status==='완료').length,pending:rows.filter(x=>x?.status!=='완료').length};});
       const customerYearMax=Math.max(1,...customerYearMonthly.map(x=>x.total));
-      const selectedDayRows=customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===String(selectedDate));
+      const selectedDayRows=customerCountAll.filter(x=>String(x?.createdAt||'').slice(0,10)===String(selectedDate));
       const todayReceived=selectedDayRows.length;
       const todayCompleted=selectedDayRows.filter(x=>x?.status==='완료').length;
       const todayPending=selectedDayRows.filter(x=>x?.status!=='완료').length;
@@ -9374,7 +9375,7 @@ html,body{
       const trendData=Array.from({length:30},(_,i)=>{
         const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-(29-i));
         const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-        return {key,label:(d.getMonth()+1)+'/'+d.getDate(),n:customerAll.filter(x=>String(x?.createdAt||'').slice(0,10)===key).length};
+        return {key,label:(d.getMonth()+1)+'/'+d.getDate(),n:customerCountAll.filter(x=>String(x?.createdAt||'').slice(0,10)===key).length};
       });
       window.__jgbTrendData=trendData;
       const trend7=trendData.slice(-7);
@@ -9455,8 +9456,8 @@ html,body{
         '기타문의':'접수 원문을 기준으로 현장 상태 및 원인 확인'
       };
       const qrPrevHtml=qrPrevRows.slice(0,5).map((o,i)=>`<div class="qr-action-insight-item"><div><b>${i+1}. ${xEsc(o.place)}</b><span>${xEsc(o.issue)} · 관련 ${o.count}건</span></div><strong>${o.pending?'미조치 '+o.pending+'건':'반복 '+o.count+'건'}</strong><small>권장: ${xEsc(qrIssueGuide[o.issue]||o.checks||'현장 상태 확인')}</small></div>`).join('')||'<div class="qr-empty">반복 또는 미조치 기준의 예방점검 후보가 아직 없습니다.</div>';
-      const qrRecent7=customerAll.filter(x=>{const t=new Date(x?.createdAt||'').getTime();return Number.isFinite(t)&&Date.now()-t<=7*86400000;}).length;
-      const qrPrev7=customerAll.filter(x=>{const t=new Date(x?.createdAt||'').getTime();return Number.isFinite(t)&&Date.now()-t>7*86400000&&Date.now()-t<=14*86400000;}).length;
+      const qrRecent7=customerCountAll.filter(x=>{const t=new Date(x?.createdAt||'').getTime();return Number.isFinite(t)&&Date.now()-t<=7*86400000;}).length;
+      const qrPrev7=customerCountAll.filter(x=>{const t=new Date(x?.createdAt||'').getTime();return Number.isFinite(t)&&Date.now()-t>7*86400000&&Date.now()-t<=14*86400000;}).length;
       const qrSurge=qrRecent7>qrPrev7&&qrRecent7>0;
       const qrUnassignedRate=customerReceived?Math.round(qrUnassigned/customerReceived*100):0;
       const qrActionHeadline=qrPrevRows[0]?`예방점검 후보: ${xEsc(qrPrevRows[0].place)} · ${xEsc(qrPrevRows[0].issue)} ${qrPrevRows[0].count}건`:(qrSurge?'최근 7일 접수가 이전 7일보다 증가했습니다.':'현재 뚜렷한 반복·급증 신호가 없습니다.');
@@ -10280,23 +10281,12 @@ html,body{
     }
 
     function jgbResetNumericCounts(){
-      if(!confirm('집계 숫자를 초기화하시겠습니까?\n고객 접수 내용과 처리 기능에는 영향을 주지 않습니다.'))return;
+      if(!confirm('집계 숫자를 초기화하시겠습니까?\n기존 접수 데이터는 삭제하지 않고, 초기화 시점 이후 데이터만 집계합니다.'))return;
       const stamp=Date.now();
       try{localStorage.setItem('JGB_NUMERIC_RESET_AT',String(stamp));}catch(e){}
       window.__JGB_NUMERIC_RESET_AT=stamp;
-      window.__JGB_NUMERIC_ZERO=true;
-      const forceZero=()=>{
-        document.querySelectorAll('.jgb-repair-stat b,.jgb-repair-year-box strong,.jgb-stat-rank-count,.jgb-type-count,#jgbComplaintMonthlyTotal').forEach(el=>{
-          if(el.id==='jgbComplaintMonthlyTotal') el.textContent='연간 0건';
-          else el.textContent='0건';
-        });
-        document.querySelectorAll('.jgb-repair-stat .num,.jgb-repair-stat .count,.jgb-repair-stat strong').forEach(el=>el.textContent='0');
-      };
+      window.__JGB_NUMERIC_ZERO=false;
       render();
-      forceZero();
-      setTimeout(forceZero,100);
-      setTimeout(forceZero,400);
-      setTimeout(forceZero,1000);
     }
 
     function jgbNumericResetAt(){
@@ -10304,11 +10294,20 @@ html,body{
       try{return Number(localStorage.getItem('JGB_NUMERIC_RESET_AT')||0)||0;}catch(e){return 0}
     }
 
+    function jgbNumericCountRows(items){
+      const resetAt=jgbNumericResetAt();
+      if(!resetAt)return Array.isArray(items)?items:[];
+      return (Array.isArray(items)?items:[]).filter(x=>{
+        const t=new Date(x?.createdAt||'').getTime();
+        return Number.isFinite(t)&&t>=resetAt;
+      });
+    }
+
     function processPage(){
      const resetAt=jgbNumericResetAt();
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
      const active=stored.filter(x=>x.status!=='완료');
-     const countActive=resetAt?[]:active;
+     const countActive=active.filter(x=>{const t=new Date(x?.createdAt||0).getTime();return !resetAt || (Number.isFinite(t)&&t>=resetAt);});
      const safe=(x)=>cleanIssueContent(x)||'접수 내용 없음';
      const state=(x)=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
      const stateClass=(x)=>state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
@@ -23869,6 +23868,21 @@ document.addEventListener('click',handle,true);
   font-variant-numeric:tabular-nums!important;
 }
 .jgb-eam-history-meta{display:block!important;text-align:left!important;}
+</style>
+
+<style id="JGB_LR_HISTORY_DIVIDER_FINAL">
+/* 조명·릴선 유지관리 이력 가운데 분할선 통일 */
+.jgb-lr-v54-detail{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+}
+.jgb-lr-v54-detail > .jgb-lr-v54-card{
+  border-right:2px solid #7894a8!important;
+  box-sizing:border-box!important;
+}
+.jgb-lr-v54-detail > .jgb-lr-v54-history{
+  border-left:0!important;
+  box-sizing:border-box!important;
+}
 </style>
 </body>
 
