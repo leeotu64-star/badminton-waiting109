@@ -8581,31 +8581,6 @@ html,body{
   font-variant-numeric:tabular-nums!important;
 }
 </style>
-
-<style id="JGB_USER_ROOF_FURTHER_REDUCE_V1">
-/* 현재 원본 기준: 옥상(지붕) 영역만 더 낮추고 1F 배치도 공간을 넓힘.
-   기존 데이터/기능/LK 위치·이동 로직은 변경하지 않음. */
-.jgb-leak-roof-3d{
-  height:20%!important;
-}
-.jgb-leak-floor1{
-  height:80%!important;
-}
-.jgb-leak-storage3d{
-  top:10%!important;
-  height:58%!important;
-}
-.jgb-leak-roof-title3d{
-  top:9px!important;
-  padding:7px 11px!important;
-}
-.jgb-leak-roof-title3d b{
-  font-size:16px!important;
-}
-.jgb-leak-roof-title3d span{
-  font-size:9px!important;
-}
-</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -10010,9 +9985,9 @@ html,body{
   <section class="eh-floor eh-floor-1f">
     <div class="eh-courts"><b>코트 구역</b>${[5,4,3,2,1].map(n=>`<div class="eh-court eh-court-3d" data-court="${n}"><div class="eh-court-surface"><span class="eh-court-net"></span><b>${n}</b></div></div>`).join('')}</div>
     <div class="eh-facility">
-      <div class="eh-row">${zone('샤워실(남)','남자 샤워실')}${zone('화장실(남)','남자 화장실')}${zone('탈의실(남)','남자 탈의실')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}${zone('화장실(여)','여자 화장실','pink')}</div>
+      <div class="eh-row">${zone('화장실(남)','남자 화장실')}${zone('샤워실(남)','남자 샤워실')}${zone('탈의실(남)','남자 탈의실')}${zone('화장실(여)','여자 화장실','pink')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}</div>
       <div class="eh-corridor">복도</div>
-      <div class="eh-bottom">${zone('휴게실','휴게공간')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영')}${zone('창고','시설물품 보관')}</div>
+      <div class="eh-bottom">${zone('휴게실','휴게공간')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영')}${zone('기타구역','기타 시설구역')}</div>
     </div>
   </section>
   <section class="eh-floor eh-floor-2f">
@@ -31326,5 +31301,101 @@ cleanupDuplicateOnly();
   left:50% !important;
   top:0 !important;
   bottom:0 !important;
+}
+</style>
+
+
+<style id="JGB_EAM_FINAL_LAYOUT_FIX_20260924">
+/* 현재 배치도 최종 정리: 가로 7:3, 하부선 완전 표시, 시설명 중복 방지 */
+.eh-main{
+  display:grid!important;
+  grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  gap:10px!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+}
+.eh-main>.eh-map-card{
+  grid-column:1!important;
+  grid-row:1!important;
+  width:100%!important;
+  max-width:none!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+}
+.eh-main>.eh-right{
+  grid-column:2!important;
+  grid-row:1!important;
+  width:100%!important;
+  max-width:none!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+}
+.eh-map-wrap{
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  padding:6px!important;
+  overflow:hidden!important;
+}
+.eh-map{
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  padding:6px!important;
+  overflow:hidden!important;
+}
+/* 1층과 옥상 사이/아래에 여유를 줘 마지막 외곽선이 잘리지 않게 함 */
+.eh-floor-1f{
+  flex:0 0 calc(83% - 3px)!important;
+  min-height:0!important;
+}
+.eh-floor-2f{
+  flex:0 0 calc(13% - 3px)!important;
+  min-height:0!important;
+}
+.eh-floor-1f .eh-facility{
+  left:1.5%!important;
+  right:1.5%!important;
+  top:35.294%!important;
+  height:64.706%!important;
+  bottom:auto!important;
+}
+.eh-floor-1f .eh-row{
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+}
+.eh-floor-1f .eh-bottom{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:4px!important;
+  padding-bottom:2px!important;
+  box-sizing:border-box!important;
+}
+.eh-floor-1f .eh-bottom>.eh-zone{
+  min-width:0!important;
+  overflow:hidden!important;
+}
+/* 남/여 샤워실+탈의실은 서로 붙어 한 세트처럼 보이되 각각 독립 칸 유지 */
+.eh-floor-1f .eh-row .eh-zone:nth-child(2),
+.eh-floor-1f .eh-row .eh-zone:nth-child(3){
+  background:linear-gradient(145deg,#f7fbfd,#dce9ee 65%,#c4d5de)!important;
+}
+.eh-floor-1f .eh-row .eh-zone:nth-child(5),
+.eh-floor-1f .eh-row .eh-zone:nth-child(6){
+  background:linear-gradient(145deg,#fff6f8,#f7dce3 65%,#e7bfc9)!important;
+}
+.eh-floor-1f .eh-row .eh-zone b,
+.eh-floor-1f .eh-bottom .eh-zone b{
+  white-space:nowrap!important;
+}
+@media(max-width:700px){
+  .eh-main{grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important}
+  .eh-floor-1f{flex-basis:calc(83% - 3px)!important}
+  .eh-floor-2f{flex-basis:calc(13% - 3px)!important}
 }
 </style>
