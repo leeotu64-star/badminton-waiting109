@@ -24063,6 +24063,141 @@ document.addEventListener('click',handle,true);
 })();
 </script>
 
+
+<style id="JGB_LEAK_FINAL_FIX_V3">
+/* ================================
+   누수 배치도 최종 정리
+   ① 기존 상단 7개 박스 제거
+      - 옥상 코트 5개
+      - 옥상 창고 2개
+   ② 창고 1개만 비 오는 옥상 영역 안으로 이동
+   ③ 창고는 기울이지 않고 반듯한 사각형
+   ④ 비 오는 옥상 헤더 영역 축소
+   ================================ */
+
+/* 기존 7개를 CSS에서도 확실히 제거 */
+.jgb-leak-plan-v1 .jgb-leak-roof-courts,
+.jgb-leak-plan-v1 .jgb-leak-roof-building.left,
+.jgb-leak-plan-v1 .jgb-leak-roof-building.right{
+  display:none!important;
+}
+
+/* 기존 시설영역에 있던 옥상 창고 항목 제거 */
+.jgb-leak-plan-v1 .jgb-leak-left-stack > div:nth-child(3){
+  display:none!important;
+}
+
+/* 비 오는 옥상 영역을 조금 낮게 */
+.jgb-leak-plan-v1 .jgb-leak-roof-panel{
+  top:2.8%!important;
+  height:11.5%!important;
+  min-height:0!important;
+}
+
+/* 옥상 제목도 같이 약간 축소 */
+.jgb-leak-plan-v1 .jgb-leak-roof-title{
+  transform:scale(.92);
+  transform-origin:center top;
+}
+
+/* 옥상 배수로는 그대로 보이되 박스와 겹치지 않게 */
+.jgb-leak-plan-v1 .jgb-leak-roof-drain{
+  transform:scale(.92);
+  transform-origin:center;
+}
+
+/* 새 창고 */
+.jgb-leak-roof-warehouse-final{
+  position:absolute!important;
+  z-index:20!important;
+  right:2.8%!important;
+  top:30%!important;
+  width:12%!important;
+  height:48%!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  background:linear-gradient(180deg,#dfeaf0 0%,#c8d8e1 100%)!important;
+  border:1px solid #8ea6b5!important;
+  border-radius:2px!important;
+  transform:none!important;
+  box-shadow:0 5px 9px rgba(0,0,0,.18)!important;
+  color:#385565!important;
+  font-weight:900!important;
+  font-size:12px!important;
+}
+.jgb-leak-roof-warehouse-final::after{
+  content:"창고";
+}
+
+/* 기존 화면에 이전 수정으로 들어간 '창고' 텍스트가
+   1층 시설영역 오른쪽에 남아 있으면 사무실로 복원 */
+.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room:last-child b{
+  font-size:0!important;
+}
+.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room:last-child b::after{
+  content:"사무실";
+  font-size:inherit;
+}
+.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room:last-child small{
+  font-size:0!important;
+}
+.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room:last-child small::after{
+  content:"관리·운영";
+  font-size:inherit;
+}
+</style>
+
+<script id="JGB_LEAK_FINAL_FIX_V3_SCRIPT">
+(function(){
+  function fixLeakMap(){
+    document.querySelectorAll('.jgb-leak-plan-v1').forEach(function(plan){
+      /* 실제 DOM에서도 7개를 제거 — CSS만으로 남는 경우까지 방지 */
+      plan.querySelectorAll('.jgb-leak-roof-courts,.jgb-leak-roof-building.left,.jgb-leak-roof-building.right')
+        .forEach(function(el){ el.remove(); });
+
+      /* 시설영역의 기존 창고 제거 */
+      plan.querySelectorAll('.jgb-leak-left-stack > div').forEach(function(el){
+        if((el.innerText||'').replace(/\s+/g,'').startsWith('창고')){
+          el.remove();
+        }
+      });
+
+      /* 비 오는 옥상 안에 창고는 딱 1개만 생성 */
+      var roof=plan.querySelector('.jgb-leak-roof-panel');
+      if(roof && !roof.querySelector('.jgb-leak-roof-warehouse-final')){
+        var w=document.createElement('div');
+        w.className='jgb-leak-roof-warehouse-final';
+        w.setAttribute('aria-label','옥상 창고');
+        roof.appendChild(w);
+      }
+
+      /* 이전 수정에서 1층 오른쪽 하단이 창고로 바뀐 경우 사무실로 복원 */
+      var rooms=plan.querySelector('.jgb-leak-room-grid');
+      if(rooms){
+        var bottom=rooms.querySelectorAll('.bottom-room');
+        var last=bottom[bottom.length-1];
+        if(last){
+          var b=last.querySelector('b'), sm=last.querySelector('small');
+          if(b && /창고/.test(b.textContent)) b.textContent='사무실';
+          if(sm && /창고|시설/.test(sm.textContent)) sm.textContent='관리·운영';
+        }
+      }
+    });
+  }
+
+  function init(){
+    fixLeakMap();
+    if(window.MutationObserver){
+      new MutationObserver(fixLeakMap).observe(document.body,{childList:true,subtree:true});
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
