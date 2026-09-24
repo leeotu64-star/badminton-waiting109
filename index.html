@@ -8582,90 +8582,87 @@ html,body{
 }
 </style>
 
-<style id="JGB_LEAK_BLUEPRINT_V1">
-/* 누수 배치도: 기존 3D/색상 표현을 제거하고 같은 모양의 평면 도면으로 전환 */
+<style id="jgb-leak-clean-3d-v22">
+/* v22: 누수 배치도 재구성 — 기존 위치/기능 유지, 중복 바닥판 제거, 무채색 3D 도면 스타일 */
 .jgb-leak-3d-map{
-  background:#fff!important;
-  border:1px solid #333!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  overflow:hidden!important;
+  height:620px!important;min-height:620px!important;overflow:hidden!important;
+  background:#f7f8f9!important;border:1px solid #aeb8bf!important;border-radius:10px!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.08)!important;
 }
 .jgb-leak-3d-map:before{display:none!important}
-/* 기존 겹쳐 보이던 바깥 배경 도면 제거 */
+/* 기존 포개짐을 만들던 배경 바닥판은 완전히 제거 */
 .jgb-leak-ground{display:none!important}
-/* 건물 기본 틀 유지 */
 .jgb-leak-building{
-  left:3.5%!important;right:3.5%!important;bottom:38px!important;height:91%!important;
-  transform:none!important;box-shadow:none!important;
+  left:3%!important;right:3%!important;bottom:20px!important;height:94%!important;
+  transform:none!important;perspective:1200px;transform-style:preserve-3d;
 }
-/* 지붕: 같은 위치/모양, 색과 입체효과만 제거 */
+/* 2층 지붕: 전체의 약 1/4, 회색 단색 3D */
 .jgb-leak-roof-3d{
-  background:#fff!important;
-  border:2px solid #333!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  transform:none!important;
+  height:25%!important;border:2px solid #4e5961!important;border-radius:7px!important;
+  background:linear-gradient(155deg,#f5f6f7 0%,#c9ced2 38%,#aeb5ba 70%,#e2e5e7 100%)!important;
+  box-shadow:0 10px 16px rgba(0,0,0,.16),inset 0 0 0 3px rgba(255,255,255,.55)!important;
+  transform:perspective(1000px) rotateX(1.5deg)!important;
 }
-.jgb-leak-roof-3d:before,
-.jgb-leak-rain3d{display:none!important}
+.jgb-leak-roof-3d:before{display:block!important;inset:7px!important;
+  background:repeating-linear-gradient(105deg,rgba(255,255,255,.42) 0 1px,transparent 1px 46px)!important;opacity:.7!important;
+}
 .jgb-leak-roof-title3d{
-  background:#fff!important;color:#222!important;border:1px solid #333!important;
-  box-shadow:none!important;border-radius:0!important;
+  left:14px!important;top:11px!important;background:#3f484e!important;color:#fff!important;
+  border-radius:5px!important;padding:7px 11px!important;box-shadow:0 3px 7px rgba(0,0,0,.16)!important;
 }
-.jgb-leak-roof-title3d span{color:#555!important}
-.jgb-leak-roof-ridge,
-.jgb-leak-roof-drain3d{
-  background:#fff!important;border:1px solid #555!important;box-shadow:none!important;
+.jgb-leak-roof-title3d b{font-size:16px!important}.jgb-leak-roof-title3d span{font-size:9px!important;color:#e5e8ea!important}
+.jgb-leak-rain3d{
+  display:block!important;inset:0!important;opacity:.42!important;
+  background:repeating-linear-gradient(108deg,transparent 0 42px,rgba(90,100,108,.42) 43px 44px,transparent 45px 82px)!important;
 }
-.jgb-leak-roof-drain3d span{background:#fff!important;color:#333!important;border:1px solid #555!important}
-/* 창고: 기존 크기/위치 유지, 도면 선만 남김 */
+.jgb-leak-roof-ridge{background:#707a81!important;box-shadow:0 2px 4px rgba(0,0,0,.2)!important;height:5px!important}
+.jgb-leak-roof-drain3d{background:#777f84!important;box-shadow:none!important;height:10px!important}
+.jgb-leak-roof-drain3d span{background:#555e64!important;color:#fff!important}
 .jgb-leak-storage3d{
-  background:#fff!important;border:2px solid #333!important;border-radius:0!important;
-  box-shadow:none!important;transform:none!important;
+  background:linear-gradient(145deg,#fafafa,#c8cdd1 48%,#9aa2a7 100%)!important;
+  border-color:#626b71!important;box-shadow:7px 8px 12px rgba(0,0,0,.17)!important;
 }
-.jgb-leak-storage3d:before,.jgb-leak-storage3d:after{display:none!important}
-/* 1층: 기존 외곽과 코트 배치 유지 */
+.jgb-leak-storage3d:before{background:#d9dde0!important;border-color:#687177!important}
+.jgb-leak-storage3d:after{background:#aeb5ba!important;border-color:#646d72!important}
+.jgb-leak-storage3d b{color:#3e474d!important;background:#fff!important;box-shadow:0 2px 4px rgba(0,0,0,.12)!important}
+.jgb-leak-storage-door{background:#aeb5ba!important;border-color:#626b70!important;box-shadow:none!important}
+.jgb-leak-storage-boxes{background:#c2c2c2!important;border-color:#777!important;box-shadow:none!important}
+/* 옥상과 1층 사이: 빗물이 아래로 내려오는 연결감을 주는 얇은 누수 경로 */
+.jgb-leak-building:after{
+  content:"↓     ↓     ↓     ↓     ↓";
+  position:absolute;left:17%;right:17%;top:24%;height:9%;z-index:20;
+  display:flex;align-items:center;justify-content:space-around;
+  color:#687177;font-size:18px;font-weight:900;letter-spacing:10px;opacity:.72;
+  pointer-events:none;
+  text-shadow:0 1px 0 #fff;
+}
+/* 1층: 색 대신 연회색 구조선 + 입체 바닥 */
 .jgb-leak-floor1{
-  background:#fff!important;
-  border:2px solid #333!important;
-  border-top-width:2px!important;
-  box-shadow:none!important;
+  height:71%!important;bottom:0!important;
+  background:linear-gradient(180deg,#f1f2f3 0%,#e5e7e9 100%)!important;
+  border:2px solid #555f66!important;border-top:3px solid #4c565d!important;
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.72),0 8px 13px rgba(0,0,0,.12)!important;
 }
-.jgb-leak-floor1-label{
-  background:#fff!important;color:#222!important;border:1px solid #333!important;
-  box-shadow:none!important;border-radius:0!important;
-}
+.jgb-leak-floor1-label{background:#444d53!important;border-radius:5px!important;box-shadow:0 3px 6px rgba(0,0,0,.14)!important}
+.jgb-leak-wall{background:linear-gradient(90deg,#747d83,#e1e4e6 45%,#666f75)!important;box-shadow:0 0 0 1px #4e575c!important}
+/* 코트: 녹색 제거, 실제 도면처럼 회색 바닥과 얇은 선 */
 .jgb-leak-court3d{
-  background:#fff!important;
-  border:2px solid #333!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  transform:none!important;
+  border:3px solid #697279!important;border-radius:2px!important;
+  background:linear-gradient(145deg,#fafafa,#d9dcde 55%,#c5c9cc)!important;
+  box-shadow:inset 0 0 0 1px #fff,0 5px 8px rgba(0,0,0,.13)!important;
+  transform:perspective(450px) rotateX(2deg)!important;
 }
-.jgb-leak-court3d:before{border:1px solid #555!important}
-.jgb-leak-court3d:after{background:#333!important;box-shadow:none!important}
-.court-centerline{background:#555!important}
-.court-net3d{background:#333!important;box-shadow:none!important;height:3px!important}
-.court-num3d{
-  background:#fff!important;color:#222!important;border:1px solid #333!important;
-  box-shadow:none!important;
+.jgb-leak-court3d:before{border:1px solid #6e777d!important}
+.jgb-leak-court3d:after{background:#4f585e!important;box-shadow:none!important}
+.court-centerline{background:#697279!important}.court-net3d{height:4px!important;background:#555e64!important;box-shadow:0 2px 3px rgba(0,0,0,.18)!important}
+.court-num3d{top:-31px!important;background:#555e64!important;border-color:#fff!important;box-shadow:0 3px 6px rgba(0,0,0,.16)!important}
+/* 시설실도 같은 무채색 도면 */
+.jgb-leak-room,.jgb-leak-bottom .jgb-leak-room,.jgb-leak-room.female,.jgb-leak-room.water,.jgb-leak-room.corridor{
+  background:linear-gradient(145deg,#fafafa,#e0e3e5)!important;border:1px solid #8a949a!important;
+  box-shadow:0 3px 6px rgba(0,0,0,.1)!important;color:#424c52!important;
 }
-/* 시설실: 같은 배치/크기, 색상과 입체효과 제거 */
-.jgb-leak-room-strip,.jgb-leak-bottom{box-shadow:none!important}
-.jgb-leak-room{
-  background:#fff!important;color:#222!important;
-  border:1px solid #555!important;border-radius:0!important;box-shadow:none!important;
-}
-.jgb-leak-room small{color:#555!important}
-.jgb-leak-room.female,.jgb-leak-room.water,.jgb-leak-room.corridor,
-.jgb-leak-bottom .jgb-leak-room{background:#fff!important}
-.jgb-leak-wall{
-  background:#fff!important;border:1px solid #555!important;box-shadow:none!important;
-}
-/* 배치도 안의 장식용 색/그림자 제거. LK 표시는 기능상 유지 */
-.jgb-leak-plan-v1,
-.jgb-leak-plan-v1 *{text-shadow:none!important}
+.jgb-leak-room small{color:#747d82!important}
+/* LK 표시는 기존 기능/색상은 유지 */
 </style>
 
 </head><body><div id="app"></div>
