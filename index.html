@@ -8800,32 +8800,6 @@ html,body{
 }
 </style>
 
-
-<style id="monthly-schedule-only-final">
-html,body{margin:0!important;padding:0!important;background:#eef3f8!important;color:#172033!important;overflow:hidden!important;font-family:"Malgun Gothic",Arial,sans-serif!important}
-#app{min-height:100vh!important;width:100%!important}
-.schedule-only-screen{width:100vw;height:100vh;box-sizing:border-box;background:#eef3f8;display:flex;align-items:flex-start;justify-content:center;padding:0;overflow:hidden}
-.schedule-only-card{width:100%;height:100%;background:#fff;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden}
-.schedule-only-head{flex:0 0 auto;padding:20px 18px 16px;background:#edf5ff;border-bottom:1px solid #cbd9e8;display:flex;align-items:flex-start;justify-content:space-between}
-.schedule-only-head span{display:block;font-size:11px;letter-spacing:1.4px;font-weight:900;color:#1769c1;margin-bottom:4px}
-.schedule-only-head h3{margin:0;font-size:24px;line-height:1.25;font-weight:900;color:#111827}
-.schedule-only-head small{display:block;margin-top:5px;font-size:12px;color:#64748b}
-.schedule-only-toolbar{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:12px 0;background:#fff}
-.schedule-only-toolbar input[type="month"]{height:36px;padding:0 8px;border:1px solid #b9cce0;border-radius:7px;background:#fff;font-size:14px}
-.schedule-only-toolbar .btn{height:38px;padding:0 16px;border:0;border-radius:8px;font-weight:900;cursor:pointer}
-.schedule-only-toolbar .btn.blue{background:#1769c1;color:#fff}
-.schedule-only-table-wrap{flex:1 1 auto;min-height:0;overflow:auto;border-top:1px solid #e2e8f0}
-.schedule-only-table{width:100%;min-width:760px;border-collapse:collapse;table-layout:fixed;background:#fff}
-.schedule-only-table th{height:34px;background:#eaf2f9;color:#12395d;font-size:12px;font-weight:900;border-bottom:1px solid #cbd9e8;border-right:1px solid #dbe5ef;text-align:center;position:sticky;top:0;z-index:3}
-.schedule-only-table td{height:48px;padding:5px 8px;border-bottom:1px solid #d8e2ec;border-right:1px solid #edf1f5;text-align:center;font-size:13px;background:#fff}
-.schedule-only-table td:first-child{width:16%;font-weight:900;color:#0f172a}
-.schedule-only-table th:first-child{width:16%}
-.schedule-only-table select{width:min(170px,100%);height:34px;padding:0 8px;border:1px solid #b7cbe0;border-radius:8px;background:#fff;font-size:13px;color:#111827}
-.schedule-only-table tbody tr:hover td{background:#f8fbff}
-@media(max-width:700px){
- .schedule-only-head{padding:16px 12px 12px}.schedule-only-head h3{font-size:20px}.schedule-only-toolbar{padding:10px 0}.schedule-only-table{min-width:700px}
-}
-</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -8955,7 +8929,7 @@ html,body{margin:0!important;padding:0!important;background:#eef3f8!important;co
       };
      }catch(e){return{issues:[],tasks:{},schedule:{}}}
     }
-    let db=load(); let page="schedule"; if(page==="digitalTwin"||page==="opsboard")page="dashboard"; let selectedDate=new Date().toISOString().slice(0,10);
+    let db=load(); let page=new URLSearchParams(location.search).get("page")||"dashboard"; if(page==="digitalTwin"||page==="opsboard")page="dashboard"; let selectedDate=new Date().toISOString().slice(0,10);
     function save(){localStorage.setItem(KEY,JSON.stringify(db));if(window.BroadcastChannel){new BroadcastChannel("JGB_LIVE").postMessage("update")}}
     window.addEventListener("storage",()=>{db=load();render()});
     let bc;try{bc=new BroadcastChannel("JGB_LIVE");bc.onmessage=()=>{db=load();render()}}catch(e){}
@@ -9080,55 +9054,16 @@ html,body{margin:0!important;padding:0!important;background:#eef3f8!important;co
     function avgTime(list){const a=list.filter(x=>x.completedAt).map(x=>new Date(x.completedAt)-new Date(x.createdAt));return a.length?fmt(a.reduce((p,c)=>p+c,0)/a.length):"-"}
     async function syncFromSupabase(){if(!SUPA)return;try{const {data,error}=await SUPA.from("requests").select("*").order("received_at",{ascending:true});if(error)throw error;const remote=(data||[]).map(r=>({remoteId:r.id,id:"R"+r.id,category:r.category||"기타",place:r.place,content:r.content,actionType:actionTypeFromIssue({content:r.content}),status:(r.status==="완료"||r.status==="조치완료"||r.status==="completed"||r.status==="done")?"완료":(r.status==="조치중"?"조치중":"미조치"),createdAt:r.received_at,handlerId:(workers.find(w=>w.name===r.handler_name)||{}).id||"",handlerName:r.handler_name||"",startedAt:r.started_at||"",completedAt:r.completed_at||"",photo_url:r.photo_url||"",assetCode:(String(r.content||"").match(/^\[([^\]]+)\]/)||[])[1]||""}));const localTasks=db.tasks||{}, localSchedule=db.schedule||{};db.issues=remote;db.tasks=localTasks;db.schedule=localSchedule;localStorage.setItem(KEY,JSON.stringify(db));render()}catch(e){console.warn("Supabase 동기화 실패",e)}}
     function startRealtime(){if(!SUPA)return;try{SUPA.channel("jgb-facility-live").on("postgres_changes",{event:"*",schema:"public",table:"requests"},()=>syncFromSupabase()).on("postgres_changes",{event:"*",schema:"public",table:"basic_tasks"},()=>syncBasicTasks().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"assets"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"asset_history"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"inspections"},()=>eamLoad().then(render)).on("postgres_changes",{event:"*",schema:"public",table:"external_work"},()=>externalLoad().then(render)).subscribe()}catch(e){console.warn(e)}}
-    function monthlyScheduleOnlyPage(){
-      const month=monthKey();
-      const opts=scheduleOptions();
-      const y=Number(month.slice(0,4)), m=Number(month.slice(5,7));
-      const days=new Date(y,m,0).getDate();
-      const rows=Array.from({length:days},(_,i)=>{
-        const day=i+1;
-        const date=month+"-"+String(day).padStart(2,"0");
-        const vals=scheduleValues(date)||[];
-        return `<tr><td><b>${day}일</b></td>${workers.map((w,j)=>{
-          const st=vals[j]||"";
-          return `<td><select class="bulk-sch" data-date="${date}" data-i="${j}">${opts.map(o=>`<option value="${xEsc(o)}" ${st===o?"selected":""}>${xEsc(o||"편성없음")}</option>`).join("")}</select></td>`;
-        }).join("")}</tr>`;
-      }).join("");
-      return `<div id="bulkScheduleModal" class="schedule-only-screen">
-        <div class="schedule-only-card">
-          <div class="schedule-only-head">
-            <div>
-              <span>STAFF SCHEDULE</span>
-              <h3>📅 월간 근무편성 입력</h3>
-              <small>한 달 근무표를 한 번에 입력하고 저장합니다.</small>
-            </div>
-          </div>
-          <div class="schedule-only-toolbar">
-            <input id="bulkScheduleMonth" type="month" value="${month}" onchange="changeMonthlyScheduleMonth(this.value)">
-            <button class="btn blue" onclick="saveBulkScheduleGrid()">월간 편성 저장</button>
-          </div>
-          <div class="schedule-only-table-wrap">
-            <table class="schedule-table schedule-only-table">
-              <thead><tr><th>일자</th>${workers.map(w=>`<th>${xEsc(w.name)}</th>`).join("")}</tr></thead>
-              <tbody>${rows}</tbody>
-            </table>
-          </div>
-        </div>
-      </div>`;
-    }
-    function changeMonthlyScheduleMonth(value){
-      if(!/^\d{4}-\d{2}$/.test(value))return;
-      selectedDate=value+"-01";
-      render();
-    }
     function render(){
      const app=document.getElementById("app");
      if(!app)return;
      try{
-       app.innerHTML=monthlyScheduleOnlyPage();
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     const mobileContent=document.getElementById('jgbMobileContent');
+     if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
-       console.error("근무표 렌더링 오류",err);
-       app.innerHTML=`<div style="padding:30px;font-family:Malgun Gothic,Arial,sans-serif"><h2>근무표를 불러오지 못했습니다.</h2><p>${String(err?.message||err)}</p></div>`;
+       console.error("화면 렌더링 오류",err);
+       app.innerHTML=`<div class="panel" style="margin:20px"><h2>화면을 불러오지 못했습니다.</h2><div class="small" style="margin-top:8px">오류: ${String(err?.message||err)}</div><button class="btn blue" style="margin-top:12px" onclick="location.reload()">새로고침</button></div>`;
      }
     }
     function nav(p,t){
@@ -9148,7 +9083,7 @@ html,body{margin:0!important;padding:0!important;background:#eef3f8!important;co
     }
     function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
     function go(p){if(!p||p==="digitalTwin")return;if(p==="opsboard")p="dashboard";page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
-    window.addEventListener("popstate",()=>{page="schedule";render()})
+    window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";if(page==="digitalTwin"||page==="opsboard")page="dashboard";render()})
     window.render=render;
     function body(){
       if(page==="lighting")return (typeof window.jgbLightReelPageMarkup==="function"?window.jgbLightReelPageMarkup():"<div></div>");
@@ -11102,13 +11037,15 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
     function openScheduleBulkEditor(){
       document.getElementById("bulkScheduleModal")?.remove();
-      const month=monthKey(), opts=scheduleOptions();
-      const days=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
+      const month=(document.getElementById("scheduleOnlyMonth")?.value||window.__scheduleOnlyMonth||monthKey()).slice(0,7);
+      const opts=scheduleOptions();
+      const y=Number(month.slice(0,4)), m=Number(month.slice(5,7));
+      const days=new Date(y,m,0).getDate();
       const rows=Array.from({length:days},(_,i)=>{
         const day=i+1,date=month+"-"+String(day).padStart(2,"0"),vals=scheduleValues(date)||[];
         return `<tr><td><b>${day}일</b></td>${workers.map((w,j)=>{const st=vals[j]||"";return `<td><select class="bulk-sch" data-date="${date}" data-i="${j}">${opts.map(o=>`<option value="${xEsc(o)}" ${st===o?"selected":""}>${xEsc(o||"편성없음")}</option>`).join("")}</select></td>`}).join("")}</tr>`;
       }).join("");
-      document.body.insertAdjacentHTML("beforeend",`<div id="bulkScheduleModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()"><div class="eam-manage-card" style="width:min(1100px,96vw);max-height:92vh;overflow:auto"><div class="eam-manage-head"><div><span>STAFF SCHEDULE</span><h3>📅 월간 근무편성 입력</h3><small>한 달 근무표를 한 번에 입력하고 저장합니다.</small></div><button onclick="document.getElementById('bulkScheduleModal').remove()">×</button></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0"><input id="bulkScheduleMonth" type="month" value="${month}"><button class="btn blue" onclick="saveBulkScheduleGrid()">월간 편성 저장</button></div><div style="overflow:auto"><table class="schedule-table"><thead><tr><th>일자</th>${workers.map(w=>`<th>${xEsc(w.name)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div><hr style="margin:16px 0"><h3 style="margin:0 0 6px">📋 엑셀 근무표 붙여넣기</h3><div class="small" style="margin-bottom:8px">엑셀에서 <b>일자 + 직원별 근무편성</b> 표를 복사해 아래에 붙여넣으세요. 첫 줄 제목은 있어도 됩니다. 예: 1일 / 새벽조 / 오전조 / 휴무 / 오후조</div><textarea id="bulkScheduleText" rows="8" placeholder="1\t새벽조\t오전조\t휴무\t오후조\n2\t새벽조\t오전조\t주휴일\t오후조"></textarea><div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn gray" onclick="saveScheduleMonthFromText()">붙여넣은 근무표 저장</button></div></div></div>`);
+      document.body.insertAdjacentHTML("beforeend",`<div id="bulkScheduleModal" class="schedule-only-modal"><div class="schedule-only-card"><div class="schedule-only-head"><div><span>STAFF SCHEDULE</span><h3>📅 월간 근무편성 입력</h3><small>한 달 근무표를 한 번에 입력하고 저장합니다.</small></div><button type="button" aria-label="닫기" onclick="document.getElementById('bulkScheduleModal').remove()">×</button></div><div class="schedule-only-tools"><input id="scheduleOnlyMonth" type="month" value="${month}" onchange="openScheduleBulkEditor()"><button class="btn blue" type="button" onclick="saveBulkScheduleGrid()">월간 편성 저장</button></div><div class="schedule-only-table-wrap"><table class="schedule-table"><thead><tr><th>일자</th>${workers.map(w=>`<th>${xEsc(w.name)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div></div></div>`);
     }
     function saveBulkScheduleGrid(){
       const month=(document.getElementById("bulkScheduleMonth")?.value||monthKey()).slice(0,7);
@@ -11117,7 +11054,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const by={};
       cells.forEach(el=>{const d=el.dataset.date,i=Number(el.dataset.i);(by[d]||(by[d]=[]))[i]=el.value||""});
       Object.keys(by).forEach(d=>{db.schedule[d]=workers.map((w,i)=>by[d]?.[i]||"")});
-      save(); document.getElementById("bulkScheduleModal")?.remove(); alert(`${month} 월간 근무편성을 저장했습니다.\n기본업무·직원실적에 자동 반영됩니다.`); render();
+      window.__scheduleOnlyMonth=month; save(); document.getElementById("bulkScheduleModal")?.remove(); alert(`${month} 월간 근무편성을 저장했습니다.\n기본업무·직원실적에 자동 반영됩니다.`); render(); setTimeout(()=>openScheduleBulkEditor(),0);
     }
     function schedulePage(){
       const vals=scheduleValues(selectedDate)||[];
@@ -31692,3 +31629,41 @@ cleanupDuplicateOnly();
   .eh-floor-2f{flex-basis:calc(13% - 3px)!important}
 }
 </style>
+
+
+<style id="JGB_SCHEDULE_ONLY_FINAL">
+html,body{margin:0!important;padding:0!important;background:#eef3f8!important;}
+body.schedule-only-mode .jgb-shell,
+body.schedule-only-mode .app,
+body.schedule-only-mode .main,
+body.schedule-only-mode .side{display:none!important;}
+.schedule-only-modal{position:fixed!important;inset:0!important;z-index:2147483647!important;background:#fff!important;display:flex!important;align-items:stretch!important;justify-content:center!important;overflow:hidden!important;}
+.schedule-only-card{width:100%!important;height:100%!important;background:#fff!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;box-shadow:none!important;border:0!important;}
+.schedule-only-head{height:118px;flex:none;background:#eef6ff;border-bottom:1px solid #cbd9e7;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;box-sizing:border-box;}
+.schedule-only-head span{font-size:11px;font-weight:900;letter-spacing:.12em;color:#1769c1;}
+.schedule-only-head h3{margin:5px 0 3px;font-size:25px;color:#172b43;}
+.schedule-only-head small{font-size:12px;color:#6b7b8d;}
+.schedule-only-head>button{border:0;background:transparent;font-size:30px;line-height:1;color:#36516b;cursor:pointer;padding:4px 8px;}
+.schedule-only-tools{height:58px;flex:none;display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #d9e3ed;background:#fff;box-sizing:border-box;}
+.schedule-only-tools input{height:38px;border:1px solid #b9cce0;border-radius:7px;padding:0 10px;font:700 13px inherit;background:#fff;}
+.schedule-only-tools .btn{height:38px;border-radius:8px;font-weight:900;}
+.schedule-only-table-wrap{flex:1;min-height:0;overflow:auto;background:#fff;}
+.schedule-only-table-wrap .schedule-table{width:100%!important;min-width:760px!important;border-collapse:collapse!important;font-size:13px!important;table-layout:fixed!important;}
+.schedule-only-table-wrap .schedule-table th{position:sticky;top:0;z-index:3;background:#eaf2f9!important;color:#173b5d!important;height:36px!important;padding:7px!important;border-bottom:1px solid #c8d6e3!important;text-align:center!important;}
+.schedule-only-table-wrap .schedule-table td{height:48px!important;padding:7px 10px!important;border-bottom:1px solid #d7e1eb!important;text-align:center!important;background:#fff!important;}
+.schedule-only-table-wrap .schedule-table th:first-child,.schedule-only-table-wrap .schedule-table td:first-child{width:15%!important;}
+.schedule-only-table-wrap .schedule-table th:not(:first-child),.schedule-only-table-wrap .schedule-table td:not(:first-child){width:21.25%!important;}
+.schedule-only-table-wrap .schedule-table select{width:116px!important;max-width:100%!important;height:34px!important;padding:4px 8px!important;border:1px solid #b8cce0!important;border-radius:8px!important;background:#fff!important;font-weight:700!important;}
+@media(max-width:700px){.schedule-only-head{height:100px;padding:14px 16px}.schedule-only-head h3{font-size:20px}.schedule-only-tools{padding-left:0}.schedule-only-table-wrap .schedule-table select{width:105px!important}.schedule-only-table-wrap .schedule-table{min-width:680px!important;}}
+</style>
+<script>
+(function(){
+  document.body.classList.add('schedule-only-mode');
+  function openOnly(){
+    if(typeof window.openScheduleBulkEditor!=='function')return;
+    if(!document.getElementById('bulkScheduleModal')) window.openScheduleBulkEditor();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(openOnly,30));
+  else setTimeout(openOnly,30);
+})();
+</script>
