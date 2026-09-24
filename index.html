@@ -2700,8 +2700,9 @@ html::before,body::before{
 .jgb-lr-v54-cell{border:2px solid #a8bac7;border-radius:5px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:950;color:#173c58;cursor:pointer;min-width:0;transition:.12s}
 .jgb-lr-v54-cell:hover{background:#eef7ff;border-color:#2777b8}.jgb-lr-v54-cell.sel{border:3px solid #1675bd;background:#eaf5ff;box-shadow:inset 0 0 0 1px #fff}
 .jgb-lr-v54-cell.warn{background:#fff8df;border-color:#dfa900}.jgb-lr-v54-cell.bad{background:#fff0f0;border-color:#d63d3d}.jgb-lr-v54-cell.repair{background:#f8efff;border-color:#8252b5}
-.jgb-lr-v54-detail{border-top:2px solid #7894a8;display:grid;grid-template-columns:minmax(0,50fr) minmax(0,50fr);min-height:260px;overflow:hidden}
-.jgb-lr-v54-card{min-width:0;padding:9px;border-right:2px solid #b2c3cf;background:#fff;overflow:auto}
+.jgb-lr-v54-detail{border-top:2px solid #7894a8;display:grid;grid-template-columns:1fr 1fr;position:relative;min-height:260px;overflow:hidden}
+.jgb-lr-v54-detail::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;transform:translateX(-1px);background:#7894a8;pointer-events:none;z-index:5}
+.jgb-lr-v54-card{min-width:0;padding:9px;border-right:0!important;background:#fff;overflow:auto}
 .jgb-lr-v54-cardtitle{font-size:16px;font-weight:950;padding:7px 8px;background:#e8f2f7;border:1px solid #a9bdcb;margin-bottom:7px}
 .jgb-lr-v54-info{display:grid;grid-template-columns:1fr 1fr;border:1px solid #9fb3c1}
 .jgb-lr-v54-field{display:grid;grid-template-columns:70px 1fr;min-height:31px;border-bottom:1px solid #c3d0d8;border-right:1px solid #c3d0d8;font-size:12px}
@@ -10107,7 +10108,8 @@ html,body{
     }
 
     function complaintStatsPanel(){
-      const all=(db.issues||[]).slice();
+      /* 숫자 초기화 기준을 통계 전체에 적용: 기존 접수 데이터는 보존하고 초기화 이후만 집계 */
+      const all=jgbNumericCountRows((db.issues||[]).slice());
       const years=Array.from({length:12},(_,i)=>2024+i);
       const nowYear=new Date().getFullYear();
       const defaultYear=years.includes(nowYear)?nowYear:2026;
@@ -10284,13 +10286,31 @@ html,body{
       if(!confirm('집계 숫자를 초기화하시겠습니까?\n기존 접수 데이터는 삭제하지 않고, 지금 이후 접수부터 다시 집계합니다.'))return;
       const stamp=Date.now();
       window.__JGB_NUMERIC_RESET_AT=stamp;
-      try{localStorage.setItem('JGB_NUMERIC_RESET_AT',String(stamp));}catch(e){}
+      window.__JGB_NUMERIC_ZERO=true;
+      try{
+        localStorage.setItem('JGB_NUMERIC_RESET_V2_AT',String(stamp));
+        localStorage.removeItem('JGB_NUMERIC_RESET_AT');
+      }catch(e){}
+      closeComplaintSummary();
+      closeComplaintStatsDetail();
       render();
     }
 
     function jgbNumericResetAt(){
       if(Number(window.__JGB_NUMERIC_RESET_AT||0))return Number(window.__JGB_NUMERIC_RESET_AT);
-      try{return Number(localStorage.getItem('JGB_NUMERIC_RESET_AT')||0)||0;}catch(e){return 0}
+      try{
+        const key='JGB_NUMERIC_RESET_V2_AT';
+        let stamp=Number(localStorage.getItem(key)||0)||0;
+        /* 현재 파일을 처음 적용하는 1회만 기존 연습/샘플 집계가 보이지 않도록 기준시점을 새로 잡는다. */
+        if(!stamp){
+          stamp=Date.now();
+          localStorage.setItem(key,String(stamp));
+        }
+        window.__JGB_NUMERIC_RESET_AT=stamp;
+        return stamp;
+      }catch(e){
+        return Number(window.__JGB_NUMERIC_RESET_AT||0)||0;
+      }
     }
 
     function jgbNumericCountRows(items){
@@ -10614,9 +10634,9 @@ html,body{
          ${liveComplaintActionPanel(countActive)}
        </section>
        ${(()=>{
-         const latest=active.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,5);
+         const latest=countActive.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,5);
          const priorityRank=(x)=>!x.handlerId?0:(String(x.status||'').includes('조치중')||String(x.status||'').includes('진행')?1:2);
-         const pending=active.slice().sort((a,b)=>priorityRank(a)-priorityRank(b)||new Date(a.createdAt||0)-new Date(b.createdAt||0)).slice(0,5);
+         const pending=countActive.slice().sort((a,b)=>priorityRank(a)-priorityRank(b)||new Date(a.createdAt||0)-new Date(b.createdAt||0)).slice(0,5);
          const miniRows=(items)=>items.length?items.map((x,i)=>{
            const st=state(x);
            return `<div class="jgb-repair-mini-row">
@@ -23623,7 +23643,7 @@ document.addEventListener('click',handle,true);
   min-width:0!important;
   max-width:100%!important;
   overflow:hidden!important;
-  border-right:2px solid #7894a8!important;
+  border-right:0!important;
 }
 .jgb-lr-v54 .jgb-lr-v54-cardtitle{
   width:100%!important;
@@ -23695,7 +23715,7 @@ document.addEventListener('click',handle,true);
 }
 
 .jgb-lr-v54-detail > .jgb-lr-v54-card{
-  border-right:2px solid #7894a8 !important;
+  border-right:0!important;
   overflow:hidden !important;
 }
 
@@ -23875,7 +23895,7 @@ document.addEventListener('click',handle,true);
   grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
 }
 .jgb-lr-v54-detail > .jgb-lr-v54-card{
-  border-right:2px solid #7894a8!important;
+  border-right:0!important;
   box-sizing:border-box!important;
 }
 .jgb-lr-v54-detail > .jgb-lr-v54-history{
@@ -30830,7 +30850,7 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
   grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
 }
 .jgb-lr-v54 .jgb-lr-v54-history{
-  border-left:2px solid #7899ad!important;
+  border-left:0!important;
   box-shadow:inset 1px 0 0 rgba(255,255,255,.8)!important;
 }
 
