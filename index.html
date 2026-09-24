@@ -10282,23 +10282,34 @@ html,body{
 
     function jgbResetNumericCounts(){
       if(!confirm('집계 숫자를 초기화하시겠습니까?\n기존 접수 데이터는 삭제하지 않고, 초기화 시점 이후 데이터만 집계합니다.'))return;
+      // 화면 숫자만 0으로 바꾸지 않고, 모든 숫자 집계의 공통 기준시각을 저장한다.
+      // 기존 db.issues / Supabase 데이터는 절대 삭제하지 않는다.
       const stamp=Date.now();
-      try{localStorage.setItem('JGB_NUMERIC_RESET_AT',String(stamp));}catch(e){}
+      try{
+        localStorage.setItem('JGB_NUMERIC_RESET_AT',String(stamp));
+        localStorage.setItem('JGB_NUMERIC_RESET_VERSION','2');
+      }catch(e){}
       window.__JGB_NUMERIC_RESET_AT=stamp;
-      window.__JGB_NUMERIC_ZERO=false;
+      window.__JGB_NUMERIC_RESET_VERSION=2;
       render();
     }
 
     function jgbNumericResetAt(){
-      if(Number(window.__JGB_NUMERIC_RESET_AT||0))return Number(window.__JGB_NUMERIC_RESET_AT);
-      try{return Number(localStorage.getItem('JGB_NUMERIC_RESET_AT')||0)||0;}catch(e){return 0}
+      const mem=Number(window.__JGB_NUMERIC_RESET_AT||0);
+      if(Number.isFinite(mem)&&mem>0)return mem;
+      try{
+        const saved=Number(localStorage.getItem('JGB_NUMERIC_RESET_AT')||0);
+        return Number.isFinite(saved)&&saved>0?saved:0;
+      }catch(e){return 0}
     }
 
     function jgbNumericCountRows(items){
+      const rows=Array.isArray(items)?items:[];
       const resetAt=jgbNumericResetAt();
-      if(!resetAt)return Array.isArray(items)?items:[];
-      return (Array.isArray(items)?items:[]).filter(x=>{
-        const t=new Date(x?.createdAt||'').getTime();
+      if(!resetAt)return rows;
+      return rows.filter(x=>{
+        const raw=x?.createdAt;
+        const t=raw instanceof Date?raw.getTime():new Date(raw||'').getTime();
         return Number.isFinite(t)&&t>=resetAt;
       });
     }
@@ -10306,13 +10317,14 @@ html,body{
     function processPage(){
      const resetAt=jgbNumericResetAt();
      const stored=(db.issues||[]).slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
-     const active=stored.filter(x=>x.status!=='완료');
-     const countActive=active.filter(x=>{const t=new Date(x?.createdAt||0).getTime();return !resetAt || (Number.isFinite(t)&&t>=resetAt);});
+     const countRows=jgbNumericCountRows(stored);
+     const active=countRows.filter(x=>x.status!=='완료');
+     const countActive=active;
      const safe=(x)=>cleanIssueContent(x)||'접수 내용 없음';
      const state=(x)=>x.status==='조치중'?'조치 진행':x.handlerId?'담당 지정':'접수';
      const stateClass=(x)=>state(x)==='조치 진행'?'run':state(x)==='담당 지정'?'assigned':'new';
      const mapComplaintCounts=complaintPlaceCounts(countActive);
-     const today=stored.filter(x=>{const d=new Date(x.createdAt||0),n=new Date();return d.getTime()>=resetAt && d.toDateString()===n.toDateString()}).length;
+     const today=countRows.filter(x=>{const d=new Date(x.createdAt||0),n=new Date();return Number.isFinite(d.getTime()) && d.toDateString()===n.toDateString()}).length;
      /* 헤더 연도별 성과 요약: 2025년은 초기 기준값 0건으로 고정하고, 2026년은 실제 접수 데이터를 집계한다. */
      const headerYear=2026;
      const header2026=complaintYearIssues(headerYear);
@@ -23882,6 +23894,61 @@ document.addEventListener('click',handle,true);
 .jgb-lr-v54-detail > .jgb-lr-v54-history{
   border-left:0!important;
   box-sizing:border-box!important;
+}
+</style>
+
+<style id="JGB_NUMERIC_AND_HISTORY_FINAL_FIX">
+/* 숫자 초기화: 기존 데이터는 유지하고 초기화 시점 이후만 집계 */
+/* 유지관리 이력: 6개 헤더를 한 줄에서 모두 보이도록 동일한 폭 기준 적용 */
+.jgb-lr-v54 .jgb-lr-v54-historyscroll{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-history table{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  table-layout:fixed!important;
+  border-collapse:collapse!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-history th,
+.jgb-lr-v54 .jgb-lr-v54-history td{
+  box-sizing:border-box!important;
+  min-width:0!important;
+  max-width:none!important;
+  padding:5px 3px!important;
+  font-size:10px!important;
+  line-height:1.2!important;
+  text-align:center!important;
+  vertical-align:middle!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(1),
+.jgb-lr-v54 .jgb-lr-v54-history td:nth-child(1){width:16%!important}
+.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(2),
+.jgb-lr-v54 .jgb-lr-v54-history td:nth-child(2){width:14%!important}
+.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(3),
+.jgb-lr-v54 .jgb-lr-v54-history td:nth-child(3){width:14%!important}
+.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(4),
+.jgb-lr-v54 .jgb-lr-v54-history td:nth-child(4){width:16%!important}
+.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(5),
+.jgb-lr-v54 .jgb-lr-v54-history td:nth-child(5){width:25%!important}
+.jgb-lr-v54 .jgb-lr-v54-history th:nth-child(6),
+.jgb-lr-v54 .jgb-lr-v54-history td:nth-child(6){width:15%!important}
+/* 가운데 분할선은 왼쪽 카드의 오른쪽 2px 하나만 사용 */
+.jgb-lr-v54 .jgb-lr-v54-detail{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-detail > .jgb-lr-v54-card{
+  border-right:2px solid #7894a8!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-detail > .jgb-lr-v54-history{
+  border-left:0!important;
 }
 </style>
 </body>
