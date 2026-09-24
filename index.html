@@ -11037,15 +11037,13 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
     function openScheduleBulkEditor(){
       document.getElementById("bulkScheduleModal")?.remove();
-      const month=(document.getElementById("scheduleOnlyMonth")?.value||window.__scheduleOnlyMonth||monthKey()).slice(0,7);
-      const opts=scheduleOptions();
-      const y=Number(month.slice(0,4)), m=Number(month.slice(5,7));
-      const days=new Date(y,m,0).getDate();
+      const month=monthKey(), opts=scheduleOptions();
+      const days=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
       const rows=Array.from({length:days},(_,i)=>{
         const day=i+1,date=month+"-"+String(day).padStart(2,"0"),vals=scheduleValues(date)||[];
         return `<tr><td><b>${day}일</b></td>${workers.map((w,j)=>{const st=vals[j]||"";return `<td><select class="bulk-sch" data-date="${date}" data-i="${j}">${opts.map(o=>`<option value="${xEsc(o)}" ${st===o?"selected":""}>${xEsc(o||"편성없음")}</option>`).join("")}</select></td>`}).join("")}</tr>`;
       }).join("");
-      document.body.insertAdjacentHTML("beforeend",`<div id="bulkScheduleModal" class="schedule-only-modal"><div class="schedule-only-card"><div class="schedule-only-head"><div><span>STAFF SCHEDULE</span><h3>📅 월간 근무편성 입력</h3><small>한 달 근무표를 한 번에 입력하고 저장합니다.</small></div><button type="button" aria-label="닫기" onclick="document.getElementById('bulkScheduleModal').remove()">×</button></div><div class="schedule-only-tools"><input id="scheduleOnlyMonth" type="month" value="${month}" onchange="openScheduleBulkEditor()"><button class="btn blue" type="button" onclick="saveBulkScheduleGrid()">월간 편성 저장</button></div><div class="schedule-only-table-wrap"><table class="schedule-table"><thead><tr><th>일자</th>${workers.map(w=>`<th>${xEsc(w.name)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div></div></div>`);
+      document.body.insertAdjacentHTML("beforeend",`<div id="bulkScheduleModal" class="eam-manage-modal" onclick="if(event.target===this)this.remove()"><div class="eam-manage-card" style="width:min(1100px,96vw);max-height:92vh;overflow:auto"><div class="eam-manage-head"><div><span>STAFF SCHEDULE</span><h3>📅 월간 근무편성 입력</h3><small>한 달 근무표를 한 번에 입력하고 저장합니다.</small></div><button onclick="document.getElementById('bulkScheduleModal').remove()">×</button></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0"><input id="bulkScheduleMonth" type="month" value="${month}"><button class="btn blue" onclick="saveBulkScheduleGrid()">월간 편성 저장</button></div><div style="overflow:auto"><table class="schedule-table"><thead><tr><th>일자</th>${workers.map(w=>`<th>${xEsc(w.name)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div><hr style="margin:16px 0"><h3 style="margin:0 0 6px">📋 엑셀 근무표 붙여넣기</h3><div class="small" style="margin-bottom:8px">엑셀에서 <b>일자 + 직원별 근무편성</b> 표를 복사해 아래에 붙여넣으세요. 첫 줄 제목은 있어도 됩니다. 예: 1일 / 새벽조 / 오전조 / 휴무 / 오후조</div><textarea id="bulkScheduleText" rows="8" placeholder="1\t새벽조\t오전조\t휴무\t오후조\n2\t새벽조\t오전조\t주휴일\t오후조"></textarea><div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn gray" onclick="saveScheduleMonthFromText()">붙여넣은 근무표 저장</button></div></div></div>`);
     }
     function saveBulkScheduleGrid(){
       const month=(document.getElementById("bulkScheduleMonth")?.value||monthKey()).slice(0,7);
@@ -11054,19 +11052,22 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const by={};
       cells.forEach(el=>{const d=el.dataset.date,i=Number(el.dataset.i);(by[d]||(by[d]=[]))[i]=el.value||""});
       Object.keys(by).forEach(d=>{db.schedule[d]=workers.map((w,i)=>by[d]?.[i]||"")});
-      window.__scheduleOnlyMonth=month; save(); document.getElementById("bulkScheduleModal")?.remove(); alert(`${month} 월간 근무편성을 저장했습니다.\n기본업무·직원실적에 자동 반영됩니다.`); render(); setTimeout(()=>openScheduleBulkEditor(),0);
+      save(); document.getElementById("bulkScheduleModal")?.remove(); alert(`${month} 월간 근무편성을 저장했습니다.\n기본업무·직원실적에 자동 반영됩니다.`); render();
     }
     function schedulePage(){
-      const vals=scheduleValues(selectedDate)||[];
-      return `<div class="jgb-page-title"><div><h2>근무편성</h2><p>${selectedDate} 근무편성표 · 저장된 편성은 기본업무와 직원실적에 자동 연동됩니다.</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input type="date" value="${selectedDate}" onchange="setDate(this.value)"><button class="btn blue" onclick="saveScheduleDay('${selectedDate}')">오늘 날짜 저장</button><button class="btn" onclick="openScheduleBulkEditor()">📅 월간 근무편성 입력</button></div></div>
-      <div class="notice"><b>근무편성 → 자동 연동</b><br>이제 일자별 입력뿐 아니라 <b>월간 근무표를 한 번에 입력</b>할 수 있습니다. 직접 입력하거나 엑셀에서 복사해 붙여넣으면 저장된 편성이 기본업무·직원실적에 자동 반영됩니다.</div>
-      <div class="jgb-card"><table class="schedule-table"><thead><tr><th>직원</th><th>근무편성</th><th>근무시간</th><th>기본업무 대상</th></tr></thead><tbody>${workers.map((w,i)=>{
-        const st=vals[i]||"";
-        const working=!!st&&!offWords.some(x=>st.includes(x))&&st!=="-";
-        const tm=st.includes("새벽")?"06:00~15:00":st.includes("오전")?"09:00~18:00":st.includes("오후")?"13:30~22:20":"-";
-        const opts=scheduleOptions();
-        return `<tr><td><b>${xEsc(w.name)}</b></td><td><select id="sch_${w.id}" style="min-width:150px"><option value="">편성없음</option>${opts.filter(Boolean).map(o=>`<option value="${xEsc(o)}" ${st===o?"selected":""}>${xEsc(o)}</option>`).join("")}</select></td><td>${tm}</td><td class="${working?'schedule-working':'schedule-off'}">${working?'대상':'제외'}</td></tr>`;
-      }).join('')}</tbody></table></div>`
+      const month=monthKey();
+      const opts=scheduleOptions();
+      const y=Number(month.slice(0,4)), m=Number(month.slice(5,7));
+      const days=new Date(y,m,0).getDate();
+      const rows=Array.from({length:days},(_,i)=>{
+        const day=i+1,date=month+"-"+String(day).padStart(2,"0"),vals=scheduleValues(date)||[];
+        return `<tr><td><b>${day}일</b></td>${workers.map((w,j)=>{const st=vals[j]||"";return `<td><select class="bulk-sch" data-date="${date}" data-i="${j}">${opts.map(o=>`<option value="${xEsc(o)}" ${st===o?"selected":""}>${xEsc(o||"편성없음")}</option>`).join("")}</select></td>`}).join("")}</tr>`;
+      }).join("");
+      return `<div class="eam-manage-card" style="width:100%;max-width:none;max-height:none;overflow:hidden;border-radius:0;box-shadow:none;margin:0">
+        <div class="eam-manage-head" style="padding:18px 22px"><div><span>STAFF SCHEDULE</span><h3>📅 월간 근무편성 입력</h3><small>한 달 근무표를 한 번에 입력하고 저장합니다.</small></div></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid #d9e3ee"><input id="bulkScheduleMonth" type="month" value="${month}"><button class="btn blue" onclick="saveBulkScheduleGrid()">월간 편성 저장</button></div>
+        <div style="overflow:auto;max-height:calc(100vh - 150px)"><table class="schedule-table"><thead><tr><th>일자</th>${workers.map(w=>`<th>${xEsc(w.name)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
+      </div>`;
     }
     const STAFF_AUTO_OFF_WORDS=["휴무","주휴일","연가","공가","대체휴무","대휴","추석"];
     function staffAutoStatus(st){const v=String(st||"").trim();if(!v||v==="편성없음"||v==="-")return false;return STAFF_AUTO_OFF_WORDS.some(x=>v.includes(x));}
@@ -31629,41 +31630,3 @@ cleanupDuplicateOnly();
   .eh-floor-2f{flex-basis:calc(13% - 3px)!important}
 }
 </style>
-
-
-<style id="JGB_SCHEDULE_ONLY_FINAL">
-html,body{margin:0!important;padding:0!important;background:#eef3f8!important;}
-body.schedule-only-mode .jgb-shell,
-body.schedule-only-mode .app,
-body.schedule-only-mode .main,
-body.schedule-only-mode .side{display:none!important;}
-.schedule-only-modal{position:fixed!important;inset:0!important;z-index:2147483647!important;background:#fff!important;display:flex!important;align-items:stretch!important;justify-content:center!important;overflow:hidden!important;}
-.schedule-only-card{width:100%!important;height:100%!important;background:#fff!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;box-shadow:none!important;border:0!important;}
-.schedule-only-head{height:118px;flex:none;background:#eef6ff;border-bottom:1px solid #cbd9e7;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;box-sizing:border-box;}
-.schedule-only-head span{font-size:11px;font-weight:900;letter-spacing:.12em;color:#1769c1;}
-.schedule-only-head h3{margin:5px 0 3px;font-size:25px;color:#172b43;}
-.schedule-only-head small{font-size:12px;color:#6b7b8d;}
-.schedule-only-head>button{border:0;background:transparent;font-size:30px;line-height:1;color:#36516b;cursor:pointer;padding:4px 8px;}
-.schedule-only-tools{height:58px;flex:none;display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #d9e3ed;background:#fff;box-sizing:border-box;}
-.schedule-only-tools input{height:38px;border:1px solid #b9cce0;border-radius:7px;padding:0 10px;font:700 13px inherit;background:#fff;}
-.schedule-only-tools .btn{height:38px;border-radius:8px;font-weight:900;}
-.schedule-only-table-wrap{flex:1;min-height:0;overflow:auto;background:#fff;}
-.schedule-only-table-wrap .schedule-table{width:100%!important;min-width:760px!important;border-collapse:collapse!important;font-size:13px!important;table-layout:fixed!important;}
-.schedule-only-table-wrap .schedule-table th{position:sticky;top:0;z-index:3;background:#eaf2f9!important;color:#173b5d!important;height:36px!important;padding:7px!important;border-bottom:1px solid #c8d6e3!important;text-align:center!important;}
-.schedule-only-table-wrap .schedule-table td{height:48px!important;padding:7px 10px!important;border-bottom:1px solid #d7e1eb!important;text-align:center!important;background:#fff!important;}
-.schedule-only-table-wrap .schedule-table th:first-child,.schedule-only-table-wrap .schedule-table td:first-child{width:15%!important;}
-.schedule-only-table-wrap .schedule-table th:not(:first-child),.schedule-only-table-wrap .schedule-table td:not(:first-child){width:21.25%!important;}
-.schedule-only-table-wrap .schedule-table select{width:116px!important;max-width:100%!important;height:34px!important;padding:4px 8px!important;border:1px solid #b8cce0!important;border-radius:8px!important;background:#fff!important;font-weight:700!important;}
-@media(max-width:700px){.schedule-only-head{height:100px;padding:14px 16px}.schedule-only-head h3{font-size:20px}.schedule-only-tools{padding-left:0}.schedule-only-table-wrap .schedule-table select{width:105px!important}.schedule-only-table-wrap .schedule-table{min-width:680px!important;}}
-</style>
-<script>
-(function(){
-  document.body.classList.add('schedule-only-mode');
-  function openOnly(){
-    if(typeof window.openScheduleBulkEditor!=='function')return;
-    if(!document.getElementById('bulkScheduleModal')) window.openScheduleBulkEditor();
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(openOnly,30));
-  else setTimeout(openOnly,30);
-})();
-</script>
