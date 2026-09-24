@@ -11197,7 +11197,55 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     function setStaffPerfMonth(v){selectedDate=String(v)+'-01';render();}
     function workerPage(){return `<div class="pagebar"><h1>근무자별 현황 · ${selectedDate}</h1></div><div class="workergrid">${todayWorkers().map(w=>{const d=tasksFor(w.id), bs=basicWorkerStats(w.id,monthKey()), mine=jgbNumericCountRows((db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey())),p=mine.filter(x=>x.status!=="완료");return `<div class="workerbox"><h3>${w.name}</h3><span class="badge ${w.working?"":"off"}">${w.working?w.shift+" "+w.start+"~"+w.end:w.status}</span><div class="compareline">기본업무 <b>${w.working?`${bs.complete}/${bs.target}일`:"-"}</b></div><div class="compareline">조치완료 <b>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</b></div><div class="compareline">미조치 <b class="${p.length?"red":"green"}">${w.working?p.length:"-"}</b></div><div class="compareline">접수 합계 <b>${mine.length}건</b></div></div>`}).join("")}</div>`}
     function pendingPage(){const p=(db.issues||[]).filter(x=>x.status!=="완료");return `<div class="pagebar"><h1>미조치 현황</h1></div><div class="panel">${p.map(x=>`<div class="issue"><div><b class="red">${x.handlerName||"담당 미지정"}</b><br>${x.category} · ${x.place} · ${x.content}<div class="small">접수시간 ${time(x.createdAt)}</div></div><button class="btn" onclick="go('process')">조치</button></div>`).join("")||"<div class='small'>미조치 사항이 없습니다.</div>"}</div>`}
-    function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><button class="btn red" onclick="resetAll()">테스트 데이터 전체 초기화</button></div>`}
+    async function resetPracticeAllCounts(){
+      if(!confirm('현재 연습모드에서 입력한 집계·실적·수리이력을 전체 리셋할까요?\n\n민원 집계 숫자, 직원 기본업무 실적, EAM 수리 LIVE, 조명·릴선 수리이력/상태, 누수·방수 연습기록을 초기화합니다.\n배치도 위치·자산 기본정보·근무편성은 유지됩니다.'))return;
+      try{
+        const stamp=Date.now();
+        /* 시설민원 숫자 집계 기준만 새로 시작: 실제 Supabase 접수 원본은 삭제하지 않음 */
+        localStorage.setItem('JGB_NUMERIC_RESET_V2_AT',String(stamp));
+        localStorage.removeItem('JGB_NUMERIC_RESET_AT');
+        window.__JGB_NUMERIC_RESET_AT=stamp;
+        window.__JGB_NUMERIC_ZERO=true;
+
+        /* 직원 연습 실적 초기화: 근무편성은 유지 */
+        if(SUPA){
+          const r=await SUPA.from('basic_tasks').delete().not('worker_id','is',null);
+          if(r.error)console.warn('basic_tasks 초기화 실패',r.error);
+        }
+        db.tasks={};
+        save();
+
+        /* EAM 헤더 상태 숫자는 연습 시작점에서 0으로 */
+        localStorage.setItem('JGB_EAM_HEADER_STATS_RESET_V1','1');
+        localStorage.removeItem('JGB_EAM_MANUAL_REPAIR_LIVE_V1');
+
+        /* 조명·릴선: 연습용 현재상태와 수리이력을 초기 상태로 */
+        try{
+          const lr=JSON.parse(localStorage.getItem('jgb_lr_v10')||'null');
+          if(Array.isArray(lr)&&lr.length===36){
+            lr.forEach(a=>{
+              a.light='정상'; a.reel='정상';
+              a.lightHistory=[]; a.reelHistory=[];
+            });
+            localStorage.setItem('jgb_lr_v10',JSON.stringify(lr));
+          }
+        }catch(e){console.warn('조명·릴선 연습 리셋 실패',e)}
+
+        /* 누수·방수 연습 기록 초기화 */
+        ['JGB_V47_LEAKS','JGB_V47_WP_HISTORY','JGB_V178_LIVE_MANUAL','JGB_V180_LIVE_DONE'].forEach(k=>localStorage.removeItem(k));
+
+        alert('연습모드 전체 리셋이 완료되었습니다.\n\n집계 숫자와 연습 실적은 초기화되었고, 배치도·자산 기본정보·근무편성은 유지됩니다.');
+        render();
+        if(typeof window.jgbLightReelPageMarkup==='function'){
+          document.querySelector('.jgb-lr-v54')?.replaceWith(document.createRange().createContextualFragment(window.jgbLightReelPageMarkup()));
+        }
+      }catch(e){
+        console.error(e);
+        alert('연습모드 전체 리셋 중 일부 항목 처리에 실패했습니다.\n'+(e?.message||e));
+        render();
+      }
+    }
+    function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><div style="padding:12px 0 6px;color:#60798b;font-size:12px;font-weight:800">연습모드</div><button class="btn red" type="button" onclick="resetPracticeAllCounts()">연습모드 전체 리셋</button><div class="small" style="margin-top:8px">민원·직원 실적·EAM·조명·릴선·누수/방수 연습 집계를 한 번에 초기화합니다. 배치도·자산 기본정보·근무편성은 유지합니다.</div><hr><button class="btn gray" type="button" onclick="resetAll()">테스트 데이터 전체 초기화</button></div>`}
     async function ensureMainEquipmentAssets(){return;}
     async function eamLoad(){window.__eamA=window.__eamA||[];window.__eamH=window.__eamH||[];window.__eamI=window.__eamI||[];if(!SUPA)return;try{const a=await SUPA.from("assets").select("*").order("name");const h=await SUPA.from("asset_history").select("*").order("event_date",{ascending:false});const i=await SUPA.from("inspections").select("*").order("inspection_date",{ascending:false});window.__eamA=a.data||[];window.__eamH=h.data||[];window.__eamI=i.data||[]}catch(e){console.warn("EAM 동기화 실패",e)}}
     function eamShowLocation(){
