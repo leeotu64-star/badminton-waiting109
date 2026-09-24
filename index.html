@@ -8839,97 +8839,6 @@ html,body{
 @media(max-width:1050px){.schedule-compact-page{width:calc(100vw - 245px);min-width:0}.schedule-compact-table th:first-child{width:62px}}
 @media(max-width:800px){.schedule-compact-page{width:calc(100vw - 24px);min-width:0}.schedule-compact-head{height:84px;padding:14px}.schedule-compact-table{min-width:700px}.schedule-compact-table-wrap{overflow:auto}}
 </style>
-
-<style id="note-paper-repair-ui">
-/* 시설 민원 접수·처리 : 노트 느낌만 적용 / 구조·JS·데이터 변경 없음 */
-.jgb-repair-page .jgb-repair-list-wrap{
-  background:#fffdf7!important;
-  border:2px solid #879eab!important;
-  border-radius:6px!important;
-  box-shadow:0 3px 10px rgba(36,58,72,.10)!important;
-  overflow:hidden!important;
-}
-.jgb-repair-page .jgb-repair-list-head{
-  background:linear-gradient(180deg,#dcecf6 0%,#cbdfea 100%)!important;
-  border-bottom:2px solid #7894a8!important;
-  color:#173c58!important;
-}
-.jgb-repair-page .jgb-repair-list-head b{color:#173c58!important;font-weight:1000!important}
-.jgb-repair-page .jgb-repair-list-head span{color:#58758b!important}
-.jgb-repair-page .jgb-repair-split{
-  background:#fffdf7!important;
-  gap:10px!important;
-  padding:10px!important;
-}
-.jgb-repair-page .jgb-repair-pane{
-  background:
-    linear-gradient(to right,transparent 0,transparent 25px,rgba(211,93,93,.18) 26px,rgba(211,93,93,.18) 27px,transparent 28px),
-    repeating-linear-gradient(to bottom,#fffefa 0,#fffefa 39px,#dfe7eb 40px,#dfe7eb 41px)!important;
-  border:1px solid #b7c4cb!important;
-  border-radius:4px!important;
-  box-shadow:0 2px 5px rgba(35,55,65,.07)!important;
-}
-.jgb-repair-page .jgb-repair-pane:first-child{border-right:1px solid #b7c4cb!important}
-.jgb-repair-page .jgb-repair-pane-head{
-  background:linear-gradient(180deg,#f1f6f8,#e5eef2)!important;
-  border-bottom:1px solid #aebdc6!important;
-  padding-left:34px!important;
-  position:relative!important;
-}
-.jgb-repair-page .jgb-repair-pane-head:before{
-  content:'✎';
-  position:absolute;
-  left:12px;
-  top:50%;
-  transform:translateY(-50%);
-  color:#6c8797;
-  font-size:14px;
-  font-weight:900;
-}
-.jgb-repair-page .jgb-repair-pane-head b{color:#234961!important}
-.jgb-repair-page .jgb-repair-pane-head span{color:#718492!important}
-.jgb-repair-page .jgb-repair-mini-head{
-  background:rgba(237,244,247,.96)!important;
-  color:#526b7b!important;
-  border-bottom:1px solid #aebdc6!important;
-}
-.jgb-repair-page .jgb-repair-mini-row{
-  background:rgba(255,255,252,.90)!important;
-  border-bottom:1px solid #d8e1e5!important;
-}
-.jgb-repair-page .jgb-repair-mini-row:nth-child(even){background:rgba(250,252,249,.90)!important}
-.jgb-repair-page .jgb-repair-mini-row>div{border-right:1px solid rgba(190,202,208,.55)!important}
-.jgb-repair-page .jgb-repair-mini-no b{color:#216487!important}
-.jgb-repair-page .jgb-repair-mini-time{color:#526c7c!important}
-.jgb-repair-page .jgb-repair-mini-content span{color:#243f51!important}
-.jgb-repair-page .jgb-repair-mini-work select{
-  background:#fffefa!important;
-  border:1px solid #aebdc6!important;
-  box-shadow:inset 0 1px 2px rgba(40,60,70,.05)!important;
-}
-.jgb-repair-page .jgb-repair-mini-actions button{border-radius:4px!important}
-.jgb-repair-page .jgb-repair-mini-actions .mini-detail{
-  background:#fffefa!important;
-  border:1px solid #9eb1bd!important;
-}
-.jgb-repair-page .jgb-repair-note{
-  background:#f5f1e5!important;
-  border-top:1px solid #c8d0d4!important;
-  color:#697983!important;
-  padding-left:30px!important;
-  position:relative!important;
-}
-.jgb-repair-page .jgb-repair-note:before{
-  content:'✎';
-  position:absolute;
-  left:12px;
-  top:50%;
-  transform:translateY(-50%);
-  color:#718897;
-  font-size:13px;
-  font-weight:900;
-}
-</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -24775,6 +24684,186 @@ document.addEventListener('click',handle,true);
 .jgb-lr-v54-annual-note{margin:0 10px 10px!important;font-size:10px!important;color:#617b8d!important}
 @media(max-width:900px){.jgb-lr-v54-stat4{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 </style>
+
+
+<style id="JGB_REPAIR_NOTE_FINAL_CLEAN">
+/* =========================================================
+   시설 민원 접수·처리 — 실제 종이 노트 느낌 최종 보정
+   기존 HTML / JS / 데이터 / 기능 / 50:50 구조 유지
+   색상·질감만 변경. 크기와 행 구조는 건드리지 않음.
+   ========================================================= */
+
+.jgb-repair-page .jgb-repair-list-wrap{
+  border:1px solid #9b8f7b!important;
+  border-radius:3px!important;
+  background:#f4efe3!important;
+  box-shadow:
+    0 4px 10px rgba(74,63,49,.14),
+    inset 0 0 0 1px rgba(255,255,255,.72)!important;
+}
+
+/* 상단 노트 표지 */
+.jgb-repair-page .jgb-repair-list-head{
+  background:#eee5d2!important;
+  border-bottom:2px solid #9b8f7b!important;
+  color:#39443d!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+.jgb-repair-page .jgb-repair-list-head b{
+  color:#303a35!important;
+}
+.jgb-repair-page .jgb-repair-list-head span{
+  color:#746d62!important;
+}
+
+/* 노트 안쪽 두 장 */
+.jgb-repair-page .jgb-repair-split{
+  background:#e9e1d3!important;
+  gap:10px!important;
+  padding:9px!important;
+}
+
+.jgb-repair-page .jgb-repair-pane{
+  border:1px solid #b5a994!important;
+  border-radius:2px!important;
+  background-color:#fffdf6!important;
+  background-image:
+    linear-gradient(to right,
+      transparent 0,
+      transparent 28px,
+      rgba(197,105,105,.36) 29px,
+      rgba(197,105,105,.36) 30px,
+      transparent 31px
+    ),
+    repeating-linear-gradient(to bottom,
+      #fffdf6 0,
+      #fffdf6 38px,
+      rgba(159,176,182,.34) 39px,
+      rgba(159,176,182,.34) 40px
+    )!important;
+  box-shadow:
+    2px 3px 6px rgba(75,66,55,.12),
+    inset 0 0 18px rgba(214,202,178,.10)!important;
+}
+
+/* 좌우 노트 제목 */
+.jgb-repair-page .jgb-repair-pane-head{
+  background:#f1e9d9!important;
+  border-bottom:1px solid #b5a994!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+.jgb-repair-page .jgb-repair-pane-head b{
+  color:#3d4942!important;
+}
+.jgb-repair-page .jgb-repair-pane-head span{
+  color:#81786b!important;
+}
+
+/* 최신/미처리 제목에 작은 종이클립 느낌 */
+.jgb-repair-page .jgb-repair-pane-head::after{
+  content:"";
+  position:absolute;
+  right:10px;
+  top:8px;
+  width:7px;
+  height:17px;
+  border:2px solid #9a8d79;
+  border-bottom:0;
+  border-radius:7px 7px 0 0;
+  opacity:.55;
+  transform:rotate(5deg);
+  pointer-events:none;
+}
+
+/* 표 머리글 */
+.jgb-repair-page .jgb-repair-mini-head{
+  background:#e7ddca!important;
+  color:#5b554b!important;
+  border-bottom:1px solid #aa9e89!important;
+}
+.jgb-repair-page .jgb-repair-mini-head>span{
+  border-right:1px solid rgba(156,145,125,.38)!important;
+}
+
+/* 행 — 흰색 테이블이 아니라 종이 위 기록 */
+.jgb-repair-page .jgb-repair-mini-row,
+.jgb-repair-page .jgb-repair-mini-row:nth-child(odd){
+  background:rgba(255,253,246,.78)!important;
+  border-bottom:1px solid rgba(151,164,166,.42)!important;
+}
+.jgb-repair-page .jgb-repair-mini-row>div{
+  border-right:1px solid rgba(171,166,150,.28)!important;
+}
+
+/* 글씨는 진한 연필/펜 느낌 */
+.jgb-repair-page .jgb-repair-mini-no b{
+  color:#4c6570!important;
+}
+.jgb-repair-page .jgb-repair-mini-time{
+  color:#6d6b62!important;
+}
+.jgb-repair-page .jgb-repair-mini-content span{
+  color:#3f4642!important;
+}
+
+/* 입력칸도 종이 노트에 적는 작은 메모칸 */
+.jgb-repair-page .jgb-repair-mini-work select{
+  border:1px solid #b9ad99!important;
+  border-radius:2px!important;
+  background:#fffdf7!important;
+  color:#4b514c!important;
+  box-shadow:inset 0 1px 2px rgba(80,70,55,.07)!important;
+}
+
+/* 버튼은 기존 기능 그대로, 색만 문구류 톤으로 */
+.jgb-repair-page .jgb-repair-mini-actions .mini-complete{
+  background:#8aa9b5!important;
+  color:#fff!important;
+  border:1px solid #7897a3!important;
+  border-radius:3px!important;
+  box-shadow:none!important;
+}
+.jgb-repair-page .jgb-repair-mini-actions .mini-detail{
+  background:#fffdf7!important;
+  color:#526b74!important;
+  border:1px solid #a9a08f!important;
+  border-radius:3px!important;
+}
+
+/* 스크롤바 */
+.jgb-repair-page .jgb-repair-scroll{
+  scrollbar-color:#aaa08e #eee8dc!important;
+}
+.jgb-repair-page .jgb-repair-scroll::-webkit-scrollbar-track{
+  background:#eee8dc!important;
+}
+.jgb-repair-page .jgb-repair-scroll::-webkit-scrollbar-thumb{
+  background:#aaa08e!important;
+  border-radius:5px!important;
+}
+
+/* 하단 메모 — 실제 노트 하단 주석처럼 */
+.jgb-repair-page .jgb-repair-note{
+  background:#eee6d6!important;
+  border-top:1px solid #b6aa96!important;
+  color:#6d685e!important;
+}
+.jgb-repair-page .jgb-repair-note::before{
+  content:"✎"!important;
+  color:#887d6b!important;
+}
+
+/* 주변 파란색 계열을 이 영역에서 완전히 덮어씀 */
+.jgb-repair-page .jgb-repair-list-wrap,
+.jgb-repair-page .jgb-repair-list-head,
+.jgb-repair-page .jgb-repair-pane,
+.jgb-repair-page .jgb-repair-pane-head,
+.jgb-repair-page .jgb-repair-mini-head,
+.jgb-repair-page .jgb-repair-note{
+  filter:none!important;
+}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
