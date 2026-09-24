@@ -11459,7 +11459,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
               <button type="button" data-v47-action="filter-lk-status" data-filter-status="외주정비"${statusFilter==='외주정비'?' class="active':''}><i style="background:#d88928"></i>외주정비 <b>${countBy(x=>String(x.maintenanceMethod||'').trim()==='외주정비')}</b></button>
             </div>
           </div>
-          <div class="jgb-leak-3d-map">
+          <div class="jgb-leak-3d-map jgb-v170-plan">
             <div class="jgb-leak-ground"></div>
             <div class="jgb-leak-building">
               <div class="jgb-leak-roof-3d">
@@ -11468,9 +11468,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
                 <div class="jgb-leak-roof-ridge"></div>
                 <div class="jgb-leak-roof-drain3d"><span>옥상 배수로</span></div>
                 <div class="jgb-leak-storage3d"><b>창고</b><div class="jgb-leak-storage-door"></div><div class="jgb-leak-storage-boxes"></div></div>
-                <div class="jgb-leak-roof-pin roof-pin-1"><span>지붕-01</span></div><div class="jgb-leak-roof-drop drop-1"></div>
-                <div class="jgb-leak-roof-pin roof-pin-2"><span>지붕-02</span></div><div class="jgb-leak-roof-drop drop-2"></div>
-                <div class="jgb-leak-roof-pin roof-pin-3"><span>지붕-03</span></div><div class="jgb-leak-roof-drop drop-3"></div>
               </div>
               <div class="jgb-leak-floor1">
                 <div class="jgb-leak-floor1-label">1F 실내 체육관 · 누수 유입 위치</div>
@@ -24295,6 +24292,40 @@ document.addEventListener('click',handle,true);
 }
 </style>
 
+
+<style id="JGB_LEAK_USER_FINAL_LAYOUT_20260924">
+/* 사용자가 요청한 최종 누수 배치도 수정: 지붕 축소 + 하단 시설 복원 + LK만 위치 아이콘으로 사용 */
+.jgb-leak-3d-map{height:680px!important;min-height:680px!important;}
+.jgb-leak-building{height:96%!important;bottom:28px!important;}
+.jgb-leak-roof-3d{height:28%!important;}
+.jgb-leak-floor1{height:72%!important;}
+.jgb-leak-courts3d{top:12%!important;height:48%!important;}
+.jgb-leak-room-strip{left:4%!important;right:4%!important;bottom:18%!important;height:27%!important;grid-template-rows:1fr 1fr .55fr!important;}
+.jgb-leak-bottom{left:4%!important;right:4%!important;bottom:2%!important;height:14%!important;display:grid!important;grid-template-columns:1fr 1.6fr 1fr!important;gap:7px!important;}
+.jgb-leak-storage3d{transform:none!important;right:5%!important;top:12%!important;width:20%!important;height:52%!important;}
+.jgb-leak-storage3d:before{transform:none!important;left:4%!important;right:4%!important;}
+.jgb-leak-storage3d:after{transform:none!important;right:-8px!important;width:8px!important;}
+.jgb-leak-roof-pin,.jgb-leak-roof-drop{display:none!important;}
+.jgb-v170-marker-wrap{touch-action:none!important;cursor:grab!important;}
+.jgb-v170-marker{touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;}
+.jgb-v170-marker.dragging{cursor:grabbing!important;}
+@media(max-width:1000px){
+  .jgb-leak-3d-map{height:600px!important;min-height:600px!important;}
+}
+@media(max-width:700px){
+  .jgb-leak-3d-map{height:520px!important;min-height:520px!important;}
+}
+</style>
+<script id="JGB_LEAK_USER_FINAL_GUARD_20260924">
+(function(){
+  /* LK 위치 이동은 기존 V177 드래그 코드를 그대로 사용하되, 실제 배치도 컨테이너를 드래그 기준으로 지정합니다. */
+  function fixPlan(){
+    document.querySelectorAll('.jgb-leak-3d-map').forEach(function(el){el.classList.add('jgb-v170-plan');});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fixPlan); else fixPlan();
+  window.addEventListener('click',function(){setTimeout(fixPlan,0);},true);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
