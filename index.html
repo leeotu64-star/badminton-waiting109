@@ -1,6 +1,3 @@
-`````
-````
-```
 <!-- JGB V3: slider + operation insight + photo delete hardening -->
     <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>장군봉체육관 종합 대시보드 - 실시간 연동 테스트</title>
@@ -24008,60 +24005,7 @@ document.addEventListener('click',handle,true);
 <style id="JGB_COMPLAINT_MANUAL_FIX">
 .jgb-header-manual-btn{font-size:15px!important}
 </style>
-<script id="JGB_COMPLAINT_MANUAL_FIX_SCRIPT">
-(function(){
-  const complaintManual = {
-    title:'📘 시설민원 관리 사용설명서',
-    sections:[
-      ['1. 민원 접수 확인','접수된 민원의 발생 장소, 민원 유형, 내용, 접수시간을 먼저 확인합니다.'],
-      ['2. 민원 유형 확인','현재 화면에서 시설 고장, 청소 불량, 조명 불량, 냉·난방 이상, 누수·배수, 화장실 불편, 샤워실 불편, 탈의실 불편, 코트 관련, 안전 관련, 기타 민원으로 구분하여 확인합니다.'],
-      ['3. 방수·누수 민원','누수·배수 또는 방수 관련 민원은 발생 위치와 현장 상태를 확인한 뒤 필요한 점검·조치를 진행합니다.'],
-      ['4. 시설·환경·안전 분류','시설, 환경, 안전, 기타 업무 분류를 확인하여 해당 담당 업무와 연결합니다.'],
-      ['5. 시설 민원 위치도','화장실, 샤워실, 탈의실, 복도, 휴게실, 기타 및 코트별 민원 건수를 위치도에서 확인합니다.'],
-      ['6. 최신 접수·미처리','최신 접수에서 새로 들어온 민원을 확인하고, 미처리 접수에서 아직 완료되지 않은 민원을 확인합니다.'],
-      ['7. 담당자 지정 및 처리','민원 내용을 확인하고 담당자를 지정한 뒤 현장 조치 내용을 기록합니다. 처리가 끝나면 처리 완료 상태로 관리합니다.'],
-      ['8. 오늘의 변화','오늘 접수와 미처리 상태의 변화를 확인하여 현재 처리해야 할 민원을 파악합니다.'],
-      ['9. 숫자 집계','오늘 접수는 06:00부터 다음 날 05:59까지, 월 누계는 해당 월, 연 누계는 해당 연도 기준으로 표시되는 집계값을 확인합니다.'],
-      ['10. 연습모드 숫자 초기화','연습 중 숫자를 다시 시작해야 할 경우 숫자 초기화 기능을 사용합니다. 초기화는 연습용 집계 기준을 새로 시작하기 위한 용도입니다.'],
-      ['11. 민원 통계·분석','월별 접수 현황, 민원 발생 위치, 민원 유형과 발생 추이를 확인하여 반복되는 민원을 파악합니다.'],
-      ['12. 처리 시 주의사항','실제 접수 내용과 현장 조치 결과에 맞게 기록하고, 기존 민원 데이터는 확인 없이 임의로 삭제하지 않습니다.']
-    ]
-  };
 
-  function openComplaintManual(){
-    let ov=document.getElementById('jgbComplaintManualFixOverlay');
-    if(!ov){
-      ov=document.createElement('div');
-      ov.id='jgbComplaintManualFixOverlay';
-      ov.style.cssText='position:fixed;inset:0;z-index:1000000;background:rgba(10,25,38,.62);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box';
-      ov.innerHTML='<div style="width:794px;height:1123px;max-width:calc(100vw - 28px);max-height:calc(100vh - 28px);overflow:auto;background:#fff;box-sizing:border-box;padding:38px 42px;border-radius:4px;color:#183247">'+
-        '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1d668f;padding-bottom:14px;margin-bottom:20px;position:sticky;top:0;background:#fff"><h2 style="margin:0;font-size:25px">'+complaintManual.title+'</h2><button id="jgbComplaintManualClose" style="padding:8px 13px;border:1px solid #b8cddd;border-radius:8px;background:#f6fafc;font-weight:800">닫기</button></div>'+
-        '<div id="jgbComplaintManualBody"></div></div>';
-      document.body.appendChild(ov);
-      ov.querySelector('#jgbComplaintManualClose').onclick=function(){ov.remove()};
-      ov.onclick=function(e){if(e.target===ov)ov.remove()};
-    }
-    const body=ov.querySelector('#jgbComplaintManualBody');
-    body.innerHTML=complaintManual.sections.map(function(x){
-      return '<section style="margin:0 0 15px;padding-bottom:13px;border-bottom:1px solid #e3ebf0"><h3 style="margin:0 0 6px;font-size:17px;color:#155b80">'+x[0]+'</h3><p style="margin:0;font-size:14px;line-height:1.75">'+x[1]+'</p></section>';
-    }).join('')+
-    '<div style="padding:12px 14px;background:#f3f8fb;border:1px solid #d4e2ea;border-radius:8px;font-size:13px;line-height:1.65">※ 현재 민원 화면에서 사용하는 항목을 기준으로 작성한 시설민원 전용 사용설명서입니다.</div>';
-  }
-
-  function bind(){
-    document.querySelectorAll('.jgb-header-manual-btn').forEach(function(btn){
-      const h=btn.closest('.jgb-v170-head,.jgb-lr-v54-head,.jgb-page-title,.pagebar');
-      const text=((h&&h.innerText)||'')+' '+(btn.parentElement?.innerText||'');
-      if(/민원/.test(text) && !btn.dataset.complaintFix){
-        btn.dataset.complaintFix='1';
-        btn.onclick=function(e){e.preventDefault();e.stopPropagation();openComplaintManual();};
-      }
-    });
-  }
-  function init(){bind();new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-</script>
 
 
 <style id="JGB_MANUAL_DETAIL_V4">
@@ -24079,6 +24023,24 @@ document.addEventListener('click',handle,true);
 <script id="JGB_MANUAL_DETAIL_V4_SCRIPT">
 (function(){
   const D = {
+    complaint:{
+      title:'📘 시설민원 관리 사용설명서',
+      purpose:'접수된 시설민원의 발생 장소·유형·내용·접수시간을 확인하고 담당자 지정과 처리상태를 관리하기 위한 화면입니다.',
+      sec:[
+        ['1. 민원 접수 확인','접수된 민원의 발생 장소, 민원 유형, 내용, 접수시간을 먼저 확인합니다.'],
+        ['2. 민원 유형 확인','현재 화면에서 시설 고장, 청소 불량, 조명 불량, 냉·난방 이상, 누수·배수, 화장실 불편, 샤워실 불편, 탈의실 불편, 코트 관련, 안전 관련, 기타 민원으로 구분하여 확인합니다.'],
+        ['3. 방수·누수 민원','누수·배수 또는 방수 관련 민원은 발생 위치와 현장 상태를 확인한 뒤 필요한 점검·조치를 진행합니다.'],
+        ['4. 시설·환경·안전 분류','시설, 환경, 안전, 기타 업무 분류를 확인하여 해당 담당 업무와 연결합니다.'],
+        ['5. 시설 민원 위치도','화장실, 샤워실, 탈의실, 복도, 휴게실, 기타 및 코트별 민원 건수를 위치도에서 확인합니다.'],
+        ['6. 최신 접수·미처리','최신 접수에서 새로 들어온 민원을 확인하고, 미처리 접수에서 아직 완료되지 않은 민원을 확인합니다.'],
+        ['7. 담당자 지정 및 처리','민원 내용을 확인하고 담당자를 지정한 뒤 현장 조치 내용을 기록합니다. 처리가 끝나면 처리 완료 상태로 관리합니다.'],
+        ['8. 오늘의 변화','오늘 접수와 미처리 상태의 변화를 확인하여 현재 처리해야 할 민원을 파악합니다.'],
+        ['9. 숫자 집계','오늘 접수는 06:00부터 다음 날 05:59까지, 월 누계는 해당 월, 연 누계는 해당 연도 기준으로 표시되는 집계값을 확인합니다.'],
+        ['10. 연습모드 숫자 초기화','연습 중 숫자를 다시 시작해야 할 경우 숫자 초기화 기능을 사용합니다. 초기화는 연습용 집계 기준을 새로 시작하기 위한 용도입니다.'],
+        ['11. 민원 통계·분석','월별 접수 현황, 민원 발생 위치, 민원 유형과 발생 추이를 확인하여 반복되는 민원을 파악합니다.'],
+        ['12. 처리 시 주의사항','실제 접수 내용과 현장 조치 결과에 맞게 기록하고, 기존 민원 데이터는 확인 없이 임의로 삭제하지 않습니다.']
+      ]
+    },
     eam:{
       title:'📘 시설물 EAM 관리 사용설명서',
       purpose:'시설 자산을 종류·위치·상태별로 찾아보고 자산 기본정보와 유지관리 이력을 확인하기 위한 화면입니다.',
@@ -24196,11 +24158,38 @@ document.addEventListener('click',handle,true);
     if(/업무 일정관리/.test(a)) return 'schedule';
     if(/조명·릴선 관리/.test(a)) return 'lighting';
     if(/시설 민원 위치도/.test(a)) return 'facility';
+    if(/민원/.test(a)) return 'complaint';
+    return null;
+  }
+
+  function isVisible(el){
+    if(!el) return false;
+    const cs=getComputedStyle(el);
+    if(cs.display==='none'||cs.visibility==='hidden'||cs.opacity==='0') return false;
+    const r=el.getBoundingClientRect();
+    return r.width>0 && r.height>0;
+  }
+
+  function findCurrentManualKey(){
+    const selectors=[
+      '.jgb-v170-head','.jgb-lr-v54-head','.employee-hero','.eam-innovation-head',
+      '.eh-head','.basic-v5-head','.jgb-page-title','.pagebar','.jgb-repair-head','.jgb-v66-top'
+    ];
+    const seen=new Set();
+    for(const selector of selectors){
+      for(const h of document.querySelectorAll(selector)){
+        if(!isVisible(h) || seen.has(h)) continue;
+        seen.add(h);
+        const k=keyFor(h);
+        if(k) return k;
+      }
+    }
     return null;
   }
 
   function openDetail(key){
-    const d=D[key]; if(!d) return;
+    const d=D[key];
+    if(!d) return;
     let ov=document.getElementById('jgbDetailManualOverlay');
     if(!ov){
       ov=document.createElement('div');
@@ -24219,18 +24208,37 @@ document.addEventListener('click',handle,true);
     ov.classList.add('open');
   }
 
-  function bindDetail(){
-    document.querySelectorAll('.jgb-header-manual-btn').forEach(btn=>{
-      if(btn.dataset.detailManual==='1') return;
-      const h=btn.closest('.jgb-v170-head,.jgb-lr-v54-head,.employee-hero,.eam-innovation-head,.eh-head,.basic-v5-head,.jgb-page-title,.pagebar,.jgb-repair-head,.jgb-v66-top');
-      const k=keyFor(h);
-      if(!k) return;
-      btn.dataset.detailManual='1';
-      btn.onclick=e=>{e.preventDefault();e.stopPropagation();openDetail(k)};
-    });
+  function ensureManualButton(){
+    let btn=document.querySelector('.jgb-manual-btn');
+    if(!btn){
+      btn=document.createElement('button');
+      btn.className='jgb-manual-btn';
+      btn.type='button';
+      btn.innerHTML='📘 사용설명서';
+      const target=document.querySelector('.jgb-top-right .jgb-top-switch');
+      if(target) target.appendChild(btn);
+      else {
+        const top=document.querySelector('.jgb-top-right');
+        if(top) top.insertBefore(btn,top.firstChild);
+        else document.body.insertBefore(btn,document.body.firstChild);
+      }
+    }
+    if(btn.dataset.unifiedManual==='1') return;
+    btn.dataset.unifiedManual='1';
+    btn.onclick=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      const key=findCurrentManualKey();
+      if(key) openDetail(key);
+      else alert('현재 화면의 사용설명서를 찾지 못했습니다. 화면을 잠시 기다린 후 다시 눌러주세요.');
+    };
   }
-  function init(){bindDetail();new MutationObserver(bindDetail).observe(document.body,{childList:true,subtree:true});}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+
+  function init(){
+    ensureManualButton();
+    new MutationObserver(ensureManualButton).observe(document.body,{childList:true,subtree:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
 </script>
 
@@ -30349,44 +30357,7 @@ cleanupDuplicateOnly();
 }
 </style>
 
-<script>
-(function(){
-function initManual(){
-  if(document.getElementById('jgbManualOverlay')) return;
-  var btn=document.createElement('button');
-  btn.className='jgb-manual-btn'; btn.type='button'; btn.innerHTML='📘 사용설명서';
-  btn.onclick=function(){document.getElementById('jgbManualOverlay').classList.add('open');};
-  var target=document.querySelector('.jgb-top-right .jgb-top-switch');
-  if(target){
-    target.appendChild(btn);
-  }else{
-    var top=document.querySelector('.jgb-top-right');
-    if(top) top.insertBefore(btn, top.firstChild);
-    else document.body.insertBefore(btn,document.body.firstChild);
-  }
 
-  var ov=document.createElement('div'); ov.id='jgbManualOverlay'; ov.className='jgb-manual-overlay';
-  ov.innerHTML='<div class="jgb-manual-box"><div class="jgb-manual-head"><strong>📘 민원 접수·처리 시스템 사용설명서</strong><button class="jgb-manual-close">닫기</button></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">📱 민원 접수</div><div class="jgb-manual-desc">고객이 시설 이용 중 발생한 불편사항을 접수합니다. 발생 장소와 민원 내용을 확인합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">📋 최신 접수</div><div class="jgb-manual-desc">최근 접수된 민원을 확인합니다. 접수 내용과 처리상태를 확인합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🕐 미처리 접수</div><div class="jgb-manual-desc">처리가 완료되지 않은 민원을 확인하고 조치 여부를 관리합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">👤 담당자 지정</div><div class="jgb-manual-desc">민원 처리를 담당할 직원을 지정합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">✅ 처리완료</div><div class="jgb-manual-desc">필요한 조치가 완료된 민원을 처리완료 상태로 변경합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🔎 상세보기</div><div class="jgb-manual-desc">접수시간·발생장소·민원유형·민원내용 등 상세정보를 확인합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">📊 오늘의 변화 및 관리조치</div><div class="jgb-manual-desc">당일 민원 변화와 필요한 관리조치를 확인합니다. 관리상태는 미처리 민원 건수를 기준으로 표시합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🔢 민원 집계</div><div class="jgb-manual-desc">오늘 접수: 06:00~다음 날 05:59 / 월 누계: 해당 월 누계 / 연 누계: 해당 연도 누계로 표시합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🔄 숫자 초기화</div><div class="jgb-manual-desc">연습 운영 시 오늘·월·연 및 민원 통계의 집계 숫자를 초기화합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">📈 민원 통계·분석</div><div class="jgb-manual-desc">월별·위치별·유형별·요일·시간대별 민원 발생 현황을 확인합니다.</div></div>'+
-  '<div class="jgb-manual-item"><div class="jgb-manual-title">🏷️ 관리상태 기준</div><div class="jgb-manual-desc"><b>0건 정상 · 1~2건 관찰 · 3~4건 유의 · 5건 이상 집중관리</b><br>판정 기준: 미처리 민원 건수를 기준으로 관리상태를 표시합니다.</div></div>'+
-  '</div>';
-  document.body.appendChild(ov);
-  ov.querySelector('.jgb-manual-close').onclick=function(){ov.classList.remove('open');};
-  ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('open');});
-  ov.querySelectorAll('.jgb-manual-title').forEach(function(t){t.onclick=function(){t.parentElement.classList.toggle('open');};});
-}
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initManual); else initManual();
-})();
-</script>
 
 
 <style id="JGB_BASIC_WORK_NOTE_FINAL_20_80">
