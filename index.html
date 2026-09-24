@@ -5750,6 +5750,22 @@ a[data-page="digitalTwin"],
 }
 </style>
 
+<style id="complaint-level-colors-v1">
+/* 민원 건수 공통 표시: 1 파랑 / 2 노랑 / 3 이상 빨강. 모든 위치도와 금일 주요 변동사항에 동일 적용 */
+.jgb-facility-zone.complaint-level-1,.jgb-repair-court.complaint-level-1{background:#e8f1ff!important;border:3px solid #2f80ed!important;color:#1559a6!important;box-shadow:0 0 0 1px rgba(47,128,237,.18)!important;}
+.jgb-facility-zone.complaint-level-2,.jgb-repair-court.complaint-level-2{background:#fff8cf!important;border:3px solid #e0b400!important;color:#765e00!important;box-shadow:0 0 0 1px rgba(224,180,0,.18)!important;}
+.jgb-facility-zone.complaint-level-3,.jgb-repair-court.complaint-level-3{background:#ffe7ea!important;border:3px solid #e5233f!important;color:#a9152b!important;box-shadow:0 0 0 1px rgba(229,35,63,.18)!important;}
+.jgb-live-status.blue{background:#2f80ed!important;color:#fff!important;}
+.jgb-live-status.yellow{background:#e0b400!important;color:#fff!important;}
+.jgb-live-status.red{background:#e5233f!important;color:#fff!important;}
+.jgb-live-action-row.blue .jgb-live-action b{color:#1559a6!important;}
+.jgb-live-action-row.yellow .jgb-live-action b{color:#765e00!important;}
+.jgb-live-action-row.red .jgb-live-action b{color:#a9152b!important;}
+
+.jgb-facility-zone.complaint-level-1 .jgb-map-complaint-count,.jgb-repair-court.complaint-level-1 .jgb-map-complaint-count{background:#2f80ed!important;box-shadow:0 2px 5px rgba(47,128,237,.25)!important;}
+.jgb-facility-zone.complaint-level-2 .jgb-map-complaint-count,.jgb-repair-court.complaint-level-2 .jgb-map-complaint-count{background:#e0b400!important;box-shadow:0 2px 5px rgba(224,180,0,.25)!important;}
+.jgb-facility-zone.complaint-level-3 .jgb-map-complaint-count,.jgb-repair-court.complaint-level-3 .jgb-map-complaint-count{background:#e5233f!important;box-shadow:0 2px 5px rgba(229,35,63,.25)!important;}
+</style>
 <style id="final-readable-ui">
 /* 최종 가독성 통일: 헤더는 진한색+흰글씨, 본문은 진하고 크게 */
 body{font-family:"Malgun Gothic",Arial,sans-serif;color:#17324d;}
@@ -10300,6 +10316,14 @@ html,body{
     }
 
 
+    function complaintLevelClass(count){
+      const n=Number(count)||0;
+      if(n>=3)return 'complaint-level-3';
+      if(n===2)return 'complaint-level-2';
+      if(n===1)return 'complaint-level-1';
+      return '';
+    }
+
     function complaintYearIssues(year){
       const y=Number(year);
       const resetAt=jgbNumericResetAt();
@@ -10503,7 +10527,7 @@ html,body{
         if(/시설|고장|설비|누수|배수|수도/.test(text)) return ['시설 상태 점검','설비 작동 및 이상 여부 확인','check'];
         return ['현장 상태 점검','접수 내용 확인 및 조치 여부 판단','observe'];
       };
-      const statusOf=count=>count>=3?['주의','warn']:count===2?['확인','check']:['관찰','observe'];
+      const statusOf=count=>count>=3?['주의','red']:count===2?['확인','yellow']:['관찰','blue'];
       const iconOf=kind=>kind==='clean'?'↗':kind==='warn'?'!':kind==='check'?'＋':'−';
       const rowsHtml=rows.length?rows.map(([place,g])=>{
         const [action,detail,kind]=actionOf(place,g);
@@ -10867,7 +10891,7 @@ html,body{
      <div class="jgb-repair-page">
        <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>시설민원 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button></div></header>
        <section class="jgb-repair-top">
-         <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["남자 화장실"]?'has-complaint':''}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["남자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${mapComplaintCounts["여자 화장실"]?'has-complaint':''}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 샤워실"]?'has-complaint':''}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${mapComplaintCounts["여자 탈의실"]?'has-complaint':''}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${mapComplaintCounts["복도"]?'has-complaint':''}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${mapComplaintCounts["휴게실"]?'has-complaint':''}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${mapComplaintCounts["기타"]?'has-complaint':''}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${n?'has-complaint':''}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
+         <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 화장실"])}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 샤워실"])}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 탈의실"])}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 화장실"])}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 샤워실"])}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 탈의실"])}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["복도"])}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["휴게실"])}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["기타"])}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${complaintLevelClass(n)}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
          ${liveComplaintActionPanel(countActive)}
        </section>
        ${(()=>{
