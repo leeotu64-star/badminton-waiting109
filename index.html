@@ -24005,327 +24005,61 @@ document.addEventListener('click',handle,true);
 .jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar-thumb{background:#7894a8!important;border-radius:7px!important;border:2px solid #edf3f6!important}
 </style>
 
-<style id="JGB_HEADER_MANUAL_A4_V1">
-/* 각 주요 헤더별 사용설명서 아이콘 */
-.jgb-header-manual-btn{
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:7px!important;
-  min-height:42px!important;
-  padding:7px 13px!important;
-  margin-left:8px!important;
-  border:1px solid #b8cddd!important;
-  border-radius:9px!important;
-  background:#fff!important;
-  color:#174d6d!important;
-  font-size:15px!important;
-  font-weight:900!important;
-  line-height:1!important;
-  cursor:pointer!important;
-  box-shadow:0 2px 7px rgba(20,55,80,.10)!important;
-  white-space:nowrap!important;
-  transition:.15s ease!important;
-}
-.jgb-header-manual-btn .jgb-header-manual-icon{
-  font-size:23px!important;
-  line-height:1!important;
-}
-.jgb-header-manual-btn:hover{
-  background:#eef7fc!important;
-  border-color:#7faec9!important;
-  transform:translateY(-1px)!important;
-}
-.jgb-header-manual-btn:active{transform:translateY(0)!important}
-
-/* 기존 최상단 단일 사용설명서 버튼은 중복 방지 */
-.jgb-top-right .jgb-manual-btn{display:none!important}
-
-/* A4 세로 문서형 사용설명서 */
-#jgbManualOverlay .jgb-manual-box{
-  width:794px!important;
-  max-width:calc(100vw - 36px)!important;
-  height:1123px!important;
-  max-height:calc(100vh - 28px)!important;
-  overflow:auto!important;
-  box-sizing:border-box!important;
-  padding:34px 38px!important;
-  border-radius:4px!important;
-  border:1px solid #cbd9e4!important;
-  background:#fff!important;
-}
-#jgbManualOverlay .jgb-manual-head{
-  min-height:58px!important;
-  padding-bottom:14px!important;
-  margin-bottom:18px!important;
-}
-#jgbManualOverlay .jgb-manual-head strong{
-  font-size:24px!important;
-}
-#jgbManualOverlay .jgb-manual-close{
-  font-size:14px!important;
-  padding:8px 13px!important;
-}
-#jgbManualOverlay .jgb-manual-item{margin:9px 0!important}
-#jgbManualOverlay .jgb-manual-title{
-  padding:13px 15px!important;
-  font-size:16px!important;
-}
-#jgbManualOverlay .jgb-manual-desc{
-  padding:11px 15px 13px!important;
-  font-size:14px!important;
-  line-height:1.75!important;
-}
-@media(max-width:900px){
-  .jgb-header-manual-btn{font-size:13px!important;padding:6px 9px!important}
-  .jgb-header-manual-btn .jgb-header-manual-icon{font-size:20px!important}
-}
+<style id="JGB_COMPLAINT_MANUAL_FIX">
+.jgb-header-manual-btn{font-size:15px!important}
 </style>
-
-<script id="JGB_HEADER_MANUAL_A4_SCRIPT">
+<script id="JGB_COMPLAINT_MANUAL_FIX_SCRIPT">
 (function(){
-  function addHeaderManualButtons(){
-    /* 실제 화면의 주요 상단 헤더만 대상으로 함 */
-    var selectors = [
-      '.jgb-v170-head',
-      '.jgb-lr-v54-head',
-      '.employee-hero',
-      '.eam-innovation-head',
-      '.eh-head',
-      '.basic-v5-head',
-      '.jgb-page-title',
-      '.pagebar'
-    ];
-
-    selectors.forEach(function(sel){
-      document.querySelectorAll(sel).forEach(function(header){
-        if(!header || header.querySelector('.jgb-header-manual-btn')) return;
-
-        var btn=document.createElement('button');
-        btn.type='button';
-        btn.className='jgb-header-manual-btn';
-        btn.title='사용설명서 열기';
-        btn.innerHTML='<span class="jgb-header-manual-icon">📘</span><span>사용설명서</span>';
-        btn.onclick=function(){
-          var ov=document.getElementById('jgbManualOverlay');
-          if(ov) ov.classList.add('open');
-        };
-
-        /* 기존 헤더의 오른쪽 액션 영역이 있으면 그 안에 배치 */
-        var target =
-          header.querySelector('.jgb-v170-head-actions') ||
-          header.querySelector('.jgb-lr-v54-head-statuses') ||
-          header.querySelector('.employee-hero-actions') ||
-          header.querySelector('.eh-head-stats') ||
-          header.querySelector('.eam-manage-top')?.parentElement ||
-          null;
-
-        if(target && target.parentElement === header){
-          target.appendChild(btn);
-        }else{
-          header.appendChild(btn);
-        }
-      });
-    });
-  }
-
-  function start(){
-    addHeaderManualButtons();
-
-    /* 페이지 전환/동적 렌더링으로 새 헤더가 생겨도 자동 추가 */
-    if(window.MutationObserver){
-      var observer=new MutationObserver(function(){
-        addHeaderManualButtons();
-      });
-      observer.observe(document.body,{childList:true,subtree:true});
-    }
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',start);
-  }else{
-    start();
-  }
-})();
-</script>
-
-
-<style id="JGB_CUSTOM_HEADER_MANUAL_V3">
-.jgb-custom-manual-overlay{position:fixed!important;inset:0!important;z-index:999999!important;display:none;align-items:center;justify-content:center;background:rgba(10,25,38,.62);padding:14px;box-sizing:border-box}
-.jgb-custom-manual-overlay.open{display:flex!important}
-.jgb-custom-manual-sheet{width:794px;height:1123px;max-width:calc(100vw - 28px);max-height:calc(100vh - 28px);overflow:auto;background:#fff;border-radius:4px;box-shadow:0 18px 55px rgba(0,0,0,.3);box-sizing:border-box;padding:36px 42px;color:#183247}
-.jgb-custom-manual-top{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1d668f;padding-bottom:13px;margin-bottom:18px;position:sticky;top:0;background:#fff;z-index:2}
-.jgb-custom-manual-top h2{margin:0;font-size:25px;line-height:1.3}
-.jgb-custom-manual-close{border:1px solid #b8cddd;background:#f6fafc;border-radius:8px;padding:8px 12px;font-weight:800;cursor:pointer}
-.jgb-custom-manual-section{margin:0 0 16px;padding:0 0 13px;border-bottom:1px solid #e3ebf0}
-.jgb-custom-manual-section h3{margin:0 0 6px;font-size:17px;color:#155b80}
-.jgb-custom-manual-section p,.jgb-custom-manual-section li{font-size:14px;line-height:1.7}
-.jgb-custom-manual-section ul{margin:5px 0 0;padding-left:22px}
-.jgb-custom-manual-note{padding:12px 14px;background:#f3f8fb;border:1px solid #d4e2ea;border-radius:8px;font-size:13px;line-height:1.65}
-</style>
-<script id="JGB_CUSTOM_HEADER_MANUAL_V3_SCRIPT">
-(function(){
-  /* 현재 HT에 실제 존재하는 메뉴/기능을 기준으로 헤더별 설명서를 구성합니다. */
-  const manuals={
-    complaint:{
-      title:'📘 시설민원 관리 사용설명서',
-      sections:[
-        ['1. 민원 접수 확인','스마트폰 QR 접수로 들어온 시설 관련 민원을 확인합니다. 접수시간·발생장소·민원유형·민원내용을 먼저 확인합니다.'],
-        ['2. 민원 유형','현재 민원 유형은 시설 고장, 청소 불량, 조명 불량, 냉·난방 이상, 누수·배수, 화장실 불편, 샤워실 불편, 탈의실 불편, 코트 관련, 안전 관련, 기타 민원으로 구분됩니다.'],
-        ['3. 시설·환경·안전 분류','관리 화면의 업무 분류는 시설·환경·안전·기타로 나뉩니다. 시설에는 냉난방기·실내기·실외기·조명·전동릴·온수·난방·누수·방수·시설물 파손 등이 있고, 환경에는 화장실·탈의실·샤워실·복도·휴게실·코트 환경정비 등이 있습니다. 안전에는 소방설비·유수장치실·기계실·옥상·안전시설·위험요소 확인 등이 있습니다.'],
-        ['4. 시설 민원 위치도','남·여 화장실, 샤워실, 탈의실, 복도, 휴게실, 기타 및 1~5번 코트에 표시되는 민원 건수를 확인합니다. 숫자는 해당 위치의 민원 건수입니다.'],
-        ['5. 최신 접수·미처리','최신 접수에서 최근 민원을 확인하고, 미처리 접수에서는 아직 완료되지 않은 민원을 확인합니다.'],
-        ['6. 담당자 지정·처리','민원 내용을 확인한 뒤 담당자를 지정하고 필요한 현장 조치를 진행합니다. 조치가 끝나면 처리완료 상태로 관리합니다.'],
-        ['7. 오늘의 변화·관리조치','당일 민원 변화와 관리가 필요한 상태를 확인합니다. 관리상태는 미처리 민원 건수를 기준으로 표시됩니다. 0건 정상, 1~2건 관찰, 3~4건 유의, 5건 이상 집중관리 기준이 현재 설명서에 정의되어 있습니다.'],
-        ['8. 숫자 집계','오늘 접수는 06:00부터 다음 날 05:59까지, 월 누계는 해당 월, 연 누계는 해당 연도 기준으로 표시됩니다.'],
-        ['9. 연습모드 숫자 초기화','연습 운영 중에는 화면의 숫자 초기화 기능을 사용해 집계 숫자를 초기화합니다. 원본 민원 처리 기능과 구분해서 사용합니다.'],
-        ['10. 민원 통계·분석','월별 민원 접수 현황, 민원 발생 위치, 민원 유형과 요일·시간대별 발생 현황을 확인합니다.']
-      ]
-    },
-    eam:{
-      title:'📘 시설물 EAM 관리 사용설명서',
-      sections:[
-        ['1. 설비 종류 선택','현재 설비 분류는 에어컨, 보일러, 소방설비, 전기설비, 문·창호, 위생설비, 기타설비입니다. 아이콘과 분류 버튼을 눌러 해당 자산을 확인합니다.'],
-        ['2. 자산 선택','선택한 설비 종류의 자산 목록에서 자산을 선택합니다. 자산코드, 자산명, 위치, 상태를 확인합니다.'],
-        ['3. 위치 필터','A 코트, B 복도, C 사무실, D 옥상, E 유수장치실, F 창고, G 휴게실, H 남자 화장실, I 여자 화장실, J 남자 샤워실, K 여자 샤워실, L 좌측 외곽, M 우측 외곽 등 위치 기준으로 자산을 좁혀 볼 수 있습니다.'],
-        ['4. 자산 기본정보','자산코드·설비 종류·소분류·위치·모델·규격·용량·수량·제조사·A/S 연락처·제조일·설치일·내용연수·평가등급·보증·A/S 기록·자산상태·취득구분·시설개선계획·특이사항을 확인합니다.'],
-        ['5. 자산 상태','정상, 점검, 조치필요, 수리중, 부품대기, 재조치 필요 등의 상태를 이력과 함께 확인합니다.'],
-        ['6. 유지관리 이력','주요설비 이력카드와 유지관리 이력을 확인하여 과거 작업내용과 현재 상태를 함께 확인합니다.'],
-        ['7. 자산 관리','상단의 ⚙ 자산 관리 메뉴는 자산 등록·관리 기능으로 연결됩니다. 기존 자산과 배치도 전용 아이콘은 별도 저장 영역으로 관리됩니다.']
-      ]
-    },
-    maintenance:{
-      title:'📘 시설물 유지관리 현황 사용설명서',
-      sections:[
-        ['1. 유지관리 현황 확인','시설물의 현재 관리상태와 유지관리 실적을 확인합니다.'],
-        ['2. 이력카드 확인','선택한 설비의 기본정보와 주요설비 이력카드를 확인하고 최근 유지관리 이력을 확인합니다.'],
-        ['3. 작업 이력 확인','작업일자, 작업구분, 작업내용, 작업결과 등 저장된 유지관리 이력을 확인합니다.'],
-        ['4. 상태 확인','정상·점검·조치필요·수리중·부품대기 등 현재 상태와 과거 이력을 함께 비교합니다.'],
-        ['5. 실적 확인','직원 업무수행 현황과 연결되는 유지관리 실적을 확인하여 당월·연간 처리 실적을 비교합니다.']
-      ]
-    },
-    leakage:{
-      title:'📘 시설 누수·수리 관리현황 사용설명서',
-      sections:[
-        ['1. 누수 위치 확인','시설 누수 위치와 수리 상태를 배치도에서 확인합니다. 코트 위치와 번호는 고정되고 LK 아이콘의 위치를 조정할 수 있습니다.'],
-        ['2. LK 생성','＋ LK 생성을 사용하여 누수·수리 관리 대상을 등록합니다. 발생 위치와 상태를 실제 현장 내용에 맞게 기록합니다.'],
-        ['3. 상태 필터','조치필요, 점검요청, 정상, 자체정비, 외주정비 상태별로 필터링하여 현재 관리 대상을 확인합니다.'],
-        ['4. 현장 확인','2F 옥상(지붕) 등 표시된 발생 구역과 시설 위치를 확인한 뒤 필요한 점검·수리 조치를 진행합니다.'],
-        ['5. LK 삭제·초기화','LK 삭제·초기화 기능은 등록된 누수 관리 항목을 정리할 때 사용합니다. 실제 운영 데이터에서는 삭제 전 내용을 확인합니다.']
-      ]
-    },
-    waterproof:{
-      title:'📘 보수·방수 이력관리 사용설명서',
-      sections:[
-        ['1. 방수 이력카드 확인','시설명, 방수 위치, 건물·구역, 주요 방수부위, 방수공사 종류, 방수 면적, 최초·최근 방수일, 현재 상태, 담당자, 시공업체, 보증기간 등을 확인합니다.'],
-        ['2. 신규 이력카드','＋ 신규 이력카드 생성을 눌러 방수 대상 시설의 기본정보를 등록합니다.'],
-        ['3. 방수 작업이력 등록','＋ 이력내역 등록을 사용하여 작업일자, 작업구분, 외주업체명, 작업비용, 작업내용, 작업결과, 방수 이력, 특이사항을 기록합니다.'],
-        ['4. 작업사진','방수 위치 사진과 작업사진을 이력에 함께 확인할 수 있습니다. 작업사진 영역은 3장 기준으로 표시됩니다.'],
-        ['5. 수정·삭제','기존 이력은 ✏ 수정으로 수정하고 🗑 삭제로 삭제합니다. 카드 자체를 삭제할 때는 카드 삭제 기능을 사용합니다.']
-      ]
-    },
-    staff:{
-      title:'📘 직원 업무수행 현황 사용설명서',
-      sections:[
-        ['1. 직원별 실적 확인','직원별 시설관리 업무수행 및 처리실적을 확인합니다. 헤더에는 정규업무 실적, 근무편성 인정실적, QR 조치완료, 종합 업무실적이 표시됩니다.'],
-        ['2. 당월·연간 실적','직원별 당월 실적과 연간 누계를 확인하고 달성률을 비교합니다.'],
-        ['3. 실적내역','각 직원의 실적내역 버튼을 눌러 세부 실적을 확인합니다.'],
-        ['4. 기간 선택','월별 실적은 선택한 연·월 기준으로 확인하고, 연간 실적은 선택한 연도를 기준으로 확인합니다.'],
-        ['5. 민원 연계','직원 업무수행 화면의 시설민원 관리 이동 기능을 사용하면 시설민원 관리 화면으로 이동할 수 있습니다.']
-      ]
-    },
-    basic:{
-      title:'📘 금일 업무현황 사용설명서',
-      sections:[
-        ['1. 날짜 선택','상단 날짜를 선택하여 해당 날짜의 금일 업무현황을 확인합니다.'],
-        ['2. 직원 페이지 이동','현재 화면은 한 번에 2명의 직원을 표시하며, 이전·다음 화살표로 직원 묶음을 이동할 수 있습니다. 화면 하단 직원 탭으로 해당 직원을 선택할 수 있습니다.'],
-        ['3. 기본 업무 확인','선택한 직원의 해당 날짜 업무와 완료 상태를 확인합니다. 기본업무 데이터는 날짜와 직원별로 저장됩니다.'],
-        ['4. 업무 완료 기록','실제 수행한 업무만 완료 처리하고, 완료된 기본업무 실적이 직원 업무수행 현황에 반영되는 구조입니다.'],
-        ['5. 연습모드','연습 중에는 실제 운영 데이터와 혼동하지 않도록 날짜와 직원별 업무 완료 상태를 확인한 뒤 입력합니다.']
-      ]
-    },
-    schedule:{
-      title:'📘 업무 일정관리 사용설명서',
-      sections:[
-        ['1. 일정 확인','직원과 날짜를 기준으로 업무 일정을 확인합니다.'],
-        ['2. 일정 등록·변경','업무 일정이 바뀌면 해당 직원과 날짜의 일정 내용을 수정하여 저장합니다.'],
-        ['3. 업무현황 연계','저장된 일정은 금일 업무현황과 직원 업무수행 현황에서 근무 편성과 실적을 확인할 때 사용됩니다.'],
-        ['4. 주의사항','업무 변경 시 직원과 적용 날짜를 먼저 확인한 뒤 저장합니다.']
-      ]
-    },
-    lighting:{
-      title:'📘 조명·릴선 관리 사용설명서',
-      sections:[
-        ['1. 시설 확인','조명과 전동릴선 관련 시설의 관리 대상과 현재 상태를 확인합니다.'],
-        ['2. 상태 확인','정상·점검·조치필요 등 현재 상태와 유지관리 이력을 확인합니다.'],
-        ['3. 이력 관리','조명·릴선의 점검 및 조치 내용을 실제 작업 기준으로 기록하고 기존 이력과 구분하여 관리합니다.'],
-        ['4. 주의사항','시설 상태를 변경할 때 실제 현장 확인 결과와 일치하도록 기록합니다.']
-      ]
-    }
+  const complaintManual = {
+    title:'📘 시설민원 관리 사용설명서',
+    sections:[
+      ['1. 민원 접수 확인','접수된 민원의 발생 장소, 민원 유형, 내용, 접수시간을 먼저 확인합니다.'],
+      ['2. 민원 유형 확인','현재 화면에서 시설 고장, 청소 불량, 조명 불량, 냉·난방 이상, 누수·배수, 화장실 불편, 샤워실 불편, 탈의실 불편, 코트 관련, 안전 관련, 기타 민원으로 구분하여 확인합니다.'],
+      ['3. 방수·누수 민원','누수·배수 또는 방수 관련 민원은 발생 위치와 현장 상태를 확인한 뒤 필요한 점검·조치를 진행합니다.'],
+      ['4. 시설·환경·안전 분류','시설, 환경, 안전, 기타 업무 분류를 확인하여 해당 담당 업무와 연결합니다.'],
+      ['5. 시설 민원 위치도','화장실, 샤워실, 탈의실, 복도, 휴게실, 기타 및 코트별 민원 건수를 위치도에서 확인합니다.'],
+      ['6. 최신 접수·미처리','최신 접수에서 새로 들어온 민원을 확인하고, 미처리 접수에서 아직 완료되지 않은 민원을 확인합니다.'],
+      ['7. 담당자 지정 및 처리','민원 내용을 확인하고 담당자를 지정한 뒤 현장 조치 내용을 기록합니다. 처리가 끝나면 처리 완료 상태로 관리합니다.'],
+      ['8. 오늘의 변화','오늘 접수와 미처리 상태의 변화를 확인하여 현재 처리해야 할 민원을 파악합니다.'],
+      ['9. 숫자 집계','오늘 접수는 06:00부터 다음 날 05:59까지, 월 누계는 해당 월, 연 누계는 해당 연도 기준으로 표시되는 집계값을 확인합니다.'],
+      ['10. 연습모드 숫자 초기화','연습 중 숫자를 다시 시작해야 할 경우 숫자 초기화 기능을 사용합니다. 초기화는 연습용 집계 기준을 새로 시작하기 위한 용도입니다.'],
+      ['11. 민원 통계·분석','월별 접수 현황, 민원 발생 위치, 민원 유형과 발생 추이를 확인하여 반복되는 민원을 파악합니다.'],
+      ['12. 처리 시 주의사항','실제 접수 내용과 현장 조치 결과에 맞게 기록하고, 기존 민원 데이터는 확인 없이 임의로 삭제하지 않습니다.']
+    ]
   };
 
-  function getKey(header){
-    const t=(header&&header.innerText||'').replace(/\s+/g,' ');
-    const c=(header&&header.className||'');
-    const a=c+' '+t;
-    if(/보수·방수 이력관리/.test(a)) return 'waterproof';
-    if(/누수·수리 관리현황/.test(a)) return 'leakage';
-    if(/시설물 EAM 관리/.test(a)) return 'eam';
-    if(/금일 업무현황/.test(a)) return 'basic';
-    if(/업무 일정관리/.test(a)) return 'schedule';
-    if(/조명·릴선 관리/.test(a)) return 'lighting';
-    if(/직원 업무수행 현황|직원업무실적|직원 업무/.test(a)) return 'staff';
-    if(/시설물 유지관리 현황|유지관리 실적/.test(a)) return 'maintenance';
-    if(/시설민원 관리|민원 접수|민원/.test(a)) return 'complaint';
-    return 'complaint';
-  }
-
-  function ensureOverlay(){
-    let ov=document.getElementById('jgbCustomHeaderManualOverlay');
-    if(ov) return ov;
-    ov=document.createElement('div');
-    ov.id='jgbCustomHeaderManualOverlay';
-    ov.className='jgb-custom-manual-overlay';
-    ov.innerHTML='<div class="jgb-custom-manual-sheet" role="dialog" aria-modal="true">'+
-      '<div class="jgb-custom-manual-top"><h2 id="jgbCustomManualTitle"></h2><button class="jgb-custom-manual-close" type="button">닫기</button></div>'+
-      '<div id="jgbCustomManualBody"></div></div>';
-    document.body.appendChild(ov);
-    ov.querySelector('.jgb-custom-manual-close').onclick=function(){ov.classList.remove('open')};
-    ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('open')});
-    return ov;
-  }
-
-  function openManual(key){
-    const data=manuals[key]||manuals.complaint;
-    const ov=ensureOverlay();
-    document.getElementById('jgbCustomManualTitle').textContent=data.title;
-    document.getElementById('jgbCustomManualBody').innerHTML=data.sections.map(function(x){
-      return '<section class="jgb-custom-manual-section"><h3>'+x[0]+'</h3><p>'+x[1]+'</p></section>';
+  function openComplaintManual(){
+    let ov=document.getElementById('jgbComplaintManualFixOverlay');
+    if(!ov){
+      ov=document.createElement('div');
+      ov.id='jgbComplaintManualFixOverlay';
+      ov.style.cssText='position:fixed;inset:0;z-index:1000000;background:rgba(10,25,38,.62);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box';
+      ov.innerHTML='<div style="width:794px;height:1123px;max-width:calc(100vw - 28px);max-height:calc(100vh - 28px);overflow:auto;background:#fff;box-sizing:border-box;padding:38px 42px;border-radius:4px;color:#183247">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1d668f;padding-bottom:14px;margin-bottom:20px;position:sticky;top:0;background:#fff"><h2 style="margin:0;font-size:25px">'+complaintManual.title+'</h2><button id="jgbComplaintManualClose" style="padding:8px 13px;border:1px solid #b8cddd;border-radius:8px;background:#f6fafc;font-weight:800">닫기</button></div>'+
+        '<div id="jgbComplaintManualBody"></div></div>';
+      document.body.appendChild(ov);
+      ov.querySelector('#jgbComplaintManualClose').onclick=function(){ov.remove()};
+      ov.onclick=function(e){if(e.target===ov)ov.remove()};
+    }
+    const body=ov.querySelector('#jgbComplaintManualBody');
+    body.innerHTML=complaintManual.sections.map(function(x){
+      return '<section style="margin:0 0 15px;padding-bottom:13px;border-bottom:1px solid #e3ebf0"><h3 style="margin:0 0 6px;font-size:17px;color:#155b80">'+x[0]+'</h3><p style="margin:0;font-size:14px;line-height:1.75">'+x[1]+'</p></section>';
     }).join('')+
-    '<div class="jgb-custom-manual-note">※ 설명서 내용은 현재 HT에 실제 구현되어 있는 메뉴·항목·처리 흐름을 기준으로 구성했습니다. 화면에 없는 기능을 임의로 안내하지 않습니다.</div>';
-    ov.classList.add('open');
+    '<div style="padding:12px 14px;background:#f3f8fb;border:1px solid #d4e2ea;border-radius:8px;font-size:13px;line-height:1.65">※ 현재 민원 화면에서 사용하는 항목을 기준으로 작성한 시설민원 전용 사용설명서입니다.</div>';
   }
 
-  function addButtons(){
+  function bind(){
     document.querySelectorAll('.jgb-header-manual-btn').forEach(function(btn){
-      if(btn.dataset.customManual==='1') return;
-      btn.dataset.customManual='1';
-      const header=btn.closest('.jgb-v170-head,.jgb-lr-v54-head,.employee-hero,.eam-innovation-head,.eh-head,.basic-v5-head,.jgb-page-title,.pagebar,.jgb-repair-head,.jgb-v66-top');
-      btn.onclick=function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        openManual(getKey(header||btn.parentElement));
-      };
+      const h=btn.closest('.jgb-v170-head,.jgb-lr-v54-head,.jgb-page-title,.pagebar');
+      const text=((h&&h.innerText)||'')+' '+(btn.parentElement?.innerText||'');
+      if(/민원/.test(text) && !btn.dataset.complaintFix){
+        btn.dataset.complaintFix='1';
+        btn.onclick=function(e){e.preventDefault();e.stopPropagation();openComplaintManual();};
+      }
     });
   }
-
-  function init(){
-    addButtons();
-    if(window.MutationObserver){
-      new MutationObserver(addButtons).observe(document.body,{childList:true,subtree:true});
-    }
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+  function init(){bind();new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 
