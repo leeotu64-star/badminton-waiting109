@@ -8581,6 +8581,34 @@ html,body{
   font-variant-numeric:tabular-nums!important;
 }
 </style>
+
+<style id="JGB_LEAK_CLEAN_WAREHOUSE_ONLY">
+/* 누수 배치도: 원본 배치값은 유지하고 창고 1개만 비 오는 옥상 안에 배치 */
+.jgb-leak-roof-warehouse-final{
+  position:absolute!important;
+  z-index:6!important;
+  right:3%!important;
+  top:52%!important;
+  width:12%!important;
+  height:28%!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  background:linear-gradient(180deg,#dfeaf0 0%,#c8d8e1 100%)!important;
+  border:1px solid #8ea6b5!important;
+  border-radius:2px!important;
+  transform:none!important;
+  clip-path:none!important;
+  box-shadow:0 4px 8px rgba(40,70,88,.18)!important;
+  color:#385565!important;
+  font-size:10px!important;
+  font-weight:900!important;
+}
+.jgb-leak-roof-warehouse-final span{display:block!important;color:#385565!important;font-size:10px!important}
+/* 상단에 있던 옥상 7개가 다시 생성되는 경우에도 표시하지 않음 */
+.jgb-leak-roof-courts,.jgb-leak-roof-building.left,.jgb-leak-roof-building.right{display:none!important}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -24054,91 +24082,6 @@ document.addEventListener('click',handle,true);
 </script>
 
 
-<style id="JGB_LEAK_FINAL_FIX_V3">
-/* ================================
-   누수 배치도 최종 정리
-   ① 기존 상단 7개 박스 제거
-      - 옥상 코트 5개
-      - 옥상 창고 2개
-   ② 창고 1개만 비 오는 옥상 영역 안으로 이동
-   ③ 창고는 기울이지 않고 반듯한 사각형
-   ④ 비 오는 옥상 헤더 영역 축소
-   ================================ */
-
-/* 기존 7개를 CSS에서도 확실히 제거 */
-.jgb-leak-plan-v1 .jgb-leak-roof-courts,
-.jgb-leak-plan-v1 .jgb-leak-roof-building.left,
-.jgb-leak-plan-v1 .jgb-leak-roof-building.right{
-  display:none!important;
-}
-
-/* 기존 시설영역에 있던 옥상 창고 항목 제거 */
-.jgb-leak-plan-v1 .jgb-leak-left-stack > div:nth-child(3){
-  display:none!important;
-}
-
-/* 비 오는 옥상 영역을 조금 낮게 */
-.jgb-leak-plan-v1 .jgb-leak-roof-panel{
-  top:2.8%!important;
-  height:11.5%!important;
-  min-height:0!important;
-}
-
-/* 옥상 제목도 같이 약간 축소 */
-.jgb-leak-plan-v1 .jgb-leak-roof-title{
-  transform:scale(.92);
-  transform-origin:center top;
-}
-
-/* 옥상 배수로는 그대로 보이되 박스와 겹치지 않게 */
-.jgb-leak-plan-v1 .jgb-leak-roof-drain{
-  transform:scale(.92);
-  transform-origin:center;
-}
-
-/* 새 창고 */
-.jgb-leak-roof-warehouse-final{
-  position:absolute!important;
-  z-index:20!important;
-  right:2.8%!important;
-  top:30%!important;
-  width:12%!important;
-  height:48%!important;
-  box-sizing:border-box!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  background:linear-gradient(180deg,#dfeaf0 0%,#c8d8e1 100%)!important;
-  border:1px solid #8ea6b5!important;
-  border-radius:2px!important;
-  transform:none!important;
-  box-shadow:0 5px 9px rgba(0,0,0,.18)!important;
-  color:#385565!important;
-  font-weight:900!important;
-  font-size:12px!important;
-}
-.jgb-leak-roof-warehouse-final::after{
-  content:"창고";
-}
-
-/* 기존 화면에 이전 수정으로 들어간 '창고' 텍스트가
-   1층 시설영역 오른쪽에 남아 있으면 사무실로 복원 */
-.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room:last-child b{
-  font-size:0!important;
-}
-.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room:last-child b::after{
-  content:"사무실";
-  font-size:inherit;
-}
-.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room:last-child small{
-  font-size:0!important;
-}
-.jgb-leak-plan-v1 .jgb-leak-room-grid .bottom-room:last-child small::after{
-  content:"관리·운영";
-  font-size:inherit;
-}
-</style>
-
 <script id="JGB_LEAK_FINAL_FIX_V3_SCRIPT">
 (function(){
   function fixLeakMap(){
@@ -29885,20 +29828,6 @@ cleanupDuplicateOnly();
   overflow:auto!important;
 }
 </style>
-
-<style id="JGB_LEAK_LAYOUT_V3">
-.jgb-leak-roof-panel{top:2.8%!important;height:21%!important}
-.jgb-leak-flow{top:23%!important;height:12%!important}
-.jgb-leak-indoor-label{top:36%!important}
-.jgb-leak-indoor{top:36%!important;height:31%!important}
-.jgb-leak-indoor-courts{height:100%!important}
-.jgb-leak-indoor-court{height:100%!important}
-.jgb-leak-facilities{bottom:2.8%!important;height:30%!important;grid-template-columns:100%!important}
-.jgb-leak-left-stack{display:none!important}
-.jgb-leak-room-grid{width:100%!important}
-.jgb-leak-room-grid .corridor{grid-column:1/7!important}
-</style>
-
 
 <style id="JGB_LEAK_REMOVE_BLUE_LABELS_V5">
 /* 누수배치도 상단 파란색 구역 문구 2개 삭제 */
