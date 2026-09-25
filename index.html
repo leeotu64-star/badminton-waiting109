@@ -32848,50 +32848,203 @@ cleanupDuplicateOnly();
 }
 </style>
 
-<style id="SCHEDULE_15_ROWS_COMPACT">
-.schedule-compact-table-wrap{max-height:514px!important;overflow-y:auto!important;overflow-x:auto!important}
-.schedule-compact-table th{height:30px!important;font-size:10px!important}
-.schedule-compact-table td{height:32px!important;padding:3px 6px!important;font-size:10px!important}
-.schedule-compact-table select.compact-sch{height:24px!important;padding:0 6px!important;font-size:10px!important;border-radius:5px!important}
-.schedule-compact-table th:first-child{width:60px!important}
-.schedule-compact-table th:not(:first-child),.schedule-compact-table td:not(:first-child){width:calc((100% - 60px)/4)!important}
-.schedule-compact-toolbar{height:48px!important;padding:7px 10px!important}
-.schedule-compact-toolbar input{height:30px!important;font-size:11px!important}
-.schedule-compact-toolbar .compact-save{height:30px!important;padding:0 11px!important;font-size:11px!important}
-</style>
 
+<style id="SCHEDULE_REBUILD_FINAL_20260925">
+/* =========================================================
+   업무 일정관리 최종 재구성
+   - 조명·릴선 관리처럼 콘텐츠 영역 전체 폭 사용
+   - 상부 헤더 / 하부 툴바 / 표를 동일한 가로 폭으로 정렬
+   - 내부 좌우 구조는 50:50 기준
+   - 한 화면에 15일 표시
+   ========================================================= */
 
-<style id="SCHEDULE_WIDTH_TIGHT_V2">
-/* 월간 근무편성 가로 폭을 확실히 축소 */
 .schedule-compact-page{
-  width:88%!important;
-  max-width:1180px!important;
-  margin:0 auto 10px!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid #dce5ee!important;
+  border-radius:10px!important;
+  box-shadow:none!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  background:#fff!important;
 }
-.schedule-compact-head,
-.schedule-compact-toolbar,
+
+/* 상부 헤더 */
+.schedule-compact-head{
+  width:100%!important;
+  height:68px!important;
+  min-height:68px!important;
+  box-sizing:border-box!important;
+  padding:8px 14px!important;
+  margin:0!important;
+  border:0!important;
+  border-bottom:2px solid #173d5a!important;
+  border-radius:8px 8px 0 0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+}
+
+/* 헤더 내부도 좌우 끝 기준 동일 */
+.schedule-compact-head>div:first-child{
+  min-width:0!important;
+  flex:1 1 auto!important;
+}
+
+.schedule-kicker{
+  font-size:8px!important;
+  line-height:1!important;
+  margin:0 0 2px!important;
+}
+
+.schedule-compact-head h2{
+  font-size:19px!important;
+  line-height:1.1!important;
+  margin:0!important;
+}
+
+.schedule-compact-head p{
+  font-size:9px!important;
+  line-height:1.1!important;
+  margin:2px 0 0!important;
+}
+
+.schedule-close-btn{
+  flex:0 0 auto!important;
+  font-size:22px!important;
+  padding:2px 5px!important;
+}
+
+/* 하부 상단 입력 헤더 */
+.schedule-compact-toolbar{
+  width:100%!important;
+  height:44px!important;
+  min-height:44px!important;
+  box-sizing:border-box!important;
+  padding:6px 10px!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  border:0!important;
+  border-bottom:1px solid #dce5ee!important;
+  background:#fff!important;
+}
+
+/* 날짜 / 저장 버튼 */
+.schedule-compact-toolbar input{
+  height:30px!important;
+  box-sizing:border-box!important;
+  font-size:10px!important;
+  padding:0 7px!important;
+}
+
+.schedule-compact-toolbar .compact-save{
+  height:30px!important;
+  box-sizing:border-box!important;
+  padding:0 11px!important;
+  font-size:10px!important;
+}
+
+/* 표 영역: 정확히 15개 행 */
 .schedule-compact-table-wrap{
   width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  height:510px!important;
+  max-height:510px!important;
+  box-sizing:border-box!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  border:0!important;
+  margin:0!important;
+  padding:0!important;
 }
+
+/* 표 자체 */
 .schedule-compact-table{
   width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
   table-layout:fixed!important;
+  border-collapse:collapse!important;
+  margin:0!important;
+  font-size:10px!important;
 }
-.schedule-compact-table th:first-child{
+
+/* 50:50 균형의 기준이 되도록 날짜열 제외 4직원 열을 동일 폭 */
+.schedule-compact-table th:first-child,
+.schedule-compact-table td:first-child{
   width:58px!important;
 }
+
 .schedule-compact-table th:not(:first-child),
 .schedule-compact-table td:not(:first-child){
   width:calc((100% - 58px)/4)!important;
 }
-.schedule-compact-table td{
-  padding-left:4px!important;
-  padding-right:4px!important;
+
+/* 표 상부 헤더 */
+.schedule-compact-table th{
+  height:30px!important;
+  min-height:30px!important;
+  padding:0 4px!important;
+  box-sizing:border-box!important;
+  font-size:10px!important;
+  line-height:30px!important;
+  white-space:nowrap!important;
+  border-bottom:1px solid #cad7e3!important;
 }
+
+/* 15일이 보이는 행 높이 */
+.schedule-compact-table td{
+  height:32px!important;
+  min-height:32px!important;
+  padding:3px 4px!important;
+  box-sizing:border-box!important;
+  font-size:10px!important;
+  line-height:1!important;
+}
+
+/* 선택창도 표 폭에 딱 맞춤 */
 .schedule-compact-table select.compact-sch{
   width:100%!important;
-  padding-left:5px!important;
-  padding-right:4px!important;
+  height:24px!important;
+  min-height:24px!important;
+  box-sizing:border-box!important;
+  padding:0 5px!important;
+  border-radius:5px!important;
   font-size:10px!important;
+  line-height:24px!important;
+}
+
+/* 좌우 어느 쪽도 별도 폭을 갖지 않게 */
+.jgb-main > .jgb-content .schedule-compact-page{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+}
+
+.jgb-main > .jgb-content .schedule-compact-head,
+.jgb-main > .jgb-content .schedule-compact-toolbar,
+.jgb-main > .jgb-content .schedule-compact-table-wrap{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+
+@media(max-width:800px){
+  .schedule-compact-page{
+    width:100%!important;
+  }
+  .schedule-compact-table-wrap{
+    overflow-x:auto!important;
+  }
+  .schedule-compact-table{
+    min-width:760px!important;
+  }
 }
 </style>
