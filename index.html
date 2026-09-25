@@ -25491,44 +25491,192 @@ document.addEventListener('click',handle,true);
 }
 </style>
 
-<style id="USER_REMOVE_DAILY_WORK_SPRINGS">
-/* 금일 업무현황 수첩 상단 스프링 제거 */
-.basic-book-layout .basic-v5-tasks::before,
-.basic-book-layout .basic-v5-tasks::after,
-.basic-book-layout::before,
-.basic-book-layout::after,
-.basic-book-layout .work-notebook-spring{
-  content:none!important;
-  display:none!important;
-  background:none!important;
-  box-shadow:none!important;
-  border:0!important;
+
+
+
+
+
+<style>
+#programCover{
+  position:fixed; inset:0; z-index:999999;
+  padding:14px 18px; box-sizing:border-box;
+  background:#edf2f6;
+  font-family:"Malgun Gothic",Arial,sans-serif;
 }
-.basic-book-layout .work-notebook{
-  padding-top:0!important;
+.navy-cover{
+  position:relative; width:100%; height:100%;
+  overflow:hidden; border-radius:18px;
+  background:#061d38;
+  box-shadow:0 18px 55px rgba(0,25,50,.25);
+}
+.navy-cover .block{
+  position:absolute; box-sizing:border-box;
+}
+.navy-cover .tl{
+  left:0; top:0; width:46%; height:78%;
+  background:#061d38;
+}
+.navy-cover .tr{
+  left:46%; top:0; width:54%; height:78%;
+  background:linear-gradient(135deg,#082b4d,#0b4f79);
+  padding:58px 70px;
+}
+.navy-cover .bl{
+  left:0; top:78%; width:46%; height:22%;
+  background:linear-gradient(135deg,#167eaa,#55b9d7);
+  overflow:hidden;
+}
+.navy-cover .br{
+  left:46%; top:78%; width:54%; height:22%;
+  background:#061d38;
+}
+.navy-cover .divider-v{
+  position:absolute; left:46%; top:0; bottom:0;
+  width:1px; background:rgba(255,255,255,.05);
+}
+.navy-cover .eyebrow{
+  color:#7fd5f7; font-size:12px; font-weight:900;
+  letter-spacing:.16em; margin-bottom:20px;
+}
+.navy-cover h1{
+  color:#fff; font-size:54px; line-height:1.05;
+  letter-spacing:-.065em; margin:0 0 12px;
+}
+.navy-cover h2{
+  color:#d9f3ff; font-size:27px; margin:0 0 13px;
+  letter-spacing:-.04em;
+}
+.navy-cover p{
+  color:#8fb0c4; font-size:13px; margin:0;
+}
+.navy-cover .start{
+  margin-top:34px; padding:13px 34px;
+  border:0; border-radius:9px;
+  background:#fff; color:#08608b;
+  font-weight:900; cursor:pointer;
+}
+.navy-cover .version{
+  position:absolute; left:70px; bottom:42px;
+  color:#6e9ab4; font-size:10px; letter-spacing:.06em;
+}
+.navy-cover .label{
+  position:absolute; right:30px; top:28px;
+  color:#d8f4ff; font-size:10px; letter-spacing:.12em;
+  font-weight:900;
+}
+.navy-cover .court{
+  position:absolute; left:14%; right:10%; top:20%; bottom:7%;
+  border:2px solid rgba(255,255,255,.72);
+  border-radius:8px;
+}
+.navy-cover .court:before{
+  content:""; position:absolute; left:50%; top:0; bottom:0;
+  border-left:2px solid rgba(255,255,255,.62);
+}
+.navy-cover .court:after{
+  content:""; position:absolute; left:11%; right:11%; top:50%;
+  border-top:2px solid rgba(255,255,255,.62);
+}
+.navy-cover .court-line{
+  position:absolute; left:10%; right:10%; top:17%;
+  border-top:2px solid rgba(255,255,255,.55);
+}
+.navy-cover .glow{
+  position:absolute; width:480px; height:480px;
+  border-radius:50%; border:1px solid rgba(255,255,255,.10);
+  right:-210px; top:-260px;
+}
+.navy-cover .glow2{
+  position:absolute; width:360px; height:360px;
+  border-radius:50%; border:1px solid rgba(255,255,255,.10);
+  left:-190px; bottom:-260px;
 }
 </style>
 
-<style id="GRAPH_TEXT_13_RED_FINAL">
-/* 월별 실적 그래프 영역만 수정 */
-.notebook-section-label{
-  font-size:13px!important;
+<div id="programCover">
+  <div class="navy-cover">
+    <div class="block tl"></div>
+    <div class="block tr">
+      <div class="eyebrow">JANGGUNBONG SPORTS CENTER</div>
+      <h1>장군봉체육관</h1>
+      <h2>통합 시설관리 시스템</h2>
+      <p>시설민원 · 시설관리 · 직원업무 · 운영관리</p>
+      <button class="start" onclick="document.getElementById('programCover').style.display='none'">프로그램 시작 →</button>
+      <div class="version">FACILITY MANAGEMENT SYSTEM · VERSION 67 · 2026</div>
+      <div class="label">FACILITY MANAGEMENT</div>
+    </div>
+    <div class="block bl">
+      <div class="badminton-court">
+        <div class="court-outline"></div>
+        <div class="court-center"></div>
+        <div class="court-service-left"></div>
+        <div class="court-service-right"></div>
+        <div class="court-net"></div>
+        <div class="court-net-post left"></div>
+        <div class="court-net-post right"></div>
+      </div>
+    </div>
+    <div class="block br"></div>
+    <div class="divider-v"></div>
+    <div class="glow"></div>
+    <div class="glow2"></div>
+  </div>
+</div>
+
+
+<style>
+.building-icon{
+  position:absolute;
+  left:12%;
+  right:9%;
+  top:10%;
+  bottom:4%;
 }
-.notebook-month-col b{
-  font-size:13px!important;
+.building-roof{
+  position:absolute;
+  left:5%;
+  right:5%;
+  top:2%;
+  height:30%;
+  background:#146f99;
+  clip-path:polygon(50% 0,100% 100%,0 100%);
+  filter:drop-shadow(0 3px 4px rgba(0,30,50,.18));
 }
-.notebook-month-col small{
-  font-size:13px!important;
+.building-body{
+  position:absolute;
+  left:14%;
+  right:14%;
+  top:29%;
+  bottom:13%;
+  border:4px solid rgba(255,255,255,.72);
+  background:linear-gradient(180deg,#197fa7,#56b6d2);
+  box-shadow:0 0 0 2px rgba(255,255,255,.18) inset;
 }
-.notebook-month-col.current b,
-.notebook-month-col.current small{
-  font-size:13px!important;
+.building-glass{
+  position:absolute;
+  inset:0;
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0 46px,
+      rgba(255,255,255,.58) 46px 48px),
+    linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.02));
 }
-.notebook-bar i{
-  background:#d9534f!important;
+.building-door{
+  position:absolute;
+  left:42%;
+  bottom:0;
+  width:16%;
+  height:47%;
+  border:2px solid rgba(255,255,255,.6);
+  border-bottom:0;
+  background:rgba(255,255,255,.10);
 }
-.notebook-month-col.current .notebook-bar i{
-  background:#d9534f!important;
+.building-ground{
+  position:absolute;
+  left:3%;
+  right:3%;
+  bottom:6%;
+  border-top:3px solid rgba(255,255,255,.72);
 }
 </style>
 
@@ -32753,43 +32901,126 @@ cleanupDuplicateOnly();
   }
 }
 </style>
-<style id="EMPLOYEE_NOTEBOOK_FINAL_BUTTON_ADJUST">
-/* 업무기록 확인: 하단 실선 바로 위에 작게 배치 */
-.employee-notebook-cover .notebook-cover-action{
-  position:absolute!important;
-  right:14px!important;
-  bottom:calc(12px + 1px)!important;
-  top:auto!important;
-  margin:0!important;
-  padding:6px 9px!important;
-  font-size:11px!important;
-  line-height:1.2!important;
-  z-index:10!important;
+
+<style>
+.badminton-court{
+  position:absolute;
+  left:8%; right:8%; top:13%; bottom:7%;
 }
-/* 가운데 표지 글씨는 한 단계 줄여 균형 조정 */
-.employee-notebook-cover .notebook-cover-inner strong{font-size:28px!important}
+.court-outline{
+  position:absolute; inset:7% 3% 8%;
+  border:3px solid rgba(255,255,255,.86);
+  border-radius:2px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.18) inset;
+}
+.court-center{
+  position:absolute; top:7%; bottom:8%; left:50%;
+  border-left:2px solid rgba(255,255,255,.78);
+}
+.court-service-left,
+.court-service-right{
+  position:absolute; top:23%; bottom:24%;
+  width:23%;
+  border-top:2px solid rgba(255,255,255,.72);
+  border-bottom:2px solid rgba(255,255,255,.72);
+}
+.court-service-left{left:16%}
+.court-service-right{right:16%}
+.court-net{
+  position:absolute; left:3%; right:3%; top:50%;
+  border-top:4px solid rgba(255,255,255,.94);
+  box-shadow:0 2px 5px rgba(0,35,60,.18);
+}
+.court-net-post{
+  position:absolute; top:47%; width:7px; height:10%;
+  background:rgba(255,255,255,.9); border-radius:3px;
+}
+.court-net-post.left{left:2%}
+.court-net-post.right{right:2%}
 </style>
 
-<style id="USER_SPRING_REMOVE_FINAL">
-/* 직원 업무현황 상단 스프링을 마지막 규칙으로 완전 제거 */
-.basic-book-layout .basic-v5-tasks::before,
-.basic-book-layout .basic-v5-tasks::after,
-.basic-work-status-wrap .work-notebook-spring,
-.basic-work-status-wrap .work-notebook-spring i,
-.work-notebook-spring,
-.work-notebook-spring i{
-  content:none!important;
-  display:none!important;
-  visibility:hidden!important;
-  opacity:0!important;
-  background:none!important;
-  border:0!important;
+<style>
+.badminton-court{left:1%;right:1%;top:3%;bottom:1%;}
+</style>
+
+<style>
+/* 배드민턴 코트 3D 효과 */
+.badminton-court{
+  transform:perspective(900px) rotateX(7deg) rotateY(-4deg);
+  transform-origin:center center;
+  filter:drop-shadow(0 18px 14px rgba(0,25,50,.28));
+}
+.court-outline{
+  background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(0,80,125,.12));
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.35),
+    inset 0 -5px 10px rgba(0,35,60,.18),
+    0 5px 0 rgba(4,58,91,.28);
+}
+.court-net{
+  height:8px;
+  border-top:0;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,.95),
+    rgba(173,224,239,.75) 45%,
+    rgba(41,104,133,.72));
+  border-radius:4px;
+  box-shadow:
+    0 4px 5px rgba(0,30,50,.28),
+    0 -1px 0 rgba(255,255,255,.7);
+}
+.court-net-post{
+  box-shadow:
+    2px 4px 5px rgba(0,25,45,.3),
+    inset 2px 0 2px rgba(255,255,255,.65);
+  transform:translateZ(8px);
+}
+.court-service-left,
+.court-service-right,
+.court-center{
+  filter:drop-shadow(1px 1px 1px rgba(0,35,55,.22));
+}
+</style>
+
+<style id="JGB_FLAT_BADMINTON_COURT">
+/* 3D 제거: 깔끔한 평면 배드민턴 코트 */
+.badminton-court{
+  transform:none!important;
+  transform-style:flat!important;
+  filter:none!important;
+  perspective:none!important;
+  left:4%!important; right:4%!important; top:8%!important; bottom:4%!important;
+}
+.court-outline{
+  inset:7% 3% 8%!important;
+  border:2px solid rgba(255,255,255,.92)!important;
+  border-radius:2px!important;
+  background:rgba(255,255,255,.04)!important;
   box-shadow:none!important;
 }
-
-/* 스프링 때문에 확보했던 상단 공간도 없앰 */
-.basic-work-status-wrap .work-notebook{
-  padding-top:0!important;
+.court-center{
+  top:7%!important; bottom:8%!important;
+  border-left:2px solid rgba(255,255,255,.82)!important;
+  filter:none!important;
+}
+.court-service-left,.court-service-right{
+  top:23%!important; bottom:24%!important;
+  border-top:2px solid rgba(255,255,255,.72)!important;
+  border-bottom:2px solid rgba(255,255,255,.72)!important;
+  filter:none!important;
+}
+.court-net{
+  left:3%!important; right:3%!important; top:50%!important;
+  height:2px!important;
+  border:0!important;
+  background:rgba(255,255,255,.9)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.court-net-post{
+  top:47%!important; width:5px!important; height:10%!important;
+  background:rgba(255,255,255,.88)!important;
+  box-shadow:none!important;
+  transform:none!important;
 }
 </style>
-
