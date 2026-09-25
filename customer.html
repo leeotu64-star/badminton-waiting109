@@ -3,40 +3,199 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>장군봉체육관 | 스마트폰 간편 접수</title>
+<title>장군봉체육관 | 시설 이용 불편 신고</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f3f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Malgun Gothic",sans-serif}
-.wrap{width:100%;max-width:560px;margin:auto;padding:20px 15px 35px}
-.card{background:#fff;border-radius:22px;padding:24px 18px;box-shadow:0 8px 30px rgba(20,40,70,.09)}
-.header{text-align:center;margin-bottom:25px}
-.header h1{font-size:26px;margin:0 0 8px;font-weight:900}
-.header p{margin:0;color:#667085;font-size:15px}
-.title{font-size:18px;font-weight:800;margin:0 0 13px}
-.place-picker{position:relative}
-.place-select{width:100%;height:58px;border:1px solid #d6deea;background:#fff;border-radius:15px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:800;color:#344054;box-shadow:0 3px 12px rgba(20,40,70,.05);cursor:pointer}
-.place-select:focus{outline:none;border-color:#1671d9;box-shadow:0 0 0 4px rgba(22,113,217,.10)}
-.place-select.placeholder{color:#98a2b3}
-.place-arrow{font-size:18px;color:#667085;transition:transform .2s}
-.place-picker.open .place-arrow{transform:rotate(180deg)}
-.place-menu{display:none;position:absolute;z-index:20;left:0;right:0;top:66px;background:#fff;border:1px solid #d6deea;border-radius:15px;padding:7px;box-shadow:0 14px 35px rgba(20,40,70,.14);max-height:280px;overflow:auto}
-.place-picker.open .place-menu{display:block}
-.place{width:100%;border:0;background:#fff;border-radius:11px;padding:13px 14px;text-align:left;font-size:15px;font-weight:700;color:#344054;cursor:pointer}
-.place:hover{background:#f4f8fd}
-.place.selected{background:#edf6ff;color:#075db8}
-.place-check{float:right;font-weight:900;color:#1671d9}
-.label{display:block;font-size:17px;font-weight:800;margin:23px 0 10px}
-textarea{width:100%;min-height:145px;border:1px solid #d8dee9;border-radius:13px;padding:14px;font-size:16px;line-height:1.55;resize:vertical;outline:none}
-textarea:focus{border-color:#1671d9}
-.submit{width:100%;border:0;border-radius:13px;background:#1671d9;color:white;font-size:17px;font-weight:900;padding:16px;margin-top:15px}
-.submit:disabled{opacity:.55}
-.note{margin-top:12px;padding:12px;border-radius:10px;background:#f5f7fa;color:#667085;font-size:13px;line-height:1.5;text-align:center}
-.done{text-align:center;padding:35px 5px 20px}
-.check{width:62px;height:62px;border-radius:50%;margin:0 auto 17px;background:#e8f7ee;color:#149447;font-size:38px;font-weight:900;line-height:62px}
-.done h2{margin:0 0 9px;font-size:23px}
-.done p{margin:0;color:#667085;line-height:1.6;font-size:15px}
-.again{background:#eef2f7;color:#344054;margin-top:22px}
+body{
+  margin:0;
+  background:#eef4f8;
+  color:#172033;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Malgun Gothic",sans-serif;
+}
+.wrap{width:100%;max-width:560px;margin:auto;padding:18px 14px 30px}
+.card{
+  background:#fff;
+  border:1px solid #dbe4ec;
+  border-radius:20px;
+  padding:24px 18px 20px;
+  box-shadow:0 8px 26px rgba(20,40,70,.08);
+}
+.header{text-align:center;margin-bottom:26px}
+.header h1{font-size:25px;margin:0 0 7px;font-weight:900;letter-spacing:-.7px}
+.header p{margin:0;color:#667085;font-size:14px}
+.step{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0 0 20px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#f4f7fa;
+  color:#526273;
+  font-size:13px;
+  font-weight:700;
+}
+.step span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:22px;height:22px;
+  border-radius:50%;
+  background:#176fc4;color:#fff;font-size:12px;
+}
+.field{margin-top:20px}
+.label{
+  display:block;
+  font-size:16px;
+  font-weight:900;
+  margin:0 0 9px;
+  letter-spacing:-.2px;
+}
+.helper{font-size:12px;color:#7a8795;margin:-2px 0 9px}
+.picker{position:relative}
+.select{
+  width:100%;
+  min-height:56px;
+  border:1px solid #cfdbe7;
+  background:#fff;
+  border-radius:12px;
+  padding:0 15px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:15px;
+  font-weight:800;
+  color:#344054;
+  box-shadow:0 2px 8px rgba(20,40,70,.035);
+  cursor:pointer;
+  text-align:left;
+}
+.select.placeholder{color:#98a2b3}
+.select:focus{outline:none;border-color:#176fc4;box-shadow:0 0 0 3px rgba(23,111,196,.11)}
+.arrow{font-size:17px;color:#667085;transition:transform .18s}
+.picker.open .arrow{transform:rotate(180deg)}
+.menu{
+  display:none;
+  position:absolute;
+  z-index:30;
+  left:0;right:0;top:62px;
+  background:#fff;
+  border:1px solid #cfdbe7;
+  border-radius:12px;
+  padding:6px;
+  box-shadow:0 12px 28px rgba(20,40,70,.14);
+  max-height:260px;
+  overflow:auto;
+}
+.picker.open .menu{display:block}
+.option{
+  width:100%;
+  border:0;
+  background:#fff;
+  border-radius:9px;
+  padding:13px 12px;
+  text-align:left;
+  font-size:15px;
+  font-weight:700;
+  color:#263548;
+  cursor:pointer;
+}
+.option:hover,.option.selected{background:#edf5fc;color:#0d5da5}
+.option-check{float:right;font-weight:900;color:#176fc4}
+textarea{
+  width:100%;
+  min-height:140px;
+  border:1px solid #cfdbe7;
+  border-radius:12px;
+  padding:14px;
+  font-size:15px;
+  line-height:1.6;
+  resize:vertical;
+  outline:none;
+  color:#172033;
+}
+textarea::placeholder{color:#9aa6b2}
+textarea:focus{border-color:#176fc4;box-shadow:0 0 0 3px rgba(23,111,196,.08)}
+.submit{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  background:#176fc4;
+  color:#fff;
+  font-size:16px;
+  font-weight:900;
+  padding:16px;
+  margin-top:20px;
+  cursor:pointer;
+}
+.submit:active{transform:translateY(1px)}
+.submit:disabled{opacity:.55;cursor:default}
+.note{
+  margin-top:10px;
+  padding:11px 12px;
+  border-radius:9px;
+  background:#f4f7fa;
+  color:#687789;
+  font-size:12px;
+  line-height:1.5;
+  text-align:center;
+}
+.done{padding:8px 2px 4px}
+.done-head{
+  text-align:center;
+  padding:10px 0 20px;
+  border-bottom:1px solid #e2e8ef;
+}
+.check{
+  width:58px;height:58px;
+  border-radius:50%;
+  margin:0 auto 14px;
+  background:#eaf7ef;
+  border:1px solid #c8ead5;
+  color:#138a47;
+  font-size:31px;
+  font-weight:900;
+  line-height:58px;
+}
+.done h2{margin:0 0 8px;font-size:22px;letter-spacing:-.5px}
+.done-lead{margin:0;color:#617084;line-height:1.6;font-size:14px}
+.summary{margin-top:18px;border:1px solid #d9e2eb;border-radius:12px;overflow:hidden}
+.summary-title{
+  padding:11px 13px;
+  background:#f3f6f9;
+  font-size:14px;
+  font-weight:900;
+}
+.row{
+  display:grid;
+  grid-template-columns:92px 1fr;
+  border-top:1px solid #e3e8ee;
+  min-height:45px;
+}
+.row .key{
+  background:#f8fafc;
+  padding:12px;
+  font-size:13px;
+  font-weight:800;
+  color:#526273;
+}
+.row .value{
+  padding:12px;
+  font-size:13px;
+  color:#263548;
+  word-break:break-word;
+}
+.process{
+  margin-top:14px;
+  padding:13px;
+  border-radius:10px;
+  background:#f5f8fb;
+  color:#5d6d7e;
+  font-size:12px;
+  line-height:1.65;
+}
+.again{background:#176fc4;color:#fff;margin-top:18px}
 </style>
 </head>
 <body>
@@ -47,68 +206,110 @@ const SUPABASE_URL="https://uadyitdlyponeilywacr.supabase.co";
 const SUPABASE_KEY="sb_publishable_uJl-AIFKhucxDzgst9JxJA_0FjvYKB9";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const PLACES=["남자 샤워실","여자 샤워실","여자 화장실","남자 화장실","복도","코트","휴게실","기타"];
+const PLACES=[
+  "코트","남자 샤워실","여자 샤워실","남자 화장실","여자 화장실",
+  "복도·통로","휴게실","탈의실","기타"
+];
+
+const ISSUE_TYPES=[
+  "청소 필요","물 고임·누수","쓰레기","소모품 부족","시설 파손",
+  "조명 이상","냉난방 이상","소음","기타"
+];
+
 let selectedPlace="";
+let selectedIssueType="";
+
+function makePicker(id, buttonId, textId, menuId, options, placeholder){
+  const picker=document.getElementById(id);
+  const btn=document.getElementById(buttonId);
+  const text=document.getElementById(textId);
+
+  btn.addEventListener("click",()=>{
+    const open=picker.classList.toggle("open");
+    btn.setAttribute("aria-expanded",open);
+  });
+
+  picker.querySelectorAll(".option").forEach(option=>{
+    option.addEventListener("click",()=>{
+      text.textContent=option.dataset.value;
+      btn.classList.remove("placeholder");
+      picker.querySelectorAll(".option").forEach(o=>{
+        o.classList.remove("selected");
+        const c=o.querySelector(".option-check");
+        if(c)c.hidden=true;
+      });
+      option.classList.add("selected");
+      const c=option.querySelector(".option-check");
+      if(c)c.hidden=false;
+      picker.classList.remove("open");
+      btn.setAttribute("aria-expanded","false");
+
+      if(id==="placePicker") selectedPlace=option.dataset.value;
+      if(id==="issuePicker") selectedIssueType=option.dataset.value;
+    });
+  });
+}
 
 function showForm(){
   selectedPlace="";
+  selectedIssueType="";
+
   document.getElementById("app").innerHTML=`
     <div class="header">
       <h1>장군봉체육관</h1>
-      <p>스마트폰 간편 접수</p>
+      <p>시설 이용 불편 신고</p>
     </div>
 
-    <div class="title">시설 이상 신고</div>
-    <div class="place-picker" id="placePicker">
-      <button class="place-select placeholder" id="placeSelect" type="button" aria-expanded="false">
-        <span id="placeText">발생 장소를 선택해 주세요</span><span class="place-arrow">⌄</span>
-      </button>
-      <div class="place-menu" id="placeMenu">
-        ${PLACES.map(p=>`<button class="place" type="button" data-place="${p}">${p}<span class="place-check" hidden>✓</span></button>`).join("")}
+    <div class="step"><span>1</span> 발생 장소 선택 <span>2</span> 불편 유형 선택 <span>3</span> 상세내용 입력</div>
+
+    <div class="field">
+      <label class="label">발생 장소</label>
+      <div class="picker" id="placePicker">
+        <button class="select placeholder" id="placeSelect" type="button" aria-expanded="false">
+          <span id="placeText">발생 장소를 선택해 주세요</span><span class="arrow">⌄</span>
+        </button>
+        <div class="menu" id="placeMenu">
+          ${PLACES.map(p=>`<button class="option" type="button" data-value="${p}">${p}<span class="option-check" hidden>✓</span></button>`).join("")}
+        </div>
       </div>
     </div>
 
-    <label class="label" for="issue">이상 내용을 입력해 주세요</label>
-    <textarea id="issue" placeholder="예: 샤워기에서 물이 새고 있습니다."></textarea>
+    <div class="field">
+      <label class="label">불편 유형</label>
+      <div class="picker" id="issuePicker">
+        <button class="select placeholder" id="issueSelect" type="button" aria-expanded="false">
+          <span id="issueText">불편 유형을 선택해 주세요</span><span class="arrow">⌄</span>
+        </button>
+        <div class="menu" id="issueMenu">
+          ${ISSUE_TYPES.map(p=>`<button class="option" type="button" data-value="${p}">${p}<span class="option-check" hidden>✓</span></button>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label" for="issue">상세내용</label>
+      <div class="helper">불편한 상황을 구체적으로 입력해 주세요.</div>
+      <textarea id="issue" placeholder="예: 3번 코트 주변 바닥에 물이 고여 미끄럽습니다."></textarea>
+    </div>
 
     <button class="submit" id="submit" type="button">접수하기</button>
-    <div class="note">접수된 내용은 관리자 작업관리에서 확인 후 조치합니다.</div>
+    <div class="note">접수된 내용은 체육관 관리자에게 전달되어 확인 후 조치됩니다.</div>
   `;
 
-  const picker=document.getElementById("placePicker");
-  const selectBtn=document.getElementById("placeSelect");
-  const placeText=document.getElementById("placeText");
+  makePicker("placePicker","placeSelect","placeText","placeMenu",PLACES,"발생 장소를 선택해 주세요");
+  makePicker("issuePicker","issueSelect","issueText","issueMenu",ISSUE_TYPES,"불편 유형을 선택해 주세요");
 
-  selectBtn.addEventListener("click",()=>{
-    const open=picker.classList.toggle("open");
-    selectBtn.setAttribute("aria-expanded",open);
-  });
-
-  document.querySelectorAll(".place").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      selectedPlace=btn.dataset.place;
-      placeText.textContent=selectedPlace;
-      selectBtn.classList.remove("placeholder");
-
-      document.querySelectorAll(".place").forEach(b=>{
-        b.classList.remove("selected");
-        b.querySelector(".place-check").hidden=true;
-      });
-
-      btn.classList.add("selected");
-      btn.querySelector(".place-check").hidden=false;
-      picker.classList.remove("open");
-      selectBtn.setAttribute("aria-expanded","false");
+  const closeMenus=(e)=>{
+    ["placePicker","issuePicker"].forEach(id=>{
+      const picker=document.getElementById(id);
+      if(picker && !picker.contains(e.target)){
+        picker.classList.remove("open");
+        const btn=picker.querySelector(".select");
+        if(btn)btn.setAttribute("aria-expanded","false");
+      }
     });
-  });
-
-  document.addEventListener("click",e=>{
-    if(!picker.contains(e.target)){
-      picker.classList.remove("open");
-      selectBtn.setAttribute("aria-expanded","false");
-    }
-  });
-
+  };
+  document.addEventListener("click",closeMenus,{once:true});
   document.getElementById("submit").addEventListener("click",submitIssue);
 }
 
@@ -117,17 +318,21 @@ async function submitIssue(){
   const content=document.getElementById("issue").value.trim();
 
   if(!selectedPlace){alert("발생 장소를 선택해 주세요.");return}
-  if(!content){alert("이상 내용을 입력해 주세요.");return}
+  if(!selectedIssueType){alert("불편 유형을 선택해 주세요.");return}
+  if(!content){alert("상세내용을 입력해 주세요.");return}
 
   btn.disabled=true;
   btn.textContent="접수 중...";
 
+  const receivedAt=new Date();
+  const savedContent=`[불편 유형] ${selectedIssueType}\n[상세내용] ${content}`;
+
   const {error}=await supabaseClient.from("requests").insert([{
     category:"시설",
     place:selectedPlace,
-    content:content,
+    content:savedContent,
     status:"접수",
-    received_at:new Date().toISOString()
+    received_at:receivedAt.toISOString()
   }]);
 
   if(error){
@@ -138,18 +343,49 @@ async function submitIssue(){
     return;
   }
 
-  showDone();
+  showDone(selectedPlace,selectedIssueType,receivedAt);
 }
 
-function showDone(){
+function formatTime(date){
+  return date.toLocaleString("ko-KR",{
+    year:"numeric",month:"2-digit",day:"2-digit",
+    hour:"2-digit",minute:"2-digit"
+  });
+}
+
+function showDone(place,issueType,receivedAt){
   document.getElementById("app").innerHTML=`
     <div class="done">
-      <div class="check">✓</div>
-      <h2>접수가 완료되었습니다.</h2>
-      <p>시설 이상 신고가 관리자에게 전달되었습니다.<br>확인 후 조치하겠습니다.</p>
-      <button class="submit again" type="button" onclick="showForm()">추가 접수하기</button>
+      <div class="done-head">
+        <div class="check">✓</div>
+        <h2>시설 이용 불편 신고가<br>접수되었습니다.</h2>
+        <p class="done-lead">접수하신 내용은 관리자에게 전달되었습니다.<br>확인 후 필요한 조치를 진행합니다.</p>
+      </div>
+
+      <div class="summary">
+        <div class="summary-title">접수 내용 확인</div>
+        <div class="row"><div class="key">발생 장소</div><div class="value">${escapeHtml(place)}</div></div>
+        <div class="row"><div class="key">불편 유형</div><div class="value">${escapeHtml(issueType)}</div></div>
+        <div class="row"><div class="key">접수 시간</div><div class="value">${escapeHtml(formatTime(receivedAt))}</div></div>
+      </div>
+
+      <div class="process">
+        접수된 신고는 시설 관리 담당자가 확인합니다.<br>
+        현장 확인이 필요한 경우 확인 후 조치하며, 시설 이용에 불편을 드려 죄송합니다.
+      </div>
+
+      <button class="submit again" type="button" onclick="showForm()">추가 신고하기</button>
     </div>
   `;
+}
+
+function escapeHtml(value){
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
 
 showForm();
