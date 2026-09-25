@@ -26269,6 +26269,81 @@ html, body {
 }
 </style>
 
+
+<style id="JGB_EAM_LAYOUT_USER_REQUEST_20260926_V1">
+/* 현재 원본 기준: 배치도 레이아웃만 수정. 기존 기능/데이터/JS는 변경하지 않음 */
+
+/* 전체 배치도 : 좌측 시설 배치 70% / 우측 실시간 조치 30% */
+.eh-main{
+  grid-template-columns:minmax(0,7fr) minmax(300px,3fr)!important;
+}
+
+/* 코트 상부 선과 코트 사이 여백 확대 */
+.eh-floor-1f .eh-courts{
+  top:2%!important;
+  height:28%!important;
+}
+.eh-floor-1f .eh-court{
+  margin-top:30px!important;
+}
+
+/* 시설 영역은 코트 아래에서 자연스럽게 시작 */
+.eh-floor-1f .eh-facility{
+  top:30%!important;
+  height:70%!important;
+  bottom:auto!important;
+}
+
+/* 휴게실은 유지 / 사무실·기타구역 축소 / 통합 유수장치실 확대 */
+.eh-floor-1f .eh-bottom{
+  grid-template-columns:1fr 2.5fr .75fr .75fr!important;
+  gap:4px!important;
+}
+.eh-floor-1f .eh-bottom .eh-zone:nth-child(1){
+  /* 휴게실: 기존 폭 기준 유지 */
+}
+.eh-floor-1f .eh-bottom .eh-zone:nth-child(2){
+  /* 통합 유수장치실: 확대 */
+}
+.eh-floor-1f .eh-bottom .eh-zone:nth-child(3),
+.eh-floor-1f .eh-bottom .eh-zone:nth-child(4){
+  /* 사무실/기타구역: 축소 */
+}
+
+/* 옥상 바로 옆에 창고 1개 표시 */
+.eh-floor-2f .eh-second-grid{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:6px!important;
+}
+.eh-floor-2f .roof2,
+.eh-floor-2f .store2{
+  display:flex!important;
+  min-width:0!important;
+}
+
+/* 작은 화면에서도 2층 옥상·창고는 나란히 유지 */
+@media(max-width:700px){
+  .eh-floor-1f .eh-courts{
+    top:2%!important;
+    height:28%!important;
+  }
+  .eh-floor-1f .eh-court{
+    margin-top:26px!important;
+  }
+  .eh-floor-1f .eh-facility{
+    top:30%!important;
+    height:70%!important;
+  }
+  .eh-floor-1f .eh-bottom{
+    grid-template-columns:1fr 2.5fr .75fr .75fr!important;
+  }
+  .eh-floor-2f .eh-second-grid{
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
