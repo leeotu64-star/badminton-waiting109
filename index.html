@@ -10064,7 +10064,7 @@ html,body{
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}${nav("settings","설정")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      const mobileContent=document.getElementById('jgbMobileContent');
      if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
@@ -10082,7 +10082,8 @@ html,body{
         waterproof:"WP",
         basic:"업무",
         schedule:"일정",
-        lighting:"조명"
+        lighting:"조명",
+        settings:"⚙"
       };
       const icon=icons[p]||"•";
       return `<a class="jgb-link ${page===p?"on":""}" href="?page=${encodeURIComponent(p)}" data-page="${p}"><span class="jgb-nav-icon">${icon}</span><span class="jgb-nav-label">${t}</span></a>`
@@ -10091,7 +10092,20 @@ html,body{
     function go(p){if(!p||p==="digitalTwin")return;if(p==="opsboard")p="dashboard";page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
     window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";if(page==="digitalTwin"||page==="opsboard")page="dashboard";render()})
     window.render=render;
+    function settingsPage(){
+      return `<div class="panel" style="max-width:900px;margin:0 auto">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #dbe5ee;padding-bottom:12px;margin-bottom:18px">
+          <div><h2 style="margin:0;color:#123a5b">⚙ 설정</h2><p style="margin:5px 0 0;color:#71869a;font-size:12px">연습 모드에서 사용하는 초기화 기능을 관리합니다.</p></div>
+        </div>
+        <section style="border:1px solid #d7e2ec;border-radius:12px;background:#fff;padding:18px">
+          <h3 style="margin:0 0 7px;color:#183b59">연습 모드 데이터 초기화</h3>
+          <p style="margin:0 0 14px;color:#6f8293;font-size:12px;line-height:1.6">민원 접수·처리, 기본업무 완료 기록, 일정 및 연습용 집계 기준을 초기 상태로 되돌립니다. 실제 운영 데이터(Supabase)는 삭제하지 않습니다.</p>
+          <button type="button" class="btn" style="background:#d9534f;color:#fff;border:1px solid #c74440;font-weight:800;padding:10px 16px;border-radius:8px" onclick="resetPracticeAll()">↻ 연습모드 전체 리셋</button>
+        </section>
+      </div>`;
+    }
     function body(){
+      if(page==="settings")return settingsPage();
       if(page==="lighting")return (typeof window.jgbLightReelPageMarkup==="function"?window.jgbLightReelPageMarkup():"<div></div>");
       if(page==="digitalTwin")return digitalTwinPage();
     if(page==="dashboard2")return dashboard2();
