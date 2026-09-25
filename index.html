@@ -13392,24 +13392,51 @@ function jgbV47GoWpByLeak(leakCode){
         alert("실적 리셋에 실패했습니다. Supabase basic_tasks 삭제 권한을 확인하세요.");
       }
     }
-    function resetPracticeAll(){
-      if(!confirm("연습모드의 모든 입력·집계 데이터를 초기화할까요?\n\n민원 접수·처리, 기본업무 완료 기록, 일정 및 연습용 집계 기준이 초기 상태로 돌아갑니다.\n실제 운영 데이터(Supabase)는 삭제하지 않습니다."))return;
+    async function resetPracticeAll(){
+      if(!confirm("연습모드의 모든 입력·집계 데이터를 초기화할까요?\n\n① 시설민원 접수·처리\n② 시설물 유지관리 현황의 실시간 조치\n③ 조명·릴선 상태·유지관리 이력\n④ 기본업무 완료 기록·일정·연습용 집계\n\n※ 연습 모드 전체 리셋은 저장된 연습 데이터를 초기 상태로 되돌립니다."))return;
       try{
+        /* 1) 민원/업무/일정 로컬 데이터 */
         db={issues:[],tasks:{},schedule:{}};
         localStorage.removeItem(KEY);
         localStorage.removeItem('JGB_NUMERIC_RESET_V2_AT');
         localStorage.removeItem('JGB_NUMERIC_RESET_AT');
         localStorage.removeItem('JGB_OPX_PERIOD');
+        localStorage.removeItem('JGB_EAM_MANUAL_REPAIR_LIVE_V1');
+        localStorage.removeItem('JGB_EAM_HEADER_STATS_RESET_V1');
+        localStorage.removeItem('JGB_EAM_HYUNHWANG_MAP_V1');
+        localStorage.removeItem('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1');
+        localStorage.removeItem('JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1');
+        localStorage.removeItem('JGB_LK_DRAFT_POS');
+        localStorage.removeItem('JGB_V48_WP_SELECTED_LEAK');
+        localStorage.removeItem('JGB_V72_SELECTED_WP');
+        localStorage.removeItem('JGB_V178_LIVE_MANUAL');
+        localStorage.removeItem('JGB_V180_LIVE_DONE');
+        /* 2) 조명·릴선: 상태/수리이력을 최초 기본값으로 복원 */
+        localStorage.removeItem('jgb_lr_v10');
+        /* 3) 숫자 집계/선택 상태 */
         window.__JGB_NUMERIC_RESET_AT=0;
         window.__JGB_NUMERIC_ZERO=false;
         if(window.__basicWorkerPage!==undefined)window.__basicWorkerPage=0;
         if(window.employeeDetailSelection)window.employeeDetailSelection=[];
         save();
+
+        /* 4) 현재 민원관리 화면이 Supabase requests를 다시 읽어오므로
+              연습모드 전체 리셋에서는 해당 접수 데이터도 함께 비움 */
+        if(window.SUPA){
+          const rq=await window.SUPA.from('requests').delete().not('id','is',null);
+          if(rq.error)throw rq.error;
+          /* 기본업무 완료 실적도 연습 데이터로 취급 */
+          const bt=await window.SUPA.from('basic_tasks').delete().not('worker_id','is',null);
+          if(bt.error)console.warn('basic_tasks 초기화 실패:',bt.error);
+        }
+
+        if(typeof syncFromSupabase==='function')await syncFromSupabase();
         render();
-        alert('연습모드 전체 초기화가 완료되었습니다.');
+        alert('연습모드 전체 초기화가 완료되었습니다.\n시설민원 관리와 시설물 유지관리 현황도 초기화되었습니다.');
       }catch(e){
         console.error(e);
-        alert('연습모드 전체 초기화에 실패했습니다.');
+        render();
+        alert('전체 초기화 중 일부 항목을 초기화하지 못했습니다.\n'+(e?.message||e));
       }
     }
     function resetAll(){resetPracticeAll()}
