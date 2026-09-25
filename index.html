@@ -11357,8 +11357,10 @@ html,body{
   <section class="eh-floor eh-floor-1f">
     <div class="eh-courts"><b>코트 구역</b>${[5,4,3,2,1].map(n=>`<div class="eh-court eh-court-3d" data-court="${n}"><div class="eh-court-surface"><span class="eh-court-net"></span><b>${n}</b></div></div>`).join('')}</div>
     <div class="eh-facility">
-      <div class="eh-row">${zone('화장실(남)','남자 화장실')}${zone('샤워실(남)','남자 샤워실')}${zone('탈의실(남)','남자 탈의실')}${zone('화장실(여)','여자 화장실','pink')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}</div>
-      <div class="eh-corridor">복도</div>
+      <div class="eh-facility-groups">
+        <div class="eh-facility-group male"><b class="eh-group-title">남자 시설</b><div class="eh-group-zones">${zone('화장실(남)','남자 화장실')}${zone('샤워실(남)','남자 샤워실')}${zone('탈의실(남)','남자 탈의실')}</div></div>
+        <div class="eh-facility-group female"><b class="eh-group-title">여자 시설</b><div class="eh-group-zones">${zone('화장실(여)','여자 화장실','pink')}${zone('샤워실(여)','여자 샤워실','pink')}${zone('탈의실(여)','여자 탈의실','pink')}</div></div>
+      </div>
       <div class="eh-bottom">${zone('휴게실','휴게공간')}${zone('통합 유수장치실','소방 · 유수 설비','water')}${zone('사무실','관리 · 운영')}${zone('기타구역','기타 시설구역')}</div>
     </div>
   </section>
@@ -26354,6 +26356,27 @@ html, body {
 }
 </style>
 
+
+<style id="EAM_MAP_SECTIONED_LAYOUT_FINAL_20260926">
+/* 배치도 요청사항: 복도 제거 + 시설을 테두리 그룹으로 구분 + 코트도 독립 박스로 구분 */
+.eh-main{grid-template-columns:minmax(0,7fr) minmax(300px,3fr)!important;}
+.eh-map{overflow:auto!important;}
+.eh-courts{left:6%!important;right:6%!important;top:2%!important;height:28%!important;gap:6px!important;padding:20px 4px 6px!important;box-sizing:border-box!important;border:1px solid #8aa2b2!important;border-radius:5px!important;background:#f7fafc!important;}
+.eh-courts>b{top:4px!important;}
+.eh-court{margin-top:0!important;border:1px solid #678092!important;border-radius:3px!important;min-width:0!important;}
+.eh-facility{left:1.5%!important;right:1.5%!important;top:31%!important;bottom:1.5%!important;height:auto!important;display:flex!important;flex-direction:column!important;gap:6px!important;}
+.eh-floor-1f .eh-corridor{display:none!important;}
+.eh-facility-groups{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:6px!important;flex:0 0 38%!important;min-height:0!important;}
+.eh-facility-group{border:1px solid #7892a4!important;border-radius:5px!important;background:#fbfdfe!important;padding:4px!important;box-sizing:border-box!important;min-width:0!important;display:flex!important;flex-direction:column!important;}
+.eh-group-title{display:block!important;text-align:center!important;font-size:10px!important;font-weight:900!important;height:22px!important;line-height:22px!important;color:#173c55!important;}
+.eh-group-zones{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:4px!important;flex:1!important;min-height:0!important;}
+.eh-group-zones .eh-zone{border:1px solid #159447!important;border-radius:4px!important;background:#fff!important;min-width:0!important;}
+.eh-group-zones .eh-zone.pink{background:#fff!important;}
+.eh-bottom{display:grid!important;grid-template-columns:1fr 2.5fr .75fr .75fr!important;gap:4px!important;flex:1 1 auto!important;min-height:0!important;border:1px solid #7892a4!important;border-radius:5px!important;padding:4px!important;box-sizing:border-box!important;}
+.eh-bottom>.eh-zone{border:1px solid #7892a4!important;border-radius:3px!important;min-width:0!important;}
+.eh-bottom>.eh-zone:nth-child(2){background:linear-gradient(145deg,#fffdf1,#fff0b6 58%,#e2c86d)!important;}
+.eh-floor-2f .eh-second-grid{grid-template-columns:1fr 1fr!important;gap:6px!important;}
+</style>
 </body>
 
 <style id="v19-court-position-final">
