@@ -25532,6 +25532,65 @@ document.addEventListener('click',handle,true);
 }
 </style>
 
+
+<script id="practice-dojo-number-reset-v1">
+(function(){
+  'use strict';
+
+  function findInputs(){
+    const all=[...document.querySelectorAll('input[type="number"]')];
+    return all.filter(function(el){
+      let p=el;
+      for(let i=0;i<10 && p;i++,p=p.parentElement){
+        const t=(p.textContent||'').replace(/\s+/g,' ');
+        if(t.includes('연습무도장') && (t.includes('설정') || t.includes('숫자'))) return true;
+      }
+      return false;
+    });
+  }
+
+  function addButton(){
+    if(document.getElementById('practiceDojoAllNumberReset')) return;
+    const inputs=findInputs();
+    if(!inputs.length) return;
+
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.id='practiceDojoAllNumberReset';
+    btn.textContent='전체 숫자 리셋';
+    btn.title='연습무도장 설정의 모든 숫자 입력값을 초기 기본값으로 되돌립니다.';
+    btn.style.cssText='margin-left:8px;padding:8px 12px;border:1px solid #b9c8d8;border-radius:8px;background:#f7fbff;color:#174a73;font-weight:800;cursor:pointer;';
+
+    btn.onclick=function(){
+      const targets=findInputs();
+      if(!targets.length) return;
+      if(!confirm('연습무도장 설정의 모든 숫자 입력값을 초기 기본값으로 되돌리겠습니까?\\n숫자가 아닌 입력값과 다른 데이터는 변경하지 않습니다.')) return;
+
+      targets.forEach(function(input){
+        input.value=input.defaultValue || '';
+        input.dispatchEvent(new Event('input',{bubbles:true}));
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      });
+    };
+
+    inputs[0].parentElement.appendChild(btn);
+  }
+
+  function boot(){
+    addButton();
+    setTimeout(addButton,300);
+    setTimeout(addButton,1000);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
+
+  new MutationObserver(function(){
+    if(!document.getElementById('practiceDojoAllNumberReset')) addButton();
+  }).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -32793,40 +32852,3 @@ cleanupDuplicateOnly();
 }
 </style>
 
-
-<style id="GLOBAL_VIEWPORT_90_LAYOUT_ONLY">
-/* 90% 브라우저 배율에서 전체 관리자 외곽 레이아웃만 통일
-   zoom/transform으로 배율을 강제하지 않음 */
-html, body{
-  width:100%;
-  min-width:0;
-  margin:0;
-  box-sizing:border-box;
-}
-*,*::before,*::after{box-sizing:border-box;}
-
-body{
-  overflow-x:hidden;
-}
-
-/* 페이지 외곽 공통 폭 */
-.page,
-.page-container,
-.screen,
-.screen-container,
-.content,
-.content-wrap,
-.main-content,
-.jgb-main{
-  width:100%;
-  max-width:none;
-  min-width:0;
-  box-sizing:border-box;
-}
-
-/* 기존 내부 콘텐츠가 부모를 넘지 않도록만 정리 */
-img,svg,canvas{
-  max-width:100%;
-}
-
-</style>
