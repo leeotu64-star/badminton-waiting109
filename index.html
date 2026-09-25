@@ -4443,7 +4443,7 @@ a[data-page="digitalTwin"],
 <style id="JGB_V8_EMPLOYEE_RELAYOUT">
 /* V8: 직원업무실적 레이아웃 재배치. 기능/계산식/월별·연별 데이터 로직은 변경하지 않음. */
 .opx-dash{max-width:1500px!important;width:100%!important;margin:0 auto!important;padding:3px 0 14px!important}
-.employee-hero.opx-hero{height:78px!important;min-height:78px!important;padding:10px 20px!important;grid-template-columns:minmax(0,1fr) 245px!important;gap:12px!important;border-radius:17px!important}
+.employee-hero.opx-hero{height:104px!important;min-height:104px!important;padding:10px 20px!important;grid-template-columns:minmax(0,1fr) 245px!important;gap:12px!important;border-radius:17px!important}
 .employee-hero .opx-eyebrow{font-size:8px!important;letter-spacing:1.4px!important}
 .employee-hero .opx-title{font-size:29px!important;line-height:1.05!important;margin:2px 0 3px!important}
 .employee-hero .opx-sub{font-size:10px!important;line-height:1.25!important;max-width:850px!important}
@@ -9644,165 +9644,484 @@ html,body{
 }
 </style>
 
-<style id="JGB_LIGHTING_HEADER_MASTER_CLEAN">
-/* ==========================================================
-   헤더 통합 기준 = 조명·릴선 관리
-   원본 구조/기능/데이터 유지
-   가로 폭·좌우 배치 변경 금지
-   ========================================================== */
-
+<style id="JGB_ALL_ADMIN_HEADERS_FINAL_UNIFIED">
+/* =========================================================
+   관리자 전체 헤더 최종 공통 규격
+   기준: 조명·릴선 관리의 기관형 헤더 구조
+   - 헤더만 통일
+   - 본문/데이터/기능/JS는 변경하지 않음
+   ========================================================= */
 :root{
-  --jgb-lr-header-height:78px;
-  --jgb-lr-icon-size:43px;
-  --jgb-lr-brand-gap:11px;
+  --jgb-header-h:88px;
+  --jgb-header-pad-x:22px;
+  --jgb-header-icon:44px;
+  --jgb-header-gap:12px;
+  --jgb-header-title:24px;
+  --jgb-header-desc:11px;
+  --jgb-header-kicker:8px;
 }
 
-/* 공통 관리자 헤더: 실제 외곽 높이만 조명 기준으로 강제 */
-.jgb-lr-v54-head,
-.jgb-repair-page .jgb-repair-head,
-.jgb-v66-top,
-.jgb-v170-head,
+/* 주요 관리자 화면 상단 헤더 */
+.jgb-common-header,
+.jgb-page-header,
+.jgb-page-title,
 .basic-v5-head,
 .pagebar,
-.schedule-compact-head,
-.jgb-page-title,
-.employee-hero,
-.ca-hero{
-  height:var(--jgb-lr-header-height)!important;
-  min-height:var(--jgb-lr-header-height)!important;
-  max-height:var(--jgb-lr-header-height)!important;
+.jgb-v66-top,
+.jgb-v170-head,
+.jgb-lr-v54-head,
+.eam-innovation .eam-innovation-head,
+.eh-head,
+.schedule-compact-head{
   box-sizing:border-box!important;
-}
-
-/* 헤더 내부의 세로 기준만 통일.
-   가로 flex/grid 구조는 각 화면 기존 것을 유지 */
-.jgb-lr-v54-head,
-.jgb-repair-page .jgb-repair-head,
-.jgb-v66-top,
-.jgb-v170-head,
-.basic-v5-head,
-.pagebar,
-.schedule-compact-head,
-.jgb-page-title,
-.employee-hero,
-.ca-hero{
+  height:var(--jgb-header-h)!important;
+  min-height:var(--jgb-header-h)!important;
+  max-height:var(--jgb-header-h)!important;
+  flex:0 0 var(--jgb-header-h)!important;
+  padding:0 var(--jgb-header-pad-x)!important;
+  display:flex!important;
   align-items:center!important;
-}
-
-/* 조명 기준 아이콘 영역 크기.
-   아이콘 모양/내용은 각 화면 것을 유지 */
-.jgb-lr-v54-brandico,
-.jgb-repair-brandico,
-.jgb-v66-top .brand-icon,
-.jgb-v170-head .brand-icon,
-.basic-v5-head .brand-icon,
-.schedule-compact-head .brand-icon,
-.jgb-page-title .brand-icon,
-.employee-hero .brand-icon,
-.ca-hero .brand-icon{
-  width:var(--jgb-lr-icon-size)!important;
-  height:var(--jgb-lr-icon-size)!important;
-  min-width:var(--jgb-lr-icon-size)!important;
-  min-height:var(--jgb-lr-icon-size)!important;
-  flex:0 0 var(--jgb-lr-icon-size)!important;
-  align-self:center!important;
-}
-
-/* 기존 헤더의 제목/설명은 존재하는 요소만 조명 기준의
-   세로 리듬으로 정리. 문구 자체는 추가/삭제하지 않음. */
-.jgb-lr-v54-brand h2,
-.jgb-repair-page .jgb-repair-head h1,
-.jgb-repair-page .jgb-repair-head h2,
-.jgb-v66-top h1,
-.jgb-v66-top h2,
-.jgb-v170-head h1,
-.jgb-v170-head h2,
-.basic-v5-head h1,
-.basic-v5-head h2,
-.pagebar h1,
-.pagebar h2,
-.schedule-compact-head h1,
-.schedule-compact-head h2,
-.jgb-page-title h1,
-.jgb-page-title h2,
-.employee-hero h1,
-.employee-hero h2,
-.ca-hero h1,
-.ca-hero h2{
-  line-height:1.2!important;
-  margin-top:0!important;
-  margin-bottom:0!important;
-}
-
-/* 기존 설명이 있는 경우만 */
-.jgb-lr-v54-brand p,
-.jgb-repair-page .jgb-repair-head p,
-.jgb-v66-top p,
-.jgb-v170-head p,
-.basic-v5-head p,
-.pagebar p,
-.schedule-compact-head p,
-.jgb-page-title p,
-.employee-hero p,
-.ca-hero p{
-  line-height:1.35!important;
-}
-
-/* 오른쪽 기존 버튼/요약 영역은 세로 중앙만 통일 */
-.jgb-repair-header-summary,
-.jgb-v66-top-actions,
-.jgb-v170-head-actions,
-.schedule-compact-head > :last-child,
-.pagebar > :last-child{
-  align-self:center!important;
-}
-
-/* 헤더가 내부 padding 때문에 기준 높이를 넘기지 않도록.
-   좌우 padding 값은 변경하지 않는다. */
-.jgb-lr-v54-head,
-.jgb-repair-page .jgb-repair-head,
-.jgb-v66-top,
-.jgb-v170-head,
-.basic-v5-head,
-.pagebar,
-.schedule-compact-head,
-.jgb-page-title,
-.employee-hero,
-.ca-hero{
+  gap:var(--jgb-header-gap)!important;
   overflow:hidden!important;
 }
 
-/* 수리·방수 화면의 방패 아이콘은 업무에 맞는 기존 수리/보수
-   아이콘이 있으면 그것을 우선 사용한다. 이 규칙은 아이콘 종류를
-   자동으로 덮어쓰지 않으며, 크기/자리만 공통화한다. */
+/* 왼쪽 헤더 정보 영역 */
+.jgb-common-header > div:first-child,
+.jgb-page-header > div:first-child,
+.jgb-page-title > div:first-child,
+.basic-v5-head > div:first-child,
+.pagebar > div:first-child,
+.jgb-v66-top-title,
+.jgb-v170-head > div:first-child,
+.jgb-lr-v54-brand,
+.eam-innovation .eam-innovation-head > div:first-child,
+.eh-head > div:first-child,
+.schedule-compact-head > div:first-child{
+  min-width:0!important;
+  text-align:left!important;
+  flex:0 1 auto!important;
+}
+
+/* 공통 아이콘 자리 */
+.jgb-common-header .header-icon,
+.jgb-page-header .header-icon,
+.jgb-page-title .header-icon,
+.jgb-v66-top .jgb-v66-top-icon,
+.jgb-v170-head .jgb-v170-icon,
+.jgb-lr-v54-brandico,
+.eam-innovation .eam-innovation-head .header-icon,
+.eh-head .header-icon{
+  width:var(--jgb-header-icon)!important;
+  height:var(--jgb-header-icon)!important;
+  min-width:var(--jgb-header-icon)!important;
+  min-height:var(--jgb-header-icon)!important;
+  flex:0 0 var(--jgb-header-icon)!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:10px!important;
+}
+
+/* 제목 */
+.jgb-common-header h1,
+.jgb-common-header h2,
+.jgb-page-header h1,
+.jgb-page-header h2,
+.jgb-page-title h1,
+.jgb-page-title h2,
+.basic-v5-head .basic-v5-title,
+.pagebar h1,
+.jgb-v66-top h1,
+.jgb-v170-head h1,
+.jgb-lr-v54-brand h2,
+.eam-innovation .eam-innovation-head h1,
+.eh-head h1,
+.schedule-compact-head h1,
+.schedule-compact-head h2{
+  margin:0!important;
+  font-size:var(--jgb-header-title)!important;
+  line-height:1.15!important;
+  font-weight:900!important;
+  letter-spacing:-.035em!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+}
+
+/* 작은 상단 문구 */
+.jgb-common-header .eyebrow,
+.jgb-page-header .eyebrow,
+.jgb-page-title .eyebrow,
+.jgb-v170-head .eyebrow,
+.eam-innovation .eyebrow,
+.schedule-compact-head .schedule-kicker{
+  margin:0 0 2px!important;
+  font-size:var(--jgb-header-kicker)!important;
+  line-height:1.1!important;
+  font-weight:900!important;
+  letter-spacing:.1em!important;
+  text-align:left!important;
+}
+
+/* 설명 */
+.jgb-common-header p,
+.jgb-page-header p,
+.jgb-page-title p,
+.basic-v5-head .basic-v5-sub,
+.pagebar .sub,
+.jgb-v170-head p,
+.jgb-lr-v54-brand p,
+.eam-innovation .eam-innovation-head p,
+.eh-head p,
+.schedule-compact-head p{
+  margin:3px 0 0!important;
+  font-size:var(--jgb-header-desc)!important;
+  line-height:1.3!important;
+  font-weight:700!important;
+  text-align:left!important;
+}
+
+/* 오른쪽 버튼/날짜 영역은 같은 세로축 */
+.jgb-common-header > :last-child,
+.jgb-page-header > :last-child,
+.jgb-page-title > :last-child,
+.basic-v5-head > :last-child,
+.pagebar > :last-child,
+.jgb-v66-top > :last-child,
+.jgb-v170-head > :last-child,
+.eam-innovation .eam-innovation-head > :last-child,
+.eh-head > :last-child,
+.schedule-compact-head > :last-child{
+  margin-left:auto!important;
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  box-sizing:border-box!important;
+}
+
+/* 조명·릴선 헤더도 같은 공통 높이/아이콘/글씨 */
+.jgb-lr-v54-head .jgb-lr-v54-brand{
+  gap:var(--jgb-header-gap)!important;
+  min-width:0!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-brandico{
+  width:var(--jgb-header-icon)!important;
+  height:var(--jgb-header-icon)!important;
+  min-width:var(--jgb-header-icon)!important;
+  min-height:var(--jgb-header-icon)!important;
+  flex:0 0 var(--jgb-header-icon)!important;
+  font-size:24px!important;
+  border-radius:10px!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-brand h2{
+  margin:0!important;
+  font-size:var(--jgb-header-title)!important;
+  line-height:1.15!important;
+  font-weight:900!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-brand p{
+  margin:3px 0 0!important;
+  font-size:var(--jgb-header-desc)!important;
+  line-height:1.3!important;
+}
+
+/* 근무편성 입력 헤더도 동일 규격 */
+.schedule-compact-head{
+  padding:0 var(--jgb-header-pad-x)!important;
+}
+.schedule-compact-head > div:first-child{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+.schedule-compact-head .schedule-kicker{
+  color:inherit!important;
+}
+.schedule-compact-head .schedule-close-btn{
+  margin-left:auto!important;
+}
+
+/* 금일 업무현황 */
+.basic-v5-head{
+  overflow:hidden!important;
+}
+.basic-v5-head > div:first-child{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+
+/* 모바일에서도 헤더 규격 자체는 유지하고 내부만 압축 */
+@media(max-width:900px){
+  :root{
+    --jgb-header-pad-x:16px;
+    --jgb-header-icon:40px;
+    --jgb-header-title:21px;
+    --jgb-header-desc:10px;
+    --jgb-header-gap:10px;
+  }
+}
 </style>
 
 
-<style id="TWO_HEADERS_DIRECT_FIX_FROM_CURRENT_ORIGINAL">
-/* 현재 첨부 원본에서 두 헤더의 충돌값만 최종 보정 */
-.employee-hero.opx-hero,
-.employee-hero.opx-hero-final{
-  height:78px!important;
-  min-height:78px!important;
-  max-height:78px!important;
-  box-sizing:border-box!important;
-  overflow:hidden!important;
+<style id="JGB_LIGHTING_HEADER_EXACT_FINAL">
+/* =========================================================
+   최종 기준: 조명·릴선 관리(jgb-lr-v54-head) 헤더 디자인
+   모든 '페이지 상단 헤더'만 동일한 외형으로 통일.
+   내부 카드/섹션 헤더는 건드리지 않음.
+   ========================================================= */
+
+:root{
+  --lr-head-height:78px;
+  --lr-head-pad-x:20px;
+  --lr-head-icon:50px;
+  --lr-head-gap:14px;
+  --lr-head-title:27px;
+  --lr-head-desc:11px;
 }
-.basic-work-status-wrap .basic-v5-head{
-  height:78px!important;
-  min-height:78px!important;
-  max-height:78px!important;
-  padding:16px 20px!important;
-  margin-bottom:10px!important;
+
+/* 조명·릴선 헤더를 제외한 주요 페이지 헤더에
+   조명·릴선 헤더의 외곽 디자인을 그대로 적용 */
+.jgb-repair-head,
+.jgb-eam-head,
+.jgb-basic-head,
+.jgb-waterproof-head,
+.jgb-leak-head,
+.jgb-maintenance-head,
+.jgb-common-head,
+.jgb-page-head,
+.jgb-v47-head,
+.jgb-v48-head,
+.jgb-v65-set-head,
+.jgb-v66-head,
+.jgb-v104-head,
+.jgb-v136-head,
+.jgb-v170-head,
+.jgb-aef-head,
+.jgb-ah-head,
+.schedule-compact-head{
+  position:relative!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-height:var(--lr-head-height)!important;
+  height:var(--lr-head-height)!important;
+  padding:16px var(--lr-head-pad-x)!important;
+  border:2px solid #173d5a!important;
   border-radius:10px!important;
-  box-sizing:border-box!important;
+  background:linear-gradient(100deg,#0d3554 0%,#14648d 55%,#0d4669 100%)!important;
+  margin-bottom:10px!important;
+  box-shadow:0 4px 0 rgba(5,35,55,.38),0 8px 14px rgba(5,35,55,.22),inset 0 1px 0 rgba(255,255,255,.35)!important;
+  color:#fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:var(--lr-head-gap)!important;
   overflow:hidden!important;
 }
-/* 두 헤더의 내부 세로 중앙만 조정 */
-.employee-hero .opx-hero-main,
-.basic-work-status-wrap .basic-v5-head>div:first-child{
-  align-self:center!important;
+
+/* 왼쪽 브랜드 영역 */
+.jgb-repair-brand,
+.jgb-eam-brand,
+.jgb-basic-brand,
+.jgb-waterproof-brand,
+.jgb-leak-brand,
+.jgb-maintenance-brand,
+.jgb-common-head > div:first-child,
+.jgb-page-head > div:first-child,
+.jgb-v47-head > div:first-child,
+.jgb-v48-head > div:first-child,
+.jgb-v65-set-head > div:first-child,
+.jgb-v66-head > div:first-child,
+.jgb-v104-head > div:first-child,
+.jgb-v136-head > div:first-child,
+.jgb-v170-head > div:first-child,
+.jgb-aef-head > div:first-child,
+.jgb-ah-head > div:first-child,
+.schedule-compact-head > div:first-child{
+  display:flex!important;
+  align-items:center!important;
+  gap:var(--lr-head-gap)!important;
+  min-width:0!important;
+  text-align:left!important;
+}
+
+/* 아이콘 - 조명·릴선 기준 */
+.jgb-repair-brandico,
+.jgb-eam-brandico,
+.jgb-basic-brandico,
+.jgb-waterproof-brandico,
+.jgb-leak-brandico,
+.jgb-maintenance-brandico,
+.jgb-common-head .header-icon,
+.jgb-page-head .header-icon,
+.jgb-v47-head .header-icon,
+.jgb-v48-head .header-icon,
+.jgb-v65-set-head .header-icon,
+.jgb-v66-head .header-icon,
+.jgb-v104-head .header-icon,
+.jgb-v136-head .header-icon,
+.jgb-v170-head .header-icon,
+.jgb-aef-head .header-icon,
+.jgb-ah-head .header-icon{
+  width:var(--lr-head-icon)!important;
+  height:var(--lr-head-icon)!important;
+  min-width:var(--lr-head-icon)!important;
+  min-height:var(--lr-head-icon)!important;
+  flex:0 0 var(--lr-head-icon)!important;
+  display:flex!important;
+  align-items:center!important;
   justify-content:center!important;
+  font-size:37px!important;
+  line-height:1!important;
+  border-radius:13px!important;
+  background:linear-gradient(145deg,#ffffff 0%,#dceff8 48%,#a9cedf 100%)!important;
+  border:2px solid rgba(255,255,255,.9)!important;
+  box-shadow:inset 0 2px 2px rgba(255,255,255,.95),0 3px 0 rgba(4,46,70,.42),0 5px 9px rgba(0,0,0,.24)!important;
+  text-shadow:1px 1px 0 #fff,2px 3px 2px rgba(0,45,75,.35)!important;
+}
+
+/* 제목 - 조명·릴선과 동일 */
+.jgb-repair-head h2,
+.jgb-eam-head h1,
+.jgb-basic-head h2,
+.jgb-waterproof-head h2,
+.jgb-leak-head h2,
+.jgb-maintenance-head h2,
+.jgb-common-head h1,
+.jgb-common-head h2,
+.jgb-page-head h1,
+.jgb-page-head h2,
+.jgb-v47-head h1,
+.jgb-v47-head h2,
+.jgb-v48-head h1,
+.jgb-v48-head h2,
+.jgb-v65-set-head h1,
+.jgb-v65-set-head h2,
+.jgb-v66-head h1,
+.jgb-v66-head h2,
+.jgb-v104-head h1,
+.jgb-v104-head h2,
+.jgb-v136-head h1,
+.jgb-v136-head h2,
+.jgb-v170-head h1,
+.jgb-v170-head h2,
+.jgb-aef-head h1,
+.jgb-aef-head h2,
+.jgb-ah-head h1,
+.jgb-ah-head h2,
+.schedule-compact-head h1,
+.schedule-compact-head h2{
+  margin:0!important;
+  font-size:var(--lr-head-title)!important;
+  line-height:1.15!important;
+  font-weight:1000!important;
+  letter-spacing:-.045em!important;
+  color:#fff!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+  text-shadow:0 1px 0 #bfe7fa,1px 2px 0 #0b3c5a,2px 3px 0 #082d45,0 5px 9px rgba(0,0,0,.30)!important;
+}
+
+/* 제목 옆 설명/하단 설명 - 조명·릴선 기준 */
+.jgb-repair-head p,
+.jgb-eam-head p,
+.jgb-basic-head p,
+.jgb-waterproof-head p,
+.jgb-leak-head p,
+.jgb-maintenance-head p,
+.jgb-common-head p,
+.jgb-page-head p,
+.jgb-v47-head p,
+.jgb-v48-head p,
+.jgb-v65-set-head p,
+.jgb-v66-head p,
+.jgb-v104-head p,
+.jgb-v136-head p,
+.jgb-v170-head p,
+.jgb-aef-head p,
+.jgb-ah-head p,
+.schedule-compact-head p{
+  margin:0!important;
+  font-size:var(--lr-head-desc)!important;
+  line-height:1.3!important;
+  font-weight:950!important;
+  color:#d9edf8!important;
+  white-space:nowrap!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.25),0 2px 3px rgba(0,0,0,.28)!important;
+}
+
+/* 오른쪽 상태/날짜/버튼은 기존 내용 유지, 위치만 조명 헤더와 동일한 축 */
+.jgb-repair-head > :last-child,
+.jgb-eam-head > :last-child,
+.jgb-basic-head > :last-child,
+.jgb-waterproof-head > :last-child,
+.jgb-leak-head > :last-child,
+.jgb-maintenance-head > :last-child,
+.jgb-common-head > :last-child,
+.jgb-page-head > :last-child,
+.jgb-v47-head > :last-child,
+.jgb-v48-head > :last-child,
+.jgb-v65-set-head > :last-child,
+.jgb-v66-head > :last-child,
+.jgb-v104-head > :last-child,
+.jgb-v136-head > :last-child,
+.jgb-v170-head > :last-child,
+.jgb-aef-head > :last-child,
+.jgb-ah-head > :last-child,
+.schedule-compact-head > :last-child{
+  margin-left:auto!important;
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+}
+
+/* 근무편성 헤더도 조명·릴선과 동일한 외형 */
+.schedule-compact-head{
+  color:#fff!important;
+}
+.schedule-compact-head .schedule-kicker{
+  color:#d9edf8!important;
+  font-size:8px!important;
+  font-weight:950!important;
+  letter-spacing:.1em!important;
+  margin:0 0 2px!important;
+}
+.schedule-compact-head > div:first-child{
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  gap:0!important;
+}
+
+/* 직원 업무수행 현황 등 큰 헤더가 별도 height를 강제하던 부분을 덮음 */
+.employee-hero.opx-hero{
+  min-height:var(--lr-head-height)!important;
+}
+
+/* 모바일에서도 디자인 자체는 동일, 폭만 반응 */
+@media(max-width:900px){
+  .jgb-repair-head,
+  .jgb-eam-head,
+  .jgb-basic-head,
+  .jgb-waterproof-head,
+  .jgb-leak-head,
+  .jgb-maintenance-head,
+  .jgb-common-head,
+  .jgb-page-head,
+  .jgb-v47-head,
+  .jgb-v48-head,
+  .jgb-v65-set-head,
+  .jgb-v66-head,
+  .jgb-v104-head,
+  .jgb-v136-head,
+  .jgb-v170-head,
+  .jgb-aef-head,
+  .jgb-ah-head,
+  .schedule-compact-head{
+    padding:16px 14px!important;
+  }
 }
 </style>
 
@@ -11917,7 +12236,7 @@ html,body{
 
 </style>
      <div class="jgb-repair-page">
-       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>시설민원 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button></div></header>
+       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">📋</span><div><h2>시설민원 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 화장실"])}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 샤워실"])}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 탈의실"])}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 화장실"])}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 샤워실"])}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 탈의실"])}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["복도"])}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["휴게실"])}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["기타"])}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${complaintLevelClass(n)}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
          ${liveComplaintActionPanel(dailyActive)}
@@ -12929,7 +13248,7 @@ function jgbV47GoWpByLeak(leakCode){
     .jgb-v66-wp-side-item.active em{color:#d45b4d;background:#fff0ed}
     .jgb-v66-wp-main .jgb-v66-grid{display:block}
     @media(max-width:900px){.jgb-v66-wp-select-grid{grid-template-columns:1fr}.jgb-v66-wp-side-list{display:flex;gap:7px;overflow:auto}.jgb-v66-wp-side-item{min-width:190px;margin:0}}
-  </style><div class="jgb-v66-top"><div class="jgb-v66-top-title"><span class="jgb-v66-top-icon">🛡</span><div><h2>보수·방수 이력관리</h2><p>시설물 보수·방수 작업이력과 관리현황을 확인합니다.</p></div></div><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div><div class="jgb-v66-wp-select-grid"><aside class="jgb-v66-wp-side"><div class="jgb-v66-wp-side-title">방수 이력 ${list.length}개</div><div class="jgb-v66-wp-side-list">${wpSide||'<div class="jgb-v66-none">등록된 방수 이력카드가 없습니다.</div>'}</div></aside><main class="jgb-v66-wp-main"><div class="jgb-v66-grid">${selected?cardFor(selected,0):'<div class="jgb-v66-none">등록된 방수공사 이력카드가 없습니다.<br><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>'}</div></main></div></div>`;
+  </style><div class="jgb-v66-top"><div class="jgb-v66-top-title"><span class="jgb-v66-top-icon">🧰</span><div><h2>보수·방수 이력관리</h2><p>시설물 보수·방수 작업이력과 관리현황을 확인합니다.</p></div></div><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div><div class="jgb-v66-wp-select-grid"><aside class="jgb-v66-wp-side"><div class="jgb-v66-wp-side-title">방수 이력 ${list.length}개</div><div class="jgb-v66-wp-side-list">${wpSide||'<div class="jgb-v66-none">등록된 방수 이력카드가 없습니다.</div>'}</div></aside><main class="jgb-v66-wp-main"><div class="jgb-v66-grid">${selected?cardFor(selected,0):'<div class="jgb-v66-none">등록된 방수공사 이력카드가 없습니다.<br><button type="button" data-v47-action="new-wp-card">＋ 신규 이력카드 생성</button></div>'}</div></main></div></div>`;
 }
     function wpSetCard(location,idx,esc){
       if(!location)return `<section class="jgb-v52-set"><div class="jgb-v48-card panel jgb-v52-card"><div class="jgb-v48-card-head"><div><h2>📋 방수 작업이력카드</h2><p>방수 대상 시설의 기본정보를 관리합니다.</p></div><div class="jgb-v48-card-actions"><button type="button" class="btn gray" disabled>✏️ 이력카드 수정</button></div></div><div class="jgb-v52-empty">방수 위치를 등록하면 이력카드가 표시됩니다.</div></div><section class="jgb-v48-history panel jgb-v52-history"><div class="jgb-v48-card-head"><div><h2>📝 방수 작업이력</h2></div></div><div class="jgb-v52-empty">등록된 방수작업 이력이 없습니다.</div></section></section>`;
@@ -25865,119 +26184,6 @@ document.addEventListener('click',handle,true);
 }
 </style>
 
-
-
-<style id="TWO_HEADERS_LIGHTING_MATCH_FINAL">
-/* =========================================================
-   조명·릴선 관리 기준으로 우선 2개 헤더만 정확히 맞춤
-   ① 금일 업무현황
-   ② 월간 근무편성 입력
-   ========================================================= */
-
-/* ① 금일 업무현황 */
-.basic-v5-head{
-  height:78px !important;
-  min-height:78px !important;
-  max-height:78px !important;
-  box-sizing:border-box !important;
-  padding:16px 20px !important;
-  margin-bottom:10px !important;
-  align-items:center !important;
-  border-radius:10px !important;
-  overflow:hidden !important;
-}
-
-.basic-v5-head > div:first-child{
-  min-height:0 !important;
-  height:100% !important;
-  padding-left:54px !important;
-  justify-content:center !important;
-  box-sizing:border-box !important;
-}
-
-.basic-v5-head > div:first-child::before{
-  width:43px !important;
-  height:43px !important;
-  left:0 !important;
-  top:50% !important;
-  transform:translateY(-50%) !important;
-}
-
-.basic-v5-head .basic-v5-title{
-  font-size:23px !important;
-  line-height:1.2 !important;
-  font-weight:950 !important;
-  margin:0 0 2px !important;
-  white-space:nowrap !important;
-}
-
-.basic-v5-head .basic-v5-sub{
-  font-size:11px !important;
-  line-height:1.35 !important;
-  font-weight:800 !important;
-  margin:0 !important;
-  white-space:nowrap !important;
-}
-
-.basic-v5-head .basic-v5-date{
-  align-self:center !important;
-}
-
-
-/* ② 월간 근무편성 입력 */
-.schedule-compact-head{
-  height:78px !important;
-  min-height:78px !important;
-  max-height:78px !important;
-  box-sizing:border-box !important;
-  padding:16px 20px !important;
-  background:linear-gradient(100deg,#0d3554 0%,#14648d 55%,#0d4669 100%) !important;
-  border:2px solid #173d5a !important;
-  border-radius:10px !important;
-  color:#fff !important;
-  align-items:center !important;
-  overflow:hidden !important;
-}
-
-.schedule-compact-head > div:first-child{
-  min-height:0 !important;
-  display:flex !important;
-  flex-direction:column !important;
-  justify-content:center !important;
-}
-
-.schedule-compact-head .schedule-kicker{
-  font-size:8px !important;
-  line-height:1.1 !important;
-  font-weight:900 !important;
-  margin:0 0 2px !important;
-  color:#d9edf8 !important;
-}
-
-.schedule-compact-head h2{
-  margin:0 0 2px !important;
-  font-size:23px !important;
-  line-height:1.2 !important;
-  font-weight:950 !important;
-  letter-spacing:-.04em !important;
-  color:#fff !important;
-}
-
-.schedule-compact-head p{
-  margin:0 !important;
-  font-size:11px !important;
-  line-height:1.35 !important;
-  font-weight:800 !important;
-  color:#d9edf8 !important;
-  white-space:nowrap !important;
-}
-
-.schedule-compact-head .schedule-close-btn{
-  align-self:center !important;
-  color:#fff !important;
-}
-</style>
-
 </body>
 
 <style id="v19-court-position-final">
@@ -33079,17 +33285,17 @@ cleanupDuplicateOnly();
   position:relative!important;
   overflow:hidden!important;
   width:100%!important;
-  min-height:78px!important;
-  height:78px!important;
+  min-height:145px!important;
+  height:145px!important;
   box-sizing:border-box!important;
   display:flex!important;
   align-items:center!important;
   justify-content:space-between!important;
   gap:15px!important;
-  padding:16px 20px!important;
-  margin:0 0 10px!important;
+  padding:28px 30px!important;
+  margin:0 0 18px!important;
   border:0!important;
-  border-radius:10px!important;
+  border-radius:22px!important;
   background:linear-gradient(110deg,#0b3968 0%,#075b96 52%,#0b8bb8 100%)!important;
   color:#fff!important;
   box-shadow:0 14px 30px rgba(8,53,92,.18)!important;
