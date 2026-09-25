@@ -9106,6 +9106,43 @@ html,body{
     @media(max-width:900px){.employee-notebook-cover-grid{grid-template-columns:1fr;grid-template-rows:none}.employee-notebook-cover{min-height:260px}.notebook-cover-inner{min-height:260px}.notebook-month-focus,.notebook-annual-summary{grid-template-columns:repeat(2,1fr)}.notebook-daily-grid{grid-template-columns:1fr}.employee-notebook-viewer-head{grid-template-columns:1fr auto}.notebook-back-btn{grid-column:1/-1;justify-self:start}.employee-notebook-book,.employee-notebook-page{min-height:560px}}
     </style>
 
+
+<style id="JGB_NOTEBOOK_FINAL_SPACING_FIX">
+/* 수첩 4장: 크기 확대 + 카드 사이 간격 균일화 */
+.employee-notebook-cover-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-template-rows:repeat(2,300px)!important;
+  gap:26px 28px!important;
+  min-height:0!important;
+  align-items:stretch!important;
+}
+.employee-notebook-cover{
+  min-height:300px!important;
+  height:300px!important;
+  padding:0 18px 0 42px!important;
+}
+.notebook-cover-inner{
+  min-height:298px!important;
+  padding:24px 30px!important;
+  justify-content:center!important;
+}
+/* 왼쪽 바인더에 잘못 세로로 나온 중복 제목 제거: 표지 제목은 한 줄로 */
+.employee-notebook-cover .notebook-cover-inner strong{
+  white-space:nowrap!important;
+  writing-mode:horizontal-tb!important;
+  word-break:keep-all!important;
+}
+.employee-notebook-cover .notebook-cover-inner strong br{
+  display:none!important;
+}
+/* 수첩마다 왼쪽 제본 폭은 유지하고 표지 내용 정렬 */
+.notebook-cover-inner{
+  align-items:flex-start!important;
+  text-align:left!important;
+}
+.notebook-cover-name{margin-top:20px!important}
+.notebook-cover-action{margin-top:18px!important}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -25024,163 +25061,6 @@ document.addEventListener('click',handle,true);
 .jgb-lr-v54-stat4 strong{font-size:23px!important;font-weight:1000!important;color:#124e73!important;line-height:1!important}
 .jgb-lr-v54-annual-note{margin:0 10px 10px!important;font-size:10px!important;color:#617b8d!important}
 @media(max-width:900px){.jgb-lr-v54-stat4{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-</style>
-
-<style id="JGB_NOTEBOOK_FINAL_COMPACT_COVER_V2">
-/* 직원 업무수행 기록부 표지 최종 정리
-   - 기존 기능/데이터/JS 유지
-   - 표지 사이 가로·세로 간격 확대
-   - 표지 폭/높이 조금 축소
-   - 왼쪽 연청 바인더 + 스프링 유지
-   - 오른쪽 색상 탭 없음
-   - 세로 제목 + 가로 제목 혼합
-   - 금일 업무 화면의 상단 스프링 제거
-*/
-.employee-notebook-section{
-  padding:12px!important;
-  background:#f4f8fb!important;
-}
-.employee-notebook-cover-grid{
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  grid-template-rows:repeat(2,minmax(245px,1fr))!important;
-  column-gap:22px!important;
-  row-gap:22px!important;
-  min-height:0!important;
-  padding:4px 2px!important;
-}
-.employee-notebook-cover{
-  min-height:270px!important;
-  height:270px!important;
-  padding:0 12px 0 72px!important;
-  border:1px solid #b9cedc!important;
-  border-radius:14px!important;
-  background:linear-gradient(90deg,#d7edf9 0,#c7e5f5 10%,#c7e5f5 10.5%,#f7f0df 10.5%,#fffaf0 100%)!important;
-  box-shadow:6px 8px 0 #b6d0df, 0 10px 22px rgba(38,70,90,.12), inset 0 1px 0 rgba(255,255,255,.95)!important;
-}
-.employee-notebook-cover:hover{
-  transform:translateY(-2px)!important;
-  box-shadow:7px 10px 0 #aecbdc,0 14px 26px rgba(38,70,90,.15),inset 0 1px 0 rgba(255,255,255,.95)!important;
-}
-.employee-notebook-cover::before{
-  content:"직원\A업무\A수행\A기록부";
-  white-space:pre;
-  position:absolute;
-  left:18px;
-  top:50%;
-  transform:translateY(-50%);
-  z-index:1;
-  color:#173b5d;
-  font-size:22px;
-  line-height:1.08;
-  font-weight:1000;
-  letter-spacing:-.06em;
-  text-align:center;
-}
-.employee-notebook-cover::after{
-  content:"";
-  position:absolute;
-  left:67px;
-  top:12px;
-  bottom:12px;
-  width:1px;
-  background:rgba(86,122,145,.25);
-  z-index:1;
-}
-.notebook-cover-inner{
-  position:relative!important;
-  z-index:2!important;
-  align-items:flex-start!important;
-  justify-content:center!important;
-  min-height:270px!important;
-  height:270px!important;
-  padding:24px 24px 22px!important;
-  border-left:0!important;
-  background:linear-gradient(100deg,rgba(255,255,255,.18),rgba(255,252,241,.66))!important;
-  box-sizing:border-box!important;
-}
-.notebook-rings{
-  left:20px!important;
-  top:18px!important;
-  bottom:18px!important;
-  width:22px!important;
-  justify-content:space-between!important;
-}
-.notebook-rings i{
-  width:18px!important;
-  height:24px!important;
-  border:3px solid #8798a3!important;
-  border-left-color:#697c88!important;
-  border-radius:9px!important;
-  background:linear-gradient(90deg,#c4d0d7,#fff,#aab8c1)!important;
-  box-shadow:1px 2px 3px rgba(35,55,65,.22),inset 1px 0 2px rgba(255,255,255,.9)!important;
-}
-.notebook-cover-kicker{
-  font-size:9px!important;
-  letter-spacing:.14em!important;
-  color:#526b7b!important;
-  margin:0 0 8px!important;
-  font-weight:950!important;
-}
-.notebook-cover-inner strong{
-  font-size:25px!important;
-  line-height:1.15!important;
-  color:#111d29!important;
-  letter-spacing:-.045em!important;
-  font-weight:1000!important;
-  white-space:nowrap!important;
-}
-.notebook-cover-name{
-  margin-top:18px!important;
-  font-size:21px!important;
-  line-height:1!important;
-  color:#101b27!important;
-  font-weight:1000!important;
-  padding-bottom:8px!important;
-  border-bottom:1px solid #bdc8cf!important;
-  min-width:54px!important;
-}
-.notebook-cover-meta{
-  margin-top:8px!important;
-  font-size:10px!important;
-  color:#506273!important;
-  font-weight:850!important;
-}
-.notebook-cover-action{
-  margin-top:12px!important;
-  padding:7px 11px!important;
-  border:1px solid #b8c3cb!important;
-  border-radius:8px!important;
-  background:rgba(255,255,255,.72)!important;
-  font-size:10px!important;
-  color:#172b3c!important;
-  font-weight:950!important;
-}
-.notebook-cover-action b{font-size:14px!important;color:#176fc1!important}
-
-/* 금일 업무수행 화면의 양쪽 업무수첩 위쪽 스프링 제거 */
-.basic-book-layout .basic-v5-tasks::before,
-.basic-book-layout .basic-v5-tasks::after{
-  background:#fffdf8!important;
-  box-shadow:0 2px 8px rgba(60,50,40,.06)!important;
-}
-.basic-book-layout .basic-v5-tasks::before,
-.basic-book-layout .basic-v5-tasks::after{
-  background-image:none!important;
-}
-
-@media(max-width:900px){
-  .employee-notebook-cover-grid{
-    column-gap:16px!important;
-    row-gap:18px!important;
-  }
-  .employee-notebook-cover{
-    height:250px!important;
-    min-height:250px!important;
-  }
-  .notebook-cover-inner{height:250px!important;min-height:250px!important}
-  .notebook-cover-inner strong{font-size:22px!important}
-  .employee-notebook-cover::before{font-size:19px!important}
-}
 </style>
 </body>
 
