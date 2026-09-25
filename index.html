@@ -9806,6 +9806,62 @@ html,body{
 }
 </style>
 
+
+<style id="JGB_TWO_PAGE_HORIZONTAL_WIDTH_FINAL">
+/* 두 화면만 가로 폭 축소: 헤더부터 본문까지 동일한 폭으로 맞춤 */
+.jgb-main:has(.jgb-v66-top) > .jgb-top,
+.jgb-main:has(.jgb-v66-top) > .jgb-content,
+.jgb-main:has(.eam-innovation) > .jgb-top,
+.jgb-main:has(.eam-innovation) > .jgb-content{
+  width:92%!important;
+  max-width:none!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  box-sizing:border-box!important;
+}
+/* 두 화면의 실제 본문도 줄어든 영역 안에서 넘치지 않게 */
+.jgb-main:has(.jgb-v66-top) .jgb-v66-wp-select-grid{
+  width:100%!important;
+  min-width:0!important;
+  grid-template-columns:200px minmax(0,1fr)!important;
+}
+.jgb-main:has(.jgb-v66-top) .jgb-v66-card-layout{
+  grid-template-columns:minmax(0,1fr) 5cm!important;
+  min-width:0!important;
+}
+.jgb-main:has(.eam-innovation) .eam-innovation,
+.jgb-main:has(.eam-innovation) .eam-innovation-head,
+.jgb-main:has(.eam-innovation) .eam-type-row,
+.jgb-main:has(.eam-innovation) .eam-innovation-layout{
+  max-width:none!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.jgb-main:has(.eam-innovation) .eam-innovation{
+  padding-left:20px!important;
+  padding-right:20px!important;
+}
+.jgb-main:has(.eam-innovation) .eam-innovation-layout{
+  grid-template-columns:320px minmax(0,1fr)!important;
+  gap:14px!important;
+}
+.jgb-main:has(.eam-innovation) .eam-type-row{
+  overflow-x:hidden!important;
+  flex-wrap:nowrap!important;
+  gap:8px!important;
+}
+.jgb-main:has(.eam-innovation) .eam-type-row .eam-type{
+  flex:1 1 0!important;
+  min-width:0!important;
+}
+@media(max-width:1100px){
+  .jgb-main:has(.jgb-v66-top) > .jgb-top,
+  .jgb-main:has(.jgb-v66-top) > .jgb-content,
+  .jgb-main:has(.eam-innovation) > .jgb-top,
+  .jgb-main:has(.eam-innovation) > .jgb-content{width:96%!important}
+  .jgb-main:has(.eam-innovation) .eam-innovation-layout{grid-template-columns:280px minmax(0,1fr)!important}
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -26269,94 +26325,6 @@ html, body {
 }
 </style>
 
-
-<style id="JGB_EAM_LAYOUT_USER_REQUEST_20260926_V1">
-/* 현재 원본 기준: 배치도 레이아웃만 수정. 기존 기능/데이터/JS는 변경하지 않음 */
-
-/* 전체 배치도 : 좌측 시설 배치 70% / 우측 실시간 조치 30% */
-.eh-main{
-  grid-template-columns:minmax(0,7fr) minmax(300px,3fr)!important;
-}
-
-/* 코트 상부 선과 코트 사이 여백 확대 */
-.eh-floor-1f .eh-courts{
-  top:2%!important;
-  height:28%!important;
-}
-.eh-floor-1f .eh-court{
-  margin-top:30px!important;
-}
-
-/* 시설 영역은 코트 아래에서 자연스럽게 시작 */
-.eh-floor-1f .eh-facility{
-  top:30%!important;
-  height:70%!important;
-  bottom:auto!important;
-}
-
-/* 휴게실은 유지 / 사무실·기타구역 축소 / 통합 유수장치실 확대 */
-.eh-floor-1f .eh-bottom{
-  grid-template-columns:1fr 2.5fr .75fr .75fr!important;
-  gap:4px!important;
-}
-.eh-floor-1f .eh-bottom .eh-zone:nth-child(1){
-  /* 휴게실: 기존 폭 기준 유지 */
-}
-.eh-floor-1f .eh-bottom .eh-zone:nth-child(2){
-  /* 통합 유수장치실: 확대 */
-}
-.eh-floor-1f .eh-bottom .eh-zone:nth-child(3),
-.eh-floor-1f .eh-bottom .eh-zone:nth-child(4){
-  /* 사무실/기타구역: 축소 */
-}
-
-/* 옥상 바로 옆에 창고 1개 표시 */
-.eh-floor-2f .eh-second-grid{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:6px!important;
-}
-.eh-floor-2f .roof2,
-.eh-floor-2f .store2{
-  display:flex!important;
-  min-width:0!important;
-}
-
-/* 작은 화면에서도 2층 옥상·창고는 나란히 유지 */
-@media(max-width:700px){
-  .eh-floor-1f .eh-courts{
-    top:2%!important;
-    height:28%!important;
-  }
-  .eh-floor-1f .eh-court{
-    margin-top:26px!important;
-  }
-  .eh-floor-1f .eh-facility{
-    top:30%!important;
-    height:70%!important;
-  }
-  .eh-floor-1f .eh-bottom{
-    grid-template-columns:1fr 2.5fr .75fr .75fr!important;
-  }
-  .eh-floor-2f .eh-second-grid{
-    grid-template-columns:1fr 1fr!important;
-  }
-}
-</style>
-
-
-<style id="JGB_BOTTOM_WATER_EXPAND_V2">
-/* 휴게실은 유지하고, 사무실·기타구역을 절반으로 줄인 만큼 통합 유수장치실 확대 */
-.eh-floor-1f .eh-bottom{
-  grid-template-columns:1fr 2fr .5fr .5fr!important;
-}
-@media(max-width:700px){
-  .eh-floor-1f .eh-bottom{
-    grid-template-columns:1fr 2fr .5fr .5fr!important;
-  }
-}
-</style>
-
 </body>
 
 <style id="v19-court-position-final">
@@ -33894,35 +33862,6 @@ img,svg,canvas{
   max-width:56px!important;
   box-sizing:border-box!important;
   white-space:nowrap!important;
-}
-</style>
-<style id="EAM_BOTTOM_WIDTH_FINAL_FIX_V2">
-/* 최종 요청: 휴게실 유지 / 사무실·기타구역 절반 / 통합 유수장치실 확대 */
-.eh-floor-1f .eh-bottom{
-  display:grid!important;
-  grid-template-columns:1fr 3fr .5fr .5fr!important;
-  gap:4px!important;
-  min-width:0!important;
-}
-.eh-floor-1f .eh-bottom > .eh-zone{
-  min-width:0!important;
-  width:auto!important;
-  box-sizing:border-box!important;
-}
-.eh-floor-1f .eh-bottom > .eh-zone:nth-child(1){
-  grid-column:auto!important;
-}
-.eh-floor-1f .eh-bottom > .eh-zone:nth-child(2){
-  grid-column:auto!important;
-}
-.eh-floor-1f .eh-bottom > .eh-zone:nth-child(3),
-.eh-floor-1f .eh-bottom > .eh-zone:nth-child(4){
-  grid-column:auto!important;
-}
-@media(max-width:700px){
-  .eh-floor-1f .eh-bottom{
-    grid-template-columns:1fr 3fr .5fr .5fr!important;
-  }
 }
 </style>
 
