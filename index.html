@@ -8818,27 +8818,197 @@ html,body{
 </style>
 
 
-<style id="SCHEDULE_COMPACT_V1">
-.schedule-compact-page{width:calc(100vw - 240px);min-width:0;max-width:none;margin:18px 24px 28px 24px;background:#fff;border:1px solid #d5e0eb;border-radius:12px;box-shadow:0 8px 24px rgba(20,50,80,.08);overflow:hidden;box-sizing:border-box}
-.schedule-compact-head{height:92px;background:#eef6ff;border-bottom:1px solid #d5e0eb;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box}
-.schedule-kicker{display:block;font-size:9px;font-weight:900;letter-spacing:.12em;color:#1970c9;margin-bottom:3px}
-.schedule-compact-head h2{margin:0;font-size:21px;line-height:1.2;color:#102a43;letter-spacing:-.03em}
-.schedule-compact-head p{margin:4px 0 0;font-size:11px;color:#6b7d91}
-.schedule-close-btn{border:0;background:transparent;color:#37516b;font-size:25px;line-height:1;cursor:pointer;padding:2px 5px}
-.schedule-compact-toolbar{height:58px;padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #dce5ee;box-sizing:border-box;background:#fff}
-.schedule-compact-toolbar input{height:34px;border:1px solid #b9c9da;border-radius:7px;padding:0 9px;font-size:12px;background:#fff}
-.schedule-compact-toolbar .compact-save{height:34px;padding:0 14px;border-radius:7px;font-size:12px;font-weight:800}
-.schedule-compact-table-wrap{max-height:calc(100vh - 205px);overflow:auto}
-.schedule-compact-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px;background:#fff}
-.schedule-compact-table th{height:32px;background:#edf3f8;color:#173b5e;font-size:11px;font-weight:900;border-bottom:1px solid #cad7e3}
-.schedule-compact-table th:first-child{width:76px}
-.schedule-compact-table td{height:40px;padding:4px 7px;text-align:center;border-bottom:1px solid #e1e8ef;color:#17324d;box-sizing:border-box}
-.schedule-compact-table tr:last-child td{border-bottom:0}
-.schedule-compact-table .sch-day{font-weight:800;background:#fbfdff}
-.schedule-compact-table select.compact-sch{width:100%;height:30px;box-sizing:border-box;border:1px solid #b9c9da;border-radius:6px;background:#fff;padding:0 7px;font-size:11px;font-weight:700;color:#20384f}
-.schedule-compact-table select.compact-sch:focus{outline:2px solid #9ec7ef;outline-offset:-1px}
-@media(max-width:1050px){.schedule-compact-page{width:calc(100vw - 245px);min-width:0}.schedule-compact-table th:first-child{width:62px}}
-@media(max-width:800px){.schedule-compact-page{width:calc(100vw - 24px);min-width:0}.schedule-compact-head{height:84px;padding:14px}.schedule-compact-table{min-width:700px}.schedule-compact-table-wrap{overflow:auto}}
+<style id="SCHEDULE_COMPACT_V2">
+/* 근무표 화면 크기 정리: 15일 표시 + 가로/세로 스크롤 */
+.schedule-compact-page{
+  width:calc(100% - 24px);
+  max-width:1500px;
+  min-width:0;
+  margin:12px auto 20px;
+  background:#fff;
+  border:1px solid #d5e0eb;
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(20,50,80,.08);
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
+.schedule-compact-head{
+  height:78px;
+  min-height:78px;
+  padding:10px 18px;
+  background:#eef6ff;
+  border-bottom:1px solid #d5e0eb;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  box-sizing:border-box;
+}
+
+.schedule-kicker{
+  display:block;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.12em;
+  color:#1970c9;
+  margin-bottom:2px;
+}
+
+.schedule-compact-head h2{
+  margin:0;
+  font-size:19px;
+  line-height:1.15;
+  color:#102a43;
+  letter-spacing:-.03em;
+}
+
+.schedule-compact-head p{
+  margin:3px 0 0;
+  font-size:10px;
+  line-height:1.3;
+  color:#6b7d91;
+}
+
+.schedule-close-btn{
+  border:0;
+  background:transparent;
+  color:#37516b;
+  font-size:22px;
+  line-height:1;
+  cursor:pointer;
+  padding:2px 5px;
+}
+
+.schedule-compact-toolbar{
+  height:48px;
+  min-height:48px;
+  padding:7px 12px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  border-bottom:1px solid #dce5ee;
+  box-sizing:border-box;
+  background:#fff;
+}
+
+.schedule-compact-toolbar input{
+  height:30px;
+  border:1px solid #b9c9da;
+  border-radius:7px;
+  padding:0 8px;
+  font-size:11px;
+  background:#fff;
+}
+
+.schedule-compact-toolbar .compact-save{
+  height:30px;
+  padding:0 12px;
+  border-radius:7px;
+  font-size:11px;
+  font-weight:800;
+}
+
+/* 15일이 한 화면에 보이도록 높이를 고정.
+   표가 더 길어지면 세로 스크롤, 폭이 커지면 가로 스크롤. */
+.schedule-compact-table-wrap{
+  height:542px;
+  max-height:542px;
+  width:100%;
+  overflow-x:auto;
+  overflow-y:auto;
+  box-sizing:border-box;
+}
+
+.schedule-compact-table{
+  width:100%;
+  min-width:1180px;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-size:10px;
+  background:#fff;
+}
+
+.schedule-compact-table th{
+  height:30px;
+  padding:0 5px;
+  background:#edf3f8;
+  color:#173b5e;
+  font-size:10px;
+  font-weight:900;
+  border-bottom:1px solid #cad7e3;
+  white-space:nowrap;
+}
+
+.schedule-compact-table th:first-child{
+  width:62px;
+}
+
+.schedule-compact-table td{
+  height:34px;
+  padding:3px 5px;
+  text-align:center;
+  border-bottom:1px solid #e1e8ef;
+  color:#17324d;
+  box-sizing:border-box;
+  white-space:nowrap;
+}
+
+.schedule-compact-table tr:last-child td{
+  border-bottom:0;
+}
+
+.schedule-compact-table .sch-day{
+  font-weight:800;
+  background:#fbfdff;
+}
+
+.schedule-compact-table select.compact-sch{
+  width:100%;
+  height:26px;
+  box-sizing:border-box;
+  border:1px solid #b9c9da;
+  border-radius:5px;
+  background:#fff;
+  padding:0 6px;
+  font-size:10px;
+  font-weight:700;
+  color:#20384f;
+}
+
+.schedule-compact-table select.compact-sch:focus{
+  outline:2px solid #9ec7ef;
+  outline-offset:-1px;
+}
+
+@media(max-width:1050px){
+  .schedule-compact-page{
+    width:calc(100% - 18px);
+    margin-left:9px;
+    margin-right:9px;
+  }
+  .schedule-compact-table{
+    min-width:1050px;
+  }
+}
+
+@media(max-width:800px){
+  .schedule-compact-page{
+    width:calc(100% - 12px);
+    margin-left:6px;
+    margin-right:6px;
+  }
+  .schedule-compact-head{
+    height:74px;
+    min-height:74px;
+    padding:9px 12px;
+  }
+  .schedule-compact-head h2{
+    font-size:17px;
+  }
+  .schedule-compact-table{
+    min-width:1050px;
+  }
+}
 </style>
 
 <style id="SCHEDULE_MATCH_LIGHTING_V2">
@@ -9473,283 +9643,6 @@ html,body{
   .notebook-cover-meta{margin-left:60px!important}
 }
 </style>
-<style id="jgb-reset-menu-style">
-.jgb-reset-menu{display:flex!important;align-items:center!important;width:100%!important;box-sizing:border-box!important;border:0!important;font:inherit!important;color:inherit!important;text-align:left!important;cursor:pointer!important;background:transparent!important;}
-.jgb-reset-menu:hover{background:rgba(37,126,205,.18)!important;}
-.jgb-reset-menu .jgb-nav-icon{flex:0 0 auto;}
-</style>
-
-<style id="COMMON_ADMIN_HEADER_LIGHT_REEL_STANDARD">
-/* 관리자 공통 헤더: 조명·릴선 관리 헤더 기준
-   기존 내용/기능을 유지하고 헤더 구조의 크기·정렬만 공통화 */
-.admin-common-header,
-.header,
-.page-header,
-.screen-header,
-.manager-header,
-.section-header {
-  box-sizing:border-box;
-}
-
-/* 공통 내부 박스 모델 */
-.admin-common-header *,
-.header *,
-.page-header *,
-.screen-header *,
-.manager-header *,
-.section-header * {
-  box-sizing:border-box;
-}
-
-/* 헤더 내부 정렬 기준 */
-.admin-common-header,
-.header,
-.page-header,
-.screen-header,
-.manager-header,
-.section-header {
-  min-height:92px;
-}
-
-/* 제목 계열 */
-.admin-common-header h1,
-.admin-common-header .title,
-.header h1,
-.header .title,
-.page-header h1,
-.page-header .title,
-.screen-header h1,
-.screen-header .title,
-.manager-header h1,
-.manager-header .title,
-.section-header h1,
-.section-header .title {
-  line-height:1.2;
-}
-
-/* 설명 계열 */
-.admin-common-header .desc,
-.admin-common-header .description,
-.header .desc,
-.header .description,
-.page-header .desc,
-.page-header .description,
-.screen-header .desc,
-.screen-header .description,
-.manager-header .desc,
-.manager-header .description,
-.section-header .desc,
-.section-header .description {
-  line-height:1.4;
-}
-</style>
-
-
-<style id="JGB_LIGHTING_MASTER_HEADER_FINAL">
-/* =========================================================
-   MASTER HEADER = 조명·릴선 관리
-   모든 관리자 화면 헤더에 일관 적용
-   - 아이콘 자체는 각 업무 아이콘 유지/교체
-   - 설명은 원래 존재하는 경우만 유지
-   - 가로 폭/좌우 배치/본문/기능은 변경하지 않음
-   ========================================================= */
-
-:root{
-  --lighting-master-h:78px;
-  --lighting-master-icon:43px;
-  --lighting-master-title:23px;
-  --lighting-master-desc:11px;
-  --lighting-master-gap:11px;
-  --lighting-master-radius:10px;
-}
-
-/* ① 기준 헤더 */
-.jgb-lr-v54-head{
-  height:var(--lighting-master-h)!important;
-  min-height:var(--lighting-master-h)!important;
-  max-height:var(--lighting-master-h)!important;
-  box-sizing:border-box!important;
-}
-
-/* ② 관리자 페이지 상단 헤더 높이/세로 정렬만 공통화 */
-.jgb-repair-head,
-.jgb-eam-head,
-.jgb-basic-head,
-.jgb-waterproof-head,
-.jgb-leak-head,
-.jgb-maintenance-head,
-.jgb-v66-top,
-.basic-v5-head,
-.pagebar,
-.eam-innovation .eam-innovation-head,
-.jgb-v170-head,
-.jgb-page-title,
-.ca-hero,
-.schedule-compact-head{
-  height:var(--lighting-master-h)!important;
-  min-height:var(--lighting-master-h)!important;
-  max-height:var(--lighting-master-h)!important;
-  box-sizing:border-box!important;
-}
-
-/* ③ 아이콘 '모양'은 건드리지 않고 크기/세로 기준만 통일 */
-.jgb-lr-v54-brandico,
-.jgb-repair-brandico,
-.jgb-eam-brandico,
-.jgb-basic-brandico,
-.jgb-waterproof-brandico,
-.jgb-leak-brandico,
-.jgb-maintenance-brandico{
-  width:var(--lighting-master-icon)!important;
-  height:var(--lighting-master-icon)!important;
-  min-width:var(--lighting-master-icon)!important;
-  min-height:var(--lighting-master-icon)!important;
-  flex:0 0 var(--lighting-master-icon)!important;
-  box-sizing:border-box!important;
-}
-
-/* ④ 브랜드 영역 간격 */
-.jgb-lr-v54-brand,
-.jgb-repair-brand,
-.jgb-eam-brand,
-.jgb-basic-brand,
-.jgb-waterproof-brand,
-.jgb-leak-brand,
-.jgb-maintenance-brand{
-  gap:var(--lighting-master-gap)!important;
-}
-
-/* ⑤ 제목/설명은 조명 기준
-      단, 설명이 없는 헤더에는 새 설명을 만들지 않음 */
-.jgb-lr-v54-brand h2,
-.jgb-repair-head h1,
-.jgb-repair-head h2,
-.jgb-eam-head h1,
-.jgb-eam-head h2,
-.jgb-basic-head h1,
-.jgb-basic-head h2,
-.jgb-waterproof-head h1,
-.jgb-waterproof-head h2,
-.jgb-leak-head h1,
-.jgb-leak-head h2,
-.jgb-maintenance-head h1,
-.jgb-maintenance-head h2,
-.jgb-v66-top h1,
-.jgb-v66-top h2,
-.basic-v5-head h1,
-.basic-v5-head h2,
-.pagebar h1,
-.pagebar h2,
-.jgb-v170-head h1,
-.jgb-v170-head h2,
-.jgb-page-title h1,
-.jgb-page-title h2,
-.ca-hero h1,
-.ca-hero h2,
-.schedule-compact-head h1,
-.schedule-compact-head h2{
-  font-size:var(--lighting-master-title)!important;
-  line-height:1.2!important;
-  font-weight:900!important;
-}
-
-/* 기존 설명이 있는 경우에만 스타일 통일 */
-.jgb-lr-v54-brand p,
-.jgb-repair-head p,
-.jgb-eam-head p,
-.jgb-basic-head p,
-.jgb-waterproof-head p,
-.jgb-leak-head p,
-.jgb-maintenance-head p,
-.jgb-v66-top p,
-.basic-v5-head p,
-.pagebar p,
-.jgb-v170-head p,
-.jgb-page-title p,
-.ca-hero p,
-.schedule-compact-head p{
-  font-size:var(--lighting-master-desc)!important;
-  line-height:1.35!important;
-}
-
-/* ⑥ 헤더 내용의 세로 중앙 정렬 */
-.jgb-lr-v54-head,
-.jgb-repair-head,
-.jgb-eam-head,
-.jgb-basic-head,
-.jgb-waterproof-head,
-.jgb-leak-head,
-.jgb-maintenance-head,
-.jgb-v66-top,
-.basic-v5-head,
-.pagebar,
-.eam-innovation .eam-innovation-head,
-.jgb-v170-head,
-.jgb-page-title,
-.ca-hero,
-.schedule-compact-head{
-  align-items:center!important;
-}
-
-/* ⑦ 오른쪽 기존 버튼/상태 영역은 내용과 가로 배치 유지,
-      세로 기준만 중앙으로 */
-.jgb-repair-head > :last-child,
-.jgb-eam-head > :last-child,
-.jgb-basic-head > :last-child,
-.jgb-waterproof-head > :last-child,
-.jgb-leak-head > :last-child,
-.jgb-maintenance-head > :last-child,
-.jgb-v66-top > :last-child,
-.basic-v5-head > :last-child,
-.pagebar > :last-child,
-.jgb-v170-head > :last-child,
-.jgb-page-title > :last-child,
-.ca-hero > :last-child,
-.schedule-compact-head > :last-child{
-  align-self:center!important;
-}
-
-/* ⑧ 헤더별 가로 padding/폭은 건드리지 않는다.
-      세로 padding 때문에 실제 높이가 커지는 경우만 box-sizing으로 제한 */
-.jgb-repair-head,
-.jgb-eam-head,
-.jgb-basic-head,
-.jgb-waterproof-head,
-.jgb-leak-head,
-.jgb-maintenance-head,
-.jgb-v66-top,
-.basic-v5-head,
-.pagebar,
-.eam-innovation .eam-innovation-head,
-.jgb-v170-head,
-.jgb-page-title,
-.ca-hero,
-.schedule-compact-head{
-  overflow:hidden!important;
-}
-
-/* ⑨ 업무에 맞지 않는 방패 아이콘은 '수리/보수' 계열로 대체.
-      아이콘 크기/자리만 공통화하며 기존 다른 아이콘은 건드리지 않음. */
-.jgb-waterproof-brandico,
-.jgb-leak-brandico{
-  font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif!important;
-}
-
-/* 아이콘 요소가 텍스트/emoji를 직접 갖는 경우 업무별 의미에 맞춘 대체 */
-.jgb-leak-brandico:has(> .fa-shield),
-.jgb-waterproof-brandico:has(> .fa-shield){
-  font-size:0!important;
-}
-.jgb-leak-brandico:has(> .fa-shield)::after{
-  content:"🔧";
-  font-size:26px;
-}
-.jgb-waterproof-brandico:has(> .fa-shield)::after{
-  content:"🛠️";
-  font-size:26px;
-}
-</style>
-
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -10008,7 +9901,7 @@ html,body{
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}<button type="button" class="jgb-link jgb-reset-menu" id="jgb-reset-menu" title="설정 숫자값 전체 초기화"><span class="jgb-nav-icon">↻</span><span class="jgb-nav-label">전체 리셋</span></button></aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      const mobileContent=document.getElementById('jgbMobileContent');
      if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
@@ -10032,13 +9925,6 @@ html,body{
       return `<a class="jgb-link ${page===p?"on":""}" href="?page=${encodeURIComponent(p)}" data-page="${p}"><span class="jgb-nav-icon">${icon}</span><span class="jgb-nav-label">${t}</span></a>`
     }
     function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
-    function resetAllSettingNumbers(){
-      const inputs=[...document.querySelectorAll('input[type="number"]')];
-      if(!inputs.length){alert("초기화할 숫자 설정값이 없습니다.");return;}
-      if(!confirm("설정에서 관리하는 모든 숫자 입력값을 초기 기본값으로 되돌리겠습니까?\n접수·민원·업무기록 데이터는 삭제하지 않습니다."))return;
-      inputs.forEach(el=>{el.value=el.defaultValue||"";el.dispatchEvent(new Event("input",{bubbles:true}));el.dispatchEvent(new Event("change",{bubbles:true}));});
-      alert("숫자 설정값을 초기화했습니다.");
-    }
     function go(p){if(!p||p==="digitalTwin")return;if(p==="opsboard")p="dashboard";page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
     window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";if(page==="digitalTwin"||page==="opsboard")page="dashboard";render()})
     window.render=render;
@@ -25815,6 +25701,7 @@ document.addEventListener('click',handle,true);
   background:#d9534f!important;
 }
 </style>
+
 </body>
 
 <style id="v19-court-position-final">
