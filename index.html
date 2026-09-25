@@ -9806,59 +9806,6 @@ html,body{
 }
 </style>
 
-
-<style id="EAM_WIDTH_TEXT_FINAL_OVERRIDE">
-/* EAM 최종: 너무 좁았던 폭을 한 단계 넓히고, 상단 제목 잘림 방지 */
-.eam-innovation{
-  width:min(1450px,calc(100% - 24px))!important;
-  max-width:1450px!important;
-  margin-left:auto!important;
-  margin-right:auto!important;
-  box-sizing:border-box!important;
-  min-width:0!important;
-  overflow-x:hidden!important;
-}
-.eam-innovation-head,.eam-type-row,.eam-innovation-layout{
-  width:100%!important;
-  max-width:none!important;
-  min-width:0!important;
-  box-sizing:border-box!important;
-}
-.eam-innovation-layout{
-  grid-template-columns:260px minmax(0,1fr)!important;
-  gap:12px!important;
-}
-.eam-assets-panel,.eam-detail-panel{
-  min-width:0!important;
-  max-width:100%!important;
-}
-.eam-detail-hero{min-width:0!important;}
-.eam-detail-hero>div{min-width:0!important;}
-.eam-detail-hero h2{
-  white-space:nowrap!important;
-  overflow:visible!important;
-  text-overflow:clip!important;
-  min-width:0!important;
-}
-.eam-detail-hero p,.hero-meta{
-  white-space:nowrap!important;
-  overflow:visible!important;
-}
-.eam-asset-row,.row-copy{min-width:0!important;}
-.row-copy b{
-  white-space:nowrap!important;
-  overflow:visible!important;
-  text-overflow:clip!important;
-}
-@media(max-width:1050px){
-  .eam-innovation{width:calc(100% - 16px)!important;max-width:none!important;}
-  .eam-innovation-layout{grid-template-columns:250px minmax(0,1fr)!important;}
-}
-@media(max-width:750px){
-  .eam-innovation{width:100%!important;margin:0!important;}
-  .eam-innovation-layout{grid-template-columns:1fr!important;}
-}
-</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -33683,3 +33630,74 @@ img,svg,canvas{
   }catch(e){}
 })();
 </script>
+
+
+<style id="JGB_EAM_TWO_FIXES_20260926">
+/* ① EAM 폭: 너무 줄어든 상태에서 조금만 넓힘 */
+.eam-innovation{
+  width:calc(100% - 32px)!important;
+  max-width:1500px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  box-sizing:border-box!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+
+.eam-innovation-head,
+.eam-type-row,
+.eam-innovation-layout{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+
+.eam-innovation-layout{
+  grid-template-columns:260px minmax(0,1fr)!important;
+  gap:12px!important;
+}
+
+.eam-assets-panel,
+.eam-detail-panel{
+  min-width:0!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+
+/* ② 상단 자산명/제목 글씨가 잘리지 않게 한 줄 유지 */
+.eam-detail-panel > .eam-detail-hero > div:first-child{
+  min-width:0!important;
+  overflow:visible!important;
+}
+.eam-detail-panel > .eam-detail-hero h2{
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  min-width:0!important;
+  width:auto!important;
+}
+.eam-detail-panel > .eam-detail-hero .hero-meta{
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+
+/* 표 안의 글씨도 불필요하게 잘리지 않게 */
+.eam-detail-panel table td,
+.eam-detail-panel table th{
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+
+@media(max-width:1200px){
+  .eam-innovation{
+    width:calc(100% - 20px)!important;
+    max-width:none!important;
+  }
+  .eam-innovation-layout{
+    grid-template-columns:240px minmax(0,1fr)!important;
+    gap:10px!important;
+  }
+}
+</style>
+
