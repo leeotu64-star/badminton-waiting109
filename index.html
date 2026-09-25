@@ -9833,16 +9833,32 @@ html,body{
 .lk-code-fixed{display:flex;align-items:center;width:100%;margin-top:5px}.lk-code-fixed span{height:38px;display:flex;align-items:center;padding:0 10px;background:#eef5fb;border:1px solid #cbd9e4;border-right:0;border-radius:8px 0 0 8px;font-weight:950;color:#1769bd}.lk-code-fixed input{flex:1;min-width:0;height:38px;box-sizing:border-box;border:1px solid #cbd9e4;border-radius:0 8px 8px 0;padding:0 10px;font-size:15px;font-weight:900}.lk-code-entry{display:block}
 </style>
 
-<style id="JGB_LAYOUT_REQUEST_FINAL">
-/* 배치도 요청사항만 반영: 코트 축소/상단 여백/유수장치실 확대/사무실·기타 축소/옥상 옆 창고/7:3 */
-.jgb-leak-layout73{grid-template-columns:minmax(0,7fr) minmax(0,3fr)!important;}
-.jgb-leak-courts3d{top:19%!important;height:34%!important;}
-/* 코트와 위쪽 시설 사이에 확실한 여백 확보 */
-.jgb-leak-floor1 .jgb-leak-courts3d{margin-top:0!important;}
-/* 하단 시설: 유수장치실을 크게, 사무실·기타구역을 작게 */
-.jgb-leak-bottom{grid-template-columns:1fr 2.4fr .6fr .6fr!important;gap:7px!important;}
-/* 옥상 오른쪽에 창고 1개만 배치 */
-.jgb-leak-storage3d{right:5%!important;top:16%!important;width:14%!important;height:26%!important;transform:none!important;}
+<style id="jgb-live-table-final-fix">
+/* 실시간 시설 조치현황: 헤더/데이터 7열을 동일한 구조로 고정 */
+.jgb-live-table-wrap{width:100%;overflow:hidden!important;box-sizing:border-box!important;}
+.jgb-live-direct-table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important;border-collapse:collapse!important;border-spacing:0!important;box-sizing:border-box!important;}
+.jgb-live-direct-table col.c-asset{width:13%!important}
+.jgb-live-direct-table col.c-content{width:29%!important}
+.jgb-live-direct-table col.c-status{width:15%!important}
+.jgb-live-direct-table col.c-date{width:15%!important}
+.jgb-live-direct-table col.c-manager{width:11%!important}
+.jgb-live-direct-table col.c-edit{width:8.5%!important}
+.jgb-live-direct-table col.c-process{width:8.5%!important}
+.jgb-live-direct-table th:nth-child(1),.jgb-live-direct-table td:nth-child(1){width:13%!important}
+.jgb-live-direct-table th:nth-child(2),.jgb-live-direct-table td:nth-child(2){width:29%!important}
+.jgb-live-direct-table th:nth-child(3),.jgb-live-direct-table td:nth-child(3){width:15%!important}
+.jgb-live-direct-table th:nth-child(4),.jgb-live-direct-table td:nth-child(4){width:15%!important}
+.jgb-live-direct-table th:nth-child(5),.jgb-live-direct-table td:nth-child(5){width:11%!important}
+.jgb-live-direct-table th:nth-child(6),.jgb-live-direct-table td:nth-child(6){width:8.5%!important}
+.jgb-live-direct-table th:nth-child(7),.jgb-live-direct-table td:nth-child(7){width:8.5%!important}
+.jgb-live-direct-table th,.jgb-live-direct-table td{box-sizing:border-box!important;width:auto!important;min-width:0!important;max-width:none!important;border-right:1px solid #d6e1ea!important;border-bottom:1px solid #dfe8ee!important;padding:7px 4px!important;text-align:center!important;vertical-align:middle!important;overflow:hidden!important;}
+.jgb-live-direct-table th:last-child,.jgb-live-direct-table td:last-child{border-right:0!important}
+.jgb-live-direct-table th{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+.jgb-live-direct-table td.left{white-space:nowrap!important;text-align:left!important;text-overflow:ellipsis!important;overflow:hidden!important;}
+.jgb-live-direct-table td>b{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+.jgb-live-direct-table td>.jgb-live-state{max-width:100%!important;box-sizing:border-box!important;}
+.jgb-live-direct-table td>button{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:100%!important;max-width:48px!important;min-width:0!important;box-sizing:border-box!important;margin:0 auto!important;padding:4px 2px!important;white-space:nowrap!important;font-size:9px!important;}
+.jgb-live-direct-table .jgb-live-actions{display:none!important;}
 </style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -12826,12 +12842,13 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
               <div class="jgb-live-panel-head"><div><h3>실시간 시설 조치현황</h3><div class="side-help">누수·LK와 연동하지 않고 시설 조치사항을 직접 등록·관리합니다.</div></div><button type="button" class="jgb-v170-add" data-v47-action="register-live">＋ 시설조치 등록</button></div>
               <div class="jgb-live-table-wrap">
                 <table class="jgb-live-direct-table">
-                  <thead><tr><th>자산번호</th><th>조치내용</th><th>조치상태</th><th>조치예정일</th><th>담당자</th><th>처리</th></tr></thead>
+                  <colgroup><col class="c-asset"><col class="c-content"><col class="c-status"><col class="c-date"><col class="c-manager"><col class="c-edit"><col class="c-process"></colgroup>
+                  <thead><tr><th>자산번호</th><th>조치내용</th><th>조치상태</th><th>조치예정일</th><th>담당자</th><th>수정</th><th>처리</th></tr></thead>
                   <tbody>${(()=>{
                     const rows=jgbV178LiveStore();
-                    if(!rows.length)return '<tr><td colspan="6" class="jgb-live-empty">등록된 시설 조치사항이 없습니다.</td></tr>';
+                    if(!rows.length)return '<tr><td colspan="7" class="jgb-live-empty">등록된 시설 조치사항이 없습니다.</td></tr>';
                     const cls=st=>st==='조치중'?'doing':st==='재조치 필요'?'danger':'wait';
-                    return rows.map(r=>`<tr><td><b>${esc(r.assetNo||'-')}</b></td><td class="left">${esc(r.content||'-')}</td><td><span class="jgb-live-state ${cls(r.status)}">${esc(r.status||'-')}</span></td><td>${esc(r.scheduled||'-')}</td><td>${esc(r.manager||'-')}</td><td><div class="jgb-live-actions"><button type="button" data-v47-action="edit-live" data-live-id="${esc(r.id)}">수정</button><button type="button" class="done" data-v47-action="live-complete" data-live-id="${esc(r.id)}">완료</button></div></td></tr>`).join('');
+                    return rows.map(r=>`<tr><td><b>${esc(r.assetNo||'-')}</b></td><td class="left">${esc(r.content||'-')}</td><td><span class="jgb-live-state ${cls(r.status)}">${esc(r.status||'-')}</span></td><td>${esc(r.scheduled||'-')}</td><td>${esc(r.manager||'-')}</td><td><button type="button" data-v47-action="edit-live" data-live-id="${esc(r.id)}">수정</button></td><td><button type="button" class="done" data-v47-action="live-complete" data-live-id="${esc(r.id)}">완료</button></td></tr>`).join('');
                   })()}</tbody>
                 </table>
               </div>
