@@ -4443,7 +4443,7 @@ a[data-page="digitalTwin"],
 <style id="JGB_V8_EMPLOYEE_RELAYOUT">
 /* V8: 직원업무실적 레이아웃 재배치. 기능/계산식/월별·연별 데이터 로직은 변경하지 않음. */
 .opx-dash{max-width:1500px!important;width:100%!important;margin:0 auto!important;padding:3px 0 14px!important}
-.employee-hero.opx-hero{height:104px!important;min-height:104px!important;padding:10px 20px!important;grid-template-columns:minmax(0,1fr) 245px!important;gap:12px!important;border-radius:17px!important}
+.employee-hero.opx-hero{height:78px!important;min-height:78px!important;padding:10px 20px!important;grid-template-columns:minmax(0,1fr) 245px!important;gap:12px!important;border-radius:17px!important}
 .employee-hero .opx-eyebrow{font-size:8px!important;letter-spacing:1.4px!important}
 .employee-hero .opx-title{font-size:29px!important;line-height:1.05!important;margin:2px 0 3px!important}
 .employee-hero .opx-sub{font-size:10px!important;line-height:1.25!important;max-width:850px!important}
@@ -9643,6 +9643,169 @@ html,body{
   .notebook-cover-meta{margin-left:60px!important}
 }
 </style>
+
+<style id="JGB_LIGHTING_HEADER_MASTER_CLEAN">
+/* ==========================================================
+   헤더 통합 기준 = 조명·릴선 관리
+   원본 구조/기능/데이터 유지
+   가로 폭·좌우 배치 변경 금지
+   ========================================================== */
+
+:root{
+  --jgb-lr-header-height:78px;
+  --jgb-lr-icon-size:43px;
+  --jgb-lr-brand-gap:11px;
+}
+
+/* 공통 관리자 헤더: 실제 외곽 높이만 조명 기준으로 강제 */
+.jgb-lr-v54-head,
+.jgb-repair-page .jgb-repair-head,
+.jgb-v66-top,
+.jgb-v170-head,
+.basic-v5-head,
+.pagebar,
+.schedule-compact-head,
+.jgb-page-title,
+.employee-hero,
+.ca-hero{
+  height:var(--jgb-lr-header-height)!important;
+  min-height:var(--jgb-lr-header-height)!important;
+  max-height:var(--jgb-lr-header-height)!important;
+  box-sizing:border-box!important;
+}
+
+/* 헤더 내부의 세로 기준만 통일.
+   가로 flex/grid 구조는 각 화면 기존 것을 유지 */
+.jgb-lr-v54-head,
+.jgb-repair-page .jgb-repair-head,
+.jgb-v66-top,
+.jgb-v170-head,
+.basic-v5-head,
+.pagebar,
+.schedule-compact-head,
+.jgb-page-title,
+.employee-hero,
+.ca-hero{
+  align-items:center!important;
+}
+
+/* 조명 기준 아이콘 영역 크기.
+   아이콘 모양/내용은 각 화면 것을 유지 */
+.jgb-lr-v54-brandico,
+.jgb-repair-brandico,
+.jgb-v66-top .brand-icon,
+.jgb-v170-head .brand-icon,
+.basic-v5-head .brand-icon,
+.schedule-compact-head .brand-icon,
+.jgb-page-title .brand-icon,
+.employee-hero .brand-icon,
+.ca-hero .brand-icon{
+  width:var(--jgb-lr-icon-size)!important;
+  height:var(--jgb-lr-icon-size)!important;
+  min-width:var(--jgb-lr-icon-size)!important;
+  min-height:var(--jgb-lr-icon-size)!important;
+  flex:0 0 var(--jgb-lr-icon-size)!important;
+  align-self:center!important;
+}
+
+/* 기존 헤더의 제목/설명은 존재하는 요소만 조명 기준의
+   세로 리듬으로 정리. 문구 자체는 추가/삭제하지 않음. */
+.jgb-lr-v54-brand h2,
+.jgb-repair-page .jgb-repair-head h1,
+.jgb-repair-page .jgb-repair-head h2,
+.jgb-v66-top h1,
+.jgb-v66-top h2,
+.jgb-v170-head h1,
+.jgb-v170-head h2,
+.basic-v5-head h1,
+.basic-v5-head h2,
+.pagebar h1,
+.pagebar h2,
+.schedule-compact-head h1,
+.schedule-compact-head h2,
+.jgb-page-title h1,
+.jgb-page-title h2,
+.employee-hero h1,
+.employee-hero h2,
+.ca-hero h1,
+.ca-hero h2{
+  line-height:1.2!important;
+  margin-top:0!important;
+  margin-bottom:0!important;
+}
+
+/* 기존 설명이 있는 경우만 */
+.jgb-lr-v54-brand p,
+.jgb-repair-page .jgb-repair-head p,
+.jgb-v66-top p,
+.jgb-v170-head p,
+.basic-v5-head p,
+.pagebar p,
+.schedule-compact-head p,
+.jgb-page-title p,
+.employee-hero p,
+.ca-hero p{
+  line-height:1.35!important;
+}
+
+/* 오른쪽 기존 버튼/요약 영역은 세로 중앙만 통일 */
+.jgb-repair-header-summary,
+.jgb-v66-top-actions,
+.jgb-v170-head-actions,
+.schedule-compact-head > :last-child,
+.pagebar > :last-child{
+  align-self:center!important;
+}
+
+/* 헤더가 내부 padding 때문에 기준 높이를 넘기지 않도록.
+   좌우 padding 값은 변경하지 않는다. */
+.jgb-lr-v54-head,
+.jgb-repair-page .jgb-repair-head,
+.jgb-v66-top,
+.jgb-v170-head,
+.basic-v5-head,
+.pagebar,
+.schedule-compact-head,
+.jgb-page-title,
+.employee-hero,
+.ca-hero{
+  overflow:hidden!important;
+}
+
+/* 수리·방수 화면의 방패 아이콘은 업무에 맞는 기존 수리/보수
+   아이콘이 있으면 그것을 우선 사용한다. 이 규칙은 아이콘 종류를
+   자동으로 덮어쓰지 않으며, 크기/자리만 공통화한다. */
+</style>
+
+
+<style id="TWO_HEADERS_DIRECT_FIX_FROM_CURRENT_ORIGINAL">
+/* 현재 첨부 원본에서 두 헤더의 충돌값만 최종 보정 */
+.employee-hero.opx-hero,
+.employee-hero.opx-hero-final{
+  height:78px!important;
+  min-height:78px!important;
+  max-height:78px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+.basic-work-status-wrap .basic-v5-head{
+  height:78px!important;
+  min-height:78px!important;
+  max-height:78px!important;
+  padding:16px 20px!important;
+  margin-bottom:10px!important;
+  border-radius:10px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+/* 두 헤더의 내부 세로 중앙만 조정 */
+.employee-hero .opx-hero-main,
+.basic-work-status-wrap .basic-v5-head>div:first-child{
+  align-self:center!important;
+  justify-content:center!important;
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -25701,6 +25864,120 @@ document.addEventListener('click',handle,true);
   background:#d9534f!important;
 }
 </style>
+
+
+
+<style id="TWO_HEADERS_LIGHTING_MATCH_FINAL">
+/* =========================================================
+   조명·릴선 관리 기준으로 우선 2개 헤더만 정확히 맞춤
+   ① 금일 업무현황
+   ② 월간 근무편성 입력
+   ========================================================= */
+
+/* ① 금일 업무현황 */
+.basic-v5-head{
+  height:78px !important;
+  min-height:78px !important;
+  max-height:78px !important;
+  box-sizing:border-box !important;
+  padding:16px 20px !important;
+  margin-bottom:10px !important;
+  align-items:center !important;
+  border-radius:10px !important;
+  overflow:hidden !important;
+}
+
+.basic-v5-head > div:first-child{
+  min-height:0 !important;
+  height:100% !important;
+  padding-left:54px !important;
+  justify-content:center !important;
+  box-sizing:border-box !important;
+}
+
+.basic-v5-head > div:first-child::before{
+  width:43px !important;
+  height:43px !important;
+  left:0 !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+}
+
+.basic-v5-head .basic-v5-title{
+  font-size:23px !important;
+  line-height:1.2 !important;
+  font-weight:950 !important;
+  margin:0 0 2px !important;
+  white-space:nowrap !important;
+}
+
+.basic-v5-head .basic-v5-sub{
+  font-size:11px !important;
+  line-height:1.35 !important;
+  font-weight:800 !important;
+  margin:0 !important;
+  white-space:nowrap !important;
+}
+
+.basic-v5-head .basic-v5-date{
+  align-self:center !important;
+}
+
+
+/* ② 월간 근무편성 입력 */
+.schedule-compact-head{
+  height:78px !important;
+  min-height:78px !important;
+  max-height:78px !important;
+  box-sizing:border-box !important;
+  padding:16px 20px !important;
+  background:linear-gradient(100deg,#0d3554 0%,#14648d 55%,#0d4669 100%) !important;
+  border:2px solid #173d5a !important;
+  border-radius:10px !important;
+  color:#fff !important;
+  align-items:center !important;
+  overflow:hidden !important;
+}
+
+.schedule-compact-head > div:first-child{
+  min-height:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+}
+
+.schedule-compact-head .schedule-kicker{
+  font-size:8px !important;
+  line-height:1.1 !important;
+  font-weight:900 !important;
+  margin:0 0 2px !important;
+  color:#d9edf8 !important;
+}
+
+.schedule-compact-head h2{
+  margin:0 0 2px !important;
+  font-size:23px !important;
+  line-height:1.2 !important;
+  font-weight:950 !important;
+  letter-spacing:-.04em !important;
+  color:#fff !important;
+}
+
+.schedule-compact-head p{
+  margin:0 !important;
+  font-size:11px !important;
+  line-height:1.35 !important;
+  font-weight:800 !important;
+  color:#d9edf8 !important;
+  white-space:nowrap !important;
+}
+
+.schedule-compact-head .schedule-close-btn{
+  align-self:center !important;
+  color:#fff !important;
+}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -32802,17 +33079,17 @@ cleanupDuplicateOnly();
   position:relative!important;
   overflow:hidden!important;
   width:100%!important;
-  min-height:145px!important;
-  height:145px!important;
+  min-height:78px!important;
+  height:78px!important;
   box-sizing:border-box!important;
   display:flex!important;
   align-items:center!important;
   justify-content:space-between!important;
   gap:15px!important;
-  padding:28px 30px!important;
-  margin:0 0 18px!important;
+  padding:16px 20px!important;
+  margin:0 0 10px!important;
   border:0!important;
-  border-radius:22px!important;
+  border-radius:10px!important;
   background:linear-gradient(110deg,#0b3968 0%,#075b96 52%,#0b8bb8 100%)!important;
   color:#fff!important;
   box-shadow:0 14px 30px rgba(8,53,92,.18)!important;
@@ -32999,76 +33276,3 @@ img,svg,canvas{
 }
 
 </style>
-
-
-<style id="FINAL_TWO_HEADERS_ONLY">
-/* ===== 현재 첨부 원본 기준 / 두 헤더만 최종 정리 ===== */
-
-/* 1. 직원 업무수행 현황 */
-.employee-hero.opx-hero,
-.employee-hero.opx-hero-final{
-  height:78px!important;
-  min-height:78px!important;
-  max-height:78px!important;
-  box-sizing:border-box!important;
-  overflow:hidden!important;
-}
-
-/* 기존 가로 grid/좌우 배치는 그대로 두고 세로만 중앙 정렬 */
-.employee-hero.opx-hero .opx-hero-main,
-.employee-hero.opx-hero-final .opx-hero-main{
-  min-height:43px!important;
-  align-self:center!important;
-  justify-content:center!important;
-}
-
-.employee-hero.opx-hero .opx-title,
-.employee-hero.opx-hero-final .opx-title{
-  line-height:1.2!important;
-  margin-top:0!important;
-  margin-bottom:2px!important;
-}
-
-.employee-hero.opx-hero .opx-eyebrow,
-.employee-hero.opx-hero-final .opx-eyebrow{
-  line-height:1.1!important;
-  margin-top:0!important;
-  margin-bottom:2px!important;
-}
-
-
-/* 2. 금일 업무현황 */
-.basic-v5-head{
-  height:78px!important;
-  min-height:78px!important;
-  max-height:78px!important;
-  box-sizing:border-box!important;
-  overflow:hidden!important;
-  align-items:center!important;
-}
-
-/* 기존 좌우 구조 유지, 헤더 안 내용만 세로 중앙 */
-.basic-v5-head > div:first-child{
-  min-height:43px!important;
-  align-self:center!important;
-  justify-content:center!important;
-}
-
-.basic-v5-head .basic-v5-title{
-  line-height:1.2!important;
-  margin-top:0!important;
-  margin-bottom:2px!important;
-}
-
-.basic-v5-head .basic-v5-sub{
-  line-height:1.35!important;
-  margin-top:0!important;
-}
-
-/* 날짜/사용설명서 등 기존 오른쪽 영역은 그대로 두고 세로만 중앙 */
-.basic-v5-head .basic-v5-date,
-.basic-v5-head > :last-child{
-  align-self:center!important;
-}
-</style>
-
