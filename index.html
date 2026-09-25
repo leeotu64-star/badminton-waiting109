@@ -9473,6 +9473,11 @@ html,body{
   .notebook-cover-meta{margin-left:60px!important}
 }
 </style>
+<style id="jgb-reset-menu-style">
+.jgb-reset-menu{display:flex!important;align-items:center!important;width:100%!important;box-sizing:border-box!important;border:0!important;font:inherit!important;color:inherit!important;text-align:left!important;cursor:pointer!important;background:transparent!important;}
+.jgb-reset-menu:hover{background:rgba(37,126,205,.18)!important;}
+.jgb-reset-menu .jgb-nav-icon{flex:0 0 auto;}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -9731,7 +9736,7 @@ html,body{
      const app=document.getElementById("app");
      if(!app)return;
      try{
-     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}</aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
+     app.innerHTML=`<div class="jgb-shell"><aside class="jgb-nav"><div class="jgb-brand">🛡 장군봉체육관</div><div class="jgb-group">시설관리 현황</div>${nav("repair","시설민원 관리")}<div class="jgb-group">시설 자산관리</div>${nav("eam","시설물 EAM 관리")}${nav("dashboard2","시설물 유지관리 현황")}<div class="jgb-group">시설 보수·방수 관리</div>${nav("leakage","시설 누수·수리 관리현황")}${nav("waterproof","보수·방수 이력관리")}<div class="jgb-group">업무관리</div>${nav("dashboard","직원 업무수행 현황")}${nav("basic","금일 업무현황")}${nav("schedule","업무 일정관리")}<div class="jgb-group">시설 운영관리</div><span class="jgb-link jgb-dt-locked" aria-disabled="true" title="현재 잠금 상태"><span class="jgb-nav-icon">DT</span><span class="jgb-nav-label">디지털트윈</span></span>${nav("lighting","조명·릴선 관리")}<button type="button" class="jgb-link jgb-reset-menu" id="jgb-reset-menu" title="설정 숫자값 전체 초기화"><span class="jgb-nav-icon">↻</span><span class="jgb-nav-label">전체 리셋</span></button></aside><main class="jgb-main"><header class="jgb-top"><div><h1>시설관리 업무포털 <span style="font-size:10px;vertical-align:middle;background:#eaf3ff;color:#1769c1;padding:4px 6px;border-radius:6px">v67</span></h1><small>시설·민원·유지관리 업무 통합 운영</small></div><div class="jgb-top-right"><div class="jgb-top-switch">${page==='dashboard'?`<button type="button" class="jgb-reverse-btn active" onclick="go('dashboard')">👥 직원 업무수행</button><button type="button" class="jgb-reverse-btn" onclick="go('repair')">📱 시설민원 관리</button>`:''}</div><div class="jgb-top-clock"><span id="clock"></span><div class="jgb-live">● 실시간 동기화</div></div></div></header><section class="jgb-content">${body()}</section></main></div>`;app.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();go(el.dataset.page);}));tick();clearInterval(window.__clock);window.__clock=setInterval(tick,1000);
      const mobileContent=document.getElementById('jgbMobileContent');
      if(mobileContent){mobileContent.addEventListener('input',()=>{const n=document.getElementById('jgbMobileCount');if(n)n.textContent=mobileContent.value.length})}
      }catch(err){
@@ -9755,6 +9760,13 @@ html,body{
       return `<a class="jgb-link ${page===p?"on":""}" href="?page=${encodeURIComponent(p)}" data-page="${p}"><span class="jgb-nav-icon">${icon}</span><span class="jgb-nav-label">${t}</span></a>`
     }
     function tick(){const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleString("ko-KR",{hour12:false})}
+    function resetAllSettingNumbers(){
+      const inputs=[...document.querySelectorAll('input[type="number"]')];
+      if(!inputs.length){alert("초기화할 숫자 설정값이 없습니다.");return;}
+      if(!confirm("설정에서 관리하는 모든 숫자 입력값을 초기 기본값으로 되돌리겠습니까?\n접수·민원·업무기록 데이터는 삭제하지 않습니다."))return;
+      inputs.forEach(el=>{el.value=el.defaultValue||"";el.dispatchEvent(new Event("input",{bubbles:true}));el.dispatchEvent(new Event("change",{bubbles:true}));});
+      alert("숫자 설정값을 초기화했습니다.");
+    }
     function go(p){if(!p||p==="digitalTwin")return;if(p==="opsboard")p="dashboard";page=p;history.pushState({page:p},"","?page="+encodeURIComponent(p));render()}
     window.addEventListener("popstate",()=>{page=new URLSearchParams(location.search).get("page")||"dashboard";if(page==="digitalTwin"||page==="opsboard")page="dashboard";render()})
     window.render=render;
@@ -25529,83 +25541,6 @@ document.addEventListener('click',handle,true);
 }
 .notebook-month-col.current .notebook-bar i{
   background:#d9534f!important;
-}
-</style>
-
-
-<script id="left-menu-total-reset">
-(function(){
-  'use strict';
-
-  function resetSettingNumbers(){
-    const inputs=[...document.querySelectorAll('input[type="number"]')];
-    if(!inputs.length){
-      alert('초기화할 숫자 설정값이 없습니다.');
-      return;
-    }
-    if(!confirm('설정에서 관리하는 모든 숫자 입력값을 초기 기본값으로 되돌리겠습니까?
-접수·민원·업무기록 데이터는 삭제하지 않습니다.')) return;
-
-    inputs.forEach(function(el){
-      el.value = el.defaultValue || '';
-      el.dispatchEvent(new Event('input',{bubbles:true}));
-      el.dispatchEvent(new Event('change',{bubbles:true}));
-    });
-
-    alert('숫자 설정값을 초기화했습니다.');
-  }
-
-  window.resetSettingNumbers=resetSettingNumbers;
-
-  function addResetMenu(){
-    if(document.getElementById('left-menu-total-reset-item')) return;
-
-    // 기존 왼쪽 메뉴의 마지막 항목 뒤에 추가
-    const candidates=[
-      'nav','.sidebar','.side-menu','.sidebar-menu','.menu','.left-menu',
-      '#sidebar','#sideMenu','#menu','#nav'
-    ];
-    let host=null;
-    for(const s of candidates){
-      const el=document.querySelector(s);
-      if(el){host=el;break;}
-    }
-    if(!host) return;
-
-    const item=document.createElement('button');
-    item.type='button';
-    item.id='left-menu-total-reset-item';
-    item.className='menu-item total-reset-menu-item';
-    item.innerHTML='🔄 <span>전체 리셋</span>';
-    item.title='설정 숫자값 전체 초기화';
-    item.addEventListener('click',resetSettingNumbers);
-
-    host.appendChild(item);
-  }
-
-  function boot(){
-    addResetMenu();
-    setTimeout(addResetMenu,500);
-    setTimeout(addResetMenu,1500);
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',boot,{once:true});
-  }else boot();
-
-  new MutationObserver(function(){
-    if(!document.getElementById('left-menu-total-reset-item')) addResetMenu();
-  }).observe(document.documentElement,{childList:true,subtree:true});
-})();
-</script>
-<style id="left-menu-total-reset-style">
-#left-menu-total-reset-item{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  width:100%;
-  box-sizing:border-box;
-  cursor:pointer;
 }
 </style>
 
