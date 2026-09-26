@@ -22618,7 +22618,7 @@ body {
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   function ordered(){return Array.from({length:36},(_,i)=>i+1);}
   function cell(n,type){const a=assets[n-1],st=type==='light'?a.light:a.reel,sel=type==='light'?selectedLight===n:selectedReel===n;return `<button type="button" class="jgb-lr-v54-cell ${statusClass[st]} ${sel?'sel':''}" onclick="window.jgbLRSelect(${n},'${type}')" title="${n}번 ${type==='light'?'조명':'릴선'}">${n}</button>`}
-  function historyRows(hist){return hist.length?hist.map((r,i)=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=r[4]||'',completion=r[5]||'';return `<tr><td>${esc(date)}</td><td>${esc(method)}</td><td class="history-status ${status==='정상'?'normal':status==='수리예정'?'planned':status==='수리중'?'repair':''}">${esc(status)}</td><td>${esc(completion||'-')}</td><td class="history-content">${esc(text)}</td><td>${esc(manager||'-')}</td><td class="history-action"><div class="jgb-lr-history-actions"><button type="button" class="jgb-lr-history-edit" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button><button type="button" class="jgb-lr-history-delete" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button></div></td></tr>`}).join(''):`<tr><td colspan="7" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
+  function historyRows(hist){return hist.length?hist.map((r,i)=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=(r[4]==='정상'?'완료':(r[4]==='수리예정'||r[4]==='수리중'?'수리':(r[4]||'수리'))),completion=r[5]||'';return `<tr><td>${esc(date)}</td><td>${esc(method)}</td><td class="history-status ${status==='완료'?'normal':'repair'}">${esc(status)}</td><td>${esc(completion||'-')}</td><td class="history-content">${esc(text)}</td><td>${esc(manager||'-')}</td><td class="history-action"><div class="jgb-lr-history-actions"><button type="button" class="jgb-lr-history-edit" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button><button type="button" class="jgb-lr-history-delete" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button></div></td></tr>`}).join(''):`<tr><td colspan="7" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`}
   function panel(n,type){
   const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',
         code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),
@@ -22628,7 +22628,7 @@ body {
 
   const historyRowsCompact = hist.length ? hist.map((r,i)=>{
     const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',
-          status=r[4]||'',completion=r[5]||'';
+          status=(r[4]==='정상'?'완료':(r[4]==='수리예정'||r[4]==='수리중'?'수리':(r[4]||'수리'))),completion=r[5]||'';
     return `<div class="jgb-lr-v54-history-pair-set">
       <article class="jgb-lr-v54-pair-history">
         <div class="jgb-lr-v54-pair-history-head">
@@ -22822,7 +22822,7 @@ body {
     const file=input.files&&input.files[0]; if(!file)return;
     const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;persist();window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
-  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>수리이력 등록</h3><label class="jgb-lr-date-label">수리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>구분<select id="jgbLRMethod"><option value="자체">자체</option><option value="외주">외주</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="수리내용을 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value=current==='정상'?'수리예정':current;}
+  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>수리이력 등록</h3><label class="jgb-lr-date-label">수리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>구분<select id="jgbLRMethod"><option value="자체">자체</option><option value="외주">외주</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리</option><option>완료</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="수리내용을 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value='수리';}
   window.jgbLRHistoryEdit=function(ev,index){
     ev?.stopPropagation();
     const btn=ev?.currentTarget;
@@ -22841,7 +22841,7 @@ body {
       <label>관리일자<input id="jgbLRHEDate" type="date" value="${esc(row[0]||'')}"></label>
       <label>담당자<input id="jgbLRHEManager" type="text" value="${esc(row[3]||'')}"></label>
       <label>구분<select id="jgbLRHEMethod"><option value="자체" ${String(row[1]||'').includes('자체')?'selected':''}>자체</option><option value="외주" ${String(row[1]||'').includes('외주')?'selected':''}>외주</option></select></label>
-      <label>처리상태<select id="jgbLRHEStatus"><option ${row[4]==='수리예정'?'selected':''}>수리예정</option><option ${row[4]==='수리중'?'selected':''}>수리중</option><option ${row[4]==='정상'?'selected':''}>정상</option></select></label>
+      <label>처리상태<select id="jgbLRHEStatus"><option ${(!row[4]||row[4]==='수리예정'||row[4]==='수리중'||row[4]==='수리')?'selected':''}>수리</option><option ${row[4]==='정상'||row[4]==='완료'?'selected':''}>완료</option></select></label>
       <label>완료예정일<input id="jgbLRHECompletion" type="date" value="${esc(row[5]||'')}"></label>
       <textarea id="jgbLRHEText" placeholder="수리내용을 입력하세요.">${esc(row[2]||'')}</textarea>
       <div class="row"><button type="button" onclick="document.getElementById('jgbLRHistoryEditModal').remove()">취소</button><button type="button" onclick="window.jgbLRHistorySave(${assetNo},'${type}',${index})">수정 저장</button></div>
@@ -22873,7 +22873,7 @@ body {
       document.getElementById('jgbLRHEMethod')?.value||hist[index][1]||'자체',
       text,
       document.getElementById('jgbLRHEManager')?.value.trim()||'',
-      document.getElementById('jgbLRHEStatus')?.value||hist[index][4]||'수리예정',
+      document.getElementById('jgbLRHEStatus')?.value||hist[index][4]||'수리',
       document.getElementById('jgbLRHECompletion')?.value||''
     ];
     if(type==='light')a.lightHistory=hist;else a.reelHistory=hist;
@@ -22887,9 +22887,9 @@ body {
     const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     const picked=document.getElementById('jgbLRDate')?.value||today;
     const y=Number(String(picked).slice(0,4));
-    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const nextStatus=document.getElementById('jgbLRStatusReg')?.value||'수리예정'; const completion=document.getElementById('jgbLRCompletionDate')?.value||''; const cy=Number(String(completion).slice(0,4)); const validCompletion=(cy>=2026&&cy<=2035)?completion:''; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager,nextStatus,validCompletion];
-    /* 등록한 이력을 반드시 현재 선택 자산의 조명/릴선 이력카드와 상태에 동시에 반영 */
-    if(type==='light'){assets[n-1].lightHistory=Array.isArray(assets[n-1].lightHistory)?assets[n-1].lightHistory:[];assets[n-1].lightHistory.unshift(row);assets[n-1].light=nextStatus;}else{assets[n-1].reelHistory=Array.isArray(assets[n-1].reelHistory)?assets[n-1].reelHistory:[];assets[n-1].reelHistory.unshift(row);assets[n-1].reel=nextStatus;}
+    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const nextStatus=document.getElementById('jgbLRStatusReg')?.value||'수리'; const completion=document.getElementById('jgbLRCompletionDate')?.value||''; const cy=Number(String(completion).slice(0,4)); const validCompletion=(cy>=2026&&cy<=2035)?completion:''; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager,nextStatus,validCompletion];
+    /* 유지관리 등록은 이력 기록만 누적하며, 일일 실시간 조명/릴선 상태는 별도로 유지 */
+    if(type==='light'){assets[n-1].lightHistory=Array.isArray(assets[n-1].lightHistory)?assets[n-1].lightHistory:[];assets[n-1].lightHistory.unshift(row);}else{assets[n-1].reelHistory=Array.isArray(assets[n-1].reelHistory)?assets[n-1].reelHistory:[];assets[n-1].reelHistory.unshift(row);}
     persist();m.classList.remove('open');window.jgbLRSelect(n,type);
   };
   /* 최초 렌더 시 이 스크립트가 뒤늦게 정의되는 경우에도 조명·릴선 화면을 즉시 다시 그립니다. */
