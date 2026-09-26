@@ -22475,24 +22475,33 @@ body {
   const historyRowsCompact = hist.length ? hist.map((r,i)=>{
     const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',
           status=r[4]||'',completion=r[5]||'';
-    return `<article class="jgb-lr-v54-pair-history">
-      <div class="jgb-lr-v54-pair-history-head">
-        <span>유지관리 이력 ${i+1} · ${esc(date)}</span>
-        <div>
-          <button type="button" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button>
-          <button type="button" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button>
+    return `<div class="jgb-lr-v54-history-pair-set">
+      <article class="jgb-lr-v54-pair-history">
+        <div class="jgb-lr-v54-pair-history-head">
+          <span>유지관리 이력 ${i+1} · ${esc(date)}</span>
+          <div>
+            <button type="button" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button>
+            <button type="button" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button>
+          </div>
+        </div>
+        <div class="jgb-lr-v54-pair-grid">
+          <div class="ph-label">작업일자</div><div class="ph-value">${esc(date)}</div>
+          <div class="ph-label">작업구분</div><div class="ph-value">${esc(method)}</div>
+          <div class="ph-label">담당자</div><div class="ph-value">${esc(manager||'-')}</div>
+          <div class="ph-label">상태</div><div class="ph-value">${esc(status||'완료')}</div>
+          <div class="ph-label">작업내용</div><div class="ph-value">${esc(text||'-')}</div>
+          <div class="ph-label">작업결과</div><div class="ph-value">${esc(completion||status||'완료')}</div>
+        </div>
+      </article>
+      <div class="jgb-lr-v54-integrated-workphotos">
+        <div class="jgb-lr-v54-integrated-photo-title">📷 유지관리 작업사진 · 3 × 3 · 2장</div>
+        <div class="jgb-lr-v54-integrated-photo-row">
+          <div class="jgb-lr-v54-maint-photo">사진 1<br>등록 자리</div>
+          <div class="jgb-lr-v54-maint-photo">사진 2<br>등록 자리</div>
         </div>
       </div>
-      <div class="jgb-lr-v54-pair-grid">
-        <div class="ph-label">작업일자</div><div class="ph-value">${esc(date)}</div>
-        <div class="ph-label">작업구분</div><div class="ph-value">${esc(method)}</div>
-        <div class="ph-label">담당자</div><div class="ph-value">${esc(manager||'-')}</div>
-        <div class="ph-label">상태</div><div class="ph-value">${esc(status||'완료')}</div>
-        <div class="ph-label">작업내용</div><div class="ph-value">${esc(text||'-')}</div>
-        <div class="ph-label">작업결과</div><div class="ph-value">${esc(completion||status||'완료')}</div>
-      </div>
-    </article>`;
-  }).join('') : `<div class="jgb-lr-v54-pair-empty">등록된 유지관리 이력이 없습니다.</div>`;
+    </div>`;
+  }).join('') : `<div class="jgb-lr-v54-history-pair-set jgb-lr-v54-history-pair-empty-set"><div class="jgb-lr-v54-pair-empty">등록된 유지관리 이력이 없습니다.</div></div>`;
 
   const topPhoto = a[photoKey]
     ? `<img src="${a[photoKey]}" alt="이력카드 사진">`
@@ -22535,17 +22544,7 @@ body {
       </div>
 
       <div class="jgb-lr-v54-integrated-history-body">
-        <div class="jgb-lr-v54-integrated-work jgb-lr-v54-pair-work">
-          <div class="jgb-lr-v54-pair-history-list">${historyRowsCompact}</div>
-        </div>
-
-        <div class="jgb-lr-v54-integrated-workphotos">
-          <div class="jgb-lr-v54-integrated-photo-title">📷 유지관리 작업사진 · 3 × 3 · 2장</div>
-          <div class="jgb-lr-v54-integrated-photo-row">
-            <div class="jgb-lr-v54-maint-photo">사진 1<br>등록 자리</div>
-            <div class="jgb-lr-v54-maint-photo">사진 2<br>등록 자리</div>
-          </div>
-        </div>
+        <div class="jgb-lr-v54-pair-history-list">${historyRowsCompact}</div>
       </div>
     </section>
 
@@ -35965,5 +35964,72 @@ img,svg,canvas{
 .jgb-lr-v54-integrated-history-body .jgb-lr-v54-integrated-work::-webkit-scrollbar,
 .jgb-lr-v54-integrated-history-body .jgb-lr-v54-integrated-workphotos::-webkit-scrollbar{
   display:none!important;
+}
+</style>
+
+<style id="JGB_LR_HISTORY_PHOTO_EACH_SET_ALIGNMENT">
+/* 각 유지관리 이력 + 작업사진을 하나의 개별 세트로 정렬 */
+.jgb-lr-v54-integrated-history-body{
+  display:block!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  box-sizing:border-box!important;
+}
+.jgb-lr-v54-integrated-history-body > .jgb-lr-v54-pair-history-list{
+  display:block!important;
+  height:auto!important;
+  min-height:0!important;
+  overflow:visible!important;
+  padding:0!important;
+  margin:0!important;
+}
+.jgb-lr-v54-history-pair-set{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 250px!important;
+  align-items:stretch!important;
+  gap:0!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0 0 10px 0!important;
+  box-sizing:border-box!important;
+}
+.jgb-lr-v54-history-pair-set:last-child{
+  margin-bottom:0!important;
+}
+.jgb-lr-v54-history-pair-set > .jgb-lr-v54-pair-history,
+.jgb-lr-v54-history-pair-set > .jgb-lr-v54-integrated-workphotos{
+  min-width:0!important;
+  min-height:0!important;
+  height:auto!important;
+  align-self:stretch!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+}
+.jgb-lr-v54-history-pair-set > .jgb-lr-v54-pair-history{
+  border-right:0!important;
+}
+.jgb-lr-v54-history-pair-set > .jgb-lr-v54-integrated-workphotos{
+  width:auto!important;
+  min-width:0!important;
+  padding:5px 6px 8px!important;
+  overflow:hidden!important;
+}
+.jgb-lr-v54-history-pair-set .jgb-lr-v54-integrated-photo-row{
+  min-height:0!important;
+  height:86px!important;
+  padding:8px 0 0!important;
+}
+.jgb-lr-v54-history-pair-set .jgb-lr-v54-maint-photo{
+  height:78px!important;
+}
+.jgb-lr-v54-history-pair-empty-set{
+  grid-template-columns:1fr 250px!important;
+}
+.jgb-lr-v54-history-pair-empty-set .jgb-lr-v54-pair-empty{
+  height:100%!important;
+  min-height:80px!important;
+  box-sizing:border-box!important;
 }
 </style>
