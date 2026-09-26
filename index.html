@@ -12270,7 +12270,7 @@ html,body{
 
 </style>
      <div class="jgb-repair-page">
-       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>시설민원 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button><button type="button" class="jgb-repair-text-btn" onclick="jgbResetNumericCounts()">숫자 초기화</button></div></header>
+       <header class="jgb-repair-head"><div class="jgb-repair-brand"><span class="jgb-repair-brandico" aria-hidden="true">🛠️</span><div><h2>시설민원 관리</h2><p>스마트폰 QR 접수로 접수된 시설 관련 민원을 관리·처리합니다.</p></div></div><div class="jgb-repair-header-summary"><button type="button" class="jgb-repair-text-btn" onclick="openComplaintSummary()">민원현황</button><button type="button" class="jgb-repair-text-btn primary" onclick="openComplaintStatsDetail()">상세보기</button></div></header>
        <section class="jgb-repair-top">
          <div class="jgb-repair-map-panel"><div class="jgb-repair-panel-head"><b>시설 민원 위치도</b><span>접수 발생 위치 표시</span></div><div class="jgb-repair-map"><div class="jgb-repair-map-title">장군봉체육관 1층 시설관리 배치 · QR 접수 위치 연계</div><div class="jgb-facility-layout"><div class="jgb-facility-group male"><b class="jgb-facility-group-title">남자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 화장실"])}">${mapComplaintCounts["남자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 화장실"]}</span>`:''}남자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 샤워실"])}">${mapComplaintCounts["남자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 샤워실"]}</span>`:''}남자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["남자 탈의실"])}">${mapComplaintCounts["남자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["남자 탈의실"]}</span>`:''}남자 탈의실</div></div></div><div class="jgb-facility-group female"><b class="jgb-facility-group-title">여자 시설</b><div class="jgb-facility-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 화장실"])}">${mapComplaintCounts["여자 화장실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 화장실"]}</span>`:''}여자 화장실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 샤워실"])}">${mapComplaintCounts["여자 샤워실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 샤워실"]}</span>`:''}여자 샤워실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["여자 탈의실"])}">${mapComplaintCounts["여자 탈의실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["여자 탈의실"]}</span>`:''}여자 탈의실</div></div></div><div class="jgb-facility-group common"><b class="jgb-facility-group-title">공용·기타 시설</b><div class="jgb-facility-items common-items"><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["복도"])}">${mapComplaintCounts["복도"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["복도"]}</span>`:''}복도</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["휴게실"])}">${mapComplaintCounts["휴게실"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["휴게실"]}</span>`:''}휴게실</div><div class="jgb-facility-zone ${complaintLevelClass(mapComplaintCounts["기타"])}">${mapComplaintCounts["기타"]?`<span class="jgb-map-complaint-count">${mapComplaintCounts["기타"]}</span>`:''}기타</div></div></div></div><div class="jgb-repair-courts">${['1코트','2코트','3코트','4코트','5코트'].map(c=>{const n=mapComplaintCounts[c]||0;return `<div class="jgb-repair-court ${complaintLevelClass(n)}"><b>${c}</b>${n?`<span class="jgb-map-complaint-count">${n}</span>`:''}</div>`}).join('')}</div><div class="jgb-repair-legend"><span><i></i> 민원 발생 위치</span><span class="sel"><i></i> 숫자 = 민원 건수</span></div></div></div>
          ${liveComplaintActionPanel(dailyActive)}
@@ -28106,6 +28106,159 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   .eh-map-card .eh-card-head .eh-stat small{font-size:8px!important}
 }
 </style>
+
+
+
+<!-- JGB 235029 FINAL REQUEST PATCH: 배치도 헤더 / 상태버튼 / 사용설명서 / 민원버튼 / EAM 완전리셋 -->
+<style id="JGB_235029_FINAL_REQUEST_PATCH_CSS">
+/* ② 시설 자산 배치도: 최상단 헤더를 메인 헤더로 사용 */
+.eh-page > .eh-head{
+  position:relative!important;
+  width:100%!important;
+  min-height:82px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:0 16px!important;
+  background:linear-gradient(100deg,#123f60 0%,#176b98 58%,#0d4b70 100%)!important;
+  color:#fff!important;
+  border-radius:13px!important;
+  box-shadow:0 6px 18px rgba(20,60,85,.18)!important;
+}
+.eh-page > .eh-head > div:first-child{min-width:0!important;flex:0 0 auto!important}
+.eh-page > .eh-head h1{margin:0!important;font-size:28px!important;font-weight:1000!important;line-height:1.15!important;color:#fff!important;letter-spacing:-.7px!important;text-shadow:0 2px 3px rgba(0,0,0,.3)!important}
+.eh-page > .eh-head small{display:block!important;margin-top:5px!important;font-size:12px!important;color:#dceff8!important}
+
+/* ③ 헤더에 실제 존재하는 상태 버튼만 동일한 아이콘형 디자인 */
+.eh-page > .eh-head .eh-head-stats{
+  display:flex!important;align-items:center!important;gap:7px!important;
+  margin-left:auto!important;order:2!important;flex:0 0 auto!important;
+}
+.eh-page > .eh-head .eh-stat{
+  min-width:72px!important;height:48px!important;padding:4px 9px!important;
+  border-radius:10px!important;border:1px solid rgba(255,255,255,.45)!important;
+  box-shadow:0 3px 7px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.35)!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;
+}
+.eh-page > .eh-head .eh-stat b{font-size:19px!important;line-height:19px!important;font-weight:1000!important;color:#fff!important}
+.eh-page > .eh-head .eh-stat small{font-size:9px!important;line-height:11px!important;margin:2px 0 0!important;color:#fff!important;font-weight:900!important}
+
+/* ④ 사용설명서와 기존 헤더 버튼은 같은 계열 */
+.eh-page > .eh-head .jgb-page-manual-btn,
+.eh-page > .eh-head .jgb-eam-7perf-open{
+  height:40px!important;min-height:40px!important;padding:0 11px!important;
+  border:1px solid #b9d2e2!important;border-radius:8px!important;
+  background:#fff!important;color:#125b83!important;font-size:11px!important;font-weight:900!important;
+  white-space:nowrap!important;box-sizing:border-box!important;
+}
+.eh-page > .eh-head .jgb-page-manual-btn{order:4!important;margin-left:0!important}
+.eh-page > .eh-head .jgb-eam-7perf-open{order:3!important;margin-left:0!important}
+.eh-page > .eh-head > button:not(.jgb-page-manual-btn):not(.jgb-eam-7perf-open){order:1!important}
+
+/* 민원 헤더: 숫자 초기화 대신 사용설명서가 오른쪽 끝 */
+.jgb-repair-page .jgb-repair-header-summary{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important}
+.jgb-repair-page .jgb-repair-header-summary .jgb-page-manual-btn{height:40px!important;min-width:100px!important;padding:0 12px!important;margin:0!important;border:1px solid #b9d2e2!important;border-radius:8px!important;background:#fff!important;color:#125b83!important;font-size:11px!important;font-weight:900!important;cursor:pointer!important;white-space:nowrap!important}
+
+/* 설정: EAM 완전 리셋은 하나의 버튼만 */
+.jgb-eam-reset-single{display:inline-flex!important;align-items:center!important;justify-content:center!important;height:38px!important;padding:0 14px!important;border:1px solid #c52222!important;border-radius:8px!important;background:#d92d2d!important;color:#fff!important;font-weight:900!important;cursor:pointer!important;box-sizing:border-box!important}
+@media(max-width:900px){
+  .eh-page > .eh-head{min-height:74px!important;padding:0 10px!important}
+  .eh-page > .eh-head h1{font-size:22px!important}
+  .eh-page > .eh-head small{font-size:10px!important}
+  .eh-page > .eh-head .eh-head-stats{gap:4px!important}
+  .eh-page > .eh-head .eh-stat{min-width:54px!important;height:42px!important}
+  .eh-page > .eh-head .eh-stat b{font-size:16px!important}
+  .eh-page > .eh-head .eh-stat small{font-size:7px!important}
+}
+@media(max-width:650px){
+  .eh-page > .eh-head .eh-head-stats{display:none!important}
+}
+</style>
+<script id="JGB_235029_FINAL_REQUEST_PATCH_SCRIPT">
+(function(){
+'use strict';
+
+function moveMapStats(){
+  const page=document.querySelector('.eh-page');
+  const head=page?.querySelector(':scope > .eh-head');
+  const stats=page?.querySelector('.eh-map-card .eh-card-head .eh-head-stats');
+  if(!head||!stats)return;
+  if(stats.parentElement!==head) head.appendChild(stats);
+}
+
+function ensureRepairManual(){
+  const box=document.querySelector('.jgb-repair-page .jgb-repair-header-summary');
+  if(!box)return;
+  if(box.querySelector('.jgb-page-manual-btn'))return;
+  const b=document.createElement('button');
+  b.type='button';
+  b.className='jgb-page-manual-btn';
+  b.textContent='📘 사용설명서';
+  b.setAttribute('aria-label','시설민원 관리 사용설명서');
+  b.addEventListener('click',function(e){
+    e.preventDefault();e.stopPropagation();
+    const key='repair';
+    if(typeof window.__JGB_OPEN_PAGE_MANUAL==='function')window.__JGB_OPEN_PAGE_MANUAL(key);
+  });
+  box.appendChild(b);
+}
+
+function ensureSingleEamReset(){
+  const content=document.querySelector('.jgb-content');
+  if(!content)return;
+  const title=content.querySelector('.pagebar h1');
+  if(!title || title.textContent.trim()!=='시스템 설정')return;
+  const panel=[...content.querySelectorAll('.panel')].find(x=>/근무시간 기준/.test(x.textContent||''));
+  if(!panel)return;
+  const row=panel.querySelector('button[onclick*="jgbEamCompleteReset"]')?.parentElement;
+  if(!row)return;
+  const old=[...row.querySelectorAll('button[onclick*="jgbEamCompleteReset"]')];
+  old.forEach(x=>x.remove());
+  if(row.querySelector('.jgb-eam-reset-single'))return;
+  const b=document.createElement('button');
+  b.type='button';b.className='btn red jgb-eam-reset-single';b.textContent='🗑 EAM 완전 리셋';
+  b.onclick=function(){if(typeof window.jgbEamCompleteReset==='function')window.jgbEamCompleteReset();};
+  row.appendChild(b);
+}
+
+/* 기존 사용설명서 IIFE의 openManual은 내부 함수이므로 클릭용 브리지 제공 */
+function bridgeManual(){
+  if(typeof window.__JGB_OPEN_PAGE_MANUAL==='function')return;
+  const btn=document.querySelector('.jgb-page-manual-btn');
+  if(!btn)return;
+  window.__JGB_OPEN_PAGE_MANUAL=function(key){
+    const target=[...document.querySelectorAll('.jgb-page-manual-btn')].find(x=>x!==btn && x.dataset.manualKey===key);
+    if(target){target.click();return;}
+    /* 현재 화면의 기존 사용설명서 버튼을 눌러 동일한 내부 openManual을 실행 */
+    btn.click();
+  };
+}
+
+function cleanupRepairNumericReset(){
+  const page=document.querySelector('.jgb-repair-page');
+  if(!page)return;
+  [...page.querySelectorAll('button')].forEach(b=>{
+    if(b.textContent.trim()==='숫자 초기화')b.remove();
+  });
+}
+
+function init(){
+  moveMapStats();
+  cleanupRepairNumericReset();
+  bridgeManual();
+  ensureRepairManual();
+  ensureSingleEamReset();
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+if(window.MutationObserver){
+  new MutationObserver(init).observe(document.body,{childList:true,subtree:true});
+}
+setInterval(init,800);
+})();
+</script>
 
 </body>
 
