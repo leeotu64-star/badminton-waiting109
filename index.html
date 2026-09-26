@@ -22464,28 +22464,24 @@ body {
         hist=isL?a.lightHistory:a.reelHistory,
         photoKey=isL?'lightPhoto':'reelPhoto';
 
-  const historyRowsCompact = hist.length ? hist.map((r,i)=>{
-    const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',
-          status=r[4]||'',completion=r[5]||'';
-    return `<tr>
-      <td>${esc(date)}</td>
-      <td>${esc(method)}</td>
-      <td>${esc(text)}</td>
-      <td>${esc(manager||'-')}</td>
-      <td>${esc(status||'완료')}</td>
-      <td class="jgb-lr-v54-history-actions-cell">
-        <button type="button" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button>
-        <button type="button" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button>
-      </td>
-    </tr>`;
-  }).join('') : `<tr><td colspan="6" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`;
+  const first=hist[0]||[];
+  const firstDate=first[0]||'-', firstMethod=first[1]||'-', firstText=first[2]||'-',
+        firstManager=first[3]||'-', firstStatus=first[4]||'완료', firstNote=first[5]||'-';
+
+  const extraRows = hist.length>1 ? hist.slice(1).map((r,i)=>{
+    const idx=i+1;
+    return `<div class="jgb-lr-v54-extra-history-row">
+      <div><b>${esc(r[0]||'-')}</b></div><div>${esc(r[1]||'-')}</div><div>${esc(r[2]||'-')}</div>
+      <div>${esc(r[3]||'-')}</div><div>${esc(r[4]||'완료')}</div>
+      <div><button type="button" onclick="window.jgbLRHistoryEdit(event,${idx})">수정</button><button type="button" onclick="window.jgbLRHistoryDelete(event,${idx})">삭제</button></div>
+    </div>`;
+  }).join('') : '';
 
   const topPhoto = a[photoKey]
     ? `<img src="${a[photoKey]}" alt="이력카드 사진">`
     : `사진 등록 자리<br><small>3 × 3cm · 1장</small>`;
 
   return `<div class="jgb-lr-v54-detail jgb-lr-v54-integrated">
-
     <section class="jgb-lr-v54-integrated-basic">
       <div class="jgb-lr-v54-integrated-title">
         <span>📋 ${name} 유지관리 이력카드 · ${code}</span>
@@ -22494,7 +22490,6 @@ body {
           <button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button>
         </div>
       </div>
-
       <div class="jgb-lr-v54-integrated-basic-body">
         <div class="jgb-lr-v54-integrated-info">
           <div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div>
@@ -22506,32 +22501,34 @@ body {
         </div>
         <div class="jgb-lr-v54-integrated-cardphoto">
           <div class="jgb-lr-v54-integrated-photo-title">📷 이력카드 사진 · 3 × 3 · 1장</div>
-          <div class="jgb-lr-v54-integrated-photo"
-               onclick="window.jgbLRPhoto(${n},'${type}')">${topPhoto}</div>
-          <input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*"
-                 style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')">
+          <div class="jgb-lr-v54-integrated-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${topPhoto}</div>
+          <input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')">
         </div>
       </div>
     </section>
 
     <section class="jgb-lr-v54-integrated-history">
       <div class="jgb-lr-v54-integrated-history-head">
-        <span>📋 유지관리 이력</span>
-        <span>${hist.length}건</span>
+        <span>📋 유지관리 이력</span><span>${hist.length}건</span>
       </div>
-
       <div class="jgb-lr-v54-integrated-history-body">
         <div class="jgb-lr-v54-integrated-work">
-          <table class="jgb-lr-v54-integrated-table">
-            <thead><tr>
-              <th>작업일자</th><th>작업구분</th><th>작업내용</th><th>담당자</th><th>상태</th><th>관리</th>
-            </tr></thead>
-            <tbody>${historyRowsCompact}</tbody>
-          </table>
+          <div class="jgb-lr-v54-history-main">
+            <div class="jgb-lr-v54-history-code">유지관리 이력 ${hist.length?'· '+code:''} <span>${firstDate}</span></div>
+            <div class="jgb-lr-v54-history-grid">
+              <div class="jgb-lr-v54-history-cell label">작업일자</div><div class="jgb-lr-v54-history-cell">${esc(firstDate)}</div>
+              <div class="jgb-lr-v54-history-cell label">작업구분</div><div class="jgb-lr-v54-history-cell">${esc(firstMethod)}</div>
+              <div class="jgb-lr-v54-history-cell label">작업내용</div><div class="jgb-lr-v54-history-cell">${esc(firstText)}</div>
+              <div class="jgb-lr-v54-history-cell label">작업결과</div><div class="jgb-lr-v54-history-cell">${esc(firstStatus)}</div>
+              <div class="jgb-lr-v54-history-cell label">담당자</div><div class="jgb-lr-v54-history-cell">${esc(firstManager)}</div>
+              <div class="jgb-lr-v54-history-cell label">특이사항</div><div class="jgb-lr-v54-history-cell">${esc(firstNote)}</div>
+              <div class="jgb-lr-v54-history-actions"><button type="button" onclick="window.jgbLRHistoryEdit(event,0)">수정</button><button type="button" onclick="window.jgbLRHistoryDelete(event,0)">삭제</button></div>
+            </div>
+          </div>
+          <div class="jgb-lr-v54-extra-history-scroll">${extraRows}</div>
         </div>
-
         <div class="jgb-lr-v54-integrated-workphotos">
-          <div class="jgb-lr-v54-integrated-photo-title">📷 유지관리 작업사진 · 3 × 3 · 3장</div>
+          <div class="jgb-lr-v54-integrated-photo-title">📷 유지관리 작업사진<br>3 × 3cm · 3장</div>
           <div class="jgb-lr-v54-integrated-photo-row">
             <div class="jgb-lr-v54-maint-photo">사진 1<br>등록 자리</div>
             <div class="jgb-lr-v54-maint-photo">사진 2<br>등록 자리</div>
@@ -22540,7 +22537,6 @@ body {
         </div>
       </div>
     </section>
-
   </div>`;
 }
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span class="jgb-lr-state-summary"><b class="ok">● 정상 ${counts.정상}</b><b class="planned">● 수리예정 ${counts.수리예정}</b><b class="repair">● 수리중 ${counts.수리중}</b></span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
@@ -34625,4 +34621,20 @@ img,svg,canvas{
 .jgb-lr-v54-integrated-workphotos .jgb-lr-v54-integrated-photo-title{
   font-size:11px!important;
 }
+
+<style>
+/* 방수 화면과 같은 유지관리 이력 배치 */
+.jgb-lr-v54-integrated-work{display:grid!important;grid-template-rows:1fr auto!important;min-height:0!important;overflow:hidden!important}
+.jgb-lr-v54-history-main{min-height:0!important;overflow:hidden!important}
+.jgb-lr-v54-history-code{height:32px;background:#eef4f7;border-bottom:1px solid #9aadb9;padding:7px 9px;font-size:11px;font-weight:900;display:flex;justify-content:space-between}
+.jgb-lr-v54-history-grid{display:grid;grid-template-columns:78px minmax(0,1fr) 78px minmax(0,1fr);min-height:0;height:calc(100% - 32px);border-bottom:1px solid #879ba8}
+.jgb-lr-v54-history-cell{min-width:0;border-right:1px solid #c0cdd5;border-bottom:1px solid #c0cdd5;padding:6px 7px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#fffdf8}
+.jgb-lr-v54-history-cell.label{background:#eaf1f5;font-weight:900;color:#203744}
+.jgb-lr-v54-history-actions{grid-column:4;display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:4px}
+.jgb-lr-v54-history-actions button,.jgb-lr-v54-extra-history-row button{border:1px solid #8da0ac;background:#fff;padding:3px 6px;font-size:9px;font-weight:900}
+.jgb-lr-v54-extra-history-scroll{max-height:76px;overflow-y:auto;overflow-x:hidden;border-top:1px solid #879ba8}
+.jgb-lr-v54-extra-history-row{display:grid;grid-template-columns:70px 55px minmax(80px,1fr) 55px 55px 70px;min-height:34px;border-bottom:1px solid #c0cdd5;font-size:9px;align-items:center}
+.jgb-lr-v54-extra-history-row>div{height:100%;display:flex;align-items:center;justify-content:center;padding:3px 4px;border-right:1px solid #c0cdd5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jgb-lr-v54-integrated-workphotos{min-height:0!important}
+</style>
 </style>
