@@ -10448,6 +10448,15 @@ html,body{
           <p style="margin:0 0 14px;color:#6f8293;font-size:12px;line-height:1.6">민원 접수·처리, 기본업무 완료 기록, 일정 및 연습용 집계 기준을 초기 상태로 되돌립니다. 실제 운영 데이터(Supabase)는 삭제하지 않습니다.</p>
           <button type="button" class="btn" style="background:#d9534f;color:#fff;border:1px solid #c74440;font-weight:800;padding:10px 16px;border-radius:8px" onclick="resetPracticeAll()">↻ 연습모드 전체 리셋</button>
         </section>
+        <section style="margin-top:16px;border:2px solid #e05b55;border-radius:12px;background:#fff;padding:18px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px">
+            <div>
+              <h3 style="margin:0 0 7px;color:#8f211d">🗑 EAM 완전 리셋</h3>
+              <p style="margin:0;color:#6f8293;font-size:12px;line-height:1.6">EAM 자산·유지관리 이력·점검·외주정비 데이터와 EAM 배치도/상태 저장값을 모두 비우고 새로 시작합니다. 이 작업은 복구할 수 없습니다.</p>
+            </div>
+            <button type="button" class="btn" style="white-space:nowrap;background:#b42318;color:#fff;border:1px solid #8f1d17;font-weight:900;padding:11px 18px;border-radius:8px" onclick="eamCompleteReset()">🗑 EAM 완전 리셋</button>
+          </div>
+        </section>
       </div>`;
     }
     function body(){
@@ -13864,6 +13873,39 @@ function jgbV47GoWpByLeak(leakCode){
         alert('전체 초기화 중 일부 항목을 초기화하지 못했습니다.\n'+(e?.message||e));
       }
     }
+    async function eamCompleteReset(){
+      const ok1=confirm('EAM 데이터를 완전히 리셋할까요?\n\n① EAM 자산 전체\n② 유지관리 이력 전체\n③ 점검 기록 전체\n④ 외주정비 기록 전체\n⑤ EAM 배치도·아이콘·상태 저장값\n⑥ EAM 이력카드 관련 저장값\n\n이 작업은 복구할 수 없습니다.');
+      if(!ok1)return;
+      const ok2=confirm('마지막 확인입니다.\nEAM의 기존 자산과 유지관리 이력을 모두 삭제하고 빈 상태에서 다시 시작합니다.\n\n정말 실행하시겠습니까?');
+      if(!ok2)return;
+      try{
+        const keys=[
+          'JGB_EAM_ASSET_META_V40','JGB_EAM_DELETED_CODES','JGB_EAM_MANUAL_REPAIR_LIVE_V1',
+          'JGB_EAM_HEADER_STATS_RESET_V1','JGB_EAM_HYUNHWANG_MAP_V1',
+          'JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1','JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1'
+        ];
+        keys.forEach(k=>localStorage.removeItem(k));
+        Object.keys(localStorage).filter(k=>k.startsWith('JGB_MAINT_PHOTO_')).forEach(k=>localStorage.removeItem(k));
+        window.__jgbMaintPhotos={};
+        if(window.SUPA){
+          const tables=['asset_history','inspections','external_work','assets'];
+          for(const table of tables){
+            const r=await window.SUPA.from(table).delete().not('id','is',null);
+            if(r.error)throw new Error(table+' 초기화 실패: '+(r.error.message||r.error));
+          }
+        }
+        window.__eamA=[]; window.__eamH=[]; window.__eamI=[]; window.__eamExt=[]; window.__eamSelCode='';
+        if(typeof window.eamLoad==='function')await window.eamLoad();
+        render();
+        alert('EAM 완전 리셋이 완료되었습니다.\n기존 EAM 자산·유지관리 데이터가 모두 비워졌습니다.');
+      }catch(e){
+        console.error('EAM_COMPLETE_RESET',e);
+        try{if(typeof window.eamLoad==='function')await window.eamLoad();}catch(_){ }
+        render();
+        alert('EAM 완전 리셋 중 오류가 발생했습니다.\n'+(e?.message||e));
+      }
+    }
+    window.eamCompleteReset=eamCompleteReset;
     function resetAll(){resetPracticeAll()}
     (function(){
       window.eamPick=eamPick; window.eamHistoryTab=eamHistoryTab; window.eamShowLocation=eamShowLocation; window.eamShowHistory=eamShowHistory;
