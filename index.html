@@ -22467,18 +22467,24 @@ body {
   const historyRowsCompact = hist.length ? hist.map((r,i)=>{
     const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',
           status=r[4]||'',completion=r[5]||'';
-    return `<tr>
-      <td>${esc(date)}</td>
-      <td>${esc(method)}</td>
-      <td>${esc(text)}</td>
-      <td>${esc(manager||'-')}</td>
-      <td>${esc(status||'완료')}</td>
-      <td class="jgb-lr-v54-history-actions-cell">
-        <button type="button" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button>
-        <button type="button" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button>
-      </td>
-    </tr>`;
-  }).join('') : `<tr><td colspan="6" class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</td></tr>`;
+    return `<article class="jgb-lr-v54-pair-history">
+      <div class="jgb-lr-v54-pair-history-head">
+        <span>유지관리 이력 ${i+1} · ${esc(date)}</span>
+        <div>
+          <button type="button" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button>
+          <button type="button" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button>
+        </div>
+      </div>
+      <div class="jgb-lr-v54-pair-grid">
+        <div class="ph-label">작업일자</div><div class="ph-value">${esc(date)}</div>
+        <div class="ph-label">작업구분</div><div class="ph-value">${esc(method)}</div>
+        <div class="ph-label">담당자</div><div class="ph-value">${esc(manager||'-')}</div>
+        <div class="ph-label">상태</div><div class="ph-value">${esc(status||'완료')}</div>
+        <div class="ph-label">작업내용</div><div class="ph-value">${esc(text||'-')}</div>
+        <div class="ph-label">작업결과</div><div class="ph-value">${esc(completion||status||'완료')}</div>
+      </div>
+    </article>`;
+  }).join('') : `<div class="jgb-lr-v54-pair-empty">등록된 유지관리 이력이 없습니다.</div>`;
 
   const topPhoto = a[photoKey]
     ? `<img src="${a[photoKey]}" alt="이력카드 사진">`
@@ -22521,13 +22527,8 @@ body {
       </div>
 
       <div class="jgb-lr-v54-integrated-history-body">
-        <div class="jgb-lr-v54-integrated-work">
-          <table class="jgb-lr-v54-integrated-table">
-            <thead><tr>
-              <th>작업일자</th><th>작업구분</th><th>작업내용</th><th>담당자</th><th>상태</th><th>관리</th>
-            </tr></thead>
-            <tbody>${historyRowsCompact}</tbody>
-          </table>
+        <div class="jgb-lr-v54-integrated-work jgb-lr-v54-pair-work">
+          <div class="jgb-lr-v54-pair-history-list">${historyRowsCompact}</div>
         </div>
 
         <div class="jgb-lr-v54-integrated-workphotos">
@@ -34744,5 +34745,81 @@ img,svg,canvas{
   height:calc(100% - 42px)!important;
   min-height:0!important;
   align-items:center!important;
+}
+</style>
+
+<style>
+/* === 유지관리 이력: 방수 수리이력처럼 좌우 2쌍 구조 === */
+.jgb-lr-v54-pair-work{
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+}
+.jgb-lr-v54-pair-history-list{
+  width:100%!important;
+  height:100%!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
+.jgb-lr-v54-pair-history{
+  width:100%!important;
+  border-bottom:1px solid #7f96a5!important;
+  background:#fffdf8!important;
+}
+.jgb-lr-v54-pair-history-head{
+  height:30px!important;
+  padding:5px 8px!important;
+  background:#edf3f6!important;
+  border-bottom:1px solid #9db0bc!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  font-size:11px!important;
+  font-weight:900!important;
+}
+.jgb-lr-v54-pair-history-head button{
+  padding:2px 6px!important;
+  margin-left:3px!important;
+  border:1px solid #8ba0ad!important;
+  background:#fff!important;
+  font-size:9px!important;
+  font-weight:900!important;
+}
+.jgb-lr-v54-pair-grid{
+  display:grid!important;
+  grid-template-columns:82px minmax(0,1fr) 82px minmax(0,1fr)!important;
+  grid-auto-rows:minmax(34px,1fr)!important;
+  width:100%!important;
+}
+.jgb-lr-v54-pair-grid > div{
+  min-width:0!important;
+  border-right:1px solid #a8bac5!important;
+  border-bottom:1px solid #a8bac5!important;
+  padding:6px 7px!important;
+  font-size:10px!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+  display:flex!important;
+  align-items:center!important;
+}
+.jgb-lr-v54-pair-grid .ph-label{
+  background:#eaf1f5!important;
+  font-weight:900!important;
+  color:#203c4f!important;
+}
+.jgb-lr-v54-pair-grid .ph-value{
+  background:#fffdf8!important;
+  font-weight:700!important;
+}
+.jgb-lr-v54-pair-empty{
+  height:100%!important;
+  min-height:100px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:11px!important;
+  color:#71828d!important;
 }
 </style>
