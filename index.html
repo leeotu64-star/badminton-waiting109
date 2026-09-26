@@ -22704,7 +22704,7 @@ body {
 
   </div>`;
 }
-  function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span class="jgb-lr-state-summary"><b class="ok">● 정상 ${counts.정상}</b><b class="planned">● 수리예정 ${counts.수리예정}</b><b class="repair">● 수리중 ${counts.수리중}</b></span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
+  function pane(type,headerCounts){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><div class="jgb-lr-v54-pane-title"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b>${group(isL?'조명':'릴선',headerCounts,type)}</div><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span class="jgb-lr-state-summary"><b class="ok">● 정상 ${counts.정상}</b><b class="planned">● 수리예정 ${counts.수리예정}</b><b class="repair">● 수리중 ${counts.수리중}</b></span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
   function markup(){
     const lc={정상:0,수리예정:0,수리중:0},rc={정상:0,수리예정:0,수리중:0};
     assets.forEach(x=>{if(lc[x.light]!==undefined)lc[x.light]++;if(rc[x.reel]!==undefined)rc[x.reel]++;});
@@ -22749,7 +22749,7 @@ body {
       const s=annualStats(type,year);
       return `<div class="jgb-lr-v54-annual-card"><div class="jgb-lr-v54-annual-head"><strong>${type==='light'?'💡 조명 유지관리 실적':'🔌 릴선 유지관리 실적'}</strong><div class="jgb-lr-v54-year-control"><span>연도</span><button type="button" onclick="window.jgbLRAnnualYear('${type}',-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="window.jgbLRAnnualYear('${type}',1)" aria-label="다음 연도">›</button></div></div><div class="jgb-lr-v54-stat4"><div><small>${s.month}월 수리 건수</small><strong>${s.monthTotal}건</strong></div><div><small>${year}년 수리 건수</small><strong>${s.total}건</strong></div><div><small>자체 수리 건수</small><strong>${s.self}건</strong></div><div><small>외주 수리 건수</small><strong>${s.external}건</strong></div></div><p class="jgb-lr-v54-annual-note">※ 자체·외주는 각 수리이력에 저장된 구분값만 집계합니다.</p></div>`;
     };
-    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>조명·릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('조명',lc,'light')}${group('릴선',rc,'reel')}<button type="button" class="jgb-lr-performance-btn" onclick="window.jgbLRTogglePerformance()">📊 유지관리 실적</button></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid" style="display:none">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
+    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>조명·릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses"><button type="button" class="jgb-lr-performance-btn" onclick="window.jgbLRTogglePerformance()">📊 유지관리 실적</button></div></header><div class="jgb-lr-v54-panes">${pane('light',lc)}${pane('reel',rc)}</div><section class="jgb-lr-v54-annual-grid" style="display:none">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
   }
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
@@ -27520,6 +27520,19 @@ html, body {
 .jgb-lr-v54-integrated-history-body{scrollbar-width:auto!important;}
 </style>
 
+
+<style id="JGB_LR_MOVE_STATUS_TO_PANEHEAD">
+.jgb-lr-v54-pane-title{display:flex!important;align-items:center!important;gap:10px!important;min-width:0!important}
+.jgb-lr-v54-pane-title>b{white-space:nowrap!important}
+.jgb-lr-v54-pane-title .jgb-lr-v54-status-group{display:flex!important;align-items:center!important;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important}
+.jgb-lr-v54-pane-title .jgb-lr-v54-status-group .group-title{display:none!important}
+.jgb-lr-v54-pane-title .jgb-lr-v54-status-group .group-items{gap:5px!important}
+.jgb-lr-v54-pane-title .jgb-lr-v54-head-status{height:32px!important;min-width:48px!important;padding:2px 5px!important;border-width:1px!important;border-radius:6px!important;box-shadow:none!important}
+.jgb-lr-v54-pane-title .jgb-lr-v54-head-status .status-icon{display:none!important}
+.jgb-lr-v54-pane-title .jgb-lr-v54-head-status .status-copy b{font-size:8px!important}
+.jgb-lr-v54-pane-title .jgb-lr-v54-head-status .status-copy strong{font-size:14px!important}
+.jgb-lr-v54-pane-title .jgb-lr-v54-head-status.self,.jgb-lr-v54-pane-title .jgb-lr-v54-head-status.external{display:none!important}
+</style>
 </body>
 
 <style id="v19-court-position-final">
