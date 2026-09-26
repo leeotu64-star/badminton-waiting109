@@ -22488,7 +22488,7 @@ body {
 
   const topPhoto = a[photoKey]
     ? `<img src="${a[photoKey]}" alt="이력카드 사진">`
-    : `사진 등록 자리<br><small>4 × 4cm · 1장</small>`;
+    : `사진 등록 자리`;
 
   return `<div class="jgb-lr-v54-detail jgb-lr-v54-integrated">
 
@@ -22511,7 +22511,7 @@ body {
           <div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model||(isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div>
         </div>
         <div class="jgb-lr-v54-integrated-cardphoto">
-          <div class="jgb-lr-v54-integrated-photo-title">📷 이력카드 사진 · 4 × 4 · 1장</div>
+          <div class="jgb-lr-v54-integrated-photo-title">📷 이력카드 사진</div>
           <div class="jgb-lr-v54-integrated-photo"
                onclick="window.jgbLRPhoto(${n},'${type}')">${topPhoto}</div>
           <input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*"
@@ -35104,5 +35104,71 @@ img,svg,canvas{
   font-size:16px!important;
   line-height:22px!important;
   font-weight:900!important;
+}
+</style>
+
+<style>
+/* ===== 이력카드 사진 최종 정리 ===== */
+/* 4×4 표기는 화면에서 완전히 제거 */
+.jgb-lr-v54-integrated-cardphoto .jgb-lr-v54-integrated-photo-title{
+  font-size:11px!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+/* 사진 칸 자체를 충분히 넓혀 5×5가 찌그러지거나 잘리지 않게 */
+.jgb-lr-v54-integrated-basic-body{
+  grid-template-columns:minmax(0,1fr) 190px!important;
+}
+.jgb-lr-v54-integrated-cardphoto{
+  width:190px!important;
+  min-width:190px!important;
+  box-sizing:border-box!important;
+  transform:none!important;
+  padding:5px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  overflow:hidden!important;
+}
+.jgb-lr-v54-integrated-cardphoto .jgb-lr-v54-integrated-photo-title{
+  width:100%!important;
+  transform:none!important;
+}
+
+/* 이력카드 사진은 5×5cm로 확대 */
+.jgb-lr-v54-integrated-cardphoto .jgb-lr-v54-integrated-photo{
+  width:5cm!important;
+  height:5cm!important;
+  min-width:5cm!important;
+  min-height:5cm!important;
+  max-width:5cm!important;
+  max-height:5cm!important;
+  margin:6px auto 0!important;
+  transform:none!important;
+  box-sizing:border-box!important;
+}
+
+/* 아래 유지관리 이력 제목 글씨도 한 단계 크게 */
+.jgb-lr-v54-integrated-history-head{
+  font-size:16px!important;
+  line-height:22px!important;
+  font-weight:950!important;
+}
+.jgb-lr-v54-pair-history-head{
+  font-size:16px!important;
+  line-height:22px!important;
+}
+.jgb-lr-v54-pair-history-head > span{
+  font-size:16px!important;
+  line-height:22px!important;
+}
+
+/* 아래 헤더와 작업사진 헤더의 높이는 동일하게 유지 */
+.jgb-lr-v54-integrated-history-head{
+  min-height:32px!important;
+  box-sizing:border-box!important;
 }
 </style>
