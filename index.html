@@ -22502,11 +22502,12 @@ body {
         </div>
 
         <div class="jgb-lr-v54-integrated-workphotos">
-          <div class="jgb-lr-v54-integrated-photo-title">📷 유지관리 작업사진 · 3 × 3 · 2장</div>
+          <div class="jgb-lr-v54-integrated-photo-title">📷 유지관리 작업사진 · 3 × 3 · 3장</div>
           <div class="jgb-lr-v54-integrated-photo-row">
             <div class="jgb-lr-v54-maint-photo">사진 1<br>등록 자리</div>
             <div class="jgb-lr-v54-maint-photo">사진 2<br>등록 자리</div>
-                      </div>
+            <div class="jgb-lr-v54-maint-photo">사진 3<br>등록 자리</div>
+          </div>
         </div>
       </div>
     </section>
@@ -27229,6 +27230,38 @@ html, body {
 }
 </style>
 
+
+<style id="FIX_HISTORY_SCROLL_POSITION">
+/* 유지관리 이력과 작업사진은 한 세트: 스크롤바는 이력 오른쪽 경계에만 고정 */
+.jgb-lr-v54-integrated-history-body{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 250px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+.jgb-lr-v54-integrated-history{
+  min-width:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  display:grid!important;
+  grid-template-rows:32px minmax(0,1fr)!important;
+}
+.jgb-lr-v54-integrated-history > :not(.jgb-lr-v54-integrated-history-head){
+  min-width:0!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:thin!important;
+}
+.jgb-lr-v54-integrated-workphotos{
+  width:250px!important;
+  min-width:250px!important;
+  max-width:250px!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.jgb-lr-v54-integrated-workphotos *{scrollbar-width:none!important;}
+</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -35135,7 +35168,7 @@ img,svg,canvas{
   overflow:hidden!important;
 }
 .jgb-lr-v54-integrated-workphotos .jgb-lr-v54-integrated-photo-title::after{
-  content:"3 × 3cm · 2장";
+  content:"3 × 3cm · 3장";
   display:block;
   font-size:9px;
   font-weight:700;
@@ -35737,248 +35770,39 @@ img,svg,canvas{
 }
 </style>
 
-
-<style id="JGB_LR_ALIGNMENT_FINAL_20260926">
-/* =========================================================
-   유지관리 이력카드 최종 정렬 보정
-   - 상단 이력카드 사진 영역과 하단 작업사진 영역의 우측 폭 통일
-   - 상단 사진 강제 좌측 이동 제거
-   - 하단 이력 스크롤은 왼쪽 이력 목록 내부에서만 표시
-   - 기존 HTML / 데이터 / JavaScript 기능은 변경하지 않음
-   ========================================================= */
-
-/* 1. 상단 이력카드: 하단 작업사진과 동일한 오른쪽 270px 영역 */
-.jgb-lr-v54-integrated-basic-body{
-  grid-template-columns:minmax(0,1fr) 270px!important;
-  min-width:0!important;
-  width:100%!important;
-  overflow:hidden!important;
-}
-
-.jgb-lr-v54-integrated-cardphoto{
-  width:270px!important;
-  min-width:270px!important;
-  max-width:270px!important;
-  margin:0!important;
-  padding:5px 6px!important;
-  box-sizing:border-box!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  transform:none!important;
-  overflow:hidden!important;
-}
-
-/* 이전에 들어간 -18px 이동을 완전히 무효화 */
-.jgb-lr-v54-integrated-cardphoto .jgb-lr-v54-integrated-photo{
-  width:var(--history-card-photo-size,4cm)!important;
-  height:auto!important;
-  aspect-ratio:var(--history-card-photo-ratio,1 / 1)!important;
-  min-width:0!important;
+<style id="JGB_LR_SCROLL_BOTH_HISTORY_AND_PHOTO">
+/* 유지관리 이력 + 작업사진을 하나의 세로 스크롤 세트로 동작 */
+.jgb-lr-v54-integrated-history{
   min-height:0!important;
-  max-width:100%!important;
-  max-height:100%!important;
-  margin:6px auto 0!important;
-  transform:none!important;
-  align-self:center!important;
-  object-fit:contain!important;
-  box-sizing:border-box!important;
+  overflow:hidden!important;
 }
-
-.jgb-lr-v54-integrated-cardphoto .jgb-lr-v54-integrated-photo-title{
-  width:100%!important;
-  margin:0!important;
-  text-align:center!important;
-  transform:none!important;
-  box-sizing:border-box!important;
-}
-
-/* 2. 하단 좌우 영역의 기준선을 정확히 일치 */
 .jgb-lr-v54-integrated-history-body{
-  grid-template-columns:minmax(0,1fr) 270px!important;
-  width:100%!important;
-  min-width:0!important;
   min-height:0!important;
-  overflow:hidden!important;
-  align-items:stretch!important;
-}
-
-.jgb-lr-v54-integrated-work{
-  min-width:0!important;
-  min-height:0!important;
-  width:100%!important;
-  overflow:hidden!important;
-}
-
-/* 3. 스크롤바는 왼쪽 이력 목록 안쪽에만 생성 */
-.jgb-lr-v54-pair-history-list{
-  min-width:0!important;
-  width:100%!important;
-  max-width:100%!important;
-  min-height:0!important;
+  height:auto!important;
+  overflow-y:auto!important;
   overflow-x:hidden!important;
-  overflow-y:auto!important;
-  scrollbar-gutter:stable!important;
-  box-sizing:border-box!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:#7f96a5 #edf3f6!important;
 }
-
-/* 스크롤바 때문에 표 자체가 좌우로 밀리지 않도록 */
-.jgb-lr-v54-pair-history-list::-webkit-scrollbar{
-  width:9px!important;
-}
-.jgb-lr-v54-pair-history-list::-webkit-scrollbar-track{
-  background:#edf3f6!important;
-}
-.jgb-lr-v54-pair-history-list::-webkit-scrollbar-thumb{
-  background:#8299a9!important;
-  border-radius:6px!important;
-  border:2px solid #edf3f6!important;
-}
-
-/* 4. 오른쪽 작업사진 3칸은 영역 전체를 정확히 사용 */
-.jgb-lr-v54-integrated-workphotos{
-  width:270px!important;
-  min-width:270px!important;
-  max-width:270px!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-  overflow:hidden!important;
-}
-
-.jgb-lr-v54-integrated-photo-row{
-  width:100%!important;
-  display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:6px!important;
-  padding:8px 4px 0!important;
-  box-sizing:border-box!important;
-}
-
-.jgb-lr-v54-maint-photo{
-  width:100%!important;
-  min-width:0!important;
-  box-sizing:border-box!important;
-}
-
-/* 작은 화면에서만 기존 반응형 폭 사용 */
-@media(max-width:1050px){
-  .jgb-lr-v54-integrated-basic-body{
-    grid-template-columns:minmax(0,1fr) 270px!important;
-  }
-  .jgb-lr-v54-integrated-cardphoto{
-    width:270px!important;
-    min-width:270px!important;
-  }
-}
-</style>
-
-
-<style id="JGB_LR_HISTORY_SLIDER_FINAL_20260926">
-/* 유지관리 이력 슬라이더 최종 고정
-   - 슬라이더가 다른 영역으로 튀지 않도록 유지관리 이력 안에만 배치
-   - 가로/세로 스크롤 모두 historyscroll 하나에서 담당
-   - 폭은 오른쪽 유지관리 이력 카드의 실제 가용 폭
-   - 높이는 제목 아래 남은 공간 전체
-*/
-.jgb-lr-v54 .jgb-lr-v54-history{
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  flex:1 1 auto!important;
-  min-height:0!important;
-  overflow:hidden!important;
-  box-sizing:border-box!important;
-}
-
-.jgb-lr-v54 .jgb-lr-v54-historyhead{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  box-sizing:border-box!important;
-}
-
-.jgb-lr-v54 .jgb-lr-v54-historyscroll{
-  position:relative!important;
-  display:block!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  height:calc(100% - 43px)!important;
-  min-height:0!important;
-  max-height:none!important;
-  margin:0!important;
-  padding:0!important;
-  box-sizing:border-box!important;
-  overflow-x:auto!important;
-  overflow-y:auto!important;
-  scrollbar-gutter:stable!important;
-}
-
-.jgb-lr-v54 .jgb-lr-v54-historyscroll table{
-  width:max-content!important;
-  min-width:560px!important;
-  max-width:none!important;
-  margin:0!important;
-  table-layout:fixed!important;
-  box-sizing:border-box!important;
-}
-
-.jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar{
-  width:10px!important;
-  height:10px!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar-track{
-  background:#edf3f6!important;
-}
-.jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar-thumb{
-  background:#8299a9!important;
-  border-radius:7px!important;
-  border:2px solid #edf3f6!important;
-}
-
-/* 기존에 잘못 붙어 있던 이력목록 별도 스크롤바 제거 */
-.jgb-lr-v54 .jgb-lr-v54-pair-history-list{
+/* 왼쪽 이력만 따로 스크롤되지 않게 함 */
+.jgb-lr-v54-integrated-history-body .jgb-lr-v54-integrated-historyscroll,
+.jgb-lr-v54-integrated-history-body .jgb-lr-v54-historyscroll{
   overflow:visible!important;
-  scrollbar-gutter:auto!important;
+  max-height:none!important;
+  height:auto!important;
 }
-.jgb-lr-v54 .jgb-lr-v54-pair-history-list::-webkit-scrollbar{
-  width:0!important;
-  height:0!important;
+/* 사진도 같은 스크롤 영역에 포함 */
+.jgb-lr-v54-integrated-history-body .jgb-lr-v54-integrated-workphotos{
+  overflow:visible!important;
+  height:auto!important;
+  min-height:0!important;
+  align-self:start!important;
 }
-</style>
-
-<style id="JGB_LR_V54_WORKPHOTO_2_FIXED">
-/* 유지관리 작업사진: 3×3cm 사진 2장 고정 / 가로 스크롤 금지 */
-.jgb-lr-v54-integrated-workphotos{
-  width:270px!important;
-  min-width:270px!important;
-  max-width:270px!important;
-  overflow:hidden!important;
-  box-sizing:border-box!important;
+/* 가로 슬라이더는 금지 */
+.jgb-lr-v54-integrated-history-body::-webkit-scrollbar:horizontal{
+  display:none!important;
 }
-.jgb-lr-v54-integrated-photo-row{
-  display:grid!important;
-  grid-template-columns:repeat(2,113.4px)!important;
-  grid-template-rows:113.4px!important;
-  gap:8px!important;
-  width:100%!important;
-  height:113.4px!important;
-  padding:0!important;
-  margin:8px 0 0!important;
-  justify-content:center!important;
-  align-items:center!important;
-  overflow:hidden!important;
-  box-sizing:border-box!important;
-}
-.jgb-lr-v54-maint-photo{
-  width:113.4px!important;
-  height:113.4px!important;
-  min-width:113.4px!important;
-  min-height:113.4px!important;
-  max-width:113.4px!important;
-  max-height:113.4px!important;
-  box-sizing:border-box!important;
-  overflow:hidden!important;
+.jgb-lr-v54-integrated-history-body::-webkit-scrollbar{
+  width:10px;
 }
 </style>
