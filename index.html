@@ -27689,6 +27689,105 @@ html, body {
   if(window.MutationObserver){new MutationObserver(()=>{addButton();buildPanel();}).observe(document.body,{childList:true,subtree:true});}
 })();
 </script>
+
+<style id="JGB_EAM_7FACILITY_PERFORMANCE_V1">
+/* 시설물 7종별 유지관리실적: 기존 화면/기능은 유지하고 별도 팝업으로 표시 */
+.jgb-eam-7perf-overlay{position:fixed;inset:0;z-index:2147483200;display:none;align-items:center;justify-content:center;background:rgba(8,29,45,.62);padding:18px;box-sizing:border-box}
+.jgb-eam-7perf-overlay.open{display:flex!important}
+.jgb-eam-7perf-sheet{width:min(1500px,97vw);max-height:min(720px,94vh);overflow:auto;background:#eef5fa;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.35);border:1px solid #b9d0df;box-sizing:border-box;padding:12px}
+.jgb-eam-7perf-head{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 8px;border-bottom:2px solid #17668f;box-sizing:border-box}
+.jgb-eam-7perf-head strong{font-size:21px;color:#174765;font-weight:1000;letter-spacing:-.5px}
+.jgb-eam-7perf-close{height:34px;padding:0 13px;border:1px solid #aac2d1;border-radius:8px;background:#fff;color:#174765;font-weight:900;cursor:pointer}
+.jgb-eam-7perf-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-top:12px;align-items:stretch}
+.jgb-eam-7perf-card{min-width:0;background:#fff;border:1px solid #bfd3e1;border-radius:10px;overflow:hidden;box-shadow:0 3px 10px rgba(30,72,100,.08)}
+.jgb-eam-7perf-card-head{height:76px;background:#f7fbfe;border-bottom:1px solid #d6e3eb;display:flex;align-items:center;gap:8px;padding:8px 9px;box-sizing:border-box}
+.jgb-eam-7perf-icon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;font-size:24px;border-radius:9px;background:#e8f2f8}
+.jgb-eam-7perf-title{min-width:0}
+.jgb-eam-7perf-title strong{display:block;font-size:14px;line-height:1.15;color:#173f59;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jgb-eam-7perf-title small{display:block;margin-top:3px;font-size:9px;color:#6b8292;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jgb-eam-7perf-year{display:flex;align-items:center;justify-content:center;gap:4px;padding:7px 7px 4px;color:#587083;font-size:9px;font-weight:900}
+.jgb-eam-7perf-year button{width:22px;height:22px;border:1px solid #b8ccd9;border-radius:5px;background:#fff;color:#23526e;font-weight:1000;cursor:pointer;padding:0;line-height:1}
+.jgb-eam-7perf-year b{min-width:48px;text-align:center;color:#173f59;font-size:10px}
+.jgb-eam-7perf-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px 7px 8px}
+.jgb-eam-7perf-stats div{min-height:46px;border:1px solid #d4e1e9;border-radius:7px;background:#fbfdff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-sizing:border-box}
+.jgb-eam-7perf-stats small{font-size:8px;line-height:1.1;color:#60798a;font-weight:800}
+.jgb-eam-7perf-stats strong{margin-top:2px;font-size:17px;line-height:1;color:#0d5b83;font-weight:1000}
+.jgb-eam-7perf-note{padding:0 8px 9px;text-align:center;color:#8093a0;font-size:8px;line-height:1.35}
+.jgb-eam-7perf-empty{grid-column:1/-1;text-align:center;padding:30px;color:#617989;background:#fff;border:1px solid #c9dbe6;border-radius:10px}
+.jgb-eam-7perf-open{height:34px;padding:0 11px;border:1px solid #b9d2e2;border-radius:8px;background:#fff;color:#125b83;font-weight:900;cursor:pointer;white-space:nowrap;margin-left:8px}
+.jgb-eam-7perf-open:hover{background:#edf7fc}
+@media(max-width:1200px){.jgb-eam-7perf-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:760px){.jgb-eam-7perf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.jgb-eam-7perf-sheet{padding:8px}}
+</style>
+<script id="JGB_EAM_7FACILITY_PERFORMANCE_V1_SCRIPT">
+(function(){
+'use strict';
+if(window.__JGB_EAM_7FACILITY_PERFORMANCE_V1)return;
+window.__JGB_EAM_7FACILITY_PERFORMANCE_V1=true;
+const years={cooling:2026,fire:2026,water:2026,electrical:2026,sanitary:2026,doors:2026,other:2026};
+const defs=[
+ ['cooling','❄️','냉난방','냉방기 · 실외기'],
+ ['fire','🚒','소방·방재','펌프 · 밸브 · 제어'],
+ ['water','♨️','온수·난방','온수기 · 조절기 · 난방'],
+ ['electrical','⚡','전기설비','분전반 · 전기'],
+ ['sanitary','🚻','위생설비','소변기 · 양변기 · 세면대'],
+ ['doors','🚪','문·창호설비','유리문 · 힌지 · 도어클로저'],
+ ['other','🔧','기타설비','사무 · 공용']
+];
+const esc=x=>String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function sourceForKey(k){
+ try{const c=typeof window.eamCategoryDefs==='function'?window.eamCategoryDefs():{};return c[k]?.items||[]}catch(_){return []}
+}
+function historyForAsset(a){
+ const H=Array.isArray(window.__eamH)?window.__eamH:[];
+ return H.filter(h=>String(h?.asset_id||'')===String(a?.id||'') || (a?.code && String(h?.asset_code||'')===String(a.code)) || (a?.asset_code && String(h?.asset_code||'')===String(a.asset_code)));
+}
+function parse(h){
+ let d={};const raw=String(h?.description??'');
+ if(raw.startsWith('MAINT::')){try{d=JSON.parse(raw.slice(7))||{}}catch(_){} }
+ return d;
+}
+function isRepair(h){
+ const d=parse(h);const type=String(d.type||'수리').replace(/\s/g,'');const event=String(h?.event_type||'').replace(/\s/g,'');const result=String(d.result||'').replace(/\s/g,'');
+ return type==='수리'||event.includes('수리')||result==='수리';
+}
+function stats(key,year){
+ const now=new Date(),month=now.getMonth()+1;let total=0,monthTotal=0,self=0,external=0;
+ sourceForKey(key).forEach(src=>historyForAsset(src).forEach(h=>{
+  if(!isRepair(h))return;
+  const d=parse(h),date=String(d.date||d.startDate||h?.event_date||h?.created_at||'').slice(0,10);
+  if(!date.startsWith(String(year)))return;
+  total++;if(Number(date.slice(5,7))===month)monthTotal++;
+  const method=String(d.maintenanceMethod||d.method||h?.worker_name||'').replace(/\s/g,'');
+  if(method.includes('외주'))external++;if(method.includes('자체'))self++;
+ }));
+ return {month,total,monthTotal,self,external};
+}
+function card(k,ico,label,desc){const s=stats(k,years[k]);return `<article class="jgb-eam-7perf-card">
+ <div class="jgb-eam-7perf-card-head"><span class="jgb-eam-7perf-icon">${ico}</span><div class="jgb-eam-7perf-title"><strong>${esc(label)}</strong><small>${esc(desc)}</small></div></div>
+ <div class="jgb-eam-7perf-year"><span>연도</span><button type="button" onclick="window.jgbEam7PerfYear('${k}',-1)">‹</button><b>${years[k]}년</b><button type="button" onclick="window.jgbEam7PerfYear('${k}',1)">›</button></div>
+ <div class="jgb-eam-7perf-stats"><div><small>${s.month}월 수리 건수</small><strong>${s.monthTotal}건</strong></div><div><small>${years[k]}년 수리 건수</small><strong>${s.total}건</strong></div><div><small>자체 수리 건수</small><strong>${s.self}건</strong></div><div><small>외주 수리 건수</small><strong>${s.external}건</strong></div></div>
+ <div class="jgb-eam-7perf-note">※ EAM 자산에 저장된 수리 이력을 기준으로 집계합니다.</div>
+ </article>`}
+function ensure(){
+ let ov=document.getElementById('jgbEam7PerfOverlay');
+ if(ov)return ov;
+ ov=document.createElement('div');ov.id='jgbEam7PerfOverlay';ov.className='jgb-eam-7perf-overlay';
+ ov.innerHTML='<div class="jgb-eam-7perf-sheet"><div class="jgb-eam-7perf-head"><strong>📊 시설물 유지관리 실적 · 7개 시설물</strong><button type="button" class="jgb-eam-7perf-close">닫기</button></div><div class="jgb-eam-7perf-grid" id="jgbEam7PerfGrid"></div></div>';
+ document.body.appendChild(ov);ov.querySelector('.jgb-eam-7perf-close').onclick=()=>ov.classList.remove('open');ov.onclick=e=>{if(e.target===ov)ov.classList.remove('open')};return ov;
+}
+function render(){const ov=ensure(),grid=ov.querySelector('#jgbEam7PerfGrid');grid.innerHTML=defs.map(x=>card(...x)).join('');}
+window.jgbEam7PerfOpen=function(){render();ensure().classList.add('open');setTimeout(render,250)};
+window.jgbEam7PerfYear=function(k,d){years[k]=Math.min(2035,Math.max(2026,years[k]+d));render()};
+function addButton(){
+ const head=document.querySelector('.eh-head');if(!head||head.querySelector('.jgb-eam-7perf-open'))return;
+ const manual=head.querySelector('.jgb-page-manual-btn');const b=document.createElement('button');b.type='button';b.className='jgb-eam-7perf-open';b.textContent='📊 유지관리 실적';b.onclick=window.jgbEam7PerfOpen;
+ if(manual)head.appendChild(b);else head.appendChild(b);
+}
+function init(){addButton();if(window.MutationObserver)new MutationObserver(addButton).observe(document.body,{childList:true,subtree:true})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
