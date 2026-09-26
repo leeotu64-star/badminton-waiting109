@@ -411,7 +411,9 @@
 .jgb-live-status.stable{background:#159447}.jgb-live-empty .jgb-live-action b{color:#18834a}
 @media(max-width:1050px){.jgb-repair-realtime-panel{min-height:280px}}
 
-</style></style>
+</style>/* 상단 조명·릴선 상태 아이콘 제거 */
+.jgb-lr-v54-head-statuses .status-icon{display:none!important;}
+</style>
     <style id="EMPLOYEE_OVERVIEW_STYLE">
     .eov-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
     .eov-card{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:14px;box-shadow:0 2px 8px #00000008}
@@ -22706,9 +22708,9 @@ body {
       });
       return {external,self};
     };
-    const group=(icon,label,c,type)=>{
+    const group=(label,c,type)=>{
       const m=maintenanceHeaderCounts(type);
-      return `<div class="jgb-lr-v54-status-group"><div class="group-title"><span>${icon}</span>${label}</div><div class="group-items">${statusBox('🟢','정상',c.정상,'normal')}${statusBox('🟡','수리예정',c.수리예정,'planned')}${statusBox('🔴','수리중',c.수리중,'repair')}${statusBox('🔧','자체',m.self,'self')}${statusBox('🛠️','외주',m.external,'external')}</div></div>`;
+      return `<div class="jgb-lr-v54-status-group"><div class="group-title">${label}</div><div class="group-items">${statusBox('🟢','정상',c.정상,'normal')}${statusBox('🟡','수리예정',c.수리예정,'planned')}${statusBox('🔴','수리중',c.수리중,'repair')}${statusBox('🔧','자체',m.self,'self')}${statusBox('🛠️','외주',m.external,'external')}</div></div>`;
     };
     const years=Array.from({length:10},(_,i)=>2026+i);
     const annualStats=(type,year)=>{
@@ -22734,7 +22736,7 @@ body {
       const s=annualStats(type,year);
       return `<div class="jgb-lr-v54-annual-card"><div class="jgb-lr-v54-annual-head"><strong>${type==='light'?'💡 조명 유지관리 실적':'🔌 릴선 유지관리 실적'}</strong><div class="jgb-lr-v54-year-control"><span>연도</span><button type="button" onclick="window.jgbLRAnnualYear('${type}',-1)" aria-label="이전 연도">‹</button><b>${year}년</b><button type="button" onclick="window.jgbLRAnnualYear('${type}',1)" aria-label="다음 연도">›</button></div></div><div class="jgb-lr-v54-stat4"><div><small>${s.month}월 수리 건수</small><strong>${s.monthTotal}건</strong></div><div><small>${year}년 수리 건수</small><strong>${s.total}건</strong></div><div><small>자체 수리 건수</small><strong>${s.self}건</strong></div><div><small>외주 수리 건수</small><strong>${s.external}건</strong></div></div><p class="jgb-lr-v54-annual-note">※ 자체·외주는 각 수리이력에 저장된 구분값만 집계합니다.</p></div>`;
     };
-    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>조명·릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('💡','조명',lc,'light')}${group('🔌','릴선',rc,'reel')}<button type="button" class="jgb-lr-performance-btn" onclick="window.jgbLRTogglePerformance()">📊 유지관리 실적</button></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid" style="display:none">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
+    return `<div class="jgb-lr-v54"><header class="jgb-lr-v54-head"><div class="jgb-lr-v54-brand"><span class="jgb-lr-v54-brandico">🏢</span><div><h2>조명·릴선 시설관리</h2><p>시설 자산의 상태와 위치를 한 화면에서 관리합니다.</p></div></div><div class="jgb-lr-v54-head-statuses">${group('조명',lc,'light')}${group('릴선',rc,'reel')}<button type="button" class="jgb-lr-performance-btn" onclick="window.jgbLRTogglePerformance()">📊 유지관리 실적</button></div></header><div class="jgb-lr-v54-panes">${pane('light')}${pane('reel')}</div><section class="jgb-lr-v54-annual-grid" style="display:none">${annualTable('light',annualLightYear)}${annualTable('reel',annualReelYear)}</section></div>`;
   }
   window.jgbLightReelPageMarkup=markup;
   window.jgbLRSelect=function(n,type){if(type==='light')selectedLight=n;else selectedReel=n;const host=document.querySelector('.jgb-lr-v54');if(host){host.outerHTML=markup();}else{window.__jgbLRRefresh=true;}}
