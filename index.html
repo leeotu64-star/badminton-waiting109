@@ -12610,7 +12610,6 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
             <select data-v182-field="status" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:9px;border:1px solid #cbd9e4;border-radius:8px;background:#fff">
               <option value="조치예정" ${target.status==='조치예정'?'selected':''}>조치예정</option>
               <option value="조치중" ${target.status==='조치중'?'selected':''}>조치중</option>
-              <option value="보수 후 관찰" ${target.status==='보수 후 관찰'?'selected':''}>보수 후 관찰</option>
               <option value="재조치 필요" ${target.status==='재조치 필요'?'selected':''}>재조치 필요</option>
             </select>
           </label>
@@ -12691,8 +12690,9 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         const now=new Date(), month=now.getMonth()+1;
         let total=0,monthTotal=0,self=0,external=0;
         wp.forEach(h=>{
-          const result=String(h?.result||'').trim();
-          if(result!=='수리' && result!=='완료')return;
+          /* WA가 '수리'로 등록된 작업만 실적 1건으로 집계.
+             이후 같은 WA-번호를 '완료'로 수정해도 중복 집계하지 않는다. */
+          if(String(h?.result||'').trim()!=='수리')return;
           const d=String(h?.date||'').slice(0,10);
           if(!d.startsWith(String(annualYear)))return;
           total++;
@@ -12716,7 +12716,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           <div><small>자체 수리 건수</small><strong>${perf.self}건</strong></div>
           <div><small>외주 수리 건수</small><strong>${perf.external}건</strong></div>
         </div>
-        <p class="jgb-lk-performance-note">※ WA 유지관리 이력 중 작업결과가 수리 또는 완료인 기록만 작업일자와 자체·외주 구분값을 기준으로 집계합니다. 라이브 이력카드의 현재 상태는 실적 집계에 사용하지 않습니다.</p>
+        <p class="jgb-lk-performance-note">※ 누수·수리 이력카드에 저장된 작업일자와 자체·외주 구분값을 기준으로 집계합니다.</p>
       </section>`;
       return `<style>
         .jgb-v170-grid{display:block!important}
@@ -12801,7 +12801,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         .jgb-v186-summary{display:flex!important;flex-wrap:nowrap!important;gap:7px!important;justify-content:flex-end!important;align-items:center!important}
         .jgb-v186-summary button{min-width:92px!important;height:46px!important;padding:5px 8px!important;border:1.5px solid #8ea0aa!important;border-radius:12px!important;background:linear-gradient(145deg,#fff 0%,#eef3f6 52%,#d2dce1 100%)!important;box-shadow:0 4px 0 #9aaab3,0 6px 10px rgba(30,55,70,.16),inset 0 2px 2px rgba(255,255,255,.95)!important;font-size:12px!important;font-weight:900!important}
         .jgb-v186-summary button i{width:13px!important;height:13px!important;border-radius:50%!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 2px 3px rgba(20,45,60,.25),inset 0 1px 2px rgba(255,255,255,.75)!important}
-        .jgb-v186-summary button b{font-size:19px!important;line-height:1!important;font-weight:1000!important}.jgb-lk-performance-summary>b{font-size:19px!important;color:#17334d!important;margin-left:1px}
+        .jgb-v186-summary button b{font-size:19px!important;line-height:1!important;font-weight:1000!important}
         .jgb-v186-summary button.active,.jgb-v186-summary button.on{transform:translateY(1px)!important;box-shadow:0 3px 0 #7f919b,0 5px 9px rgba(30,55,70,.16),inset 0 2px 2px rgba(255,255,255,.9)!important}
         .jgb-lk-performance-panel{margin:0 0 14px;padding:0;border:1px solid #d0dce6;border-radius:12px;background:#fff;box-shadow:0 8px 22px rgba(24,55,77,.08);overflow:hidden}
         .jgb-lk-performance-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 14px;background:#e7f1f7;border-bottom:1px solid #cbdbe6}
@@ -12825,7 +12825,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
               <button type="button" data-v47-action="filter-lk-status" data-filter-status="조치필요"${statusFilter==='조치필요'?' class="active"':''}><i style="background:#ef5b52"></i>조치필요 <b>${countBy(x=>String(x.status||'').trim()==='조치필요'||String(x.status||'').trim()==='보수필요')}</b></button>
               <button type="button" data-v47-action="filter-lk-status" data-filter-status="점검요청"${statusFilter==='점검요청'?' class="active"':''}><i style="background:#e0b62f"></i>점검요청 <b>${countBy(x=>String(x.status||'').trim()==='점검요청'||String(x.status||'').trim()==='점검필요')}</b></button>
               <button type="button" data-v47-action="filter-lk-status" data-filter-status="정상"${statusFilter==='정상'?' class="active':''}><i style="background:#3d8fe4"></i>정상 <b>${countBy(x=>String(x.status||'').trim()==='정상')}</b></button>
-              <button type="button" class="jgb-lk-performance-summary" data-v47-action="toggle-lk-performance"><i style="background:#1769bd">▣</i>유지관리실적 <b>${perf.total}</b></button>
+              <button type="button" class="jgb-lk-performance-summary" data-v47-action="toggle-lk-performance"><i style="background:#1769bd">▣</i>유지관리실적</button>
             </div>
           </div>
           ${performancePanel}
