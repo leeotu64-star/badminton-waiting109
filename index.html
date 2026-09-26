@@ -12657,10 +12657,10 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const statusFilter=window.__JGB_LK_STATUS_FILTER||'';
       const matchesFilter=x=>{
         if(!statusFilter)return true;
-        const st=String(x.status||'').trim(), mm=String(x.maintenanceMethod||'').trim();
+        const c=cardForLk(x.leakCode), st=String(c.status||'').trim(), mm=String(c.maintenanceMethod||'').trim();
         if(statusFilter==='조치필요')return st==='조치필요'||st==='보수필요';
         if(statusFilter==='점검요청')return st==='점검요청'||st==='점검필요';
-        if(statusFilter==='정상')return st==='정상'||!st;
+        if(statusFilter==='정상')return st==='정상';
         if(statusFilter==='자체정비')return mm==='자체정비';
         if(statusFilter==='외주정비')return mm==='외주정비';
         return true;
@@ -12683,7 +12683,38 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
           const py=Number.isFinite(Number(x.mapY))?Number(x.mapY):Math.max(25,Math.min(88,base[1]+o[1]));
           return `<div class="jgb-v170-marker-wrap" style="left:${px}%;top:${py}%" data-id="${esc(x.id)}"><button type="button" class="jgb-v170-marker ${markerClass(lk)}" data-v47-action="go-wp-by-leak" data-id="${esc(x.id)}" data-map-x="${px}" data-map-y="${py}" title="${esc(lk)} · 클릭하면 방수 이력"><span class="lk-pin-dot"></span><span class="lk-pin-code">${esc(lk||'-')}</span></button></div>`;
         }).join('');
-      const countBy=(fn)=>leaks.filter(fn).length;
+      const mergedForCount=x=>({...x,...cardForLk(x.leakCode)});
+      const countBy=(fn)=>leaks.filter(x=>fn(mergedForCount(x))).length;
+      const annualYear=Number(window.__JGB_LK_ANNUAL_YEAR)||new Date().getFullYear();
+      const annualStats=()=>{
+        const now=new Date(), month=now.getMonth()+1;
+        let total=0,monthTotal=0,self=0,external=0;
+        wp.forEach(h=>{
+          const d=String(h?.date||'').slice(0,10);
+          if(!d.startsWith(String(annualYear)))return;
+          total++;
+          const mm=Number(d.slice(5,7));
+          if(mm===month)monthTotal++;
+          const method=String(h?.method||'').replace(/\s/g,'');
+          if(method.includes('외주'))external++;
+          if(method.includes('자체'))self++;
+        });
+        return {month,total,self,external};
+      };
+      const perf=annualStats();
+      const performancePanel=`<section class="jgb-lk-performance-panel" style="display:none">
+        <div class="jgb-lk-performance-head">
+          <strong>🔧 누수·수리 유지관리 실적</strong>
+          <div class="jgb-lk-year-control"><span>연도</span><button type="button" data-v47-action="lk-annual-year" data-dir="-1">‹</button><b>${annualYear}년</b><button type="button" data-v47-action="lk-annual-year" data-dir="1">›</button></div>
+        </div>
+        <div class="jgb-lk-performance-stat4">
+          <div><small>${perf.month}월 수리 건수</small><strong>${perf.monthTotal}건</strong></div>
+          <div><small>${annualYear}년 수리 건수</small><strong>${perf.total}건</strong></div>
+          <div><small>자체 수리 건수</small><strong>${perf.self}건</strong></div>
+          <div><small>외주 수리 건수</small><strong>${perf.external}건</strong></div>
+        </div>
+        <p class="jgb-lk-performance-note">※ 누수·수리 이력카드에 저장된 작업일자와 자체·외주 구분값을 기준으로 집계합니다.</p>
+      </section>`;
       return `<style>
         .jgb-v170-grid{display:block!important}
         .jgb-v170-card{background:#fff;border:1px solid #d0dce6;border-radius:15px;box-shadow:0 8px 22px rgba(24,55,77,.08);overflow:hidden}
@@ -12764,6 +12795,23 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
         .jgb-v170-marker.dragging{cursor:grabbing;box-shadow:0 9px 18px rgba(20,50,70,.34);z-index:50}
         @media(max-width:1000px){.jgb-leak-layout73{grid-template-columns:1fr}.jgb-leak-side30{max-height:none}.jgb-leak-3d-map{height:600px;min-height:600px}.jgb-leak-bottom{display:none}.jgb-v170-title{display:block}.jgb-v186-summary{justify-content:flex-start;margin-top:8px}}
         @media(max-width:700px){.jgb-leak-3d-map{height:520px;min-height:520px}.jgb-leak-courts3d{gap:4px}.jgb-leak-room-strip{gap:3px}.jgb-leak-storage3d{width:25%}.court-num3d{font-size:10px;padding:4px 9px}}
+        .jgb-v186-summary{display:flex!important;flex-wrap:nowrap!important;gap:7px!important;justify-content:flex-end!important;align-items:center!important}
+        .jgb-v186-summary button{min-width:92px!important;height:46px!important;padding:5px 8px!important;border:1.5px solid #8ea0aa!important;border-radius:12px!important;background:linear-gradient(145deg,#fff 0%,#eef3f6 52%,#d2dce1 100%)!important;box-shadow:0 4px 0 #9aaab3,0 6px 10px rgba(30,55,70,.16),inset 0 2px 2px rgba(255,255,255,.95)!important;font-size:12px!important;font-weight:900!important}
+        .jgb-v186-summary button i{width:13px!important;height:13px!important;border-radius:50%!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 2px 3px rgba(20,45,60,.25),inset 0 1px 2px rgba(255,255,255,.75)!important}
+        .jgb-v186-summary button b{font-size:19px!important;line-height:1!important;font-weight:1000!important}
+        .jgb-v186-summary button.active,.jgb-v186-summary button.on{transform:translateY(1px)!important;box-shadow:0 3px 0 #7f919b,0 5px 9px rgba(30,55,70,.16),inset 0 2px 2px rgba(255,255,255,.9)!important}
+        .jgb-lk-performance-panel{margin:0 0 14px;padding:0;border:1px solid #d0dce6;border-radius:12px;background:#fff;box-shadow:0 8px 22px rgba(24,55,77,.08);overflow:hidden}
+        .jgb-lk-performance-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 14px;background:#e7f1f7;border-bottom:1px solid #cbdbe6}
+        .jgb-lk-performance-head strong{font-size:15px;color:#17384f}
+        .jgb-lk-year-control{display:flex;align-items:center;gap:6px;font-size:11px;color:#587083}
+        .jgb-lk-year-control button{width:27px;height:27px;border:1px solid #b9cbd8;border-radius:6px;background:#fff;color:#24516e;font-weight:900;cursor:pointer}
+        .jgb-lk-year-control b{min-width:62px;text-align:center;font-size:13px;color:#17384f}
+        .jgb-lk-performance-stat4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px}
+        .jgb-lk-performance-stat4>div{min-height:72px;display:flex;flex-direction:column;justify-content:center;align-items:center;border:1px solid #bdd1df;border-radius:9px;background:#f7fbfd}
+        .jgb-lk-performance-stat4 small{font-size:10px;color:#557187;font-weight:800}
+        .jgb-lk-performance-stat4 strong{margin-top:5px;font-size:23px;color:#0e527d}
+        .jgb-lk-performance-note{margin:0;padding:0 14px 12px;color:#6d8393;font-size:10px}
+        @media(max-width:700px){.jgb-lk-performance-stat4{grid-template-columns:repeat(2,1fr)}}
       </style>
       <div class="jgb-v170-wrap">
         <header class="jgb-v170-head"><div><div style="font-size:11px;font-weight:900;letter-spacing:.12em;color:#1475ca">LEAK LOCATION MANAGEMENT</div><h1>시설 누수·수리 관리현황</h1><p class="jgb-common-head-sub">2층 옥상(지붕) 누수 위치와 1층 실내 유입 위치를 확인하고 관리합니다.</p></div><div class="jgb-v170-head-actions"><button type="button" class="jgb-v170-add" data-v47-action="new-lk">＋ LK 생성</button><button type="button" class="jgb-v171-delete-btn" data-v47-action="open-lk-delete">LK 삭제·초기화</button></div></header>
@@ -12774,10 +12822,10 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
               <button type="button" data-v47-action="filter-lk-status" data-filter-status="조치필요"${statusFilter==='조치필요'?' class="active"':''}><i style="background:#ef5b52"></i>조치필요 <b>${countBy(x=>String(x.status||'').trim()==='조치필요'||String(x.status||'').trim()==='보수필요')}</b></button>
               <button type="button" data-v47-action="filter-lk-status" data-filter-status="점검요청"${statusFilter==='점검요청'?' class="active"':''}><i style="background:#e0b62f"></i>점검요청 <b>${countBy(x=>String(x.status||'').trim()==='점검요청'||String(x.status||'').trim()==='점검필요')}</b></button>
               <button type="button" data-v47-action="filter-lk-status" data-filter-status="정상"${statusFilter==='정상'?' class="active':''}><i style="background:#3d8fe4"></i>정상 <b>${countBy(x=>String(x.status||'').trim()==='정상')}</b></button>
-              <button type="button" data-v47-action="filter-lk-status" data-filter-status="자체정비"${statusFilter==='자체정비'?' class="active':''}><i style="background:#38a169"></i>자체정비 <b>${countBy(x=>String(x.maintenanceMethod||'').trim()==='자체정비')}</b></button>
-              <button type="button" data-v47-action="filter-lk-status" data-filter-status="외주정비"${statusFilter==='외주정비'?' class="active':''}><i style="background:#d88928"></i>외주정비 <b>${countBy(x=>String(x.maintenanceMethod||'').trim()==='외주정비')}</b></button>
+              <button type="button" class="jgb-lk-performance-summary" data-v47-action="toggle-lk-performance"><i style="background:#1769bd">▣</i>유지관리실적</button>
             </div>
           </div>
+          ${performancePanel}
           <div class="jgb-leak-layout73">
             <div class="jgb-leak-main">
           <div class="jgb-leak-3d-map">
@@ -13184,6 +13232,20 @@ function jgbV47GoWpByLeak(leakCode){
 
     if(!window.__JGB_V47_EVENTS){window.__JGB_V47_EVENTS=true;document.addEventListener('click',function(e){const place=e.target.closest('[data-v47-place]');if(place){e.preventDefault();e.stopPropagation();const input=document.getElementById('v47_location');if(input){input.value=place.getAttribute('data-v47-place')||'';input.focus()}return}const b=e.target.closest('[data-v47-action]');if(!b)return;const a=b.getAttribute('data-v47-action'),id=b.getAttribute('data-id'),type=b.getAttribute('data-type'),loc=b.getAttribute('data-location'),code=b.getAttribute('data-code'),isNew=b.getAttribute('data-new')==='1';e.preventDefault();e.stopPropagation();if(window.__JGB_LK_DRAG_SUPPRESS&&(a==='edit-leak'||a==='go-wp-by-leak'))return;
       if(a==='filter-lk-status'){const f=String(b.getAttribute('data-filter-status')||'');window.__JGB_LK_STATUS_FILTER=(window.__JGB_LK_STATUS_FILTER===f)?'':f;return render();}
+      if(a==='toggle-lk-performance'){
+        const host=document.querySelector('.jgb-v170-wrap'), panel=host?.querySelector('.jgb-lk-performance-panel'), layout=host?.querySelector('.jgb-leak-layout73');
+        if(!panel||!layout)return;
+        const showing=getComputedStyle(panel).display!=='none';
+        panel.style.setProperty('display',showing?'none':'block','important');
+        layout.style.setProperty('display',showing?'grid':'none','important');
+        b.classList.toggle('on',!showing);
+        return;
+      }
+      if(a==='lk-annual-year'){
+        const dir=Number(b.getAttribute('data-dir')||1);
+        window.__JGB_LK_ANNUAL_YEAR=(Number(window.__JGB_LK_ANNUAL_YEAR)||new Date().getFullYear())+dir;
+        return render();
+      }
       if(a==='new-lk')return jgbV47CreateLk();
       if(a==='register-live')return jgbV178OpenLiveRegister();
       if(a==='edit-live')return jgbV178OpenLiveEditor(b.getAttribute('data-live-id')||'');
@@ -26501,15 +26563,44 @@ html, body {
 </style>
 
 
-<style id="JGB_STATUS_3D_SMALL_FINAL">
-.jgb-v186-summary{gap:7px!important;align-items:center!important}
-.jgb-v186-summary button{
-  min-width:92px!important;height:46px!important;padding:5px 8px!important;
-  border-radius:12px!important;
-  box-shadow:0 4px 0 #9aaab3,0 6px 10px rgba(30,55,70,.16),inset 0 2px 2px rgba(255,255,255,.95)!important;
+<style id="STATUS_3D_SMALL_KEEP_DATA_BINDING">
+/* 기존 JS의 countBy()/render() 연동은 그대로 두고 화면 크기만 조정 */
+.jgb-v186-summary{
+  display:flex!important;
+  gap:7px!important;
+  align-items:center!important;
+  flex-wrap:nowrap!important;
 }
-.jgb-v186-summary button i{width:13px!important;height:13px!important;box-shadow:0 2px 3px rgba(20,45,60,.25),inset 0 1px 2px rgba(255,255,255,.75)!important}
-.jgb-v186-summary button b{font-size:19px!important;font-weight:1000!important}
+.jgb-v186-summary button{
+  min-width:92px!important;
+  min-height:46px!important;
+  height:46px!important;
+  padding:5px 8px!important;
+  border:1.5px solid #8ea0aa!important;
+  border-radius:12px!important;
+  background:linear-gradient(145deg,#ffffff 0%,#eef3f6 52%,#d2dce1 100%)!important;
+  box-shadow:
+    0 4px 0 #9aaab3,
+    0 6px 10px rgba(30,55,70,.16),
+    inset 0 2px 2px rgba(255,255,255,.95)!important;
+  font-size:12px!important;
+  font-weight:900!important;
+}
+.jgb-v186-summary button i{
+  width:13px!important;
+  height:13px!important;
+  border-radius:50%!important;
+  box-shadow:0 2px 3px rgba(20,45,60,.25),inset 0 1px 2px rgba(255,255,255,.75)!important;
+}
+.jgb-v186-summary button b{
+  font-size:19px!important;
+  line-height:1!important;
+  font-weight:1000!important;
+}
+.jgb-v186-summary button.active{
+  transform:translateY(1px)!important;
+  box-shadow:0 3px 0 #7f919b,0 5px 9px rgba(30,55,70,.16),inset 0 2px 2px rgba(255,255,255,.9)!important;
+}
 </style>
 
 </body>
