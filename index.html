@@ -12650,7 +12650,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       const displayPlace=obj=>{const p=String(obj?.place||'-');const c=placeCode(obj);const labels={A:'A · 코트',B:'B · 복도',C:'C · 사무실',D:'D · 옥상',E:'E · 유수장치실',F:'F · 창고',G:'G · 휴게실',H:'H · 남자 화장실',I:'I · 여자 화장실',J:'J · 남자 샤워실',K:'K · 여자 샤워실',L:'L · 좌측 외곽',M:'M · 우측 외곽'};return labels[c]||p};
       const status=current?.status||'원본';
       return `<div class="eam-innovation">
-        <div class="eam-innovation-head"><div><div class="eyebrow">ENTERPRISE ASSET MANAGEMENT</div><h1>시설물 유지관리 현황</h1><p>설비 종류 → 자산 선택 → 기본정보 → 유지보수 이력</p></div><button class="eam-manage-main eam-manage-top" onclick="eamOpenManageMenu()">⚙ 자산 관리</button></div>
+        <div class="eam-innovation-head"><div><div class="eyebrow">ENTERPRISE ASSET MANAGEMENT</div><h1>시설물 유지관리 현황</h1><p>설비 종류 → 자산 선택 → 기본정보 → 유지보수 이력</p></div><div class="eam-head-actions-fixed"><button class="eam-manage-main eam-manage-top" onclick="eamOpenManageMenu()">⚙ 자산 관리</button><button type="button" class="jgb-eam-performance-btn" onclick="window.jgbEamPerformanceOpen()">📊 유지관리 실적</button></div></div>
         <div class="eam-type-row">${order.map(k=>{const v=cats[k];return `<button class="eam-type ${k===cat?'on':''} eam-type-${k}" onclick="eamPick('${k}')"><span>${v.ico}</span><strong>${v.label}</strong><em>${v.items.length}</em></button>`}).join('')}</div>
         <div class="eam-innovation-layout">
           <aside class="eam-assets-panel"><div class="eam-assets-head"><div><b>${C.ico} ${C.label}</b><span>${list.length}개 자산</span></div><div class="eam-filter-row"><select id="eamProLocationFilter" onchange="eamProFilter('',this.value)"><option value="">전체 위치</option><option value="A">A · 코트</option><option value="B">B · 복도</option><option value="C">C · 사무실</option><option value="D">D · 옥상</option><option value="E">E · 유수장치실</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option></select></div></div><div id="eamproGrid" class="eam-asset-list">${list.map(v=>{const a=eamRegisteredForSource(v), mm=meta[v.code]||{};const merged={...(a||v),...mm};const st=a?.status||'원본';return `<button class="eam-asset-row ${v.code===sel?'on':''}" data-code="${xEsc(v.code)}" data-loc="${xEsc(placeCode(merged))}" onclick="eamPick('${cat}','${xEsc(v.code)}')"><span class="row-code">${xEsc(eamUnifiedCode(v))}</span><span class="row-copy"><b>${xEsc(eamDisplayName(merged))}</b><small>${xEsc(eamDisplaySubName(merged))} · ${xEsc(displayPlace(merged))}</small><span class="row-origin">표시코드 ${xEsc(eamUnifiedCode(v))} · 기존코드 ${xEsc(v.code)}</span></span><i class="${st==='정상'?'ok':st==='원본'?'source':'bad'}">${xEsc(st)}</i></button>`}).join('')||'<div class="eam-empty">등록된 자산이 없습니다.</div>'}</div></aside>
@@ -25786,6 +25786,36 @@ document.addEventListener('click',handle,true);
 }
 </style>
 
+<style id="JGB_EAM_PERFORMANCE_BUTTON_FIX">
+.eam-innovation-head .eam-head-actions-fixed{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 0 auto;position:relative;z-index:30}
+.eam-innovation-head .eam-manage-top{margin:0!important;position:static!important}
+.jgb-eam-performance-btn{height:44px!important;min-width:124px!important;padding:0 13px!important;border:1px solid #aebbc4!important;border-radius:10px!important;background:linear-gradient(180deg,#fff 0%,#eef2f4 58%,#d9e0e4 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 2px 3px rgba(0,0,0,.24)!important;color:#18374b!important;font-size:12px!important;font-weight:900!important;white-space:nowrap!important;cursor:pointer!important}
+.jgb-eam-performance-overlay{position:fixed;inset:0;background:rgba(12,31,45,.42);z-index:99990;display:none;align-items:flex-start;justify-content:center;padding-top:72px;box-sizing:border-box}
+.jgb-eam-performance-overlay.open{display:flex}
+.jgb-eam-performance-sheet{width:min(810px,calc(100vw - 40px));background:#fff;border-radius:15px;box-shadow:0 18px 45px rgba(0,0,0,.28);overflow:hidden;border:1px solid #aebfca}
+.jgb-eam-performance-head{height:60px;background:linear-gradient(135deg,#0d4266,#176b98);color:#fff;display:flex;align-items:center;padding:0 14px;gap:8px;box-sizing:border-box}
+.jgb-eam-performance-head h2{margin:0;font-size:18px;flex:1}
+.jgb-eam-performance-close{border:0;background:#fff;color:#164563;border-radius:7px;width:30px;height:30px;font-weight:900;cursor:pointer}
+.jgb-eam-performance-year{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:900}
+.jgb-eam-performance-year button{width:28px;height:30px;border:1px solid #d5e0e6;background:#fff;border-radius:6px;color:#164563;font-weight:900;cursor:pointer}
+.jgb-eam-performance-body{padding:14px 12px 12px;background:#f5f8fa}
+.jgb-eam-performance-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.jgb-eam-performance-card{min-height:82px;border:1px solid #bcd3e2;border-radius:8px;background:#f8fbfd;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.jgb-eam-performance-card small{font-size:12px;font-weight:900;color:#31536b}
+.jgb-eam-performance-card strong{font-size:25px;color:#05619a;line-height:1}
+.jgb-eam-performance-total{margin-top:8px;height:42px;border:1px solid #bcd3e2;border-radius:8px;background:#eaf4fb;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:900;color:#24485f}
+@media(max-width:700px){.jgb-eam-performance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.eam-innovation-head .eam-head-actions-fixed{gap:4px}.jgb-eam-performance-btn{min-width:110px!important}}
+</style>
+<script id="JGB_EAM_PERFORMANCE_FINAL">
+(function(){
+ const cats=[['cooling','❄️ 냉난방'],['fire','🚒 소방·방재'],['heating','♨️ 온수·난방'],['electric','⚡ 전기설비'],['sanitary','🚻 위생설비'],['door','🚪 문·창호설비'],['other','🔧 기타설비']];
+ const v=x=>String(x??'').trim();
+ function categoryOf(a){const c=v(a?.category||a?.type||'').replace(/\s/g,'');if(/냉난방|냉방|에어컨/.test(c))return'cooling';if(/소방|방재/.test(c))return'fire';if(/온수|난방/.test(c))return'heating';if(/전기/.test(c))return'electric';if(/위생|급배수|위생설비/.test(c))return'sanitary';if(/문|창호/.test(c))return'door';return'other'}
+ const getYear=()=>Number(localStorage.getItem('JGB_EAM_PERFORMANCE_YEAR')||new Date().getFullYear());
+ function render(){const year=getYear(),A=Array.isArray(window.__eamA)?window.__eamA:[],H=Array.isArray(window.__eamH)?window.__eamH:[];let deleted=new Set();try{deleted=new Set(JSON.parse(localStorage.getItem('JGB_EAM_DELETED_CODES')||'[]').map(v))}catch(e){}const active=A.filter(a=>!deleted.has(v(a?.asset_code)));const counts={cooling:0,fire:0,heating:0,electric:0,sanitary:0,door:0,other:0};H.forEach(h=>{const type=v(h?.event_type);if(['자산등록','자산정보수정'].includes(type))return;const d=v(h?.description);if(!(d.startsWith('MAINT:')||d.startsWith('MAINT::')||/수리|정비|점검|교체|조치/.test(type+' '+d)))return;const date=v(h?.event_date);if(date&&!date.startsWith(String(year)))return;const a=active.find(x=>v(x?.id)===v(h?.asset_id)||v(x?.asset_code)===v(h?.asset_code));if(a)counts[categoryOf(a)]++});const total=Object.values(counts).reduce((a,b)=>a+b,0);let ov=document.getElementById('jgbEamPerformanceOverlay');if(!ov){ov=document.createElement('div');ov.id='jgbEamPerformanceOverlay';ov.className='jgb-eam-performance-overlay';document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open')})}ov.innerHTML='<div class="jgb-eam-performance-sheet"><div class="jgb-eam-performance-head"><h2>📊 EAM 유지관리 실적</h2><div class="jgb-eam-performance-year"><button type="button" onclick="window.jgbEamPerformanceYear(-1)">‹</button><b>'+year+'년</b><button type="button" onclick="window.jgbEamPerformanceYear(1)">›</button></div><button type="button" class="jgb-eam-performance-close" onclick="document.getElementById(\'jgbEamPerformanceOverlay\').classList.remove(\'open\')">×</button></div><div class="jgb-eam-performance-body"><div class="jgb-eam-performance-grid">'+cats.map(([k,n])=>'<div class="jgb-eam-performance-card"><small>'+n+'</small><strong>'+counts[k]+'건</strong></div>').join('')+'</div><div class="jgb-eam-performance-total">전체 유지관리 실적&nbsp;&nbsp; <b>'+total+'건</b></div></div></div>'}
+ window.jgbEamPerformanceOpen=()=>{render();document.getElementById('jgbEamPerformanceOverlay')?.classList.add('open')};window.jgbEamPerformanceYear=d=>{localStorage.setItem('JGB_EAM_PERFORMANCE_YEAR',String(getYear()+d));render()};
+})();
+</script>
 <script id="JGB_ORIGINAL_BASE_HEADER_MANUAL_DETAIL_V1_SCRIPT">
 (function(){
   const M={
