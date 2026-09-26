@@ -22456,7 +22456,7 @@ body {
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   function ordered(){return Array.from({length:36},(_,i)=>i+1);}
   function cell(n,type){const a=assets[n-1],st=type==='light'?a.light:a.reel,sel=type==='light'?selectedLight===n:selectedReel===n;return `<button type="button" class="jgb-lr-v54-cell ${statusClass[st]} ${sel?'sel':''}" onclick="window.jgbLRSelect(${n},'${type}')" title="${n}번 ${type==='light'?'조명':'릴선'}">${n}</button>`}
-  function historyRows(hist){return hist.length?hist.map((r,i)=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status=r[4]||'',completion=r[5]||'';const statusCls=status==='정상'?'normal':status==='수리예정'?'planned':status==='수리중'?'repair':'';return `<article class="jgb-lr-history-card"><div class="jgb-lr-history-card-head"><div><strong>유지관리 이력</strong><span>${esc(date)}</span></div><div class="jgb-lr-history-actions"><button type="button" class="jgb-lr-history-edit" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button><button type="button" class="jgb-lr-history-delete" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button></div></div><div class="jgb-lr-history-card-body"><div class="jgb-lr-history-info"><div><small>작업일자</small><b>${esc(date||'-')}</b></div><div><small>구분</small><b>${esc(method||'-')}</b></div><div><small>처리상태</small><b class="history-status ${statusCls}">${esc(status||'-')}</b></div><div><small>완료예정일</small><b>${esc(completion||'-')}</b></div><div class="wide"><small>수리내용</small><b>${esc(text||'-')}</b></div><div class="wide"><small>담당자</small><b>${esc(manager||'-')}</b></div></div><div class="jgb-lr-history-photos"><div class="jgb-lr-history-photo-title">📷 작업사진 · 3.3cm × 2장</div><div class="jgb-lr-history-photo-grid"><div>사진 1<br><small>등록 자리</small></div><div>사진 2<br><small>등록 자리</small></div></div></div></div></article>`}).join(''):`<div class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</div>`}
+  function historyRows(hist){return hist.length?hist.map((r,i)=>{const date=r[0]||'',method=r[1]||'',text=r[2]||'',manager=r[3]||'',status='수리 완료',completion=r[5]||'';const statusCls='complete';return `<article class="jgb-lr-history-card"><div class="jgb-lr-history-card-head"><div><strong>유지관리 이력</strong><span>${esc(date)}</span></div><div class="jgb-lr-history-actions"><button type="button" class="jgb-lr-history-edit" onclick="window.jgbLRHistoryEdit(event,${i})">수정</button><button type="button" class="jgb-lr-history-delete" onclick="window.jgbLRHistoryDelete(event,${i})">삭제</button></div></div><div class="jgb-lr-history-card-body"><div class="jgb-lr-history-info"><div><small>작업일자</small><b>${esc(date||'-')}</b></div><div><small>구분</small><b>${esc(method||'-')}</b></div><div><small>처리상태</small><b class="history-status ${statusCls}">${esc(status||'-')}</b></div><div><small>완료예정일</small><b>${esc(completion||'-')}</b></div><div class="wide"><small>수리내용</small><b>${esc(text||'-')}</b></div><div class="wide"><small>담당자</small><b>${esc(manager||'-')}</b></div></div><div class="jgb-lr-history-photos"><div class="jgb-lr-history-photo-title">📷 작업사진 · 3.3cm × 2장</div><div class="jgb-lr-history-photo-grid"><div>사진 1<br><small>등록 자리</small></div><div>사진 2<br><small>등록 자리</small></div></div></div></div></article>`}).join(''):`<div class="jgb-lr-v54-empty">등록된 유지관리 이력이 없습니다.</div>`}
 
   function panel(n,type){const a=assets[n-1],isL=type==='light',name=isL?'코트 조명':'릴선',code=(isL?'L-':'RL-')+String(n).padStart(2,'0'),st=isL?a.light:a.reel,hist=isL?a.lightHistory:a.reelHistory;return `<div class="jgb-lr-v54-detail"><section class="jgb-lr-v54-card"><div class="jgb-lr-v54-cardtitle">📋 ${name} 주요시설 이력카드 · ${code}</div><div class="jgb-lr-v54-info"><div class="jgb-lr-v54-field"><small>자산코드</small><strong>${code}</strong></div><div class="jgb-lr-v54-field"><small>관리번호</small><strong>${n}</strong></div><div class="jgb-lr-v54-field"><small>설비종류</small><span>${esc(a.equipment||name)}</span></div><div class="jgb-lr-v54-field"><small>설치위치</small><span>${esc(a.location||`${n}번 위치`)}</span></div><div class="jgb-lr-v54-field"><small>현재상태</small><strong style="color:${statusColors[st]}">● ${st}</strong></div><div class="jgb-lr-v54-field"><small>모델·규격</small><span>${esc(a.model|| (isL?'LED 코트 조명':'CSI-7 릴선'))}</span></div></div><div class="jgb-lr-v54-photo-wrap"><div class="jgb-lr-v54-photo" onclick="window.jgbLRPhoto(${n},'${type}')">${a[isL?'lightPhoto':'reelPhoto']?`<img src="${a[isL?'lightPhoto':'reelPhoto']}" alt="현장 사진">`:`현장 사진 1장 등록<br><small>사진 등록 · 4×4cm</small>`}</div><input id="jgbLRPhotoInput_${n}_${type}" type="file" accept="image/*" style="display:none" onchange="window.jgbLRPhotoSave(this,${n},'${type}')"></div><div class="jgb-lr-v54-actions"><button type="button" onclick="window.jgbLRMaintenance(${n},'${type}')">＋ 유지관리 등록</button><button type="button" onclick="window.jgbLRCardEdit(${n},'${type}')">이력카드 수정</button></div></section><section class="jgb-lr-v54-history"><div class="jgb-lr-v54-historyhead"><span>유지관리 이력</span><span>${hist.length}건</span></div><div class="jgb-lr-v54-historyscroll">${historyRows(hist)}</div></section></div>`}
   function pane(type){const isL=type==='light',n=isL?selectedLight:selectedReel,a=assets[n-1],counts={};Object.keys(statusColors).forEach(s=>counts[s]=assets.filter(x=>(isL?x.light:x.reel)===s).length);return `<section class="jgb-lr-v54-pane"><div class="jgb-lr-v54-panehead"><b>${isL?'💡 조명 관리':'🔌 릴선 관리'}</b><span>${isL?'코트 조명 36개':'CSI-7 릴선 36개'} · 36개 위치</span></div><div class="jgb-lr-v54-maptitle"><span>코트 배치도 · 하단 왼쪽 1번 기준</span><span class="jgb-lr-state-summary"><b class="ok">● 정상 ${counts.정상}</b><b class="planned">● 수리예정 ${counts.수리예정}</b><b class="repair">● 수리중 ${counts.수리중}</b></span></div><div><div class="jgb-lr-v54-grid">${ordered().reverse().map(x=>cell(x,type)).join('')}</div>${panel(n,type)}</div></section>`}
@@ -22558,7 +22558,7 @@ body {
     const file=input.files&&input.files[0]; if(!file)return;
     const reader=new FileReader(); reader.onload=function(){assets[n-1][type==='light'?'lightPhoto':'reelPhoto']=reader.result;persist();window.jgbLRSelect(n,type);}; reader.readAsDataURL(file);
   };
-  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>수리이력 등록</h3><label class="jgb-lr-date-label">수리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>구분<select id="jgbLRMethod"><option value="자체">자체</option><option value="외주">외주</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리예정</option><option>수리중</option><option>정상</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="수리내용을 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value=current==='정상'?'수리예정':current;}
+  window.jgbLRMaintenance=function(n,type){const m=document.getElementById('jgbLRModal');if(!m){const x=document.createElement('div');x.id='jgbLRModal';x.className='jgb-lr-v54-modal';x.innerHTML='<div class="jgb-lr-v54-dialog jgb-lr-maint-dialog"><h3>수리이력 등록</h3><label class="jgb-lr-date-label">수리일자<input id="jgbLRDate" type="date" min="2026-01-01" max="2035-12-31"></label><label>담당자<input id="jgbLRManager" type="text" placeholder="담당자 입력"></label><label>구분<select id="jgbLRMethod"><option value="자체">자체</option><option value="외주">외주</option></select></label><label>처리상태<select id="jgbLRStatusReg"><option selected>수리 완료</option></select></label><label>완료예정일<input id="jgbLRCompletionDate" type="date" min="2026-01-01" max="2035-12-31"></label><textarea id="jgbLRText" placeholder="수리내용을 입력하세요."></textarea><div class="row"><button type="button" onclick="document.getElementById(\'jgbLRModal\').classList.remove(\'open\')">취소</button><button type="button" onclick="window.jgbLRSave()">저장</button></div></div>';document.body.appendChild(x);}const modal=document.getElementById('jgbLRModal');modal.dataset.n=n;modal.dataset.type=type;const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const dateInput=document.getElementById('jgbLRDate');if(dateInput)dateInput.value=(now.getFullYear()>=2026&&now.getFullYear()<=2035)?today:'2026-01-01';modal.classList.add('open');document.getElementById('jgbLRText').value='';document.getElementById('jgbLRManager').value='';document.getElementById('jgbLRMethod').value='자체';const completionInput=document.getElementById('jgbLRCompletionDate');if(completionInput)completionInput.value='';const current=assets[n-1][type==='light'?'light':'reel'];const rs=document.getElementById('jgbLRStatusReg');if(rs)rs.value='수리 완료';}
   window.jgbLRHistoryEdit=function(ev,index){
     ev?.stopPropagation();
     const btn=ev?.currentTarget;
@@ -22577,7 +22577,7 @@ body {
       <label>관리일자<input id="jgbLRHEDate" type="date" value="${esc(row[0]||'')}"></label>
       <label>담당자<input id="jgbLRHEManager" type="text" value="${esc(row[3]||'')}"></label>
       <label>구분<select id="jgbLRHEMethod"><option value="자체" ${String(row[1]||'').includes('자체')?'selected':''}>자체</option><option value="외주" ${String(row[1]||'').includes('외주')?'selected':''}>외주</option></select></label>
-      <label>처리상태<select id="jgbLRHEStatus"><option ${row[4]==='수리예정'?'selected':''}>수리예정</option><option ${row[4]==='수리중'?'selected':''}>수리중</option><option ${row[4]==='정상'?'selected':''}>정상</option></select></label>
+      <label>처리상태<select id="jgbLRHEStatus"><option selected>수리 완료</option></select></label>
       <label>완료예정일<input id="jgbLRHECompletion" type="date" value="${esc(row[5]||'')}"></label>
       <textarea id="jgbLRHEText" placeholder="수리내용을 입력하세요.">${esc(row[2]||'')}</textarea>
       <div class="row"><button type="button" onclick="document.getElementById('jgbLRHistoryEditModal').remove()">취소</button><button type="button" onclick="window.jgbLRHistorySave(${assetNo},'${type}',${index})">수정 저장</button></div>
@@ -22609,7 +22609,7 @@ body {
       document.getElementById('jgbLRHEMethod')?.value||hist[index][1]||'자체',
       text,
       document.getElementById('jgbLRHEManager')?.value.trim()||'',
-      document.getElementById('jgbLRHEStatus')?.value||hist[index][4]||'수리예정',
+      '수리 완료',
       document.getElementById('jgbLRHECompletion')?.value||''
     ];
     if(type==='light')a.lightHistory=hist;else a.reelHistory=hist;
@@ -22623,7 +22623,7 @@ body {
     const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     const picked=document.getElementById('jgbLRDate')?.value||today;
     const y=Number(String(picked).slice(0,4));
-    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const nextStatus=document.getElementById('jgbLRStatusReg')?.value||'수리예정'; const completion=document.getElementById('jgbLRCompletionDate')?.value||''; const cy=Number(String(completion).slice(0,4)); const validCompletion=(cy>=2026&&cy<=2035)?completion:''; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager,nextStatus,validCompletion];
+    const manager=document.getElementById('jgbLRManager')?.value.trim()||''; const method=document.getElementById('jgbLRMethod')?.value||'자체정비'; const nextStatus='수리 완료'; const completion=document.getElementById('jgbLRCompletionDate')?.value||''; const cy=Number(String(completion).slice(0,4)); const validCompletion=(cy>=2026&&cy<=2035)?completion:''; const row=[(y>=2026&&y<=2035)?picked:today,method,text,manager,nextStatus,validCompletion];
     /* 등록한 이력을 반드시 현재 선택 자산의 조명/릴선 이력카드와 상태에 동시에 반영 */
     if(type==='light'){assets[n-1].lightHistory=Array.isArray(assets[n-1].lightHistory)?assets[n-1].lightHistory:[];assets[n-1].lightHistory.unshift(row);assets[n-1].light=nextStatus;}else{assets[n-1].reelHistory=Array.isArray(assets[n-1].reelHistory)?assets[n-1].reelHistory:[];assets[n-1].reelHistory.unshift(row);assets[n-1].reel=nextStatus;}
     persist();m.classList.remove('open');window.jgbLRSelect(n,type);
@@ -26743,6 +26743,52 @@ html, body {
   .jgb-lr-history-card-body{grid-template-columns:1fr!important}
   .jgb-lr-history-info{border-right:0!important;border-bottom:1px solid #9aabba!important}
   .jgb-lr-history-photos{border-top:0!important}
+}
+</style>
+
+<style id="JGB_LR_HISTORY_CARD_SCROLL_FINAL_20260926">
+/* 조명·릴선 유지관리 이력 최종: 좁은 칸에서도 카드 내용을 읽도록 가로/세로 독립 스크롤 */
+.jgb-lr-v54 .jgb-lr-v54-historyscroll{
+  overflow-x:auto!important;
+  overflow-y:auto!important;
+  scrollbar-width:auto!important;
+  scrollbar-color:#6f8da3 #e8eef2!important;
+}
+.jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar{width:11px!important;height:11px!important}
+.jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar-thumb{background:#6f8da3!important;border-radius:6px!important;border:2px solid #e8eef2!important}
+.jgb-lr-v54 .jgb-lr-v54-historyscroll::-webkit-scrollbar-track{background:#e8eef2!important}
+.jgb-lr-v54 .jgb-lr-history-card{
+  min-width:720px!important;
+  width:720px!important;
+  max-width:none!important;
+}
+.jgb-lr-v54 .jgb-lr-history-card-body{
+  grid-template-columns:minmax(0,1fr) 7.1cm!important;
+}
+.jgb-lr-v54 .jgb-lr-history-info{
+  grid-template-columns:82px minmax(110px,1fr) 82px minmax(110px,1fr)!important;
+}
+.jgb-lr-v54 .jgb-lr-history-info small{
+  font-size:11px!important;
+  font-weight:1000!important;
+  color:#183f58!important;
+  white-space:nowrap!important;
+}
+.jgb-lr-v54 .jgb-lr-history-info b{
+  font-size:11px!important;
+  font-weight:900!important;
+}
+.jgb-lr-v54 .jgb-lr-history-info .history-status.complete{
+  color:#1477b8!important;
+  font-weight:1000!important;
+}
+.jgb-lr-v54 .jgb-lr-history-photo-title{
+  font-size:11px!important;
+  font-weight:1000!important;
+}
+@media(max-width:1050px){
+  .jgb-lr-v54 .jgb-lr-history-card{min-width:720px!important;width:720px!important}
+  .jgb-lr-v54 .jgb-lr-history-card-body{grid-template-columns:minmax(0,1fr) 7.1cm!important}
 }
 </style>
 </body>
