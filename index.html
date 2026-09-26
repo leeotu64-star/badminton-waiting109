@@ -12575,8 +12575,8 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     function setStaffPerfMonth(v){selectedDate=String(v)+'-01';render();}
     function workerPage(){return `<div class="pagebar"><h1>근무자별 현황 · ${selectedDate}</h1></div><div class="workergrid">${todayWorkers().map(w=>{const d=tasksFor(w.id), bs=basicWorkerStats(w.id,monthKey()), mine=jgbNumericCountRows((db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey())),p=mine.filter(x=>x.status!=="완료");return `<div class="workerbox"><h3>${w.name}</h3><span class="badge ${w.working?"":"off"}">${w.working?w.shift+" "+w.start+"~"+w.end:w.status}</span><div class="compareline">기본업무 <b>${w.working?`${bs.complete}/${bs.target}일`:"-"}</b></div><div class="compareline">조치완료 <b>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</b></div><div class="compareline">미조치 <b class="${p.length?"red":"green"}">${w.working?p.length:"-"}</b></div><div class="compareline">접수 합계 <b>${mine.length}건</b></div></div>`}).join("")}</div>`}
     function pendingPage(){const p=(db.issues||[]).filter(x=>x.status!=="완료");return `<div class="pagebar"><h1>미조치 현황</h1></div><div class="panel">${p.map(x=>`<div class="issue"><div><b class="red">${x.handlerName||"담당 미지정"}</b><br>${x.category} · ${x.place} · ${x.content}<div class="small">접수시간 ${time(x.createdAt)}</div></div><button class="btn" onclick="go('process')">조치</button></div>`).join("")||"<div class='small'>미조치 사항이 없습니다.</div>"}</div>`}
-    function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><button class="btn red" onclick="resetPracticeAll()">연습모드 전체 초기화</button></div><div class="panel" style="margin-top:12px;border:2px solid #d64545;background:#fffafa"><h2 style="color:#9d1c1c">⚙️ EAM 완전 리셋</h2><p class="small" style="line-height:1.7">EAM 자산, 유지관리 이력, 점검·외주정비 기록과 EAM 배치도 저장값을 모두 삭제하고 빈 상태에서 다시 시작합니다. 실시간 라이브 입력도 초기화됩니다.</p><button type="button" class="btn red" style="font-weight:900" onclick="window.jgbEamCompleteReset&&window.jgbEamCompleteReset()">🗑 EAM 완전 리셋</button></div>`}
-    async function ensureMainEquipmentAssets(){return;}
+    function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn red" type="button" onclick="resetPracticeAll()">연습모드 전체 초기화</button><button class="btn red" type="button" onclick="window.jgbEamCompleteReset&&window.jgbEamCompleteReset()">🗑 EAM 완전 리셋</button></div></div>`}
+async function ensureMainEquipmentAssets(){return;}
     async function eamLoad(){window.__eamA=window.__eamA||[];window.__eamH=window.__eamH||[];window.__eamI=window.__eamI||[];if(!SUPA)return;try{const a=await SUPA.from("assets").select("*").order("name");const h=await SUPA.from("asset_history").select("*").order("event_date",{ascending:false});const i=await SUPA.from("inspections").select("*").order("inspection_date",{ascending:false});window.__eamA=a.data||[];window.__eamH=h.data||[];window.__eamI=i.data||[]}catch(e){console.warn("EAM 동기화 실패",e)}}
     function eamShowLocation(){
      const old=document.getElementById("eamLocationModal"); if(old){old.remove();return;}
@@ -12650,29 +12650,36 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     }
 
     function eamSourceAssets(){
-      const main=Array.isArray(JGB_MAIN_EQUIPMENT)?JGB_MAIN_EQUIPMENT:[];
-      const excel=Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[];
+      /* 연습모드 EAM 자산의 단일 원천:
+         실제 Supabase assets에 존재하는 자산만 화면에 표시한다.
+         JGB_MAIN_EQUIPMENT / JGB_EXCEL_EQUIPMENT의 기존 고정목록을
+         화면에 자동 복원하지 않는다. */
+      const A=Array.isArray(window.__eamA)?window.__eamA:[];
       let gone=new Set();
-      try{gone=new Set(JSON.parse(localStorage.getItem('JGB_EAM_DELETED_CODES')||'[]').map(v=>String(v||'').trim().toUpperCase()).filter(Boolean))}catch(e){}
-      const rows=[...main,...excel]
-        .filter(x=>x && x.code)
-        .filter(x=>!["OT-04","OT-05","OT-06"].includes(String(x.code)))
+      try{
+        gone=new Set(JSON.parse(localStorage.getItem('JGB_EAM_DELETED_CODES')||'[]')
+          .map(v=>String(v||'').trim().toUpperCase()).filter(Boolean));
+      }catch(e){}
+      const rows=A
+        .filter(x=>x && (x.asset_code||x.code))
+        .filter(x=>!gone.has(String(x.asset_code||x.code).trim().toUpperCase()))
+        .filter(x=>String(x.status||'').trim()!=='폐기')
         .map(x=>({
-          code:String(x.code),
-          name:String(x.name||"-"),
-          type:String(x.type||"기타설비"),
-          place:String(String(x.type||"").includes('소방')?'유수장치실':(x.place||"-")),
-          model:String(x.model||x.capacity||"-"),
-          qty:x.quantity??x.quantity??"-",
-          vendor:String(x.vendor||x.maker||"-"),
-          asContact:String(x.asContact||x.contact||"-"),
-          installDate:String(x.installDate||x.date||"-"),
-          warranty:String(x.warranty||"-"),
-          asHistory:String(x.asHistory||"-"),
-          note:String(x.note||"-"),
+          ...x,
+          code:String(x.asset_code||x.code||''),
+          name:String(x.name||x.product_name||'-'),
+          type:String(x.category||x.type||'기타설비'),
+          place:String(x.place||x.location||x.zone||x.area||'-'),
+          model:String(x.model||x.capacity||'-'),
+          qty:x.quantity??'-',
+          vendor:String(x.vendor||x.maker||'-'),
+          asContact:String(x.asContact||x.contact||'-'),
+          installDate:String(x.installDate||x.date||'-'),
+          warranty:String(x.warranty||'-'),
+          asHistory:String(x.asHistory||'-'),
+          note:String(x.note||'-'),
           photo:x.photo||null
-        }))
-        .filter(x=>!gone.has(String(x.code).trim().toUpperCase()));
+        }));
       const map=new Map();
       rows.forEach(x=>{
         const code=String(x.code).trim().toUpperCase();
@@ -12680,6 +12687,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
       });
       return [...map.values()];
     }
+
     function eamDisplayName(x){
       const code=String(x?.code||"");
       const name=String(x?.name||"").trim();
@@ -37132,14 +37140,4 @@ function renderPerfReal(){
 const oldPerfOpen=window.jgbEam7PerfOpen;
 if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen.apply(this,arguments);setTimeout(renderPerfReal,20);setTimeout(renderPerfReal,250)};
 
-/* 설정 페이지가 다시 렌더되어도 완전 리셋 버튼이 항상 존재하도록 보강 */
-function ensureResetButton(){
- if(!location.search.includes('page=settings'))return;
- const panels=[...document.querySelectorAll('.panel')];if(!panels.length)return;
- if(document.getElementById('jgbEamCompleteResetBtn'))return;
- const p=document.createElement('div');p.className='panel';p.style.cssText='margin-top:12px;border:2px solid #d64545;background:#fffafa';p.innerHTML='<h2 style="color:#9d1c1c;margin:0 0 8px">⚙️ EAM 완전 리셋</h2><p class="small" style="line-height:1.7">EAM 자산·유지관리 이력·점검·외주정비·배치도 저장값을 모두 삭제합니다.</p><button id="jgbEamCompleteResetBtn" type="button" class="btn red" style="font-weight:900">🗑 EAM 완전 리셋</button>';p.querySelector('button').onclick=window.jgbEamCompleteReset;panels[panels.length-1].after(p);
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(ensureResetButton,50));else setTimeout(ensureResetButton,50);
-new MutationObserver(()=>setTimeout(ensureResetButton,0)).observe(document.documentElement,{childList:true,subtree:true});
-})();
 </script>
