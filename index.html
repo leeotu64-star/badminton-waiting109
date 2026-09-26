@@ -27561,6 +27561,134 @@ html, body {
 .jgb-lr-v54-pane-title .jgb-lr-v54-head-status .status-copy strong{font-size:14px!important}
 .jgb-lr-v54-pane-title .jgb-lr-v54-head-status.self,.jgb-lr-v54-pane-title .jgb-lr-v54-head-status.external{display:none!important}
 </style>
+
+
+<style id="EAM_MAINTENANCE_PERFORMANCE_7_V1">
+/* EAM 유지관리 실적: 조명·릴선의 유지관리 실적 버튼 계열 / 기존 화면 기능은 그대로 유지 */
+.eam-maint-performance-btn{
+  height:44px!important;min-width:132px!important;padding:0 13px!important;
+  border:1px solid #aebbc4!important;border-radius:10px!important;
+  background:linear-gradient(180deg,#fff 0%,#eef2f4 58%,#d9e0e4 100%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 2px 3px rgba(0,0,0,.20)!important;
+  color:#18374b!important;font-size:12px!important;font-weight:900!important;
+  white-space:nowrap!important;cursor:pointer!important;
+}
+.eam-maint-performance-btn:hover,.eam-maint-performance-btn.active{
+  background:#eaf6ff!important;border-color:#78a9c8!important;color:#125b83!important;
+}
+.eam-maint-performance-panel{
+  display:none;box-sizing:border-box;width:100%;margin-top:10px;
+  padding:12px;border:1px solid #bfd2df;border-radius:10px;background:#f7fafc;
+}
+.eam-maint-performance-panel.open{display:block!important}
+.eam-maint-performance-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:10px;padding:0 2px;
+}
+.eam-maint-performance-head strong{font-size:16px;color:#17384e;font-weight:1000}
+.eam-maint-performance-head small{font-size:11px;color:#688095;font-weight:800}
+.eam-maint-performance-grid{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px!important;
+}
+.eam-maint-performance-card{
+  min-height:76px;padding:10px 11px;box-sizing:border-box;
+  border:1px solid #b9cedd;border-radius:9px;background:#fff;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.eam-maint-performance-card:nth-child(n+5){grid-column:auto}
+.eam-maint-performance-card .ep-left{display:flex;align-items:center;gap:8px;min-width:0}
+.eam-maint-performance-card .ep-icon{width:31px;height:31px;min-width:31px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#edf5fa;font-size:18px}
+.eam-maint-performance-card .ep-name{font-size:12px;font-weight:900;color:#29485e;line-height:1.2;white-space:nowrap}
+.eam-maint-performance-card .ep-desc{display:block;font-size:9px;color:#8295a5;margin-top:3px;white-space:nowrap}
+.eam-maint-performance-card .ep-count{font-size:22px;font-weight:1000;color:#125b83;white-space:nowrap}
+.eam-maint-performance-card .ep-count small{font-size:10px;margin-left:2px}
+.eam-maint-performance-total{margin-top:8px;padding:9px 11px;border-radius:8px;background:#e9f3f8;border:1px solid #b9cedd;display:flex;justify-content:space-between;align-items:center;color:#17384e;font-weight:900}
+.eam-maint-performance-total b{font-size:19px}
+@media(max-width:900px){.eam-maint-performance-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){.eam-maint-performance-grid{grid-template-columns:1fr!important}}
+</style>
+<script id="EAM_MAINTENANCE_PERFORMANCE_7_V1_SCRIPT">
+(function(){
+  const defs=[
+    ['cooling','❄️','냉난방','냉방기 · 실외기'],
+    ['fire','🚒','소방·방재','펌프 · 밸브 · 제어'],
+    ['water','♨️','온수·난방','온수기 · 조절기 · 난방'],
+    ['electrical','⚡','전기설비','분전반 · 전기'],
+    ['sanitary','🚻','위생설비','소변기 · 양변기 · 세면대'],
+    ['doors','🚪','문·창호설비','유리문 · 힌지 · 도어클로저'],
+    ['other','🔧','기타설비','사무 · 공용']
+  ];
+  function esc(v){return String(v==null?'':v).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
+  function categoryOf(a){
+    const c=String(a?.category||a?.type||'').toLowerCase();
+    const n=String(a?.name||a?.asset_name||a?.model||'').toLowerCase();
+    if(c.includes('냉난방')||c.includes('냉방')||c.includes('난방')||n.includes('에어컨')||n.includes('냉난방')) return 'cooling';
+    if(c.includes('소방')||c.includes('방재')||n.includes('소방')) return 'fire';
+    if(c.includes('온수')||c.includes('난방')||n.includes('온수')) return 'water';
+    if(c.includes('전기')||n.includes('분전반')||n.includes('전기')) return 'electrical';
+    if(c.includes('위생')||n.includes('변기')||n.includes('세면')||n.includes('소변')) return 'sanitary';
+    if(c.includes('문')||c.includes('창호')||n.includes('문')||n.includes('창호')) return 'doors';
+    return 'other';
+  }
+  function count(){
+    const H=Array.isArray(window.__eamH)?window.__eamH:[];
+    const A=Array.isArray(window.__eamA)?window.__eamA:[];
+    const byId={}; A.forEach(a=>{if(a&&a.id!=null)byId[String(a.id)]=a});
+    const out={}; defs.forEach(d=>out[d[0]]=0);
+    H.forEach(h=>{const a=byId[String(h.asset_id||'')];out[categoryOf(a)]++;});
+    return out;
+  }
+  function buildPanel(){
+    const host=document.querySelector('.eam-innovation'); if(!host)return;
+    if(host.querySelector('.eam-maint-performance-panel'))return;
+    const panel=document.createElement('section');
+    panel.className='eam-maint-performance-panel';
+    panel.innerHTML='<div class="eam-maint-performance-head"><strong>📊 EAM 유지관리 실적</strong><small>자체·외주 합산 · 등록된 유지관리 이력 기준</small></div><div class="eam-maint-performance-grid"></div><div class="eam-maint-performance-total"><span>전체 유지관리 실적</span><b>0건</b></div>';
+    const head=host.querySelector('.eam-innovation-head');
+    const typeRow=host.querySelector('.eam-type-row');
+    (typeRow||head)?.after(panel);
+    renderPanel(panel);
+  }
+  function renderPanel(panel){
+    const vals=count();
+    const grid=panel.querySelector('.eam-maint-performance-grid');
+    if(!grid)return;
+    grid.innerHTML=defs.map(d=>`<div class="eam-maint-performance-card"><div class="ep-left"><span class="ep-icon">${d[1]}</span><div><div class="ep-name">${esc(d[2])}</div><span class="ep-desc">${esc(d[3])}</span></div></div><div class="ep-count">${vals[d[0]]||0}<small>건</small></div></div>`).join('');
+    const total=Object.values(vals).reduce((a,b)=>a+b,0);
+    panel.querySelector('.eam-maint-performance-total b').textContent=total+'건';
+  }
+  function addButton(){
+    const host=document.querySelector('.eam-innovation');
+    if(!host)return;
+    const manual=document.querySelector('.jgb-page-manual-btn');
+    if(!manual)return;
+    if(manual.dataset.eamPerfAdded==='1')return;
+    const b=document.createElement('button');
+    b.type='button'; b.className='eam-maint-performance-btn'; b.textContent='📊 유지관리 실적';
+    b.setAttribute('aria-label','EAM 유지관리 실적 열기');
+    b.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      buildPanel();
+      const panel=host.querySelector('.eam-maint-performance-panel');
+      if(!panel)return;
+      const open=!panel.classList.contains('open');
+      panel.classList.toggle('open',open);
+      b.classList.toggle('active',open);
+      const typeRow=host.querySelector('.eam-type-row');
+      const layout=host.querySelector('.eam-innovation-layout');
+      if(typeRow)typeRow.style.setProperty('display',open?'none':'','important');
+      if(layout)layout.style.setProperty('display',open?'none':'','important');
+      if(open)renderPanel(panel);
+    });
+    manual.insertAdjacentElement('afterend',b);
+    manual.dataset.eamPerfAdded='1';
+  }
+  function init(){addButton();buildPanel();}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+  if(window.MutationObserver){new MutationObserver(()=>{addButton();buildPanel();}).observe(document.body,{childList:true,subtree:true});}
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
