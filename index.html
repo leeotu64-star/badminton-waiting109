@@ -38810,55 +38810,156 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 </style>
 
 
-<!-- CLEAN: EAM 아이콘은 더블클릭 후에만 드래그 이동 -->
-<style id="JGB_EAM_CLEAN_DBLCLICK_DRAG">
-#eam228Map .eam228-asset{cursor:pointer!important;touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;}
-#eam228Map .eam228-asset.jgb-move-ready{cursor:grab!important;}
-#eam228Map .eam228-asset.jgb-moving{cursor:grabbing!important;z-index:999999!important;}
+
+
+<!-- CLEAN REBUILD: 실제 EAM 배치도 아이콘(.eh-marker) 더블클릭 후 드래그 이동 -->
+<style id="JGB_EAM_DBLCLICK_DRAG_REAL_MARKER">
+.eh-map .eh-marker[data-code]{
+  cursor:pointer!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  touch-action:none!important;
+}
+.eh-map .eh-marker[data-code].jgb-move-ready{
+  cursor:grab!important;
+  outline:2px dashed rgba(22,117,194,.55)!important;
+  outline-offset:3px!important;
+}
+.eh-map .eh-marker[data-code].jgb-moving{
+  cursor:grabbing!important;
+  z-index:999999!important;
+}
 </style>
-<script id="JGB_EAM_CLEAN_DBLCLICK_DRAG_SCRIPT">
+
+<script id="JGB_EAM_DBLCLICK_DRAG_REAL_MARKER_SCRIPT">
 (function(){
-  if(window.__JGB_EAM_CLEAN_DBLCLICK_DRAG)return;
-  window.__JGB_EAM_CLEAN_DBLCLICK_DRAG=true;
-  const SEL='#eam228Map .eam228-asset';
+  'use strict';
+  if(window.__JGB_EAM_DBLCLICK_DRAG_REAL_MARKER)return;
+  window.__JGB_EAM_DBLCLICK_DRAG_REAL_MARKER=true;
+
+  const SEL='.eh-map .eh-marker[data-code]';
   const POSKEY='JGB_EAM_DASH_MAP_POS_V228';
+
   let active=null;
-  const read=()=>{try{const v=JSON.parse(localStorage.getItem(POSKEY)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}};
-  const save=(code,x,y)=>{if(!code)return;const v=read();v[code]=[+x.toFixed(3),+y.toFixed(3)];try{localStorage.setItem(POSKEY,JSON.stringify(v))}catch(_){} };
-  document.addEventListener('dblclick',e=>{
-    const el=e.target.closest?.(SEL); if(!el)return;
-    e.preventDefault();e.stopImmediatePropagation();
+
+  function readPos(){
+    try{
+      const x=JSON.parse(localStorage.getItem(POSKEY)||'{}');
+      return x&&typeof x==='object'&&!Array.isArray(x)?x:{};
+    }catch(_){ return {}; }
+  }
+
+  function savePos(code,x,y){
+    if(!code)return;
+    const all=readPos();
+    all[code]=[Number(x.toFixed(3)),Number(y.toFixed(3))];
+    try{localStorage.setItem(POSKEY,JSON.stringify(all));}catch(_){}
+  }
+
+  /* 더블클릭을 해야 이동 준비 상태가 된다. */
+  document.addEventListener('dblclick',function(e){
+    const el=e.target?.closest?.(SEL);
+    if(!el)return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
     el.classList.add('jgb-move-ready');
-    el.dataset.jgbMoveUntil=String(Date.now()+8000);
+    el.dataset.jgbMoveUntil=String(Date.now()+10000);
   },true);
-  document.addEventListener('pointerdown',e=>{
-    const el=e.target.closest?.(SEL); if(!el||e.button!==0)return;
-    if(Number(el.dataset.jgbMoveUntil||0)<Date.now())return;
-    const map=el.closest('#eam228Map'); if(!map)return;
-    const mr=map.getBoundingClientRect(), er=el.getBoundingClientRect();
-    active={el,map,pid:e.pointerId,mr,ox:e.clientX-(er.left+er.width/2),oy:e.clientY-(er.top+er.height/2),moved:false};
-    e.preventDefault();e.stopImmediatePropagation();
-    try{el.setPointerCapture(e.pointerId)}catch(_){}
+
+  /* 이동 준비 상태가 아니면 pointerdown을 절대 가로채지 않는다. */
+  document.addEventListener('pointerdown',function(e){
+    const el=e.target?.closest?.(SEL);
+    if(!el || e.button!==0)return;
+
+    const until=Number(el.dataset.jgbMoveUntil||0);
+    if(until<Date.now())return;
+
+    const map=el.closest('.eh-map');
+    if(!map)return;
+
+    const mr=map.getBoundingClientRect();
+    const er=el.getBoundingClientRect();
+
+    active={
+      el:el,
+      map:map,
+      pointerId:e.pointerId,
+      mapRect:mr,
+      offsetX:e.clientX-(er.left+er.width/2),
+      offsetY:e.clientY-(er.top+er.height/2),
+      moved:false,
+      x:null,
+      y:null
+    };
+
+    el.classList.add('jgb-moving');
+
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+    e.preventDefault();
+    e.stopImmediatePropagation();
   },true);
-  document.addEventListener('pointermove',e=>{
-    const d=active;if(!d||e.pointerId!==d.pid)return;
-    const x=Math.max(1,Math.min(99,((e.clientX-d.ox-d.mr.left)/d.mr.width)*100));
-    const y=Math.max(1,Math.min(99,((e.clientY-d.oy-d.mr.top)/d.mr.height)*100));
-    d.moved=true;d.el.classList.add('jgb-moving');
-    d.el.style.left=x.toFixed(3)+'%';d.el.style.top=y.toFixed(3)+'%';
-    d.x=x;d.y=y;e.preventDefault();e.stopImmediatePropagation();
+
+  document.addEventListener('pointermove',function(e){
+    const d=active;
+    if(!d || e.pointerId!==d.pointerId)return;
+
+    const x=Math.max(1,Math.min(99,
+      ((e.clientX-d.offsetX-d.mapRect.left)/d.mapRect.width)*100
+    ));
+    const y=Math.max(1,Math.min(99,
+      ((e.clientY-d.offsetY-d.mapRect.top)/d.mapRect.height)*100
+    ));
+
+    d.moved=true;
+    d.x=x;
+    d.y=y;
+
+    d.el.style.left=x.toFixed(3)+'%';
+    d.el.style.top=y.toFixed(3)+'%';
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
   },true);
-  const finish=e=>{
-    const d=active;if(!d||e.pointerId!==d.pid)return;
-    active=null;d.el.classList.remove('jgb-moving');d.el.classList.remove('jgb-move-ready');
-    if(d.moved){
-      const x=d.x,y=d.y,code=String(d.el.getAttribute('data-code')||'').trim();
-      save(code,x,y);d.el.dataset.v19Dragged='1';d.el.dataset.v19DraggedAt=String(Date.now());
+
+  function finish(e){
+    const d=active;
+    if(!d || e.pointerId!==d.pointerId)return;
+
+    active=null;
+
+    try{d.el.releasePointerCapture(e.pointerId);}catch(_){}
+
+    d.el.classList.remove('jgb-moving');
+    d.el.classList.remove('jgb-move-ready');
+
+    if(d.moved && d.x!=null && d.y!=null){
+      const code=String(d.el.getAttribute('data-code')||'').trim();
+      savePos(code,d.x,d.y);
     }
-    try{d.el.releasePointerCapture(e.pointerId)}catch(_){}
-    e.preventDefault();e.stopImmediatePropagation();
-  };
+
+    delete d.el.dataset.jgbMoveUntil;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }
+
   document.addEventListener('pointerup',finish,true);
   document.addEventListener('pointercancel',finish,true);
 })();
 </script>
+
+<!-- 제목과 배치도 사이의 불필요한 선만 제거 -->
+<style id="JGB_EAM_MAP_HEADER_LINE_CLEAN">
+.eh-page .eh-map-card .eh-card-head{
+  border-bottom:0!important;
+  box-shadow:none!important;
+  outline:0!important;
+}
+.eh-page .eh-map-card .eh-map-wrap{
+  border-top:0!important;
+  box-shadow:none!important;
+  outline:0!important;
+}
+</style>
