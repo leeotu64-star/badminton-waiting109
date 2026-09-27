@@ -10742,7 +10742,7 @@ html,body{
         <section style="border:1px solid #d7e2ec;border-radius:12px;background:#fff;padding:18px">
           <h3 style="margin:0 0 7px;color:#183b59">연습 모드 데이터 초기화</h3>
           <p style="margin:0 0 14px;color:#6f8293;font-size:12px;line-height:1.6">민원 접수·처리, 기본업무 완료 기록, 일정 및 연습용 집계 기준을 초기 상태로 되돌립니다. 실제 운영 데이터(Supabase)는 삭제하지 않습니다.</p>
-
+          <button type="button" class="btn" style="background:#d9534f;color:#fff;border:1px solid #c74440;font-weight:800;padding:10px 16px;border-radius:8px" onclick="resetPracticeAll()">↻ 연습모드 전체 리셋</button>
         </section>
       </div>`;
     }
@@ -12876,7 +12876,7 @@ const _dtStyle=document.createElement('style');_dtStyle.id='JGB_DT_LOCATION_LINK
     function setStaffPerfMonth(v){selectedDate=String(v)+'-01';render();}
     function workerPage(){return `<div class="pagebar"><h1>근무자별 현황 · ${selectedDate}</h1></div><div class="workergrid">${todayWorkers().map(w=>{const d=tasksFor(w.id), bs=basicWorkerStats(w.id,monthKey()), mine=jgbNumericCountRows((db.issues||[]).filter(x=>x.handlerId===w.id&&String(x?.createdAt||'').slice(0,7)===monthKey())),p=mine.filter(x=>x.status!=="완료");return `<div class="workerbox"><h3>${w.name}</h3><span class="badge ${w.working?"":"off"}">${w.working?w.shift+" "+w.start+"~"+w.end:w.status}</span><div class="compareline">기본업무 <b>${w.working?`${bs.complete}/${bs.target}일`:"-"}</b></div><div class="compareline">조치완료 <b>${w.working?mine.filter(x=>x.status==="완료").length:"-"}</b></div><div class="compareline">미조치 <b class="${p.length?"red":"green"}">${w.working?p.length:"-"}</b></div><div class="compareline">접수 합계 <b>${mine.length}건</b></div></div>`}).join("")}</div>`}
     function pendingPage(){const p=(db.issues||[]).filter(x=>x.status!=="완료");return `<div class="pagebar"><h1>미조치 현황</h1></div><div class="panel">${p.map(x=>`<div class="issue"><div><b class="red">${x.handlerName||"담당 미지정"}</b><br>${x.category} · ${x.place} · ${x.content}<div class="small">접수시간 ${time(x.createdAt)}</div></div><button class="btn" onclick="go('process')">조치</button></div>`).join("")||"<div class='small'>미조치 사항이 없습니다.</div>"}</div>`}
-    function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn red jgb-practice-reset-single" type="button" onclick="resetPracticeAll()">🗑 연습 데이터 전체 초기화</button></div></div>`}
+    function settingsPage(){return `<div class="pagebar"><h1>시스템 설정</h1></div><div class="panel"><h2>근무시간 기준</h2><div class="compareline">새벽조 <b>06:00~15:00 · 9시간</b></div><div class="compareline">오전조 <b>09:00~18:00 · 9시간</b></div><div class="compareline">오후조 <b>13:30~22:20 · 8시간 50분</b></div><hr><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn red" type="button" onclick="resetPracticeAll()">연습모드 전체 초기화</button><button class="btn red jgb-eam-reset-single" type="button" onclick="window.jgbEamCompleteReset&&window.jgbEamCompleteReset()">🗑 EAM 완전 리셋</button></div></div>`}
 async function ensureMainEquipmentAssets(){return;}
     async function eamLoad(){window.__eamA=window.__eamA||[];window.__eamH=window.__eamH||[];window.__eamI=window.__eamI||[];if(!SUPA)return;try{const a=await SUPA.from("assets").select("*").order("name");const h=await SUPA.from("asset_history").select("*").order("event_date",{ascending:false});const i=await SUPA.from("inspections").select("*").order("inspection_date",{ascending:false});window.__eamA=a.data||[];window.__eamH=h.data||[];window.__eamI=i.data||[]}catch(e){console.warn("EAM 동기화 실패",e)}}
     function eamShowLocation(){
@@ -14127,95 +14127,51 @@ function jgbV47GoWpByLeak(leakCode){
       }
     }
     async function resetPracticeAll(){
-      if(document.getElementById('jgbPracticeResetModal'))return;
-      const m=document.createElement('div');
-      m.id='jgbPracticeResetModal';
-      m.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
-      m.innerHTML='<div style="width:min(560px,94vw);background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden"><div style="padding:16px 18px;background:#173d62;color:#fff;font-size:18px;font-weight:900">🗑 연습 데이터 전체 초기화</div><div style="padding:20px;line-height:1.7"><b>9월까지 등록·저장된 연습 데이터를 전부 초기화할까요?</b><br><br>자산·배치도·유지관리·점검·외주정비·민원·기본업무와 이 앱의 과거 브라우저 저장값을 초기화합니다.<br><br><b style="color:#b21f1f">초기화 후 복구할 수 없습니다. 10월부터 새로 등록할 때 사용하는 버튼입니다.</b></div><div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;background:#f6f8fa"><button type="button" id="jgbPracticeResetCancel" class="btn gray">취소</button><button type="button" id="jgbPracticeResetGo" class="btn red">전체 초기화</button></div></div>';
-      document.body.appendChild(m);
-      m.querySelector('#jgbPracticeResetCancel').onclick=()=>m.remove();
-      m.querySelector('#jgbPracticeResetGo').onclick=async()=>{
-        const btn=m.querySelector('#jgbPracticeResetGo');
-        btn.disabled=true;btn.textContent='전체 삭제 중…';
-        const errors=[];
-        try{
-          if(!window.SUPA)throw new Error('Supabase 연결이 필요합니다.');
-          const jobs=[
-            ['inspections','id'],['external_work','id'],['asset_history','id'],['assets','id'],
-            ['basic_tasks','worker_id'],['requests','id']
-          ];
-          for(const [table,col] of jobs){
-            try{
-              const r=await window.SUPA.from(table).delete().not(col,'is',null);
-              if(r.error)throw r.error;
-            }catch(e){errors.push(table+' DB: '+(e?.message||e));}
-          }
-          try{
-            const bucket=window.SUPA.storage.from('request-photos');
-            let offset=0;
-            while(true){
-              const listed=await bucket.list('',{limit:1000,offset});
-              if(listed.error)throw listed.error;
-              const files=(listed.data||[]).filter(x=>x&&x.name).map(x=>x.name);
-              if(!files.length)break;
-              const rem=await bucket.remove(files);
-              if(rem.error)throw rem.error;
-              if(files.length<1000)break;
-              offset+=files.length;
-            }
-          }catch(e){errors.push('request-photos: '+(e?.message||e));}
+      if(!confirm("연습모드의 모든 입력·집계 데이터를 초기화할까요?\n\n① 시설민원 접수·처리\n② 시설물 유지관리 현황의 실시간 조치\n③ 조명·릴선 상태·유지관리 이력\n④ 기본업무 완료 기록·일정·연습용 집계\n\n※ 연습 모드 전체 리셋은 저장된 연습 데이터를 초기 상태로 되돌립니다."))return;
+      try{
+        /* 1) 민원/업무/일정 로컬 데이터 */
+        db={issues:[],tasks:{},schedule:{}};
+        localStorage.removeItem(KEY);
+        localStorage.removeItem('JGB_NUMERIC_RESET_V2_AT');
+        localStorage.removeItem('JGB_NUMERIC_RESET_AT');
+        localStorage.removeItem('JGB_OPX_PERIOD');
+        localStorage.removeItem('JGB_EAM_MANUAL_REPAIR_LIVE_V1');
+        localStorage.removeItem('JGB_EAM_HEADER_STATS_RESET_V1');
+        localStorage.removeItem('JGB_EAM_HYUNHWANG_MAP_V1');
+        localStorage.removeItem('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1');
+        localStorage.removeItem('JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1');
+        localStorage.removeItem('JGB_LK_DRAFT_POS');
+        localStorage.removeItem('JGB_V48_WP_SELECTED_LEAK');
+        localStorage.removeItem('JGB_V72_SELECTED_WP');
+        localStorage.removeItem('JGB_V178_LIVE_MANUAL');
+        localStorage.removeItem('JGB_V180_LIVE_DONE');
+        /* 2) 조명·릴선: 상태/수리이력을 최초 기본값으로 복원 */
+        localStorage.removeItem('jgb_lr_v10');
+        /* 3) 숫자 집계/선택 상태 */
+        window.__JGB_NUMERIC_RESET_AT=0;
+        window.__JGB_NUMERIC_ZERO=false;
+        if(window.__basicWorkerPage!==undefined)window.__basicWorkerPage=0;
+        if(window.employeeDetailSelection)window.employeeDetailSelection=[];
+        save();
 
-          const clearStore=(store)=>{
-            if(!store)return;
-            const keys=[];
-            for(let i=0;i<store.length;i++){
-              const k=store.key(i);
-              if(k&&/^(JGB_|jgb_)/.test(k))keys.push(k);
-            }
-            keys.forEach(k=>{try{store.removeItem(k)}catch(_){} });
-          };
-          clearStore(window.localStorage);
-          clearStore(window.sessionStorage);
-
-          try{
-            if(window.indexedDB&&indexedDB.databases){
-              const dbs=await indexedDB.databases();
-              for(const d of (dbs||[])){
-                if(d?.name&&/jgb/i.test(d.name)){
-                  await new Promise(resolve=>{
-                    const req=indexedDB.deleteDatabase(d.name);
-                    req.onsuccess=req.onerror=req.onblocked=()=>resolve();
-                  });
-                }
-              }
-            }
-          }catch(e){errors.push('IndexedDB: '+(e?.message||e));}
-          try{
-            if(window.caches){
-              const names=await caches.keys();
-              await Promise.all(names.filter(n=>/jgb/i.test(n)).map(n=>caches.delete(n)));
-            }
-          }catch(e){errors.push('Cache: '+(e?.message||e));}
-
-          db={issues:[],tasks:{},schedule:{}};
-          window.__eamA=[];window.__eamH=[];window.__eamI=[];
-          window.__eamSelCode='';window.__eamCat='';window.__eamMetaByCode={};
-          window.__JGB_NUMERIC_RESET_AT=0;window.__JGB_NUMERIC_ZERO=false;
-          if(window.__basicWorkerPage!==undefined)window.__basicWorkerPage=0;
-          if(window.employeeDetailSelection)window.employeeDetailSelection=[];
-
-          m.remove();
-          if(typeof window.eamLoad==='function')await window.eamLoad();
-          if(typeof syncFromSupabase==='function')await syncFromSupabase();
-          if(typeof syncBasicTasks==='function')await syncBasicTasks();
-          if(typeof render==='function')render();else location.reload();
-          alert(errors.length?'전체 초기화가 완료되었지만 일부 저장소는 확인이 필요합니다.\n\n'+errors.join('\n'):'연습 데이터 전체 초기화가 완료되었습니다.\n\n9월까지의 연습 데이터와 저장 흔적을 비웠습니다.\n이제 10월부터 새로 등록하면 됩니다.');
-        }catch(e){
-          console.error(e);
-          btn.disabled=false;btn.textContent='전체 초기화';
-          alert('전체 초기화 중 오류가 발생했습니다.\n'+(e?.message||e));
+        /* 4) 현재 민원관리 화면이 Supabase requests를 다시 읽어오므로
+              연습모드 전체 리셋에서는 해당 접수 데이터도 함께 비움 */
+        if(window.SUPA){
+          const rq=await window.SUPA.from('requests').delete().not('id','is',null);
+          if(rq.error)throw rq.error;
+          /* 기본업무 완료 실적도 연습 데이터로 취급 */
+          const bt=await window.SUPA.from('basic_tasks').delete().not('worker_id','is',null);
+          if(bt.error)console.warn('basic_tasks 초기화 실패:',bt.error);
         }
-      };
+
+        if(typeof syncFromSupabase==='function')await syncFromSupabase();
+        render();
+        alert('연습모드 전체 초기화가 완료되었습니다.\n시설민원 관리와 시설물 유지관리 현황도 초기화되었습니다.');
+      }catch(e){
+        console.error(e);
+        render();
+        alert('전체 초기화 중 일부 항목을 초기화하지 못했습니다.\n'+(e?.message||e));
+      }
     }
     function resetAll(){resetPracticeAll()}
     (function(){
@@ -14405,19 +14361,35 @@ function jgbV47GoWpByLeak(leakCode){
       const FIRE_CODES=new Set(['FI-09','FI-10','FI-11','FI-12','FI-01','FI-02','FI-03','FI-04','FI-05','FI-06','FI-07','FI-08']);
       function vstr(v){return String(v??'').trim()}
       window.eamSourceAssets=function(){
-        const main=Array.isArray(JGB_MAIN_EQUIPMENT)?JGB_MAIN_EQUIPMENT:[];
-        const excel=Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[];
-        const rows=[...main,...excel]
-          .filter(x=>x&&x.code)
-          .filter(x=>!['OT-04','OT-05','OT-06'].includes(vstr(x.code)))
-          .map(x=>{
-            const code=vstr(x.code), fire=FIRE_CODES.has(code)||vstr(x.type).includes('소방');
-            const srcModel=vstr(x.model);
-            const fireName=fire && srcModel && srcModel!=='-' ? srcModel : vstr(x.name)||'-';
-            const install=fire && /^2017(?:년)?$/.test(vstr(x.installDate||x.date)) ? '2017.09.04' : vstr(x.installDate||x.date)||'-';
-            return {code,name:vstr(fireName),rawName:vstr(x.name)||'-',type:vstr(x.type)||'기타설비',place:fire?'유수장치실':(vstr(x.place)||'-'),model:srcModel||'-',qty:x.quantity??'-',vendor:vstr(x.vendor||x.maker)||'-',asContact:vstr(x.asContact||x.contact)||'-',installDate:install,warranty:vstr(x.warranty)||'-',asHistory:vstr(x.asHistory)||'-',note:vstr(x.note)||'-',photo:null,capacity:vstr(x.capacity)||'',life:vstr(x.life)||'',grade:vstr(x.grade)||'',date:vstr(x.date)||''};
-          });
-        const map=new Map();rows.forEach(x=>{if(!map.has(x.code))map.set(x.code,x)});
+        const A=Array.isArray(window.__eamA)?window.__eamA:[];
+        let gone=new Set();
+        try{gone=new Set(JSON.parse(localStorage.getItem('JGB_EAM_DELETED_CODES')||'[]').map(vstr).filter(Boolean).map(v=>v.toUpperCase()))}catch(e){}
+        const rows=A
+          .filter(x=>x&&x.asset_code)
+          .filter(x=>!gone.has(vstr(x.asset_code).toUpperCase()))
+          .filter(x=>vstr(x.status)!=='폐기')
+          .map(x=>({
+            code:vstr(x.asset_code),
+            name:vstr(x.name||x.product_name)||'-',
+            rawName:vstr(x.name||x.product_name)||'-',
+            type:vstr(x.category)||'기타설비',
+            place:vstr(x.place)||'-',
+            model:vstr(x.product_name)||'-',
+            qty:x.quantity??'-',
+            vendor:vstr(x.vendor||x.maker)||'-',
+            asContact:vstr(x.asContact||x.contact)||'-',
+            installDate:vstr(x.installDate||x.date)||'-',
+            warranty:vstr(x.warranty)||'-',
+            asHistory:vstr(x.asHistory)||'-',
+            note:vstr(x.note)||'-',
+            photo:null,
+            capacity:vstr(x.capacity)||'',
+            life:vstr(x.life)||'',
+            grade:vstr(x.grade)||'',
+            date:vstr(x.date)||''
+          }));
+        const map=new Map();
+        rows.forEach(x=>{if(!map.has(x.code))map.set(x.code,x)});
         return [...map.values()];
       };
       const FIRE_DISPLAY_NAMES={
@@ -14630,30 +14602,45 @@ function jgbV47GoWpByLeak(leakCode){
       function placeCode(p){p=v(p);if(p.includes('좌측 외곽'))return'L';if(p.includes('우측 외곽'))return'M';if(p.includes('유수장치실'))return'E';if(p.includes('옥상'))return'D';if(p.includes('창고'))return'F';if(p.includes('사무실'))return'C';if(p.includes('복도'))return'B';if(p.includes('코트'))return'A';if(p.includes('남자 화장실'))return'H';if(p.includes('여자 화장실'))return'I';if(p.includes('남자 샤워실'))return'J';if(p.includes('여자 샤워실'))return'K';if(p.includes('휴게실'))return'G';return'-'}
       function placeLabel(p){return v(p)||'-'}
       function rawRows(){
-        const main=typeof JGB_MAIN_EQUIPMENT!=='undefined'&&Array.isArray(JGB_MAIN_EQUIPMENT)?JGB_MAIN_EQUIPMENT:[];
-        const excel=typeof JGB_EXCEL_EQUIPMENT!=='undefined'&&Array.isArray(JGB_EXCEL_EQUIPMENT)?JGB_EXCEL_EQUIPMENT:[];
-        const rows=[...main,...excel].filter(x=>x&&x.code&&!['OT-04','OT-05','OT-06'].includes(v(x.code)));
-        const map=new Map();
-        rows.forEach(x=>{if(!map.has(v(x.code)))map.set(v(x.code),x)});
-        return [...map.values()];
+        return Array.isArray(window.__eamA)?window.__eamA:[];
       }
       function sourceRows(){
-        const raw=rawRows(), A=Array.isArray(window.__eamA)?window.__eamA:[], meta=readMeta(), map=new Map();
-        raw.forEach(x=>{
-          const code=v(x.code), a=A.find(z=>v(z.asset_code)===code)||{} , m=meta[code]||{};
-          const fire=FIRE.has(code)||catKey(x)==='fire';
-          const row=Object.assign({},x,{code,name:v(m.name||a.name||x.name)||'-',type:v(m.category||a.category||x.type)||'기타설비',place:fire?'유수장치실':v(m.place||a.place||x.place)||'-',model:v(m.model||a.product_name||x.model)||'',qty:m.qty??a.quantity??x.quantity??'-',vendor:v(m.vendor||a.vendor||x.vendor||x.maker)||'-',maker:v(m.maker||m.vendor||a.vendor||x.vendor||x.maker)||'-',asContact:v(m.asContact||x.asContact||x.contact)||'-',installDate:v(m.installDate||x.installDate)||'',warranty:v(m.warranty||x.warranty)||'-',asHistory:v(m.asHistory||x.asHistory)||'-',note:v(m.note||x.note)||'',capacity:v(m.capacity||x.capacity)||'',life:v(m.life||x.life)||'',grade:v(m.grade||x.grade)||'',date:v(m.date||x.date)||'',improvementPlan:v(m.improvementPlan)||'',status:v(m.status||a.status)||'원본',acquisitionType:v(m.acquisitionType)||'기존 자산',internalCode:code});
-          // 기존 기타설비로 저장된 누수 자산도 방수 자산으로 통합하고 WP 관리코드를 사용한다.
-          const rowCat=catKey(row);
-          if(rowCat==='waterproof'){row.type=categoryLabel(rowCat);row.category=categoryLabel(rowCat)}
-          map.set(code,row);
-        });
+        const A=Array.isArray(window.__eamA)?window.__eamA:[];
+        const meta=readMeta();
+        let gone=new Set();
+        try{gone=new Set(JSON.parse(localStorage.getItem('JGB_EAM_DELETED_CODES')||'[]').map(v).filter(Boolean).map(v=>v.toUpperCase()))}catch(e){}
+        const map=new Map();
         A.forEach(a=>{
-          const code=v(a.asset_code); if(!code||map.has(code))return;
-          const m=meta[code]||{}, k=catKey(Object.assign({},a,m));
-          map.set(code,Object.assign({},a,m,{code,name:v(m.name||a.name)||'-',type:categoryLabel(k),category:categoryLabel(k),place:k==='fire'?'유수장치실':v(m.place||a.place)||'-',model:v(m.model||a.product_name)||'',qty:m.qty??a.quantity??'-',vendor:v(m.vendor||a.vendor)||'-',maker:v(m.maker||m.vendor||a.vendor)||'-',asContact:v(m.asContact)||'-',installDate:v(m.installDate)||'',warranty:v(m.warranty)||'-',asHistory:v(m.asHistory)||'-',note:v(m.note)||'',capacity:v(m.capacity)||'',life:v(m.life)||'',grade:v(m.grade)||'',date:v(m.date||m.manufactureDate)||'',improvementPlan:v(m.improvementPlan)||'',status:v(m.status||a.status)||'정상',acquisitionType:v(m.acquisitionType)||'기존 자산',internalCode:code}));
+          const code=v(a.asset_code);
+          if(!code || gone.has(code.toUpperCase()) || v(a.status)==='폐기')return;
+          const m=meta[code]||{};
+          const k=catKey(Object.assign({},a,m));
+          map.set(code,Object.assign({},a,m,{
+            code,
+            name:v(m.name||a.name||a.product_name)||'-',
+            type:categoryLabel(k),
+            category:categoryLabel(k),
+            place:k==='fire'?'유수장치실':v(m.place||a.place)||'-',
+            model:v(m.model||a.product_name)||'',
+            qty:m.qty??a.quantity??'-',
+            vendor:v(m.vendor||a.vendor)||'-',
+            maker:v(m.maker||m.vendor||a.vendor)||'-',
+            asContact:v(m.asContact)||'-',
+            installDate:v(m.installDate)||'-',
+            warranty:v(m.warranty)||'-',
+            asHistory:v(m.asHistory)||'-',
+            note:v(m.note)||'',
+            capacity:v(m.capacity)||'',
+            life:v(m.life)||'',
+            grade:v(m.grade)||'',
+            date:v(m.date||m.manufactureDate)||'',
+            improvementPlan:v(m.improvementPlan)||'',
+            status:v(m.status||a.status)||'정상',
+            acquisitionType:v(m.acquisitionType)||'신규 등록',
+            internalCode:code
+          }));
         });
-        return [...map.values()].filter(x=>catKey(x)!=='waterproof');
+        return [...map.values()];
       }
       window.eamSourceAssets=sourceRows;
       window.eamSourceCategory=catKey;
@@ -28425,16 +28412,23 @@ function ensureRepairManual(){
 }
 
 function ensureSingleEamReset(){
-  /* 설정 화면의 초기화 버튼은 원본 settingsPage()가 만드는
-     "연습 데이터 전체 초기화" 하나만 사용한다.
-     별도의 EAM 완전 리셋 버튼을 생성하지 않는다. */
   const content=document.querySelector('.jgb-content');
   if(!content)return;
   const title=content.querySelector('.pagebar h1');
   if(!title || !/시스템 설정/.test(title.textContent||''))return;
   const panel=[...content.querySelectorAll('.panel')].find(x=>/근무시간 기준/.test(x.textContent||''));
   if(!panel)return;
-  panel.querySelectorAll('.jgb-eam-reset-single').forEach(x=>x.remove());
+  const row=panel.querySelector('button[onclick*="resetPracticeAll"]')?.parentElement;
+  if(!row)return;
+  row.querySelectorAll('.jgb-eam-reset-single').forEach((x,i)=>{if(i>0)x.remove()});
+  let b=row.querySelector('.jgb-eam-reset-single');
+  if(!b){
+    b=document.createElement('button');
+    b.type='button';b.className='btn red jgb-eam-reset-single';
+    b.textContent='🗑 EAM 완전 리셋';
+    b.onclick=function(e){e.preventDefault();e.stopPropagation();if(typeof window.jgbEamCompleteReset==='function')window.jgbEamCompleteReset();};
+    row.appendChild(b);
+  }
 }
 
 /* 기존 사용설명서 IIFE의 openManual은 내부 함수이므로 클릭용 브리지 제공 */
@@ -28462,7 +28456,7 @@ function init(){
   cleanupRepairNumericReset();
   bridgeManual();
   ensureRepairManual();
-  /* 설정 화면에는 연습 데이터 전체 초기화 버튼 하나만 사용 */
+  ensureSingleEamReset();
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
@@ -38482,12 +38476,30 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 </style>
 <script id="JGB_000309_SETTINGS_RESET_FINAL_SCRIPT">
 (function(){
-  /* 구버전 EAM 완전 리셋 버튼 생성/재바인딩 로직 비활성화.
-     설정 화면은 연습 데이터 전체 초기화 버튼 하나만 사용한다. */
   function fix(){
     const page=document.querySelector('.jgb-content');
     if(!page || !/시스템 설정/.test(page.innerText||'')) return;
-    page.querySelectorAll('.jgb-eam-reset-single').forEach(x=>x.remove());
+    const panel=[...page.querySelectorAll('.panel')].find(x=>/근무시간 기준/.test(x.textContent||''));
+    if(!panel) return;
+    const row=panel.querySelector('button[onclick*="resetPracticeAll"]')?.parentElement;
+    if(!row) return;
+    const btns=[...row.querySelectorAll('.jgb-eam-reset-single')];
+    btns.slice(1).forEach(x=>x.remove());
+    const b=btns[0] || row.querySelector('.jgb-eam-reset-single');
+    if(b){
+      b.type='button';
+      b.disabled=false;
+      b.style.pointerEvents='auto';
+      b.onclick=function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(typeof window.jgbEamCompleteReset==='function'){
+          window.jgbEamCompleteReset();
+        }else{
+          alert('EAM 완전 리셋 기능을 불러오지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.');
+        }
+      };
+    }
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fix);
   else fix();
