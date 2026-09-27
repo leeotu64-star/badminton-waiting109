@@ -29314,6 +29314,132 @@ setInterval(init,800);
 }
 </style>
 
+
+
+<!-- JGB FINAL: 033922 원본 기준 오른쪽 실시간 조치현황 표 정렬 보정 + 시설 아이콘 단일 클릭 -->
+<style id="JGB_033922_FINAL_LIVE_TABLE">
+/* 오른쪽 실시간 시설 조치현황: 7개 열을 현재 패널 폭 안에 정확히 맞춤 */
+.eh-live-card-v20 .eh-live-scroll{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  box-sizing:border-box!important;
+}
+.eh-live-card-v20 .eh-live-scroll table{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  table-layout:fixed!important;
+  border-collapse:collapse!important;
+  border-spacing:0!important;
+  box-sizing:border-box!important;
+}
+.eh-live-card-v20 .eh-live-scroll th,
+.eh-live-card-v20 .eh-live-scroll td{
+  box-sizing:border-box!important;
+  min-width:0!important;
+  height:38px!important;
+  padding:6px 5px!important;
+  border-right:1px solid #cbd9e4!important;
+  border-bottom:1px solid #cbd9e4!important;
+  text-align:center!important;
+  vertical-align:middle!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  line-height:1.2!important;
+}
+.eh-live-card-v20 .eh-live-scroll th:last-child,
+.eh-live-card-v20 .eh-live-scroll td:last-child{border-right:0!important}
+.eh-live-card-v20 .eh-live-scroll th:nth-child(1),
+.eh-live-card-v20 .eh-live-scroll td:nth-child(1){width:13%!important;min-width:0!important}
+.eh-live-card-v20 .eh-live-scroll th:nth-child(2),
+.eh-live-card-v20 .eh-live-scroll td:nth-child(2){width:29%!important;min-width:0!important;text-align:left!important}
+.eh-live-card-v20 .eh-live-scroll th:nth-child(3),
+.eh-live-card-v20 .eh-live-scroll td:nth-child(3){width:15%!important;min-width:0!important}
+.eh-live-card-v20 .eh-live-scroll th:nth-child(4),
+.eh-live-card-v20 .eh-live-scroll td:nth-child(4){width:13%!important;min-width:0!important}
+.eh-live-card-v20 .eh-live-scroll th:nth-child(5),
+.eh-live-card-v20 .eh-live-scroll td:nth-child(5){width:11%!important;min-width:0!important}
+.eh-live-card-v20 .eh-live-scroll th:nth-child(6),
+.eh-live-card-v20 .eh-live-scroll td:nth-child(6){width:9%!important;min-width:0!important;padding-left:3px!important;padding-right:3px!important}
+.eh-live-card-v20 .eh-live-scroll th:nth-child(7),
+.eh-live-card-v20 .eh-live-scroll td:nth-child(7){width:10%!important;min-width:0!important;padding-left:3px!important;padding-right:3px!important}
+.eh-live-card-v20 .eh-live-scroll td:nth-child(6) button,
+.eh-live-card-v20 .eh-live-scroll td:nth-child(7) button{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:4px 2px!important;
+  box-sizing:border-box!important;
+  font-size:11px!important;
+  white-space:nowrap!important;
+}
+</style>
+
+<script id="JGB_033922_FINAL_SINGLE_CLICK">
+(function(){
+  'use strict';
+  if(window.__JGB_033922_FINAL_SINGLE_CLICK)return;
+  window.__JGB_033922_FINAL_SINGLE_CLICK=true;
+  const V=x=>String(x??'').trim();
+  function categoryFor(code){
+    const c=V(code), A=Array.isArray(window.__eamA)?window.__eamA:[];
+    const a=A.find(x=>V(x?.asset_code)===c);
+    if(a){
+      const t=V(a.category||a.type);
+      if(t.includes('냉난방'))return'cooling';
+      if(t.includes('소방'))return'fire';
+      if(t.includes('온수')||t.includes('보일러')||t.includes('난방'))return'water';
+      if(t.includes('전기'))return'electrical';
+      if(t.includes('조명'))return'lighting';
+      if(t.includes('방수'))return'waterproof';
+      if(t.includes('위생'))return'sanitary';
+      if(t.includes('문')||t.includes('창호')||t.includes('도어'))return'doors';
+    }
+    const defs=typeof window.eamCategoryDefs==='function'?window.eamCategoryDefs():{};
+    for(const [k,d] of Object.entries(defs||{})){
+      if((d.items||[]).some(x=>V(x?.code||x?.asset_code)===c))return k;
+    }
+    return ({AC:'cooling',BO:'water',FI:'fire',EL:'electrical',LT:'lighting',WP:'waterproof',SA:'sanitary',DO:'doors',OT:'other'}[c.split('-')[0]]||'other');
+  }
+  function openOne(code){
+    const c=V(code); if(!c)return;
+    window.__eamSelCode=c;
+    window.__eamCat=categoryFor(c);
+    if(typeof window.go==='function')window.go('eam');
+    const pick=()=>{
+      if(typeof window.eamPick==='function'){
+        try{window.eamPick(window.__eamCat,c);return true}catch(_){ }
+      }
+      return false;
+    };
+    requestAnimationFrame(()=>{if(!pick())setTimeout(pick,80);setTimeout(pick,220)});
+  }
+  /* window 캡처 단계에서 먼저 처리하여 기존 더블클릭 전용 스크립트가 가로채지 못하게 함 */
+  window.addEventListener('click',function(e){
+    const el=e.target?.closest?.('.eh-map .eh-marker[data-code]');
+    if(!el || el.classList.contains('map-only'))return;
+    const c=V(el.getAttribute('data-code')); if(!c)return;
+    e.preventDefault();
+    e.stopPropagation();
+    openOne(c);
+  },true);
+  /* 더블클릭도 별도 동작으로 남지 않게 차단 */
+  window.addEventListener('dblclick',function(e){
+    const el=e.target?.closest?.('.eh-map .eh-marker[data-code]');
+    if(!el || el.classList.contains('map-only'))return;
+    e.preventDefault();
+    e.stopPropagation();
+  },true);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
