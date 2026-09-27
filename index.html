@@ -37249,6 +37249,7 @@ window.jgbEamCompleteReset=async function(){
       /* FK 때문에 자식 기록부터 삭제 */
       const ops=[
         ['inspections','id'],
+        ['external_work','id'],
         ['asset_history','id'],
         ['assets','id']
       ];
@@ -37258,9 +37259,16 @@ window.jgbEamCompleteReset=async function(){
       }
       const keys=[
         'JGB_EAM_HYUNHWANG_MAP_V1','JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1','JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1',
-        'JGB_EAM_ASSET_META_V40','JGB_EAM_MANUAL_REPAIR_LIVE_V1','JGB_EAM_HEADER_STATS_RESET_V1',
-        'JGB_EAM_DELETED_CODES','JGB_EAM_DASH_MAP_POS_V228','JGB_EAM_DASH_MAP_ONLY_V228','JGB_EAM_DASH_MAP_HIDDEN_V228',
-        'JGB_EAM_SELECTED_CODE_V1','JGB_EAM_SELECTED_CAT_V1','JGB_MAINT_PHOTO'
+        'JGB_EAM_ASSET_META_V39','JGB_EAM_ASSET_META_V40','JGB_EAM_META',
+        'JGB_EAM_HISTORY_CARD_STATE','JGB_EAM_MAINT_HISTORY_STATE',
+        'JGB_EAM_MANUAL_REPAIR_LIVE_V1','JGB_EAM_HEADER_STATS_RESET_V1',
+        'JGB_EAM_DELETED_CODES','JGB_EAM_DASH_MAP_POS_V228','JGB_EAM_DASH_MAP_ONLY_V228',
+        'JGB_EAM_DASH_MAP_HIDDEN_V228','JGB_EAM_DASH_MAP_DELETED_V241',
+        'JGB_EAM_HYUNHWANG_MAP_V1','JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1',
+        'JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1',
+        'JGB_EAM_SELECTED_CODE_V1','JGB_EAM_SELECTED_CAT_V1',
+        'JGB_EAM_SELECTED_ASSET_CODE_V33','JGB_EAM_SELECTED_CATEGORY_V33',
+        'JGB_MAINT_PHOTO'
       ];
       keys.forEach(k=>{try{localStorage.removeItem(k)}catch(_){} });
       Object.keys(localStorage).filter(k=>k.startsWith('JGB_MAINT_PHOTO_')).forEach(k=>{try{localStorage.removeItem(k)}catch(_){}});
@@ -37306,9 +37314,66 @@ function renderPerfReal(){
 const oldPerfOpen=window.jgbEam7PerfOpen;
 if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen.apply(this,arguments);setTimeout(renderPerfReal,20);setTimeout(renderPerfReal,250)};
 
+
+})();
 </script>
 
 <!-- JGB 235029 FOLLOWUP FIX: settings manual + reset + map header alignment -->
+
+<style id="JGB_000309_HEADER_MANUAL_ALIGNMENT_FIX">
+/* EAM 관리 메인 헤더: 기존 자산관리 버튼을 보존하고 사용설명서는 맨 오른쪽 */
+.eam-innovation .eam-innovation-head{
+  position:relative!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+}
+.eam-innovation .eam-innovation-head > div:first-child{
+  min-width:0!important;
+  flex:1 1 auto!important;
+}
+.eam-innovation .eam-innovation-head .eam-head-actions{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+  flex:0 0 auto!important;
+}
+.eam-innovation .eam-innovation-head > .eam-manage-main{
+  flex:0 0 auto!important;
+  margin-left:auto!important;
+}
+.eam-innovation .eam-innovation-head .jgb-page-manual-btn{
+  flex:0 0 auto!important;
+  height:40px!important;
+  min-height:40px!important;
+  padding:0 12px!important;
+  border:1px solid #b9d2e2!important;
+  border-radius:8px!important;
+  background:#fff!important;
+  color:#125b83!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+  cursor:pointer!important;
+  box-sizing:border-box!important;
+  position:relative!important;
+  z-index:5!important;
+}
+.eam-innovation .eam-innovation-head .jgb-page-manual-btn:hover{
+  background:#edf7fc!important;
+}
+@media(max-width:720px){
+  .eam-innovation .eam-innovation-head{
+    flex-wrap:wrap!important;
+  }
+  .eam-innovation .eam-innovation-head > div:first-child{
+    flex-basis:100%!important;
+  }
+}
+</style>
+
 <style id="JGB_235029_FOLLOWUP_FIX_CSS">
 .eh-page > .eh-head{
   display:grid!important;
@@ -37330,6 +37395,38 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 .pagebar .jgb-page-manual-btn{margin-left:auto!important;flex:0 0 auto!important;height:38px!important;padding:0 12px!important}
 .jgb-eam-reset-single{position:relative!important;z-index:30!important;pointer-events:auto!important}
 </style>
+
+<script id="JGB_000309_EAM_MANUAL_PLACEMENT_FIX">
+(function(){
+  function addEamManual(){
+    const head=document.querySelector('.eam-innovation .eam-innovation-head');
+    if(!head || head.querySelector('.jgb-page-manual-btn')) return;
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='jgb-page-manual-btn';
+    b.textContent='📘 사용설명서';
+    b.setAttribute('aria-label','시설물 EAM 관리 사용설명서');
+    b.onclick=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(typeof window.__JGB_OPEN_PAGE_MANUAL==='function'){
+        window.__JGB_OPEN_PAGE_MANUAL('eam');
+      }else{
+        const fallback=document.querySelector('.jgb-page-manual-btn[data-manual-key="eam"]');
+        if(fallback && fallback!==b) fallback.click();
+      }
+    };
+    head.appendChild(b);
+  }
+  function init(){ addEamManual(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+  if(window.MutationObserver){
+    new MutationObserver(init).observe(document.body,{childList:true,subtree:true});
+  }
+})();
+</script>
+
 <script id="JGB_235029_FOLLOWUP_FIX_SCRIPT">
 (function(){
   function addSettingsManual(){
@@ -37348,5 +37445,50 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
   function init(){addSettingsManual();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
   if(window.MutationObserver)new MutationObserver(init).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+
+<style id="JGB_000309_SETTINGS_RESET_FINAL">
+.jgb-eam-reset-single{
+  position:relative!important;
+  z-index:100!important;
+  pointer-events:auto!important;
+  cursor:pointer!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+</style>
+<script id="JGB_000309_SETTINGS_RESET_FINAL_SCRIPT">
+(function(){
+  function fix(){
+    const page=document.querySelector('.jgb-content');
+    if(!page || !/시스템 설정/.test(page.innerText||'')) return;
+    const panel=[...page.querySelectorAll('.panel')].find(x=>/근무시간 기준/.test(x.textContent||''));
+    if(!panel) return;
+    const row=panel.querySelector('button[onclick*="resetPracticeAll"]')?.parentElement;
+    if(!row) return;
+    const btns=[...row.querySelectorAll('.jgb-eam-reset-single')];
+    btns.slice(1).forEach(x=>x.remove());
+    const b=btns[0] || row.querySelector('.jgb-eam-reset-single');
+    if(b){
+      b.type='button';
+      b.disabled=false;
+      b.style.pointerEvents='auto';
+      b.onclick=function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(typeof window.jgbEamCompleteReset==='function'){
+          window.jgbEamCompleteReset();
+        }else{
+          alert('EAM 완전 리셋 기능을 불러오지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.');
+        }
+      };
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fix);
+  else fix();
+  if(window.MutationObserver) new MutationObserver(fix).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
