@@ -29572,8 +29572,18 @@ setInterval(init,800);
           window.__JGB_OPEN_PAGE_MANUAL_DIRECT('lighting');
           return;
         }
-        if(typeof window.__JGB_OPEN_PAGE_MANUAL==='function'){
-          window.__JGB_OPEN_PAGE_MANUAL('lighting');
+        if(typeof window.__JGB_OPEN_PAGE_MANUAL_DIRECT==='function'){
+          window.__JGB_OPEN_PAGE_MANUAL_DIRECT('lighting');
+        }else{
+          const overlay=document.getElementById('jgbPageManualOverlay');
+          if(overlay){
+            const title=document.getElementById('jgbPageManualTitle');
+            const body=document.getElementById('jgbPageManualBody');
+            if(title && body){
+              title.textContent='📘 조명·릴선 관리 사용설명서';
+              overlay.classList.add('open');
+            }
+          }
         }
       },true);
     }
