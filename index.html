@@ -30568,6 +30568,57 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
   function init(){addCard()} if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();if(window.MutationObserver)new MutationObserver(addCard).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+
+<style id="JGB_FIX_MAINT_STAY_IN_DETAIL">
+/* 유지관리 영역이 페이지 전체 높이를 계속 밀어내지 않도록
+   EAM 오른쪽 상세영역 안에서만 세로 스크롤 */
+.eam-main-grid{
+  align-items:start!important;
+}
+
+.eam-assets-panel,
+.eam-detail-panel{
+  align-self:start!important;
+  max-height:calc(100vh - 150px)!important;
+}
+
+.eam-assets-panel{
+  overflow:hidden!important;
+}
+
+.eam-detail-panel{
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+}
+
+/* 상단 기본정보 → 유지관리 순서는 그대로 유지 */
+.eam-detail-panel > .eam-detail-hero,
+.eam-detail-panel > .eam-detail-section{
+  flex:none!important;
+}
+
+/* 유지관리 카드가 불필요한 외부 여백 때문에 더 아래로 밀리지 않게 */
+.eam-detail-panel .eam-detail-section.eam-history{
+  margin-top:0!important;
+  margin-bottom:0!important;
+}
+
+/* 기존 유지관리 카드의 내부 기능/접기/수정/삭제는 그대로 */
+.eam-detail-panel .jgb-v136-maint{
+  margin-top:0!important;
+}
+
+/* 좁은 화면에서는 기존 페이지 흐름을 유지 */
+@media(max-width:900px){
+  .eam-assets-panel,
+  .eam-detail-panel{
+    max-height:none!important;
+    overflow:visible!important;
+  }
+}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
