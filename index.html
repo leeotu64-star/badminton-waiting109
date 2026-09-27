@@ -24048,6 +24048,8 @@ body {
     };
     requestAnimationFrame(()=>{if(!pick())setTimeout(pick,80);});
   }
+})();
+</script>
 <style id="JGB_V25_ICON_DELETE_FINAL_FIX">
 /* V25: 배치도 아이콘 삭제창의 목록 영역만 안정화 */
 #eamHyunIconDeleteModal .eh-modal-box{width:min(620px,95vw);max-height:88vh;overflow:auto}
@@ -32896,7 +32898,29 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 <!-- 기존 V8 아이콘 이동 엔진 제거 완료: V10 단일 엔진 사용 -->
 
 
-\n<script id="JGB_EAM_DO_EDIT_FIX_V9">\n(function(){\n  const oldEdit=window.eamEditSelectedAsset;\n  if(typeof oldEdit!=='function') return;\n  window.eamEditSelectedAsset=async function(){\n    const shown=String(window.__eamSelCode||'').trim();\n    if(!shown) return oldEdit();\n    try{\n      const rows=typeof sourceRows==='function'?sourceRows():[];\n      const src=rows.find(x=>String(x.code||'').trim()===shown || (typeof window.eamUnifiedCode==='function' && String(window.eamUnifiedCode(x))===shown));\n      if(src && String(src.code)!==shown){\n        window.__eamSelCode=String(src.code);\n        return await oldEdit();\n      }\n      return await oldEdit();\n    }catch(e){\n      console.error(e);\n      alert('문·창호설비 이력카드 수정 대상을 찾을 수 없습니다.\\n'+(e?.message||''));\n    }\n  };\n})();\n</script>\n
+<script id="JGB_EAM_DO_EDIT_FIX_V9">
+(function(){
+  const oldEdit=window.eamEditSelectedAsset;
+  if(typeof oldEdit!=='function') return;
+  window.eamEditSelectedAsset=async function(){
+    const shown=String(window.__eamSelCode||'').trim();
+    if(!shown) return oldEdit();
+    try{
+      const rows=typeof sourceRows==='function'?sourceRows():[];
+      const src=rows.find(x=>String(x.code||'').trim()===shown || (typeof window.eamUnifiedCode==='function' && String(window.eamUnifiedCode(x))===shown));
+      if(src && String(src.code)!==shown){
+        window.__eamSelCode=String(src.code);
+        return await oldEdit();
+      }
+      return await oldEdit();
+    }catch(e){
+      console.error(e);
+      alert('문·창호설비 이력카드 수정 대상을 찾을 수 없습니다.\
+'+(e?.message||''));
+    }
+  };
+})();
+</script>\n
 
 <style id="JGB_EAM_MAP_ICON_REBUILD_V19_CSS">
 .eh-map .eh-marker{touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important;cursor:grab!important;}
