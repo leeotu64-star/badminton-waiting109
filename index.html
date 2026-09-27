@@ -30295,6 +30295,83 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
   font-weight: 900 !important;
 }
 </style>
+
+<style id="JGB_EAM_CONSUMABLE_CARD_V1">
+/* EAM 상단 설비 종류에 소모품을 기존 카드와 동일한 크기로 추가 */
+.eam-consumable-card{
+  position:relative!important;
+  flex:0 0 210px!important;width:210px!important;min-width:210px!important;max-width:210px!important;
+  border:1px solid #cfd9e6!important;border-top:4px solid #7a8b9a!important;
+  background:#fff!important;border-radius:12px!important;padding:12px 9px!important;min-height:86px!important;
+  cursor:pointer!important;text-align:center!important;box-shadow:0 7px 18px rgba(26,67,109,.08)!important;
+  color:#173554!important;box-sizing:border-box!important;
+}
+.eam-consumable-card:hover{background:#f8fbff!important;border-color:#8da9bd!important}
+.eam-consumable-card .con-icon{font-size:30px!important;line-height:1!important;display:block!important;margin-bottom:7px!important}
+.eam-consumable-card strong{display:block!important;font-size:16px!important;line-height:1.2!important}
+.eam-consumable-card em{position:absolute!important;right:10px!important;top:10px!important;font-style:normal!important;font-size:12px!important;color:#5d7089!important;font-weight:800!important}
+.eam-consumable-card small{display:block!important;margin-top:3px!important;font-size:10px!important;color:#64778c!important}
+.jgb-consumable-modal{position:fixed;inset:0;z-index:2147483300;display:none;align-items:center;justify-content:center;background:rgba(8,29,45,.62);padding:18px}
+.jgb-consumable-modal.open{display:flex!important}
+.jgb-consumable-sheet{width:min(1050px,96vw);max-height:90vh;overflow:auto;background:#eef5fa;border:1px solid #b9d0df;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.35);padding:12px}
+.jgb-consumable-head{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 8px;border-bottom:2px solid #17668f}
+.jgb-consumable-head strong{font-size:21px;color:#174765}.jgb-consumable-head small{display:block;color:#647b8d;margin-top:3px;font-size:11px}
+.jgb-consumable-close{height:34px;padding:0 13px;border:1px solid #aac2d1;border-radius:8px;background:#fff;color:#174765;font-weight:900;cursor:pointer}
+.jgb-consumable-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:12px 0}
+.jgb-consumable-chip{background:#fff;border:1px solid #c2d4e0;border-radius:9px;padding:12px 8px;text-align:center;font-weight:900;color:#234c65}.jgb-consumable-chip span{display:block;font-size:22px;margin-bottom:4px}.jgb-consumable-chip small{display:block;color:#6a8090;margin-top:3px}
+.jgb-consumable-note{background:#fff;border:1px solid #c5d6e1;border-radius:10px;padding:14px;color:#476478;font-size:12px;line-height:1.6}
+.jgb-consumable-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}.jgb-consumable-primary{border:0;border-radius:8px;background:#0b75ad;color:#fff;font-weight:900;padding:9px 13px;cursor:pointer}
+@media(max-width:700px){.jgb-consumable-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+<script id="JGB_EAM_CONSUMABLE_CARD_V1_SCRIPT">
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  function count(){
+    try{
+      const a=JSON.parse(localStorage.getItem('JGB_EAM_CONSUMABLE_MASTER_V1')||'[]');
+      return Array.isArray(a)?a.length:0;
+    }catch(e){return 0}
+  }
+  function openHub(){
+    document.getElementById('jgbConsumableHub')?.remove();
+    document.body.insertAdjacentHTML('beforeend',`<div id="jgbConsumableHub" class="jgb-consumable-modal open" onclick="if(event.target===this)this.remove()">
+      <div class="jgb-consumable-sheet">
+        <div class="jgb-consumable-head"><div><strong>🧰 소모품 관리</strong><small>전기 · 청소 · 의약품 · 위생용품 · 기타 / 자산번호 없이 재고와 처리이력 관리</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConsumableHub').remove()">닫기</button></div>
+        <div class="jgb-consumable-grid">
+          <div class="jgb-consumable-chip"><span>⚡</span>전기용품<small>스위치 · 콘센트 · 전구</small></div>
+          <div class="jgb-consumable-chip"><span>🧹</span>청소용품<small>락스 · 세제 · 청소용품</small></div>
+          <div class="jgb-consumable-chip"><span>💊</span>의약품<small>소독약 · 구급용품</small></div>
+          <div class="jgb-consumable-chip"><span>🧻</span>위생용품<small>휴지 · 비누 · 위생용품</small></div>
+          <div class="jgb-consumable-chip"><span>📦</span>기타<small>기타 소모품</small></div>
+        </div>
+        <div class="jgb-consumable-note"><b>관리 방식</b><br>품목별 자산번호는 만들지 않습니다. 현재재고·안전재고·사용주기·사용위치·최근 처리일·다음 예정일을 소모품 이력으로 관리하고, 실제 처리에서는 수량만 +·−로 조정하도록 확장할 수 있습니다.</div>
+        <div class="jgb-consumable-actions"><button class="jgb-consumable-primary" onclick="jgbOpenConsumableHistory()">소모품 이력관리 열기</button></div>
+      </div></div>`);
+  }
+  window.jgbOpenConsumableHub=openHub;
+  window.jgbOpenConsumableHistory=function(){
+    document.getElementById('jgbConsumableHub')?.remove();
+    const btn=document.getElementById('jgbV76ConsumableBtn');
+    if(btn){btn.click();return}
+    // 신규 등록 화면이 없을 때도 같은 관리 기능을 바로 열 수 있게 최소 관리창을 제공
+    openHub();
+    const note=document.querySelector('#jgbConsumableHub .jgb-consumable-note');
+    if(note)note.innerHTML='<b>소모품 이력관리</b><br>현재 화면의 신규 자산 등록에서 사용하는 기존 소모품 이력관리와 연결됩니다. 자산코드는 생성하지 않습니다.';
+  };
+  function addCard(){
+    const row=document.querySelector('.eam-type-row');
+    if(!row || row.querySelector('.eam-consumable-card'))return;
+    const b=document.createElement('button');
+    b.type='button';b.className='eam-consumable-card';b.setAttribute('aria-label','소모품 관리');
+    b.innerHTML=`<span class="con-icon">🧰</span><strong>소모품</strong><em>${count()}</em><small>전기 · 청소 · 위생</small>`;
+    b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openHub()});
+    row.appendChild(b);
+  }
+  function init(){addCard()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+  if(window.MutationObserver)new MutationObserver(addCard).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
