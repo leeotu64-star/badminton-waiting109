@@ -29314,23 +29314,6 @@ setInterval(init,800);
 }
 </style>
 
-
-<style id="JGB_LIVE_TABLE_GRID_FINAL_032449">
-/* 실시간 시설 조치현황: 셀 경계가 끊겨 보이지 않도록 전체 격자를 동일 규칙으로 고정 */
-.eh-live-card .eh-live-scroll table{
-  border:1px solid #cbd9e3!important;
-  border-collapse:collapse!important;
-  border-spacing:0!important;
-}
-.eh-live-card .eh-live-scroll th,
-.eh-live-card .eh-live-scroll td{
-  border:1px solid #cbd9e3!important;
-  box-sizing:border-box!important;
-}
-.eh-live-card .eh-live-scroll th{
-  border-bottom-color:#b9cad6!important;
-}
-</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -29567,28 +29550,75 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
   if(window.__JGB_EAM_ICON_DBLCLICK_V72)return;
   window.__JGB_EAM_ICON_DBLCLICK_V72=true;
   let suppressUntil=0;
-  document.addEventListener('pointerup',function(e){
+  let moveArmed=null;
+  let drag=null;
+  const KEY='JGB_EAM_HYUNHWANG_MAP_V1';
+  const ONLY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
+  const readObj=k=>{try{const v=JSON.parse(localStorage.getItem(k)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}};
+  const savePos=(code,x,y)=>{
+    if(!code)return;
+    try{const v=readObj(KEY);v[code]=[Number(x.toFixed(3)),Number(y.toFixed(3))];localStorage.setItem(KEY,JSON.stringify(v));}catch(_){}
+    try{const v=readObj(ONLY);if(v[code]){v[code].x=Number(x.toFixed(3));v[code].y=Number(y.toFixed(3));localStorage.setItem(ONLY,JSON.stringify(v));}}catch(_){}
+  };
+  document.addEventListener('dblclick',function(e){
     const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(el && el.classList.contains('dragging')) suppressUntil=Date.now()+180;
+    if(!el)return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    moveArmed=el;
+    el.classList.add('move-armed');
+    setTimeout(()=>{if(moveArmed===el)el.classList.remove('move-armed')},4000);
   },true);
+  document.addEventListener('pointerdown',function(e){
+    const el=e.target.closest?.('#eam228Map .eam228-asset');
+    if(!el || (e.pointerType==='mouse' && e.button!==0))return;
+    if(moveArmed!==el)return;
+    const map=el.closest('#eam228Map');
+    if(!map)return;
+    const mr=map.getBoundingClientRect();
+    const er=el.getBoundingClientRect();
+    drag={el,map,pid:e.pointerId,mr,ox:e.clientX-(er.left+er.width/2),oy:e.clientY-(er.top+er.height/2),moved:false};
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    try{el.setPointerCapture(e.pointerId)}catch(_){}
+  },true);
+  document.addEventListener('pointermove',function(e){
+    const d=drag;if(!d||e.pointerId!==d.pid)return;
+    const dx=e.clientX-(d.mr.left+d.mr.width/2+d.ox);
+    const dy=e.clientY-(d.mr.top+d.mr.height/2+d.oy);
+    if(!d.moved && Math.hypot(dx,dy)<4)return;
+    d.moved=true;
+    const x=Math.max(.5,Math.min(99.5,((e.clientX-d.ox-d.mr.left)/d.mr.width)*100));
+    const y=Math.max(.5,Math.min(99.5,((e.clientY-d.oy-d.mr.top)/d.mr.height)*100));
+    d.el.style.left=x+'%';d.el.style.top=y+'%';
+    d.el.classList.add('dragging');
+    e.preventDefault();e.stopImmediatePropagation();
+  },true);
+  function finish(e){
+    const d=drag;if(!d||e.pointerId!==d.pid)return;
+    drag=null;
+    if(d.moved){
+      const x=Math.max(.5,Math.min(99.5,((e.clientX-d.ox-d.mr.left)/d.mr.width)*100));
+      const y=Math.max(.5,Math.min(99.5,((e.clientY-d.oy-d.mr.top)/d.mr.height)*100));
+      d.el.style.left=x+'%';d.el.style.top=y+'%';
+      savePos(d.el.getAttribute('data-code')||'',x,y);
+      suppressUntil=Date.now()+500;
+    }
+    d.el.classList.remove('dragging','move-armed');
+    if(moveArmed===d.el)moveArmed=null;
+    try{d.el.releasePointerCapture(e.pointerId)}catch(_){}
+    e.preventDefault();e.stopImmediatePropagation();
+  }
+  document.addEventListener('pointerup',finish,true);
+  document.addEventListener('pointercancel',finish,true);
   document.addEventListener('click',function(e){
     const el=e.target.closest?.('#eam228Map .eam228-asset');
     if(!el)return;
-    /* 단일 클릭은 선택만 하고 화면 이동하지 않음 */
     if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
     e.preventDefault();
     e.stopImmediatePropagation();
     const c=el.getAttribute('data-code')||'';
     window.__eamSelCode=c;
-  },true);
-  document.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(!el)return;
-    if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    const c=el.getAttribute('data-code')||'';
-    if(c && typeof window.jgbOpenEamAssetByCode==='function') window.jgbOpenEamAssetByCode(c);
   },true);
 })();
 </script>
@@ -31666,13 +31696,10 @@ function getTarget(e){return e.target&&e.target.closest?e.target.closest(SEL):nu
 function down(e){
  const el=getTarget(e); if(!el)return;
  if(e.pointerType==='mouse' && e.button!==0)return;
- /* 한 번 클릭/드래그로는 절대 이동하지 않는다. 더블클릭으로 이동모드를 먼저 켠다. */
- if(el.dataset.v19DragUnlocked!=='1')return;
  const map=el.closest('.eh-map'); if(!map)return;
  const mr=el.getBoundingClientRect(), rr=map.getBoundingClientRect();
  drag={el,map,pid:e.pointerId,rr,startX:e.clientX,startY:e.clientY,ox:e.clientX-(mr.left+mr.width/2),oy:e.clientY-(mr.top+mr.height/2),moved:false};
  try{el.setPointerCapture(e.pointerId)}catch(_){ }
- e.preventDefault();
 }
 function move(e){
  const d=drag;if(!d||e.pointerId!==d.pid)return;
@@ -31704,8 +31731,6 @@ function finish(e){
   }catch(_){}
   d.el.dataset.v19Dragged='1';
   d.el.dataset.v19DraggedAt=String(Date.now());
-  /* 한 번 이동이 끝나면 다시 더블클릭해야 이동할 수 있도록 잠근다. */
-  d.el.dataset.v19DragUnlocked='';
   e.preventDefault();e.stopPropagation();
  }
  d.el.classList.remove('eam-v19-dragging');
@@ -31713,39 +31738,36 @@ function finish(e){
 }
 function click(e){
  const el=getTarget(e);if(!el)return;
- const code=String(el.getAttribute('data-code')||'').trim();if(!code)return;
- /* 드래그 직후 발생하는 합성 click은 선택 동작으로 연결하지 않는다. */
  if(el.dataset.v19Dragged==='1'){
-   const at=Number(el.dataset.v19DraggedAt||0);
-   el.dataset.v19Dragged='';
-   if(Date.now()-at<500){e.preventDefault();e.stopImmediatePropagation();return;}
+  const at=Number(el.dataset.v19DraggedAt||0);
+  el.dataset.v19Dragged='';
+  if(Date.now()-at<500){e.preventDefault();e.stopImmediatePropagation();return;}
  }
- /* 배치도 전용 아이콘은 기존 동작대로 클릭 선택을 막는다. */
+ const code=String(el.getAttribute('data-code')||'').trim();if(!code)return;
+ /* 배치도 전용 아이콘은 EAM 이력카드 연결 대상이 아니다. */
  if(el.classList.contains('map-only')){
-   e.preventDefault();e.stopImmediatePropagation();return;
- }
- /* 첫 클릭은 잠시 보류한다. 두 번째 클릭이 들어오면 이동모드를 켠다. */
- const now=Date.now();
- if(window.__JGB_EAM_V19_CLICK_TIMER){clearTimeout(window.__JGB_EAM_V19_CLICK_TIMER);window.__JGB_EAM_V19_CLICK_TIMER=null;}
- if(window.__JGB_EAM_V19_LAST_EL===el && now-Number(window.__JGB_EAM_V19_LAST_TIME||0)<450){
-   window.__JGB_EAM_V19_LAST_EL=null;window.__JGB_EAM_V19_LAST_TIME=0;
-   el.dataset.v19DragUnlocked='1';
-   el.dataset.v19DragUnlockedAt=String(now);
    e.preventDefault();e.stopImmediatePropagation();
    return;
  }
- window.__JGB_EAM_V19_LAST_EL=el;window.__JGB_EAM_V19_LAST_TIME=now;
  e.preventDefault();e.stopImmediatePropagation();
- window.__JGB_EAM_V19_CLICK_TIMER=setTimeout(()=>{
-   window.__JGB_EAM_V19_CLICK_TIMER=null;
-   if(el.dataset.v19DragUnlocked==='1')return;
-   window.__eamSelCode=code;
-   const prefix=code.split('-')[0].toUpperCase();
-   const cat={AC:'cooling',BO:'water',FI:'fire',EL:'electrical',LT:'lighting',WP:'waterproof',SA:'sanitary',DO:'doors',OT:'other'}[prefix]||'other';
-   window.__eamCat=cat;
-   try{if(typeof window.eamPick==='function'){window.eamPick(cat,code);return;}}catch(_){}
-   if(typeof window.go==='function')window.go('eam');
- },300);
+ window.__eamSelCode=code;
+ const prefix=code.split('-')[0].toUpperCase();
+ /* 아이콘 클릭은 자산코드 하나를 기준으로 실제 EAM 분류에 연결한다.
+    특히 BO는 heating이 아니라 EAM의 water 분류로 연결한다. */
+ const cat={
+   AC:'cooling', BO:'water', FI:'fire', EL:'electrical', LT:'lighting',
+   WP:'waterproof', SA:'sanitary', DO:'doors', OT:'other'
+ }[prefix]||'other';
+ window.__eamCat=cat;
+ /* 행의 DOM 클릭을 중간에 거치지 않고 EAM의 공식 선택 함수에 직접 전달한다.
+    그래서 아이콘 클릭 → 같은 자산코드의 이력카드가 바로 열린다. */
+ try{
+   if(typeof window.eamPick==='function'){
+     window.eamPick(cat,code);
+     return;
+   }
+ }catch(_){}
+ if(typeof window.go==='function')window.go('eam');
 }
 document.addEventListener('pointerdown',down,true);
 document.addEventListener('pointermove',move,true);
@@ -38868,4 +38890,11 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
     width:56px!important;min-width:56px!important;height:44px!important;min-height:44px!important;
   }
 }
+</style>
+
+<style id="FIX_035718_TITLE_AND_ROOF_LINES">
+/* 요청: 시설 자산 배치도 제목 아래 선 제거 */
+.eh-page .eh-map-card .eh-card-head{border-bottom:0!important;}
+/* 요청: 누수 지붕 중앙 능선선 제거 */
+.jgb-leak-roof-ridge{display:none!important;}
 </style>
