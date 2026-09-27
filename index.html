@@ -10651,6 +10651,46 @@ html,body{
 .basic-work-status-wrap > .basic-v5-page-nav{display:none!important;}
 </style>
 
+
+<style id="JGB_072449_TWO_FIXES">
+/* 072449 원본 기준: 요청한 두 가지 UI 수정 */
+
+/* 1) 시설물 유지관리 현황 헤더 제목/설명 수직 정렬 */
+.eh-page > .eh-head,
+.eh-page .eh-head-inner {
+  display:flex!important;
+  align-items:center!important;
+}
+.eh-page .eh-head-title,
+.eh-page .eh-title,
+.eh-page .eh-head h1,
+.eh-page .eh-head h2 {
+  transform:none!important;
+  margin-top:0!important;
+  top:auto!important;
+}
+
+/* 2) 시설 배치도: 과한 3D 완화, 코트는 조금 축소 */
+.eh-map-card,
+.eh-map,
+.facility-map {
+  box-shadow:0 2px 6px rgba(0,0,0,.10)!important;
+  transform:none!important;
+}
+.eh-map-card [class*="facility"],
+.eh-map-card [class*="room"],
+.eh-map-card [class*="area"] {
+  box-shadow:0 1px 3px rgba(0,0,0,.08)!important;
+  transform:none!important;
+}
+
+/* 코트만 살짝 축소 + 약한 입체감 */
+.eh-map-card [class*="court"] {
+  transform:scale(.94)!important;
+  box-shadow:0 2px 5px rgba(0,0,0,.14)!important;
+}
+</style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -29328,156 +29368,6 @@ setInterval(init,800);
 }
 </style>
 
-
-<style id="JGB_HEADER_DUPLICATE_ICON_ALIGN_FINAL_V2">
-/* =========================================================
-   최종 헤더 중복 아이콘 제거 + 제목 정렬
-   기능 / 데이터 / JS 변경 없음
-   ========================================================= */
-
-/* 1) 시설물 EAM 관리
-   바깥 헤더에 별도로 붙은 아이콘은 제거하고
-   제목 묶음 안의 자산 아이콘 하나만 사용 */
-.eam-innovation .eam-innovation-head::before{
-  content:none!important;
-  display:none!important;
-}
-.eam-innovation .eam-innovation-head{
-  position:relative!important;
-}
-.eam-innovation .eam-innovation-head > div:first-child{
-  position:relative!important;
-  padding-left:54px!important;
-  margin:0!important;
-  min-width:0!important;
-  box-sizing:border-box!important;
-}
-.eam-innovation .eam-innovation-head > div:first-child::before{
-  content:"🗄️"!important;
-  position:absolute!important;
-  left:0!important;
-  top:50%!important;
-  transform:translateY(-50%)!important;
-  width:40px!important;
-  min-width:40px!important;
-  height:40px!important;
-  min-height:40px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  box-sizing:border-box!important;
-  border-radius:10px!important;
-  background:linear-gradient(145deg,#fff 0%,#e8f1f7 52%,#c4d8e5 100%)!important;
-  border:1px solid rgba(255,255,255,.96)!important;
-  box-shadow:inset 0 2px 2px rgba(255,255,255,.95),0 3px 0 rgba(5,48,75,.28),0 5px 9px rgba(0,0,0,.16)!important;
-  color:#145b82!important;
-  font-size:21px!important;
-  line-height:1!important;
-}
-
-/* 2) 시설물 유지관리 현황
-   상단은 '시설물 현황'이므로 지도 아이콘을 사용하지 않음 */
-.eh-page > .eh-head > div:first-child{
-  position:relative!important;
-  padding-left:54px!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-  min-width:0!important;
-}
-.eh-page > .eh-head > div:first-child::before{
-  content:"🏢"!important;
-  position:absolute!important;
-  left:0!important;
-  top:50%!important;
-  transform:translateY(-50%)!important;
-  width:40px!important;
-  min-width:40px!important;
-  height:40px!important;
-  min-height:40px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  box-sizing:border-box!important;
-  border-radius:10px!important;
-  background:linear-gradient(145deg,#fff 0%,#e8f1f7 52%,#c4d8e5 100%)!important;
-  border:1px solid rgba(255,255,255,.96)!important;
-  box-shadow:inset 0 2px 2px rgba(255,255,255,.95),0 3px 0 rgba(5,48,75,.28),0 5px 9px rgba(0,0,0,.16)!important;
-  color:#145b82!important;
-  font-size:21px!important;
-  line-height:1!important;
-}
-
-/* 3) 시설 자산 배치도
-   지도 아이콘은 이곳에만 유지 */
-.eh-map-card .eh-card-head{
-  display:flex!important;
-  align-items:center!important;
-  min-height:58px!important;
-  height:58px!important;
-  box-sizing:border-box!important;
-}
-.eh-map-card .eh-card-head h2{
-  display:flex!important;
-  align-items:center!important;
-  gap:8px!important;
-  margin:0!important;
-  padding:0!important;
-  white-space:nowrap!important;
-}
-.eh-map-card .eh-map-title-icon{
-  width:40px!important;
-  min-width:40px!important;
-  height:40px!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  box-sizing:border-box!important;
-  font-size:21px!important;
-  line-height:1!important;
-}
-
-/* 4) 시설 누수·수리 관리현황
-   바깥쪽에 떠 있는 두 번째 물방울 제거.
-   제목 옆 흰색 아이콘 하나만 유지 */
-.jgb-v170-head::before{
-  content:none!important;
-  display:none!important;
-}
-.jgb-v170-head{
-  position:relative!important;
-}
-.jgb-v170-head > div:first-child{
-  position:relative!important;
-  padding-left:54px!important;
-  box-sizing:border-box!important;
-}
-.jgb-v170-head > div:first-child::before{
-  content:"💧"!important;
-  position:absolute!important;
-  left:0!important;
-  top:50%!important;
-  transform:translateY(-50%)!important;
-  width:40px!important;
-  min-width:40px!important;
-  height:40px!important;
-  min-height:40px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  box-sizing:border-box!important;
-  border-radius:10px!important;
-}
-
-/* 모든 위 헤더의 제목 시작선 동일 */
-.eam-innovation .eam-innovation-head > div:first-child h1,
-.eh-page > .eh-head > div:first-child h1,
-.jgb-v170-head > div:first-child h1{
-  margin:0!important;
-  padding:0!important;
-  text-align:left!important;
-}
-</style>
-
 </body>
 
 <style id="v19-court-position-final">
@@ -39273,178 +39163,4 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 }
 /* 배치도 카드 헤더는 제목 아이콘 자체를 사용하므로 별도 의미 아이콘은 유지 */
 .eh-map-card .eh-card-head .eh-map-title-icon{width:40px!important;height:40px!important;flex:0 0 40px!important;font-size:30px!important;}
-</style>
-
-
-<style id="JGB_HEADER_ICON_NO_DUPLICATE_FINAL">
-/* =========================================================
-   헤더 아이콘 중복 최종 제거
-   - 기존 기능 / 데이터 / JS 변경 없음
-   - 각 헤더에는 아이콘 1개만 표시
-   ========================================================= */
-
-/* 공통 */
-.eam-innovation .eam-innovation-head,
-.eh-page > .eh-head,
-.jgb-v170-head{
-  position:relative!important;
-  box-sizing:border-box!important;
-}
-
-/* ---------- 시설물 EAM 관리 ----------
-   기존: 헤더 바깥/안쪽 아이콘이 함께 표시됨
-   최종: 헤더 자체에 아이콘 1개만 표시
-*/
-.eam-innovation .eam-innovation-head > div:first-child::before{
-  content:none!important;
-  display:none!important;
-}
-.eam-innovation .eam-innovation-head::before{
-  content:"🗄️"!important;
-  position:absolute!important;
-  left:20px!important;
-  top:50%!important;
-  transform:translateY(-50%)!important;
-  width:40px!important;
-  height:40px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  box-sizing:border-box!important;
-  font-size:21px!important;
-  line-height:1!important;
-  border-radius:10px!important;
-  background:linear-gradient(145deg,#fff,#e5eef6)!important;
-  border:1px solid rgba(255,255,255,.95)!important;
-  box-shadow:0 3px 7px rgba(0,0,0,.20)!important;
-  z-index:3!important;
-}
-.eam-innovation .eam-innovation-head > div:first-child{
-  padding-left:60px!important;
-  position:relative!important;
-  z-index:2!important;
-}
-
-/* ---------- 시설물 유지관리 현황 ----------
-   지도 아이콘은 제거하고 시설물 현황 의미의 건물 아이콘 1개
-*/
-.eh-page > .eh-head > div:first-child::before{
-  content:none!important;
-  display:none!important;
-}
-.eh-page > .eh-head::before{
-  content:"🏢"!important;
-  position:absolute!important;
-  left:20px!important;
-  top:50%!important;
-  transform:translateY(-50%)!important;
-  width:40px!important;
-  height:40px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  box-sizing:border-box!important;
-  font-size:21px!important;
-  line-height:1!important;
-  border-radius:10px!important;
-  background:linear-gradient(145deg,#fff,#e5eef6)!important;
-  border:1px solid rgba(255,255,255,.95)!important;
-  box-shadow:0 3px 7px rgba(0,0,0,.20)!important;
-  z-index:3!important;
-}
-.eh-page > .eh-head > div:first-child{
-  padding-left:60px!important;
-  position:relative!important;
-  z-index:2!important;
-}
-
-/* ---------- 시설 자산 배치도 ----------
-   이곳에서만 지도 아이콘 유지
-*/
-.eh-page .eh-map-card .eh-card-head .eh-map-title-icon{
-  width:40px!important;
-  min-width:40px!important;
-  height:40px!important;
-  flex:0 0 40px!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  font-size:24px!important;
-  line-height:1!important;
-}
-
-/* ---------- 시설 누수·수리 관리현황 ----------
-   기존 내부 ::before 제거 → 헤더에 물방울 1개
-*/
-.jgb-v170-head > div:first-child::before{
-  content:none!important;
-  display:none!important;
-}
-.jgb-v170-head::before{
-  content:"💧"!important;
-  position:absolute!important;
-  left:20px!important;
-  top:50%!important;
-  transform:translateY(-50%)!important;
-  width:40px!important;
-  height:40px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  box-sizing:border-box!important;
-  font-size:21px!important;
-  line-height:1!important;
-  border-radius:10px!important;
-  background:linear-gradient(145deg,#fff,#e5eef6)!important;
-  border:1px solid rgba(255,255,255,.95)!important;
-  box-shadow:0 3px 7px rgba(0,0,0,.20)!important;
-  z-index:3!important;
-}
-.jgb-v170-head{
-  padding-left:80px!important;
-}
-.jgb-v170-head > div:first-child{
-  padding-left:0!important;
-}
-
-/* ---------- 보수·방수 이력관리 ----------
-   기존 실제 아이콘 하나만 사용
-*/
-.jgb-v66-top-title::before,
-.jgb-v66-top-title > div::before{
-  content:none!important;
-  display:none!important;
-}
-.jgb-v66-top-icon{
-  width:40px!important;
-  min-width:40px!important;
-  height:40px!important;
-  min-height:40px!important;
-  flex:0 0 40px!important;
-  font-size:21px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-}
-
-/* ---------- 시스템 설정 ----------
-   pagebar의 기존 ::before 하나만 사용
-*/
-.pagebar.jgb-settings-pagebar::before{
-  width:40px!important;
-  height:40px!important;
-  font-size:21px!important;
-}
-
-/* ---------- 시설민원 관리 ----------
-   공구 아이콘 제거 후 민원 문서 아이콘 하나만
-*/
-.jgb-repair-page .jgb-repair-brandico{
-  width:40px!important;
-  min-width:40px!important;
-  height:40px!important;
-  min-height:40px!important;
-  flex:0 0 40px!important;
-  font-size:21px!important;
-}
 </style>
