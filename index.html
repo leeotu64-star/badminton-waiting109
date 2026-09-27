@@ -28503,10 +28503,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 function moveMapStats(){
   const page=document.querySelector('.eh-page');
-  const head=page?.querySelector(':scope > .eh-head');
-  const stats=page?.querySelector('.eh-map-card .eh-card-head .eh-head-stats');
-  if(!head||!stats)return;
-  if(stats.parentElement!==head) head.appendChild(stats);
+  const mapHead=page?.querySelector('.eh-map-card .eh-card-head');
+  const stats=page?.querySelector('.eh-head-stats');
+  if(!page||!mapHead||!stats)return;
+
+  /* 상태 5개는 최상단 헤더로 이동시키지 않고
+     반드시 '시설 자산 배치도' 헤더 안에 유지 */
+  if(stats.parentElement!==mapHead){
+    mapHead.appendChild(stats);
+  }
 }
 
 function ensureRepairManual(){
@@ -29621,6 +29626,88 @@ setInterval(init,800);
   .eh-header .eh-head-stats{display:none!important;}
 }
 </style>
+
+<style id="JGB_TRUE_FINAL_MAP_HEADER_STATUS_FIX">
+/* ===== 실제 최종: 상태 5개는 시설 자산 배치도 헤더에만 표시 ===== */
+
+/* 최상단 유지관리 헤더에서는 상태 5개 제거 */
+.eh-page > .eh-head .eh-head-stats{
+  display:none!important;
+}
+
+/* 배치도 헤더에서는 상태 5개 표시 */
+.eh-map-card .eh-card-head .eh-head-stats{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  position:static!important;
+  float:none!important;
+  transform:none!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  gap:5px!important;
+}
+
+/* 배치도 헤더 전체 */
+.eh-map-card .eh-card-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:14px!important;
+}
+
+/* 아이콘 + 제목 */
+.eh-map-card .eh-card-head h2{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0!important;
+  padding:0!important;
+  height:100%!important;
+  line-height:1!important;
+  text-align:center!important;
+}
+
+/* 지도 아이콘 */
+.eh-map-card .eh-card-head .eh-map-title-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  position:static!important;
+  margin:0!important;
+  transform:none!important;
+}
+
+/* 5개 상태 버튼 */
+.eh-map-card .eh-card-head .eh-stat{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  position:static!important;
+  float:none!important;
+  transform:none!important;
+  margin:0!important;
+  padding:3px 4px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+}
+
+.eh-map-card .eh-card-head .eh-stat b,
+.eh-map-card .eh-card-head .eh-stat small{
+  position:static!important;
+  display:block!important;
+  width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  text-align:center!important;
+  transform:none!important;
+}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
