@@ -29540,88 +29540,7 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
 }
 </style>
 
-<style id="JGB_EAM_V72_ICON_DBLCLICK">
-/* V72: 자산 배치 아이콘은 단일 클릭으로 화면 이동하지 않고, 더블클릭에서만 이력카드로 이동 */
-#eam228Map .eam228-asset{cursor:grab!important;user-select:none!important;-webkit-user-select:none!important;touch-action:none!important;}
-#eam228Map .eam228-asset.dragging{cursor:grabbing!important;}
-</style>
-<script id="JGB_EAM_V72_ICON_DBLCLICK_SCRIPT">
-(function(){
-  if(window.__JGB_EAM_ICON_DBLCLICK_V72)return;
-  window.__JGB_EAM_ICON_DBLCLICK_V72=true;
-  let suppressUntil=0;
-  let moveArmed=null;
-  let drag=null;
-  const KEY='JGB_EAM_HYUNHWANG_MAP_V1';
-  const ONLY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
-  const readObj=k=>{try{const v=JSON.parse(localStorage.getItem(k)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}};
-  const savePos=(code,x,y)=>{
-    if(!code)return;
-    try{const v=readObj(KEY);v[code]=[Number(x.toFixed(3)),Number(y.toFixed(3))];localStorage.setItem(KEY,JSON.stringify(v));}catch(_){}
-    try{const v=readObj(ONLY);if(v[code]){v[code].x=Number(x.toFixed(3));v[code].y=Number(y.toFixed(3));localStorage.setItem(ONLY,JSON.stringify(v));}}catch(_){}
-  };
-  document.addEventListener('dblclick',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(!el)return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    moveArmed=el;
-    el.classList.add('move-armed');
-    setTimeout(()=>{if(moveArmed===el)el.classList.remove('move-armed')},4000);
-  },true);
-  document.addEventListener('pointerdown',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(!el || (e.pointerType==='mouse' && e.button!==0))return;
-    if(moveArmed!==el)return;
-    const map=el.closest('#eam228Map');
-    if(!map)return;
-    const mr=map.getBoundingClientRect();
-    const er=el.getBoundingClientRect();
-    drag={el,map,pid:e.pointerId,mr,ox:e.clientX-(er.left+er.width/2),oy:e.clientY-(er.top+er.height/2),moved:false};
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    try{el.setPointerCapture(e.pointerId)}catch(_){}
-  },true);
-  document.addEventListener('pointermove',function(e){
-    const d=drag;if(!d||e.pointerId!==d.pid)return;
-    const dx=e.clientX-(d.mr.left+d.mr.width/2+d.ox);
-    const dy=e.clientY-(d.mr.top+d.mr.height/2+d.oy);
-    if(!d.moved && Math.hypot(dx,dy)<4)return;
-    d.moved=true;
-    const x=Math.max(.5,Math.min(99.5,((e.clientX-d.ox-d.mr.left)/d.mr.width)*100));
-    const y=Math.max(.5,Math.min(99.5,((e.clientY-d.oy-d.mr.top)/d.mr.height)*100));
-    d.el.style.left=x+'%';d.el.style.top=y+'%';
-    d.el.classList.add('dragging');
-    e.preventDefault();e.stopImmediatePropagation();
-  },true);
-  function finish(e){
-    const d=drag;if(!d||e.pointerId!==d.pid)return;
-    drag=null;
-    if(d.moved){
-      const x=Math.max(.5,Math.min(99.5,((e.clientX-d.ox-d.mr.left)/d.mr.width)*100));
-      const y=Math.max(.5,Math.min(99.5,((e.clientY-d.oy-d.mr.top)/d.mr.height)*100));
-      d.el.style.left=x+'%';d.el.style.top=y+'%';
-      savePos(d.el.getAttribute('data-code')||'',x,y);
-      suppressUntil=Date.now()+500;
-    }
-    d.el.classList.remove('dragging','move-armed');
-    if(moveArmed===d.el)moveArmed=null;
-    try{d.el.releasePointerCapture(e.pointerId)}catch(_){}
-    e.preventDefault();e.stopImmediatePropagation();
-  }
-  document.addEventListener('pointerup',finish,true);
-  document.addEventListener('pointercancel',finish,true);
-  document.addEventListener('click',function(e){
-    const el=e.target.closest?.('#eam228Map .eam228-asset');
-    if(!el)return;
-    if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();return;}
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    const c=el.getAttribute('data-code')||'';
-    window.__eamSelCode=c;
-  },true);
-})();
-</script>
+
 
 <style id="JGB_EAM_V8_LIVE_SCREEN_FORMAT">
 /* V8: 참고 화면처럼 실시간 시설 조치현황만 독립 스크롤 영역으로 구성
@@ -30584,10 +30503,8 @@ a[data-page="digitalTwin"] *{color:transparent!important;text-shadow:none!import
   cursor:pointer!important;
 }
 .eam228-court::before{
-  content:""!important;position:absolute!important;left:10%!important;right:10%!important;
-  top:50%!important;height:0!important;border-top:1px solid rgba(255,255,255,.92)!important;
-  box-shadow:0 -1px 0 rgba(37,67,86,.68),0 1px 0 rgba(255,255,255,.45)!important;
-  z-index:4!important;display:block!important;pointer-events:none!important;
+  display:none!important;
+  content:none!important;
 }
 .eam228-court::after{
   content:""!important;position:absolute!important;left:10%!important;right:10%!important;
@@ -38817,7 +38734,7 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
   min-height:72px!important;
   flex:0 0 72px!important;
   padding:0 14px!important;
-  border-bottom:1px solid rgba(255,255,255,.25)!important;
+  border-bottom:0!important;
   box-sizing:border-box!important;
 }
 
@@ -38892,9 +38809,56 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 }
 </style>
 
-<style id="FIX_035718_TITLE_AND_ROOF_LINES">
-/* 요청: 시설 자산 배치도 제목 아래 선 제거 */
-.eh-page .eh-map-card .eh-card-head{border-bottom:0!important;}
-/* 요청: 누수 지붕 중앙 능선선 제거 */
-.jgb-leak-roof-ridge{display:none!important;}
+
+<!-- CLEAN: EAM 아이콘은 더블클릭 후에만 드래그 이동 -->
+<style id="JGB_EAM_CLEAN_DBLCLICK_DRAG">
+#eam228Map .eam228-asset{cursor:pointer!important;touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;}
+#eam228Map .eam228-asset.jgb-move-ready{cursor:grab!important;}
+#eam228Map .eam228-asset.jgb-moving{cursor:grabbing!important;z-index:999999!important;}
 </style>
+<script id="JGB_EAM_CLEAN_DBLCLICK_DRAG_SCRIPT">
+(function(){
+  if(window.__JGB_EAM_CLEAN_DBLCLICK_DRAG)return;
+  window.__JGB_EAM_CLEAN_DBLCLICK_DRAG=true;
+  const SEL='#eam228Map .eam228-asset';
+  const POSKEY='JGB_EAM_DASH_MAP_POS_V228';
+  let active=null;
+  const read=()=>{try{const v=JSON.parse(localStorage.getItem(POSKEY)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}};
+  const save=(code,x,y)=>{if(!code)return;const v=read();v[code]=[+x.toFixed(3),+y.toFixed(3)];try{localStorage.setItem(POSKEY,JSON.stringify(v))}catch(_){} };
+  document.addEventListener('dblclick',e=>{
+    const el=e.target.closest?.(SEL); if(!el)return;
+    e.preventDefault();e.stopImmediatePropagation();
+    el.classList.add('jgb-move-ready');
+    el.dataset.jgbMoveUntil=String(Date.now()+8000);
+  },true);
+  document.addEventListener('pointerdown',e=>{
+    const el=e.target.closest?.(SEL); if(!el||e.button!==0)return;
+    if(Number(el.dataset.jgbMoveUntil||0)<Date.now())return;
+    const map=el.closest('#eam228Map'); if(!map)return;
+    const mr=map.getBoundingClientRect(), er=el.getBoundingClientRect();
+    active={el,map,pid:e.pointerId,mr,ox:e.clientX-(er.left+er.width/2),oy:e.clientY-(er.top+er.height/2),moved:false};
+    e.preventDefault();e.stopImmediatePropagation();
+    try{el.setPointerCapture(e.pointerId)}catch(_){}
+  },true);
+  document.addEventListener('pointermove',e=>{
+    const d=active;if(!d||e.pointerId!==d.pid)return;
+    const x=Math.max(1,Math.min(99,((e.clientX-d.ox-d.mr.left)/d.mr.width)*100));
+    const y=Math.max(1,Math.min(99,((e.clientY-d.oy-d.mr.top)/d.mr.height)*100));
+    d.moved=true;d.el.classList.add('jgb-moving');
+    d.el.style.left=x.toFixed(3)+'%';d.el.style.top=y.toFixed(3)+'%';
+    d.x=x;d.y=y;e.preventDefault();e.stopImmediatePropagation();
+  },true);
+  const finish=e=>{
+    const d=active;if(!d||e.pointerId!==d.pid)return;
+    active=null;d.el.classList.remove('jgb-moving');d.el.classList.remove('jgb-move-ready');
+    if(d.moved){
+      const x=d.x,y=d.y,code=String(d.el.getAttribute('data-code')||'').trim();
+      save(code,x,y);d.el.dataset.v19Dragged='1';d.el.dataset.v19DraggedAt=String(Date.now());
+    }
+    try{d.el.releasePointerCapture(e.pointerId)}catch(_){}
+    e.preventDefault();e.stopImmediatePropagation();
+  };
+  document.addEventListener('pointerup',finish,true);
+  document.addEventListener('pointercancel',finish,true);
+})();
+</script>
