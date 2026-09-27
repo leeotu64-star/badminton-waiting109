@@ -5747,6 +5747,8 @@ a[data-page="digitalTwin"],
   .jgb-repair-mini-no b{font-size:12px!important}
   .jgb-repair-mini-time{font-size:11px!important}
   .jgb-repair-mini-content span{font-size:12px!important;font-weight:900!important}
+  .jgb-repair-title{display:block;font-size:12px!important;font-weight:900!important;line-height:1.35}
+  .jgb-repair-detail{display:block;margin-top:2px;font-size:11px!important;font-weight:500!important;color:#4b5b70;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .jgb-repair-mini-work select{font-size:11px!important}
   .jgb-repair-mini-actions button{font-size:11px!important}
   .jgb-repair-note{font-size:11px!important}
@@ -12238,7 +12240,23 @@ html,body{
     const ACTION_TYPES=['자체조치','외부용역'];
     function actionNoteFromIssue(x){const m=String(x?.content||'').match(/\[\[조치내용:([\s\S]*?)\]\]/);return m?m[1].trim():''}
     function applyIssuePreset(){const v=document.getElementById("issuePreset")?.value||"",ta=document.getElementById("content");if(!ta)return;if(v&&v!=="직접입력")ta.value=v;else if(v==="직접입력"){ta.value="";ta.focus()}}
-    function cleanIssueContent(x){return String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').trim()}
+    function cleanIssueContent(x){
+  return String(x?.content||'')
+    .replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'')
+    .replace(/\[\s*불편\s*유형\s*\]\s*/g,'')
+    .replace(/\[\s*상세\s*내용\s*\]\s*/g,'')
+    .trim()
+}
+function complaintTitle(x){
+  const raw=String(x?.content||'');
+  const m=raw.match(/\[\s*불편\s*유형\s*\]\s*([\s\S]*?)(?=\[\s*상세\s*내용\s*\]|$)/);
+  return (m?m[1]:String(x?.category||'민원')).trim()||'민원';
+}
+function complaintDetail(x){
+  const raw=String(x?.content||'');
+  const m=raw.match(/\[\s*상세\s*내용\s*\]\s*([\s\S]*)$/);
+  return (m?m[1]:cleanIssueContent(x)).trim();
+}
     function cleanReporterContent(text){return String(text||'').replace(/\s*\[\[신고자:[^\]]+\]\]/g,'').trim()}
     function cleanWorkContent(x){return cleanReporterContent(String(x?.content||'').replace(/\s*\[\[처리구분:(?:자체조치|외부용역)\]\]/g,'').replace(/\s*\[\[조치내용:[\s\S]*?\]\]/g,'').trim())}
     function registerPage(){const defaultCat="시설";const places=PLACE_GROUPS[defaultCat]||PLACE_OPTIONS;const presets=ISSUE_PRESETS[defaultCat]||[];return `<div class="pagebar"><h1>시설·환경·안전 접수</h1><button class="btn gray" onclick="go('dashboard')">종합 대시보드</button></div><div class="notice">구분과 장소를 선택하면 해당 시설에 맞는 장소·접수사항이 자동으로 표시됩니다. 등록자 이름은 저장하지 않습니다.</div><div class="panel"><div class="formgrid"><div class="field"><label>민원 유형</label><select id="cat">${COMPLAINT_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('')}</select></div><div class="field"><label>접수 장소</label><select id="place"><option value="">장소를 선택하세요</option>${places.map(p=>`<option value="${p}">${p}</option>`).join("")}</select></div><div class="field full"><label>민원 상세 선택</label><select id="issuePreset" onchange="applyIssuePreset()"><option value="">시설 이상 내용을 선택하세요</option>${presets.map(v=>`<option value="${v}">${v}</option>`).join("")}<option value="직접입력">직접입력</option></select></div><div class="field full"><label>민원 내용</label><textarea id="content" rows="3" placeholder="예 : 시설에 이상이 있습니다. 상세 내용을 입력해 주세요."></textarea></div><div class="field full"><label>사진(선택)</label><input id="photo" type="file" accept="image/*"></div></div><button class="btn" style="margin-top:10px" onclick="addIssue()">접수 등록</button></div><div class="panel" style="margin-top:10px"><h2>최근 접수</h2>${db.issues.slice(-8).reverse().map(x=>`<div class="issue"><div><b>${x.category} · ${x.place}</b><br>${x.content}<div class="small">접수 ${time(x.createdAt)}</div></div><div class="status ${x.status==="완료"?"green":"red"}">${x.status}</div></div>`).join("")||"<div class='small'>접수된 사항이 없습니다.</div>"}</div>`}
@@ -12865,7 +12883,7 @@ html,body{
            return `<div class="jgb-repair-mini-row">
              <div class="jgb-repair-mini-no"><b>${String(i+1).padStart(2,'0')}</b></div>
              <div class="jgb-repair-mini-time">${time(x.createdAt)}</div>
-             <div class="jgb-repair-mini-content"><span>${xEsc(safe(x))}</span></div>
+             <div class="jgb-repair-mini-content"><b class="jgb-repair-title">${xEsc(complaintTitle(x))}</b>${complaintDetail(x)?`<span class="jgb-repair-detail">${xEsc(complaintDetail(x))}</span>`:''}</div>
              <div class="jgb-repair-mini-work"><select onchange="assign('${x.id}',this.value)"><option value="">담당자 지정</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select></div>
              <div class="jgb-repair-mini-actions"><button type="button" class="mini-complete" ${x.handlerId?'':'disabled'} onclick="${x.handlerId?`completeIssue('${x.id}')`:''}">처리완료</button></div>
              <div class="jgb-repair-mini-actions"><button type="button" class="mini-detail" onclick="openCustomerComplaint('${x.id}')">상세보기</button></div>
