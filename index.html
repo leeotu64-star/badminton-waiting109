@@ -10663,28 +10663,42 @@ html,body{
       return '📋';
     };
     window.basicTaskTone=function(i){return ['blue','teal','green','orange','violet','navy','cyan','amber','mint','red'][i%10]};
-    function basicNotebookHtml(w, notebookNo){
-      if(!w) return `<article class="work-notebook work-notebook-empty"><div class="work-notebook-spring">${Array.from({length:12},()=>'<i></i>').join('')}</div><div class="empty-note">업무수첩</div></article>`;
-      const d=tasksFor(w.id)||{done:[],updatedAt:null};
-      const isHoliday=/휴일\s*근무/.test(String(w.status||''));
+    function basicNotebookHtml(w,notebookNo){
+      const d=tasksFor(w.id);
+      const isHoliday=(w.status||'').includes('주휴일');
       const isOff=!w.working || offWords.some(x=>(w.status||'').includes(x));
       const done=isHoliday?10:Array.isArray(d.done)?d.done.length:0;
       const state=isOff?'대상 제외':isHoliday?'자동완료':'직접 실시';
       const tasksHtml=tasks.map((t,i)=>{
         const checked=isHoliday||(Array.isArray(d.done)&&d.done.includes(t));
         const safe=t.replace(/'/g,"\\'");
-        return `<button type="button" class="basic-v5-task basic-tone-${basicTaskTone(i)} ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${safe}')"><span class="task-icon" aria-hidden="true">${basicTaskIcon(t)}</span><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`;
+        return `<button type="button" class="basic-v5-task notebook-task-row basic-tone-${basicTaskTone(i)} ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${safe}')"><span class="task-icon" aria-hidden="true">${basicTaskIcon(t)}</span><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`;
       }).join('');
-      return `<article class="work-notebook">
-        <div class="work-notebook-spring">${Array.from({length:12},()=>'<i></i>').join('')}</div>
+
+      return `<article class="work-notebook work-notebook-clean">
         <div class="work-paper">
-          <div class="work-paper-head">
-            <div><div class="work-person">${w.name}</div><div class="work-shift">${w.shift||w.status||''}${w.start?` · ${w.start}~${w.end}`:''}</div></div>
-            <span class="work-count ${done===10&&!isOff?'done':''}">${state} · ${isOff?'-':done+'/10'}</span>
+          <div class="notebook-paper-lines"></div>
+          <div class="work-paper-inner">
+            <div class="notebook-kicker">DAILY WORK PERFORMANCE</div>
+            <div class="notebook-title-row">
+              <div>
+                <h3 class="notebook-title">일일 업무실적</h3>
+                <div class="notebook-date">${selectedDate}</div>
+              </div>
+              <span class="notebook-page-mark">${notebookNo} / 2</span>
+            </div>
+            <div class="notebook-worker-head">
+              <div>
+                <strong>${w.name}</strong>
+                <span>${w.shift||w.status||''}${w.start?` · ${w.start}~${w.end}`:''}</span>
+              </div>
+              <span class="work-count ${done===10&&!isOff?'done':''}">${state} · ${isOff?'-':done+'/10'}</span>
+            </div>
+            <div class="notebook-progress"><i style="width:${isOff?0:done*10}%"></i></div>
+            <div class="notebook-section-label">오늘의 업무실적 · 10개</div>
+            <div class="basic-v5-tasks notebook-task-list">${tasksHtml}</div>
+            <div class="basic-v5-foot notebook-foot"><span>${isOff?'기본업무 대상 아님':isHoliday?'휴일근무 · 기본업무 1건 자동완료':done===10?'오늘 기본업무 완료':'실시한 항목만 실적 반영'}</span><b>${isOff?'':done+'/10'}</b></div>
           </div>
-          <div class="work-progress"><i style="width:${isOff?0:done*10}%"></i></div>
-          <div class="basic-v5-tasks">${tasksHtml}</div>
-          <div class="basic-v5-foot"><span>${isOff?'기본업무 대상 아님':isHoliday?'휴일근무 · 기본업무 1건 자동완료':done===10?'오늘 기본업무 완료':'실시한 항목만 실적 반영'}</span><b>${isOff?'':done+'/10'}</b></div>
         </div>
       </article>`;
     }
@@ -28737,41 +28751,216 @@ setInterval(init,800);
 </style>
 
 
-<style id="USER_NOTEBOOK_LEFT_POWDER_BLUE_FINAL">
-/* 직원 업무실적 수첩: 참고 이미지처럼 왼쪽 제본 영역에 파우더블루 색상 적용 */
+<style id="JGB_NOTEBOOK_50_50_FINAL">
+/* 공책형 50:50 — 스프링/우측 4색 장식 제거 */
+.basic-work-status-wrap{
+  background:#eef5f9 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  padding:18px !important;
+  box-shadow:none !important;
+}
+.basic-work-status-wrap .basic-v5-page-nav,
+.basic-work-status-wrap .basic-v5-worker-tabs,
+.basic-work-status-wrap .work-notebook-spring{
+  display:none !important;
+}
+.basic-work-status-wrap .work-notebooks{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:18px !important;
+  width:100% !important;
+}
 .basic-work-status-wrap .work-notebook{
-  position:relative!important;
-  overflow:visible!important;
-  padding-left:68px!important;
-  background:#dcecf7!important;
-  border:1px solid #b8d2e3!important;
-  border-radius:14px!important;
-  box-shadow:0 5px 14px rgba(63,91,112,.12)!important;
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
 }
-.basic-work-status-wrap .work-notebook::before{
-  content:""!important;
-  position:absolute!important;
-  left:0!important;
-  top:0!important;
-  bottom:0!important;
-  width:68px!important;
-  background:#dcecf7!important;
-  border-right:1px dashed #a9c7db!important;
-  border-radius:14px 0 0 14px!important;
-  z-index:1!important;
-  pointer-events:none!important;
+.basic-work-status-wrap .work-paper{
+  position:relative !important;
+  overflow:hidden !important;
+  min-height:610px !important;
+  padding:0 !important;
+  background:#fffaf0 !important;
+  border:1px solid #b9c4c8 !important;
+  border-radius:8px !important;
+  box-shadow:0 2px 0 #e0d7c8,0 10px 22px rgba(35,57,70,.14) !important;
 }
-.basic-work-status-wrap .work-notebook .work-paper{
-  position:relative!important;
-  z-index:2!important;
-  margin:0!important;
-  width:100%!important;
+.basic-work-status-wrap .work-paper-inner{
+  position:relative !important;
+  min-height:610px !important;
+  padding:25px 24px 18px !important;
+  box-sizing:border-box !important;
 }
-@media(max-width:900px){
-  .basic-work-status-wrap .work-notebook{padding-left:52px!important}
-  .basic-work-status-wrap .work-notebook::before{width:52px!important}
+.basic-work-status-wrap .work-paper-inner::before{
+  display:none !important;
+  content:none !important;
+}
+.basic-work-status-wrap .notebook-paper-lines{
+  position:absolute !important;
+  inset:0 !important;
+  background:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,rgba(117,150,169,.15) 32px,transparent 33px) !important;
+  pointer-events:none !important;
+}
+.basic-work-status-wrap .notebook-kicker{
+  position:relative !important;
+  color:#29465b !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+  letter-spacing:1.3px !important;
+}
+.basic-work-status-wrap .notebook-title-row{
+  position:relative !important;
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:flex-start !important;
+  margin:5px 0 12px !important;
+  padding-bottom:9px !important;
+  border-bottom:1px solid #b9c7cf !important;
+}
+.basic-work-status-wrap .notebook-title{
+  margin:0 !important;
+  color:#142d42 !important;
+  font-size:27px !important;
+  line-height:1.15 !important;
+  font-weight:900 !important;
+}
+.basic-work-status-wrap .notebook-date{
+  margin-top:6px !important;
+  color:#587082 !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+}
+.basic-work-status-wrap .notebook-page-mark{
+  color:#617987 !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+}
+.basic-work-status-wrap .notebook-worker-head{
+  position:relative !important;
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  gap:12px !important;
+  padding:9px 0 !important;
+  border-bottom:1px solid #b9c7cf !important;
+}
+.basic-work-status-wrap .notebook-worker-head strong{
+  font-size:22px !important;
+  color:#142d42 !important;
+  font-weight:900 !important;
+}
+.basic-work-status-wrap .notebook-worker-head span{
+  margin-left:8px !important;
+  font-size:11px !important;
+  color:#5e7483 !important;
+}
+.basic-work-status-wrap .notebook-worker-head .work-count{
+  margin:0 !important;
+  padding:6px 9px !important;
+  background:#edf5f8 !important;
+  color:#315c72 !important;
+  border:1px solid #bfd0d8 !important;
+  border-radius:4px !important;
+  white-space:nowrap !important;
+}
+.basic-work-status-wrap .notebook-progress{
+  height:5px !important;
+  margin:8px 0 11px !important;
+  background:#e3e7e5 !important;
+  border:1px solid #cbd2d1 !important;
+  border-radius:2px !important;
+  overflow:hidden !important;
+}
+.basic-work-status-wrap .notebook-progress i{
+  display:block !important;
+  height:100% !important;
+  background:#5d8ca4 !important;
+}
+.basic-work-status-wrap .notebook-section-label{
+  position:relative !important;
+  padding:7px 0 !important;
+  color:#2e5063 !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  border-bottom:1px solid #9fb0b8 !important;
+}
+.basic-work-status-wrap .notebook-task-list{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:0 !important;
+  margin:0 !important;
+  border-left:1px solid #c5cfd2 !important;
+  border-right:1px solid #c5cfd2 !important;
+}
+.basic-work-status-wrap .notebook-task-row{
+  min-width:0 !important;
+  min-height:48px !important;
+  height:48px !important;
+  padding:0 9px !important;
+  display:grid !important;
+  grid-template-columns:22px 24px minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:2px !important;
+  background:rgba(255,252,245,.78) !important;
+  border:0 !important;
+  border-bottom:1px solid #c7d0d2 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  color:#263d4b !important;
+  text-align:left !important;
+}
+.basic-work-status-wrap .notebook-task-row:nth-child(odd){
+  border-right:1px solid #c7d0d2 !important;
+}
+.basic-work-status-wrap .notebook-task-row .task-icon{
+  font-size:13px !important;
+  text-align:center !important;
+}
+.basic-work-status-wrap .notebook-task-row .no{
+  color:#6a7d87 !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+}
+.basic-work-status-wrap .notebook-task-row .txt{
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+}
+.basic-work-status-wrap .notebook-task-row .action{
+  color:#1773b8 !important;
+  font-size:10px !important;
+  font-weight:900 !important;
+}
+.basic-work-status-wrap .notebook-task-row.is-done{
+  background:#eef7f1 !important;
+}
+.basic-work-status-wrap .notebook-task-row.is-done .action{
+  color:#23804d !important;
+}
+.basic-work-status-wrap .notebook-foot{
+  position:relative !important;
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  margin-top:10px !important;
+  padding:9px 0 0 !important;
+  border-top:1px solid #9fb0b8 !important;
+  color:#536b78 !important;
+  font-size:11px !important;
+}
+.basic-work-status-wrap .notebook-foot b{
+  color:#294f63 !important;
+  font-size:13px !important;
+}
+@media (max-width:900px){
+  .basic-work-status-wrap .work-notebooks{grid-template-columns:1fr !important;}
 }
 </style>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -38489,14 +38678,39 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
   .jgb-dashboard-mode.staff .employee-hero .opx-subtitle,
   .basic-work-status-wrap .basic-v5-sub{white-space:normal!important;}
 }
-</style>
-<style id="REMOVE_SPRING_ONLY">
-/* 스프링만 제거 — 파우더블루 왼쪽 제본 영역과 공책 디자인은 유지 */
-.work-notebook-spring,
-.notebook-rings,
-.notebook-cover-page-rings,
-.employee-notebook-cover .notebook-rings,
-.employee-notebook-page .notebook-cover-page-rings{
-  display:none !important;
+
+/* 오른쪽 4색 인덱스 탭 — 스프링 없이 얇고 깔끔하게 */
+.basic-work-status-wrap .work-notebook-clean .work-paper::after{
+  content:"" !important;
+  position:absolute !important;
+  top:30px !important;
+  right:-1px !important;
+  width:10px !important;
+  height:190px !important;
+  background:
+    linear-gradient(
+      to bottom,
+      #b8dff0 0 25%,
+      #b8e5d9 25% 50%,
+      #f4c6c0 50% 75%,
+      #ead9a8 75% 100%
+    ) !important;
+  border-left:1px solid rgba(105,130,142,.28) !important;
+  border-radius:2px 0 0 2px !important;
+  box-shadow:-1px 0 0 rgba(255,255,255,.55) inset !important;
+  z-index:5 !important;
 }
+
+/* 4색 탭이 종이 밖으로 살짝 나오는 느낌 */
+.basic-work-status-wrap .work-notebook-clean{
+  overflow:visible !important;
+}
+.basic-work-status-wrap .work-paper{
+  overflow:visible !important;
+}
+.basic-work-status-wrap .work-paper-inner,
+.basic-work-status-wrap .notebook-paper-lines{
+  overflow:hidden !important;
+}
+
 </style>
