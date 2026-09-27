@@ -10661,6 +10661,47 @@ html,body{
   transform:translateY(calc(-50% - 8px))!important;
 }
 </style>
+<style id="jgb-complaint-type-column-160301">
+/* 160301 원본: 고객 접수의 불편유형과 민원내용을 관리자 목록에서 별도 열로 표시 */
+.jgb-repair-page .jgb-repair-mini-head,
+.jgb-repair-page .jgb-repair-mini-row{
+  grid-template-columns:58px 78px 112px minmax(140px,1fr) 125px 92px 78px!important;
+  column-gap:0!important;
+}
+.jgb-repair-page .jgb-repair-mini-head>span,
+.jgb-repair-page .jgb-repair-mini-row>div{
+  box-sizing:border-box!important;
+  min-width:0!important;
+  border-right:1px solid #aebfca!important;
+}
+.jgb-repair-page .jgb-repair-mini-head>span:nth-child(3),
+.jgb-repair-page .jgb-repair-mini-row>div:nth-child(3){
+  justify-content:center!important;
+  text-align:center!important;
+}
+.jgb-repair-page .jgb-repair-mini-head>span:nth-child(4),
+.jgb-repair-page .jgb-repair-mini-row>div:nth-child(4){
+  justify-content:flex-start!important;
+  text-align:left!important;
+}
+.jgb-repair-mini-type{
+  font-size:12px!important;
+  font-weight:1000!important;
+  color:#173e57!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.jgb-repair-mini-content .jgb-repair-detail{
+  margin:0!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  color:#243f56!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -12252,6 +12293,9 @@ function complaintTitle(x){
   const m=raw.match(/\[\s*불편\s*유형\s*\]\s*([\s\S]*?)(?=\[\s*상세\s*내용\s*\]|$)/);
   return (m?m[1]:String(x?.category||'민원')).trim()||'민원';
 }
+function complaintType(x){
+  return String(x?.category||'').trim() || complaintTitle(x) || '기타';
+}
 function complaintDetail(x){
   const raw=String(x?.content||'');
   const m=raw.match(/\[\s*상세\s*내용\s*\]\s*([\s\S]*)$/);
@@ -12883,13 +12927,13 @@ function complaintDetail(x){
            return `<div class="jgb-repair-mini-row">
              <div class="jgb-repair-mini-no"><b>${String(i+1).padStart(2,'0')}</b></div>
              <div class="jgb-repair-mini-time">${time(x.createdAt)}</div>
-             <div class="jgb-repair-mini-content"><b class="jgb-repair-title">${xEsc(complaintTitle(x))}</b>${complaintDetail(x)?`<span class="jgb-repair-detail">${xEsc(complaintDetail(x))}</span>`:''}</div>
+             <div class="jgb-repair-mini-type">${xEsc(complaintType(x))}</div><div class="jgb-repair-mini-content">${complaintDetail(x)?`<span class="jgb-repair-detail">${xEsc(complaintDetail(x))}</span>`:'<span class="jgb-repair-detail">-</span>'}</div>
              <div class="jgb-repair-mini-work"><select onchange="assign('${x.id}',this.value)"><option value="">담당자 지정</option>${workers.map(w=>`<option value="${w.id}" ${x.handlerId===w.id?'selected':''}>${xEsc(w.name)}</option>`).join('')}</select></div>
              <div class="jgb-repair-mini-actions"><button type="button" class="mini-complete" ${x.handlerId?'':'disabled'} onclick="${x.handlerId?`completeIssue('${x.id}')`:''}">처리완료</button></div>
              <div class="jgb-repair-mini-actions"><button type="button" class="mini-detail" onclick="openCustomerComplaint('${x.id}')">상세보기</button></div>
            </div>`;
          }).join(''):`<div class="jgb-repair-empty"><strong>현재 접수된 민원이 없습니다.</strong>새로운 스마트폰 QR 접수가 들어오면 표시됩니다.</div>`;
-         const miniHead=`<div class="jgb-repair-mini-head"><span>접수번호</span><span>접수시간</span><span>민원내용</span><span>담당자 지정</span><span>처리완료</span><span>상세보기</span></div>`;
+         const miniHead=`<div class="jgb-repair-mini-head"><span>접수번호</span><span>접수시간</span><span>불편유형</span><span>민원내용</span><span>담당자 지정</span><span>처리완료</span><span>상세보기</span></div>`;
          return `<section class="jgb-repair-list-wrap"><div class="jgb-repair-list-head"><b>시설 민원 접수·처리</b><span>좌우 50:50 · 최근 민원 표시 · 세로 스크롤 · 상세보기</span></div>
            <div class="jgb-repair-split">
              <section class="jgb-repair-pane"><div class="jgb-repair-pane-head"><b>최신 접수</b><span>최근 접수 순 · ${latest.length}건</span></div><div class="jgb-repair-scroll">${miniHead}${miniRows(latest)}</div></section>
@@ -12911,8 +12955,8 @@ function complaintDetail(x){
       modal.innerHTML=`<div class="jgb-customer-modal-card" role="dialog" aria-modal="true" aria-label="고객 민원내용">
         <div class="jgb-customer-modal-head"><strong>고객 민원내용</strong><button type="button" class="jgb-customer-modal-close" onclick="closeCustomerComplaint()">×</button></div>
         <div class="jgb-customer-modal-body">
-          <div class="jgb-customer-modal-meta"><div><small>접수번호</small><b>${String((db.issues||[]).findIndex(i=>String(i.id)===String(x.id))+1).padStart(2,'0')}</b></div><div><small>접수일시</small><b>${xEsc(time(x.createdAt))}</b></div><div><small>접수장소</small><b>${xEsc(x.place||'장소 미기록')}</b></div><div><small>접수유형</small><b>${xEsc(newCustomerTypeOf(x)||x.category||'기타')}</b></div></div>
-          <div class="jgb-customer-modal-label">고객이 입력한 민원내용</div>
+          <div class="jgb-customer-modal-meta"><div><small>접수번호</small><b>${String((db.issues||[]).findIndex(i=>String(i.id)===String(x.id))+1).padStart(2,'0')}</b></div><div><small>접수일시</small><b>${xEsc(time(x.createdAt))}</b></div><div><small>접수장소</small><b>${xEsc(x.place||'장소 미기록')}</b></div><div><small>불편유형</small><b>${xEsc(complaintType(x))}</b></div></div>
+          <div class="jgb-customer-modal-label">민원내용</div>
           <div class="jgb-customer-modal-content">${xEsc(content)}</div>
         </div>
       </div>`;
