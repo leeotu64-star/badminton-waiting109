@@ -10572,22 +10572,39 @@ html,body{
 }
 </style>
 
-<style id="ONLY_LEFT_RIGHT_ARROWS">
-.basic-v5-page-nav.only-arrows{
+<style id="USER_REQUEST_EXACT_PAGE_ARROWS">
+.basic-work-status-wrap .basic-v5-page-nav{
   display:flex!important;
+  flex-direction:row!important;
   align-items:center!important;
   justify-content:space-between!important;
   width:100%!important;
-  min-height:64px!important;
-  padding:6px 0!important;
   box-sizing:border-box!important;
 }
-.basic-v5-page-nav.only-arrows .page-arrow{
+.basic-work-status-wrap .basic-v5-page-nav .basic-v5-page-center{
+  position:absolute!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:9px!important;
+}
+.basic-work-status-wrap .basic-v5-page-nav .basic-v5-nav-btn.page-arrow{
+  position:relative!important;
+  flex:0 0 auto!important;
   display:flex!important;
   align-items:center!important;
   justify-content:center!important;
 }
+.basic-work-status-wrap .basic-v5-page-nav .basic-v5-nav-btn.page-arrow:first-child{
+  margin-left:0!important;
+}
+.basic-work-status-wrap .basic-v5-page-nav .basic-v5-nav-btn.page-arrow.next{
+  margin-left:auto!important;
+}
 </style>
+
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -10836,14 +10853,7 @@ html,body{
 
       return `<div class="basic-v5 basic-work-status-wrap">
         <div class="basic-v5-head"><div class="basic-v5-head-main"><span class="jgb-unified-head-icon" aria-hidden="true">✓</span><div class="jgb-unified-head-text"><h2 class="basic-v5-title">금일 업무현황</h2><div class="basic-v5-sub">${selectedDate} · 시설 이용환경을 꼼꼼히 확인해 주세요. · 전체 약 40분 소요 · 차근차근 점검해 주세요.</div></div></div><div class="basic-v5-head-actions jgb-unified-head-actions"><input class="basic-v5-date" type="date" value="${selectedDate}" onchange="setDate(this.value)"><button type="button" class="jgb-page-manual-btn" aria-label="금일 업무현황 사용설명서">📘 사용설명서</button></div></div>
-        <div class="basic-v5-page-nav only-arrows">
-  <button type="button" class="basic-v5-nav-btn page-arrow"
-    ${pageIndex===0?'disabled':''}
-    onclick="basicPageWorkerNav(-1)" aria-label="이전">‹</button>
-  <button type="button" class="basic-v5-nav-btn page-arrow next"
-    ${pageIndex===pageCount-1?'disabled':''}
-    onclick="basicPageWorkerNav(1)" aria-label="다음">›</button>
-</div>
+        <div class="basic-v5-page-nav">
           <button type="button" class="basic-v5-nav-btn page-arrow" ${pageIndex===0?'disabled':''} onclick="basicPageWorkerNav(-1)" aria-label="이전 직원 묶음">‹</button>
           <div class="basic-v5-page-center"><strong>${centerName}</strong><span>${pageIndex+1} / ${pageCount}</span></div>
           <button type="button" class="basic-v5-nav-btn next page-arrow" ${pageIndex===pageCount-1?'disabled':''} onclick="basicPageWorkerNav(1)" aria-label="다음 직원 묶음">›</button>
