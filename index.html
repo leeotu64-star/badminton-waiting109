@@ -10746,6 +10746,33 @@ html,body{
   text-align:center !important;
 }
 </style>
+
+<style id="JGB_CONSUMABLE_FINAL_TABLE">
+/* 소모품 최종 표: 6열 고정 / 글씨 확대 / 세로선 정확히 정렬 */
+.jgb-con-manager{width:min(1180px,97vw)!important}
+.jgb-con-table-wrap{overflow:auto!important;max-height:420px!important}
+.jgb-con-table{width:100%!important;min-width:920px!important;table-layout:fixed!important;border-collapse:collapse!important;font-size:14px!important}
+.jgb-con-table col.c-cat{width:150px!important}
+.jgb-con-table col.c-name{width:200px!important}
+.jgb-con-table col.c-stock{width:140px!important}
+.jgb-con-table col.c-safe{width:140px!important}
+.jgb-con-table col.c-place{width:190px!important}
+.jgb-con-table col.c-act{width:260px!important}
+.jgb-con-table th,.jgb-con-table td{height:50px!important;padding:8px 10px!important;text-align:center!important;vertical-align:middle!important;border-right:1px solid #c9d9e2!important;border-bottom:1px solid #d7e3ea!important;font-size:14px!important;line-height:1.25!important;white-space:nowrap!important}
+.jgb-con-table th{font-size:15px!important;font-weight:900!important;background:#eaf3f8!important}
+.jgb-con-table td b{font-size:15px!important;font-weight:900!important}
+.jgb-con-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;flex-wrap:nowrap!important}
+.jgb-con-actions button{min-width:62px!important;height:34px!important;padding:5px 10px!important;border:1px solid #b9cddb!important;background:#fff!important;color:#31566d!important;border-radius:6px!important;font-size:13px!important;font-weight:900!important}
+.jgb-con-actions button[data-act="입고"]{background:#eef7fb!important}
+.jgb-con-actions button[data-act="사용"]{background:#f7f9fb!important}
+.jgb-con-actions button[data-edit="1"]{background:#fff!important}
+.jgb-con-number-wrap{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0}
+.jgb-con-number-wrap input{width:120px!important;height:48px!important;border:2px solid #9db8c8!important;border-radius:8px!important;text-align:center!important;font-size:22px!important;font-weight:900!important}
+.jgb-con-number-wrap span{font-size:17px!important;font-weight:900!important;color:#456579!important}
+.jgb-con-process-box small{font-size:13px!important}
+.jgb-con-history-title{font-size:15px!important}
+@media(max-width:900px){.jgb-con-table{min-width:920px!important}}
+</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -30575,15 +30602,16 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
     close('jgbConsumableManager');
     document.body.insertAdjacentHTML('beforeend',`<div id="jgbConProcess" class="jgb-consumable-modal open" onclick="if(event.target===this)this.remove()"><div class="jgb-consumable-sheet jgb-con-manager">
       <div class="jgb-consumable-head"><div><strong>${esc(item.name)} ${type}</strong><small>${esc(item.category)} · ${esc(item.place)} · 현재 ${item.stock}${esc(item.unit)}</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConProcess').remove()">닫기</button></div>
-      <div class="jgb-con-process-box"><b>처리 수량</b><div class="jgb-con-qty"><button id="conMinus">−</button><strong id="conQty">1</strong><button id="conPlus">＋</button></div><small>입력하지 않고 버튼으로만 수량을 조정합니다.</small></div>
+      <div class="jgb-con-process-box"><b>처리 수량</b><div class="jgb-con-number-wrap"><input id="conQty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="처리 수량"><span>${esc(item.unit)}</span></div><small>처리할 수량을 숫자로 입력합니다.</small></div>
       <div class="jgb-con-explain"><b>${type==='교체'?'교체 처리':'사용 처리'}</b> — ${type==='교체'?'기존 소모품을 새 소모품으로 교체할 때 사용합니다. 처리 수량만큼 재고가 자동 차감되고 교체 이력이 기록됩니다.':'실제로 사용한 소모품을 처리합니다. 처리 수량만큼 재고가 자동 차감되고 사용 이력이 기록됩니다.'}</div>
       <div class="jgb-con-auto-card"><span>사용주기</span><b>${esc(metrics(item).cycle)}</b><span>최근 처리일</span><b>${esc(metrics(item).last)}</b><span>다음 예정일</span><b>${esc(metrics(item).next)}</b></div>
       <div class="jgb-consumable-actions"><button class="jgb-con-cancel" onclick="this.closest('#jgbConProcess').remove()">취소</button><button class="jgb-consumable-primary" id="conProcessSave">${type} 완료</button></div>
     </div></div>`);
-    let q=1;const qEl=document.getElementById('conQty');const refresh=()=>{q=Math.max(1,q);if(type!=='입고')q=Math.min(q,Math.max(1,item.stock));qEl.textContent=q};
-    document.getElementById('conMinus').onclick=()=>{q--;refresh()};document.getElementById('conPlus').onclick=()=>{q++;refresh()};
+    const qEl=document.getElementById('conQty');
+    qEl.addEventListener('input',()=>{let q=Math.max(1,Math.floor(Number(qEl.value)||1));if(type!=='입고')q=Math.min(q,Math.max(1,item.stock));qEl.value=q;});
     document.getElementById('conProcessSave').onclick=()=>{
       const arr=masters(),idx=arr.findIndex(x=>x.id===item.id);if(idx<0)return;
+      let q=Math.max(1,Math.floor(Number(qEl.value)||0));if(!Number.isFinite(q)||q<1){alert('처리 수량을 입력하세요.');return}
       if(type!=='입고'&&arr[idx].stock<q){alert('현재 재고보다 많이 처리할 수 없습니다.');return}
       arr[idx].stock=type==='입고'?arr[idx].stock+q:arr[idx].stock-q;save(MASTER,arr);
       const hs=history();hs.unshift({id:'H'+Date.now(),itemId:item.id,name:item.name,category:item.category,place:item.place,type,qty:q,date:today(),note:type+' 처리'});save(HIST,hs);
@@ -30597,12 +30625,12 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
     document.body.insertAdjacentHTML('beforeend',`<div id="jgbConsumableManager" class="jgb-consumable-modal open" onclick="if(event.target===this)this.remove()"><div class="jgb-consumable-sheet jgb-con-manager">
       <div class="jgb-consumable-head"><div><strong>🧰 소모품 이력관리</strong><small>품목을 등록하고 사용 · 교체 · 입고를 수량 버튼으로 처리합니다. 오타는 [수정]에서 바로 고칠 수 있습니다.</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConsumableManager').remove()">닫기</button></div>
       <div class="jgb-con-manager-top"><div><b>등록된 소모품 ${arr.length}종</b><small>안전재고·사용주기는 처리 이력에서 자동 계산</small></div><button class="jgb-consumable-primary" id="jgbConRegisterBtn">＋ 소모품 등록</button></div>
-      <div class="jgb-con-table-wrap"><table class="jgb-con-table"><thead><tr><th>대분류</th><th>품목</th><th>현재재고</th><th>안전재고</th><th>사용주기</th><th>사용위치</th><th>최근 처리일</th><th>다음 예정일</th><th>처리 / 수정</th></tr></thead><tbody id="jgbConRows"></tbody></table></div>
+      <div class="jgb-con-table-wrap"><table class="jgb-con-table"><colgroup><col class="c-cat"><col class="c-name"><col class="c-stock"><col class="c-safe"><col class="c-place"><col class="c-act"></colgroup><thead><tr><th>대분류</th><th>품목</th><th>현재재고</th><th>안전재고</th><th>사용위치</th><th>처리</th></tr></thead><tbody id="jgbConRows"></tbody></table></div>
       <div class="jgb-con-history-title">최근 처리 이력</div><div id="jgbConHistory" class="jgb-con-history"></div>
     </div></div>`);
     const tbody=document.getElementById('jgbConRows');
     if(!arr.length)tbody.innerHTML='<tr><td colspan="9" class="jgb-con-empty">등록된 소모품이 없습니다. 오른쪽 위 <b>＋ 소모품 등록</b>을 눌러 품목을 먼저 등록하세요.</td></tr>';
-    else tbody.innerHTML=arr.map(item=>{const m=metrics(item);return `<tr><td>${esc(item.category)}</td><td><b>${esc(item.name)}</b></td><td><b>${item.stock}${esc(item.unit)}</b></td><td>${esc(m.safe)}</td><td>${esc(m.cycle)}</td><td>${esc(item.place)}</td><td>${esc(m.last)}</td><td>${esc(m.next)}</td><td><div class="jgb-con-actions"><button data-act="사용" data-id="${item.id}">사용</button><button data-act="교체" data-id="${item.id}">교체</button><button data-act="입고" data-id="${item.id}">입고</button><button data-edit="1" data-id="${item.id}">수정</button></div></td></tr>`}).join('');
+    else tbody.innerHTML=arr.map(item=>{const m=metrics(item);return `<tr><td>${esc(item.category)}</td><td><b>${esc(item.name)}</b></td><td><b>${item.stock}${esc(item.unit)}</b></td><td>${esc(m.safe)}</td><td>${esc(item.place)}</td><td><div class="jgb-con-actions"><button data-act="입고" data-id="${item.id}">입고</button><button data-act="사용" data-id="${item.id}">사용</button><button data-edit="1" data-id="${item.id}">수정</button></div></td></tr>`}).join('');
     const hs=history().slice(0,15);document.getElementById('jgbConHistory').innerHTML=hs.length?hs.map(h=>`<div><b>${esc(h.name)}</b><span>${esc(h.type)} ${h.qty}${esc((arr.find(x=>x.id===h.itemId)?.unit)||'개')}</span><time>${esc(h.date)}</time></div>`).join(''):'<div class="jgb-con-empty">아직 처리 이력이 없습니다.</div>';
     document.getElementById('jgbConRegisterBtn').onclick=openRegister;
     tbody.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>{const it=masters().find(x=>x.id===b.dataset.id);if(it)processItem(it,b.dataset.act)});
