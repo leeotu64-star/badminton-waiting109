@@ -24048,8 +24048,6 @@ body {
     };
     requestAnimationFrame(()=>{if(!pick())setTimeout(pick,80);});
   }
-})();
-</script>
 <style id="JGB_V25_ICON_DELETE_FINAL_FIX">
 /* V25: 배치도 아이콘 삭제창의 목록 영역만 안정화 */
 #eamHyunIconDeleteModal .eh-modal-box{width:min(620px,95vw);max-height:88vh;overflow:auto}
@@ -32898,29 +32896,7 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 <!-- 기존 V8 아이콘 이동 엔진 제거 완료: V10 단일 엔진 사용 -->
 
 
-<script id="JGB_EAM_DO_EDIT_FIX_V9">
-(function(){
-  const oldEdit=window.eamEditSelectedAsset;
-  if(typeof oldEdit!=='function') return;
-  window.eamEditSelectedAsset=async function(){
-    const shown=String(window.__eamSelCode||'').trim();
-    if(!shown) return oldEdit();
-    try{
-      const rows=typeof sourceRows==='function'?sourceRows():[];
-      const src=rows.find(x=>String(x.code||'').trim()===shown || (typeof window.eamUnifiedCode==='function' && String(window.eamUnifiedCode(x))===shown));
-      if(src && String(src.code)!==shown){
-        window.__eamSelCode=String(src.code);
-        return await oldEdit();
-      }
-      return await oldEdit();
-    }catch(e){
-      console.error(e);
-      alert('문·창호설비 이력카드 수정 대상을 찾을 수 없습니다.\
-'+(e?.message||''));
-    }
-  };
-})();
-</script>\n
+\n<script id="JGB_EAM_DO_EDIT_FIX_V9">\n(function(){\n  const oldEdit=window.eamEditSelectedAsset;\n  if(typeof oldEdit!=='function') return;\n  window.eamEditSelectedAsset=async function(){\n    const shown=String(window.__eamSelCode||'').trim();\n    if(!shown) return oldEdit();\n    try{\n      const rows=typeof sourceRows==='function'?sourceRows():[];\n      const src=rows.find(x=>String(x.code||'').trim()===shown || (typeof window.eamUnifiedCode==='function' && String(window.eamUnifiedCode(x))===shown));\n      if(src && String(src.code)!==shown){\n        window.__eamSelCode=String(src.code);\n        return await oldEdit();\n      }\n      return await oldEdit();\n    }catch(e){\n      console.error(e);\n      alert('문·창호설비 이력카드 수정 대상을 찾을 수 없습니다.\\n'+(e?.message||''));\n    }\n  };\n})();\n</script>\n
 
 <style id="JGB_EAM_MAP_ICON_REBUILD_V19_CSS">
 .eh-map .eh-marker{touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important;cursor:grab!important;}
@@ -40779,3 +40755,132 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
     border-radius:7px !important;
 }
 </style>
+
+
+<!-- JGB SAFE FIX: 무한 MutationObserver/setInterval 없이 렌더 후 1회만 UI 교체 -->
+<style id="JGB_SAFE_ICON_DROPDOWN">
+.eam-innovation > .eam-type-row{
+  display:none!important;
+  height:0!important;
+  min-height:0!important;
+  max-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+}
+.eam-innovation .eam-assets-head .eam-filter-row{
+  display:block!important;
+  margin:0!important;
+  padding:0!important;
+}
+.eam-innovation .jgb-safe-category-select{
+  display:block!important;
+  width:100%!important;
+  height:40px!important;
+  min-height:40px!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+  padding:0 32px 0 10px!important;
+  border:1px solid #c8d6e4!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  color:#173957!important;
+  font-size:13px!important;
+  font-weight:900!important;
+}
+</style>
+<script id="JGB_SAFE_ICON_DROPDOWN_SCRIPT">
+(function(){
+  'use strict';
+
+  const ITEMS=[
+    ['cooling','❄️ 냉난방'],
+    ['fire','🚒 소방·방재'],
+    ['water','♨️ 온수·난방'],
+    ['electrical','⚡ 전기설비'],
+    ['sanitary','🚻 위생설비'],
+    ['doors','🚪 문·창호설비'],
+    ['other','🔧 기타설비'],
+    ['consumable','🧰 소모품']
+  ];
+
+  function compactEam(){
+    const host=document.querySelector('.eam-innovation');
+    if(!host)return;
+
+    const filter=host.querySelector('.eam-assets-head .eam-filter-row');
+    if(!filter)return;
+
+    /* 기존 전체 위치를 제거 */
+    const old=filter.querySelector('#eamProLocationFilter');
+    if(old)old.remove();
+
+    let sel=filter.querySelector('.jgb-safe-category-select');
+    if(!sel){
+      sel=document.createElement('select');
+      sel.className='jgb-safe-category-select';
+      sel.setAttribute('aria-label','설비 종류 선택');
+      filter.replaceChildren(sel);
+
+      sel.addEventListener('change',function(){
+        if(this.value==='consumable'){
+          if(typeof window.jgbOpenConsumableHistory==='function'){
+            window.jgbOpenConsumableHistory();
+          }
+          return;
+        }
+        if(typeof window.eamPick==='function'){
+          window.eamPick(this.value);
+        }
+      });
+    }
+
+    const cat=String(window.__eamCat||'cooling');
+    sel.innerHTML=ITEMS.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('');
+    sel.value=ITEMS.some(x=>x[0]===cat)?cat:'cooling';
+
+    /* 실제 DOM에서 기존 아이콘 행 제거 */
+    host.querySelectorAll('.eam-type-row').forEach(x=>x.remove());
+  }
+
+  function later(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(compactEam);
+    });
+  }
+
+  /* 최초 화면 */
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',later,{once:true});
+  }else{
+    later();
+  }
+
+  /*
+    핵심: 기존 render/eamPick을 감시하는 MutationObserver나 setInterval을 사용하지 않는다.
+    기존 렌더 함수가 다시 실행되는 경우에만 함수 래퍼가 1회 적용한다.
+  */
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__jgbSafeWrapped){
+    function wrappedRender(){
+      const r=oldRender.apply(this,arguments);
+      later();
+      return r;
+    }
+    wrappedRender.__jgbSafeWrapped=true;
+    window.render=wrappedRender;
+  }
+
+  const oldPick=window.eamPick;
+  if(typeof oldPick==='function' && !oldPick.__jgbSafeWrapped){
+    function wrappedPick(){
+      const r=oldPick.apply(this,arguments);
+      later();
+      return r;
+    }
+    wrappedPick.__jgbSafeWrapped=true;
+    window.eamPick=wrappedPick;
+  }
+})();
+</script>
+
