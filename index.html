@@ -30323,6 +30323,13 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
 .jgb-consumable-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}.jgb-consumable-primary{border:0;border-radius:8px;background:#0b75ad;color:#fff;font-weight:900;padding:9px 13px;cursor:pointer}
 @media(max-width:700px){.jgb-consumable-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
+
+<style id="JGB_EAM_CONSUMABLE_MANAGER_FIX_V2">
+.jgb-con-manager{width:min(1100px,96vw)!important}
+.jgb-con-manager-top{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #c5d6e1;border-radius:10px;padding:11px 13px;margin:11px 0 9px}.jgb-con-manager-top small{display:block;color:#6a8090;margin-top:3px;font-size:11px}
+.jgb-con-mini-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:9px}.jgb-con-mini-grid>div{background:#fff;border:1px solid #c5d6e1;border-radius:8px;padding:9px;text-align:center}.jgb-con-mini-grid small{display:block;color:#71869a;font-size:10px;margin-top:3px}
+.jgb-con-auto{display:grid;grid-template-columns:1.5fr repeat(6,1fr);gap:0;background:#eaf3f8;border:1px solid #c5d6e1;border-radius:8px 8px 0 0;padding:9px 8px;font-size:10px;color:#476478}.jgb-con-auto>*{padding:0 5px;border-right:1px solid #d2e0e8}.jgb-con-auto>*:last-child{border-right:0}.jgb-con-rows{max-height:300px;overflow:auto;background:#fff;border:1px solid #c5d6e1;border-top:0;border-radius:0 0 8px 8px}.jgb-con-row{display:grid;grid-template-columns:1.5fr repeat(4,1fr) 2fr;gap:0;align-items:center;border-bottom:1px solid #e0e8ed;padding:9px 8px;font-size:11px}.jgb-con-row:last-child{border-bottom:0}.jgb-con-row>*{padding:0 5px;border-right:1px solid #e4ebef}.jgb-con-row>*:last-child{border-right:0}.jgb-con-row em{font-style:normal;color:#607889}@media(max-width:760px){.jgb-con-mini-grid{grid-template-columns:repeat(2,1fr)}.jgb-con-auto{min-width:760px}.jgb-con-rows{overflow-x:auto}.jgb-con-row{min-width:760px}}
+</style>
 <script id="JGB_EAM_CONSUMABLE_CARD_V1_SCRIPT">
 (function(){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -30351,12 +30358,36 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
   window.jgbOpenConsumableHub=openHub;
   window.jgbOpenConsumableHistory=function(){
     document.getElementById('jgbConsumableHub')?.remove();
-    const btn=document.getElementById('jgbV76ConsumableBtn');
-    if(btn){btn.click();return}
-    // 신규 등록 화면이 없을 때도 같은 관리 기능을 바로 열 수 있게 최소 관리창을 제공
-    openHub();
-    const note=document.querySelector('#jgbConsumableHub .jgb-consumable-note');
-    if(note)note.innerHTML='<b>소모품 이력관리</b><br>현재 화면의 신규 자산 등록에서 사용하는 기존 소모품 이력관리와 연결됩니다. 자산코드는 생성하지 않습니다.';
+    document.getElementById('jgbConsumableManager')?.remove();
+    const key='JGB_EAM_CONSUMABLE_HISTORY_V76';
+    let rows=[];try{rows=JSON.parse(localStorage.getItem(key)||'[]')||[]}catch(e){}
+    const esc2=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const render=()=>{
+      const box=document.getElementById('jgbConRows'); if(!box)return;
+      if(!rows.length){box.innerHTML='<div style="padding:28px;text-align:center;color:#71869a">등록된 소모품 이력이 없습니다.</div>';return}
+      box.innerHTML=rows.slice(0,30).map(r=>`<div class="jgb-con-row"><b>${esc2(r.name)}</b><span>${esc2(r.category||'-')}</span><span>${esc2(r.place||'-')}</span><span>${esc2(r.qty||'-')}</span><span>${esc2(r.date||'-')}</span><em>${esc2(r.note||'처리')}</em></div>`).join('');
+    };
+    document.body.insertAdjacentHTML('beforeend',`<div id="jgbConsumableManager" class="jgb-consumable-modal open" onclick="if(event.target===this)this.remove()">
+      <div class="jgb-consumable-sheet jgb-con-manager">
+        <div class="jgb-consumable-head"><div><strong>🧰 소모품 이력관리</strong><small>전기 · 청소 · 의약품 · 위생용품 · 기타 / 자산번호 없이 관리</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConsumableManager').remove()">닫기</button></div>
+        <div class="jgb-con-manager-top">
+          <div><b>소모품 처리</b><small>품목을 선택하고 수량만 − / ＋로 조정합니다.</small></div>
+          <button class="jgb-consumable-primary" id="jgbConAddBtn">＋ 소모품 처리</button>
+        </div>
+        <div class="jgb-con-mini-grid">
+          <div><b>전기용품</b><small>스위치 · 콘센트 · 전구</small></div><div><b>청소용품</b><small>락스 · 세제</small></div><div><b>의약품</b><small>소독약 · 구급용품</small></div><div><b>위생용품</b><small>휴지 · 비누</small></div><div><b>기타</b><small>기타 소모품</small></div>
+        </div>
+        <div class="jgb-con-auto"><b>자동 관리 항목</b><span>현재재고</span><span>안전재고</span><span>사용주기</span><span>사용위치</span><span>최근 처리일</span><span>다음 예정일</span></div>
+        <div id="jgbConRows" class="jgb-con-rows"></div>
+      </div></div>`);
+    render();
+    document.getElementById('jgbConAddBtn')?.addEventListener('click',()=>{
+      const old=document.getElementById('jgbConsumableManager'); if(old)old.remove();
+      const btn=document.getElementById('jgbV76ConsumableBtn');
+      if(btn){btn.click();return}
+      alert('소모품 처리창을 연결할 신규등록 화면이 현재 열려 있지 않습니다. 소모품 관리 화면은 정상적으로 열렸습니다.');
+      openHub();
+    });
   };
   function addCard(){
     const row=document.querySelector('.eam-type-row');
