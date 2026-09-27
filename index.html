@@ -10746,39 +10746,6 @@ html,body{
   text-align:center !important;
 }
 </style>
-
-<style id="EAM_CONSUMABLE_8CARD_FINAL">
-/* 소모품 카드가 오른쪽으로 밀려 보이지 않도록 EAM 상단 8개 카드를 한 화면에 정렬 */
-@media (min-width:1201px){
-  .eam-type-row{
-    display:grid!important;
-    grid-template-columns:repeat(8,minmax(0,1fr))!important;
-    gap:12px!important;
-    width:100%!important;
-    max-width:1520px!important;
-    overflow:visible!important;
-    overflow-x:visible!important;
-    padding-bottom:0!important;
-  }
-  .eam-type-row > .eam-type,
-  .eam-type-row > .eam-consumable-card{
-    width:auto!important;
-    min-width:0!important;
-    max-width:none!important;
-    flex:initial!important;
-    box-sizing:border-box!important;
-  }
-  .eam-type-row > .eam-type{
-    min-height:98px!important;
-  }
-  .eam-type-row > .eam-consumable-card{
-    min-height:98px!important;
-    height:98px!important;
-    padding:14px 10px!important;
-    border-radius:16px!important;
-  }
-}
-</style>
 </head><body><div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -14632,11 +14599,8 @@ function jgbV47GoWpByLeak(leakCode){
 <style id="JGB_163450_INTERACTION_DETAIL_FIX">
 .jgb-lr-v54 .jgb-lr-performance-btn{position:relative;z-index:50;pointer-events:auto!important;cursor:pointer!important;}
 .jgb-lr-v54 .jgb-lr-performance-btn.active{font-weight:950;box-shadow:0 0 0 2px rgba(23,105,189,.12),0 4px 10px rgba(23,105,189,.12);}
-.eam-asset-row-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:stretch;}
+.eam-asset-row-wrap{display:block;width:100%;}
 .eam-asset-row-wrap .eam-asset-row{min-width:0;width:100%;}
-.eam-history-link{border:1px solid #b7ccdb;background:#f7fbfe;color:#174f73;border-radius:7px;padding:0 8px;font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap;}
-.eam-history-link:hover{background:#e8f3fa;border-color:#6ea8ca;}
-.eam-asset-row-wrap.on .eam-history-link{background:#eaf5fc;border-color:#5b9bc3;}
 </style>
 <style id="JGB_DIGITAL_TWIN_V49_ORIGINAL_FLOOR">
 /* v49: 원본 평면도 선명도 개선 + 불필요한 공간 핫스팟 제거 + 기존 조명 위치의 표시만 개선 */
@@ -15367,7 +15331,7 @@ function jgbV47GoWpByLeak(leakCode){
         const d=maintenanceData(reg,H,I,sel),hs=d.hs;
         return `<div class="eam-innovation"><div class="eam-innovation-head"><div><div class="eyebrow">ENTERPRISE ASSET MANAGEMENT</div><h1>시설물 EAM 관리</h1><p>설비 종류 → 자산 선택 → 통합 자산마스터 → 주요설비 이력카드 → 유지관리 이력</p></div><button class="eam-manage-main eam-manage-top" onclick="eamOpenManageMenu()">⚙ 자산 관리</button></div>
           <div class="eam-type-row">${order.map(k=>{const z=cats[k];return `<button type="button" class="eam-type ${k===cat?'on':''}" onclick="eamPick('${k}')"><span>${z.ico}</span><strong>${z.label}</strong><em>${z.items.length}</em><small>${z.desc}</small></button>`}).join('')}</div>
-          <div class="eam-innovation-layout"><aside class="eam-assets-panel"><div class="eam-assets-head"><div><b>${C.ico} ${C.label}</b><span>${list.length}개 자산</span></div><div class="eam-filter-row"><select id="eamProLocationFilter" onchange="eamProFilter('',this.value)"><option value="">전체 위치</option><option value="A">A · 코트</option><option value="B">B · 복도</option><option value="C">C · 사무실</option><option value="D">D · 옥상</option><option value="E">E · 유수장치실</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option></select></div></div><div id="eamproGrid" class="eam-asset-list">${list.map(x=>{const m=meta[x.code]||{},a=A.find(z=>v(z.asset_code)===v(x.code))||null,merged=Object.assign({},x,a||{},m);if(cat==='fire')merged.place='유수장치실';const st=a?.status||m.status||'원본';return `<div class="eam-asset-row-wrap ${v(x.code)===v(sel)?'on':''}"><button type="button" class="eam-asset-row" data-code="${esc(x.code)}" data-loc="${esc(placeCode(merged.place))}" onclick="eamPick('${cat}','${esc(x.code)}')"><span class="row-code">${esc(codes[x.code]||x.code)}</span><span class="row-copy"><b>${esc(window.eamDisplayName(merged))}</b></span><i class="${st==='정상'?'ok':st==='원본'?'source':'bad'}">${esc(st)}</i></button><button type="button" class="eam-history-link" title="선택한 자산의 주요설비 이력카드 보기" onclick="event.preventDefault();event.stopPropagation();eamPick('${cat}','${esc(x.code)}');requestAnimationFrame(()=>document.querySelector('.jgb-eam-card-final,.jgb-history-card,.eam-detail-panel')?.scrollIntoView({behavior:'smooth',block:'start'}));">📋 이력카드</button></div>`}).join('')||'<div class="eam-empty">등록된 자산이 없습니다.</div>'}</div></aside>
+          <div class="eam-innovation-layout"><aside class="eam-assets-panel"><div class="eam-assets-head"><div><b>${C.ico} ${C.label}</b><span>${list.length}개 자산</span></div><div class="eam-filter-row"><select id="eamProLocationFilter" onchange="eamProFilter('',this.value)"><option value="">전체 위치</option><option value="A">A · 코트</option><option value="B">B · 복도</option><option value="C">C · 사무실</option><option value="D">D · 옥상</option><option value="E">E · 유수장치실</option><option value="F">F · 창고</option><option value="G">G · 휴게실</option><option value="H">H · 남자 화장실</option><option value="I">I · 여자 화장실</option><option value="J">J · 남자 샤워실</option><option value="K">K · 여자 샤워실</option><option value="L">L · 좌측 외곽</option><option value="M">M · 우측 외곽</option></select></div></div><div id="eamproGrid" class="eam-asset-list">${list.map(x=>{const m=meta[x.code]||{},a=A.find(z=>v(z.asset_code)===v(x.code))||null,merged=Object.assign({},x,a||{},m);if(cat==='fire')merged.place='유수장치실';const st=a?.status||m.status||'원본';return `<div class="eam-asset-row-wrap ${v(x.code)===v(sel)?'on':''}"><button type="button" class="eam-asset-row" data-code="${esc(x.code)}" data-loc="${esc(placeCode(merged.place))}" onclick="eamPick('${cat}','${esc(x.code)}')"><span class="row-code">${esc(codes[x.code]||x.code)}</span><span class="row-copy"><b>${esc(window.eamDisplayName(merged))}</b></span><i class="${st==='정상'?'ok':st==='원본'?'source':'bad'}">${esc(st)}</i></button></div>`}).join('')||'<div class="eam-empty">등록된 자산이 없습니다.</div>'}</div></aside>
           <main class="eam-detail-panel">${src?`<div class="eam-detail-hero"><div><div class="hero-code">${esc(dc)}</div><h2>${esc(window.eamDisplayName(cur))}</h2><div class="hero-meta"><span>${esc(C.label)}</span><b>${esc(placeLabel(cur.place))}</b></div></div><span class="hero-status ${String(cur.status||'원본')==='정상'?'good':'source'}">${esc(cur.status||'원본')}</span></div>
           <section class="eam-detail-section eam-master"><div class="section-title"><h3>자산 기본정보</h3><span>주요설비 이력카드와 동일 자산정보</span></div><div class="master-grid"><div><small>자산코드</small><b>${esc(dc)}</b></div><div><small>설비 종류</small><b>${esc(C.label)}</b></div><div><small>소분류(자산명)</small><b>${esc(window.eamDisplayName(cur))}</b></div><div><small>위치</small><b>${esc(placeLabel(cur.place))}</b></div><div><small>모델·규격</small><b>${esc(cur.model||'-')}</b></div><div><small>용량</small><b>${esc(cur.capacity||'-')}</b></div><div><small>수량</small><b>${esc(cur.qty??cur.quantity??'-')}</b></div><div><small>제조사</small><b>${esc(cur.maker||cur.vendor||'-')}</b></div><div><small>A/S 연락처</small><b>${esc(cur.asContact||'-')}</b></div><div><small>제조일</small><b>${esc(cur.date||cur.manufactureDate||'-')}</b></div><div><small>설치일</small><b>${esc(cur.installDate||'-')}</b></div><div><small>내용연수</small><b>${esc(cur.life||'-')}</b></div><div><small>평가등급</small><b>${esc(cur.grade||'-')}</b></div><div><small>보증</small><b>${esc(cur.warranty||'-')}</b></div><div><small>A/S 기록</small><b>${esc(cur.asHistory||'-')}</b></div><div><small>자산상태</small><b>${esc(cur.status||'정상')}</b></div><div><small>취득구분</small><b>${esc(cur.acquisitionType||'기존 자산')}</b></div><div class="wide"><small>시설개선계획</small><b>${esc(cur.improvementPlan||'-')}</b></div><div class="wide"><small>특이사항</small><b>${esc(cur.note||'-')}</b></div></div></section>
           ${window.JGB_EAM_CARD_V22_HTML(cur,reg,H,I)}
@@ -16833,51 +16797,7 @@ function jgbV47GoWpByLeak(leakCode){
     if(c)c.style.display=box.value==='직접 입력'?'block':'none';
   };
 
-  // 신규 등록 화면의 세부 위치 바로 아래에 코드 없는 소모품 이력관리 버튼 추가
-  const addConsumableButton=()=>{
-    const box=document.getElementById('eamRegDetailPlace');
-    if(!box || document.getElementById('jgbV76ConsumableBtn'))return;
-    const label=box.closest('label');
-    if(!label)return;
-    const b=document.createElement('button');
-    b.type='button';b.id='jgbV76ConsumableBtn';b.className='jgb-v76-consumable-btn';
-    b.textContent='🧰 소모품 이력관리 (자산코드 없음)';
-    b.onclick=()=>{
-      document.getElementById('jgbV76ConsumableModal')?.remove();
-      document.body.insertAdjacentHTML('beforeend',`<div id="jgbV76ConsumableModal" class="eam-modal" onclick="if(event.target===this)this.remove()"><div class="eam-modal-card">
-        <div class="eam-modal-head"><div><span>CONSUMABLE HISTORY</span><h3>소모품 이력관리</h3><small>자산코드는 생성하지 않습니다. 전기·창호 등 분야별 이력만 기록합니다.</small></div><button type="button" onclick="this.closest('#jgbV76ConsumableModal').remove()">×</button></div>
-        <div class="eam-modal-grid">
-          <label>분야 *<select id="jgbV76ConCategory"><option>전기</option><option>창호</option><option>기타</option></select></label>
-          <label>품목명 *<input id="jgbV76ConName" placeholder="예: LED 전등, 스위치, 콘센트"></label>
-          <label>세부 위치<select id="jgbV76ConPlace">${DETAIL.map(z=>`<option>${esc(z)}</option>`).join('')}<option>직접 입력</option></select></label>
-          <label>수량<input id="jgbV76ConQty" placeholder="예: 2"></label>
-          <label class="wide">이력 내용<textarea id="jgbV76ConNote" rows="4" placeholder="점검·수리·교체 내용"></textarea></label>
-        </div>
-        <div class="eam-modal-note">※ 이 화면에서는 AST-XX, AC-XX 같은 자산코드를 만들지 않습니다.</div>
-        <div class="eam-modal-actions"><button class="btn gray" type="button" onclick="this.closest('#jgbV76ConsumableModal').remove()">취소</button><button class="btn blue" type="button" onclick="window.jgbV76SaveConsumableHistory()">이력 저장</button></div>
-      </div></div>`);
-    };
-    label.appendChild(b);
-  };
-  window.jgbV76SaveConsumableHistory=function(){
-    const cat=document.getElementById('jgbV76ConCategory')?.value||'';
-    const name=document.getElementById('jgbV76ConName')?.value.trim()||'';
-    const place=document.getElementById('jgbV76ConPlace')?.value||'';
-    const qty=document.getElementById('jgbV76ConQty')?.value.trim()||'';
-    const note=document.getElementById('jgbV76ConNote')?.value.trim()||'';
-    if(!name){alert('품목명을 입력하세요.');return}
-    const key='JGB_EAM_CONSUMABLE_HISTORY_V76';
-    let rows=[];try{rows=JSON.parse(localStorage.getItem(key)||'[]')||[]}catch(e){}
-    rows.unshift({id:'CON-'+Date.now(),category:cat,name,place,qty,note,date:new Date().toISOString().slice(0,10)});
-    localStorage.setItem(key,JSON.stringify(rows));
-    alert('소모품 이력이 저장되었습니다.\n자산코드는 생성하지 않았습니다.');
-    document.getElementById('jgbV76ConsumableModal')?.remove();
-  };
-
-  // 신규등록 함수가 화면을 만든 직후 버튼을 붙일 수 있도록 감시
-  const watch=()=>addConsumableButton();
-  const mo=new MutationObserver(watch);mo.observe(document.body,{childList:true,subtree:true});
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch);else watch();
+  // 소모품 관리는 EAM 상단의 소모품 카드에서 별도로 엽니다.
 })();
 </script>
 
@@ -30328,7 +30248,6 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
   font-weight: 900 !important;
 }
 </style>
-
 <style id="JGB_EAM_CONSUMABLE_CARD_V1">
 /* EAM 상단 설비 종류에 소모품을 기존 카드와 동일한 크기로 추가 */
 .eam-consumable-card{
@@ -30507,6 +30426,26 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
 }
 </style>
 
+<style id="JGB_EAM_CONSUMABLE_FINAL_COMPACT">
+/* 소모품 최종: 꼭 필요한 6열만 표시 / 큰 글씨 / 정확한 열선 */
+.eam-consumable-card{flex:0 0 205px!important;width:205px!important;min-width:205px!important;max-width:205px!important;min-height:74px!important}
+.eam-consumable-card .con-icon{font-size:26px!important}.eam-consumable-card strong{font-size:15px!important}.eam-consumable-card small{font-size:10px!important}
+.jgb-con-manager{width:min(1120px,96vw)!important}
+.jgb-consumable-head{min-height:62px!important;height:auto!important;padding:5px 10px 10px!important}
+.jgb-consumable-head strong{font-size:25px!important}.jgb-consumable-head small{font-size:13px!important}
+.jgb-con-manager-top{padding:12px 14px!important}.jgb-con-manager-top b{font-size:17px!important}.jgb-con-manager-top small{font-size:13px!important}
+.jgb-con-table-wrap{max-height:400px!important;overflow:auto!important}
+.jgb-con-table{width:100%!important;min-width:960px!important;table-layout:fixed!important;border-collapse:collapse!important;font-size:14px!important}
+.jgb-con-table .c-cat{width:15%!important}.jgb-con-table .c-name{width:20%!important}.jgb-con-table .c-stock{width:14%!important}.jgb-con-table .c-safe{width:14%!important}.jgb-con-table .c-place{width:17%!important}.jgb-con-table .c-act{width:20%!important}
+.jgb-con-table th,.jgb-con-table td{height:46px!important;padding:9px 7px!important;font-size:14px!important;line-height:1.25!important;text-align:center!important;vertical-align:middle!important;white-space:nowrap!important;border-right:1px solid #cbd9e2!important;border-bottom:1px solid #d9e3e9!important;box-sizing:border-box!important}
+.jgb-con-table th{font-size:15px!important;font-weight:900!important;background:#e8f2f7!important;color:#183f5b!important}
+.jgb-con-table th:last-child,.jgb-con-table td:last-child{border-right:0!important}
+.jgb-con-table td b{font-size:15px!important}.jgb-con-actions{gap:5px!important;justify-content:center!important;flex-wrap:nowrap!important}.jgb-con-actions button{min-width:48px!important;min-height:32px!important;padding:6px 8px!important;font-size:12px!important;font-weight:900!important}
+.jgb-con-history-title{font-size:14px!important;margin:14px 0 8px!important}.jgb-con-history{max-height:180px!important}.jgb-con-history>div{padding:10px 11px!important;font-size:12px!important;grid-template-columns:1fr 1fr 120px!important}
+.jgb-con-reg-grid label{font-size:13px!important}.jgb-con-reg-grid input,.jgb-con-reg-grid select{min-height:42px!important;font-size:14px!important}.jgb-con-reg-note{font-size:13px!important}
+.jgb-con-process-box{padding:20px!important;font-size:15px!important}.jgb-con-process-box input{width:170px!important;height:48px!important;border:1px solid #b8ccd9!important;border-radius:8px!important;text-align:center!important;font-size:22px!important;font-weight:900!important;margin:12px 0 4px!important}.jgb-con-number-wrap{display:flex!important;justify-content:center!important;align-items:center!important;gap:8px!important}.jgb-con-number-wrap span{font-size:16px!important;font-weight:800!important;color:#49677a!important}
+@media(max-width:850px){.jgb-con-table{min-width:960px!important}.jgb-con-manager{width:96vw!important}}
+</style>
 <script id="JGB_EAM_CONSUMABLE_CARD_V1_SCRIPT">
 (function(){
   const MASTER='JGB_EAM_CONSUMABLE_MASTER_V1';
@@ -30520,37 +30459,19 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
   const count=()=>masters().length;
   function unitFor(v){return v==='화장지'?'롤':v==='락스'?'통':v==='세제'?'병':'개'}
   function metrics(item){
-    const hs=history().filter(h=>h.itemId===item.id && (h.type==='사용'||h.type==='교체')).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-    if(!hs.length)return {safe:'계산 대기',cycle:'계산 대기',last:'-',next:'-'};
-    const now=new Date(); const cutoff=new Date(now); cutoff.setDate(cutoff.getDate()-30);
+    const hs=history().filter(h=>h.itemId===item.id && h.type==='사용').sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    if(!hs.length)return {safe:'계산 대기'};
+    const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-30);
     const recent=hs.filter(h=>new Date(h.date)>=cutoff);
     const qty30=recent.reduce((n,h)=>n+Number(h.qty||0),0);
     const avgDaily=qty30/30;
-    let cycle='수시';
-    if(hs.length>=2){let gaps=[];for(let i=1;i<hs.length;i++){const a=new Date(hs[i-1].date),b=new Date(hs[i].date);const d=Math.round((b-a)/86400000);if(d>0)gaps.push(d)}if(gaps.length){cycle=Math.max(1,Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length))+'일';}}
-    const avgGap=(hs.length>=2)?Math.max(1,Math.round(hs.slice(1).reduce((sum,h,i)=>sum+Math.max(1,Math.round((new Date(h.date)-new Date(hs[i].date))/86400000)),0)/(hs.length-1))):null;
-    const safe=qty30>0?Math.max(1,Math.ceil(avgDaily*(avgGap||1))):'계산 대기';
-    const last=hs[hs.length-1].date;
-    let next='-';
-    if(avgGap){const d=new Date(last);d.setDate(d.getDate()+avgGap);next=d.toISOString().slice(0,10)}
-    return {safe,cycle,last,next};
+    const safe=qty30>0?Math.max(1,Math.ceil(avgDaily*7)):'계산 대기';
+    return {safe};
   }
   function close(id){document.getElementById(id)?.remove()}
   function openHub(){
     close('jgbConsumableHub');
-    document.body.insertAdjacentHTML('beforeend',`<div id="jgbConsumableHub" class="jgb-consumable-modal open" onclick="if(event.target===this)this.remove()">
-      <div class="jgb-consumable-sheet">
-        <div class="jgb-consumable-head"><div><strong>🧰 소모품 관리</strong><small>전기 · 청소 · 의약품 · 위생용품 · 기타 / 자산번호 없이 재고와 처리이력 관리</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConsumableHub').remove()">닫기</button></div>
-        <div class="jgb-consumable-grid">
-          <div class="jgb-consumable-chip"><span>⚡</span>전기용품<small>스위치 · 콘센트 · 전구</small></div>
-          <div class="jgb-consumable-chip"><span>🧹</span>청소용품<small>락스 · 세제 · 청소용품</small></div>
-          <div class="jgb-consumable-chip"><span>💊</span>의약품<small>소독약 · 구급용품</small></div>
-          <div class="jgb-consumable-chip"><span>🧻</span>위생용품<small>휴지 · 비누 · 위생용품</small></div>
-          <div class="jgb-consumable-chip"><span>📦</span>기타<small>기타 소모품</small></div>
-        </div>
-        <div class="jgb-consumable-note"><b>관리 방식</b><br>자산번호는 만들지 않습니다. 품목을 한 번 등록하면 이후 사용·교체·입고는 수량 − / ＋ 버튼으로 처리하고, 처리 이력에서 사용주기·안전재고·최근 처리일을 자동 계산합니다.</div>
-        <div class="jgb-consumable-actions"><button class="jgb-consumable-primary" onclick="jgbOpenConsumableHistory()">소모품 이력관리 열기</button></div>
-      </div></div>`);
+    jgbOpenConsumableHistory();
   }
   function openRegister(){
     close('jgbConsumableManager');
@@ -30562,7 +30483,7 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
         <label>초기재고 *<input id="conRegStock" type="number" min="0" value="0"></label>
         <label>사용위치 *<input id="conRegPlace" placeholder="예: 복도, 화장실, 창고"></label>
       </div>
-      <div class="jgb-con-reg-note">안전재고·사용주기는 직접 적지 않습니다. 등록 후 실제 사용·교체 이력이 쌓이면 자동 계산합니다.</div>
+      <div class="jgb-con-reg-note">안전재고는 직접 적지 않습니다. 실제 사용 이력이 쌓이면 최근 사용량을 기준으로 자동 계산합니다.</div>
       <div class="jgb-consumable-actions"><button class="jgb-consumable-close jgb-con-cancel" onclick="this.closest('#jgbConRegister').remove()">취소</button><button class="jgb-consumable-primary" id="conRegSave">등록</button></div>
     </div></div>`);
     document.getElementById('conRegSave').onclick=()=>{
@@ -30575,7 +30496,7 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
   function editItem(item){
     close('jgbConsumableManager');
     document.body.insertAdjacentHTML('beforeend',`<div id="jgbConEdit" class="jgb-consumable-modal open" onclick="if(event.target===this)this.remove()"><div class="jgb-consumable-sheet jgb-con-manager">
-      <div class="jgb-consumable-head"><div><strong>✎ 소모품 정보 수정</strong><small>오타·분류·사용위치·현재재고를 바로 수정합니다. 기존 처리 이력은 유지됩니다.</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConEdit').remove()">닫기</button></div>
+      <div class="jgb-consumable-head"><div><strong>✎ 소모품 정보 수정</strong><small>오타·분류·사용위치·현재재고를 수정합니다. 기존 처리 이력은 유지됩니다.</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConEdit').remove()">닫기</button></div>
       <div class="jgb-con-reg-grid">
         <label>대분류<select id="conEditCat"><option>전기용품</option><option>청소용품</option><option>의약품</option><option>위생용품</option><option>기타</option></select></label>
         <label>품목명 *<input id="conEditName"></label>
@@ -30608,15 +30529,14 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
     close('jgbConsumableManager');
     document.body.insertAdjacentHTML('beforeend',`<div id="jgbConProcess" class="jgb-consumable-modal open" onclick="if(event.target===this)this.remove()"><div class="jgb-consumable-sheet jgb-con-manager">
       <div class="jgb-consumable-head"><div><strong>${esc(item.name)} ${type}</strong><small>${esc(item.category)} · ${esc(item.place)} · 현재 ${item.stock}${esc(item.unit)}</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConProcess').remove()">닫기</button></div>
-      <div class="jgb-con-process-box"><b>처리 수량</b><div class="jgb-con-qty"><button id="conMinus">−</button><strong id="conQty">1</strong><button id="conPlus">＋</button></div><small>입력하지 않고 버튼으로만 수량을 조정합니다.</small></div>
-      <div class="jgb-con-explain"><b>${type==='교체'?'교체 처리':'사용 처리'}</b> — ${type==='교체'?'기존 소모품을 새 소모품으로 교체할 때 사용합니다. 처리 수량만큼 재고가 자동 차감되고 교체 이력이 기록됩니다.':'실제로 사용한 소모품을 처리합니다. 처리 수량만큼 재고가 자동 차감되고 사용 이력이 기록됩니다.'}</div>
-      <div class="jgb-con-auto-card"><span>사용주기</span><b>${esc(metrics(item).cycle)}</b><span>최근 처리일</span><b>${esc(metrics(item).last)}</b><span>다음 예정일</span><b>${esc(metrics(item).next)}</b></div>
+      <div class="jgb-con-process-box"><b>처리 수량</b><div class="jgb-con-number-wrap"><input id="conQty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="처리 수량"><span>${esc(item.unit)}</span></div><small>처리할 수량을 숫자로 입력합니다.</small></div>
       <div class="jgb-consumable-actions"><button class="jgb-con-cancel" onclick="this.closest('#jgbConProcess').remove()">취소</button><button class="jgb-consumable-primary" id="conProcessSave">${type} 완료</button></div>
     </div></div>`);
-    let q=1;const qEl=document.getElementById('conQty');const refresh=()=>{q=Math.max(1,q);if(type!=='입고')q=Math.min(q,Math.max(1,item.stock));qEl.textContent=q};
-    document.getElementById('conMinus').onclick=()=>{q--;refresh()};document.getElementById('conPlus').onclick=()=>{q++;refresh()};
+    const qEl=document.getElementById('conQty');
+    qEl.addEventListener('input',()=>{let q=Math.max(1,Math.floor(Number(qEl.value)||1));if(type!=='입고')q=Math.min(q,Math.max(1,item.stock));qEl.value=q;});
     document.getElementById('conProcessSave').onclick=()=>{
       const arr=masters(),idx=arr.findIndex(x=>x.id===item.id);if(idx<0)return;
+      let q=Math.max(1,Math.floor(Number(qEl.value)||0));if(!Number.isFinite(q)||q<1){alert('처리 수량을 입력하세요.');return}
       if(type!=='입고'&&arr[idx].stock<q){alert('현재 재고보다 많이 처리할 수 없습니다.');return}
       arr[idx].stock=type==='입고'?arr[idx].stock+q:arr[idx].stock-q;save(MASTER,arr);
       const hs=history();hs.unshift({id:'H'+Date.now(),itemId:item.id,name:item.name,category:item.category,place:item.place,type,qty:q,date:today(),note:type+' 처리'});save(HIST,hs);
@@ -30628,14 +30548,14 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
     close('jgbConsumableHub');close('jgbConsumableManager');
     const arr=masters();
     document.body.insertAdjacentHTML('beforeend',`<div id="jgbConsumableManager" class="jgb-consumable-modal open" onclick="if(event.target===this)this.remove()"><div class="jgb-consumable-sheet jgb-con-manager">
-      <div class="jgb-consumable-head"><div><strong>🧰 소모품 이력관리</strong><small>품목을 등록하고 사용 · 교체 · 입고를 수량 버튼으로 처리합니다. 오타는 [수정]에서 바로 고칠 수 있습니다.</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConsumableManager').remove()">닫기</button></div>
-      <div class="jgb-con-manager-top"><div><b>등록된 소모품 ${arr.length}종</b><small>안전재고·사용주기는 처리 이력에서 자동 계산</small></div><button class="jgb-consumable-primary" id="jgbConRegisterBtn">＋ 소모품 등록</button></div>
-      <div class="jgb-con-table-wrap"><table class="jgb-con-table"><thead><tr><th>대분류</th><th>품목</th><th>현재재고</th><th>안전재고</th><th>사용주기</th><th>사용위치</th><th>최근 처리일</th><th>다음 예정일</th><th>처리 / 수정</th></tr></thead><tbody id="jgbConRows"></tbody></table></div>
+      <div class="jgb-consumable-head"><div><strong>🧰 소모품 이력관리</strong><small>품목을 등록하고 입고 · 사용을 숫자로 처리합니다. 오타는 [수정]에서 바로 고칠 수 있습니다.</small></div><button class="jgb-consumable-close" onclick="this.closest('#jgbConsumableManager').remove()">닫기</button></div>
+      <div class="jgb-con-manager-top"><div><b>등록된 소모품 ${arr.length}종</b><small>안전재고는 최근 사용량과 처리 이력에서 자동 계산</small></div><button class="jgb-consumable-primary" id="jgbConRegisterBtn">＋ 소모품 등록</button></div>
+      <div class="jgb-con-table-wrap"><table class="jgb-con-table"><colgroup><col class="c-cat"><col class="c-name"><col class="c-stock"><col class="c-safe"><col class="c-place"><col class="c-act"></colgroup><thead><tr><th>대분류</th><th>품목</th><th>현재재고</th><th>안전재고</th><th>사용위치</th><th>처리</th></tr></thead><tbody id="jgbConRows"></tbody></table></div>
       <div class="jgb-con-history-title">최근 처리 이력</div><div id="jgbConHistory" class="jgb-con-history"></div>
     </div></div>`);
     const tbody=document.getElementById('jgbConRows');
-    if(!arr.length)tbody.innerHTML='<tr><td colspan="9" class="jgb-con-empty">등록된 소모품이 없습니다. 오른쪽 위 <b>＋ 소모품 등록</b>을 눌러 품목을 먼저 등록하세요.</td></tr>';
-    else tbody.innerHTML=arr.map(item=>{const m=metrics(item);return `<tr><td>${esc(item.category)}</td><td><b>${esc(item.name)}</b></td><td><b>${item.stock}${esc(item.unit)}</b></td><td>${esc(m.safe)}</td><td>${esc(m.cycle)}</td><td>${esc(item.place)}</td><td>${esc(m.last)}</td><td>${esc(m.next)}</td><td><div class="jgb-con-actions"><button data-act="사용" data-id="${item.id}">사용</button><button data-act="교체" data-id="${item.id}">교체</button><button data-act="입고" data-id="${item.id}">입고</button><button data-edit="1" data-id="${item.id}">수정</button></div></td></tr>`}).join('');
+    if(!arr.length)tbody.innerHTML='<tr><td colspan="6" class="jgb-con-empty">등록된 소모품이 없습니다. 오른쪽 위 <b>＋ 소모품 등록</b>을 눌러 품목을 먼저 등록하세요.</td></tr>';
+    else tbody.innerHTML=arr.map(item=>{const m=metrics(item);return `<tr><td>${esc(item.category)}</td><td><b>${esc(item.name)}</b></td><td><b>${item.stock}${esc(item.unit)}</b></td><td>${esc(m.safe)}</td><td>${esc(item.place)}</td><td><div class="jgb-con-actions"><button data-act="입고" data-id="${item.id}">입고</button><button data-act="사용" data-id="${item.id}">사용</button><button data-edit="1" data-id="${item.id}">수정</button></div></td></tr>`}).join('');
     const hs=history().slice(0,15);document.getElementById('jgbConHistory').innerHTML=hs.length?hs.map(h=>`<div><b>${esc(h.name)}</b><span>${esc(h.type)} ${h.qty}${esc((arr.find(x=>x.id===h.itemId)?.unit)||'개')}</span><time>${esc(h.date)}</time></div>`).join(''):'<div class="jgb-con-empty">아직 처리 이력이 없습니다.</div>';
     document.getElementById('jgbConRegisterBtn').onclick=openRegister;
     tbody.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>{const it=masters().find(x=>x.id===b.dataset.id);if(it)processItem(it,b.dataset.act)});
@@ -30643,7 +30563,7 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
   };
   function addCard(){
     const row=document.querySelector('.eam-type-row');if(!row||row.querySelector('.eam-consumable-card'))return;
-    const b=document.createElement('button');b.type='button';b.className='eam-consumable-card';b.setAttribute('aria-label','소모품 관리');b.innerHTML=`<span class="con-icon">🧰</span><strong>소모품</strong><em>${count()}</em><small>전기 · 청소 · 위생</small>`;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openHub()});row.appendChild(b);
+    const b=document.createElement('button');b.type='button';b.className='eam-consumable-card';b.setAttribute('aria-label','소모품 관리');b.innerHTML=`<span class="con-icon">🧰</span><strong>소모품</strong><em>${count()}</em><small>전기 · 청소 · 위생 · 기타</small>`;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openHub()});row.appendChild(b);
   }
   function init(){addCard()} if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();if(window.MutationObserver)new MutationObserver(addCard).observe(document.body,{childList:true,subtree:true});
 })();
