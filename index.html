@@ -29655,6 +29655,51 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+
+<style id="JGB_MANUAL_HARD_FORCE_20260928">
+.jgb-manual-hard-force{pointer-events:auto!important;cursor:pointer!important;}
+</style>
+<script id="JGB_MANUAL_HARD_FORCE_20260928">
+(function(){
+ 'use strict';
+ function currentKey(){
+   var t=(document.querySelector('.jgb-content')||document.body).innerText||'';
+   if(/업무 일정관리/.test(t)) return 'schedule';
+   if(/조명·릴선 관리/.test(t)) return 'lighting';
+   return null;
+ }
+ function force(){
+   var key=currentKey();
+   if(key!=='schedule' && key!=='lighting') return;
+   var buttons=document.querySelectorAll('.jgb-page-manual-btn');
+   buttons.forEach(function(old){
+     if(old.dataset.hardForceKey===key) return;
+     var b=old.cloneNode(true);
+     b.dataset.hardForceKey=key;
+     b.classList.add('jgb-manual-hard-force');
+     b.removeAttribute('onclick');
+     b.onclick=null;
+     b.addEventListener('click',function(e){
+       e.preventDefault();
+       e.stopPropagation();
+       e.stopImmediatePropagation();
+       if(typeof window.__JGB_OPEN_PAGE_MANUAL_DIRECT==='function'){
+         window.__JGB_OPEN_PAGE_MANUAL_DIRECT(key);
+       }else{
+         var ov=document.getElementById('jgbPageManualOverlay');
+         if(ov) ov.classList.add('open');
+       }
+       return false;
+     },true);
+     old.replaceWith(b);
+   });
+ }
+ function init(){force();}
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+ new MutationObserver(force).observe(document.body,{childList:true,subtree:true});
+ setInterval(force,300);
+})();
+</script>
 </body>
 
 <style id="v19-court-position-final">
