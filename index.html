@@ -29314,6 +29314,13 @@ setInterval(init,800);
 }
 </style>
 
+
+<style id="JGB_20260927_LINE_CLEAN_FINAL">
+/* 원본 기준 최종 선 정리: 제목 아래 구분선과 배치도 상단(지붕) 가로선만 제거 */
+.eh-map-card .eh-card-head{border-bottom:0!important;box-shadow:none!important;}
+.eh-map-card .eh-card-head::before,.eh-map-card .eh-card-head::after{border:0!important;box-shadow:none!important;}
+.eh-map-card .jgb-plan-map{border-top:0!important;box-shadow:inset 0 0 0 0 transparent, inset 0 -16px 28px rgba(50,70,80,.10), 0 7px 15px rgba(35,50,58,.18)!important;}
+</style>
 </body>
 
 <style id="v19-court-position-final">
@@ -31609,13 +31616,26 @@ const read=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'{}');return v
 const write=v=>{try{localStorage.setItem(KEY,JSON.stringify(v));return true}catch(_){return false}};
 const save=(code,x,y)=>{if(!code)return;const v=read();v[code]=[Number(x.toFixed(3)),Number(y.toFixed(3))];write(v)};
 let drag=null;
+const armed=new WeakMap();
+const lastDown=new WeakMap();
 function getTarget(e){return e.target&&e.target.closest?e.target.closest(SEL):null}
 function down(e){
  const el=getTarget(e); if(!el)return;
  if(e.pointerType==='mouse' && e.button!==0)return;
  const map=el.closest('.eh-map'); if(!map)return;
+ const now=Date.now(), prev=lastDown.get(el);
+ const isDouble=!!prev && (now-prev.time<500) && Math.hypot(e.clientX-prev.x,e.clientY-prev.y)<12;
+ lastDown.set(el,{time:now,x:e.clientX,y:e.clientY});
+ if(isDouble){
+   armed.set(el,now+5000);
+ }else if((armed.get(el)||0)<now){
+   return;
+ }
+ if((armed.get(el)||0)<now)return;
  const mr=el.getBoundingClientRect(), rr=map.getBoundingClientRect();
  drag={el,map,pid:e.pointerId,rr,startX:e.clientX,startY:e.clientY,ox:e.clientX-(mr.left+mr.width/2),oy:e.clientY-(mr.top+mr.height/2),moved:false};
+ e.preventDefault();
+ e.stopImmediatePropagation();
  try{el.setPointerCapture(e.pointerId)}catch(_){ }
 }
 function move(e){
@@ -38811,54 +38831,3 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 
 
 <!-- CLEAN: EAM 아이콘은 더블클릭 후에만 드래그 이동 -->
-<style id="JGB_EAM_CLEAN_DBLCLICK_DRAG">
-#eam228Map .eam228-asset{cursor:pointer!important;touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;}
-#eam228Map .eam228-asset.jgb-move-ready{cursor:grab!important;}
-#eam228Map .eam228-asset.jgb-moving{cursor:grabbing!important;z-index:999999!important;}
-</style>
-<script id="JGB_EAM_CLEAN_DBLCLICK_DRAG_SCRIPT">
-(function(){
-  if(window.__JGB_EAM_CLEAN_DBLCLICK_DRAG)return;
-  window.__JGB_EAM_CLEAN_DBLCLICK_DRAG=true;
-  const SEL='#eam228Map .eam228-asset';
-  const POSKEY='JGB_EAM_DASH_MAP_POS_V228';
-  let active=null;
-  const read=()=>{try{const v=JSON.parse(localStorage.getItem(POSKEY)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}};
-  const save=(code,x,y)=>{if(!code)return;const v=read();v[code]=[+x.toFixed(3),+y.toFixed(3)];try{localStorage.setItem(POSKEY,JSON.stringify(v))}catch(_){} };
-  document.addEventListener('dblclick',e=>{
-    const el=e.target.closest?.(SEL); if(!el)return;
-    e.preventDefault();e.stopImmediatePropagation();
-    el.classList.add('jgb-move-ready');
-    el.dataset.jgbMoveUntil=String(Date.now()+8000);
-  },true);
-  document.addEventListener('pointerdown',e=>{
-    const el=e.target.closest?.(SEL); if(!el||e.button!==0)return;
-    if(Number(el.dataset.jgbMoveUntil||0)<Date.now())return;
-    const map=el.closest('#eam228Map'); if(!map)return;
-    const mr=map.getBoundingClientRect(), er=el.getBoundingClientRect();
-    active={el,map,pid:e.pointerId,mr,ox:e.clientX-(er.left+er.width/2),oy:e.clientY-(er.top+er.height/2),moved:false};
-    e.preventDefault();e.stopImmediatePropagation();
-    try{el.setPointerCapture(e.pointerId)}catch(_){}
-  },true);
-  document.addEventListener('pointermove',e=>{
-    const d=active;if(!d||e.pointerId!==d.pid)return;
-    const x=Math.max(1,Math.min(99,((e.clientX-d.ox-d.mr.left)/d.mr.width)*100));
-    const y=Math.max(1,Math.min(99,((e.clientY-d.oy-d.mr.top)/d.mr.height)*100));
-    d.moved=true;d.el.classList.add('jgb-moving');
-    d.el.style.left=x.toFixed(3)+'%';d.el.style.top=y.toFixed(3)+'%';
-    d.x=x;d.y=y;e.preventDefault();e.stopImmediatePropagation();
-  },true);
-  const finish=e=>{
-    const d=active;if(!d||e.pointerId!==d.pid)return;
-    active=null;d.el.classList.remove('jgb-moving');d.el.classList.remove('jgb-move-ready');
-    if(d.moved){
-      const x=d.x,y=d.y,code=String(d.el.getAttribute('data-code')||'').trim();
-      save(code,x,y);d.el.dataset.v19Dragged='1';d.el.dataset.v19DraggedAt=String(Date.now());
-    }
-    try{d.el.releasePointerCapture(e.pointerId)}catch(_){}
-    e.preventDefault();e.stopImmediatePropagation();
-  };
-  document.addEventListener('pointerup',finish,true);
-  document.addEventListener('pointercancel',finish,true);
-})();
-</script>
