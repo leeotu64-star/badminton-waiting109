@@ -40757,10 +40757,9 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 </style>
 
 
-<!-- JGB FINAL FORCE: 기존 아이콘 행/전체위치 제거 후 동일 자리에 아이콘 드롭다운 -->
-<style id="JGB_FINAL_ICON_DROPDOWN_FORCE">
-/* 렌더 함수가 다시 만들어도 기존 상단 아이콘 행은 항상 숨김 */
-.eam-innovation .eam-type-row{
+<!-- JGB SAFE FIX: 무한 MutationObserver/setInterval 없이 렌더 후 1회만 UI 교체 -->
+<style id="JGB_SAFE_ICON_DROPDOWN">
+.eam-innovation > .eam-type-row{
   display:none!important;
   height:0!important;
   min-height:0!important;
@@ -40769,114 +40768,119 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
   padding:0!important;
   overflow:hidden!important;
 }
-/* 왼쪽 자산 헤더의 기존 위치필터 자리에 한 줄 드롭다운 */
 .eam-innovation .eam-assets-head .eam-filter-row{
   display:block!important;
   margin:0!important;
   padding:0!important;
 }
-.eam-innovation .jgb-final-category-select{
+.eam-innovation .jgb-safe-category-select{
   display:block!important;
   width:100%!important;
   height:40px!important;
   min-height:40px!important;
-  max-height:40px!important;
   box-sizing:border-box!important;
   margin:0!important;
-  padding:0 34px 0 11px!important;
+  padding:0 32px 0 10px!important;
   border:1px solid #c8d6e4!important;
   border-radius:9px!important;
   background:#fff!important;
   color:#173957!important;
   font-size:13px!important;
   font-weight:900!important;
-  line-height:40px!important;
-  cursor:pointer!important;
 }
 </style>
-
-<script id="JGB_FINAL_ICON_DROPDOWN_FORCE_SCRIPT">
+<script id="JGB_SAFE_ICON_DROPDOWN_SCRIPT">
 (function(){
   'use strict';
 
-  const ITEMS = [
-    ['cooling','❄️','냉난방'],
-    ['fire','🚒','소방·방재'],
-    ['water','♨️','온수·난방'],
-    ['electrical','⚡','전기설비'],
-    ['sanitary','🚻','위생설비'],
-    ['doors','🚪','문·창호설비'],
-    ['other','🔧','기타설비'],
-    ['consumable','🧰','소모품']
+  const ITEMS=[
+    ['cooling','❄️ 냉난방'],
+    ['fire','🚒 소방·방재'],
+    ['water','♨️ 온수·난방'],
+    ['electrical','⚡ 전기설비'],
+    ['sanitary','🚻 위생설비'],
+    ['doors','🚪 문·창호설비'],
+    ['other','🔧 기타설비'],
+    ['consumable','🧰 소모품']
   ];
 
-  function currentCat(root){
-    return window.__eamCat || 'cooling';
-  }
+  function compactEam(){
+    const host=document.querySelector('.eam-innovation');
+    if(!host)return;
 
-  function install(root){
-    const filter = root.querySelector('.eam-assets-head .eam-filter-row');
-    if(!filter) return;
+    const filter=host.querySelector('.eam-assets-head .eam-filter-row');
+    if(!filter)return;
 
-    /* 기존 전체 위치를 포함한 모든 기존 select/input을 이 자리에서 제거 */
-    const oldLocation = filter.querySelector('#eamProLocationFilter');
-    if(oldLocation) oldLocation.remove();
+    /* 기존 전체 위치를 제거 */
+    const old=filter.querySelector('#eamProLocationFilter');
+    if(old)old.remove();
 
-    let select = filter.querySelector('.jgb-final-category-select');
+    let sel=filter.querySelector('.jgb-safe-category-select');
+    if(!sel){
+      sel=document.createElement('select');
+      sel.className='jgb-safe-category-select';
+      sel.setAttribute('aria-label','설비 종류 선택');
+      filter.replaceChildren(sel);
 
-    if(!select){
-      filter.replaceChildren();
-      select = document.createElement('select');
-      select.className = 'jgb-final-category-select';
-      select.setAttribute('aria-label','설비 종류 선택');
-      filter.appendChild(select);
-
-      select.addEventListener('change', function(){
-        const key=this.value;
-        if(key === 'consumable'){
-          if(typeof window.jgbOpenConsumableHistory === 'function'){
+      sel.addEventListener('change',function(){
+        if(this.value==='consumable'){
+          if(typeof window.jgbOpenConsumableHistory==='function'){
             window.jgbOpenConsumableHistory();
-          }else{
-            const card=document.querySelector('.eam-consumable-card');
-            if(card) card.click();
           }
           return;
         }
-        if(typeof window.eamPick === 'function'){
-          window.eamPick(key);
+        if(typeof window.eamPick==='function'){
+          window.eamPick(this.value);
         }
       });
     }
 
-    const cat=currentCat(root);
-    select.innerHTML=ITEMS.map(x =>
-      '<option value="'+x[0]+'">'+x[1]+' '+x[2]+'</option>'
-    ).join('');
-    select.value = ITEMS.some(x=>x[0]===cat) ? cat : 'cooling';
+    const cat=String(window.__eamCat||'cooling');
+    sel.innerHTML=ITEMS.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('');
+    sel.value=ITEMS.some(x=>x[0]===cat)?cat:'cooling';
 
-    /* 기존 아이콘 행은 DOM에서도 제거 */
-    root.querySelectorAll('.eam-type-row').forEach(row=>row.remove());
+    /* 실제 DOM에서 기존 아이콘 행 제거 */
+    host.querySelectorAll('.eam-type-row').forEach(x=>x.remove());
   }
 
-  function force(){
-    document.querySelectorAll('.eam-innovation').forEach(install);
+  function later(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(compactEam);
+    });
   }
 
-  /* 초기 렌더 + 렌더 함수가 다시 실행될 때도 강제 적용 */
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded',force);
+  /* 최초 화면 */
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',later,{once:true});
   }else{
-    force();
+    later();
   }
 
-  if(window.MutationObserver){
-    new MutationObserver(function(){
-      force();
-    }).observe(document.body,{childList:true,subtree:true});
+  /*
+    핵심: 기존 render/eamPick을 감시하는 MutationObserver나 setInterval을 사용하지 않는다.
+    기존 렌더 함수가 다시 실행되는 경우에만 함수 래퍼가 1회 적용한다.
+  */
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__jgbSafeWrapped){
+    function wrappedRender(){
+      const r=oldRender.apply(this,arguments);
+      later();
+      return r;
+    }
+    wrappedRender.__jgbSafeWrapped=true;
+    window.render=wrappedRender;
   }
 
-  /* 기존 코드가 즉시 render()하는 경우까지 확실히 잡음 */
-  setInterval(force, 250);
+  const oldPick=window.eamPick;
+  if(typeof oldPick==='function' && !oldPick.__jgbSafeWrapped){
+    function wrappedPick(){
+      const r=oldPick.apply(this,arguments);
+      later();
+      return r;
+    }
+    wrappedPick.__jgbSafeWrapped=true;
+    window.eamPick=wrappedPick;
+  }
 })();
 </script>
 
