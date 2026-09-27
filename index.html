@@ -26755,6 +26755,9 @@ document.addEventListener('click',handle,true);
     ov.classList.add('open');
   }
 
+  // 외부 버튼에서 실제 내부 openManual을 직접 호출할 수 있도록 공개
+  window.__JGB_OPEN_PAGE_MANUAL_DIRECT=function(key){openManual(key);};
+
   function addHeaderButton(){
     const key=pageKey();if(!key)return;
     const selectors=[
@@ -29565,8 +29568,10 @@ setInterval(init,800);
       manual.addEventListener('click',function(e){
         e.preventDefault();
         e.stopImmediatePropagation();
-        const target=[...document.querySelectorAll('.jgb-page-manual-btn')].find(x=>x!==manual && x.dataset.manualKey==='lighting');
-        if(target){ target.click(); return; }
+        if(typeof window.__JGB_OPEN_PAGE_MANUAL_DIRECT==='function'){
+          window.__JGB_OPEN_PAGE_MANUAL_DIRECT('lighting');
+          return;
+        }
         if(typeof window.__JGB_OPEN_PAGE_MANUAL==='function'){
           window.__JGB_OPEN_PAGE_MANUAL('lighting');
         }
