@@ -10742,7 +10742,7 @@ html,body{
         <section style="border:1px solid #d7e2ec;border-radius:12px;background:#fff;padding:18px">
           <h3 style="margin:0 0 7px;color:#183b59">연습 모드 데이터 초기화</h3>
           <p style="margin:0 0 14px;color:#6f8293;font-size:12px;line-height:1.6">민원 접수·처리, 기본업무 완료 기록, 일정 및 연습용 집계 기준을 초기 상태로 되돌립니다. 실제 운영 데이터(Supabase)는 삭제하지 않습니다.</p>
-          <button type="button" class="btn" style="background:#d9534f;color:#fff;border:1px solid #c74440;font-weight:800;padding:10px 16px;border-radius:8px" onclick="resetPracticeAll()">↻ 연습모드 전체 리셋</button>
+
         </section>
       </div>`;
     }
@@ -28425,23 +28425,16 @@ function ensureRepairManual(){
 }
 
 function ensureSingleEamReset(){
+  /* 설정 화면의 초기화 버튼은 원본 settingsPage()가 만드는
+     "연습 데이터 전체 초기화" 하나만 사용한다.
+     별도의 EAM 완전 리셋 버튼을 생성하지 않는다. */
   const content=document.querySelector('.jgb-content');
   if(!content)return;
   const title=content.querySelector('.pagebar h1');
   if(!title || !/시스템 설정/.test(title.textContent||''))return;
   const panel=[...content.querySelectorAll('.panel')].find(x=>/근무시간 기준/.test(x.textContent||''));
   if(!panel)return;
-  const row=panel.querySelector('button[onclick*="resetPracticeAll"]')?.parentElement;
-  if(!row)return;
-  row.querySelectorAll('.jgb-eam-reset-single').forEach((x,i)=>{if(i>0)x.remove()});
-  let b=row.querySelector('.jgb-eam-reset-single');
-  if(!b){
-    b=document.createElement('button');
-    b.type='button';b.className='btn red jgb-eam-reset-single';
-    b.textContent='🗑 EAM 완전 리셋';
-    b.onclick=function(e){e.preventDefault();e.stopPropagation();if(typeof window.jgbEamCompleteReset==='function')window.jgbEamCompleteReset();};
-    row.appendChild(b);
-  }
+  panel.querySelectorAll('.jgb-eam-reset-single').forEach(x=>x.remove());
 }
 
 /* 기존 사용설명서 IIFE의 openManual은 내부 함수이므로 클릭용 브리지 제공 */
@@ -28469,7 +28462,7 @@ function init(){
   cleanupRepairNumericReset();
   bridgeManual();
   ensureRepairManual();
-  ensureSingleEamReset();
+  /* 설정 화면에는 연습 데이터 전체 초기화 버튼 하나만 사용 */
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
@@ -38489,30 +38482,12 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 </style>
 <script id="JGB_000309_SETTINGS_RESET_FINAL_SCRIPT">
 (function(){
+  /* 구버전 EAM 완전 리셋 버튼 생성/재바인딩 로직 비활성화.
+     설정 화면은 연습 데이터 전체 초기화 버튼 하나만 사용한다. */
   function fix(){
     const page=document.querySelector('.jgb-content');
     if(!page || !/시스템 설정/.test(page.innerText||'')) return;
-    const panel=[...page.querySelectorAll('.panel')].find(x=>/근무시간 기준/.test(x.textContent||''));
-    if(!panel) return;
-    const row=panel.querySelector('button[onclick*="resetPracticeAll"]')?.parentElement;
-    if(!row) return;
-    const btns=[...row.querySelectorAll('.jgb-eam-reset-single')];
-    btns.slice(1).forEach(x=>x.remove());
-    const b=btns[0] || row.querySelector('.jgb-eam-reset-single');
-    if(b){
-      b.type='button';
-      b.disabled=false;
-      b.style.pointerEvents='auto';
-      b.onclick=function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        if(typeof window.jgbEamCompleteReset==='function'){
-          window.jgbEamCompleteReset();
-        }else{
-          alert('EAM 완전 리셋 기능을 불러오지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.');
-        }
-      };
-    }
+    page.querySelectorAll('.jgb-eam-reset-single').forEach(x=>x.remove());
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fix);
   else fix();
