@@ -28503,14 +28503,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 function moveMapStats(){
   const page=document.querySelector('.eh-page');
-  const mapHead=page?.querySelector('.eh-map-card .eh-card-head');
+  const mapCard=page?.querySelector('.eh-map-card');
+  const mapWrap=mapCard?.querySelector('.eh-map-wrap');
   const stats=page?.querySelector('.eh-head-stats');
-  if(!page||!mapHead||!stats)return;
+  if(!page||!mapCard||!mapWrap||!stats)return;
 
-  /* 상태 5개는 최상단 헤더로 이동시키지 않고
-     반드시 '시설 자산 배치도' 헤더 안에 유지 */
-  if(stats.parentElement!==mapHead){
-    mapHead.appendChild(stats);
+  /* 상태 5개는 상단 헤더/배치도 헤더에서 제거하고
+     시설 자산 배치도 영역의 맨 아래로 이동 */
+  if(stats.parentElement!==mapCard){
+    mapCard.appendChild(stats);
   }
 }
 
@@ -29708,6 +29709,108 @@ setInterval(init,800);
 }
 </style>
 
+
+<style id="JGB_FINAL_STATUS_BOTTOM_OF_MAP">
+/* ===== 최종: 상단 헤더 삭제 / 시설 자산 배치도 하단 배치 ===== */
+
+/* 1) 최상단 헤더의 상태 5개 완전 제거 */
+.eh-page > .eh-head .eh-head-stats,
+.eh-page > header.eh-head .eh-head-stats{
+  display:none!important;
+}
+
+/* 2) 시설 자산 배치도 카드를 세로 구조로 고정 */
+.eh-map-card{
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:0!important;
+}
+
+/* 3) 배치도 헤더에는 상태 5개 없음 */
+.eh-map-card .eh-card-head .eh-head-stats{
+  display:none!important;
+}
+
+/* 4) 시설 자산 배치도 본체가 남은 공간을 사용 */
+.eh-map-card .eh-map-wrap{
+  flex:1 1 auto!important;
+  min-height:0!important;
+}
+
+/* 5) 상태 5개를 배치도 카드 맨 아래에 별도 영역으로 표시 */
+.eh-map-card > .eh-head-stats{
+  display:flex!important;
+  flex:0 0 52px!important;
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  box-sizing:border-box!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  margin:0!important;
+  padding:5px 10px!important;
+  border-top:1px solid #cbd9e3!important;
+  background:#f5f9fb!important;
+  position:static!important;
+  float:none!important;
+  transform:none!important;
+}
+
+/* 6) 하단 5개 버튼 동일 크기 */
+.eh-map-card > .eh-head-stats .eh-stat{
+  display:flex!important;
+  flex:0 0 62px!important;
+  width:62px!important;
+  min-width:62px!important;
+  height:40px!important;
+  min-height:40px!important;
+  box-sizing:border-box!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0!important;
+  padding:2px 4px!important;
+  position:static!important;
+  float:none!important;
+  transform:none!important;
+  text-align:center!important;
+}
+
+.eh-map-card > .eh-head-stats .eh-stat b{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:center!important;
+  font-size:15px!important;
+  line-height:15px!important;
+}
+
+.eh-map-card > .eh-head-stats .eh-stat small{
+  display:block!important;
+  width:100%!important;
+  margin:1px 0 0!important;
+  padding:0!important;
+  text-align:center!important;
+  font-size:8px!important;
+  line-height:10px!important;
+  white-space:nowrap!important;
+}
+
+@media(max-width:700px){
+  .eh-map-card > .eh-head-stats{
+    gap:3px!important;
+    padding:4px 5px!important;
+  }
+  .eh-map-card > .eh-head-stats .eh-stat{
+    flex-basis:50px!important;
+    width:50px!important;
+    min-width:50px!important;
+    height:38px!important;
+  }
+}
+</style>
 </body>
 
 <style id="v19-court-position-final">
