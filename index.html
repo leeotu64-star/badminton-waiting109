@@ -31603,207 +31603,94 @@ window.eamHyunDeleteMapIcon=function(code,kind){
 'use strict';
 if(window.__JGB_EAM_MAP_ICON_REBUILD_V19)return;
 window.__JGB_EAM_MAP_ICON_REBUILD_V19=true;
-
 const KEY='JGB_EAM_HYUNHWANG_MAP_V1';
 const SEL='.eh-map .eh-marker';
-const CLICK_WAIT=280;
-const MOVE_READY_MS=10000;
-
-const read=()=>{try{
-  const v=JSON.parse(localStorage.getItem(KEY)||'{}');
-  return v&&typeof v==='object'?v:{};
-}catch(_){return {}}};
+const read=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}};
 const write=v=>{try{localStorage.setItem(KEY,JSON.stringify(v));return true}catch(_){return false}};
-const save=(code,x,y)=>{
-  if(!code)return;
-  const v=read();
-  v[code]=[Number(x.toFixed(3)),Number(y.toFixed(3))];
-  write(v);
+const save=(code,x,y)=>{if(!code)return;const v=read();v[code]=[Number(x.toFixed(3)),Number(y.toFixed(3))];write(v)};
+let drag=null;
+function getTarget(e){return e.target&&e.target.closest?e.target.closest(SEL):null}
+function down(e){
+ const el=getTarget(e); if(!el)return;
+ if(e.pointerType==='mouse' && e.button!==0)return;
+ const map=el.closest('.eh-map'); if(!map)return;
+ const mr=el.getBoundingClientRect(), rr=map.getBoundingClientRect();
+ drag={el,map,pid:e.pointerId,rr,startX:e.clientX,startY:e.clientY,ox:e.clientX-(mr.left+mr.width/2),oy:e.clientY-(mr.top+mr.height/2),moved:false};
+ try{el.setPointerCapture(e.pointerId)}catch(_){ }
+}
+function move(e){
+ const d=drag;if(!d||e.pointerId!==d.pid)return;
+ const dx=e.clientX-d.startX,dy=e.clientY-d.startY;
+ if(!d.moved && Math.hypot(dx,dy)<6)return;
+ d.moved=true;
+ const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.ox-d.rr.left)/d.rr.width*100));
+ const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.oy-d.rr.top)/d.rr.height*100));
+ d.el.style.left=x+'%';d.el.style.top=y+'%';d.el.classList.add('eam-v19-dragging');
+ e.preventDefault();
+}
+function finish(e){
+ const d=drag;if(!d||e.pointerId!==d.pid)return;
+ drag=null;
+ if(d.moved){
+  const x=Math.max(0.5,Math.min(99.5,(e.clientX-d.ox-d.rr.left)/d.rr.width*100));
+  const y=Math.max(0.5,Math.min(99.5,(e.clientY-d.oy-d.rr.top)/d.rr.height*100));
+  d.el.style.left=x+'%';d.el.style.top=y+'%';
+  const savedCode=String(d.el.getAttribute('data-code')||'').trim();
+  save(savedCode,x,y);
+  /* 배치도 전용 아이콘은 별도 저장소의 x/y도 함께 갱신해야 재렌더링 후 같은 위치를 유지한다. */
   try{
     const only=JSON.parse(localStorage.getItem('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1')||'{}');
-    if(only && only[code]){
-      only[code].x=Number(x.toFixed(3));
-      only[code].y=Number(y.toFixed(3));
+    if(only && only[savedCode]){
+      only[savedCode].x=Number(x.toFixed(3));
+      only[savedCode].y=Number(y.toFixed(3));
       localStorage.setItem('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1',JSON.stringify(only));
     }
   }catch(_){}
-};
-
-function getTarget(e){
-  return e.target&&e.target.closest?e.target.closest(SEL):null;
+  d.el.dataset.v19Dragged='1';
+  d.el.dataset.v19DraggedAt=String(Date.now());
+  e.preventDefault();e.stopPropagation();
+ }
+ d.el.classList.remove('eam-v19-dragging');
+ try{d.el.releasePointerCapture(e.pointerId)}catch(_){ }
 }
-function catFor(code){
-  return ({
-    AC:'cooling', BO:'water', FI:'fire', EL:'electrical',
-    LT:'lighting', WP:'waterproof', SA:'sanitary',
-    DO:'doors', OT:'other'
-  }[String(code||'').split('-')[0].toUpperCase()]||'other');
-}
-function openAsset(el){
-  const code=String(el?.getAttribute('data-code')||'').trim();
-  if(!code || el.classList.contains('map-only'))return;
-
-  window.__eamSelCode=code;
-  window.__eamCat=catFor(code);
-
-  try{
-    if(typeof window.go==='function')window.go('eam');
-    setTimeout(()=>{
-      try{
-        if(typeof window.eamPick==='function'){
-          window.eamPick(window.__eamCat,code);
-        }
-      }catch(_){}
-    },0);
-  }catch(_){}
-}
-
-let pendingClick=null;
-let drag=null;
-
-function cancelPending(){
-  if(pendingClick){
-    clearTimeout(pendingClick.timer);
-    pendingClick=null;
-  }
-}
-
-/*
-  핵심:
-  - 첫 클릭은 즉시 기존 click 핸들러로 보내지 않고 280ms 대기.
-  - 두 번째 클릭(detail=2)이 들어오면 첫 클릭을 취소하고 이동 준비.
-  - 따라서 "한 번 클릭해서 바로 이동"하지 않고,
-    "더블클릭 후 별도로 드래그"해야 위치가 움직인다.
-*/
 function click(e){
-  const el=getTarget(e);
-  if(!el)return;
-
-  e.preventDefault();
-  e.stopImmediatePropagation();
-
-  const detail=Number(e.detail||1);
-
-  if(detail>=2){
-    cancelPending();
-    el.classList.add('jgb-move-ready');
-    el.dataset.jgbMoveUntil=String(Date.now()+MOVE_READY_MS);
-    return;
-  }
-
-  cancelPending();
-  const timer=setTimeout(()=>{
-    pendingClick=null;
-    openAsset(el);
-  },CLICK_WAIT);
-
-  pendingClick={el,timer};
+ const el=getTarget(e);if(!el)return;
+ if(el.dataset.v19Dragged==='1'){
+  const at=Number(el.dataset.v19DraggedAt||0);
+  el.dataset.v19Dragged='';
+  if(Date.now()-at<500){e.preventDefault();e.stopImmediatePropagation();return;}
+ }
+ const code=String(el.getAttribute('data-code')||'').trim();if(!code)return;
+ /* 배치도 전용 아이콘은 EAM 이력카드 연결 대상이 아니다. */
+ if(el.classList.contains('map-only')){
+   e.preventDefault();e.stopImmediatePropagation();
+   return;
+ }
+ e.preventDefault();e.stopImmediatePropagation();
+ window.__eamSelCode=code;
+ const prefix=code.split('-')[0].toUpperCase();
+ /* 아이콘 클릭은 자산코드 하나를 기준으로 실제 EAM 분류에 연결한다.
+    특히 BO는 heating이 아니라 EAM의 water 분류로 연결한다. */
+ const cat={
+   AC:'cooling', BO:'water', FI:'fire', EL:'electrical', LT:'lighting',
+   WP:'waterproof', SA:'sanitary', DO:'doors', OT:'other'
+ }[prefix]||'other';
+ window.__eamCat=cat;
+ /* 행의 DOM 클릭을 중간에 거치지 않고 EAM의 공식 선택 함수에 직접 전달한다.
+    그래서 아이콘 클릭 → 같은 자산코드의 이력카드가 바로 열린다. */
+ try{
+   if(typeof window.eamPick==='function'){
+     window.eamPick(cat,code);
+     return;
+   }
+ }catch(_){}
+ if(typeof window.go==='function')window.go('eam');
 }
-
-function down(e){
-  const el=getTarget(e);
-  if(!el)return;
-  if(e.pointerType==='mouse' && e.button!==0)return;
-
-  const until=Number(el.dataset.jgbMoveUntil||0);
-  if(!until || until<Date.now())return;
-
-  const map=el.closest('.eh-map');
-  if(!map)return;
-
-  const mr=map.getBoundingClientRect();
-  const er=el.getBoundingClientRect();
-
-  drag={
-    el,map,pid:e.pointerId,rr:mr,
-    ox:e.clientX-(er.left+er.width/2),
-    oy:e.clientY-(er.top+er.height/2),
-    startX:e.clientX,startY:e.clientY,
-    moved:false
-  };
-
-  el.classList.add('eam-v19-dragging');
-
-  try{el.setPointerCapture(e.pointerId)}catch(_){}
-
-  e.preventDefault();
-  e.stopImmediatePropagation();
-}
-
-function move(e){
-  const d=drag;
-  if(!d || e.pointerId!==d.pid)return;
-
-  const dx=e.clientX-d.startX;
-  const dy=e.clientY-d.startY;
-  if(!d.moved && Math.hypot(dx,dy)<4)return;
-
-  d.moved=true;
-
-  const x=Math.max(0.5,Math.min(99.5,
-    ((e.clientX-d.ox-d.rr.left)/d.rr.width)*100
-  ));
-  const y=Math.max(0.5,Math.min(99.5,
-    ((e.clientY-d.oy-d.rr.top)/d.rr.height)*100
-  ));
-
-  d.el.style.left=x.toFixed(3)+'%';
-  d.el.style.top=y.toFixed(3)+'%';
-
-  e.preventDefault();
-  e.stopImmediatePropagation();
-}
-
-function finish(e){
-  const d=drag;
-  if(!d || e.pointerId!==d.pid)return;
-
-  drag=null;
-
-  const code=String(d.el.getAttribute('data-code')||'').trim();
-
-  if(d.moved){
-    const x=Math.max(0.5,Math.min(99.5,
-      ((e.clientX-d.ox-d.rr.left)/d.rr.width)*100
-    ));
-    const y=Math.max(0.5,Math.min(99.5,
-      ((e.clientY-d.oy-d.rr.top)/d.rr.height)*100
-    ));
-
-    d.el.style.left=x.toFixed(3)+'%';
-    d.el.style.top=y.toFixed(3)+'%';
-    save(code,x,y);
-
-    d.el.dataset.v19Dragged='1';
-    d.el.dataset.v19DraggedAt=String(Date.now());
-  }
-
-  d.el.classList.remove('eam-v19-dragging');
-  d.el.classList.remove('jgb-move-ready');
-  delete d.el.dataset.jgbMoveUntil;
-
-  try{d.el.releasePointerCapture(e.pointerId)}catch(_){}
-
-  e.preventDefault();
-  e.stopImmediatePropagation();
-}
-
-document.addEventListener('click',click,true);
-document.addEventListener('dblclick',function(e){
-  const el=getTarget(e);
-  if(!el)return;
-  e.preventDefault();
-  e.stopImmediatePropagation();
-  cancelPending();
-  el.classList.add('jgb-move-ready');
-  el.dataset.jgbMoveUntil=String(Date.now()+MOVE_READY_MS);
-},true);
-
 document.addEventListener('pointerdown',down,true);
 document.addEventListener('pointermove',move,true);
 document.addEventListener('pointerup',finish,true);
 document.addEventListener('pointercancel',finish,true);
-
+document.addEventListener('click',click,true);
 })();
 </script>
 
@@ -38919,85 +38806,5 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
   .eh-page .eh-map-card .eh-card-head .eh-stat{
     width:56px!important;min-width:56px!important;height:44px!important;min-height:44px!important;
   }
-}
-</style>
-
-
-<!-- CLEAN: EAM 아이콘은 더블클릭 후에만 드래그 이동 -->
-<style id="JGB_EAM_CLEAN_DBLCLICK_DRAG">
-#eam228Map .eam228-asset{cursor:pointer!important;touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;}
-#eam228Map .eam228-asset.jgb-move-ready{cursor:grab!important;}
-#eam228Map .eam228-asset.jgb-moving{cursor:grabbing!important;z-index:999999!important;}
-</style>
-<script id="JGB_EAM_CLEAN_DBLCLICK_DRAG_SCRIPT">
-(function(){
-  if(window.__JGB_EAM_CLEAN_DBLCLICK_DRAG)return;
-  window.__JGB_EAM_CLEAN_DBLCLICK_DRAG=true;
-  const SEL='#eam228Map .eam228-asset';
-  const POSKEY='JGB_EAM_DASH_MAP_POS_V228';
-  let active=null;
-  const read=()=>{try{const v=JSON.parse(localStorage.getItem(POSKEY)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return {}}};
-  const save=(code,x,y)=>{if(!code)return;const v=read();v[code]=[+x.toFixed(3),+y.toFixed(3)];try{localStorage.setItem(POSKEY,JSON.stringify(v))}catch(_){} };
-  document.addEventListener('dblclick',e=>{
-    const el=e.target.closest?.(SEL); if(!el)return;
-    e.preventDefault();e.stopImmediatePropagation();
-    el.classList.add('jgb-move-ready');
-    el.dataset.jgbMoveUntil=String(Date.now()+8000);
-  },true);
-  document.addEventListener('pointerdown',e=>{
-    const el=e.target.closest?.(SEL); if(!el||e.button!==0)return;
-    if(Number(el.dataset.jgbMoveUntil||0)<Date.now())return;
-    const map=el.closest('#eam228Map'); if(!map)return;
-    const mr=map.getBoundingClientRect(), er=el.getBoundingClientRect();
-    active={el,map,pid:e.pointerId,mr,ox:e.clientX-(er.left+er.width/2),oy:e.clientY-(er.top+er.height/2),moved:false};
-    e.preventDefault();e.stopImmediatePropagation();
-    try{el.setPointerCapture(e.pointerId)}catch(_){}
-  },true);
-  document.addEventListener('pointermove',e=>{
-    const d=active;if(!d||e.pointerId!==d.pid)return;
-    const x=Math.max(1,Math.min(99,((e.clientX-d.ox-d.mr.left)/d.mr.width)*100));
-    const y=Math.max(1,Math.min(99,((e.clientY-d.oy-d.mr.top)/d.mr.height)*100));
-    d.moved=true;d.el.classList.add('jgb-moving');
-    d.el.style.left=x.toFixed(3)+'%';d.el.style.top=y.toFixed(3)+'%';
-    d.x=x;d.y=y;e.preventDefault();e.stopImmediatePropagation();
-  },true);
-  const finish=e=>{
-    const d=active;if(!d||e.pointerId!==d.pid)return;
-    active=null;d.el.classList.remove('jgb-moving');d.el.classList.remove('jgb-move-ready');
-    if(d.moved){
-      const x=d.x,y=d.y,code=String(d.el.getAttribute('data-code')||'').trim();
-      save(code,x,y);d.el.dataset.v19Dragged='1';d.el.dataset.v19DraggedAt=String(Date.now());
-    }
-    try{d.el.releasePointerCapture(e.pointerId)}catch(_){}
-    e.preventDefault();e.stopImmediatePropagation();
-  };
-  document.addEventListener('pointerup',finish,true);
-  document.addEventListener('pointercancel',finish,true);
-})();
-</script>
-
-
-<style id="JGB_EAM_TWO_LINES_FINAL">
-/* 제목 아래 구분선만 제거 */
-.eh-map-card .eh-card-head{
-  border-bottom:0!important;
-  box-shadow:none!important;
-}
-/* 제목과 배치도 사이의 이중 상단선 제거 */
-.eh-map-card .eh-map-wrap{
-  border-top:0!important;
-}
-/* 배치도 바깥 테두리/이중 프레임만 제거. 코트 내부 선은 유지 */
-.eh-map-card .eh-map{
-  border-top:0!important;
-  box-shadow:none!important;
-}
-/* 지붕 영역의 외곽/칸막이 선 제거 */
-.eh-map-card .eh-roof{
-  border:0!important;
-  box-shadow:none!important;
-}
-.eh-map-card .eh-roof span{
-  border-right:0!important;
 }
 </style>
