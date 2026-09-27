@@ -40882,3 +40882,43 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 })();
 </script>
 
+
+<style id="JGB_CONSUMABLE_OPTION_V2">
+  /* 소모품 옵션은 기존 설비 드롭다운과 동일한 한 줄 선택 방식으로 표시 */
+  .eam-innovation .eam-category-dropdown option[value="소모품"]::before{
+    content:"🧰 ";
+  }
+</style>
+
+<script id="JGB_CONSUMABLE_OPTION_V2_SCRIPT">
+(function(){
+  'use strict';
+
+  function addConsumableOption(){
+    document.querySelectorAll('.eam-innovation .eam-category-dropdown').forEach(function(select){
+      if(!select.querySelector('option[data-jgb-consumable="1"]')){
+        const opt=document.createElement('option');
+        opt.value='소모품';
+        opt.textContent='🧰 소모품';
+        opt.dataset.jgbConsumable='1';
+        select.appendChild(opt);
+      }
+    });
+  }
+
+  function apply(){
+    addConsumableOption();
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',apply);
+  }else{
+    apply();
+  }
+
+  if(window.MutationObserver){
+    new MutationObserver(apply).observe(document.body,{childList:true,subtree:true});
+  }
+})();
+</script>
+
