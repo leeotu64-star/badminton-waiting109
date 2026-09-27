@@ -40755,3 +40755,137 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
     border-radius:7px !important;
 }
 </style>
+
+
+<!-- JGB: 전체 위치 삭제 + 기존 상단 설비 아이콘 삭제 + 아이콘 설비 드롭다운 + 이력카드 상향 -->
+<style id="JGB_EAM_ICON_DROPDOWN_V1">
+  /* 기존 상단 8개(및 기존 설비 종류) 아이콘 행은 제거 */
+  .eam-innovation > .eam-type-row{
+    display:none!important;
+    height:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+
+  /* 기존 전체 위치가 있던 자리: 한 줄짜리 아이콘 설비 드롭다운 */
+  .eam-innovation .eam-assets-head .eam-filter-row{
+    display:block!important;
+    margin:0!important;
+    padding:0!important;
+    flex:0 0 auto!important;
+  }
+  .eam-innovation .eam-category-icon-dropdown{
+    width:100%!important;
+    height:40px!important;
+    min-height:40px!important;
+    box-sizing:border-box!important;
+    border:1px solid #c8d6e4!important;
+    border-radius:9px!important;
+    background:#fff!important;
+    color:#173957!important;
+    padding:0 34px 0 11px!important;
+    font-size:13px!important;
+    font-weight:900!important;
+    cursor:pointer!important;
+  }
+
+  /* 아이콘 행 삭제로 생긴 공간을 이력카드/상세영역이 사용 */
+  .eam-innovation .eam-innovation-layout{
+    margin-top:0!important;
+  }
+</style>
+
+<script id="JGB_EAM_ICON_DROPDOWN_V1_SCRIPT">
+(function(){
+  'use strict';
+
+  const DEF=[
+    ['cooling','❄️','냉난방'],
+    ['fire','🚒','소방·방재'],
+    ['water','♨️','온수·난방'],
+    ['electrical','⚡','전기설비'],
+    ['sanitary','🚻','위생설비'],
+    ['doors','🚪','문·창호설비'],
+    ['other','🔧','기타설비'],
+    ['consumable','🧰','소모품']
+  ];
+
+  function getDefs(root){
+    const row=root.querySelector(':scope > .eam-type-row');
+    const arr=[];
+    if(row){
+      row.querySelectorAll('.eam-type').forEach(b=>{
+        const m=(b.getAttribute('onclick')||'').match(/eamPick\(\s*['"]([^'"]+)['"]/);
+        const key=m ? m[1] : '';
+        const strong=b.querySelector('strong');
+        const span=b.querySelector('span');
+        if(key && strong){
+          arr.push([key,(span?.textContent||'').trim(),(strong.textContent||'').trim()]);
+        }
+      });
+    }
+    /* 원본 7개에 없는 소모품은 반드시 마지막에 추가 */
+    if(!arr.some(x=>x[0]==='consumable')){
+      arr.push(['consumable','🧰','소모품']);
+    }
+    return arr.length ? arr : DEF;
+  }
+
+  function make(root){
+    const filter=root.querySelector('.eam-assets-head .eam-filter-row');
+    if(!filter) return;
+
+    const old=filter.querySelector('#eamProLocationFilter');
+    if(old) old.remove();
+
+    let sel=filter.querySelector('.eam-category-icon-dropdown');
+    if(!sel){
+      sel=document.createElement('select');
+      sel.className='eam-category-icon-dropdown';
+      sel.setAttribute('aria-label','설비 종류 선택');
+      filter.replaceChildren(sel);
+    }
+
+    const defs=getDefs(root);
+    const current=(root.querySelector('.eam-type.on')?.className||'').match(/eam-type-([^\s]+)/)?.[1]||'';
+    sel.innerHTML=defs.map(([key,ico,label])=>
+      `<option value="${key}" ${key===current?'selected':''}>${ico} ${label}</option>`
+    ).join('');
+
+    if(!sel.value && defs[0]) sel.value=defs[0][0];
+
+    sel.onchange=function(){
+      const key=this.value;
+      if(key==='consumable'){
+        /* 기존 소모품 카드가 제공하는 관리 기능을 그대로 호출 */
+        const card=root.querySelector('.eam-consumable-card');
+        if(card){ card.click(); return; }
+        if(typeof window.jgbOpenConsumableHistory==='function'){
+          window.jgbOpenConsumableHistory();
+          return;
+        }
+      }
+      if(typeof window.eamPick==='function'){
+        window.eamPick(key);
+      }
+    };
+
+    const row=root.querySelector(':scope > .eam-type-row');
+    if(row) row.remove();
+  }
+
+  function apply(){
+    document.querySelectorAll('.eam-innovation').forEach(make);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply);
+  else apply();
+
+  if(window.MutationObserver){
+    new MutationObserver(apply).observe(document.body,{childList:true,subtree:true});
+  }
+})();
+</script>
+
