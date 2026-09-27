@@ -28503,15 +28503,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 function moveMapStats(){
   const page=document.querySelector('.eh-page');
-  const mapCard=page?.querySelector('.eh-map-card');
-  const mapWrap=mapCard?.querySelector('.eh-map-wrap');
+  const mapHead=page?.querySelector('.eh-map-card .eh-card-head');
   const stats=page?.querySelector('.eh-head-stats');
-  if(!page||!mapCard||!mapWrap||!stats)return;
+  if(!page||!mapHead||!stats)return;
 
-  /* 상태 5개는 상단 헤더/배치도 헤더에서 제거하고
-     시설 자산 배치도 영역의 맨 아래로 이동 */
-  if(stats.parentElement!==mapCard){
-    mapCard.appendChild(stats);
+  /* 상태 5개를 반드시 '시설 자산 배치도' 헤더 안으로 이동 */
+  if(stats.parentElement!==mapHead){
+    mapHead.appendChild(stats);
   }
 }
 
@@ -29811,6 +29809,180 @@ setInterval(init,800);
   }
 }
 </style>
+
+<style id="JGB_ABSOLUTE_FINAL_MAP_HEADER_LAYOUT">
+/* ==========================================================
+   최종 확정
+   상태 5개는 '시설 자산 배치도' 헤더 안에서
+   아이콘 + 제목 + 상태버튼과 한 줄로 중앙 정렬
+   하단 별도 영역은 사용하지 않음
+   ========================================================== */
+
+/* 최상단 '시설물 유지관리 현황' 헤더 */
+.eh-page > .eh-head .eh-head-stats,
+.eh-page > header.eh-head .eh-head-stats{
+  display:none!important;
+}
+
+/* 배치도 카드 */
+.eh-map-card{
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:0!important;
+}
+
+/* 배치도 헤더 전체 */
+.eh-map-card .eh-card-head{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:14px!important;
+  width:100%!important;
+  height:58px!important;
+  min-height:58px!important;
+  flex:0 0 58px!important;
+  padding:0 14px!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+
+/* 지도 아이콘 + 제목 */
+.eh-map-card .eh-card-head h2{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  gap:9px!important;
+  font-size:23px!important;
+  line-height:1!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+}
+
+/* 지도 아이콘 */
+.eh-map-card .eh-card-head .eh-map-title-icon{
+  position:static!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 36px!important;
+  width:36px!important;
+  height:36px!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:30px!important;
+  line-height:1!important;
+  transform:none!important;
+}
+
+/* 상태 5개: 반드시 헤더 안 */
+.eh-map-card .eh-card-head > .eh-head-stats{
+  display:flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  width:auto!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  position:static!important;
+  float:none!important;
+  transform:none!important;
+}
+
+/* 상태 버튼 */
+.eh-map-card .eh-card-head > .eh-head-stats .eh-stat{
+  display:flex!important;
+  flex:0 0 58px!important;
+  width:58px!important;
+  min-width:58px!important;
+  height:42px!important;
+  min-height:42px!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0!important;
+  padding:3px 4px!important;
+  box-sizing:border-box!important;
+  position:static!important;
+  float:none!important;
+  transform:none!important;
+  text-align:center!important;
+  border-radius:8px!important;
+}
+
+/* 숫자 */
+.eh-map-card .eh-card-head > .eh-head-stats .eh-stat b{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:16px!important;
+  line-height:16px!important;
+  text-align:center!important;
+}
+
+/* 상태명 */
+.eh-map-card .eh-card-head > .eh-head-stats .eh-stat small{
+  display:block!important;
+  width:100%!important;
+  margin:2px 0 0!important;
+  padding:0!important;
+  font-size:8px!important;
+  line-height:10px!important;
+  white-space:nowrap!important;
+  text-align:center!important;
+}
+
+/* 기존 '배치도 카드 하단'으로 만들어 놓은 상태 영역 완전 제거 */
+.eh-map-card > .eh-head-stats{
+  display:none!important;
+}
+
+/* 배치도 본체는 정상 */
+.eh-map-card .eh-map-wrap{
+  flex:1 1 auto!important;
+  min-height:0!important;
+}
+
+/* 좁은 화면 */
+@media(max-width:900px){
+  .eh-map-card .eh-card-head{
+    gap:8px!important;
+    padding:0 8px!important;
+  }
+
+  .eh-map-card .eh-card-head h2{
+    font-size:19px!important;
+    gap:6px!important;
+  }
+
+  .eh-map-card .eh-card-head .eh-map-title-icon{
+    flex-basis:30px!important;
+    width:30px!important;
+    height:30px!important;
+    font-size:25px!important;
+  }
+
+  .eh-map-card .eh-card-head > .eh-head-stats{
+    gap:3px!important;
+  }
+
+  .eh-map-card .eh-card-head > .eh-head-stats .eh-stat{
+    flex-basis:50px!important;
+    width:50px!important;
+    min-width:50px!important;
+    height:38px!important;
+  }
+}
+</style>
+
 </body>
 
 <style id="v19-court-position-final">
