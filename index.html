@@ -10672,7 +10672,7 @@ html,body{
       const tasksHtml=tasks.map((t,i)=>{
         const checked=isHoliday||(Array.isArray(d.done)&&d.done.includes(t));
         const safe=t.replace(/'/g,"\\'");
-        return `<button type="button" class="basic-v5-task notebook-task-row basic-tone-${basicTaskTone(i)} ${checked?'is-done':''}" ${isOff||isHoliday?'disabled':''} onclick="toggleTask('${w.id}','${safe}')"><span class="task-icon" aria-hidden="true">${basicTaskIcon(t)}</span><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`;
+        return `<button type="button" class="basic-v5-task notebook-task-row basic-tone-${basicTaskTone(i)} ${checked?'is-done':''}" ${isOff||isHoliday||checked?'disabled':''} onclick="toggleTask('${w.id}','${safe}')"><span class="task-icon" aria-hidden="true">${basicTaskIcon(t)}</span><span class="no">${String(i+1).padStart(2,'0')}</span><span class="txt">${t}</span><span class="action">${checked?'✓ 완료':'실시'}</span></button>`;
       }).join('');
 
       return `<article class="work-notebook work-notebook-clean">
@@ -14147,7 +14147,7 @@ function jgbV47GoWpByLeak(leakCode){
 
     async function completeIssue(id){const x=db.issues.find(i=>i.id===id);if(!x||!x.handlerId){alert("먼저 담당 직원을 선택하세요.");return}if(!SUPA){alert("Supabase 연결이 필요합니다.");return}if(!confirm("조치완료 처리하시겠습니까?\n완료하면 현재 접수 목록에서는 사라지고 최근 1개월 기록에 남습니다."))return;const now=new Date().toISOString(),elapsed=Math.max(0,Math.round((new Date(now)-new Date(x.createdAt))/60000));if(x.remoteId){const r=await SUPA.from("requests").update({status:"완료",handler_name:x.handlerName,started_at:x.startedAt||now,completed_at:now,elapsed_minutes:elapsed}).eq("id",x.remoteId);if(r.error){alert("조치완료 저장에 실패했습니다.");return}}await syncFromSupabase();render()}
     async function syncBasicTasks(){if(!SUPA)return;try{const {data,error}=await SUPA.from("basic_tasks").select("*");if(error)throw error;const t={};(data||[]).forEach(r=>{const name=taskDisplayName(r.task_name);if(!name)return;const k=r.work_date+"_"+r.worker_id;(t[k]??={done:[],updatedAt:null}).done.push(name);t[k].updatedAt=r.completed_at||null});db.tasks=t;save()}catch(e){console.warn("기본업무 동기화 실패",e)}}
-    async function toggleTask(wid,t){const d=tasksFor(wid),idx=d.done.indexOf(t);if(idx>=0)d.done.splice(idx,1);else d.done.push(t);d.updatedAt=new Date().toISOString();render();if(!SUPA)return;try{const q=SUPA.from("basic_tasks");const dbName=taskDbName(t);if(idx>=0){const {error}=await q.delete().eq("work_date",dateKey()).eq("worker_id",wid).eq("task_name",dbName);if(error)throw error}else{const {error}=await q.insert({work_date:dateKey(),worker_id:wid,task_name:dbName,completed_at:new Date().toISOString()});if(error)throw error}await syncBasicTasks();render()}catch(e){console.warn(e);if(idx>=0)d.done.push(t);else d.done=d.done.filter(x=>x!==t);render();alert("기본업무 저장에 실패했습니다. Supabase 권한/컬럼을 확인하세요.")}}
+    async function toggleTask(wid,t){const d=tasksFor(wid);if(d.done.includes(t))return;d.done.push(t);d.updatedAt=new Date().toISOString();render();if(!SUPA)return;try{const q=SUPA.from("basic_tasks");const dbName=taskDbName(t);const {error}=await q.insert({work_date:dateKey(),worker_id:wid,task_name:dbName,completed_at:new Date().toISOString()});if(error)throw error;await syncBasicTasks();render()}catch(e){console.warn(e);d.done=d.done.filter(x=>x!==t);render();alert("기본업무 저장에 실패했습니다. Supabase 권한/컬럼을 확인하세요.")}}
     function setDate(v){if(v){selectedDate=v;render()}}
     function time(v){return new Date(v).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hourCycle:"h23"})}
     function seedDemo(){if(db.issues.length)return alert("이미 테스트 데이터가 있습니다.");let now=Date.now();db.issues=[{id:"I"+now,category:"시설",place:"2층 남자화장실",content:"조명 점검 필요",status:"미조치",createdAt:new Date(now-35*60000).toISOString(),handlerId:"w1",handlerName:"김",completedAt:""},{id:"I"+(now+1),category:"환경",place:"복도",content:"바닥 청소 요청",status:"완료",createdAt:new Date(now-70*60000).toISOString(),handlerId:"w2",handlerName:"안",completedAt:new Date(now-25*60000).toISOString()}];save();render()}
@@ -28876,7 +28876,7 @@ setInterval(init,800);
 .basic-work-status-wrap .notebook-progress i{
   display:block !important;
   height:100% !important;
-  background:#5d8ca4 !important;
+  background:#e53935 !important;
 }
 .basic-work-status-wrap .notebook-section-label{
   position:relative !important;
