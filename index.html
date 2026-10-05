@@ -30645,86 +30645,142 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
 
 <!-- JGB_FI09_OPERATING_INFO_APPLIED -->
 
-<!-- JGB EAM FINAL FIX: 자산 분류 변경 시 배치도 아이콘/위치 보존 -->
-<script id="JGB_EAM_FINAL_CATEGORY_ICON_PRESERVE">
+<script id="JGB_EAM_CATEGORY_AUTO_CODE_V35">
 (function(){
   'use strict';
-  if(window.__JGB_EAM_FINAL_CATEGORY_ICON_PRESERVE)return;
-  window.__JGB_EAM_FINAL_CATEGORY_ICON_PRESERVE=true;
+  if(window.__JGB_EAM_CATEGORY_AUTO_CODE_V35)return;
+  window.__JGB_EAM_CATEGORY_AUTO_CODE_V35=true;
   const V=x=>String(x??'').trim();
-  const readObj=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(_){return {}}};
-  const writeObj=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x))}catch(_){}};
-  const readArr=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(x)?x.map(V):[]}catch(_){return []}};
-  const writeArr=(k,x)=>{try{localStorage.setItem(k,JSON.stringify(x))}catch(_){}};
-
-  /* 분류 변경은 자산의 동일 자산코드를 유지하는 '수정'이다.
-     따라서 기존 배치도 좌표를 절대 초기화하지 않고, 숨김/구버전 삭제표시만 해제한다. */
-  function preserveMapIcon(code){
-    const c=V(code).toUpperCase(); if(!c)return;
-    const POS='JGB_EAM_HYUNHWANG_MAP_V1';
-    const OLD_POS='JGB_EAM_DASH_MAP_POS_V228';
-    const HIDDEN='JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1';
-    const ONLY='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
-    const DELETED='JGB_EAM_DASH_MAP_DELETED_V241';
-    const DELETED_CODES='JGB_EAM_DELETED_CODES';
-
-    const pos=readObj(POS);
-    const oldPos=readObj(OLD_POS);
-    /* 기존 위치가 있으면 그대로 보존. 둘 다 없었던 자산만 중앙에 신규 생성. */
-    if(!pos[c]){
-      const legacy=oldPos[c];
-      if(Array.isArray(legacy)&&legacy.length>=2) pos[c]=[Number(legacy[0]),Number(legacy[1])];
-      else if(legacy&&typeof legacy==='object'&&Number.isFinite(Number(legacy.x))&&Number.isFinite(Number(legacy.y))) pos[c]=[Number(legacy.x),Number(legacy.y)];
-      else pos[c]=[50,50];
+  const PFX={
+    '냉난방':'AC','소방설비':'FI','소방·방재':'FI','온수·난방':'BO','보일러·온수':'BO',
+    '전기설비':'EL','코트조명':'LT','방수':'WP','위생설비':'SA','문·창호설비':'DR','기타설비':'OT'
+  };
+  function readObj(k){try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(_){return {}}}
+  function putObj(k,x){try{localStorage.setItem(k,JSON.stringify(x||{}))}catch(_){}}
+  function readArr(k){try{const x=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(x)?x:[]}catch(_){return []}}
+  function putArr(k,x){try{localStorage.setItem(k,JSON.stringify(x||[]))}catch(_){}}
+  function categoryPrefix(category){return PFX[V(category)]||'OT'}
+  async function nextCode(category, oldCode){
+    const prefix=categoryPrefix(category), used=new Set();
+    try{
+      const A=Array.isArray(window.__eamA)?window.__eamA:[];
+      A.forEach(a=>{const c=V(a?.asset_code);if(c)used.add(c.toUpperCase())});
+    }catch(_){ }
+    try{
+      if(window.SUPA){
+        const r=await window.SUPA.from('assets').select('asset_code');
+        if(!r.error)(r.data||[]).forEach(a=>{const c=V(a?.asset_code);if(c)used.add(c.toUpperCase())});
+      }
+    }catch(_){ }
+    // 현재 자산의 기존 코드는 번호 탐색에서 제외해도 된다.
+    if(oldCode)used.delete(V(oldCode).toUpperCase());
+    for(let n=1;n<10000;n++){
+      const c=prefix+'-'+String(n).padStart(2,'0');
+      if(!used.has(c.toUpperCase()))return c;
     }
-    writeObj(POS,pos);
-
-    const hidden=readObj(HIDDEN); delete hidden[c]; writeObj(HIDDEN,hidden);
-    const only=readObj(ONLY); delete only[c]; writeObj(ONLY,only);
-    writeArr(DELETED,readArr(DELETED).filter(x=>x.toUpperCase()!==c));
-    writeArr(DELETED_CODES,readArr(DELETED_CODES).filter(x=>x.toUpperCase()!==c));
-
-    /* 화면에 즉시 다시 그리도록 현재 DOM에서 같은 코드의 잔여 중복만 제거하지 않는다.
-       최종 render가 자산 1개를 기준으로 표시하게 맡긴다. */
+    throw new Error('새 설비분류 자산코드를 자동 발급하지 못했습니다.');
   }
-
-  function categoryOf(a){return V(a?.category||a?.type||a?.product_name)}
-  function selectedAsset(code){
-    const c=V(code);
-    return (Array.isArray(window.__eamA)?window.__eamA:[]).find(a=>V(a?.asset_code)===c)||null;
+  function migrateLocal(oldCode,newCode,meta){
+    const oldC=V(oldCode), newC=V(newCode);
+    if(!oldC||!newC||oldC===newC)return;
+    // 메타: 기존 코드의 상세정보를 새 코드로 이동
+    const mk='JGB_EAM_ASSET_META_V40';
+    const m=readObj(mk);
+    const oldMeta=m[oldC]||meta||{};
+    delete m[oldC];
+    m[newC]=Object.assign({},oldMeta,{asset_code:newC});
+    putObj(mk,m);
+    // 배치도 위치: 기존 코드의 좌표/숨김 상태를 새 코드에 그대로 승계
+    ['JGB_EAM_HYUNHWANG_MAP_V1','JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1'].forEach(k=>{
+      const o=readObj(k);
+      if(Object.prototype.hasOwnProperty.call(o,oldC)){
+        o[newC]=o[oldC];
+        delete o[oldC];
+        putObj(k,o);
+      }
+    });
+    const only=readObj('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1');
+    if(Object.prototype.hasOwnProperty.call(only,oldC)){
+      only[newC]=Object.assign({},only[oldC]||{},{code:newC});
+      delete only[oldC];
+      putObj('JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1',only);
+    }
+    // 삭제목록도 새 코드 기준으로 이동
+    const del=readArr('JGB_EAM_DELETED_CODES').map(V).filter(Boolean);
+    const nd=del.filter(c=>c!==oldC);
+    if(!nd.includes(newC)){
+      // 현재 활성 자산이므로 새 코드는 삭제목록에서 제외
+    }
+    putArr('JGB_EAM_DELETED_CODES',nd);
+    const dash=readArr('JGB_EAM_DASH_MAP_DELETED_V241').map(V).filter(Boolean).filter(c=>c!==oldC&&c!==newC);
+    putArr('JGB_EAM_DASH_MAP_DELETED_V241',dash);
   }
-
-  /* 일반 EAM 자산정보 수정 */
-  const oldFull=window.eamSaveFullEdit;
-  if(typeof oldFull==='function'&&!window.__JGB_WRAP_FULL_EDIT){
-    window.__JGB_WRAP_FULL_EDIT=true;
+  async function autoChangeCodeAfterCategorySave(oldCode, category, assetId, meta){
+    const oldC=V(oldCode), cat=V(category);
+    if(!oldC||!cat)return oldC;
+    const prefix=categoryPrefix(cat);
+    // 이미 새 분류 코드 형식이면 코드 변경 불필요
+    if(oldC.toUpperCase().startsWith(prefix+'-'))return oldC;
+    const newCode=await nextCode(cat,oldC);
+    const db=window.SUPA;
+    if(!db)throw new Error('Supabase 연결이 필요합니다.');
+    const r=await db.from('assets').update({asset_code:newCode}).eq('id',assetId);
+    if(r.error)throw r.error;
+    migrateLocal(oldC,newCode,meta);
+    window.__eamSelCode=newCode;
+    return newCode;
+  }
+  // 주요설비 이력카드 수정: 설비 종류가 바뀌면 자산코드를 시스템이 자동 변경.
+  const oldMain=window.eamSaveFullEdit;
+  if(typeof oldMain==='function'&&!window.__JGB_EAM_MAIN_WRAP_V35){
+    window.__JGB_EAM_MAIN_WRAP_V35=true;
     window.eamSaveFullEdit=async function(code){
-      const a=selectedAsset(code);
-      const oldCat=categoryOf(a);
-      const newCat=V(document.getElementById('editCategory')?.value||'');
-      const r=await oldFull.apply(this,arguments);
-      if(r!==false && oldCat && newCat && oldCat!==newCat) preserveMapIcon(code);
-      return r;
+      const oldC=V(code);
+      const a=(window.__eamA||[]).find(z=>V(z.asset_code)===oldC);
+      const cat=document.getElementById('editCategory')?.value||'';
+      const oldCat=a?.category||'';
+      const result=await oldMain.apply(this,arguments);
+      if(a && cat && cat!==oldCat){
+        // 기존 저장이 실제로 성공한 경우에만 코드 변경을 진행한다.
+        try{
+          const chk=window.SUPA?await window.SUPA.from('assets').select('category,asset_code').eq('id',a.id).maybeSingle():null;
+          if(chk?.error || !chk?.data || V(chk.data.category)!==cat) return result;
+        }catch(_){ return result; }
+        try{
+          const m=readObj('JGB_EAM_ASSET_META_V40')[oldC]||{};
+          const newCode=await autoChangeCodeAfterCategorySave(oldC,cat,a.id,m);
+          if(newCode!==oldC){
+            await window.eamLoad();
+            window.__eamSelCode=newCode;
+            window.__eamCat=(cat==='소방·방재'||cat==='소방설비')?'fire':
+              (cat==='냉난방'?'cooling':cat==='온수·난방'||cat==='보일러·온수'?'water':cat==='전기설비'?'electrical':cat==='코트조명'?'lighting':cat==='방수'?'waterproof':cat==='위생설비'?'sanitary':cat==='문·창호설비'?'doors':'other');
+            render();
+          }
+        }catch(e){console.error('JGB_EAM_CATEGORY_AUTO_CODE_V35',e);alert('설비 종류는 저장됐지만 자산코드 자동 변경에 실패했습니다.\n'+(e?.message||''));}
+      }
+      return result;
     };
   }
-
-  /* 주요설비 이력카드 수정 */
+  // 구형 주요설비 이력카드 수정 경로도 동일하게 자동 처리.
   const oldCard=window.JGB_EAM_CARD_V22_SAVE;
-  if(typeof oldCard==='function'&&!window.__JGB_WRAP_CARD_EDIT){
-    window.__JGB_WRAP_CARD_EDIT=true;
+  if(typeof oldCard==='function'&&!window.__JGB_EAM_CARD_WRAP_V35){
+    window.__JGB_EAM_CARD_WRAP_V35=true;
     window.JGB_EAM_CARD_V22_SAVE=async function(code){
-      const a=selectedAsset(code);
-      const oldCat=categoryOf(a);
-      const newCat=V(document.getElementById('jgb22_category')?.value||'');
-      const r=await oldCard.apply(this,arguments);
-      if(r!==false && oldCat && newCat && oldCat!==newCat) preserveMapIcon(code);
-      return r;
+      const oldC=V(code);
+      const a=(window.__eamA||[]).find(z=>V(z.asset_code)===oldC);
+      const cat=document.getElementById('jgb22_category')?.value||'';
+      const oldCat=a?.category||'';
+      const result=await oldCard.apply(this,arguments);
+      if(result!==false && a && cat && cat!==oldCat){
+        try{
+          const m=readObj('JGB_EAM_ASSET_META_V40')[oldC]||{};
+          const newCode=await autoChangeCodeAfterCategorySave(oldC,cat,a.id,m);
+          if(newCode!==oldC){await window.eamLoad();window.__eamSelCode=newCode;render();}
+        }catch(e){console.error('JGB_EAM_CARD_WRAP_V35',e);alert('설비 종류는 저장됐지만 자산코드 자동 변경에 실패했습니다.\n'+(e?.message||''));}
+      }
+      return result;
     };
   }
-
-  /* 혹시 위 함수가 이 파일의 다른 후처리에 의해 다시 감싸져도
-     자산 저장 직후 선택 자산의 아이콘을 보존할 수 있도록 공개한다. */
-  window.jgbEamPreserveMapIcon=preserveMapIcon;
 })();
 </script>
 
