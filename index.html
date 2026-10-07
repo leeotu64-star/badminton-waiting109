@@ -13351,7 +13351,10 @@ async function ensureMainEquipmentAssets(){return;}
         if(a.error)throw a.error;
         const __gone=(()=>{try{return new Set(JSON.parse(localStorage.getItem('JGB_EAM_DELETED_CODES')||'[]').map(v=>String(v||'').trim().toUpperCase()))}catch(e){return new Set()}})();
 
-        window.__eamA=(a.data||[]).filter(x=>!__gone.has(String(x?.asset_code||'').trim().toUpperCase())); window.__eamH=h.data||[]; window.__eamI=i.data||[];
+        /* DB에 실제 존재하는 자산은 localStorage의 과거 삭제목록 때문에 숨기지 않는다.
+           삭제는 fullDeleteAsset()이 DB에서 실제 행을 삭제한 뒤에만 완료된다.
+           따라서 날짜 변경/새로고침/재접속 후에도 등록 자산은 DB를 기준으로 유지한다. */
+        window.__eamA=(a.data||[]); window.__eamH=h.data||[]; window.__eamI=i.data||[];
         const meta={};
         (window.__eamH||[]).forEach(h=>{
           if(h.event_type!=='자산정보수정'||!h.description)return;
@@ -13374,7 +13377,6 @@ async function ensureMainEquipmentAssets(){return;}
       }catch(e){}
       const rows=A
         .filter(x=>x && (x.asset_code||x.code))
-        .filter(x=>!gone.has(String(x.asset_code||x.code).trim().toUpperCase()))
         .filter(x=>String(x.status||'').trim()!=='폐기')
         .map(x=>({
           ...x,
@@ -24353,7 +24355,7 @@ try{
       const k='JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1';
       const o=JSON.parse(localStorage.getItem(k)||'{}')||{};
       let changed=false;
-      Object.keys(o).forEach(c=>{if(aset.has(c)){delete o[c];changed=true;}});
+      /* 실제 자산과 같은 코드라는 이유만으로 생성 아이콘을 삭제하지 않는다. */
       if(changed)localStorage.setItem(k,JSON.stringify(o));
     }catch(_){}
   }
@@ -30784,6 +30786,47 @@ new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 
+<!-- JGB EAM PERSISTENCE GUARD V1: DB 자산은 날짜/새로고침 때문에 숨기지 않음 -->
+<script id="JGB_EAM_PERSISTENCE_GUARD_V1">
+(function(){
+  'use strict';
+  if(window.__JGB_EAM_PERSISTENCE_GUARD_V1)return;
+  window.__JGB_EAM_PERSISTENCE_GUARD_V1=true;
+  const V=x=>String(x??'').trim();
+  const deletedKey='JGB_EAM_DELETED_CODES';
+  function explicitDeleted(){
+    try{
+      const a=JSON.parse(localStorage.getItem(deletedKey)||'[]');
+      return new Set(Array.isArray(a)?a.map(V).filter(Boolean):[]);
+    }catch(_){return new Set()}
+  }
+  /* 이미 DB에 존재하는 자산은 과거 브라우저 삭제목록만으로 숨기지 않는다. */
+  function keepDbAssetsVisible(){
+    const A=Array.isArray(window.__eamA)?window.__eamA:[];
+    if(!A.length)return;
+    const dbCodes=new Set(A.map(x=>V(x?.asset_code||x?.code).toUpperCase()).filter(Boolean));
+    if(!dbCodes.size)return;
+    const gone=explicitDeleted();
+    let changed=false;
+    [...gone].forEach(c=>{if(dbCodes.has(V(c).toUpperCase())){gone.delete(c);changed=true}});
+    if(changed){try{localStorage.setItem(deletedKey,JSON.stringify([...gone]))}catch(_){}
+    }
+  }
+  const oldLoad=window.eamLoad;
+  if(typeof oldLoad==='function'&&!oldLoad.__jgbPersistenceGuard){
+    const wrapped=async function(){
+      const r=await oldLoad.apply(this,arguments);
+      keepDbAssetsVisible();
+      return r;
+    };
+    wrapped.__jgbPersistenceGuard=true;
+    window.eamLoad=wrapped;
+  }
+  /* 명시적 삭제 함수가 아닌 일반 화면 갱신에서는 DB 자산을 삭제목록에 넣지 않는다. */
+  window.jgbEamPersistenceCheck=keepDbAssetsVisible;
+})();
+</script>
+
 </body>
 
 <style id="v19-court-position-final">
@@ -33430,7 +33473,7 @@ function ensureMapIcon(code){
     writeObj(posKey,pos);
   }
   /* 기존 배치도 전용 중복 아이콘은 같은 자산이 등록되는 순간 제거한다. */
-  if(only[c]){delete only[c];writeObj(onlyKey,only)}
+  /* map-only 아이콘은 실제 자산이 생겨도 보존한다. 명시적 삭제에서만 제거한다. */
 }
 window.jgbEamEnsureMapIcon=ensureMapIcon;
 
@@ -34134,17 +34177,11 @@ function bindIcon(code){
   const pos=obj(POS_KEY),only=obj(ONLY_KEY),hidden=obj(HIDDEN_KEY);
   /* 실제 자산은 배치도 위치 저장소의 한 좌표만 가진다. */
   if(!pos[c])pos[c]=[50,50];
-  delete only[c];
+  /* 생성된 map-only 아이콘은 실제 자산 연결 과정에서도 삭제하지 않는다. */
   delete hidden[c];
   put(POS_KEY,pos);put(ONLY_KEY,only);put(HIDDEN_KEY,hidden);
 }
-function cleanupDuplicateOnly(){
-  const A=Array.isArray(window.__eamA)?window.__eamA:[];
-  const codes=new Set(A.map(a=>V(a?.asset_code)).filter(Boolean));
-  const only=obj(ONLY_KEY);let changed=false;
-  Object.keys(only).forEach(c=>{if(codes.has(c)){delete only[c];changed=true}});
-  if(changed)put(ONLY_KEY,only);
-}
+function cleanupDuplicateOnly(){ /* 생성 아이콘 자동 삭제 금지 */ }
 /* 최종 신규등록 함수의 성공 후처리를 한 번 더 보장한다. */
 const oldSubmit=window.submitEamRegister;
 if(typeof oldSubmit==='function'&&!window.__JGB_EAM_V6_SUBMIT_WRAP){
@@ -41049,3 +41086,107 @@ if(typeof oldPerfOpen==='function')window.jgbEam7PerfOpen=function(){oldPerfOpen
 })();
 </script>
 
+
+
+<script id="JGB_EAM_PERSISTENCE_FINAL_V1">
+(function(){
+'use strict';
+if(window.__JGB_EAM_PERSISTENCE_FINAL_V1)return;
+window.__JGB_EAM_PERSISTENCE_FINAL_V1=true;
+const V=x=>String(x??'').trim();
+const ASSET_BACKUP='JGB_EAM_ASSET_BACKUP_V1';
+const MAP_BACKUP='JGB_EAM_MAP_ICON_BACKUP_V1';
+const DEL='JGB_EAM_DELETED_CODES';
+const MAP_DEL='JGB_EAM_DASH_MAP_DELETED_V241';
+function read(k,d){try{const x=JSON.parse(localStorage.getItem(k)||'');return x??d}catch(_){return d}}
+function put(k,x){try{localStorage.setItem(k,JSON.stringify(x))}catch(_){}
+}
+function deleted(){return new Set((Array.isArray(read(DEL,[]))?read(DEL,[]):[]).map(x=>V(x).toUpperCase()).filter(Boolean))}
+function mapDeleted(){return new Set((Array.isArray(read(MAP_DEL,[]))?read(MAP_DEL,[]):[]).map(x=>V(x).toUpperCase()).filter(Boolean))}
+function cleanRow(x){
+  if(!x||!V(x.asset_code))return null;
+  const y=Object.assign({},x);
+  delete y.id; delete y.created_at; delete y.updated_at;
+  return y;
+}
+async function db(){
+  try{if(window.SUPA)return window.SUPA}catch(_){}
+  return null;
+}
+async function recoverAssets(){
+  const dbx=await db(); if(!dbx)return;
+  try{
+    const r=await dbx.from('assets').select('*');
+    if(r.error)throw r.error;
+    const rows=Array.isArray(r.data)?r.data:[];
+    const existing=new Set(rows.map(x=>V(x?.asset_code).toUpperCase()).filter(Boolean));
+    const gone=deleted();
+    const backup=Array.isArray(read(ASSET_BACKUP,[]))?read(ASSET_BACKUP,[]):[];
+    const missing=backup.map(cleanRow).filter(Boolean).filter(x=>!existing.has(V(x.asset_code).toUpperCase())&&!gone.has(V(x.asset_code).toUpperCase()));
+    if(missing.length){
+      const ins=await dbx.from('assets').insert(missing);
+      if(ins.error){
+        /* 한 건씩 복구하여 특정 행 하나 때문에 전체 복구가 실패하지 않게 한다. */
+        for(const row of missing){
+          try{await dbx.from('assets').insert(row)}catch(_){}
+        }
+      }
+    }
+  }catch(e){console.warn('EAM 자산 보존/복구 실패',e)}
+}
+function backupAssets(){
+  try{
+    const A=Array.isArray(window.__eamA)?window.__eamA:[];
+    const gone=deleted();
+    const old=Array.isArray(read(ASSET_BACKUP,[]))?read(ASSET_BACKUP,[]):[];
+    const by=new Map();
+    old.forEach(x=>{const c=V(x?.asset_code).toUpperCase();if(c&&!gone.has(c))by.set(c,x)});
+    A.forEach(x=>{const y=cleanRow(x);if(!y)return;const c=V(y.asset_code).toUpperCase();if(!gone.has(c))by.set(c,y)});
+    put(ASSET_BACKUP,[...by.values()]);
+  }catch(_){}
+}
+function backupMap(){
+  try{
+    const keys=['JGB_EAM_HYUNHWANG_MAP_V1','JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1','JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1'];
+    const gone=deleted(), mapgone=mapDeleted(), out={};
+    keys.forEach(k=>out[k]=read(k,{}));
+    [out.JGB_EAM_HYUNHWANG_MAP_V1,out.JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1,out.JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1].forEach(o=>{
+      Object.keys(o||{}).forEach(c=>{if(gone.has(V(c).toUpperCase())||mapgone.has(V(c).toUpperCase()))delete o[c]});
+    });
+    put(MAP_BACKUP,out);
+  }catch(_){}
+}
+function restoreMap(){
+  try{
+    const b=read(MAP_BACKUP,null);if(!b)return;
+    const gone=deleted(),mapgone=mapDeleted();
+    ['JGB_EAM_HYUNHWANG_MAP_V1','JGB_EAM_HYUNHWANG_MAP_ONLY_ICONS_V1','JGB_EAM_HYUNHWANG_MAP_HIDDEN_ICONS_V1'].forEach(k=>{
+      const cur=read(k,{}), src=b[k]||{};
+      Object.keys(src).forEach(c=>{const u=V(c).toUpperCase();if(!gone.has(u)&&!mapgone.has(u)&&!Object.prototype.hasOwnProperty.call(cur,c))cur[c]=src[c]});
+      put(k,cur);
+    });
+  }catch(_){}
+}
+async function protect(){
+  await recoverAssets();
+  try{if(typeof window.eamLoad==='function'&&!window.__JGB_EAM_LOAD_WRAPPED){
+    const old=window.eamLoad; window.__JGB_EAM_LOAD_WRAPPED=true;
+    window.eamLoad=async function(){
+      await recoverAssets();
+      const r=await old.apply(this,arguments);
+      backupAssets(); backupMap();
+      return r;
+    };
+  }}catch(_){}
+  restoreMap(); backupAssets(); backupMap();
+  try{if(typeof window.render==='function'&&!window.__JGB_EAM_RENDER_WRAPPED){
+    const oldR=window.render;window.__JGB_EAM_RENDER_WRAPPED=true;
+    window.render=function(){const r=oldR.apply(this,arguments);setTimeout(()=>{backupAssets();backupMap()},50);return r};
+  }}catch(_){}
+  try{if(typeof window.render==='function')window.render()}catch(_){}
+}
+setTimeout(protect,1500);
+setTimeout(protect,5000);
+window.addEventListener('load',()=>setTimeout(protect,500));
+})();
+</script>
