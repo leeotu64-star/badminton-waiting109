@@ -33769,26 +33769,55 @@ async function deleteAssetByCode(c){
   const db=await getDb();
   if(!db)throw new Error('Supabase 연결에 실패했습니다.');
 
-  /* 핵심: 이름/종류가 비슷한 다른 자산은 절대 건드리지 않고
-     선택한 asset_code의 행만 실제 assets에서 삭제한다. */
+  /* 선택한 asset_code에 해당하는 실제 assets 행만 찾는다. */
   const q=await db.from('assets').select('id,asset_code').eq('asset_code',c);
   if(q.error)throw q.error;
   const rows=Array.isArray(q.data)?q.data:[];
   const ids=rows.map(x=>x?.id).filter(Boolean);
+  if(!ids.length)throw new Error(`assets에 ${c} 자산이 없습니다.`);
 
+  /*
+     삭제 순서를 안전하게 통일한다.
+     1) 먼저 assets 삭제를 시도한다. DB의 FK가 ON DELETE CASCADE라면 이것만으로 관련 이력도 같이 정리된다.
+     2) FK가 자식 이력 때문에 막히는 DB라면 자식 테이블을 정리한 뒤 assets 삭제를 다시 시도한다.
+     이렇게 해야 기존 데이터에서도 '첫 번째 이력 삭제 오류 때문에 assets 삭제까지 못 가는' 문제가 생기지 않는다.
+  */
+  const firstDeleteErrors=[];
+  let allDeleted=true;
   for(const id of ids){
-    let r=await db.from('asset_history').delete().eq('asset_id',id);
-    if(r.error)throw r.error;
-    try{
-      r=await db.from('inspections').delete().eq('asset_id',id);
-      if(r.error&&!/does not exist|relation|not found/i.test(r.error.message||''))throw r.error;
-    }catch(e){if(!/does not exist|relation|not found/i.test(e?.message||''))throw e}
-    try{
-      r=await db.from('external_work').delete().eq('asset_id',id);
-      if(r.error&&!/does not exist|relation|column|not found/i.test(r.error.message||''))throw r.error;
-    }catch(e){if(!/does not exist|relation|column|not found/i.test(e?.message||''))throw e}
-    r=await db.from('assets').delete().eq('id',id);
-    if(r.error)throw r.error;
+    const r=await db.from('assets').delete().eq('id',id);
+    if(r.error){firstDeleteErrors.push(r.error);allDeleted=false;}
+  }
+
+  if(!allDeleted){
+    const childErrors=[];
+    for(const id of ids){
+      try{
+        let r=await db.from('asset_history').delete().eq('asset_id',id);
+        if(r.error)childErrors.push(r.error);
+      }catch(e){childErrors.push(e)}
+      try{
+        let r=await db.from('inspections').delete().eq('asset_id',id);
+        if(r.error&&!/does not exist|relation|not found|schema cache/i.test(r.error.message||''))childErrors.push(r.error);
+      }catch(e){if(!/does not exist|relation|not found|schema cache/i.test(e?.message||''))childErrors.push(e)}
+      try{
+        let r=await db.from('external_work').delete().eq('asset_id',id);
+        if(r.error&&!/does not exist|relation|column|not found|schema cache/i.test(r.error.message||''))childErrors.push(r.error);
+      }catch(e){if(!/does not exist|relation|column|not found|schema cache/i.test(e?.message||''))childErrors.push(e)}
+    }
+
+    /* 자식 이력 정리 후 실제 assets 삭제를 다시 시도한다. */
+    const retryErrors=[];
+    for(const id of ids){
+      const r=await db.from('assets').delete().eq('id',id);
+      if(r.error)retryErrors.push(r.error);
+    }
+    if(retryErrors.length){
+      const firstMsg=firstDeleteErrors[0]?.message||firstDeleteErrors[0]||'';
+      const childMsg=childErrors[0]?.message||childErrors[0]||'';
+      const retryMsg=retryErrors[0]?.message||retryErrors[0]||'';
+      throw new Error(`assets 삭제에 실패했습니다.\n처음 오류: ${firstMsg}\n이력 정리 오류: ${childMsg}\n재삭제 오류: ${retryMsg}`);
+    }
   }
 
   /* 삭제 성공 후에만 로컬 표시정보를 정리한다. */
